@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfileOverlay : OsuTestScene
     {
+        protected override bool RequiresAPIAccess => true;
+
         private readonly TestUserProfileOverlay profile;
 
         [Resolved]

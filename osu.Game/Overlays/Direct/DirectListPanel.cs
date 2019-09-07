@@ -129,6 +129,7 @@ namespace osu.Game.Overlays.Direct
                                                     AutoSizeAxes = Axes.X,
                                                     Height = 20,
                                                     Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
+                                                    Spacing = new Vector2(3),
                                                     Children = GetDifficultyIcons(colours),
                                                 },
                                             },

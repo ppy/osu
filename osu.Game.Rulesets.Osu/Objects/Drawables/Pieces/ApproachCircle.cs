@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private class SkinnableApproachCircle : SkinnableSprite
         {
             public SkinnableApproachCircle()
-                : base(new OsuSkinComponent(OsuSkinComponents.ApproachCircle))
+                : base("Gameplay/osu/approachcircle")
             {
             }
 

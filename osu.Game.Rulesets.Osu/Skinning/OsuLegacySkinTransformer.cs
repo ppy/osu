@@ -3,20 +3,18 @@
 
 using System;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public class OsuLegacySkin : ISkin
+    public class OsuLegacySkinTransformer : ISkin
     {
         private readonly ISkin source;
-
-        private Lazy<SkinConfiguration> configuration;
 
         private Lazy<bool> hasHitCircle;
 
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         /// </summary>
         private const float legacy_circle_radius = 64 - 5;
 
-        public OsuLegacySkin(ISkinSource source)
+        public OsuLegacySkinTransformer(ISkinSource source)
         {
             this.source = source;
 
@@ -37,21 +35,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private void sourceChanged()
         {
-            // these need to be lazy in order to ensure they aren't called before the dependencies have been loaded into our source.
-            configuration = new Lazy<SkinConfiguration>(() =>
-            {
-                var config = new SkinConfiguration();
-                if (hasHitCircle.Value)
-                    config.SliderPathRadius = legacy_circle_radius;
-
-                // defaults should only be applied for non-beatmap skins (which are parsed via this constructor).
-                config.CustomColours["SliderBall"] =
-                    source.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.TryGetValue("SliderBall", out var val) ? val : (Color4?)null)
-                    ?? new Color4(2, 170, 255, 255);
-
-                return config;
-            });
-
             hasHitCircle = new Lazy<bool>(() => source.GetTexture("hitcircle") != null);
         }
 
@@ -96,8 +79,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return null;
 
                 case OsuSkinComponents.HitCircleText:
-                    string font = GetValue<SkinConfiguration, string>(config => config.HitCircleFont);
-                    var overlap = GetValue<SkinConfiguration, float>(config => config.HitCircleOverlap);
+                    var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCircleFont)?.Value ?? "default";
+                    var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? 0;
 
                     return !hasFont(font)
                         ? null
@@ -116,13 +99,27 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         public SampleChannel GetSample(ISampleInfo sample) => source.GetSample(sample);
 
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
         {
-            TValue val;
-            if (configuration.Value is TConfiguration conf && (val = query.Invoke(conf)) != null)
-                return val;
+            switch (lookup)
+            {
+                case OsuSkinColour colour:
+                    return source.GetConfig<SkinCustomColourLookup, TValue>(new SkinCustomColourLookup(colour));
 
-            return source.GetValue(query);
+                case OsuSkinConfiguration osuLookup:
+                    switch (osuLookup)
+                    {
+                        case OsuSkinConfiguration.SliderPathRadius:
+                            if (hasHitCircle.Value)
+                                return SkinUtils.As<TValue>(new BindableFloat(legacy_circle_radius));
+
+                            break;
+                    }
+
+                    break;
+            }
+
+            return source.GetConfig<TLookup, TValue>(lookup);
         }
 
         private bool hasFont(string fontName) => source.GetTexture($"{fontName}-0") != null;
