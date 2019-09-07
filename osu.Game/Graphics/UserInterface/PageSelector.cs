@@ -59,11 +59,25 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            CurrentPage.BindValueChanged(page => redraw(page.NewValue), true);
+            CurrentPage.BindValueChanged(_ => redraw(), true);
         }
 
-        private void redraw(int newPage)
+        private void redraw()
         {
+            if (CurrentPage.Value > maxPages)
+            {
+                CurrentPage.Value = maxPages;
+                return;
+            }
+
+            if (CurrentPage.Value < 1)
+            {
+                CurrentPage.Value = 1;
+                return;
+            }
+
+            int newPage = CurrentPage.Value;
+
             previousPageButton.Enabled.Value = newPage != 1;
             nextPageButton.Enabled.Value = newPage != maxPages;
 
