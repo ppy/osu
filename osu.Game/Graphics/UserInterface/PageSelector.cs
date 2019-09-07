@@ -7,12 +7,12 @@ using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Framework.Extensions.Color4Extensions;
 using System;
 using osuTK;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -21,7 +21,7 @@ namespace osu.Game.Graphics.UserInterface
         public readonly BindableInt CurrentPage = new BindableInt(1);
 
         private readonly int maxPages;
-        private readonly FillFlowContainer pillsFlow;
+        private readonly FillFlowContainer itemsFlow;
 
         private readonly Button previousPageButton;
         private readonly Button nextPageButton;
@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         Action = () => CurrentPage.Value -= 1,
                     },
-                    pillsFlow = new FillFlowContainer
+                    itemsFlow = new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
@@ -66,7 +66,7 @@ namespace osu.Game.Graphics.UserInterface
             previousPageButton.Enabled.Value = newPage != 1;
             nextPageButton.Enabled.Value = newPage != maxPages;
 
-            pillsFlow.Clear();
+            itemsFlow.Clear();
 
             if (newPage > 3)
                 addDrawablePage(1);
@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
             for (int i = Math.Max(newPage - 2, 1); i <= Math.Min(newPage + 2, maxPages); i++)
             {
                 if (i == newPage)
-                    addCurrentPagePill();
+                    addDrawableCurrentPage();
                 else
                     addDrawablePage(i);
             }
@@ -89,137 +89,101 @@ namespace osu.Game.Graphics.UserInterface
                 addDrawablePage(maxPages);
         }
 
-        private void addDrawablePage(int page)
+        private void addDrawablePage(int page) => itemsFlow.Add(new DrawablePage(page.ToString())
         {
-            pillsFlow.Add(new Page(page.ToString(), () => CurrentPage.Value = page));
-        }
+            Action = () => CurrentPage.Value = page,
+        });
 
-        private void addPlaceholder()
-        {
-            pillsFlow.Add(new Placeholder());
-        }
+        private void addPlaceholder() => itemsFlow.Add(new Placeholder());
 
-        private void addCurrentPagePill()
-        {
-            pillsFlow.Add(new SelectedPage(CurrentPage.Value.ToString()));
-        }
+        private void addDrawableCurrentPage() => itemsFlow.Add(new SelectedPage(CurrentPage.Value.ToString()));
 
-        private abstract class DrawablePage : CompositeDrawable
+        private abstract class PageItem : OsuHoverContainer
         {
-            private const int height = 20;
             private const int margin = 8;
+            private const int height = 20;
 
-            protected readonly string Text;
-            protected readonly Drawable Content;
-
-            protected DrawablePage(string text)
+            protected PageItem(string text)
             {
-                Text = text;
-
                 AutoSizeAxes = Axes.X;
                 Height = height;
 
+                var contentContainer = new CircularContainer
+                {
+                    AutoSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Y,
+                    Masking = true,
+                };
+
                 var background = CreateBackground();
-
                 if (background != null)
-                    AddInternal(background);
+                    contentContainer.Add(background);
 
-                Content = CreateContent();
-                Content.Margin = new MarginPadding { Horizontal = margin };
+                var drawableText = CreateText(text);
+                if (drawableText != null)
+                {
+                    drawableText.Margin = new MarginPadding { Horizontal = margin };
+                    contentContainer.Add(drawableText);
+                }
 
-                AddInternal(Content);
+                Add(contentContainer);
             }
 
-            protected abstract Drawable CreateContent();
+            protected abstract Drawable CreateText(string text);
 
-            protected virtual Drawable CreateBackground() => null;
+            protected abstract Drawable CreateBackground();
         }
 
-        private abstract class ActivatedDrawablePage : DrawablePage
+        private class DrawablePage : PageItem
         {
-            protected readonly Action Action;
+            protected SpriteText SpriteText;
 
-            public ActivatedDrawablePage(string text, Action action = null)
+            protected override IEnumerable<Drawable> EffectTargets => new[] { SpriteText };
+
+            public DrawablePage(string text)
                 : base(text)
             {
-                Action = action;
             }
 
-            protected override bool OnClick(ClickEvent e)
+            protected override Drawable CreateBackground() => null;
+
+            protected override Drawable CreateText(string text) => SpriteText = new SpriteText
             {
-                Action?.Invoke();
-                return base.OnClick(e);
-            }
-        }
-
-        private class Page : ActivatedDrawablePage
-        {
-            private OsuColour colours;
-
-            public Page(string text, Action action)
-                : base(text, action)
-            {
-            }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = text,
+            };
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                this.colours = colours;
-                Content.Colour = colours.Seafoam;
+                IdleColour = colours.Seafoam;
+                HoverColour = colours.Seafoam.Lighten(30f);
             }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                Content.Colour = colours.Seafoam.Lighten(30f);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                Content.Colour = colours.Seafoam;
-                base.OnHoverLost(e);
-            }
-
-            protected override Drawable CreateContent() => new SpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = Text
-            };
         }
 
         private class SelectedPage : DrawablePage
         {
             private Box background;
 
+            protected override IEnumerable<Drawable> EffectTargets => null;
+
             public SelectedPage(string text)
                 : base(text)
             {
             }
 
+            protected override Drawable CreateBackground() => background = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Content.Colour = colours.GreySeafoam;
                 background.Colour = colours.Seafoam;
+                SpriteText.Colour = colours.GreySeafoamDark;
             }
-
-            protected override Drawable CreateContent() => new SpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = Text
-            };
-
-            protected override Drawable CreateBackground() => new CircularContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Masking = true,
-                Child = background = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
-            };
         }
 
         private class Placeholder : DrawablePage
@@ -228,79 +192,28 @@ namespace osu.Game.Graphics.UserInterface
                 : base("...")
             {
             }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Content.Colour = colours.Seafoam;
-            }
-
-            protected override Drawable CreateContent() => new SpriteText
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = Text
-            };
         }
 
-        private class Button : OsuHoverContainer
+        private class Button : PageItem
         {
-            private const int height = 20;
-            private const int margin = 8;
-
-            private readonly Anchor alignment;
-            private readonly Box background;
+            private Box background;
+            private FillFlowContainer textContainer;
+            private SpriteIcon icon;
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
             public Button(bool rightAligned, string text)
+                : base(text)
             {
-                alignment = rightAligned ? Anchor.x0 : Anchor.x2;
+                var alignment = rightAligned ? Anchor.x0 : Anchor.x2;
 
-                AutoSizeAxes = Axes.X;
-                Height = height;
-
-                Child = new CircularContainer
+                textContainer.ForEach(drawable =>
                 {
-                    AutoSizeAxes = Axes.X,
-                    RelativeSizeAxes = Axes.Y,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        background = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new Container
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Child = new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Horizontal = margin },
-                                Direction = FillDirection.Horizontal,
-                                Children = new Drawable[]
-                                {
-                                    new SpriteText
-                                    {
-                                        Anchor = Anchor.y1 | alignment,
-                                        Origin = Anchor.y1 | alignment,
-                                        Text = text.ToUpper(),
-                                    },
-                                    new SpriteIcon
-                                    {
-                                        Anchor = Anchor.y1 | alignment,
-                                        Origin = Anchor.y1 | alignment,
-                                        Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronLeft : FontAwesome.Solid.ChevronRight,
-                                        Size = new Vector2(10),
-                                    },
-                                }
-                            }
-                        }
-                    }
-                };
+                    drawable.Anchor = Anchor.y1 | alignment;
+                    drawable.Origin = Anchor.y1 | alignment;
+                });
+
+                icon.Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronLeft : FontAwesome.Solid.ChevronRight;
             }
 
             [BackgroundDependencyLoader]
@@ -309,6 +222,28 @@ namespace osu.Game.Graphics.UserInterface
                 IdleColour = colours.GreySeafoamDark;
                 HoverColour = colours.GrayA;
             }
+
+            protected override Drawable CreateBackground() => background = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            protected override Drawable CreateText(string text) => textContainer = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                Children = new Drawable[]
+                {
+                    new SpriteText
+                    {
+                        Text = text.ToUpper(),
+                    },
+                    icon = new SpriteIcon
+                    {
+                        Size = new Vector2(10),
+                    },
+                }
+            };
         }
     }
 }
