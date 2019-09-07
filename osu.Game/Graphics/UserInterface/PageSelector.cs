@@ -13,6 +13,7 @@ using osuTK;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -100,38 +101,47 @@ namespace osu.Game.Graphics.UserInterface
 
         private abstract class PageItem : OsuHoverContainer
         {
-            private const int margin = 8;
+            private const int margin = 10;
             private const int height = 20;
+
+            protected override Container<Drawable> Content => contentContainer;
+
+            private readonly CircularContainer contentContainer;
 
             protected PageItem(string text)
             {
                 AutoSizeAxes = Axes.X;
                 Height = height;
 
-                var contentContainer = new CircularContainer
+                base.Content.Add(contentContainer = new CircularContainer
                 {
                     AutoSizeAxes = Axes.X,
                     RelativeSizeAxes = Axes.Y,
                     Masking = true,
-                };
+                });
 
                 var background = CreateBackground();
                 if (background != null)
-                    contentContainer.Add(background);
+                    Add(background);
 
                 var drawableText = CreateText(text);
                 if (drawableText != null)
                 {
                     drawableText.Margin = new MarginPadding { Horizontal = margin };
-                    contentContainer.Add(drawableText);
+                    Add(drawableText);
                 }
+            }
 
-                Add(contentContainer);
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                IdleColour = colours.Seafoam;
+                HoverColour = colours.Seafoam.Lighten(30f);
             }
 
             protected abstract Drawable CreateText(string text);
 
-            protected abstract Drawable CreateBackground();
+            protected virtual Drawable CreateBackground() => null;
         }
 
         private class DrawablePage : PageItem
@@ -145,28 +155,20 @@ namespace osu.Game.Graphics.UserInterface
             {
             }
 
-            protected override Drawable CreateBackground() => null;
-
             protected override Drawable CreateText(string text) => SpriteText = new SpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = text,
+                Font = OsuFont.GetFont(size: 12),
             };
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IdleColour = colours.Seafoam;
-                HoverColour = colours.Seafoam.Lighten(30f);
-            }
         }
 
         private class SelectedPage : DrawablePage
         {
             private Box background;
 
-            protected override IEnumerable<Drawable> EffectTargets => null;
+            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
             public SelectedPage(string text)
                 : base(text)
@@ -181,7 +183,6 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                background.Colour = colours.Seafoam;
                 SpriteText.Colour = colours.GreySeafoamDark;
             }
         }
@@ -196,11 +197,14 @@ namespace osu.Game.Graphics.UserInterface
 
         private class Button : PageItem
         {
+            private const int duration = 100;
+
             private Box background;
             private FillFlowContainer textContainer;
             private SpriteIcon icon;
+            private readonly Box fadeBox;
 
-            protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+            protected override IEnumerable<Drawable> EffectTargets => new[] { textContainer };
 
             public Button(bool rightAligned, string text)
                 : base(text)
@@ -214,13 +218,29 @@ namespace osu.Game.Graphics.UserInterface
                 });
 
                 icon.Icon = alignment == Anchor.x2 ? FontAwesome.Solid.ChevronLeft : FontAwesome.Solid.ChevronRight;
+
+                Add(fadeBox = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black.Opacity(100)
+                });
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                IdleColour = colours.GreySeafoamDark;
-                HoverColour = colours.GrayA;
+                background.Colour = colours.GreySeafoamDark;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Enabled.BindValueChanged(onEnabledChanged, true);
+            }
+
+            private void onEnabledChanged(ValueChangedEvent<bool> enabled)
+            {
+                fadeBox.FadeTo(enabled.NewValue ? 0 : 1, duration);
             }
 
             protected override Drawable CreateBackground() => background = new Box
@@ -231,16 +251,19 @@ namespace osu.Game.Graphics.UserInterface
             protected override Drawable CreateText(string text) => textContainer = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
                     new SpriteText
                     {
                         Text = text.ToUpper(),
+                        Font = OsuFont.GetFont(size: 12),
                     },
                     icon = new SpriteIcon
                     {
-                        Size = new Vector2(10),
+                        Size = new Vector2(8),
                     },
                 }
             };
