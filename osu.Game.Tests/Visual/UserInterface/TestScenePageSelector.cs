@@ -22,6 +22,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
+
+            AddStep("1 max pages", () => redraw(1));
+            AddStep("10 max pages", () => redraw(10));
+            AddStep("200 max pages, current 199", () => redraw(200, 199));
+            AddStep("200 max pages, current 201", () => redraw(200, 201));
+            AddStep("200 max pages, current -10", () => redraw(200, -10));
+        }
+
+        private void redraw(int maxPages, int currentPage = 0)
+        {
+            Clear();
+
+            var selector = new PageSelector(maxPages)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            };
+
+            if (currentPage != 0)
+                selector.CurrentPage.Value = currentPage;
+
+            Add(selector);
         }
     }
 }
