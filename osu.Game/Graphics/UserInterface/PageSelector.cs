@@ -58,34 +58,34 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            CurrentPage.BindValueChanged(_ => redraw(), true);
+            CurrentPage.BindValueChanged(page => redraw(page.NewValue), true);
         }
 
-        private void redraw()
+        private void redraw(int newPage)
         {
-            previousPageButton.Enabled.Value = CurrentPage.Value != 1;
-            nextPageButton.Enabled.Value = CurrentPage.Value != maxPages;
+            previousPageButton.Enabled.Value = newPage != 1;
+            nextPageButton.Enabled.Value = newPage != maxPages;
 
             pillsFlow.Clear();
 
-            if (CurrentPage.Value > 3)
+            if (newPage > 3)
                 addDrawablePage(1);
 
-            if (CurrentPage.Value > 4)
+            if (newPage > 4)
                 addPlaceholder();
 
-            for (int i = Math.Max(CurrentPage.Value - 2, 1); i <= Math.Min(CurrentPage.Value + 2, maxPages); i++)
+            for (int i = Math.Max(newPage - 2, 1); i <= Math.Min(newPage + 2, maxPages); i++)
             {
-                if (i == CurrentPage.Value)
+                if (i == newPage)
                     addCurrentPagePill();
                 else
                     addDrawablePage(i);
             }
 
-            if (CurrentPage.Value + 2 < maxPages - 1)
+            if (newPage + 2 < maxPages - 1)
                 addPlaceholder();
 
-            if (CurrentPage.Value + 2 < maxPages)
+            if (newPage + 2 < maxPages)
                 addDrawablePage(maxPages);
         }
 
