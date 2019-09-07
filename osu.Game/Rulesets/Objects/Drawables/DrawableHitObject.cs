@@ -153,6 +153,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (UseTransformStateManagement)
             {
+                lifetimeStart = null;
+                LifetimeEnd = double.MaxValue;
+
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
                 base.ApplyTransformsAt(transformTime, true);
