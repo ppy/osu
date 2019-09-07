@@ -5,11 +5,14 @@ using System;
 using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
@@ -27,7 +30,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("setup layout larger source", () =>
             {
-                Child = new LocalSkinOverrideContainer(new SizedSource(50))
+                Child = new SkinProvidingContainer(new SizedSource(50))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer<ExposedSkinnableDrawable>
@@ -59,7 +62,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("setup layout larger source", () =>
             {
-                Child = new LocalSkinOverrideContainer(new SizedSource(30))
+                Child = new SkinProvidingContainer(new SizedSource(30))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = fill = new FillFlowContainer<ExposedSkinnableDrawable>
@@ -95,7 +98,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new SkinSourceContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = new LocalSkinOverrideContainer(secondarySource)
+                    Child = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)
@@ -120,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Child = new SkinSourceContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = target = new LocalSkinOverrideContainer(secondarySource)
+                    Child = target = new SkinProvidingContainer(secondarySource)
                     {
                         RelativeSizeAxes = Axes.Both,
                     }
@@ -132,12 +135,55 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("skinchanged only called once", () => consumer.SkinChangedCount == 1);
         }
 
+        [Test]
+        public void TestSwitchOff()
+        {
+            SkinConsumer consumer = null;
+            SwitchableSkinProvidingContainer target = null;
+
+            AddStep("setup layout", () =>
+            {
+                Child = new SkinSourceContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = target = new SwitchableSkinProvidingContainer(new SecondarySource())
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                };
+            });
+
+            AddStep("add permissive", () => target.Add(consumer = new SkinConsumer("test", name => new NamedBox("Default Implementation"), source => true)));
+            AddAssert("consumer using override source", () => consumer.Drawable is SecondarySourceBox);
+            AddStep("disable", () => target.Disable());
+            AddAssert("consumer using base source", () => consumer.Drawable is BaseSourceBox);
+        }
+
+        private class SwitchableSkinProvidingContainer : SkinProvidingContainer
+        {
+            private bool allow = true;
+
+            protected override bool AllowDrawableLookup(ISkinComponent component) => allow;
+
+            public void Disable()
+            {
+                allow = false;
+                TriggerSourceChanged();
+            }
+
+            public SwitchableSkinProvidingContainer(ISkin skin)
+                : base(skin)
+            {
+            }
+        }
+
         private class ExposedSkinnableDrawable : SkinnableDrawable
         {
             public new Drawable Drawable => base.Drawable;
 
-            public ExposedSkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
-                : base(name, defaultImplementation, allowFallback, confineMode)
+            public ExposedSkinnableDrawable(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null,
+                                            ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+                : base(new TestSkinComponent(name), defaultImplementation, allowFallback, confineMode)
             {
             }
         }
@@ -205,8 +251,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new Drawable Drawable => base.Drawable;
             public int SkinChangedCount { get; private set; }
 
-            public SkinConsumer(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null)
-                : base(name, defaultImplementation, allowFallback)
+            public SkinConsumer(string name, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null)
+                : base(new TestSkinComponent(name), defaultImplementation, allowFallback)
             {
             }
 
@@ -242,8 +288,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 this.size = size;
             }
 
-            public Drawable GetDrawableComponent(string componentName) =>
-                componentName == "available"
+            public Drawable GetDrawableComponent(ISkinComponent componentName) =>
+                componentName.LookupName == "available"
                     ? new DrawWidthBox
                     {
                         Colour = Color4.Yellow,
@@ -253,31 +299,48 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
 
         private class SecondarySource : ISkin
         {
-            public Drawable GetDrawableComponent(string componentName) => new SecondarySourceBox();
+            public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
 
-        private class SkinSourceContainer : Container, ISkin
+        [Cached(typeof(ISkinSource))]
+        private class SkinSourceContainer : Container, ISkinSource
         {
-            public Drawable GetDrawableComponent(string componentName) => new BaseSourceBox();
+            public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
 
-            public SampleChannel GetSample(string sampleName) => throw new NotImplementedException();
+            public SampleChannel GetSample(ISampleInfo sampleInfo) => throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
+
+            public event Action SourceChanged;
+        }
+
+        private class TestSkinComponent : ISkinComponent
+        {
+            private readonly string name;
+
+            public TestSkinComponent(string name)
+            {
+                this.name = name;
+            }
+
+            public string ComponentGroup => string.Empty;
+
+            public string LookupName => name;
         }
     }
 }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -24,6 +25,11 @@ namespace osu.Game.Tests.Visual.UserInterface
     public class TestSceneBeatSyncedContainer : OsuTestScene
     {
         private readonly NowPlayingOverlay np;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(BeatSyncedContainer)
+        };
 
         [Cached]
         private MusicController musicController = new MusicController();
@@ -154,7 +160,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                 if (timingPoints[timingPoints.Count - 1] == current)
                     return current;
 
-                return timingPoints[timingPoints.IndexOf(current) + 1];
+                int index = timingPoints.IndexOf(current); // -1 means that this is a "default beat"
+
+                return index == -1 ? current : timingPoints[index + 1];
             }
 
             private int calculateBeatCount(TimingControlPoint current)

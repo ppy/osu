@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Edit
     {
         public new IScrollingInfo ScrollingInfo => base.ScrollingInfo;
 
-        public DrawableManiaEditRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableManiaEditRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class DrawableOsuEditRuleset : DrawableOsuRuleset
     {
-        public DrawableOsuEditRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuEditRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
