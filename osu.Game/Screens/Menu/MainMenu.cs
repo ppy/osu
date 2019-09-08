@@ -135,10 +135,10 @@ namespace osu.Game.Screens.Menu
                     track.Seek(metadata.PreviewTime != -1 ? metadata.PreviewTime : 0.4f * track.Length);
                     track.Start();
                 }
-
-                if (api?.State == APIState.Offline)
-                    login?.ToggleVisibility();
             }
+
+            if (last is IntroScreen && api?.State == APIState.Offline)
+                login?.ToggleVisibility();
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
