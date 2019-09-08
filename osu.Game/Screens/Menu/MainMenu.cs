@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            if (last is IntroScreen && api?.State == APIState.Offline)
+            if (last is IntroScreen && api.State == APIState.Offline)
                 login?.ToggleVisibility();
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
