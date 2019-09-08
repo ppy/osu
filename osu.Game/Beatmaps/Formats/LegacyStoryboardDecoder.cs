@@ -31,6 +31,13 @@ namespace osu.Game.Beatmaps.Formats
             // note that this isn't completely correct
             AddDecoder<Storyboard>(@"osu file format v", m => new LegacyStoryboardDecoder());
             AddDecoder<Storyboard>(@"[Events]", m => new LegacyStoryboardDecoder());
+            SetFallbackDecoder<Storyboard>(line =>
+            {
+                var decoder = new LegacyStoryboardDecoder();
+                // it's possible that the first line was a section header - make sure it is parsed
+                decoder.ParseLine(line);
+                return decoder;
+            });
         }
 
         protected override void ParseStream(StreamReader stream)
