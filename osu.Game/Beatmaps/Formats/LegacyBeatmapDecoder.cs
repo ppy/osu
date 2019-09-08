@@ -60,11 +60,11 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal);
 
-        protected override void ParseLine(Beatmap beatmap, Section section, string line)
+        protected override void ParseSectionLine(Beatmap beatmap, string line)
         {
             var strippedLine = StripComments(line);
 
-            switch (section)
+            switch (ConfigSection)
             {
                 case Section.General:
                     handleGeneral(strippedLine);
@@ -95,7 +95,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
 
-            base.ParseLine(beatmap, section, line);
+            base.ParseSectionLine(beatmap, line);
         }
 
         private void handleGeneral(string line)

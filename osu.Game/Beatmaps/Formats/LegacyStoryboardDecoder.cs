@@ -45,11 +45,11 @@ namespace osu.Game.Beatmaps.Formats
                 layer.Elements = layer.Elements.OrderBy(h => h.StartTime).ToList();
         }
 
-        protected override void ParseLine(Storyboard storyboard, Section section, string line)
+        protected override void ParseSectionLine(Storyboard storyboard, string line)
         {
             line = StripComments(line);
 
-            switch (section)
+            switch (ConfigSection)
             {
                 case Section.Events:
                     handleEvents(line);
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
 
-            base.ParseLine(storyboard, section, line);
+            base.ParseSectionLine(storyboard, line);
         }
 
         private void handleEvents(string line)

@@ -15,6 +15,7 @@ namespace osu.Game.Beatmaps.Formats
         where T : new()
     {
         protected readonly int FormatVersion;
+        protected Section ConfigSection => configSection;
 
         protected LegacyDecoder(int version)
         {
@@ -23,44 +24,47 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseStreamInto(StreamReader stream, T output)
         {
-            Section section = Section.None;
+            configSection = Section.None;
 
             string line;
 
             while ((line = stream.ReadLine()) != null)
+                ParseLine(output, line);
+        }
+
+        protected void ParseLine(T output, string line)
+        {
+            if (ShouldSkipLine(line))
+                return;
+
+            if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
             {
-                if (ShouldSkipLine(line))
-                    continue;
+                if (Enum.TryParse(line.Substring(1, line.Length - 2), out configSection))
+                    return;
 
-                if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
-                {
-                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
-                    {
-                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
-                        section = Section.None;
-                    }
+                Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
+                configSection = Section.None;
 
-                    continue;
-                }
+                return;
+            }
 
-                try
-                {
-                    ParseLine(output, section, line);
-                }
-                catch (Exception e)
-                {
-                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
-                }
+            try
+            {
+                ParseSectionLine(output, line);
+            }
+            catch (Exception e)
+            {
+                Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
             }
         }
 
         protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
-        protected virtual void ParseLine(T output, Section section, string line)
+        protected virtual void ParseSectionLine(T output, string line)
         {
             line = StripComments(line);
 
-            switch (section)
+            switch (ConfigSection)
             {
                 case Section.Colours:
                     handleColours(output, line);
@@ -77,6 +81,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
+        private Section configSection;
         private bool hasComboColours;
 
         private void handleColours(T output, string line)

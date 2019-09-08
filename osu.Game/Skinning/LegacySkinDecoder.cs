@@ -12,15 +12,15 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
+        protected override void ParseSectionLine(DefaultSkinConfiguration skin, string line)
         {
-            if (section != Section.Colours)
+            if (ConfigSection != Section.Colours)
             {
                 line = StripComments(line);
 
                 var pair = SplitKeyVal(line);
 
-                switch (section)
+                switch (ConfigSection)
                 {
                     case Section.General:
                         switch (pair.Key)
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
                     skin.ConfigDictionary[pair.Key] = pair.Value;
             }
 
-            base.ParseLine(skin, section, line);
+            base.ParseSectionLine(skin, line);
         }
     }
 }
