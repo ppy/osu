@@ -19,8 +19,6 @@ namespace osu.Game.Beatmaps.Formats
         private StoryboardSprite storyboardSprite;
         private CommandTimelineGroup timelineGroup;
 
-        private Storyboard storyboard;
-
         private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 
         public LegacyStoryboardDecoder()
@@ -35,17 +33,16 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<Storyboard>(@"[Events]", m => new LegacyStoryboardDecoder());
         }
 
-        protected override void ParseStreamInto(StreamReader stream, Storyboard storyboard)
+        protected override void ParseStream(StreamReader stream)
         {
-            this.storyboard = storyboard;
-            base.ParseStreamInto(stream, storyboard);
+            base.ParseStream(stream);
 
             // OrderBy is used to guarantee that the parsing order of elements with equal start times is maintained (stably-sorted)
-            foreach (StoryboardLayer layer in storyboard.Layers)
+            foreach (StoryboardLayer layer in Output.Layers)
                 layer.Elements = layer.Elements.OrderBy(h => h.StartTime).ToList();
         }
 
-        protected override void ParseSectionLine(Storyboard storyboard, string line)
+        protected override void ParseSectionLine(string line)
         {
             line = StripComments(line);
 
@@ -60,7 +57,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
 
-            base.ParseSectionLine(storyboard, line);
+            base.ParseSectionLine(line);
         }
 
         private void handleEvents(string line)
@@ -96,7 +93,7 @@ namespace osu.Game.Beatmaps.Formats
                         var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                         var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
-                        storyboard.GetLayer(layer).Add(storyboardSprite);
+                        Output.GetLayer(layer).Add(storyboardSprite);
                         break;
                     }
 
@@ -111,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
                         var frameDelay = double.Parse(split[7], NumberFormatInfo.InvariantInfo);
                         var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
-                        storyboard.GetLayer(layer).Add(storyboardSprite);
+                        Output.GetLayer(layer).Add(storyboardSprite);
                         break;
                     }
 
@@ -121,7 +118,7 @@ namespace osu.Game.Beatmaps.Formats
                         var layer = parseLayer(split[2]);
                         var path = cleanFilename(split[3]);
                         var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                        storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
+                        Output.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
                     }
                 }

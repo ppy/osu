@@ -12,16 +12,23 @@ namespace osu.Game.Beatmaps.Formats
         where TOutput : new()
     {
         protected virtual TOutput CreateTemplateObject() => new TOutput();
+        protected TOutput Output => output.Value;
+
+        private readonly Lazy<TOutput> output;
+
+        protected Decoder()
+        {
+            output = new Lazy<TOutput>(CreateTemplateObject);
+        }
 
         public TOutput Decode(StreamReader primaryStream, params StreamReader[] otherStreams)
         {
-            var output = CreateTemplateObject();
             foreach (StreamReader stream in otherStreams.Prepend(primaryStream))
-                ParseStreamInto(stream, output);
-            return output;
+                ParseStream(stream);
+            return Output;
         }
 
-        protected abstract void ParseStreamInto(StreamReader stream, TOutput output);
+        protected abstract void ParseStream(StreamReader stream);
     }
 
     public abstract class Decoder

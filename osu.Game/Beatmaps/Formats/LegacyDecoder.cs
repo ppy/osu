@@ -22,17 +22,17 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, T output)
+        protected override void ParseStream(StreamReader stream)
         {
             configSection = Section.None;
 
             string line;
 
             while ((line = stream.ReadLine()) != null)
-                ParseLine(output, line);
+                ParseLine(line);
         }
 
-        protected void ParseLine(T output, string line)
+        protected void ParseLine(string line)
         {
             if (ShouldSkipLine(line))
                 return;
@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (Enum.TryParse(line.Substring(1, line.Length - 2), out configSection))
                     return;
 
-                Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
+                Logger.Log($"Unknown section \"{line}\" in \"{Output}\"");
                 configSection = Section.None;
 
                 return;
@@ -50,24 +50,24 @@ namespace osu.Game.Beatmaps.Formats
 
             try
             {
-                ParseSectionLine(output, line);
+                ParseSectionLine(line);
             }
             catch (Exception e)
             {
-                Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
+                Logger.Log($"Failed to process line \"{line}\" into \"{Output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
             }
         }
 
         protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
-        protected virtual void ParseSectionLine(T output, string line)
+        protected virtual void ParseSectionLine(string line)
         {
             line = StripComments(line);
 
             switch (ConfigSection)
             {
                 case Section.Colours:
-                    handleColours(output, line);
+                    handleColours(line);
                     return;
             }
         }
@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps.Formats
         private Section configSection;
         private bool hasComboColours;
 
-        private void handleColours(T output, string line)
+        private void handleColours(string line)
         {
             var pair = SplitKeyVal(line);
 
@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (isCombo)
             {
-                if (!(output is IHasComboColours tHasComboColours)) return;
+                if (!(Output is IHasComboColours tHasComboColours)) return;
 
                 if (!hasComboColours)
                 {
@@ -121,7 +121,7 @@ namespace osu.Game.Beatmaps.Formats
             }
             else
             {
-                if (!(output is IHasCustomColours tHasCustomColours)) return;
+                if (!(Output is IHasCustomColours tHasCustomColours)) return;
 
                 tHasCustomColours.CustomColours[pair.Key] = colour;
             }

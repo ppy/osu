@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected override void ParseSectionLine(DefaultSkinConfiguration skin, string line)
+        protected override void ParseSectionLine(string line)
         {
             if (ConfigSection != Section.Colours)
             {
@@ -26,11 +26,11 @@ namespace osu.Game.Skinning
                         switch (pair.Key)
                         {
                             case @"Name":
-                                skin.SkinInfo.Name = pair.Value;
+                                Output.SkinInfo.Name = pair.Value;
                                 return;
 
                             case @"Author":
-                                skin.SkinInfo.Creator = pair.Value;
+                                Output.SkinInfo.Creator = pair.Value;
                                 return;
                         }
 
@@ -38,10 +38,10 @@ namespace osu.Game.Skinning
                 }
 
                 if (!string.IsNullOrEmpty(pair.Key))
-                    skin.ConfigDictionary[pair.Key] = pair.Value;
+                    Output.ConfigDictionary[pair.Key] = pair.Value;
             }
 
-            base.ParseSectionLine(skin, line);
+            base.ParseSectionLine(line);
         }
     }
 }
