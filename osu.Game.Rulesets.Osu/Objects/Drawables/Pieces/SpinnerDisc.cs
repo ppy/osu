@@ -85,8 +85,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public float BidirectionalRotation;
         private int completeTick;
 
+        private double lastTime;
 
         private bool updateCompleteTick() => completeTick != (completeTick = (int)(BidirectionalRotation / 360));
+
         private bool rotationTransferred;
 
         protected override void Update()
@@ -112,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 currentRotation += thisAngle - lastAngle;
                 BidirectionalRotation += Math.Abs(thisAngle - lastAngle) * Math.Sign(Time.Current - lastTime);
+                lastTime = Time.Current;
             }
 
             lastAngle = thisAngle;
