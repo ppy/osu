@@ -24,8 +24,6 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseStream(StreamReader stream)
         {
-            configSection = Section.None;
-
             string line;
 
             while ((line = stream.ReadLine()) != null)
@@ -81,7 +79,7 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        private Section configSection;
+        private Section configSection = Section.None;
         private bool hasComboColours;
 
         private void handleColours(string line)

@@ -494,5 +494,39 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.DoesNotThrow(() => decoder.Decode(badStream));
             }
         }
+
+        [Test]
+        public void TestDecodeBeatmapWithCorruptedHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
+                Assert.AreEqual("Evil Hacker", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapWithMissingHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("missing-header.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
+                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.AuthorString);
+            }
+        }
     }
 }

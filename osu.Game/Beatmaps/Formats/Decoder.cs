@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class Decoder
     {
         private static readonly Dictionary<Type, Dictionary<string, Func<string, Decoder>>> decoders = new Dictionary<Type, Dictionary<string, Func<string, Decoder>>>();
+        private static readonly Dictionary<Type, Func<string, Decoder>> fallback_decoders = new Dictionary<Type, Func<string, Decoder>>();
 
         static Decoder()
         {
@@ -66,10 +67,13 @@ namespace osu.Game.Beatmaps.Formats
                 throw new IOException(@"Unknown file format (null)");
 
             var decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
-            if (decoder == null)
+            if (decoder != null)
+                return (Decoder<T>)decoder.Invoke(line);
+
+            if (!fallback_decoders.TryGetValue(typeof(T), out var fallbackDecoder))
                 throw new IOException($@"Unknown file format ({line})");
 
-            return (Decoder<T>)decoder.Invoke(line);
+            return (Decoder<T>)fallbackDecoder.Invoke(line);
         }
 
         /// <summary>
@@ -83,6 +87,20 @@ namespace osu.Game.Beatmaps.Formats
                 decoders.Add(typeof(T), typedDecoders = new Dictionary<string, Func<string, Decoder>>());
 
             typedDecoders[magic] = constructor;
+        }
+
+        /// <summary>
+        /// Registers a fallback decoder instantiation function.
+        /// The fallback will be returned if the first line of the decoded stream does not match any known magic.
+        /// </summary>
+        /// <typeparam name="T">Type of object being decoded.</typeparam>
+        /// <param name="constructor">A function that constructs the <see cref="Decoder"/>, accepting the consumed first line of input for internal parsing.</param>
+        protected static void SetFallbackDecoder<T>(Func<string, Decoder> constructor)
+        {
+            if (fallback_decoders.ContainsKey(typeof(T)))
+                throw new InvalidOperationException($"A fallback decoder was already added for type {typeof(T)}.");
+
+            fallback_decoders[typeof(T)] = constructor;
         }
     }
 }
