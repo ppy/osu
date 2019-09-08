@@ -37,10 +37,21 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public void SetContents(Func<Drawable> creationFunction)
         {
-            Cell(0).Child = new LocalSkinOverrideContainer(null) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
-            Cell(1).Child = new LocalSkinOverrideContainer(metricsSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
-            Cell(2).Child = new LocalSkinOverrideContainer(defaultSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
-            Cell(3).Child = new LocalSkinOverrideContainer(specialSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
+            Cell(0).Child = createProvider(null, creationFunction);
+            Cell(1).Child = createProvider(metricsSkin, creationFunction);
+            Cell(2).Child = createProvider(defaultSkin, creationFunction);
+            Cell(3).Child = createProvider(specialSkin, creationFunction);
+        }
+
+        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
+        {
+            var mainProvider = new SkinProvidingContainer(skin);
+
+            return mainProvider
+                .WithChild(new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider))
+                {
+                    Child = creationFunction()
+                });
         }
 
         private class TestLegacySkin : LegacySkin

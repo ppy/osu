@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Chat.Selection
         private Color4 topicColour;
         private Color4 hoverColour;
 
-        public IEnumerable<string> FilterTerms => new[] { channel.Name };
+        public IEnumerable<string> FilterTerms => new[] { channel.Name, channel.Topic };
 
         public bool MatchingFilter
         {
@@ -121,10 +121,11 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new SpriteIcon
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     Icon = FontAwesome.Solid.User,
                                     Size = new Vector2(text_size - 2),
                                     Shadow = false,
-                                    Margin = new MarginPadding { Top = 1 },
                                 },
                                 new OsuSpriteText
                                 {

@@ -55,6 +55,7 @@ namespace osu.Game.Graphics.Sprites
                     Origin = Anchor.Centre,
                     BlurSigma = new Vector2(4),
                     CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
                     RelativeSizeAxes = Axes.Both,
                     Blending = BlendingParameters.Additive,
                     Size = new Vector2(3f),

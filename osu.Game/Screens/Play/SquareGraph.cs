@@ -103,6 +103,7 @@ namespace osu.Game.Screens.Play
             var newColumns = new BufferedContainer<Column>
             {
                 CacheDrawnFrameBuffer = true,
+                RedrawOnScale = false,
                 RelativeSizeAxes = Axes.Both,
             };
 

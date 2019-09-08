@@ -4,6 +4,9 @@
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Colour;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
@@ -35,5 +38,41 @@ namespace osu.Game.Screens.Edit
         protected override int DefaultMinValue => VALID_DIVISORS.First();
         protected override int DefaultMaxValue => VALID_DIVISORS.Last();
         protected override int DefaultPrecision => 1;
+
+        /// <summary>
+        /// Retrieves the appropriate colour for a beat divisor.
+        /// </summary>
+        /// <param name="beatDivisor">The beat divisor.</param>
+        /// <param name="colours">The set of colours.</param>
+        /// <returns>The applicable colour from <paramref name="colours"/> for <paramref name="beatDivisor"/>.</returns>
+        public static ColourInfo GetColourFor(int beatDivisor, OsuColour colours)
+        {
+            switch (beatDivisor)
+            {
+                case 2:
+                    return colours.BlueLight;
+
+                case 4:
+                    return colours.Blue;
+
+                case 8:
+                    return colours.BlueDarker;
+
+                case 16:
+                    return colours.PurpleDark;
+
+                case 3:
+                    return colours.YellowLight;
+
+                case 6:
+                    return colours.Yellow;
+
+                case 12:
+                    return colours.YellowDarker;
+
+                default:
+                    return Color4.White;
+            }
+        }
     }
 }
