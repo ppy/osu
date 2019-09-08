@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 
@@ -77,11 +78,35 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         private IEnumerable<IActionPoint> generateActionPoints()
         {
-            foreach (var obj in Beatmap.HitObjects)
+            for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
-                yield return new HitPoint { Time = obj.StartTime, Column = obj.Column };
-                yield return new ReleasePoint { Time = ((obj as IHasEndTime)?.EndTime ?? obj.StartTime) + RELEASE_DELAY, Column = obj.Column };
+                var currentObject = Beatmap.HitObjects[i];
+                var nextObjectInColumn = GetNextObject(i); // Get the next object that requires pressing the same button
+
+                double endTime = (currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime;
+
+                bool canDelayKeyUp = nextObjectInColumn == null ||
+                                     nextObjectInColumn.StartTime > endTime + RELEASE_DELAY;
+
+                double calculatedDelay = canDelayKeyUp ? RELEASE_DELAY : (nextObjectInColumn.StartTime - endTime) * 0.9;
+
+                yield return new HitPoint { Time = currentObject.StartTime, Column = currentObject.Column };
+
+                yield return new ReleasePoint { Time = endTime + calculatedDelay, Column = currentObject.Column };
             }
+        }
+
+        protected override HitObject GetNextObject(int currentIndex)
+        {
+            int desiredColumn = Beatmap.HitObjects[currentIndex].Column;
+
+            for (int i = currentIndex + 1; i < Beatmap.HitObjects.Count; i++)
+            {
+                if (Beatmap.HitObjects[i].Column == desiredColumn)
+                    return Beatmap.HitObjects[i];
+            }
+
+            return null;
         }
 
         private interface IActionPoint

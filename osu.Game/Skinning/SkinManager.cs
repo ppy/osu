@@ -14,7 +14,9 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.IO.Archives;
 
@@ -23,6 +25,8 @@ namespace osu.Game.Skinning
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
     {
         private readonly AudioManager audio;
+
+        private readonly IResourceStore<byte[]> legacyDefaultResources;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
@@ -33,10 +37,11 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
-        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio)
+        public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {
             this.audio = audio;
+            this.legacyDefaultResources = legacyDefaultResources;
 
             ItemRemoved += removedInfo =>
             {
@@ -65,6 +70,7 @@ namespace osu.Game.Skinning
         {
             var userSkins = GetAllUserSkins();
             userSkins.Insert(0, SkinInfo.Default);
+            userSkins.Insert(1, DefaultLegacySkin.Info);
             return userSkins;
         }
 
@@ -90,7 +96,7 @@ namespace osu.Game.Skinning
             else
             {
                 model.Name = model.Name.Replace(".osk", "");
-                model.Creator = "Unknown";
+                model.Creator = model.Creator ?? "Unknown";
             }
         }
 
@@ -104,6 +110,9 @@ namespace osu.Game.Skinning
             if (skinInfo == SkinInfo.Default)
                 return new DefaultSkin();
 
+            if (skinInfo == DefaultLegacySkin.Info)
+                return new DefaultLegacySkin(legacyDefaultResources, audio);
+
             return new LegacySkin(skinInfo, Files.Store, audio);
         }
 
@@ -116,12 +125,12 @@ namespace osu.Game.Skinning
 
         public event Action SourceChanged;
 
-        public Drawable GetDrawableComponent(string componentName) => CurrentSkin.Value.GetDrawableComponent(componentName);
+        public Drawable GetDrawableComponent(ISkinComponent component) => CurrentSkin.Value.GetDrawableComponent(component);
 
         public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
 
-        public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
+        public SampleChannel GetSample(ISampleInfo sampleInfo) => CurrentSkin.Value.GetSample(sampleInfo);
 
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration => CurrentSkin.Value.GetValue(query);
+        public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => CurrentSkin.Value.GetConfig<TLookup, TValue>(lookup);
     }
 }

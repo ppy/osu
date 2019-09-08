@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.Cursor
         public class Cursor : Container
         {
             private Container cursorContainer;
-            private Bindable<double> cursorScale;
+            private Bindable<float> cursorScale;
             private const float base_scale = 0.15f;
 
             public Sprite AdditiveLayer;
@@ -159,9 +159,8 @@ namespace osu.Game.Graphics.Cursor
                     }
                 };
 
-                cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
-                cursorScale.ValueChanged += scale => cursorContainer.Scale = new Vector2((float)scale.NewValue * base_scale);
-                cursorScale.TriggerChange();
+                cursorScale = config.GetBindable<float>(OsuSetting.MenuCursorSize);
+                cursorScale.BindValueChanged(scale => cursorContainer.Scale = new Vector2(scale.NewValue * base_scale), true);
             }
         }
 

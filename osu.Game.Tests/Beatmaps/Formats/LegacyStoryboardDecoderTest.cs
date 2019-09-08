@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 int spriteCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSprite));
                 int animationCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardAnimation));
-                int sampleCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSample));
+                int sampleCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSampleInfo));
 
                 Assert.AreEqual(15, spriteCount);
                 Assert.AreEqual(1, animationCount);
