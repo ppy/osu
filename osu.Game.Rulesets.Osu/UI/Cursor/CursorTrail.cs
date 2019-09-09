@@ -24,21 +24,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
     {
         private const int max_sprites = 2048;
 
-        private Texture texture = Texture.WhitePixel;
-
-        public Texture Texture
-        {
-            get => texture;
-            set
-            {
-                if (texture == value)
-                    return;
-
-                texture = value;
-                Invalidate(Invalidation.DrawNode);
-            }
-        }
-
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
         private IShader shader;
@@ -70,6 +55,21 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.LoadComplete();
             resetTime();
+        }
+
+        private Texture texture = Texture.WhitePixel;
+
+        public Texture Texture
+        {
+            get => texture;
+            set
+            {
+                if (texture == value)
+                    return;
+
+                texture = value;
+                Invalidate(Invalidation.DrawNode);
+            }
         }
 
         public override bool IsPresent => true;
