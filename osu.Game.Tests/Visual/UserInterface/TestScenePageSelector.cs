@@ -15,35 +15,40 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(PageSelector)
         };
 
+        private readonly PageSelector pageSelector;
+
         public TestScenePageSelector()
         {
-            Child = new PageSelector(200)
+            Child = pageSelector = new PageSelector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
 
-            AddStep("1 max pages", () => redraw(1));
-            AddStep("10 max pages", () => redraw(10));
-            AddStep("200 max pages, current 199", () => redraw(200, 199));
-            AddStep("200 max pages, current 201", () => redraw(200, 201));
-            AddStep("200 max pages, current -10", () => redraw(200, -10));
-        }
-
-        private void redraw(int maxPages, int currentPage = 0)
-        {
-            Clear();
-
-            var selector = new PageSelector(maxPages)
+            AddStep("10 max pages", () => setMaxPages(10));
+            AddStep("200 max pages, current 199", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
-
-            if (currentPage != 0)
-                selector.CurrentPage.Value = currentPage;
-
-            Add(selector);
+                setMaxPages(200);
+                setCurrentPage(199);
+            });
+            AddStep("200 max pages, current 201", () =>
+            {
+                setMaxPages(200);
+                setCurrentPage(201);
+            });
+            AddStep("200 max pages, current -10", () =>
+            {
+                setMaxPages(200);
+                setCurrentPage(-10);
+            });
+            AddStep("-10 max pages", () =>
+            {
+                setMaxPages(-10);
+            });
         }
+
+        private void setMaxPages(int maxPages) => pageSelector.MaxPages.Value = maxPages;
+
+        private void setCurrentPage(int currentPage) => pageSelector.CurrentPage.Value = currentPage;
     }
 }
