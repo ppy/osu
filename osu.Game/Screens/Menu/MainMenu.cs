@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Menu
             logo.Action += () =>
             {
                 if (!api.IsLoggedIn && !loginPrompted)
-                    login?.ToggleVisibility();
+                    login?.Show();
 
                 loginPrompted = true;
 
