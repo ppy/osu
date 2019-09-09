@@ -140,6 +140,8 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
+        private bool loginDisplayed = false;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -160,11 +162,18 @@ namespace osu.Game.Screens.Menu
             }
             else if (!api.IsLoggedIn)
             {
-                logo.Action += () =>
+                logo.Action += displayLogin;
+            }
+
+            bool displayLogin()
+            {
+                if (!loginDisplayed)
                 {
                     Scheduler.AddDelayed(() => login?.Show(), 500);
-                    return true;
-                };
+                    loginDisplayed = true;
+                }
+
+                return true;
             }
         }
 
