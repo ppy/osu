@@ -72,6 +72,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
+        /// <summary>
+        /// The amount of time to fade the cursor trail pieces.
+        /// </summary>
+        protected virtual double FadeDuration => 300;
+
         public override bool IsPresent => true;
 
         protected override void Update()
@@ -82,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             const int fade_clock_reset_threshold = 1000000;
 
-            time = (float)(Time.Current - timeOffset) / 300f;
+            time = (float)((Time.Current - timeOffset) / FadeDuration);
             if (time > fade_clock_reset_threshold)
                 resetTime();
         }
