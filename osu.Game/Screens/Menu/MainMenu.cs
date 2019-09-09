@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
 
         private ButtonSystem buttons;
 
-        private bool loginPrompted = false;
+        private bool loginPrompted;
 
         [Resolved]
         private GameHost host { get; set; }
