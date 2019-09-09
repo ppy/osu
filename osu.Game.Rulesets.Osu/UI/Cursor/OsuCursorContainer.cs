@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail())
+                Child = cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling)
             };
         }
 
