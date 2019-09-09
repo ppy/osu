@@ -22,12 +22,27 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             SetContents(() => new MovingCursorInputManager
             {
-                Child = new OsuCursorContainer
+                Child = new ClickingCursorContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                 }
             });
+        }
+
+        private class ClickingCursorContainer : OsuCursorContainer
+        {
+            protected override void Update()
+            {
+                base.Update();
+
+                double currentTime = Time.Current;
+
+                if (((int)(currentTime / 1000)) % 2 == 0)
+                    OnPressed(OsuAction.LeftButton);
+                else
+                    OnReleased(OsuAction.LeftButton);
+            }
         }
 
         private class MovingCursorInputManager : ManualInputManager
