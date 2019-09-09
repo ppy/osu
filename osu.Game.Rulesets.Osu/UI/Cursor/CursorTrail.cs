@@ -22,28 +22,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
     internal class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
-        private int currentIndex;
-
-        private IShader shader;
-        private Texture texture;
-
-        private Vector2 size => texture.Size * Scale;
-
-        private double timeOffset;
-
-        private float time;
-
-        public override bool IsPresent => true;
-
         private const int max_sprites = 2048;
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
-
-        private Vector2? lastPosition;
-
-        private readonly InputResampler resampler = new InputResampler();
-
-        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
+        private int currentIndex;
+        private IShader shader;
+        private Texture texture;
+        private double timeOffset;
+        private float time;
 
         public CursorTrail()
         {
@@ -60,8 +46,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
         {
@@ -75,6 +59,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             base.LoadComplete();
             resetTime();
         }
+
+        public override bool IsPresent => true;
 
         protected override void Update()
         {
@@ -100,6 +86,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             time = 0;
             timeOffset = Time.Current;
         }
+
+        private Vector2 size => texture.Size * Scale;
+
+        private Vector2? lastPosition;
+        private readonly InputResampler resampler = new InputResampler();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -127,21 +120,19 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 for (float d = interval; d < distance; d += interval)
                 {
                     lastPosition = pos1 + direction * d;
-                    addPosition(lastPosition.Value);
+
+                    parts[currentIndex].Position = lastPosition.Value;
+                    parts[currentIndex].Time = time;
+                    ++parts[currentIndex].InvalidationID;
+
+                    currentIndex = (currentIndex + 1) % max_sprites;
                 }
             }
 
             return base.OnMouseMove(e);
         }
 
-        private void addPosition(Vector2 pos)
-        {
-            parts[currentIndex].Position = pos;
-            parts[currentIndex].Time = time;
-            ++parts[currentIndex].InvalidationID;
-
-            currentIndex = (currentIndex + 1) % max_sprites;
-        }
+        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
 
         private struct TrailPart
         {
