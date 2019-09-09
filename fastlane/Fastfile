@@ -6,9 +6,7 @@ desc 'Deploy to play store'
     # update csproj version
     update_version(options)
 
-    build(
-      build_configuration: 'Release', 
-    )
+    build()
 
     client = HTTPClient.new
     changelog = client.get_content 'https://gist.githubusercontent.com/peppy/ab89c29dcc0dce95f39eb218e8fad197/raw'
@@ -22,6 +20,7 @@ desc 'Deploy to play store'
     )
 
     souyuz(
+      build_configuration: 'Release',
       solution_path: 'osu.Android.sln',
       platform: "android",
     )
