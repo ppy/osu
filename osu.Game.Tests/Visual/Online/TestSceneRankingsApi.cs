@@ -22,9 +22,11 @@ namespace osu.Game.Tests.Visual.Online
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        private readonly FillFlowContainer usersContainer;
+        private readonly FillFlowContainer flow;
         private readonly DimmedLoadingLayer loading;
-        private GetUserRankingsRequest request;
+
+        private GetUserRankingsRequest userRequest;
+        private GetCountryRankingsRequest countryRequest;
 
         public TestSceneRankingsApi()
         {
@@ -33,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
                 new BasicScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = usersContainer = new FillFlowContainer
+                    Child = flow = new FillFlowContainer
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
@@ -53,42 +55,57 @@ namespace osu.Game.Tests.Visual.Online
             base.LoadComplete();
 
             AddStep("Get osu performance", () =>
-                updateRequest(new GetUserRankingsRequest(new OsuRuleset().RulesetInfo), updatePerformanceRankings));
+                updateUserRequest(new GetUserRankingsRequest(new OsuRuleset().RulesetInfo), updatePerformanceRankings));
 
             AddStep("Get USA osu performance", () =>
-                updateRequest(new GetUserRankingsRequest(new OsuRuleset().RulesetInfo, country: "US"), updatePerformanceRankings));
+                updateUserRequest(new GetUserRankingsRequest(new OsuRuleset().RulesetInfo, country: "US"), updatePerformanceRankings));
 
             AddStep("Get osu performance page 100", () =>
-                updateRequest(new GetUserRankingsRequest(new OsuRuleset().RulesetInfo, page: 100), updatePerformanceRankings));
+                updateUserRequest(new GetUserRankingsRequest(new OsuRuleset().RulesetInfo, page: 100), updatePerformanceRankings));
 
             AddStep("Get mania performance", () =>
-                updateRequest(new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo), updatePerformanceRankings));
+                updateUserRequest(new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo), updatePerformanceRankings));
 
             AddStep("Get taiko performance", () =>
-                updateRequest(new GetUserRankingsRequest(new TaikoRuleset().RulesetInfo), updatePerformanceRankings));
+                updateUserRequest(new GetUserRankingsRequest(new TaikoRuleset().RulesetInfo), updatePerformanceRankings));
 
             AddStep("Get catch performance", () =>
-                updateRequest(new GetUserRankingsRequest(new CatchRuleset().RulesetInfo), updatePerformanceRankings));
+                updateUserRequest(new GetUserRankingsRequest(new CatchRuleset().RulesetInfo), updatePerformanceRankings));
 
             AddStep("Get mania scores for BY", () =>
-                updateRequest(new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo, UserRankingsType.Score, country: "BY")
+                updateUserRequest(new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo, UserRankingsType.Score, country: "BY")
                 , updateScoreRankings));
+
+            AddStep("Get osu country rankings", () =>
+                updateCountryRequest(new GetCountryRankingsRequest(new OsuRuleset().RulesetInfo)
+                , updateCountryRankings));
         }
 
-        private void updateRequest(GetUserRankingsRequest newRequest, APISuccessHandler<List<APIUserRankings>> onSuccess)
+        private void updateUserRequest(GetUserRankingsRequest newRequest, APISuccessHandler<List<APIUserRankings>> onSuccess)
         {
             loading.Show();
-            request?.Cancel();
-            request = newRequest;
-            request.Success += onSuccess;
-            api.Queue(request);
+            userRequest?.Cancel();
+            countryRequest?.Cancel();
+            userRequest = newRequest;
+            userRequest.Success += onSuccess;
+            api.Queue(userRequest);
+        }
+
+        private void updateCountryRequest(GetCountryRankingsRequest newRequest, APISuccessHandler<List<APICountryRankings>> onSuccess)
+        {
+            loading.Show();
+            userRequest?.Cancel();
+            countryRequest?.Cancel();
+            countryRequest = newRequest;
+            countryRequest.Success += onSuccess;
+            api.Queue(countryRequest);
         }
 
         private void updatePerformanceRankings(List<APIUserRankings> rankings)
         {
-            usersContainer.Clear();
+            flow.Clear();
 
-            rankings.ForEach(r => usersContainer.Add(new OsuSpriteText
+            rankings.ForEach(r => flow.Add(new OsuSpriteText
             {
                 Text = $"{r.User.Username}, Accuracy: {r.Accuracy}, Play Count: {r.PlayCount}, Performance: {r.PP}, SS: {r.GradesCount.SS}, S: {r.GradesCount.S}, A: {r.GradesCount.A}"
             }));
@@ -98,11 +115,23 @@ namespace osu.Game.Tests.Visual.Online
 
         private void updateScoreRankings(List<APIUserRankings> rankings)
         {
-            usersContainer.Clear();
+            flow.Clear();
 
-            rankings.ForEach(r => usersContainer.Add(new OsuSpriteText
+            rankings.ForEach(r => flow.Add(new OsuSpriteText
             {
                 Text = $"{r.User.Username}, Accuracy: {r.Accuracy}, Play Count: {r.PlayCount}, Total Score: {r.TotalScore}, Ranked Score: {r.RankedScore}, SS: {r.GradesCount.SS}, S: {r.GradesCount.S}, A: {r.GradesCount.A}"
+            }));
+
+            loading.Hide();
+        }
+
+        private void updateCountryRankings(List<APICountryRankings> rankings)
+        {
+            flow.Clear();
+
+            rankings.ForEach(r => flow.Add(new OsuSpriteText
+            {
+                Text = $"{r.FlagName}, Active Users: {r.ActiveUsers}, Play Count: {r.PlayCount}, Ranked Score: {r.RankedScore}, Performance: {r.Performance}"
             }));
 
             loading.Hide();
