@@ -20,17 +20,15 @@ namespace osu.Game.Graphics.UserInterface
     public class PageSelector : CompositeDrawable
     {
         public readonly BindableInt CurrentPage = new BindableInt(1);
+        public readonly BindableInt MaxPages = new BindableInt(1);
 
-        private readonly int maxPages;
         private readonly FillFlowContainer itemsFlow;
 
         private readonly Button previousPageButton;
         private readonly Button nextPageButton;
 
-        public PageSelector(int maxPages)
+        public PageSelector()
         {
-            this.maxPages = maxPages;
-
             AutoSizeAxes = Axes.Both;
             InternalChild = new FillFlowContainer
             {
@@ -59,24 +57,48 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            CurrentPage.BindValueChanged(_ => redraw(), true);
+            MaxPages.BindValueChanged(pagesAmount => onMaxPagesChanged(pagesAmount.NewValue), true);
+            CurrentPage.BindValueChanged(page => onCurrentPageChanged(page.NewValue), true);
         }
 
-        private void redraw()
+        private void onMaxPagesChanged(int pagesAmount)
         {
-            if (CurrentPage.Value > maxPages)
+            if (pagesAmount < 1)
             {
-                CurrentPage.Value = maxPages;
+                MaxPages.Value = 1;
                 return;
             }
 
-            if (CurrentPage.Value < 1)
+            if (CurrentPage.Value > pagesAmount)
+            {
+                CurrentPage.Value = pagesAmount;
+                return;
+            }
+
+            redraw();
+        }
+
+        private void onCurrentPageChanged(int newPage)
+        {
+            if (newPage > MaxPages.Value)
+            {
+                CurrentPage.Value = MaxPages.Value;
+                return;
+            }
+
+            if (newPage < 1)
             {
                 CurrentPage.Value = 1;
                 return;
             }
 
+            redraw();
+        }
+
+        private void redraw()
+        {
             int newPage = CurrentPage.Value;
+            int maxPages = MaxPages.Value;
 
             previousPageButton.Enabled.Value = newPage != 1;
             nextPageButton.Enabled.Value = newPage != maxPages;
