@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
 using System.Linq;
+using System.IO;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -43,6 +44,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double fcProbTP = calculateFCProbTP(movements);
             double fcTimeTP = calculateFCTimeTP(movements);
+
+            graph(movements, fcProbTP);
 
             double[] comboTPs = calculateComboTps(movements);
             (var missTPs, var missCounts) = calculateMissTPsMissCounts(movements, fcTimeTP);
@@ -110,6 +113,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Brent.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, tpPrecision);
 
         }
+
+        private static void graph(List<OsuMovement> movements, double tp)
+        {
+            string path = Path.Combine("cache", "graph.txt");
+
+            var sw = new StringWriter();
+
+            foreach (var movement in movements)
+            {
+                double time = movement.Time;
+                double ipRaw = movement.IP12;
+                double ipCorrected = FittsLaw.CalculateIP(movement.D, movement.MT * (1 + defaultCheeseLevel * movement.CheesableRatio));
+                double missProb = 1 - calculateCheeseHitProb(movement, tp, defaultCheeseLevel);
+
+                sw.WriteLine($"{time} {ipRaw} {ipCorrected} {missProb}");
+            }
+
+            File.WriteAllText(path, sw.ToString());
+            sw.Dispose();
+        }
+
+
 
         /// <summary>
         /// Calculate miss count for a list of throughputs (used to evaluate miss count of plays).
