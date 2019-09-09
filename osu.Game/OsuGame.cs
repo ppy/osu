@@ -182,7 +182,26 @@ namespace osu.Game
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
             SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
-            configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
+            configSkin.ValueChanged += skinId =>
+            {
+                var skinInfo = SkinManager.Query(s => s.ID == skinId.NewValue);
+
+                if (skinInfo == null)
+                {
+                    switch (skinId.NewValue)
+                    {
+                        case -1:
+                            skinInfo = DefaultLegacySkin.Info;
+                            break;
+
+                        default:
+                            skinInfo = SkinInfo.Default;
+                            break;
+                    }
+                }
+
+                SkinManager.CurrentSkinInfo.Value = skinInfo;
+            };
             configSkin.TriggerChange();
 
             IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);

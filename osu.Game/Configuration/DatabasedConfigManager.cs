@@ -16,11 +16,11 @@ namespace osu.Game.Configuration
 
         private readonly int? variant;
 
-        private readonly List<DatabasedSetting> databasedSettings;
+        private List<DatabasedSetting> databasedSettings;
 
         private readonly RulesetInfo ruleset;
 
-        private readonly bool legacySettingsExist;
+        private bool legacySettingsExist;
 
         protected DatabasedConfigManager(SettingsStore settings, RulesetInfo ruleset = null, int? variant = null)
         {
@@ -28,20 +28,30 @@ namespace osu.Game.Configuration
             this.ruleset = ruleset;
             this.variant = variant;
 
-            databasedSettings = settings.Query(ruleset?.ID, variant);
-            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out var _));
+            Load();
 
             InitialiseDefaults();
         }
 
         protected override void PerformLoad()
         {
+            databasedSettings = settings.Query(ruleset?.ID, variant);
+            legacySettingsExist = databasedSettings.Any(s => int.TryParse(s.Key, out var _));
         }
 
         protected override bool PerformSave()
         {
+            lock (dirtySettings)
+            {
+                foreach (var setting in dirtySettings)
+                    settings.Update(setting);
+                dirtySettings.Clear();
+            }
+
             return true;
         }
+
+        private readonly List<DatabasedSetting> dirtySettings = new List<DatabasedSetting>();
 
         protected override void AddBindable<TBindable>(T lookup, Bindable<TBindable> bindable)
         {
@@ -80,7 +90,12 @@ namespace osu.Game.Configuration
             bindable.ValueChanged += b =>
             {
                 setting.Value = b.NewValue;
-                settings.Update(setting);
+
+                lock (dirtySettings)
+                {
+                    if (!dirtySettings.Contains(setting))
+                        dirtySettings.Add(setting);
+                }
             };
         }
     }
