@@ -9,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
-using osuTK;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
+            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.Solid.ChevronRight,

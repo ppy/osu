@@ -18,14 +18,6 @@ namespace osu.Game.Skinning
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
-        public string HitCircleFont { get; set; }
-
-        public int HitCircleOverlap { get; set; }
-
-        public float? SliderBorderSize { get; set; }
-
-        public float? SliderPathRadius { get; set; }
-
-        public bool? CursorExpand { get; set; }
+        public readonly Dictionary<string, string> ConfigDictionary = new Dictionary<string, string>();
     }
 }

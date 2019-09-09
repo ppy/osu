@@ -35,16 +35,16 @@ namespace osu.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
-                new SettingsSlider<double, SizeSlider>
+                new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize),
+                    Bindable = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
-                new SettingsSlider<double, SizeSlider>
+                new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize),
+                    Bindable = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        private class SizeSlider : OsuSliderBar<double>
+        private class SizeSlider : OsuSliderBar<float>
         {
             public override string TooltipText => Current.Value.ToString(@"0.##x");
         }
