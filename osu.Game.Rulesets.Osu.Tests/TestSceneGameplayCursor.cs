@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Osu.Tests
     [TestFixture]
     public class TestSceneGameplayCursor : SkinnableTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(CursorTrail) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(OsuCursorContainer),
+            typeof(CursorTrail)
+        };
 
         [BackgroundDependencyLoader]
         private void load()
