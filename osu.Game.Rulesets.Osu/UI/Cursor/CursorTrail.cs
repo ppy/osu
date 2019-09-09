@@ -106,6 +106,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private Vector2 size => texture.Size * Scale;
 
+        /// <summary>
+        /// Whether to interpolate mouse movements and add trail pieces at intermediate points.
+        /// </summary>
+        protected virtual bool InterpolateMovements => true;
+
         private Vector2? lastPosition;
         private readonly InputResampler resampler = new InputResampler();
 
@@ -126,27 +131,39 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 Trace.Assert(lastPosition.HasValue);
 
-                // ReSharper disable once PossibleInvalidOperationException
-                Vector2 pos1 = lastPosition.Value;
-                Vector2 diff = pos2 - pos1;
-                float distance = diff.Length;
-                Vector2 direction = diff / distance;
-
-                float interval = size.X / 2 * 0.9f;
-
-                for (float d = interval; d < distance; d += interval)
+                if (InterpolateMovements)
                 {
-                    lastPosition = pos1 + direction * d;
+                    // ReSharper disable once PossibleInvalidOperationException
+                    Vector2 pos1 = lastPosition.Value;
+                    Vector2 diff = pos2 - pos1;
+                    float distance = diff.Length;
+                    Vector2 direction = diff / distance;
 
-                    parts[currentIndex].Position = lastPosition.Value;
-                    parts[currentIndex].Time = time;
-                    ++parts[currentIndex].InvalidationID;
+                    float interval = size.X / 2 * 0.9f;
 
-                    currentIndex = (currentIndex + 1) % max_sprites;
+                    for (float d = interval; d < distance; d += interval)
+                    {
+                        lastPosition = pos1 + direction * d;
+                        addPart(lastPosition.Value);
+                    }
+                }
+                else
+                {
+                    lastPosition = pos2;
+                    addPart(lastPosition.Value);
                 }
             }
 
             return base.OnMouseMove(e);
+        }
+
+        private void addPart(Vector2 screenSpacePosition)
+        {
+            parts[currentIndex].Position = screenSpacePosition;
+            parts[currentIndex].Time = time;
+            ++parts[currentIndex].InvalidationID;
+
+            currentIndex = (currentIndex + 1) % max_sprites;
         }
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
