@@ -39,8 +39,6 @@ namespace osu.Game.Screens.Menu
 
         private ButtonSystem buttons;
 
-        private bool loginPrompted;
-
         [Resolved]
         private GameHost host { get; set; }
 
@@ -151,16 +149,6 @@ namespace osu.Game.Screens.Menu
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
 
-            logo.Action += () =>
-            {
-                if (!api.IsLoggedIn && !loginPrompted)
-                    login?.Show();
-
-                loginPrompted = true;
-
-                return true;
-            };
-
             if (resuming)
             {
                 buttons.State = ButtonSystemState.TopLevel;
@@ -169,6 +157,14 @@ namespace osu.Game.Screens.Menu
                 this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
+            }
+            else if (!api.IsLoggedIn)
+            {
+                logo.Action += () =>
+                {
+                    Scheduler.AddDelayed(() => login?.Show(), 500);
+                    return true;
+                };
             }
         }
 
