@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
             {
                 beatmap = value;
                 Details.Beatmap = beatmap?.BeatmapInfo;
-                Leaderboard.Beatmap = beatmap is NoBeatmapsAvailableWorkingBeatmap ? null : beatmap?.BeatmapInfo;
+                Leaderboard.Beatmap = beatmap is DummyWorkingBeatmap ? null : beatmap?.BeatmapInfo;
             }
         }
 
