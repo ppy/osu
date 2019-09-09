@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using osu.Game.IO;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -13,15 +14,15 @@ namespace osu.Game.Beatmaps.Formats
     {
         protected virtual TOutput CreateTemplateObject() => new TOutput();
 
-        public TOutput Decode(StreamReader primaryStream, params StreamReader[] otherStreams)
+        public TOutput Decode(LineBufferedReader primaryStream, params LineBufferedReader[] otherStreams)
         {
             var output = CreateTemplateObject();
-            foreach (StreamReader stream in otherStreams.Prepend(primaryStream))
+            foreach (LineBufferedReader stream in otherStreams.Prepend(primaryStream))
                 ParseStreamInto(stream, output);
             return output;
         }
 
-        protected abstract void ParseStreamInto(StreamReader stream, TOutput output);
+        protected abstract void ParseStreamInto(LineBufferedReader stream, TOutput output);
     }
 
     public abstract class Decoder
@@ -39,7 +40,7 @@ namespace osu.Game.Beatmaps.Formats
         /// Retrieves a <see cref="Decoder"/> to parse a <see cref="Beatmap"/>.
         /// </summary>
         /// <param name="stream">A stream pointing to the <see cref="Beatmap"/>.</param>
-        public static Decoder<T> GetDecoder<T>(StreamReader stream)
+        public static Decoder<T> GetDecoder<T>(LineBufferedReader stream)
             where T : new()
         {
             if (stream == null)
