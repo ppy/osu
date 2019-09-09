@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
@@ -72,6 +73,20 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
+        private readonly Cached<Vector2> partSizeCache = new Cached<Vector2>();
+
+        private Vector2 partSize => partSizeCache.IsValid
+            ? partSizeCache.Value
+            : (partSizeCache.Value = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight) * DrawInfo.Matrix.ExtractScale().Xy);
+
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & (Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                partSizeCache.Invalidate();
+
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
         /// <summary>
         /// The amount of time to fade the cursor trail pieces.
         /// </summary>
@@ -103,8 +118,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             time = 0;
             timeOffset = Time.Current;
         }
-
-        private Vector2 size => texture.Size * Scale;
 
         /// <summary>
         /// Whether to interpolate mouse movements and add trail pieces at intermediate points.
@@ -139,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     float distance = diff.Length;
                     Vector2 direction = diff / distance;
 
-                    float interval = size.X / 2 * 0.9f;
+                    float interval = partSize.X / 2 * 0.9f;
 
                     for (float d = interval; d < distance; d += interval)
                     {
@@ -202,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 shader = Source.shader;
                 texture = Source.texture;
-                size = Source.size;
+                size = Source.partSize;
                 time = Source.time;
 
                 for (int i = 0; i < Source.parts.Length; ++i)
