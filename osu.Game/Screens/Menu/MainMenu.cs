@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        private bool loginDisplayed = false;
+        private bool loginDisplayed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
