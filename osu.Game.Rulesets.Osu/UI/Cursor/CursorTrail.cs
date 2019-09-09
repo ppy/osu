@@ -20,14 +20,28 @@ using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    internal class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
+    public class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
         private const int max_sprites = 2048;
+
+        private Texture texture = Texture.WhitePixel;
+
+        public Texture Texture
+        {
+            get => texture;
+            set
+            {
+                if (texture == value)
+                    return;
+
+                texture = value;
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private int currentIndex;
         private IShader shader;
-        private Texture texture;
         private double timeOffset;
         private float time;
 
@@ -47,11 +61,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, TextureStore textures)
+        private void load(ShaderManager shaders)
         {
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
-            texture = textures.Get(@"Cursor/cursortrail");
-            Scale = new Vector2(1 / texture.ScaleAdjust);
         }
 
         protected override void LoadComplete()
