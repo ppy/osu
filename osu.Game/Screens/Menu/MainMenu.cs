@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Menu
 
         private ButtonSystem buttons;
 
+        private bool loginPrompted = false;
+
         [Resolved]
         private GameHost host { get; set; }
 
@@ -137,9 +139,6 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            if (!api.IsLoggedIn)
-                login?.ToggleVisibility();
-
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
@@ -151,6 +150,16 @@ namespace osu.Game.Screens.Menu
 
             logo.FadeColour(Color4.White, 100, Easing.OutQuint);
             logo.FadeIn(100, Easing.OutQuint);
+
+            logo.Action += () =>
+            {
+                if (!api.IsLoggedIn && !loginPrompted)
+                    login?.ToggleVisibility();
+
+                loginPrompted = true;
+
+                return true;
+            };
 
             if (resuming)
             {
