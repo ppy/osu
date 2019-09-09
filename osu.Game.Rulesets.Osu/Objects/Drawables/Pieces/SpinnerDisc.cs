@@ -85,8 +85,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public float RotationAbsolute;
         private int completeTick;
 
-        private double lastTime;
-
         private bool updateCompleteTick() => completeTick != (completeTick = (int)(RotationAbsolute / 360));
 
         private bool rotationTransferred;
@@ -113,7 +111,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     lastAngle -= 360;
 
                 currentRotation += thisAngle - lastAngle;
-                lastTime = Time.Current;
                 RotationAbsolute += Math.Abs(thisAngle - lastAngle) * Math.Sign(Clock.ElapsedFrameTime);
             }
 
