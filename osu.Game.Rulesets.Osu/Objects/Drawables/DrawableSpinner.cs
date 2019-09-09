@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
-        public float Progress => MathHelper.Clamp(Disc.BidirectionalRotation / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
-            spmCounter.SetRotation(Disc.BidirectionalRotation);
+            spmCounter.SetRotation(Disc.RotationAbsolute);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
