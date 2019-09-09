@@ -233,6 +233,8 @@ namespace osu.Game.Rulesets.Scoring
             drawableRuleset.OnRevertResult += revertResult;
 
             ApplyBeatmap(drawableRuleset.Beatmap);
+
+            Reset(false);
             SimulateAutoplay(drawableRuleset.Beatmap);
             Reset(true);
 
@@ -269,8 +271,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to simulate.</param>
         protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap)
         {
-            Reset(false);
-
             foreach (var obj in beatmap.HitObjects)
                 simulate(obj);
 
