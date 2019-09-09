@@ -4,25 +4,18 @@
 using osu.Framework.IO.Network;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
-using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserRankingsRequest : APIRequest<List<APIUserRankings>>
+    public class GetUserRankingsRequest : GetRankingsRequest<APIUserRankings>
     {
-        private const int min_page = 1;
-        private const int max_page = 200;
-
-        private readonly RulesetInfo ruleset;
         private readonly string country;
         private readonly UserRankingsType type;
-        private int page;
 
-        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = min_page, string country = null)
+        public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
+            : base(ruleset, page)
         {
             this.type = type;
-            this.ruleset = ruleset;
-            this.page = page;
             this.country = country;
         }
 
@@ -30,17 +23,13 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            page = page < min_page ? min_page : (page > max_page ? max_page : page);
-
-            req.AddParameter("page", page.ToString());
-
             if (country != null)
                 req.AddParameter("country", country);
 
             return req;
         }
 
-        protected override string Target => $"rankings/{ruleset.ShortName}/{type.ToString().ToLowerInvariant()}";
+        protected override string TargetPostfix() => type.ToString().ToLowerInvariant();
     }
 
     public enum UserRankingsType
