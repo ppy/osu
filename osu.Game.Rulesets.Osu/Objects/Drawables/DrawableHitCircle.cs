@@ -10,8 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osuTK;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (result == HitResult.None)
             {
-                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
+                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;
             }
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     hitArea.HitAction = null;
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.WindowFor(HitResult.Miss);
                     break;
 
                 case ArmedState.Miss:

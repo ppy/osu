@@ -10,14 +10,9 @@ namespace osu.Game.Tests.Visual.Menus
 {
     public class TestSceneDisclaimer : ScreenTestScene
     {
-        [Cached(typeof(IAPIProvider))]
-        private readonly DummyAPIAccess api = new DummyAPIAccess();
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
-            Add(api);
-
             AddStep("load disclaimer", () => LoadScreen(new Disclaimer()));
 
             AddStep("toggle support", () =>
