@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
         public static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
+            SetFallbackDecoder<Beatmap>(() => new LegacyBeatmapDecoder());
         }
 
         /// <summary>

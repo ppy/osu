@@ -28,6 +28,7 @@ namespace osu.Game.Beatmaps.Formats
     public abstract class Decoder
     {
         private static readonly Dictionary<Type, Dictionary<string, Func<string, Decoder>>> decoders = new Dictionary<Type, Dictionary<string, Func<string, Decoder>>>();
+        private static readonly Dictionary<Type, Func<Decoder>> fallback_decoders = new Dictionary<Type, Func<Decoder>>();
 
         static Decoder()
         {
@@ -49,21 +50,31 @@ namespace osu.Game.Beatmaps.Formats
             if (!decoders.TryGetValue(typeof(T), out var typedDecoders))
                 throw new IOException(@"Unknown decoder type");
 
-            string line;
+            // start off with the first line of the file
+            string line = stream.PeekLine()?.Trim();
 
-            do
+            while (line != null && line.Length == 0)
             {
-                line = stream.ReadLine()?.Trim();
-            } while (line != null && line.Length == 0);
+                // consume the previously peeked empty line and advance to the next one
+                stream.ReadLine();
+                line = stream.PeekLine()?.Trim();
+            }
 
             if (line == null)
-                throw new IOException(@"Unknown file format (null)");
+                throw new IOException("Unknown file format (null)");
 
             var decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
-            if (decoder == null)
-                throw new IOException($@"Unknown file format ({line})");
 
-            return (Decoder<T>)decoder.Invoke(line);
+            // it's important the magic does NOT get consumed here, since sometimes it's part of the structure
+            // (see JsonBeatmapDecoder - the magic string is the opening brace)
+            // decoder implementations should therefore not die on receiving their own magic
+            if (decoder != null)
+                return (Decoder<T>)decoder.Invoke(line);
+
+            if (!fallback_decoders.TryGetValue(typeof(T), out var fallbackDecoder))
+                throw new IOException($"Unknown file format ({line})");
+
+            return (Decoder<T>)fallbackDecoder.Invoke();
         }
 
         /// <summary>
@@ -77,6 +88,20 @@ namespace osu.Game.Beatmaps.Formats
                 decoders.Add(typeof(T), typedDecoders = new Dictionary<string, Func<string, Decoder>>());
 
             typedDecoders[magic] = constructor;
+        }
+
+        /// <summary>
+        /// Registers a fallback decoder instantiation function.
+        /// The fallback will be returned if the first line of the decoded stream does not match any known magic.
+        /// </summary>
+        /// <typeparam name="T">Type of object being decoded.</typeparam>
+        /// <param name="constructor">A function that constructs the fallback<see cref="Decoder"/>.</param>
+        protected static void SetFallbackDecoder<T>(Func<Decoder> constructor)
+        {
+            if (fallback_decoders.ContainsKey(typeof(T)))
+                throw new InvalidOperationException($"A fallback decoder was already added for type {typeof(T)}.");
+
+            fallback_decoders[typeof(T)] = constructor;
         }
     }
 }
