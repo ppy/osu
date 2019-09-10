@@ -1,12 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\osu.TestProject.props" />
-  <ItemGroup>
-    <None Remove="Resources\corrupted-header.osu" />
-    <None Remove="Resources\empty-line-instead-of-header.osu" />
-    <None Remove="Resources\empty-lines-at-start.osu" />
-    <None Remove="Resources\missing-header.osu" />
-    <None Remove="Resources\no-empty-line-after-header.osu" />
-  </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
     <PackageReference Include="DeepEqual" Version="2.0.0" />
