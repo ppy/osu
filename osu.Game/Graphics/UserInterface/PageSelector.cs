@@ -172,8 +172,8 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                IdleColour = colours.Seafoam;
-                HoverColour = colours.Seafoam.Lighten(30f);
+                IdleColour = colours.Lime;
+                HoverColour = colours.Lime.Lighten(20f);
             }
 
             protected abstract Drawable CreateText(string text);
