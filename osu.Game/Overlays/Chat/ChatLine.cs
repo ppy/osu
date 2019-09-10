@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Chat
                 Shadow = false,
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
                 Truncate = true,
-                EllipsisString = ".. :",
+                EllipsisString = "… :",
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
