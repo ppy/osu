@@ -197,6 +197,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double tapValue = tapSkillToPP(tapSkill);
 
+            // Buff high acc
+            double accBuff1 = Math.Pow(urOnStreams / 10, -skillToPPExponent) * 5000;
+            double accBuff2 = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2;
+
+            tapValue += accBuff1 + accBuff2;
+
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             tapValue *= Math.Pow(0.97f, countMiss);
 
@@ -216,7 +222,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double mapAimValue = tpToPP(Attributes.MissTPs[0]);
             double mapSpeedValue = tapSkillToPP(Attributes.TapDiff);
-            double softCap = Mean.PowerMean(mapAimValue, mapSpeedValue, 3) * 1.3;
+            double softCap = Mean.PowerMean(0.8 * mapAimValue, 1.3 * mapSpeedValue, 3);
 
             double modifiedAcc = getModifiedAcc();
             double accOnCircles = 1 - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
@@ -253,7 +259,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.114;
 
-        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.230f;
+        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.210f;
 
         private double totalHits => countGreat + countGood + countMeh + countMiss;
         private double totalSuccessfulHits => countGreat + countGood + countMeh;
