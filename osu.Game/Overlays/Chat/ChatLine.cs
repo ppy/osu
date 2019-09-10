@@ -148,8 +148,8 @@ namespace osu.Game.Overlays.Chat
                         },
                         new MessageSender(message.Sender)
                         {
+                            AutoSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = timestamp_padding },
-                            RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Child = effectedUsername,
