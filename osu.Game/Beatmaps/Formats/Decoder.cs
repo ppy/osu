@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps.Formats
 
         /// <summary>
         /// Registers a fallback decoder instantiation function.
-        /// The fallback will be returned if the first line of the decoded stream does not match any known magic.
+        /// The fallback will be returned if the first non-empty line of the decoded stream does not match any known magic.
         /// </summary>
         /// <typeparam name="T">Type of object being decoded.</typeparam>
         /// <param name="constructor">A function that constructs the fallback<see cref="Decoder"/>.</param>
