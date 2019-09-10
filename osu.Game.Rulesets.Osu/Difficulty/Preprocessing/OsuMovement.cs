@@ -327,7 +327,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (d12 > 0 && tapStrain != null)
             {
-                tapCorrection = SpecialFunctions.Logistic((tapStrain.Sum() / tapStrain.Count / IP12 - 1) * 15) * 0.2;
+                tapCorrection = SpecialFunctions.Logistic((tapStrain.Sum() / tapStrain.Count / IP12 - 1.08) * 15) * 0.35;
             }
 
             // Correction #5 - Cheesing
