@@ -8,7 +8,6 @@ using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Input.Events;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 
@@ -17,8 +16,6 @@ namespace osu.Game.Graphics.UserInterface
     public class GradientLineTabControl<TModel> : PageTabControl<TModel>
     {
         protected override Dropdown<TModel> CreateDropdown() => null;
-
-        protected override TabItem<TModel> CreateTabItem(TModel value) => new ScopeSelectorTabItem(value);
 
         protected Color4 LineColour
         {
@@ -48,29 +45,6 @@ namespace osu.Game.Graphics.UserInterface
             Direction = FillDirection.Horizontal,
             Spacing = new Vector2(20, 0),
         };
-
-        private class ScopeSelectorTabItem : PageTabItem
-        {
-            public ScopeSelectorTabItem(TModel value)
-                : base(value)
-            {
-                Text.Font = OsuFont.GetFont(size: 16);
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                Text.FadeColour(AccentColour);
-
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                base.OnHoverLost(e);
-
-                Text.FadeColour(Color4.White);
-            }
-        }
 
         private class GradientLine : GridContainer
         {
