@@ -229,15 +229,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                         (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
             double deviationAccValue = Math.Pow(deviationOnCircles, -skillToPPExponent) * 50000;
 
-            // apply a soft cap on accuracy value so that it will not skyrocket
-            double adjustedDeviationAccValue = Math.Log(1 + deviationAccValue / softCap) * softCap;
-
             // another algorithm that only focuses on acc instead of acc and od
             double percentageAccValue = Math.Exp((accOnCircles - 1) * 20) * softCap;
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
 
-            return Math.Pow(adjustedDeviationAccValue, 0.4) * Math.Pow(percentageAccValue, 0.6) * lengthFactor;
+            return Math.Pow(deviationAccValue, 0.4) * Math.Pow(percentageAccValue, 0.6) * lengthFactor;
         }
 
         private double getModifiedAcc()
