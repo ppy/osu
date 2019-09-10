@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0s = { 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks0s = { -1.8, -6.4, -5.5, -3.7, -3.7 };
+        private static readonly double[] ks0s = { -1.8, -5.8, -5.5, -3.7, -3.7 };
         private static readonly double[,,] coeffs0s = new double[,,]  {{{ 2   ,  2.8 ,  4   ,  6   ,  6   },
                                                                         { 0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   ,  1   ,  0   ,  0   ,  0   },
