@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     {
 
         private const int mashLevelCount = 11;
+        private const double spacedBuffFactor = 0.10f;
 
         private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 1.7, -0.7))
                                                                                  .PointwiseExp();
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainHistory.Add(currStrain);
 
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
-                double spacedBuff = calculateSpacedness(relativeD) * 0.07;
+                double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
                 currStrain += decayCoeffs * (1 + spacedBuff);
                 prevTime = currTime;
             }
@@ -101,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 maxStrain = maxStrain.PointwiseMaximum(currStrain);
 
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
-                double spacedBuff = calculateSpacedness(relativeD) * 0.07;
+                double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
                 currStrain += decayCoeffs * calculateMashNerfFactor(relativeD, mashLevel) * (1 + spacedBuff);
                 prevTime = currTime;
             }
@@ -116,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private static double calculateSpacedness(double d)
         {
-            return SpecialFunctions.Logistic((d - 0.4) * 10) - SpecialFunctions.Logistic(-4);
+            return SpecialFunctions.Logistic((d - 0.5) * 10) - SpecialFunctions.Logistic(-5);
         }
 	        
     }
