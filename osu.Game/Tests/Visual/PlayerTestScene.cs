@@ -50,7 +50,11 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value = CreateWorkingBeatmap(beatmap);
 
             if (!AllowFail)
-                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
+            {
+                var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);
+                if (noFailMod != null)
+                    Mods.Value = new[] { noFailMod };
+            }
 
             if (Autoplay)
             {

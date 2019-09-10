@@ -64,5 +64,11 @@ namespace osu.Game.Storyboards.Drawables
                 LifetimeEnd = sampleInfo.StartTime;
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            channel?.Stop();
+            base.Dispose(isDisposing);
+        }
     }
 }
