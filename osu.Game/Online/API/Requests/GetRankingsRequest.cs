@@ -10,7 +10,7 @@ namespace osu.Game.Online.API.Requests
     public abstract class GetRankingsRequest<TModel> : APIRequest<List<TModel>>
     {
         private readonly RulesetInfo ruleset;
-        private int page;
+        private readonly int page;
 
         protected GetRankingsRequest(RulesetInfo ruleset, int page = 1)
         {
