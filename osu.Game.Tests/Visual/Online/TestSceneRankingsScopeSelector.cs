@@ -9,7 +9,6 @@ using osu.Game.Overlays;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -24,18 +23,20 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneRankingsScopeSelector()
         {
-            Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
+            var scope = new Bindable<RankingsScope>();
 
-            Add(background = new Box
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both
-            });
-
-            Add(new RankingsScopeSelector
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Current = { BindTarget = scope }
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both
+                },
+                new RankingsScopeSelector
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Current = { BindTarget = scope }
+                }
             });
 
             AddStep(@"Select country", () => scope.Value = RankingsScope.Country);
@@ -47,7 +48,7 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Yellow.Opacity(50);
+            background.Colour = colours.GreySeafoam;
         }
     }
 }
