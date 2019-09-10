@@ -25,6 +25,7 @@ namespace osu.Game.IO
 
         /// <summary>
         /// Reads the next line from the stream without consuming it.
+        /// Subsequent calls to <see cref="PeekLine"/> without a <see cref="ReadLine"/> will return the same string.
         /// </summary>
         public string PeekLine()
         {
@@ -39,6 +40,7 @@ namespace osu.Game.IO
 
         /// <summary>
         /// Reads the next line from the stream and consumes it.
+        /// If a line was peeked, that same line will then be consumed and returned.
         /// </summary>
         public string ReadLine() => lineBuffer.Count > 0 ? lineBuffer.Dequeue() : streamReader.ReadLine();
 

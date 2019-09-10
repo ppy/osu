@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps.Formats
             // note that this isn't completely correct
             AddDecoder<Storyboard>(@"osu file format v", m => new LegacyStoryboardDecoder());
             AddDecoder<Storyboard>(@"[Events]", m => new LegacyStoryboardDecoder());
+            SetFallbackDecoder<Storyboard>(() => new LegacyStoryboardDecoder());
         }
 
         protected override void ParseStreamInto(LineBufferedReader stream, Storyboard storyboard)

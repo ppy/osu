@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using NUnit.Framework;
 using osuTK;
 using osuTK.Graphics;
@@ -488,6 +489,106 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var badStream = new LineBufferedReader(badResStream))
             {
                 Assert.DoesNotThrow(() => decoder.Decode(badStream));
+            }
+        }
+
+        [Test]
+        public void TestFallbackDecoderForCorruptedHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
+                Assert.AreEqual("Evil Hacker", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestFallbackDecoderForMissingHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("missing-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
+                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeFileWithEmptyLinesAtStart()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("empty-lines-at-start.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("Empty lines at start", beatmap.Metadata.Title);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeFileWithEmptyLinesAndNoHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("empty-line-instead-of-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("The dog ate the file header", beatmap.Metadata.Title);
+                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeFileWithContentImmediatelyAfterHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("no-empty-line-after-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("No empty line delimiting header from contents", beatmap.Metadata.Title);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeEmptyFile()
+        {
+            using (var resStream = new MemoryStream())
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.Throws<IOException>(() => Decoder.GetDecoder<Beatmap>(stream));
             }
         }
     }
