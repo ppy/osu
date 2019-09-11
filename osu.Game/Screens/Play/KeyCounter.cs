@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play
         [Resolved(canBeNull: true)]
         private GameplayClock gameplayClock { get; set; }
 
-        public double CurrentTime => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
+        private double currentTime => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
 
         public bool IsCounting { get; set; } = true;
         private int countPresses;
@@ -154,14 +154,14 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            if (currentState?.Time > CurrentTime)
-                restoreStateTo(CurrentTime);
+            if (currentState?.Time > currentTime)
+                restoreStateTo(currentTime);
         }
 
         private void saveState()
         {
-            if (currentState == null || currentState.Time < CurrentTime)
-                states.Add(currentState = new KeyCounterState(CurrentTime, CountPresses));
+            if (currentState == null || currentState.Time < currentTime)
+                states.Add(currentState = new KeyCounterState(currentTime, CountPresses));
         }
 
         private void restoreStateTo(double time)
