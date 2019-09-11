@@ -20,49 +20,39 @@ namespace osu.Game.Overlays.Rankings
 
         public Action Action;
 
-        private readonly Container hoverContainer;
+        private readonly SpriteIcon hoverIcon;
 
         public HeaderFlag()
         {
-            AddInternal(hoverContainer = new Container
+            AddInternal(hoverIcon = new SpriteIcon
             {
-                Alpha = 0,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 Depth = -1,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Size = new Vector2(15),
-                        Icon = FontAwesome.Solid.Times,
-                    },
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(100),
-                    }
-                }
+                Alpha = 0,
+                Size = new Vector2(10),
+                Icon = FontAwesome.Solid.Times,
             });
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            hoverContainer.FadeIn(duration, Easing.OutQuint);
+            hoverIcon.FadeIn(duration, Easing.OutQuint);
+            this.FadeColour(Color4.Gray, duration, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            hoverContainer.FadeOut(duration, Easing.OutQuint);
+            hoverIcon.FadeOut(duration, Easing.OutQuint);
+            this.FadeColour(Color4.White, duration, Easing.OutQuint);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke();
-            return base.OnClick(e);
+            return true;
         }
     }
 }
