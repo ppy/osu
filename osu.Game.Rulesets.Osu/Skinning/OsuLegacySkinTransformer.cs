@@ -86,9 +86,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                         ? null
                         : new LegacySpriteText(source, font)
                         {
-                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
-                            Scale = new Vector2(0.96f),
-                            Spacing = new Vector2(-overlap * 0.89f, 0)
+                            // stable applies a blanket 0.8x scale to hitcircle fonts
+                            Scale = new Vector2(0.8f),
+                            Spacing = new Vector2(-overlap, 0)
                         };
             }
 
