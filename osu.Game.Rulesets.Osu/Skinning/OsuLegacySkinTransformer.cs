@@ -45,6 +45,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             switch (osuComponent.Component)
             {
+                case OsuSkinComponents.FollowPoint:
+                    return this.GetAnimation(component.LookupName, true, false);
+
                 case OsuSkinComponents.SliderFollowCircle:
                     return this.GetAnimation("sliderfollowcircle", true, true);
 
