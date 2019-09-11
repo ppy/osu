@@ -11,6 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
-        private const float column_width = 45;
+        public const float COLUMN_WIDTH = 80;
         private const float special_column_width = 70;
 
         /// <summary>
@@ -41,10 +43,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Index = index;
 
             RelativeSizeAxes = Axes.Y;
-            Width = column_width;
-
-            Masking = true;
-            CornerRadius = 5;
+            Width = COLUMN_WIDTH;
 
             background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
@@ -67,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         }
                     }
                 },
@@ -108,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 isSpecial = value;
 
-                Width = isSpecial ? special_column_width : column_width;
+                Width = isSpecial ? special_column_width : COLUMN_WIDTH;
             }
         }
 
