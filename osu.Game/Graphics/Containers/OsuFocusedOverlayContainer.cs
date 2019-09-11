@@ -42,6 +42,12 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
+            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
+            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+        }
+
+        protected override void LoadComplete()
+        {
             OverlayActivationMode.ValueChanged += mode =>
             {
                 if (mode.NewValue == OverlayActivation.Disabled)
@@ -51,8 +57,7 @@ namespace osu.Game.Graphics.Containers
             if (game != null)
                 OverlayActivationMode.BindTo(game.OverlayActivationMode);
 
-            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
-            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+            base.LoadComplete();
         }
 
         /// <summary>
