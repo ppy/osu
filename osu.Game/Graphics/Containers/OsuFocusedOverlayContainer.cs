@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -106,26 +106,26 @@ namespace osu.Game.Graphics.Containers
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
-            base.UpdateState(state);
-
             switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    if (OverlayActivationMode.Value != OverlayActivation.Disabled)
+                    if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                     {
-                        if (PlaySamplesOnStateChange) samplePopIn?.Play();
-                        if (BlockScreenWideMouse && DimMainContent) osuGame?.AddBlockingOverlay(this);
+                        State.Value = Visibility.Hidden;
+                        return;
                     }
-                    else
-                        Hide();
 
+                    if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                    if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();
-                    if (BlockScreenWideMouse) osuGame?.RemoveBlockingOverlay(this);
+                    if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }
+
+            base.UpdateState(state);
         }
 
         protected override void PopOut()
