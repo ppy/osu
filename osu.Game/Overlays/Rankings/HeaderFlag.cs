@@ -2,14 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK.Graphics;
 using osuTK;
 using osu.Framework.Input.Events;
-using osu.Framework.Extensions.Color4Extensions;
 using System;
 
 namespace osu.Game.Overlays.Rankings
