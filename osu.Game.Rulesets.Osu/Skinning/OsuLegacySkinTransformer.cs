@@ -78,6 +78,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                     return null;
 
+                case OsuSkinComponents.CursorTrail:
+                    if (source.GetTexture("cursortrail") != null)
+                        return new LegacyCursorTrail();
+
+                    return null;
+
                 case OsuSkinComponents.HitCircleText:
                     var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
                     var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? 0;
