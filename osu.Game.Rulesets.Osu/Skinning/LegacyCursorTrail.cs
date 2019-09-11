@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Texture = skin.GetTexture("cursortrail");
             disjointTrail = skin.GetTexture("cursormiddle") == null;
 
-            if (disjointTrail && Texture != null)
+            if (Texture != null)
             {
                 // stable "magic ratio". see OsuPlayfieldAdjustmentContainer for full explanation.
                 Texture.ScaleAdjust *= 1.6f;
