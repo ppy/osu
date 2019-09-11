@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static readonly double[] ds0f = { 0, 1, 1.7, 2.3 };
         private static readonly double[] ks0f = { -14.4, -9.5, -6.5, -2 };
+        private static readonly double[] scales0f = { 1, 1, 1, 1 };
         private static readonly double[,,] coeffs0f = new double[,,]  {{{ 0   , -1   , -1.7 , -2   },
                                                                         { 0   ,  0   ,  0   ,  0   },
                                                                         { 1   ,  1   ,  1   ,  1   },
@@ -40,6 +41,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static readonly double[] ds0s = { 1.5, 2.5, 4, 6, 8 };
         private static readonly double[] ks0s = { -1.8, -5.8, -5.5, -3.7, -3.7 };
+        private static readonly double[] scales0s = { 1, 1, 1, 1, 1 };
         private static readonly double[,,] coeffs0s = new double[,,]  {{{ 2   ,  2.8 ,  4   ,  6   ,  6   },
                                                                         { 0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   ,  1   ,  0   ,  0   ,  0   },
@@ -59,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static readonly double[] ds3f = { 0, 1, 2, 3, 4 };
         private static readonly double[] ks3f = { -4, -4, -4.5, -2.5, -2.5 };
+        private static readonly double[] scales3f = { 1, 1, 1, 1, 1 };
         private static readonly double[,,] coeffs3f = new double[,,]  {{{0  , 1  , 2  , 4  , 4  },
                                                                         {0  , 0  , 0  , 0  , 0  },
                                                                         {0  , 0  , 0  , 0  , 0  },
@@ -70,6 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static readonly double[] ds3s = { 1, 1.5, 2.5, 4, 6, 8 };
         private static readonly double[] ks3s = { -2, -2, -3, -5.4, -4.9 ,-4.9 };
+        private static readonly double[] scales3s = { 1, 1, 1, 1, 1, 1 };
         private static readonly double[,,] coeffs3s = new double[,,]  {{{-2  , -2  , -3  , -4  , -6  , -6  },
                                                                         { 0  ,  0  ,  0  ,  0  ,  0  ,  0  },
                                                                         { 1  ,  1  ,  1  ,  0  ,  0  ,  0  },
@@ -92,12 +96,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                                         { 0  ,  0  , -0.6, -0.4, -0.3, -0.3}}};
 
         private static LinearSpline k0fInterp;
+        private static LinearSpline scale0fInterp;
         private static LinearSpline[,] coeffs0fInterps;
         private static LinearSpline k0sInterp;
+        private static LinearSpline scale0sInterp;
         private static LinearSpline[,] coeffs0sInterps;
         private static LinearSpline k3fInterp;
+        private static LinearSpline scale3fInterp;
         private static LinearSpline[,] coeffs3fInterps;
         private static LinearSpline k3sInterp;
+        private static LinearSpline scale3sInterp;
         private static LinearSpline[,] coeffs3sInterps;
 
         private const double tRatioThreshold = 1.4;
@@ -226,8 +234,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         double x0 = normalized_pos0.DotProduct(s12) / d12;
                         double y0 = (normalized_pos0 - x0 * s12 / d12).L2Norm();
 
-                        double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0fInterp, coeffs0fInterps);
-                        double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0sInterp, coeffs0sInterps);
+                        double correction0Flow = calcCorrection0Or3(d12, x0, y0, k0fInterp, scale0fInterp, coeffs0fInterps);
+                        double correction0Snap = calcCorrection0Or3(d12, x0, y0, k0sInterp, scale0sInterp, coeffs0sInterps);
                         double correction0Stop = calcCorrection0Stop(d12, x0, y0);
 
                         flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
@@ -295,8 +303,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         double x3 = normalizedPos3.DotProduct(s12) / d12;
                         double y3 = (normalizedPos3 - x3 * s12 / d12).L2Norm();
 
-                        double correction3Flow = calcCorrection0Or3(d12, x3, y3, k3fInterp, coeffs3fInterps);
-                        double correction3Snap = calcCorrection0Or3(d12, x3, y3, k3sInterp, coeffs3sInterps);
+                        double correction3Flow = calcCorrection0Or3(d12, x3, y3, k3fInterp, scale3fInterp, coeffs3fInterps);
+                        double correction3Snap = calcCorrection0Or3(d12, x3, y3, k3sInterp, scale3sInterp, coeffs3sInterps);
 
                         flowiness123 = SpecialFunctions.Logistic((correction3Snap - correction3Flow - 0.05) * 20);
 
@@ -414,17 +422,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         public static void Initialize()
         {
-            prepareInterp(ds0f, ks0f, coeffs0f, ref k0fInterp, ref coeffs0fInterps);
-            prepareInterp(ds0s, ks0s, coeffs0s, ref k0sInterp, ref coeffs0sInterps);
-            prepareInterp(ds3f, ks3f, coeffs3f, ref k3fInterp, ref coeffs3fInterps);
-            prepareInterp(ds3s, ks3s, coeffs3s, ref k3sInterp, ref coeffs3sInterps);
+            prepareInterp(ds0f, ks0f, scales0f, coeffs0f, ref k0fInterp, ref scale0fInterp, ref coeffs0fInterps);
+            prepareInterp(ds0s, ks0s, scales0s, coeffs0s, ref k0sInterp, ref scale0sInterp, ref coeffs0sInterps);
+            prepareInterp(ds3f, ks3f, scales3f, coeffs3f, ref k3fInterp, ref scale3fInterp, ref coeffs3fInterps);
+            prepareInterp(ds3s, ks3s, scales3s, coeffs3s, ref k3sInterp, ref scale3sInterp, ref coeffs3sInterps);
         }
 
 
-        private static void prepareInterp(double[] ds, double[] ks, double[,,] coeffs,
-                                           ref LinearSpline kInterp, ref LinearSpline[,] coeffsInterps)
+        private static void prepareInterp(double[] ds, double[] ks, double[] scales, double[,,] coeffs,
+                                           ref LinearSpline kInterp, ref LinearSpline scaleInterp, ref LinearSpline[,] coeffsInterps)
         {
             kInterp = LinearSpline.InterpolateSorted(ds, ks);
+            scaleInterp = LinearSpline.InterpolateSorted(ds, scales);
 
             coeffsInterps = new LinearSpline[coeffs.GetLength(0), numCoeffs];
             for (int i = 0; i < coeffs.GetLength(0); i++)
@@ -442,7 +451,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         private static double calcCorrection0Or3(double d, double x, double y,
-                                                     LinearSpline kInterp, LinearSpline[,] coeffsInterps)
+                                                 LinearSpline kInterp, LinearSpline scaleInterp, LinearSpline[,] coeffsInterps)
         {
             double correction_raw = kInterp.Interpolate(d);
             for (int i = 0; i < coeffsInterps.GetLength(0); i++)
@@ -456,7 +465,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                                                     Math.Pow((y - cs[1]), 2) +
                                                     cs[2]);
             }
-            return SpecialFunctions.Logistic(correction_raw);
+            return SpecialFunctions.Logistic(correction_raw) * scaleInterp.Interpolate(d);
         }
 
         private static double calcCorrection0Stop(double d, double x, double y)
