@@ -48,14 +48,14 @@ namespace osu.Game.Graphics.Containers
 
         protected override void LoadComplete()
         {
-            OverlayActivationMode.ValueChanged += mode =>
+            if (game != null)
+                OverlayActivationMode.BindTo(game.OverlayActivationMode);
+
+            OverlayActivationMode.BindValueChanged(mode =>
             {
                 if (mode.NewValue == OverlayActivation.Disabled)
                     State.Value = Visibility.Hidden;
-            };
-
-            if (game != null)
-                OverlayActivationMode.BindTo(game.OverlayActivationMode);
+            }, true);
 
             base.LoadComplete();
         }
