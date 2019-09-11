@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.Containers
         protected virtual bool DimMainContent => true;
 
         [Resolved(CanBeNull = true)]
-        private OsuGame osuGame { get; set; }
+        private OsuGame game { get; set; }
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -42,8 +42,14 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
-            if (osuGame != null)
-                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+            OverlayActivationMode.ValueChanged += mode =>
+            {
+                if (mode.NewValue == OverlayActivation.Disabled)
+                    State.Value = Visibility.Hidden;
+            };
+
+            if (game != null)
+                OverlayActivationMode.BindTo(game.OverlayActivationMode);
 
             samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
@@ -137,7 +143,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            osuGame?.RemoveBlockingOverlay(this);
+            game?.RemoveBlockingOverlay(this);
         }
     }
 }
