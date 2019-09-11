@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            Child = new SkinnableDrawable("Play/osu/followpoint", _ => new Container
+            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new Container
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Child = new Box
                 {
                     Size = new Vector2(width),
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,

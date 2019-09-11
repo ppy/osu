@@ -113,13 +113,14 @@ namespace osu.Desktop.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog)
+            private void load(OsuColour colours, ChangelogOverlay changelog, NotificationOverlay notificationOverlay)
             {
                 Icon = FontAwesome.Solid.CheckSquare;
                 IconBackgound.Colour = colours.BlueDark;
 
                 Activated = delegate
                 {
+                    notificationOverlay.Hide();
                     changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
                     return true;
                 };

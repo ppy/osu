@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -9,8 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osuTK;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -28,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Container scaleContainer;
 
         private readonly HitArea hitArea;
+
+        private readonly SkinnableDrawable mainContent;
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
@@ -56,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        new SkinnableDrawable("Play/osu/hitcircle", _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
+                        mainContent = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -85,6 +88,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -97,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (result == HitResult.None)
             {
-                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
+                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.WindowFor(HitResult.Miss));
                 return;
             }
 
@@ -108,6 +113,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
+            mainContent.FadeInFromZero(HitObject.TimeFadeIn);
+
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
             ApproachCircle.Expire(true);
@@ -115,6 +122,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             switch (state)
             {
                 case ArmedState.Idle:
@@ -125,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     hitArea.HitAction = null;
 
                     // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.WindowFor(HitResult.Miss);
                     break;
 
                 case ArmedState.Miss:

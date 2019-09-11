@@ -11,8 +11,11 @@ namespace osu.Game.Screens
 {
     public abstract class BackgroundScreen : Screen, IEquatable<BackgroundScreen>
     {
-        protected BackgroundScreen()
+        private readonly bool animateOnEnter;
+
+        protected BackgroundScreen(bool animateOnEnter = true)
         {
+            this.animateOnEnter = animateOnEnter;
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
         }
@@ -39,11 +42,14 @@ namespace osu.Game.Screens
 
         public override void OnEntering(IScreen last)
         {
-            this.FadeOut();
-            this.MoveToX(x_movement_amount);
+            if (animateOnEnter)
+            {
+                this.FadeOut();
+                this.MoveToX(x_movement_amount);
 
-            this.FadeIn(transition_length, Easing.InOutQuart);
-            this.MoveToX(0, transition_length, Easing.InOutQuart);
+                this.FadeIn(transition_length, Easing.InOutQuart);
+                this.MoveToX(0, transition_length, Easing.InOutQuart);
+            }
 
             base.OnEntering(last);
         }

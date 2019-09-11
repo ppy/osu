@@ -44,6 +44,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsEnumDropdown<ScoreMeterType>
+                {
+                    LabelText = "Score meter type",
+                    Bindable = config.GetBindable<ScoreMeterType>(OsuSetting.ScoreMeter)
+                },
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "Score display mode",

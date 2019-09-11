@@ -6,6 +6,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
