@@ -24,7 +24,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestSmoothCursorTrail()
         {
-            createTest(() => new CursorTrail());
+            Container scalingContainer = null;
+
+            createTest(() => scalingContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Child = new CursorTrail()
+            });
+
+            AddStep("set large scale", () => scalingContainer.Scale = new Vector2(10));
         }
 
         [Test]
