@@ -85,16 +85,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return null;
 
                 case OsuSkinComponents.HitCircleText:
-                    var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCircleFont)?.Value ?? "default";
+                    var font = GetConfig<OsuSkinConfiguration, string>(OsuSkinConfiguration.HitCirclePrefix)?.Value ?? "default";
                     var overlap = GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.HitCircleOverlap)?.Value ?? 0;
 
                     return !hasFont(font)
                         ? null
                         : new LegacySpriteText(source, font)
                         {
-                            // Spacing value was reverse-engineered from the ratio of the rendered sprite size in the visual inspector vs the actual texture size
-                            Scale = new Vector2(0.96f),
-                            Spacing = new Vector2(-overlap * 0.89f, 0)
+                            // stable applies a blanket 0.8x scale to hitcircle fonts
+                            Scale = new Vector2(0.8f),
+                            Spacing = new Vector2(-overlap, 0)
                         };
             }
 
