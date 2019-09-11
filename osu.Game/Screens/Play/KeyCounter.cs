@@ -25,6 +25,11 @@ namespace osu.Game.Screens.Play
         private readonly List<KeyCounterState> states = new List<KeyCounterState>();
         private KeyCounterState currentState;
 
+        [Resolved(canBeNull: true)]
+        private GameplayClock gameplayClock { get; set; }
+
+        public double CurrentTime => gameplayClock?.CurrentTime ?? Clock.CurrentTime;
+
         public bool IsCounting { get; set; } = true;
         private int countPresses;
 
@@ -72,12 +77,9 @@ namespace osu.Game.Screens.Play
             Name = name;
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(TextureStore textures, GameplayClock clock)
+        [BackgroundDependencyLoader]
+        private void load(TextureStore textures)
         {
-            if (clock != null)
-                Clock = clock;
-
             Children = new Drawable[]
             {
                 buttonSprite = new Sprite
@@ -152,14 +154,14 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            if (currentState?.Time > Clock.CurrentTime)
-                restoreStateTo(Clock.CurrentTime);
+            if (currentState?.Time > CurrentTime)
+                restoreStateTo(CurrentTime);
         }
 
         private void saveState()
         {
-            if (currentState == null || currentState.Time < Clock.CurrentTime)
-                states.Add(currentState = new KeyCounterState(Clock.CurrentTime, CountPresses));
+            if (currentState == null || currentState.Time < CurrentTime)
+                states.Add(currentState = new KeyCounterState(CurrentTime, CountPresses));
         }
 
         private void restoreStateTo(double time)
