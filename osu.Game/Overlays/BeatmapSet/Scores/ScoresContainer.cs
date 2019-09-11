@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Scores = null;
 
-            if (beatmap?.OnlineBeatmapID.HasValue != true)
+            if (beatmap?.OnlineBeatmapID.HasValue != true || beatmap.Status <= BeatmapSetOnlineStatus.Pending)
                 return;
 
             loadingAnimation.Show();
