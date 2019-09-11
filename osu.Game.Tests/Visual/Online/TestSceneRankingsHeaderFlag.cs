@@ -24,6 +24,18 @@ namespace osu.Game.Tests.Visual.Online
             HeaderFlag flag;
             SpriteText text;
 
+            var countryA = new Country
+            {
+                FlagName = "BY",
+                FullName = "Belarus"
+            };
+
+            var countryB = new Country
+            {
+                FlagName = "US",
+                FullName = "United States"
+            };
+
             AddRange(new Drawable[]
             {
                 flag = new HeaderFlag
@@ -31,11 +43,7 @@ namespace osu.Game.Tests.Visual.Online
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Size = new Vector2(30, 20),
-                    Country = new Country
-                    {
-                        FlagName = "BY",
-                        FullName = "Belarus"
-                    }
+                    Country = countryA,
                 },
                 text = new SpriteText
                 {
@@ -50,6 +58,8 @@ namespace osu.Game.Tests.Visual.Online
             flag.Action += () => text.FadeIn().Then().FadeOut(1000, Easing.OutQuint);
 
             AddStep("Trigger click", () => flag.Click());
+            AddStep("Change to country 2", () => flag.Country = countryB);
+            AddStep("Change to country 1", () => flag.Country = countryA);
         }
     }
 }
