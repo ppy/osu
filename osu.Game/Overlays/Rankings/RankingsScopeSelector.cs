@@ -5,7 +5,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Rankings
 {
     public class RankingsScopeSelector : GradientLineTabControl<RankingsScope>
     {

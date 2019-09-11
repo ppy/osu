@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
-using osu.Game.Overlays;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.Online
 {
