@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public DrawableOsuRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
