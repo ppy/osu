@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 if (lastPlateableFruit == null)
                     return;
 
-                // this is required to make this run after the last caught fruit runs UpdateState at least once.
+                // this is required to make this run after the last caught fruit runs updateState() at least once.
                 // TODO: find a better alternative
                 if (lastPlateableFruit.IsLoaded)
                     action();
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
                 additive.RelativePositionAxes = RelativePositionAxes;
-                additive.Blending = BlendingMode.Additive;
+                additive.Blending = BlendingParameters.Additive;
 
                 AdditiveTarget.Add(additive);
 

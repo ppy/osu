@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Testing;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
@@ -12,6 +13,7 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
+    [HeadlessTest]
     public class TestSceneAutoGeneration : OsuTestScene
     {
         [Test]
