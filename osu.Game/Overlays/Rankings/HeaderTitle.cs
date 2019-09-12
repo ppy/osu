@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Rankings
 
         private readonly SpriteText scopeText;
         private readonly Container flagPlaceholder;
-        private readonly HeaderFlag flag;
+        private readonly DismissableFlag flag;
 
         public HeaderTitle()
         {
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Rankings
                         Origin = Anchor.BottomLeft,
                         AutoSizeAxes = Axes.Both,
                         Margin = new MarginPadding { Bottom = flag_margin },
-                        Child = flag = new HeaderFlag
+                        Child = flag = new DismissableFlag
                         {
                             Size = new Vector2(30, 20),
                         },
