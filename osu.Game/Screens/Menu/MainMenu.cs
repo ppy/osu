@@ -11,6 +11,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -43,6 +44,12 @@ namespace osu.Game.Screens.Menu
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private LoginOverlay login { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private BackgroundScreenDefault background;
 
@@ -133,6 +140,8 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
+        private bool loginDisplayed;
+
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
@@ -150,6 +159,21 @@ namespace osu.Game.Screens.Menu
                 this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
+            }
+            else if (!api.IsLoggedIn)
+            {
+                logo.Action += displayLogin;
+            }
+
+            bool displayLogin()
+            {
+                if (!loginDisplayed)
+                {
+                    Scheduler.AddDelayed(() => login?.Show(), 500);
+                    loginDisplayed = true;
+                }
+
+                return true;
             }
         }
 
