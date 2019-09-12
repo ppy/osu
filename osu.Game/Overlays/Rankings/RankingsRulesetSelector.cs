@@ -25,9 +25,9 @@ namespace osu.Game.Overlays.Rankings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, RulesetStore Rulesets)
+        private void load(OsuColour colours, RulesetStore rulesets)
         {
-            foreach (var r in Rulesets.AvailableRulesets)
+            foreach (var r in rulesets.AvailableRulesets)
                 AddItem(r);
 
             AccentColour = colours.Lime;
