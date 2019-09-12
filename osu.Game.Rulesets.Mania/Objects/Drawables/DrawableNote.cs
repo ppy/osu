@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
+        public const float CORNER_RADIUS = NotePiece.NOTE_HEIGHT / 2;
+
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject)
@@ -38,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = colour.NewValue.Lighten(1f).Opacity(0.6f),
+                    Colour = colour.NewValue.Lighten(1f).Opacity(0.2f),
                     Radius = 10,
                 };
             }, true);
