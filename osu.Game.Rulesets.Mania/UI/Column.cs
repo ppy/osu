@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
-        public const float COLUMN_WIDTH = 45;
+        public const float COLUMN_WIDTH = 80;
         private const float special_column_width = 70;
 
         /// <summary>
@@ -45,9 +45,6 @@ namespace osu.Game.Rulesets.Mania.UI
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
 
-            Masking = true;
-            CornerRadius = 5;
-
             background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
             Container hitTargetContainer;
@@ -69,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         }
                     }
                 },
