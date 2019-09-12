@@ -219,10 +219,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         break;
                 }
 
-                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+                this.FadeOut(fade_out_time, Easing.OutQuint);
             }
-
-            Expire(true);
         }
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;

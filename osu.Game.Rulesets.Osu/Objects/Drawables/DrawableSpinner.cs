@@ -219,10 +219,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             switch (state)
             {
-                case ArmedState.Idle:
-                    Expire(true);
-                    break;
-
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
@@ -231,8 +227,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
-
-            Expire();
         }
     }
 }

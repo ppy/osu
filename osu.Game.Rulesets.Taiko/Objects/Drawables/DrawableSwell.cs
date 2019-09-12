@@ -208,8 +208,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     {
                         this.FadeOut(transition_duration, Easing.Out);
                         bodyContainer.ScaleTo(1.4f, transition_duration);
-
-                        Expire();
                     }
 
                     break;

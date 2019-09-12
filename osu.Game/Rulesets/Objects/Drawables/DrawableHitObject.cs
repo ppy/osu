@@ -153,7 +153,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (UseTransformStateManagement)
             {
-                lifetimeStart = null;
                 LifetimeEnd = double.MaxValue;
 
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
@@ -173,6 +172,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         state.Value = newState;
                     }
                 }
+
+                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
+                    Expire();
             }
             else
                 state.Value = newState;
@@ -203,6 +205,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
+        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// </summary>
         /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
