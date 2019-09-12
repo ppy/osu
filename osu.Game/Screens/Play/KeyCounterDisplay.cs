@@ -102,11 +102,6 @@ namespace osu.Game.Screens.Play
 
         private Receptor receptor;
 
-        public Receptor GetReceptor()
-        {
-            return receptor ?? (receptor = new Receptor(this));
-        }
-
         public void SetReceptor(Receptor receptor)
         {
             if (this.receptor != null)
