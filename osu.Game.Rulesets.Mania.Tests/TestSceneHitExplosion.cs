@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -59,26 +57,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                     }
                 });
             }, 100);
-        }
-
-        private class TestNote : DrawableNote
-        {
-            protected override void CheckForResult(bool userTriggered, double timeOffset)
-            {
-                if (!userTriggered)
-                {
-                    // force success
-                    ApplyResult(r => r.Type = HitResult.Great);
-                }
-                else
-                    base.CheckForResult(userTriggered, timeOffset);
-            }
-
-            public TestNote(Note hitObject)
-                : base(hitObject)
-            {
-                AccentColour.Value = Color4.Pink;
-            }
         }
     }
 }

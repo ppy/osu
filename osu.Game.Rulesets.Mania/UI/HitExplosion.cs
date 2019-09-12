@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly CircularContainer largeFaint;
         private readonly CircularContainer mainGlow1;
-        private readonly CircularContainer mainGlow2;
-        private readonly CircularContainer mainGlow3;
 
         public HitExplosion(Color4 objectColour, bool isSmall = false)
         {
@@ -35,8 +33,6 @@ namespace osu.Game.Rulesets.Mania.UI
             const float angle_variangle = 15; // should be less than 45
 
             const float roundness = 80;
-
-            const float opacity = 1;
 
             const float initial_height = 10;
 
@@ -76,7 +72,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         Radius = 50,
                     },
                 },
-                mainGlow2 = new CircularContainer
+                new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -93,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         Radius = 40,
                     },
                 },
-                mainGlow3 = new CircularContainer
+                new CircularContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
