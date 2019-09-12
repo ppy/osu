@@ -44,7 +44,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Key key = (Key)((int)Key.A + RNG.Next(26));
                 kc.Add(new KeyCounterKeyboard(key));
             });
-            AddSliderStep("Fade time", 0, 200, 50, v => kc.FadeTime = v);
 
             Key testKey = ((KeyCounterKeyboard)kc.Children.First()).Key;
             double time1 = 0;
