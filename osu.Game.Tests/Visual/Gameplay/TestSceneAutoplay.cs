@@ -21,13 +21,20 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("score above zero", () => ((ScoreAccessiblePlayer)Player).ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 5));
+            AddStep("rewind", () =>
+            {
+                ((ScoreAccessiblePlayer)Player).GameplayClockContainer.Seek(0);
+            });
+            AddUntilStep("key counter counted no", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
         }
 
         private class ScoreAccessiblePlayer : TestPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
+
+            public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
             public ScoreAccessiblePlayer()
                 : base(false, false)
