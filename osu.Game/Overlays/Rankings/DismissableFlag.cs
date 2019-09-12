@@ -11,7 +11,7 @@ using System;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class HeaderFlag : UpdateableFlag
+    public class DismissableFlag : UpdateableFlag
     {
         private const int duration = 200;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Rankings
 
         private readonly SpriteIcon hoverIcon;
 
-        public HeaderFlag()
+        public DismissableFlag()
         {
             AddInternal(hoverIcon = new SpriteIcon
             {
