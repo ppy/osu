@@ -11,6 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -90,7 +92,11 @@ namespace osu.Game.Rulesets.Mania.UI
                     Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
-                explosionContainer.Y = dir.NewValue == ScrollingDirection.Down ? -NotePiece.NOTE_HEIGHT : 0;
+                explosionContainer.Padding = new MarginPadding
+                {
+                    Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
+                };
 
                 keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
@@ -168,7 +174,7 @@ namespace osu.Game.Rulesets.Mania.UI
             explosionContainer.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
             {
                 Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
-                Origin = Direction.Value == ScrollingDirection.Up ? Anchor.BottomCentre : Anchor.TopCentre,
+                Origin = Anchor.Centre
             });
         }
 
