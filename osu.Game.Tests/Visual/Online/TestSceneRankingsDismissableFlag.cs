@@ -12,16 +12,16 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    public class TestSceneRankingsHeaderFlag : OsuTestScene
+    public class TestSceneRankingsDismissableFlag : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(HeaderFlag),
+            typeof(DismissableFlag),
         };
 
-        public TestSceneRankingsHeaderFlag()
+        public TestSceneRankingsDismissableFlag()
         {
-            HeaderFlag flag;
+            DismissableFlag flag;
             SpriteText text;
 
             var countryA = new Country
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Visual.Online
 
             AddRange(new Drawable[]
             {
-                flag = new HeaderFlag
+                flag = new DismissableFlag
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
