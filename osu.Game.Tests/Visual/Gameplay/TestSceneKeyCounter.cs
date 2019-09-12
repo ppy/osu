@@ -46,7 +46,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             Key testKey = ((KeyCounterKeyboard)kc.Children.First()).Key;
-            double time1 = 0;
 
             AddStep($"Press {testKey} key", () =>
             {
@@ -60,7 +59,6 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 InputManager.PressKey(testKey);
                 InputManager.ReleaseKey(testKey);
-                time1 = Clock.CurrentTime;
             });
 
             AddAssert($"Check {testKey} counter after keypress", () => testCounter.CountPresses == 2);
