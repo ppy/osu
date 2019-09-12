@@ -144,12 +144,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public void ResetCount()
-        {
-            CountPresses = 0;
-            states.Clear();
-        }
-
         protected override void Update()
         {
             base.Update();
