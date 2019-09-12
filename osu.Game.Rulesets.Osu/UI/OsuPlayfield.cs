@@ -70,13 +70,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.Add(h);
         }
 
-        private void addApproachCircleProxy(Drawable d)
-        {
-            var proxy = d.CreateProxy();
-            proxy.LifetimeStart = d.LifetimeStart;
-            proxy.LifetimeEnd = d.LifetimeEnd;
-            approachCircles.Add(proxy);
-        }
+        private void addApproachCircleProxy(Drawable d) => approachCircles.Add(d.CreateProxy());
 
         public override void PostProcess()
         {
