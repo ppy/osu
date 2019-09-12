@@ -23,10 +23,9 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneRankingsRulesetSelector()
         {
-            RankingsRulesetSelector selector;
             var current = new Bindable<RulesetInfo>();
 
-            Add(selector = new RankingsRulesetSelector
+            Add(new RankingsRulesetSelector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
