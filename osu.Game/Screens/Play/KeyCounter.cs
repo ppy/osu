@@ -130,15 +130,17 @@ namespace osu.Game.Screens.Play
 
         private void updateGlowSprite(bool show)
         {
+            double remainingFadeTime = FadeTime * (1 - glowSprite.Alpha);
+
             if (show)
             {
-                glowSprite.FadeIn(FadeTime);
-                textLayer.FadeColour(KeyDownTextColor, FadeTime);
+                glowSprite.FadeIn(remainingFadeTime);
+                textLayer.FadeColour(KeyDownTextColor, remainingFadeTime);
             }
             else
             {
-                glowSprite.FadeOut(FadeTime);
-                textLayer.FadeColour(KeyUpTextColor, FadeTime);
+                glowSprite.FadeOut(remainingFadeTime);
+                textLayer.FadeColour(KeyUpTextColor, remainingFadeTime);
             }
         }
 
