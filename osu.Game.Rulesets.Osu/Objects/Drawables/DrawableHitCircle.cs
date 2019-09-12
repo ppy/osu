@@ -86,6 +86,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue, true);
         }
 
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                base.LifetimeStart = value;
+                ApproachCircle.LifetimeStart = value;
+            }
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                base.LifetimeEnd = value;
+                ApproachCircle.LifetimeEnd = value;
+            }
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             Debug.Assert(HitObject.HitWindows != null);
@@ -132,22 +152,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Expire(true);
 
                     hitArea.HitAction = null;
-
-                    // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.WindowFor(HitResult.Miss);
                     break;
 
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
                     this.FadeOut(100);
-                    Expire();
                     break;
 
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
                     // todo: temporary / arbitrary
-                    this.Delay(800).Expire();
+                    this.Delay(800).FadeOut();
                     break;
             }
         }
