@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
         //further: change default values here and in KeyCounterCollection if needed, instead of passing them in every constructor
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
-        public int FadeTime { get; set; }
+        public double FadeTime { get; set; }
 
         protected KeyCounter(string name)
         {
@@ -130,17 +130,17 @@ namespace osu.Game.Screens.Play
 
         private void updateGlowSprite(bool show)
         {
-            double remainingFadeTime = FadeTime * (1 - glowSprite.Alpha);
-
             if (show)
             {
-                glowSprite.FadeIn(remainingFadeTime);
-                textLayer.FadeColour(KeyDownTextColor, remainingFadeTime);
+                double remainingFadeTime = FadeTime * (1 - glowSprite.Alpha);
+                glowSprite.FadeIn(remainingFadeTime, Easing.OutQuint);
+                textLayer.FadeColour(KeyDownTextColor, remainingFadeTime, Easing.OutQuint);
             }
             else
             {
-                glowSprite.FadeOut(remainingFadeTime);
-                textLayer.FadeColour(KeyUpTextColor, remainingFadeTime);
+                double remainingFadeTime = 8 * FadeTime * glowSprite.Alpha;
+                glowSprite.FadeOut(remainingFadeTime, Easing.OutQuint);
+                textLayer.FadeColour(KeyUpTextColor, remainingFadeTime, Easing.OutQuint);
             }
         }
 
