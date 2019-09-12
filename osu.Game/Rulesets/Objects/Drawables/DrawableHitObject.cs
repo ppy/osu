@@ -314,7 +314,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
+        /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
