@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -12,21 +11,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class DrawableWeightedScore : DrawableTotalScore
     {
-        private readonly double weight;
-
         public DrawableWeightedScore(ScoreInfo score, double weight)
             : base(score)
         {
-            this.weight = weight;
-        }
+            DetailInfo.Origin = Anchor.BottomLeft;
+            DetailInfo.Margin = new MarginPadding { Bottom = 2 };
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Accuracy.Origin = Anchor.BottomLeft;
-            Accuracy.Margin = new MarginPadding { Bottom = 2 };
-
-            Accuracy.Add(new Container
+            DetailInfo.Add(new Container
             {
                 AutoSizeAxes = Axes.Y,
                 Width = 50,

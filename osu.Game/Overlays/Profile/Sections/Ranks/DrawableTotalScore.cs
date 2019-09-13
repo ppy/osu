@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private const int corner_radius = 6;
 
         protected readonly Container InfoContainer;
-        protected readonly FillFlowContainer Accuracy;
+        protected readonly FillFlowContainer DetailInfo;
         protected readonly ScoreInfo Score;
 
         private readonly Box background;
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Origin = Anchor.CentreRight,
                             Children = new Drawable[]
                             {
-                                Accuracy = new FillFlowContainer
+                                DetailInfo = new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.CentreLeft,
