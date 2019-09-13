@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        public PopupDialog()
+        protected PopupDialog()
         {
             RelativeSizeAxes = Axes.Both;
 
