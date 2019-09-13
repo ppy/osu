@@ -32,6 +32,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
         {
+            this.api = api;
             this.rulesets = rulesets;
 
             testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
