@@ -74,6 +74,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 caughtFruit.Anchor = Anchor.TopCentre;
                 caughtFruit.Origin = Anchor.Centre;
                 caughtFruit.Scale *= 0.7f;
+                caughtFruit.LifetimeStart = caughtFruit.HitObject.StartTime;
                 caughtFruit.LifetimeEnd = double.MaxValue;
 
                 MovableCatcher.Add(caughtFruit);
@@ -414,7 +415,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
                     f.MoveToY(f.Y + 75, 750, Easing.InSine);
                     f.FadeOut(750);
-                    f.Expire(true);
+
+                    // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
+                    f.LifetimeStart = Time.Current;
+                    f.Expire();
                 }
             }
 
@@ -448,7 +452,10 @@ namespace osu.Game.Rulesets.Catch.UI
                 fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
                 fruit.MoveToX(fruit.X + originalX * 6, 1000);
                 fruit.FadeOut(750);
-                fruit.Expire(true);
+
+                // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
+                fruit.LifetimeStart = Time.Current;
+                fruit.Expire();
             }
         }
     }
