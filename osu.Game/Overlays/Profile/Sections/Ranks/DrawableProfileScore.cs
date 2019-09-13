@@ -12,12 +12,13 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Beatmaps;
 using osu.Framework.Localisation;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public abstract class DrawableProfileScore : DrawableProfileRow
     {
-        private readonly ScoreModsContainer modsContainer;
+        private readonly FillFlowContainer modsContainer;
         protected readonly ScoreInfo Score;
 
         protected DrawableProfileScore(ScoreInfo score)
@@ -28,12 +29,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             Height = 60;
             Children = new Drawable[]
             {
-                modsContainer = new ScoreModsContainer
+                modsContainer = new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Width = 60,
+                    Spacing = new Vector2(1),
                     Margin = new MarginPadding { Right = 160 }
                 }
             };
