@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.Play.HUD.HitErrorMeters.Bar;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -92,13 +93,13 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(meter = new BarHitErrorMeter(hitWindows, true)
+            Add(meter = new SidebarHitErrorMeter(hitWindows, true)
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
 
-            Add(meter2 = new BarHitErrorMeter(hitWindows, false)
+            Add(meter2 = new SidebarHitErrorMeter(hitWindows, false)
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,

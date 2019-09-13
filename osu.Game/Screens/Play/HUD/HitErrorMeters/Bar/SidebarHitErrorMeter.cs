@@ -15,9 +15,9 @@ using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Play.HUD.HitErrorMeters
+namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
 {
-    public class BarHitErrorMeter : HitErrorMeter
+    public class SidebarHitErrorMeter : HitErrorMeter
     {
         private readonly Anchor alignment;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private double maxHitWindow;
 
-        public BarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
+        public SidebarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
             : base(hitWindows)
         {
             alignment = rightAligned ? Anchor.x0 : Anchor.x2;

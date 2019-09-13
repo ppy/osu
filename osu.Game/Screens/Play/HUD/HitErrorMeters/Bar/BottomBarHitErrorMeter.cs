@@ -16,7 +16,7 @@ using osuTK;
 using osuTK.Graphics;
 using System.Linq;
 
-namespace osu.Game.Screens.Play.HUD.HitErrorMeters
+namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
 {
     public class BottomBarHitErrorMeter : HitErrorMeter
     {

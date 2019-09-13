@@ -10,6 +10,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osu.Game.Screens.Play.HUD.HitErrorMeters.Bar;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void createBar(bool rightAligned)
         {
-            var display = new BarHitErrorMeter(hitWindows, rightAligned)
+            var display = new SidebarHitErrorMeter(hitWindows, rightAligned)
             {
                 Margin = new MarginPadding(margin),
                 Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
