@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Current = { BindTarget = scope }
+                    Current = scope
                 }
             });
 
