@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual
             get
             {
                 if (UseOnlineAPI)
-                    throw new Exception("Using the OsuTestScene dummy API is not supported when UseOnlineAPI is true");
+                    throw new Exception($"Using the {nameof(OsuTestScene)} dummy API is not supported when {nameof(UseOnlineAPI)} is true");
 
                 return dummyAPI;
             }
@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual
 
         /// <summary>
         /// Whether this test scene requires real-world API access.
-        /// If true, this will bypass the local <see cref="dummyAPI"/> and use the <see cref="OsuGameBase"/> provided one.
+        /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
         /// </summary>
         protected virtual bool UseOnlineAPI => false;
 
