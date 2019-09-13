@@ -35,7 +35,6 @@ namespace osu.Game.Migrations
                     AudioFile = table.Column<string>(type: "TEXT", nullable: true),
                     Author = table.Column<string>(type: "TEXT", nullable: true),
                     BackgroundFile = table.Column<string>(type: "TEXT", nullable: true),
-                    VideoFile = table.Column<string>(type: "TEXT", nullable: true),
                     PreviewTime = table.Column<int>(type: "INTEGER", nullable: false),
                     Source = table.Column<string>(type: "TEXT", nullable: true),
                     Tags = table.Column<string>(type: "TEXT", nullable: true),
