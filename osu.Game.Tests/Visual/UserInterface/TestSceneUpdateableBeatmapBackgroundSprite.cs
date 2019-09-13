@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneUpdateableBeatmapBackgroundSprite : OsuTestScene
     {
-        protected override bool RequiresAPIAccess => true;
+        protected override bool UseOnlineAPI => true;
 
         private BeatmapSetInfo testBeatmap;
         private IAPIProvider api;
@@ -32,7 +32,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osu, IAPIProvider api, RulesetStore rulesets)
         {
-            this.api = api;
             this.rulesets = rulesets;
 
             testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
