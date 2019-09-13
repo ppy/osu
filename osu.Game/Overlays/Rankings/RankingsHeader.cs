@@ -19,8 +19,6 @@ namespace osu.Game.Overlays.Rankings
     {
         private const int content_height = 250;
         private const int dropdown_height = 50;
-        private const int spacing = 20;
-        private const int duration = 200;
 
         public IEnumerable<Spotlight> Spotlights
         {
@@ -72,7 +70,7 @@ namespace osu.Game.Overlays.Rankings
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
-                                Spacing = new Vector2(0, spacing),
+                                Spacing = new Vector2(0, 20),
                                 Children = new Drawable[]
                                 {
                                     new RankingsScopeSelector
@@ -112,12 +110,12 @@ namespace osu.Game.Overlays.Rankings
 
         protected override void LoadComplete()
         {
-            Scope.BindValueChanged(scope => onScopeChanged(scope.NewValue), true);
+            Scope.BindValueChanged(onScopeChanged, true);
             base.LoadComplete();
         }
 
-        private void onScopeChanged(RankingsScope scope) =>
-            dropdownPlaceholder.FadeTo(scope == RankingsScope.Spotlights ? 1 : 0, duration, Easing.OutQuint);
+        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope) =>
+            dropdownPlaceholder.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
 
         private class HeaderBackground : Sprite
         {
