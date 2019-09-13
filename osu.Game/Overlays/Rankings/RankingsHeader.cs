@@ -20,7 +20,6 @@ namespace osu.Game.Overlays.Rankings
         private const int content_height = 250;
         private const int dropdown_height = 50;
         private const int spacing = 20;
-        private const int title_offset = 30;
         private const int duration = 200;
 
         public IEnumerable<Spotlight> Spotlights
@@ -68,27 +67,25 @@ namespace osu.Game.Overlays.Rankings
                                 Masking = true,
                                 Child = new HeaderBackground(),
                             },
-                            new RankingsScopeSelector
-                            {
-                                Margin = new MarginPadding { Top = 10 },
-                                Current = { BindTarget = Scope }
-                            },
                             new FillFlowContainer
                             {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Y = title_offset,
                                 AutoSizeAxes = Axes.Y,
                                 RelativeSizeAxes = Axes.X,
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(0, spacing),
                                 Children = new Drawable[]
                                 {
+                                    new RankingsScopeSelector
+                                    {
+                                        Margin = new MarginPadding { Top = 10 },
+                                        Current = { BindTarget = Scope }
+                                    },
                                     new HeaderTitle
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Scope = { BindTarget = Scope },
+                                        Margin = new MarginPadding { Top = 10 },
                                         Country = { BindTarget = Country },
                                     },
                                     dropdownPlaceholder = new Container
