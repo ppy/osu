@@ -180,6 +180,7 @@ namespace osu.Game.Screens.Play
                 },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
+                DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
                 HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
                 {
                     HoldToQuit =
@@ -503,15 +504,18 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
-                // still want to block if we are within the cooldown period and not already paused.
-                return true;
-
-            if (HasFailed && ValidForResume && !FailOverlay.IsPresent)
-                // ValidForResume is false when restarting
+            // ValidForResume is false when restarting
+            if (ValidForResume)
             {
-                failAnimation.FinishTransforms(true);
-                return true;
+                if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
+                    // still want to block if we are within the cooldown period and not already paused.
+                    return true;
+
+                if (HasFailed && !FailOverlay.IsPresent)
+                {
+                    failAnimation.FinishTransforms(true);
+                    return true;
+                }
             }
 
             GameplayClockContainer.ResetLocalAdjustments();

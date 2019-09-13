@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
@@ -49,6 +48,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult result)
         {
+            if (result.HitObject.HitWindows == null)
+                return;
+
             foreach (var c in Children)
                 c.OnNewJudgement(result);
         }

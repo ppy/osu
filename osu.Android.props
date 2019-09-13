@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
     <SchemaVersion>2.0</SchemaVersion>
@@ -35,7 +37,7 @@
     <DebugType>None</DebugType>
     <Optimize>True</Optimize>
     <ErrorReport>prompt</ErrorReport>
-	<EnableLLVM>true</EnableLLVM>
+    <EnableLLVM>true</EnableLLVM>
     <AndroidManagedSymbols>false</AndroidManagedSymbols>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
@@ -60,7 +62,7 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.830.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.830.1" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.913.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.911.0" />
   </ItemGroup>
 </Project>

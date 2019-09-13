@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 
@@ -82,11 +83,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                 remove { }
             }
 
-            public Drawable GetDrawableComponent(string componentName)
+            public Drawable GetDrawableComponent(ISkinComponent component)
             {
-                switch (componentName)
+                switch (component.LookupName)
                 {
-                    case "Play/Catch/fruit-catcher-idle":
+                    case "Gameplay/catch/fruit-catcher-idle":
                         return new CatcherCustomSkin();
                 }
 
@@ -99,8 +100,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             public Texture GetTexture(string componentName) =>
                 throw new NotImplementedException();
 
-            public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration =>
-                throw new NotImplementedException();
+            public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
         }
     }
 }
