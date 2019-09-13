@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(HeaderFlag),
+            typeof(DismissableFlag),
             typeof(HeaderTitle),
             typeof(RankingsRulesetSelector),
             typeof(RankingsScopeSelector),
@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Online
                     new Spotlight
                     {
                         Id = 3,
-                        Text = "Spotlight 4"
+                        Text = "Spotlight 3"
                     }
                 }
             });
