@@ -12,10 +12,8 @@ using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class GradientLineTabControl<TModel> : PageTabControl<TModel>
+    public abstract class GradientLineTabControl<TModel> : PageTabControl<TModel>
     {
-        protected override Dropdown<TModel> CreateDropdown() => null;
-
         protected Color4 LineColour
         {
             get => line.Colour;
@@ -24,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly GradientLine line;
 
-        public GradientLineTabControl()
+        protected GradientLineTabControl()
         {
             RelativeSizeAxes = Axes.X;
 
@@ -34,6 +32,8 @@ namespace osu.Game.Graphics.UserInterface
                 Origin = Anchor.BottomCentre,
             });
         }
+
+        protected override Dropdown<TModel> CreateDropdown() => null;
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
