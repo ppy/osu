@@ -41,12 +41,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
-        protected override void LoadComplete()
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            base.LoadComplete();
+            base.UpdateStateTransforms(state);
 
-            // Manually set to reduce the number of future alive objects to a bare minimum.
-            LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
+            switch (state)
+            {
+                case ArmedState.Idle:
+                    // Manually set to reduce the number of future alive objects to a bare minimum.
+                    LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
+                    break;
+            }
         }
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);

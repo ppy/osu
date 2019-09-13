@@ -202,6 +202,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
 
