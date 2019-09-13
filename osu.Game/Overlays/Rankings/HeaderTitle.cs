@@ -22,7 +22,6 @@ namespace osu.Game.Overlays.Rankings
         public readonly Bindable<Country> Country = new Bindable<Country>();
 
         private readonly SpriteText scopeText;
-        private readonly Container flagPlaceholder;
         private readonly DismissableFlag flag;
 
         public HeaderTitle()
@@ -35,16 +34,12 @@ namespace osu.Game.Overlays.Rankings
                 Spacing = new Vector2(spacing, 0),
                 Children = new Drawable[]
                 {
-                    flagPlaceholder = new Container
+                    flag = new DismissableFlag
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        AutoSizeAxes = Axes.Both,
                         Margin = new MarginPadding { Bottom = flag_margin },
-                        Child = flag = new DismissableFlag
-                        {
-                            Size = new Vector2(30, 20),
-                        },
+                        Size = new Vector2(30, 20),
                     },
                     scopeText = new SpriteText
                     {
@@ -90,15 +85,13 @@ namespace osu.Game.Overlays.Rankings
         {
             if (country.NewValue == null)
             {
-                flagPlaceholder.Hide();
+                flag.Hide();
                 return;
             }
 
             Scope.Value = RankingsScope.Performance;
 
-            if (country.OldValue == null)
-                flagPlaceholder.Show();
-
+            flag.Show();
             flag.Country = country.NewValue;
         }
     }
