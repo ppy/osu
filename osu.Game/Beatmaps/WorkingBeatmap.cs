@@ -44,7 +44,6 @@ namespace osu.Game.Beatmaps
 
             track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
-            video = new RecyclableLazy<VideoSprite>(GetVideo);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<ISkin>(GetSkin);
@@ -188,11 +187,9 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
-        public bool VideoLoaded => video.IsResultAvailable;
-        public VideoSprite Video => video.Value;
+        public VideoSprite Video => GetVideo();
 
         protected abstract VideoSprite GetVideo();
-        private readonly RecyclableLazy<VideoSprite> video;
 
         public bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value;
