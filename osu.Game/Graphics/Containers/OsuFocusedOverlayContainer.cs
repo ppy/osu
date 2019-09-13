@@ -21,8 +21,6 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        protected virtual bool PlaySamplesOnStateChange => true;
-
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>
@@ -126,12 +124,12 @@ namespace osu.Game.Graphics.Containers
                         return;
                     }
 
-                    if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                    samplePopIn?.Play();
                     if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (PlaySamplesOnStateChange) samplePopOut?.Play();
+                    samplePopOut?.Play();
                     if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }

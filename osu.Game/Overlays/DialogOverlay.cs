@@ -5,6 +5,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -41,8 +43,6 @@ namespace osu.Game.Overlays
             Show();
         }
 
-        protected override bool PlaySamplesOnStateChange => false;
-
         protected override bool BlockNonPositionalInput => true;
 
         private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
@@ -73,6 +73,18 @@ namespace osu.Game.Overlays
             }
 
             this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    currentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
+                    return true;
+            }
+
+            return base.OnPressed(action);
         }
     }
 }
