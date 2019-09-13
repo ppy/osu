@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -199,7 +199,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 additive.Anchor = Anchor;
                 additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
-                additive.LifetimeStart = Clock.CurrentTime;
                 additive.Position = Position;
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
@@ -208,7 +207,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 AdditiveTarget.Add(additive);
 
-                additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint).Expire();
+                additive.FadeTo(0.4f).FadeOut(800, Easing.OutQuint);
+                additive.Expire(true);
 
                 Scheduler.AddDelayed(beginTrail, HyperDashing ? 25 : 50);
             }
@@ -303,6 +303,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     {
                         this.FadeColour(Color4.White, hyper_dash_transition_length, Easing.OutQuint);
                         this.FadeTo(1, hyper_dash_transition_length, Easing.OutQuint);
+                        Trail &= Dashing;
                     }
                 }
                 else
@@ -385,12 +386,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 {
                     X = hyperDashTargetPosition;
                     SetHyperDashState();
-                }
-
-                if (Clock.ElapsedFrameTime < 0)
-                {
-                    AdditiveTarget.RemoveAll(d => Clock.CurrentTime < d.LifetimeStart);
-                    caughtFruit.RemoveAll(d => d.HitObject.StartTime > Clock.CurrentTime);
                 }
             }
 
