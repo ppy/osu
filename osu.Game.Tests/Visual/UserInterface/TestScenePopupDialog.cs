@@ -13,13 +13,22 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         public TestScenePopupDialog()
         {
-            var popup = new PopupDialog
+            Add(new TestPopupDialog
             {
                 RelativeSizeAxes = Axes.Both,
                 State = { Value = Framework.Graphics.Containers.Visibility.Visible },
-                Icon = FontAwesome.Solid.AssistiveListeningSystems,
-                HeaderText = @"This is a test popup",
-                BodyText = "I can say lots of stuff and even wrap my words!",
+            });
+        }
+
+        private class TestPopupDialog : PopupDialog
+        {
+            public TestPopupDialog()
+            {
+                Icon = FontAwesome.Solid.AssistiveListeningSystems;
+
+                HeaderText = @"This is a test popup";
+                BodyText = "I can say lots of stuff and even wrap my words!";
+
                 Buttons = new PopupDialogButton[]
                 {
                     new PopupDialogCancelButton
@@ -30,10 +39,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         Text = @"You're a fake!",
                     },
-                }
-            };
-
-            Add(popup);
+                };
+            }
         }
     }
 }
