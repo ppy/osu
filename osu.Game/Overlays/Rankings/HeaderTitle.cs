@@ -73,16 +73,16 @@ namespace osu.Game.Overlays.Rankings
 
         protected override void LoadComplete()
         {
-            Scope.BindValueChanged(scope => onScopeChanged(scope.NewValue), true);
+            Scope.BindValueChanged(onScopeChanged, true);
             Country.BindValueChanged(onCountryChanged, true);
             base.LoadComplete();
         }
 
-        private void onScopeChanged(RankingsScope scope)
+        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope)
         {
-            scopeText.Text = scope.ToString();
+            scopeText.Text = scope.NewValue.ToString();
 
-            if (scope != RankingsScope.Performance)
+            if (scope.NewValue != RankingsScope.Performance)
                 Country.Value = null;
         }
 
