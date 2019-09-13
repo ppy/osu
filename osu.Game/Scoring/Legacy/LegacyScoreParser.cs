@@ -218,7 +218,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = 0;
-            LegacyReplayFrame currentFrame = null;
+            ReplayFrame currentFrame = null;
 
             foreach (var l in reader.ReadToEnd().Split(','))
             {
@@ -241,18 +241,16 @@ namespace osu.Game.Scoring.Legacy
                 if (diff < 0)
                     continue;
 
-                var lastFrame = currentFrame;
-
-                currentFrame = new LegacyReplayFrame(lastTime,
+                currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
                     Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE),
                     Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE),
-                    (ReplayButtonState)Parsing.ParseInt(split[3]));
+                    (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
 
-                replay.Frames.Add(convertFrame(currentFrame, lastFrame));
+                replay.Frames.Add(currentFrame);
             }
         }
 
-        private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, LegacyReplayFrame lastFrame)
+        private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, ReplayFrame lastFrame)
         {
             var convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
