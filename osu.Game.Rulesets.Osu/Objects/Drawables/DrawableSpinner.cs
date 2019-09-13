@@ -215,6 +215,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)

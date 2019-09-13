@@ -142,6 +142,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             Debug.Assert(HitObject.HitWindows != null);
 
             switch (state)
