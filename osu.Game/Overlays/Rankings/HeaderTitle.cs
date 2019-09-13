@@ -91,8 +91,8 @@ namespace osu.Game.Overlays.Rankings
 
             Scope.Value = RankingsScope.Performance;
 
-            flag.Show();
             flag.Country = country.NewValue;
+            flag.Show();
         }
     }
 }
