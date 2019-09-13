@@ -8,7 +8,6 @@ using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Extensions.Color4Extensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -66,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Color4.White.Opacity(0), Color4.White)
+                            Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Color4.White)
                         },
                         new Box
                         {
@@ -75,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.White.Opacity(0))
+                            Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.Transparent)
                         },
                     }
                 };
