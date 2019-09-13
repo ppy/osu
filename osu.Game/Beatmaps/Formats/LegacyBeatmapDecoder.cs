@@ -296,8 +296,13 @@ namespace osu.Game.Beatmaps.Formats
             switch (type)
             {
                 case EventType.Background:
-                    string filename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(filename);
+                    string bgFilename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(bgFilename);
+                    break;
+
+                case EventType.Video:
+                    string videoFilename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.VideoFile = FileSafety.PathStandardise(videoFilename);
                     break;
 
                 case EventType.Break:

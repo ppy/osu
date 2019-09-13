@@ -19,6 +19,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
+using osu.Framework.Graphics.Video;
 
 namespace osu.Game.Beatmaps
 {
@@ -43,6 +44,7 @@ namespace osu.Game.Beatmaps
 
             track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
+            video = new RecyclableLazy<VideoSprite>(GetVideo);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
             skin = new RecyclableLazy<ISkin>(GetSkin);
@@ -185,6 +187,12 @@ namespace osu.Game.Beatmaps
         protected virtual bool BackgroundStillValid(Texture b) => b == null || b.Available;
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
+
+        public bool VideoLoaded => video.IsResultAvailable;
+        public VideoSprite Video => video.Value;
+
+        protected abstract VideoSprite GetVideo();
+        private readonly RecyclableLazy<VideoSprite> video;
 
         public bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value;
