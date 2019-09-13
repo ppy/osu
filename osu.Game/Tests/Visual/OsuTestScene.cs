@@ -46,13 +46,27 @@ namespace osu.Game.Tests.Visual
         protected Storage LocalStorage => localStorage.Value;
 
         private readonly Lazy<DatabaseContextFactory> contextFactory;
+
+        protected IAPIProvider API
+        {
+            get
+            {
+                if (UseOnlineAPI)
+                    throw new Exception("Using the OsuTestScene dummy API is not supported when UseOnlineAPI is true");
+
+                return dummyAPI;
+            }
+        }
+
+        private DummyAPIAccess dummyAPI;
+
         protected DatabaseContextFactory ContextFactory => contextFactory.Value;
 
         /// <summary>
-        /// Whether this test scene requires API access
-        /// Setting this will cache an actual <see cref="APIAccess"/>.
+        /// Whether this test scene requires real-world API access.
+        /// If true, this will bypass the local <see cref="dummyAPI"/> and use the <see cref="OsuGameBase"/> provided one.
         /// </summary>
-        protected virtual bool RequiresAPIAccess => false;
+        protected virtual bool UseOnlineAPI => false;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -66,10 +80,9 @@ namespace osu.Game.Tests.Visual
 
             Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            if (!RequiresAPIAccess)
+            if (!UseOnlineAPI)
             {
-                var dummyAPI = new DummyAPIAccess();
-
+                dummyAPI = new DummyAPIAccess();
                 Dependencies.CacheAs<IAPIProvider>(dummyAPI);
                 Add(dummyAPI);
             }

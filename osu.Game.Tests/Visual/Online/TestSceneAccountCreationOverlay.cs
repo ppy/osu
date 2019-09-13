@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
 using osu.Game.Users;
@@ -26,6 +26,8 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         private readonly Container userPanelArea;
+
+        private Bindable<User> localUser;
 
         public TestSceneAccountCreationOverlay()
         {
@@ -47,12 +49,14 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load()
         {
-            api.Logout();
-            api.LocalUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
+            API.Logout();
 
-            AddStep("logout", api.Logout);
+            localUser = API.LocalUser.GetBoundCopy();
+            localUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
+
+            AddStep("logout", API.Logout);
         }
     }
 }
