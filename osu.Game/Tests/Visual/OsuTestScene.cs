@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual
             get
             {
                 if (UseOnlineAPI)
-                    throw new Exception($"Using the {nameof(OsuTestScene)} dummy API is not supported when {nameof(UseOnlineAPI)} is true");
+                    throw new InvalidOperationException($"Using the {nameof(OsuTestScene)} dummy API is not supported when {nameof(UseOnlineAPI)} is true");
 
                 return dummyAPI;
             }
