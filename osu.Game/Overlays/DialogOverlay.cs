@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Select:
-                    currentDialog.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
+                    currentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
                     return true;
             }
 
