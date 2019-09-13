@@ -218,6 +218,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = 0;
+            LegacyReplayFrame currentFrame = null;
 
             foreach (var l in reader.ReadToEnd().Split(','))
             {
@@ -240,23 +241,27 @@ namespace osu.Game.Scoring.Legacy
                 if (diff < 0)
                     continue;
 
-                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime,
+                var lastFrame = currentFrame;
+
+                currentFrame = new LegacyReplayFrame(lastTime,
                     Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE),
                     Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE),
-                    (ReplayButtonState)Parsing.ParseInt(split[3]))));
+                    (ReplayButtonState)Parsing.ParseInt(split[3]));
+
+                replay.Frames.Add(convertFrame(currentFrame, lastFrame));
             }
         }
 
-        private ReplayFrame convertFrame(LegacyReplayFrame legacyFrame)
+        private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, LegacyReplayFrame lastFrame)
         {
             var convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 
-            convertible.ConvertFrom(legacyFrame, currentBeatmap);
+            convertible.ConvertFrom(currentFrame, currentBeatmap, lastFrame);
 
             var frame = (ReplayFrame)convertible;
-            frame.Time = legacyFrame.Time;
+            frame.Time = currentFrame.Time;
 
             return frame;
         }
