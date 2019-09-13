@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -50,8 +51,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public override bool Remove(DrawableHitObject hitObject)
         {
             var result = base.Remove(hitObject);
+
             if (result)
+            {
                 initialStateCache.Invalidate();
+                hitObjectInitialStateCache.Remove(hitObject);
+            }
+
             return result;
         }
 
@@ -86,13 +92,34 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 scrollingInfo.Algorithm.Reset();
 
                 foreach (var obj in Objects)
+                {
+                    computeLifetimeStartRecursive(obj);
                     computeInitialStateRecursive(obj);
+                }
+
                 initialStateCache.Validate();
             }
         }
 
-        private void computeInitialStateRecursive(DrawableHitObject hitObject)
+        private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
         {
+            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+
+            foreach (var obj in hitObject.NestedHitObjects)
+                computeLifetimeStartRecursive(obj);
+        }
+
+        private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
+
+        // Cant use AddOnce() since the delegate is re-constructed every invocation
+        private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
+        {
+            if (!hitObjectInitialStateCache.TryGetValue(hitObject, out var cached))
+                cached = hitObjectInitialStateCache[hitObject] = new Cached();
+
+            if (cached.IsValid)
+                return;
+
             double endTime = hitObject.HitObject.StartTime;
 
             if (hitObject.HitObject is IHasEndTime e)
@@ -113,7 +140,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 }
             }
 
-            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
             hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, endTime, timeRange.Value, scrollLength);
 
             foreach (var obj in hitObject.NestedHitObjects)
@@ -123,7 +149,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 // Nested hitobjects don't need to scroll, but they do need accurate positions
                 updatePosition(obj, hitObject.HitObject.StartTime);
             }
-        }
+
+            cached.Validate();
+        });
 
         protected override void UpdateAfterChildrenLife()
         {

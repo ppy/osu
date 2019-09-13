@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -74,8 +75,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
         public JudgementResult Result { get; private set; }
-
-        private bool judgementOccurred;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -154,6 +153,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (UseTransformStateManagement)
             {
+                LifetimeEnd = double.MaxValue;
+
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
                 base.ApplyTransformsAt(transformTime, true);
@@ -163,7 +164,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     UpdateInitialTransforms();
 
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+                    var judgementOffset = Math.Min(HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
@@ -171,6 +172,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         state.Value = newState;
                     }
                 }
+
+                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
+                    Expire();
             }
             else
                 state.Value = newState;
@@ -201,6 +205,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
+        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// </summary>
         /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
@@ -240,7 +245,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.SkinChanged(skin, allowFallback);
 
             if (HitObject is IHasComboInformation combo)
-                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            {
+                var comboColours = skin.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+
+                AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            }
         }
 
         /// <summary>
@@ -278,6 +287,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
+        /// <summary>
+        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only provided temporarily until hitobject pooling is implemented.
+        /// </remarks>
+        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
+
         private double? lifetimeStart;
 
         public override double LifetimeStart
@@ -297,7 +314,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
+        /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
@@ -333,8 +350,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
-            judgementOccurred = true;
-
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             Result.TimeOffset = Time.Current - endTime;
@@ -367,21 +382,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Time.Elapsed < 0)
                 return false;
 
-            judgementOccurred = false;
-
-            if (AllJudged)
+            if (Judged)
                 return false;
-
-            foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateResult(userTriggered);
-
-            if (judgementOccurred || Judged)
-                return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
-            return judgementOccurred;
+            return Judged;
         }
 
         /// <summary>
@@ -401,7 +408,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
