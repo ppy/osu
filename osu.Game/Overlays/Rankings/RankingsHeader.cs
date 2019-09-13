@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Rankings
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Current = { BindTarget = Ruleset }
+                        Current = Ruleset
                     },
                     new Container
                     {
@@ -76,14 +76,14 @@ namespace osu.Game.Overlays.Rankings
                                     new RankingsScopeSelector
                                     {
                                         Margin = new MarginPadding { Top = 10 },
-                                        Current = { BindTarget = Scope }
+                                        Current = Scope
                                     },
                                     new HeaderTitle
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Scope = { BindTarget = Scope },
                                         Margin = new MarginPadding { Top = 10 },
+                                        Scope = { BindTarget = Scope },
                                         Country = { BindTarget = Country },
                                     },
                                     dropdownPlaceholder = new Container
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Rankings
                                         Child = dropdown = new OsuDropdown<Spotlight>
                                         {
                                             RelativeSizeAxes = Axes.X,
-                                            Current = { BindTarget = Spotlight },
+                                            Current = Spotlight,
                                         }
                                     }
                                 }
