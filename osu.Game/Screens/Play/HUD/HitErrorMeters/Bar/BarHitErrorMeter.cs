@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -27,7 +30,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public BarHitErrorMeter(HitWindows hitWindows)
+        protected BarHitErrorMeter(HitWindows hitWindows)
             : base(hitWindows)
         {
         }
@@ -95,11 +98,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
         {
             private const int judgement_fade_duration = 10000;
 
-            private bool is_vertical;
+            private readonly bool isVertical;
 
             public JudgementLine(bool isVertical)
             {
-                is_vertical = isVertical;
+                this.isVertical = isVertical;
 
                 InternalChild = new CircularContainer
                 {
@@ -117,7 +120,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
             {
                 base.LoadComplete();
 
-                if (is_vertical)
+                if (isVertical)
                 {
                     Height = 0;
                     this.ResizeHeightTo(1, 200, Easing.OutElasticHalf);
@@ -127,7 +130,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
                     Width = 0;
                     this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
                 }
-                
+
                 this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
             }
         }
