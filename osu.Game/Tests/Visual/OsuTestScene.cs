@@ -15,6 +15,8 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
@@ -43,6 +45,15 @@ namespace osu.Game.Tests.Visual
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
+        private readonly Lazy<DatabaseContextFactory> contextFactory;
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
+        /// <summary>
+        /// Whether this test scene requires API access
+        /// Setting this will cache an actual <see cref="APIAccess"/>.
+        /// </summary>
+        protected virtual bool RequiresAPIAccess => false;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
@@ -53,12 +64,30 @@ namespace osu.Game.Tests.Visual
                 Default = working
             };
 
-            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            if (!RequiresAPIAccess)
+            {
+                var dummyAPI = new DummyAPIAccess();
+
+                Dependencies.CacheAs<IAPIProvider>(dummyAPI);
+                Add(dummyAPI);
+            }
+
+            return Dependencies;
         }
 
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+                factory.ResetDatabase();
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
         }
 
         [Resolved]
@@ -84,6 +113,9 @@ namespace osu.Game.Tests.Visual
 
             if (beatmap?.Value.TrackLoaded == true)
                 beatmap.Value.Track.Stop();
+
+            if (contextFactory.IsValueCreated)
+                contextFactory.Value.ResetDatabase();
 
             if (localStorage.IsValueCreated)
             {

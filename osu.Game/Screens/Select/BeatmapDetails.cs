@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Select
         private readonly MetadataSection description, source, tags;
         private readonly Container failRetryContainer;
         private readonly FailRetryGraph failRetryGraph;
-        private readonly DimmedLoadingAnimation loading;
+        private readonly DimmedLoadingLayer loading;
 
         private IAPIProvider api;
 
@@ -156,10 +156,7 @@ namespace osu.Game.Screens.Select
                         },
                     },
                 },
-                loading = new DimmedLoadingAnimation
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                loading = new DimmedLoadingLayer(),
             };
         }
 
@@ -363,36 +360,6 @@ namespace osu.Game.Screens.Select
                     // fade in if we haven't yet.
                     textContainer.FadeIn(transition_duration);
                 });
-            }
-        }
-
-        private class DimmedLoadingAnimation : VisibilityContainer
-        {
-            private readonly LoadingAnimation loading;
-
-            public DimmedLoadingAnimation()
-            {
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black.Opacity(0.5f),
-                    },
-                    loading = new LoadingAnimation(),
-                };
-            }
-
-            protected override void PopIn()
-            {
-                this.FadeIn(transition_duration, Easing.OutQuint);
-                loading.Show();
-            }
-
-            protected override void PopOut()
-            {
-                this.FadeOut(transition_duration, Easing.OutQuint);
-                loading.Hide();
             }
         }
     }
