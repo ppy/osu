@@ -31,7 +31,6 @@ namespace osu.Game.Overlays.Rankings
         public readonly Bindable<Country> Country = new Bindable<Country>();
         public readonly Bindable<Spotlight> Spotlight = new Bindable<Spotlight>();
 
-        private readonly Container dropdownPlaceholder;
         private readonly OsuDropdown<Spotlight> dropdown;
 
         public RankingsHeader()
@@ -86,14 +85,13 @@ namespace osu.Game.Overlays.Rankings
                                         Scope = { BindTarget = Scope },
                                         Country = { BindTarget = Country },
                                     },
-                                    dropdownPlaceholder = new Container
+                                    new Container
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         RelativeSizeAxes = Axes.X,
                                         Height = dropdown_height,
                                         Width = 0.8f,
-                                        AlwaysPresent = true,
                                         Child = dropdown = new OsuDropdown<Spotlight>
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -115,7 +113,7 @@ namespace osu.Game.Overlays.Rankings
         }
 
         private void onScopeChanged(ValueChangedEvent<RankingsScope> scope) =>
-            dropdownPlaceholder.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
+            dropdown.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
 
         private class HeaderBackground : Sprite
         {
