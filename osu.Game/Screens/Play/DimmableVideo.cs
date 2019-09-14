@@ -4,8 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
 using osu.Game.Graphics.Containers;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -64,7 +66,15 @@ namespace osu.Game.Screens.Play
                 video.Anchor = Anchor.Centre;
                 video.Origin = Anchor.Centre;
 
-                AddInternal(video);
+                AddRangeInternal(new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                    },
+                    video,
+                });
             }
 
             [BackgroundDependencyLoader]
