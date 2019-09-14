@@ -61,10 +61,17 @@ namespace osu.Game.Tests.Visual.Online
                 FullName = "Belarus"
             };
 
+            var unknownCountry = new Country
+            {
+                FlagName = "CK",
+                FullName = "Cook Islands"
+            };
+
             AddStep("Set country", () => countryBindable.Value = country);
             AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
             AddAssert("Check country is Null", () => countryBindable.Value == null);
+            AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
         }
     }
 }
