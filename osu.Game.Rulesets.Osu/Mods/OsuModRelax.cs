@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using static osu.Game.Input.Handlers.ReplayInputHandler;
+using static osu.Game.Input.Handlers.GameplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             wasHit = hitting;
 
-            var state = new ReplayState<OsuAction>
+            var state = new GameplayInputState<OsuAction>
             {
                 PressedActions = new List<OsuAction>()
             };

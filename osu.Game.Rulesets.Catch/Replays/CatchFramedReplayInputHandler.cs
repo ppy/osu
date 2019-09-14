@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             };
         }
 
-        public class CatchReplayState : ReplayState<CatchAction>
+        public class CatchReplayState : GameplayInputState<CatchAction>
         {
             public float? CatcherX { get; set; }
         }

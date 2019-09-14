@@ -16,7 +16,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 using osuTK.Input;
-using static osu.Game.Input.Handlers.ReplayInputHandler;
+using static osu.Game.Input.Handlers.GameplayInputHandler;
 using JoystickState = osu.Framework.Input.States.JoystickState;
 using KeyboardState = osu.Framework.Input.States.KeyboardState;
 using MouseState = osu.Framework.Input.States.MouseState;
@@ -55,12 +55,12 @@ namespace osu.Game.Rulesets.UI
 
         public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
         {
-            if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
+            if (inputStateChange is GameplayStateChangeEvent<T> gameplayStateChanged)
             {
-                foreach (var action in replayStateChanged.ReleasedActions)
+                foreach (var action in gameplayStateChanged.ReleasedActions)
                     KeyBindingContainer.TriggerReleased(action);
 
-                foreach (var action in replayStateChanged.PressedActions)
+                foreach (var action in gameplayStateChanged.PressedActions)
                     KeyBindingContainer.TriggerPressed(action);
             }
             else
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.UI
     public class RulesetInputManagerInputState<T> : InputState
         where T : struct
     {
-        public ReplayState<T> LastReplayState;
+        public GameplayInputState<T> LastGameplayState;
 
         public RulesetInputManagerInputState(MouseState mouse = null, KeyboardState keyboard = null, JoystickState joystick = null)
             : base(mouse, keyboard, joystick)
