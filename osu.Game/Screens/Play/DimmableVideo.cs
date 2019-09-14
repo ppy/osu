@@ -59,8 +59,12 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both;
                 Masking = true;
 
-                AddInternal(video);
                 video.RelativeSizeAxes = Axes.Both;
+                video.FillMode = FillMode.Fill;
+                video.Anchor = Anchor.Centre;
+                video.Origin = Anchor.Centre;
+
+                AddInternal(video);
             }
 
             [BackgroundDependencyLoader]
