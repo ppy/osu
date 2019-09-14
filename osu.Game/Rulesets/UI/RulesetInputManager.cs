@@ -23,7 +23,7 @@ using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler, IHasVirtualHandler
         where T : struct
     {
         protected override InputState CreateInitialState()
@@ -87,6 +87,27 @@ namespace osu.Game.Rulesets.UI
 
                 if (replayInputHandler != null)
                     AddHandler(replayInputHandler);
+            }
+        }
+
+        #endregion
+
+        #region IHasVirtualHandler
+
+        private VirtualInputHandler virtualInputHandler;
+
+        public VirtualInputHandler VirtualInputHandler
+        {
+            get => virtualInputHandler;
+            set
+            {
+                if (virtualInputHandler != null) RemoveHandler(virtualInputHandler);
+
+                virtualInputHandler = value;
+                UseParentInput = virtualInputHandler == null;
+
+                if (virtualInputHandler != null)
+                    AddHandler(virtualInputHandler);
             }
         }
 
@@ -162,6 +183,14 @@ namespace osu.Game.Rulesets.UI
     public interface IHasReplayHandler
     {
         ReplayInputHandler ReplayInputHandler { get; set; }
+    }
+
+    /// <summary>
+    /// Expose the <see cref="VirtualInputHandler"/>  in a capable <see cref="InputManager"/>.
+    /// </summary>
+    public interface IHasVirtualHandler
+    {
+        VirtualInputHandler VirtualInputHandler { get; set; }
     }
 
     /// <summary>
