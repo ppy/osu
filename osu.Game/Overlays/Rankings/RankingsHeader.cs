@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.Rankings
     public class RankingsHeader : CompositeDrawable
     {
         private const int content_height = 250;
-        private const int dropdown_height = 50;
 
         public IEnumerable<Spotlight> Spotlights
         {
@@ -85,18 +84,13 @@ namespace osu.Game.Overlays.Rankings
                                         Scope = { BindTarget = Scope },
                                         Country = { BindTarget = Country },
                                     },
-                                    new Container
+                                    dropdown = new OsuDropdown<Spotlight>
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         RelativeSizeAxes = Axes.X,
-                                        Height = dropdown_height,
                                         Width = 0.8f,
-                                        Child = dropdown = new OsuDropdown<Spotlight>
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Current = Spotlight,
-                                        }
+                                        Current = Spotlight,
                                     }
                                 }
                             },
