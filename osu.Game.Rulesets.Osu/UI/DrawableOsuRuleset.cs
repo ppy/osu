@@ -11,6 +11,7 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Input;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
@@ -58,6 +59,8 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
+
+        protected override VirtualInputHandler CreateVirtualInputHandler() => new OsuVirtualInputHandler();
 
         public override double GameplayStartTime
         {

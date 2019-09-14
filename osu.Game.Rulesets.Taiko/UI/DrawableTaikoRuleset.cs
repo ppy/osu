@@ -17,6 +17,7 @@ using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Taiko.Input;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -69,5 +70,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
+
+        protected override VirtualInputHandler CreateVirtualInputHandler() => new TaikoVirtualInputHandler();
     }
 }

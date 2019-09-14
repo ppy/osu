@@ -7,6 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Catch.Input;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Replays;
@@ -35,6 +36,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
+
+        protected override VirtualInputHandler CreateVirtualInputHandler() => new CatchVirtualInputHandler();
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
 
