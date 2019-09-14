@@ -318,7 +318,7 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
-        public virtual VirtualInputHandler CreateVirtualInputHandler() => null;
+        protected virtual VirtualInputHandler CreateVirtualInputHandler() => null;
 
         /// <summary>
         /// Creates a Playfield.
