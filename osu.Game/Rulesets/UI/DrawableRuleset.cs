@@ -16,6 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
@@ -119,6 +120,10 @@ namespace osu.Game.Rulesets.UI
 
         private OnScreenDisplay onScreenDisplay;
 
+        protected bool HasGameplayInputHandler =>
+            (KeyBindingInputManager as IHasVirtualHandler)?.VirtualInputHandler != null ||
+            (KeyBindingInputManager as IHasReplayHandler)?.ReplayInputHandler != null;
+
         /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
@@ -142,7 +147,7 @@ namespace osu.Game.Rulesets.UI
 
             IsPaused.ValueChanged += paused =>
             {
-                if (HasReplayLoaded.Value)
+                if (HasGameplayInputHandler)
                     return;
 
                 KeyBindingInputManager.UseParentInput = !paused.NewValue;
@@ -196,11 +201,28 @@ namespace osu.Game.Rulesets.UI
                 Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
 
+            var resumeInputManager = CreateInputManager();
+
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
             {
-                AddInternal(CreateInputManager()
+                AddInternal(resumeInputManager
                     .WithChild(CreatePlayfieldAdjustmentContainer()
                         .WithChild(ResumeOverlay)));
+            }
+
+            if (RuntimeInfo.IsMobile)
+            {
+                if (!(KeyBindingInputManager is IHasVirtualHandler virtualInputManager))
+                    throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports virtual input handling is not available");
+
+                virtualInputManager.VirtualInputHandler = CreateVirtualInputHandler();
+                resumeInputManager.UseParentInput = false;
+
+                if (!ProvidingUserCursor)
+                {
+                    // The cursor is hidden by default (see Playfield.load()), but should be shown when there's a replay
+                    Playfield.Cursor?.Show();
+                }
             }
 
             applyRulesetMods(mods, config);
@@ -296,6 +318,8 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
+        public virtual VirtualInputHandler CreateVirtualInputHandler() => null;
+
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
@@ -329,7 +353,7 @@ namespace osu.Game.Rulesets.UI
 
         public override GameplayCursorContainer Cursor => Playfield.Cursor;
 
-        public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
+        public bool ProvidingUserCursor => Playfield.Cursor != null && !HasGameplayInputHandler;
 
         #endregion
 
