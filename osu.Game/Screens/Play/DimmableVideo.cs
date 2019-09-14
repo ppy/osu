@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Play
                 Masking = true;
 
                 video.RelativeSizeAxes = Axes.Both;
-                video.FillMode = FillMode.Fill;
+                video.FillMode = FillMode.Fit;
                 video.Anchor = Anchor.Centre;
                 video.Origin = Anchor.Centre;
 
