@@ -499,7 +499,10 @@ namespace osu.Game.Screens.Play
 
         private class MutedNotification : SimpleNotification
         {
-            public MutedNotification() => Text = "Your music volume is set to 0%! Click here to restore it.";
+            public MutedNotification()
+            {
+                Text = "Your music volume is set to 0%! Click here to restore it.";
+            }
 
             public override bool IsImportant => true;
 
