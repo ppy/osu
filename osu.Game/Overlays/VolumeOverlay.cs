@@ -32,11 +32,7 @@ namespace osu.Game.Overlays
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
-        public bool IsMuted
-        {
-            get => muteButton.Current.Value;
-            set => muteButton.Current.Value = value;
-        }
+        public Bindable<bool> IsMuted => muteButton.Current;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
