@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -24,6 +25,11 @@ namespace osu.Game.Beatmaps
         /// Retrieves the background for this <see cref="WorkingBeatmap"/>.
         /// </summary>
         Texture Background { get; }
+
+        /// <summary>
+        /// Retrieves the video background file for this <see cref="WorkingBeatmap"/>.
+        /// </summary>
+        VideoSprite Video { get; }
 
         /// <summary>
         /// Retrieves the audio track for this <see cref="WorkingBeatmap"/>.
