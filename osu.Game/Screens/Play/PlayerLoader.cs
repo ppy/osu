@@ -57,7 +57,8 @@ namespace osu.Game.Screens.Play
 
         private InputManager inputManager;
 
-        private NotificationOverlay notificationOverlay;
+        [Resolved]
+        private NotificationOverlay notificationOverlay { get; set; }
 
         private IdleTracker idleTracker;
 
@@ -106,8 +107,6 @@ namespace osu.Game.Screens.Play
             });
 
             loadNewPlayer();
-
-            this.notificationOverlay = notificationOverlay;
 
             checkVolume(audioManager);
         }
