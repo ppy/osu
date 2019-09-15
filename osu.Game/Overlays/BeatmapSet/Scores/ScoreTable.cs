@@ -171,6 +171,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(1),
                     ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
                     {
                         AutoSizeAxes = Axes.Both,

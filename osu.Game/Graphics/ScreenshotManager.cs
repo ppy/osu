@@ -22,7 +22,7 @@ using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
+    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -83,11 +83,19 @@ namespace osu.Game.Graphics
                 const int frames_to_wait = 3;
 
                 int framesWaited = 0;
-                ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() => framesWaited++, 0, true);
-                while (framesWaited < frames_to_wait)
-                    Thread.Sleep(10);
 
-                waitDelegate.Cancel();
+                using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                {
+                    ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                    {
+                        if (framesWaited++ < frames_to_wait)
+                            // ReSharper disable once AccessToDisposedClosure
+                            framesWaitedEvent.Set();
+                    }, 10, true);
+
+                    framesWaitedEvent.Wait();
+                    waitDelegate.Cancel();
+                }
             }
 
             using (var image = await host.TakeScreenshotAsync())

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.MathUtils;
 using osu.Game.Replays;
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
         }
 
-        protected override bool IsImportant(CatchReplayFrame frame) => frame.Position > 0;
+        protected override bool IsImportant(CatchReplayFrame frame) => frame.Actions.Any();
 
         protected float? Position
         {
@@ -38,21 +39,11 @@ namespace osu.Game.Rulesets.Catch.Replays
         {
             if (!Position.HasValue) return new List<IInput>();
 
-            var actions = new List<CatchAction>();
-
-            if (CurrentFrame.Dashing)
-                actions.Add(CatchAction.Dash);
-
-            if (Position.Value > CurrentFrame.Position)
-                actions.Add(CatchAction.MoveRight);
-            else if (Position.Value < CurrentFrame.Position)
-                actions.Add(CatchAction.MoveLeft);
-
             return new List<IInput>
             {
                 new CatchReplayState
                 {
-                    PressedActions = actions,
+                    PressedActions = CurrentFrame?.Actions ?? new List<CatchAction>(),
                     CatcherX = Position.Value
                 },
             };

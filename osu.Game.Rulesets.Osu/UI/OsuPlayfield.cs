@@ -42,9 +42,8 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
                 // Todo: Remove when hitobjects are properly pooled
-                new LocalSkinOverrideContainer(null)
+                new SkinProvidingContainer(null)
                 {
-                    RelativeSizeAxes = Axes.Both,
                     Child = HitObjectContainer,
                 },
                 approachCircles = new ApproachCircleProxyContainer
@@ -71,13 +70,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.Add(h);
         }
 
-        private void addApproachCircleProxy(Drawable d)
-        {
-            var proxy = d.CreateProxy();
-            proxy.LifetimeStart = d.LifetimeStart;
-            proxy.LifetimeEnd = d.LifetimeEnd;
-            approachCircles.Add(proxy);
-        }
+        private void addApproachCircleProxy(Drawable d) => approachCircles.Add(d.CreateProxy());
 
         public override void PostProcess()
         {

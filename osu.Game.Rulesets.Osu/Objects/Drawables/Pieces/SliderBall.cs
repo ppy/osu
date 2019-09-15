@@ -11,6 +11,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Skinning;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -30,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.drawableSlider = drawableSlider;
             this.slider = slider;
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new DefaultFollowCircle()),
+                    Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
                 },
                 new CircularContainer
                 {
@@ -55,8 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Child = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        // TODO: support skin filename animation (sliderb0, sliderb1...)
-                        Child = new SkinnableDrawable("Play/osu/sliderball", _ => new DefaultSliderBall()),
+                        Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall()),
                     }
                 }
             };
@@ -168,9 +168,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
 
+        private Vector2? lastPosition;
+
         public void UpdateProgress(double completionProgress)
         {
-            Position = slider.CurvePositionAt(completionProgress);
+            var newPos = slider.CurvePositionAt(completionProgress);
+
+            var diff = lastPosition.HasValue ? lastPosition.Value - newPos : newPos - slider.CurvePositionAt(completionProgress + 0.01f);
+            if (diff == Vector2.Zero)
+                return;
+
+            Position = newPos;
+            Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
+
+            lastPosition = newPos;
         }
 
         private class FollowCircleContainer : Container
@@ -190,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Masking = true,
                     BorderThickness = 5,
                     BorderColour = Color4.Orange,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Child = new Box
                     {
                         Colour = Color4.Orange,
@@ -208,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 RelativeSizeAxes = Axes.Both;
 
-                float radius = skin.GetValue<SkinConfiguration, float?>(s => s.SliderPathRadius) ?? OsuHitObject.OBJECT_RADIUS;
+                float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
 
                 InternalChild = new CircularContainer
                 {

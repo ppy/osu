@@ -11,7 +11,9 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Mania.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -32,12 +34,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new ManiaDifficultyAttributes { Mods = mods, Skills = skills };
 
+            HitWindows hitWindows = new ManiaHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
             return new ManiaDifficultyAttributes
             {
                 StarRating = difficultyValue(skills) * star_scaling_factor,
                 Mods = mods,
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
+                GreatHitWindow = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate,
                 Skills = skills
             };
         }

@@ -50,6 +50,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         public Func<CatchHitObject, bool> CheckPosition;
 
+        public bool IsOnPlate;
+
+        public override bool RemoveWhenNotAlive => IsOnPlate;
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (CheckPosition == null) return;
@@ -58,14 +62,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
 
-        protected override bool UseTransformStateManagement => false;
+        protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateInitialTransforms() => this.FadeInFromZero(200);
+
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            // TODO: update to use new state management.
-            using (BeginAbsoluteSequence(HitObject.StartTime - HitObject.TimePreempt))
-                this.FadeIn(200);
-
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
             using (BeginAbsoluteSequence(endTime, true))
@@ -73,11 +75,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 switch (state)
                 {
                     case ArmedState.Miss:
-                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out).Expire();
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
                         break;
 
                     case ArmedState.Hit:
-                        this.FadeOut().Expire();
+                        this.FadeOut();
                         break;
                 }
             }
