@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DrawableTotalScore),
             typeof(RanksSection)
         };
+
         protected override bool UseOnlineAPI => true;
 
         public TestSceneUserRanks()
