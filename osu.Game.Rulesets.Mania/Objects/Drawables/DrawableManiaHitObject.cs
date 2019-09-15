@@ -45,6 +45,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             Anchor = Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
+
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            switch (state)
+            {
+                case ArmedState.Miss:
+                    this.FadeOut(150, Easing.In);
+                    break;
+
+                case ArmedState.Hit:
+                    this.FadeOut(150, Easing.OutQuint);
+                    break;
+            }
+        }
     }
 
     public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
@@ -56,23 +70,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(hitObject)
         {
             HitObject = hitObject;
-        }
-
-        protected override bool UseTransformStateManagement => false;
-
-        protected override void UpdateState(ArmedState state)
-        {
-            // TODO: update to use new state management.
-            switch (state)
-            {
-                case ArmedState.Miss:
-                    this.FadeOut(150, Easing.In).Expire();
-                    break;
-
-                case ArmedState.Hit:
-                    this.FadeOut(150, Easing.OutQuint).Expire();
-                    break;
-            }
         }
     }
 }

@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable("Play/osu/sliderscorepoint", _ => new CircularContainer
+            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderScorePoint), _ => new CircularContainer
             {
                 Masking = true,
                 Origin = Anchor.Centre,
@@ -75,6 +75,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             switch (state)
             {
                 case ArmedState.Idle:

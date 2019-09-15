@@ -12,6 +12,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
@@ -93,6 +94,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            Body.FadeInFromZero(HitObject.TimeFadeIn);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -159,12 +167,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.SkinChanged(skin, allowFallback);
 
-            Body.BorderSize = skin.GetValue<SkinConfiguration, float?>(s => s.SliderBorderSize) ?? SliderBody.DEFAULT_BORDER_SIZE;
-            sliderPathRadius = skin.GetValue<SkinConfiguration, float?>(s => s.SliderPathRadius) ?? OsuHitObject.OBJECT_RADIUS;
+            Body.BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? SliderBody.DEFAULT_BORDER_SIZE;
+            sliderPathRadius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
             updatePathRadius();
 
-            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? AccentColour.Value;
-            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Color4.White;
+            Body.AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? AccentColour.Value;
+            Body.BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
         }
 
         private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
@@ -194,6 +202,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
 
@@ -211,10 +221,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         break;
                 }
 
-                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+                this.FadeOut(fade_out_time, Easing.OutQuint);
             }
-
-            Expire(true);
         }
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;

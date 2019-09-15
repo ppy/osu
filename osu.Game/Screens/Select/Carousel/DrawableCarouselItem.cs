@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                 }
             };

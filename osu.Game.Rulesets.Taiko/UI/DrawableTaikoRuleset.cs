@@ -5,19 +5,18 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
-using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableTaikoRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableTaikoRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
@@ -38,49 +37,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            loadBarLines();
-        }
-
-        private void loadBarLines()
-        {
-            TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
-            double lastHitTime = 1 + ((lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime);
-
-            var timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
-
-            if (timingPoints.Count == 0)
-                return;
-
-            int currentIndex = 0;
-            int currentBeat = 0;
-            double time = timingPoints[currentIndex].Time;
-
-            while (time <= lastHitTime)
-            {
-                int nextIndex = currentIndex + 1;
-
-                if (nextIndex < timingPoints.Count && time > timingPoints[nextIndex].Time)
-                {
-                    currentIndex = nextIndex;
-                    time = timingPoints[currentIndex].Time;
-                    currentBeat = 0;
-                }
-
-                var currentPoint = timingPoints[currentIndex];
-
-                var barLine = new BarLine
-                {
-                    StartTime = time,
-                };
-
-                barLine.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
-
-                bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
-                Playfield.Add(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
-
-                time += currentPoint.BeatLength * (int)currentPoint.TimeSignature;
-                currentBeat++;
-            }
+            new BarLineGenerator(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
