@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -57,10 +58,13 @@ namespace osu.Game.Screens.Play
 
         private InputManager inputManager;
 
+        private IdleTracker idleTracker;
+
         [Resolved]
         private NotificationOverlay notificationOverlay { get; set; }
 
-        private IdleTracker idleTracker;
+        [Resolved]
+        private VolumeOverlay volumeOverlay { get; set; }
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -155,7 +159,7 @@ namespace osu.Game.Screens.Play
 
         private void checkVolume(AudioManager audio)
         {
-            if (audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue)
+            if (volumeOverlay.IsMuted || audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue)
                 notificationOverlay.Post(new MutedNotification());
         }
 
@@ -500,7 +504,7 @@ namespace osu.Game.Screens.Play
             public override bool RequestsFocus => true;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
                 Icon = FontAwesome.Solid.VolumeMute;
                 IconBackgound.Colour = colours.RedDark;
@@ -509,6 +513,7 @@ namespace osu.Game.Screens.Play
                 {
                     notificationOverlay.Hide();
 
+                    volumeOverlay.IsMuted = false;
                     audioManager.Volume.SetDefault();
                     audioManager.VolumeTrack.SetDefault();
 
