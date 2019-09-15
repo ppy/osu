@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private VolumeOverlay volumeOverlay { get; set; }
 
-        private bool muteWarningShownOnce = false;
+        private bool muteWarningShownOnce;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -500,10 +499,7 @@ namespace osu.Game.Screens.Play
 
         private class MutedNotification : SimpleNotification
         {
-            public MutedNotification()
-            {
-                this.Text = "Your music volume is set to 0%! Click here to restore it.";
-            }
+            public MutedNotification() => Text = "Your music volume is set to 0%! Click here to restore it.";
 
             public override bool IsImportant => true;
 
