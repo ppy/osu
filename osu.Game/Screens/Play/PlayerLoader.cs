@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -19,6 +20,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
@@ -54,6 +57,8 @@ namespace osu.Game.Screens.Play
 
         private InputManager inputManager;
 
+        private NotificationOverlay notificationOverlay;
+
         private IdleTracker idleTracker;
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -68,7 +73,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audioManager, NotificationOverlay notificationOverlay)
         {
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -101,6 +106,10 @@ namespace osu.Game.Screens.Play
             });
 
             loadNewPlayer();
+
+            this.notificationOverlay = notificationOverlay;
+
+            checkVolume(audioManager);
         }
 
         private void playerLoaded(Player player) => info.Loading = false;
@@ -143,6 +152,12 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
+        }
+
+        private void checkVolume(AudioManager audio)
+        {
+            if (audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue)
+                notificationOverlay.Post(new MutedNotification());
         }
 
         public override void OnEntering(IScreen last)
@@ -471,6 +486,35 @@ namespace osu.Game.Screens.Play
                 };
 
                 Loading = true;
+            }
+        }
+
+        private class MutedNotification : SimpleNotification
+        {
+            public MutedNotification()
+            {
+                this.Text = "Your music volume is set to 0%! Click here to restore it.";
+            }
+
+            public override bool IsImportant => true;
+
+            public override bool RequestsFocus => true;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay)
+            {
+                Icon = FontAwesome.Solid.VolumeMute;
+                IconBackgound.Colour = colours.RedDark;
+
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
+
+                    audioManager.Volume.SetDefault();
+                    audioManager.VolumeTrack.SetDefault();
+
+                    return true;
+                };
             }
         }
     }
