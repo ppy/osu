@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Play
 
         private void checkVolume(AudioManager audio)
         {
-            if (volumeOverlay.IsMuted || audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue)
+            if (volumeOverlay.IsMuted.Value || audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue)
                 notificationOverlay.Post(new MutedNotification());
         }
 
@@ -513,7 +513,7 @@ namespace osu.Game.Screens.Play
                 {
                     notificationOverlay.Hide();
 
-                    volumeOverlay.IsMuted = false;
+                    volumeOverlay.IsMuted.Value = false;
                     audioManager.Volume.SetDefault();
                     audioManager.VolumeTrack.SetDefault();
 
