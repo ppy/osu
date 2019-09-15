@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
@@ -17,26 +16,21 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
-using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawableTotalScore : OsuHoverContainer
+    public class DrawableTotalScore : DrawableUserInfoItem
     {
         private const int height = 40;
-        private const int corner_radius = 6;
 
         protected readonly Container InfoContainer;
         protected readonly FillFlowContainer DetailInfo;
         protected readonly ScoreInfo Score;
 
-        private readonly Box background;
         private readonly OsuSpriteText performanceValue;
         private readonly OsuSpriteText performance;
         private readonly OsuSpriteText version;
         private readonly OsuSpriteText accuracyText;
-
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public DrawableTotalScore(ScoreInfo score)
         {
@@ -44,26 +38,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             Score = score;
 
-            Enabled.Value = true; //manually enabled, because we have no action
-
-            RelativeSizeAxes = Axes.X;
             Height = height;
-            Masking = true;
-            CornerRadius = corner_radius;
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    AutoSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Left = 10 },
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(10),
@@ -213,7 +195,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         }
                     }
                 }
-            };
+            });
 
             foreach (Mod mod in score.Mods)
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.4f) });
@@ -222,9 +204,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IdleColour = colours.GreySeafoam;
-            HoverColour = colours.GreySeafoamLight;
-
             performanceValue.Colour = colours.GreenLight;
             performance.Colour = colours.Green;
             version.Colour = accuracyText.Colour = colours.Yellow;
