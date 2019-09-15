@@ -485,7 +485,7 @@ namespace osu.Game
                 toolbarElements.Add(d);
             });
 
-            dependencies.Cache(loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add));
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
