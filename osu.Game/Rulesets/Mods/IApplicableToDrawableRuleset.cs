@@ -7,7 +7,7 @@ using osu.Game.Rulesets.UI;
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// An interface for <see cref="Mod"/>s that can be applied to <see cref="DrawableRuleset"/>s.
+    /// An interface for <see cref="Mod"/>s that can be applied to <see cref="DrawableRuleset{TObject}"/>s.
     /// </summary>
     public interface IApplicableToDrawableRuleset<TObject> : IApplicableMod
         where TObject : HitObject
