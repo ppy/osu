@@ -105,12 +105,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     validActionPressed = false;
 
                     UnproxyContent();
-                    this.Delay(HitObject.HitWindows.WindowFor(HitResult.Miss)).Expire();
                     break;
 
                 case ArmedState.Miss:
-                    this.FadeOut(100)
-                        .Expire();
+                    this.FadeOut(100);
                     break;
 
                 case ArmedState.Hit:
@@ -129,9 +127,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         .Then()
                         .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
 
-                    this.FadeOut(800)
-                        .Expire();
-
+                    this.FadeOut(800);
                     break;
             }
         }

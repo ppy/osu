@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private DirectOverlay direct;
 
-        protected override bool RequiresAPIAccess => true;
+        protected override bool UseOnlineAPI => true;
 
         protected override void LoadComplete()
         {
