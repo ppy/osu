@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -114,8 +115,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 var obj = new BarLine
                 {
                     StartTime = Time.Current + 2000,
-                    ControlPoint = new TimingControlPoint(),
-                    BeatIndex = major ? 0 : 1
+                    Major = major,
                 };
 
                 obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

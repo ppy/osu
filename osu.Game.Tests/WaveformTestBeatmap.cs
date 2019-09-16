@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Archives;
@@ -41,6 +42,8 @@ namespace osu.Game.Tests
         protected override IBeatmap GetBeatmap() => createTestBeatmap();
 
         protected override Texture GetBackground() => null;
+
+        protected override VideoSprite GetVideo() => null;
 
         protected override Waveform GetWaveform() => new Waveform(trackStore.GetStream(firstAudioFile));
 
