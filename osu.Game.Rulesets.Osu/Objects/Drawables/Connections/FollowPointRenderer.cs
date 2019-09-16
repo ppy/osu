@@ -100,17 +100,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                             Scale = new Vector2(1.5f * currHitObject.Scale),
                         });
 
-                        HasFailed.BindValueChanged(_ => fp.Fail(), true);
-
-                        using (fp.BeginAbsoluteSequence(fadeInTime))
+                        HasFailed.BindValueChanged(v =>
                         {
-                            fp.FadeIn(currHitObject.TimeFadeIn);
-                            fp.ScaleTo(currHitObject.Scale, currHitObject.TimeFadeIn, Easing.Out);
+                            fp.ClearTransforms();
 
-                            fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
+                            if (v.NewValue)
+                                fp.ApplyFailTransforms();
+                            else
+                            {
+                                using (fp.BeginAbsoluteSequence(fadeInTime))
+                                {
+                                    fp.FadeIn(currHitObject.TimeFadeIn);
+                                    fp.ScaleTo(currHitObject.Scale, currHitObject.TimeFadeIn, Easing.Out);
 
-                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
-                        }
+                                    fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
+
+                                    fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
+                                }
+                            }
+                        }, true);
 
                         fp.Expire(true);
                     }

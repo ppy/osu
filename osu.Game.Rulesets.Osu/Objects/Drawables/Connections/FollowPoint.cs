@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             }, confineMode: ConfineMode.NoScaling);
         }
 
-        public void Fail()
+        public void ApplyFailTransforms()
         {
             this.ScaleTo(Scale * 0.5f, FailAnimation.FAIL_DURATION);
             this.MoveToOffset(new Vector2(0, 400), FailAnimation.FAIL_DURATION);
