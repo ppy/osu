@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual void BindDrawableRuleset(IDrawableRuleset drawableRuleset)
         {
-            (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
+            drawableRuleset.Attach(KeyCounter);
 
             replayLoaded.BindTo(drawableRuleset.HasReplayLoaded);
 

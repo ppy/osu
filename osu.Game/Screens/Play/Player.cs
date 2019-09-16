@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Play
                 .WithChild(beatmapSkinProvider
                     .WithChild(target = rulesetSkinProvider)));
 
-            target.AddRange(new Drawable[]
+            target.AddRange(new[]
             {
                 DrawableRuleset as Drawable,
                 new ComboEffects(ScoreProcessor)
