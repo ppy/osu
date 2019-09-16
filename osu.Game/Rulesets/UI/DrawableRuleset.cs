@@ -49,6 +49,10 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public virtual int Variant => 0;
 
+        public BindableBool HasReplayLoaded { get; } = new BindableBool();
+
+        public BindableBool IsPaused { get; } = new BindableBool();
+
         /// <summary>
         /// The key conversion input manager for this DrawableRuleset.
         /// </summary>
@@ -89,6 +93,8 @@ namespace osu.Game.Rulesets.UI
                     frameStabilityContainer.FrameStablePlayback = value;
             }
         }
+
+        public Ruleset Ruleset { get; }
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
@@ -133,10 +139,17 @@ namespace osu.Game.Rulesets.UI
         [Cached(typeof(IReadOnlyList<Mod>))]
         private readonly IReadOnlyList<Mod> mods;
 
+        Score IDrawableRuleset.ReplayScore => ReplayScore;
+
+        public Score ReplayScore { get; protected set; }
+
         private FrameStabilityContainer frameStabilityContainer;
 
         private OnScreenDisplay onScreenDisplay;
 
+        ResumeOverlay IDrawableRuleset.ResumeOverlay => ResumeOverlay;
+
+        public ResumeOverlay ResumeOverlay { get; protected set; }
 
         protected virtual ResumeOverlay CreateResumeOverlay() => null;
 
