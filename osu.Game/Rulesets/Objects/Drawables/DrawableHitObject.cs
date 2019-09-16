@@ -155,11 +155,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (State.Value == newState && !force)
                 return;
 
-            state.Value = newState;
-
             if (newState == ArmedState.Fail)
             {
                 UpdateFailTransforms();
+                state.Value = newState;
                 return;
             }
 
@@ -179,7 +178,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     var judgementOffset = Math.Min(HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
+                    {
                         UpdateStateTransforms(newState);
+                        state.Value = newState;
+                    }
                 }
 
                 if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
