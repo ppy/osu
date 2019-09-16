@@ -349,116 +349,85 @@ namespace osu.Game.Rulesets.UI
 
     /// <summary>
     /// Displays an interactive ruleset gameplay instance.
-    /// <remarks>
-    /// This type is required only for adding non-generic type to the draw hierarchy.
-    /// Once IDrawable is a thing, this can also become an interface.
-    /// </remarks>
     /// </summary>
-    public abstract class DrawableRuleset : CompositeDrawable
+    public interface IDrawableRuleset : IProvideCursor, ICanAttachKeyCounter
     {
         /// <summary>
         /// Whether a replay is currently loaded.
         /// </summary>
-        public readonly BindableBool HasReplayLoaded = new BindableBool();
+        BindableBool HasReplayLoaded { get; }
 
         /// <summary>
         /// Whether the game is paused. Used to block user input.
         /// </summary>
-        public readonly BindableBool IsPaused = new BindableBool();
+        BindableBool IsPaused { get; }
 
         /// <summary>
         /// The playfield.
         /// </summary>
-        public abstract Playfield Playfield { get; }
+        Playfield Playfield { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
         /// </summary>
-        public abstract GameplayClock FrameStableClock { get; }
+        GameplayClock FrameStableClock { get; }
 
         /// <summary>~
         /// The associated ruleset.
         /// </summary>
-        public readonly Ruleset Ruleset;
-
-        /// <summary>
-        /// Creates a ruleset visualisation for the provided ruleset.
-        /// </summary>
-        /// <param name="ruleset">The ruleset.</param>
-        internal DrawableRuleset(Ruleset ruleset)
-        {
-            Ruleset = ruleset;
-        }
+        Ruleset Ruleset { get; }
 
         /// <summary>
         /// All the converted hit objects contained by this hit renderer.
         /// </summary>
-        public abstract IEnumerable<HitObject> Objects { get; }
+        IEnumerable<HitObject> Objects { get; }
 
         /// <summary>
         /// The point in time at which gameplay starts, including any required lead-in for display purposes.
         /// Defaults to two seconds before the first <see cref="HitObject"/>. Override as necessary.
         /// </summary>
-        public abstract double GameplayStartTime { get; }
+        double GameplayStartTime { get; }
 
         /// <summary>
         /// The currently loaded replay. Usually null in the case of a local player.
         /// </summary>
-        public Score ReplayScore { get; protected set; }
+        Score ReplayScore { get; }
 
         /// <summary>
         /// The cursor being displayed by the <see cref="Playfield"/>. May be null if no cursor is provided.
         /// </summary>
-        public abstract GameplayCursorContainer Cursor { get; }
+        new GameplayCursorContainer Cursor { get; }
 
         /// <summary>
         /// An optional overlay used when resuming gameplay from a paused state.
         /// </summary>
-        public ResumeOverlay ResumeOverlay { get; protected set; }
+        ResumeOverlay ResumeOverlay { get; }
 
         /// <summary>
         /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
         /// </summary>
         [CanBeNull]
-        public HitWindows FirstAvailableHitWindows
-        {
-            get
-            {
-                foreach (var h in Objects)
-                {
-                    if (h.HitWindows != null)
-                        return h.HitWindows;
-
-                    foreach (var n in h.NestedHitObjects)
-                        if (n.HitWindows != null)
-                            return n.HitWindows;
-                }
-
-                return null;
-            }
-        }
-
-        protected virtual ResumeOverlay CreateResumeOverlay() => null;
+        HitWindows FirstAvailableHitWindows { get; }
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
-        public abstract void SetReplayScore(Score replayScore);
+        void SetReplayScore(Score replayScore);
 
         /// <summary>
         /// Invoked when the interactive user requests resuming from a paused state.
         /// Allows potentially delaying the resume process until an interaction is performed.
         /// </summary>
         /// <param name="continueResume">The action to run when resuming is to be completed.</param>
-        public abstract void RequestResume(Action continueResume);
+        void RequestResume(Action continueResume);
 
         /// <summary>
         /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
-        /// <see cref="DrawableRuleset"/>.
+        /// <see cref="IDrawableRuleset"/>.
         /// </summary>
         /// <returns>A score processor.</returns>
-        public abstract ScoreProcessor CreateScoreProcessor();
+        ScoreProcessor CreateScoreProcessor();
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
