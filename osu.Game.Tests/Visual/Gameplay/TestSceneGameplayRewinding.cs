@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 
-            public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
+            public new IDrawableRuleset DrawableRuleset => base.DrawableRuleset;
 
             public RulesetExposingPlayer()
                 : base(false, false)

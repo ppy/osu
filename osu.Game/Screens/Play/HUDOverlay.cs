@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
         private readonly ScoreProcessor scoreProcessor;
-        private readonly DrawableRuleset drawableRuleset;
+        private readonly IDrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
         private Bindable<bool> showHud;
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Play
 
         private readonly Container topScoreContainer;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(ScoreProcessor scoreProcessor, IDrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             this.scoreProcessor = scoreProcessor;
             this.drawableRuleset = drawableRuleset;
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected virtual void BindDrawableRuleset(DrawableRuleset drawableRuleset)
+        protected virtual void BindDrawableRuleset(IDrawableRuleset drawableRuleset)
         {
             (drawableRuleset as ICanAttachKeyCounter)?.Attach(KeyCounter);
 

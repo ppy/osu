@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class FailPlayer : ReplayPlayer
         {
-            public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
+            public new IDrawableRuleset DrawableRuleset => base.DrawableRuleset;
 
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 

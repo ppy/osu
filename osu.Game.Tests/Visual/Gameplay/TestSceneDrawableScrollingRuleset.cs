@@ -174,7 +174,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new TestDrawableScrollingRuleset(this, beatmap, mods);
+            public override IDrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new TestDrawableScrollingRuleset(this, beatmap, mods);
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
 

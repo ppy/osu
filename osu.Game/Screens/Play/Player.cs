@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Play
         private BreakOverlay breakOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
-        protected DrawableRuleset DrawableRuleset { get; private set; }
+        protected IDrawableRuleset DrawableRuleset { get; private set; }
 
         protected HUDOverlay HUDOverlay { get; private set; }
 
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play
 
             target.AddRange(new Drawable[]
             {
-                DrawableRuleset,
+                DrawableRuleset as Drawable,
                 new ComboEffects(ScoreProcessor)
             });
         }

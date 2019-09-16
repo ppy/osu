@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Play
     {
         public Action OnComplete;
 
-        private readonly DrawableRuleset drawableRuleset;
+        private readonly IDrawableRuleset drawableRuleset;
 
         private readonly BindableDouble trackFreq = new BindableDouble(1);
 
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel failSample;
 
-        public FailAnimation(DrawableRuleset drawableRuleset)
+        public FailAnimation(IDrawableRuleset drawableRuleset)
         {
             this.drawableRuleset = drawableRuleset;
         }

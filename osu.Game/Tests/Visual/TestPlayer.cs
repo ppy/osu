@@ -10,7 +10,7 @@ namespace osu.Game.Tests.Visual
     {
         protected override bool PauseOnFocusLost => false;
 
-        public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
+        public new IDrawableRuleset DrawableRuleset => base.DrawableRuleset;
 
         public TestPlayer(bool allowPause = true, bool showResults = true)
             : base(allowPause, showResults)
