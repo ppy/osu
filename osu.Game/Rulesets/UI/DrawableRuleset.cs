@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.UI
     /// Displays an interactive ruleset gameplay instance.
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this DrawableRuleset.</typeparam>
-    public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
+    public abstract class DrawableRuleset<TObject> : CompositeDrawable, IDrawableRuleset
         where TObject : HitObject
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public PassThroughInputManager KeyBindingInputManager;
 
-        public override double GameplayStartTime => Objects.First().StartTime - 2000;
+        public virtual double GameplayStartTime => Objects.First().StartTime - 2000;
 
         private readonly Lazy<Playfield> playfield;
 
@@ -65,14 +65,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The playfield.
         /// </summary>
-        public override Playfield Playfield => playfield.Value;
+        public Playfield Playfield => playfield.Value;
 
         /// <summary>
         /// Place to put drawables above hit objects but below UI.
         /// </summary>
         public Container Overlays { get; private set; }
 
-        public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
+        public GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
         private bool frameStablePlayback = true;
 
@@ -105,7 +105,25 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Beatmap<TObject> Beatmap;
 
-        public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+        public IEnumerable<HitObject> Objects => Beatmap.HitObjects;
+
+        public HitWindows FirstAvailableHitWindows
+        {
+            get
+            {
+                foreach (var h in Objects)
+                {
+                    if (h.HitWindows != null)
+                        return h.HitWindows;
+
+                    foreach (var n in h.NestedHitObjects)
+                        if (n.HitWindows != null)
+                            return n.HitWindows;
+                }
+
+                return null;
+            }
+        }
 
         protected IRulesetConfigManager Config { get; private set; }
 
@@ -119,6 +137,9 @@ namespace osu.Game.Rulesets.UI
 
         private OnScreenDisplay onScreenDisplay;
 
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
+
         /// <summary>
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
@@ -126,8 +147,9 @@ namespace osu.Game.Rulesets.UI
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
-            : base(ruleset)
         {
+            Ruleset = ruleset;
+
             if (workingBeatmap == null)
                 throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
 
@@ -227,7 +249,7 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
-        public override void RequestResume(Action continueResume)
+        public void RequestResume(Action continueResume)
         {
             if (ResumeOverlay != null && (Cursor == null || (Cursor.LastFrameState == Visibility.Visible && Contains(Cursor.ActiveCursor.ScreenSpaceDrawQuad.Centre))))
             {
@@ -256,7 +278,7 @@ namespace osu.Game.Rulesets.UI
             Playfield.Add(drawableObject);
         }
 
-        public override void SetReplayScore(Score replayScore)
+        public void SetReplayScore(Score replayScore)
         {
             if (!(KeyBindingInputManager is IHasReplayHandler replayInputManager))
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
@@ -302,7 +324,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
+        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
@@ -327,7 +349,7 @@ namespace osu.Game.Rulesets.UI
 
         CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
 
-        public override GameplayCursorContainer Cursor => Playfield.Cursor;
+        public GameplayCursorContainer Cursor => Playfield.Cursor;
 
         public bool ProvidingUserCursor => Playfield.Cursor != null && !HasReplayLoaded.Value;
 
