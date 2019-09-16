@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private VolumeOverlay volumeOverlay { get; set; }
 
-        private bool muteWarningShownOnce;
+        private static bool muteWarningShownOnce;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
