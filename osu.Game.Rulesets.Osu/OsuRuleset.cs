@@ -52,6 +52,11 @@ namespace osu.Game.Rulesets.Osu
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
 
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new OsuModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new OsuModSuddenDeath();
+
             if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
@@ -76,17 +81,11 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new OsuModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
             if (mods.HasFlag(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
