@@ -364,10 +364,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
-            // TODO: Playfield.HasFailed should likely be checked here to allow reviving the hitobject
-            if (State.Value == ArmedState.Fail)
-                return;
-
             application?.Invoke(Result);
 
             if (!Result.HasResult)
@@ -376,6 +372,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             Result.TimeOffset = Time.Current - endTime;
+
+            OnNewResult?.Invoke(this, Result);
+
+            // TODO: Playfield.HasFailed should likely be checked here to allow reviving the hitobject
+            if (State.Value == ArmedState.Fail)
+                return;
 
             switch (Result.Type)
             {
@@ -390,8 +392,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     updateState(ArmedState.Hit);
                     break;
             }
-
-            OnNewResult?.Invoke(this, Result);
         }
 
         /// <summary>
