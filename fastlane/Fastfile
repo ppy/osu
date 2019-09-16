@@ -3,6 +3,9 @@ update_fastlane
 platform :android do
 desc 'Deploy to play store'
   lane :beta do |options|
+
+    options[:solution_path] = 'osu.Android.sln'
+
     # update csproj version
     update_version(options)
 
