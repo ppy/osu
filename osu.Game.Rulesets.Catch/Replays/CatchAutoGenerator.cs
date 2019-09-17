@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Catch.Replays
 
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
             addFrame(-100000, lastPosition);
+            addFrame(0, lastPosition);
 
             void moveToNext(CatchHitObject h)
             {

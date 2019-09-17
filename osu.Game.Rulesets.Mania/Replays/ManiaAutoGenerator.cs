@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Mania.Replays
         {
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
             Replay.Frames.Add(new ManiaReplayFrame(-100000, 0));
+            Replay.Frames.Add(new ManiaReplayFrame(0, 0));
 
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
