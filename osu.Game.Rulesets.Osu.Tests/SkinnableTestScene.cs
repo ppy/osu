@@ -26,21 +26,32 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, SkinManager skinManager)
         {
             var dllStore = new DllResourceStore("osu.Game.Rulesets.Osu.Tests.dll");
 
             metricsSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
-            defaultSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/default_skin"), audio, false);
+            defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
             specialSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
         }
 
         public void SetContents(Func<Drawable> creationFunction)
         {
-            Cell(0).Child = new LocalSkinOverrideContainer(null) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
-            Cell(1).Child = new LocalSkinOverrideContainer(metricsSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
-            Cell(2).Child = new LocalSkinOverrideContainer(defaultSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
-            Cell(3).Child = new LocalSkinOverrideContainer(specialSkin) { RelativeSizeAxes = Axes.Both }.WithChild(creationFunction());
+            Cell(0).Child = createProvider(null, creationFunction);
+            Cell(1).Child = createProvider(metricsSkin, creationFunction);
+            Cell(2).Child = createProvider(defaultSkin, creationFunction);
+            Cell(3).Child = createProvider(specialSkin, creationFunction);
+        }
+
+        private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
+        {
+            var mainProvider = new SkinProvidingContainer(skin);
+
+            return mainProvider
+                .WithChild(new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider))
+                {
+                    Child = creationFunction()
+                });
         }
 
         private class TestLegacySkin : LegacySkin

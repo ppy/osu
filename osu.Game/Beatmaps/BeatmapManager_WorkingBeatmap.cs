@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
@@ -57,6 +58,21 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+
+            protected override VideoSprite GetVideo()
+            {
+                if (Metadata?.VideoFile == null)
+                    return null;
+
+                try
+                {
+                    return new VideoSprite(textureStore.GetStream(getPathForFile(Metadata.VideoFile)));
                 }
                 catch
                 {
@@ -136,7 +152,7 @@ namespace osu.Game.Beatmaps
                 return storyboard;
             }
 
-            protected override Skin GetSkin()
+            protected override ISkin GetSkin()
             {
                 try
                 {

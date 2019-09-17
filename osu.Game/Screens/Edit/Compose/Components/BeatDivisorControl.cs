@@ -188,6 +188,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             private Marker marker;
 
+            [Resolved]
+            private OsuColour colours { get; set; }
+
             private readonly BindableBeatDivisor beatDivisor;
             private readonly int[] availableDivisors;
 
@@ -204,11 +207,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 foreach (var t in availableDivisors)
                 {
-                    AddInternal(new Tick(t)
+                    AddInternal(new Tick
                     {
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopCentre,
                         RelativePositionAxes = Axes.X,
+                        Colour = BindableBeatDivisor.GetColourFor(t, colours),
                         X = getMappedPosition(t)
                     });
                 }
@@ -284,53 +288,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             private class Tick : CompositeDrawable
             {
-                private readonly int divisor;
-
-                public Tick(int divisor)
+                public Tick()
                 {
-                    this.divisor = divisor;
                     Size = new Vector2(2.5f, 10);
 
                     InternalChild = new Box { RelativeSizeAxes = Axes.Both };
 
                     CornerRadius = 0.5f;
                     Masking = true;
-                }
-
-                [BackgroundDependencyLoader]
-                private void load(OsuColour colours)
-                {
-                    Colour = getColourForDivisor(divisor, colours);
-                }
-
-                private ColourInfo getColourForDivisor(int divisor, OsuColour colours)
-                {
-                    switch (divisor)
-                    {
-                        case 2:
-                            return colours.BlueLight;
-
-                        case 4:
-                            return colours.Blue;
-
-                        case 8:
-                            return colours.BlueDarker;
-
-                        case 16:
-                            return colours.PurpleDark;
-
-                        case 3:
-                            return colours.YellowLight;
-
-                        case 6:
-                            return colours.Yellow;
-
-                        case 12:
-                            return colours.YellowDarker;
-
-                        default:
-                            return Color4.White;
-                    }
                 }
             }
 

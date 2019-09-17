@@ -15,8 +15,8 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
-using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
@@ -154,6 +154,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (Time.Current < HitObject.StartTime) return;
 
+            spinningSample.Play();
+
             if (Progress >= 1 && !Disc.Complete)
             {
                 Disc.Complete = true;
@@ -171,6 +173,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (userTriggered || Time.Current < Spinner.EndTime)
                 return;
+
+            spinningSample.Stop();
 
             ApplyResult(r =>
             {
@@ -214,8 +218,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            spinningSample.Play();
-
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
 
@@ -231,14 +233,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {
-                case ArmedState.Idle:
-                    Expire(true);
-                    break;
-
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
@@ -247,12 +247,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
-
-            Schedule(() =>
-            {
-                if (State.Value != ArmedState.Idle)
-                    spinningSample.Stop();
-            });
 
             Expire();
         }

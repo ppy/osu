@@ -23,8 +23,10 @@ namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableTaikoRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableTaikoRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
+
+        public const string SHORT_NAME = "taiko";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -42,6 +44,11 @@ namespace osu.Game.Rulesets.Taiko
                 yield return new TaikoModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new TaikoModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new TaikoModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
@@ -64,14 +71,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new TaikoModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new TaikoModRelax();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new TaikoModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -116,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string Description => "osu!taiko";
 
-        public override string ShortName => "taiko";
+        public override string ShortName => SHORT_NAME;
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 

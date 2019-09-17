@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.Edit
     [Cached(Type = typeof(IManiaHitObjectComposer))]
     public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>, IManiaHitObjectComposer
     {
-        protected new DrawableManiaEditRuleset DrawableRuleset { get; private set; }
+        private DrawableManiaEditRuleset drawableRuleset;
 
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -33,23 +33,23 @@ namespace osu.Game.Rulesets.Mania.Edit
         /// </summary>
         /// <param name="screenSpacePosition">The screen-space position.</param>
         /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public Column ColumnAt(Vector2 screenSpacePosition) => DrawableRuleset.GetColumnByPosition(screenSpacePosition);
+        public Column ColumnAt(Vector2 screenSpacePosition) => drawableRuleset.GetColumnByPosition(screenSpacePosition);
 
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-        public int TotalColumns => ((ManiaPlayfield)DrawableRuleset.Playfield).TotalColumns;
+        public int TotalColumns => ((ManiaPlayfield)drawableRuleset.Playfield).TotalColumns;
 
-        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected override DrawableRuleset<ManiaHitObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
         {
-            DrawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
+            drawableRuleset = new DrawableManiaEditRuleset(ruleset, beatmap, mods);
 
             // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
-            dependencies.CacheAs(DrawableRuleset.ScrollingInfo);
+            dependencies.CacheAs(drawableRuleset.ScrollingInfo);
 
-            return DrawableRuleset;
+            return drawableRuleset;
         }
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]

@@ -14,6 +14,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneMatchLeaderboard : MultiplayerTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         public TestSceneMatchLeaderboard()
         {
             Room.RoomID.Value = 3;
@@ -27,11 +29,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
         }
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             var req = new GetRoomScoresRequest();
             req.Success += v => { };

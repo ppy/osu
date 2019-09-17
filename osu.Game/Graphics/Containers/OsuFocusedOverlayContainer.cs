@@ -21,8 +21,6 @@ namespace osu.Game.Graphics.Containers
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        protected virtual bool PlaySamplesOnStateChange => true;
-
         protected override bool BlockNonPositionalInput => true;
 
         /// <summary>
@@ -32,7 +30,7 @@ namespace osu.Game.Graphics.Containers
         protected virtual bool DimMainContent => true;
 
         [Resolved(CanBeNull = true)]
-        private OsuGame osuGame { get; set; }
+        private OsuGame game { get; set; }
 
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
@@ -42,13 +40,22 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio)
         {
-            if (osuGame != null)
-                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
-
             samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
             samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
+        }
 
-            State.ValueChanged += onStateChanged;
+        protected override void LoadComplete()
+        {
+            if (game != null)
+                OverlayActivationMode.BindTo(game.OverlayActivationMode);
+
+            OverlayActivationMode.BindValueChanged(mode =>
+            {
+                if (mode.NewValue == OverlayActivation.Disabled)
+                    State.Value = Visibility.Hidden;
+            }, true);
+
+            base.LoadComplete();
         }
 
         /// <summary>
@@ -63,12 +70,30 @@ namespace osu.Game.Graphics.Containers
         protected override bool OnClick(ClickEvent e)
         {
             if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
-            {
                 Hide();
-                return true;
-            }
 
             return base.OnClick(e);
+        }
+
+        private bool closeOnDragEnd;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                closeOnDragEnd = true;
+
+            return base.OnDragStart(e);
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            if (closeOnDragEnd)
+            {
+                Hide();
+                closeOnDragEnd = false;
+            }
+
+            return base.OnDragEnd(e);
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -88,26 +113,28 @@ namespace osu.Game.Graphics.Containers
 
         public bool OnReleased(GlobalAction action) => false;
 
-        private void onStateChanged(ValueChangedEvent<Visibility> state)
+        protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
             switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    if (OverlayActivationMode.Value != OverlayActivation.Disabled)
+                    if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                     {
-                        if (PlaySamplesOnStateChange) samplePopIn?.Play();
-                        if (BlockScreenWideMouse && DimMainContent) osuGame?.AddBlockingOverlay(this);
+                        State.Value = Visibility.Hidden;
+                        return;
                     }
-                    else
-                        Hide();
 
+                    samplePopIn?.Play();
+                    if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
 
                 case Visibility.Hidden:
-                    if (PlaySamplesOnStateChange) samplePopOut?.Play();
-                    if (BlockScreenWideMouse) osuGame?.RemoveBlockingOverlay(this);
+                    samplePopOut?.Play();
+                    if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }
+
+            base.UpdateState(state);
         }
 
         protected override void PopOut()
@@ -119,7 +146,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            osuGame?.RemoveBlockingOverlay(this);
+            game?.RemoveBlockingOverlay(this);
         }
     }
 }
