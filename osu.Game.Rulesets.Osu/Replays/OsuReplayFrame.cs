@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, LegacyReplayFrame lastFrame = null)
+        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             Position = currentFrame.Position;
             if (currentFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
