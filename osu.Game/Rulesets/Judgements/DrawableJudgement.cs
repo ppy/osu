@@ -34,9 +34,13 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// Duration of initial fade in.
-        /// Default fade out will start immediately after this duration.
         /// </summary>
         protected virtual double FadeInDuration => 100;
+
+        /// <summary>
+        /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
+        /// </summary>
+        protected virtual double FadeOutDelay => FadeInDuration;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -76,7 +80,7 @@ namespace osu.Game.Rulesets.Judgements
             JudgementBody.ScaleTo(0.9f);
             JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
 
-            this.Delay(FadeInDuration).FadeOut(400);
+            this.Delay(FadeOutDelay).FadeOut(400);
         }
 
         protected override void LoadComplete()
