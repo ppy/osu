@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneHistoricalSection : OsuTestScene
     {
-        protected override bool RequiresAPIAccess => true;
+        protected override bool UseOnlineAPI => true;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

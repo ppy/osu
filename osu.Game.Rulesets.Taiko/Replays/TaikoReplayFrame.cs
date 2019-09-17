@@ -23,12 +23,12 @@ namespace osu.Game.Rulesets.Taiko.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
-            if (legacyFrame.MouseRight1) Actions.Add(TaikoAction.LeftRim);
-            if (legacyFrame.MouseRight2) Actions.Add(TaikoAction.RightRim);
-            if (legacyFrame.MouseLeft1) Actions.Add(TaikoAction.LeftCentre);
-            if (legacyFrame.MouseLeft2) Actions.Add(TaikoAction.RightCentre);
+            if (currentFrame.MouseRight1) Actions.Add(TaikoAction.LeftRim);
+            if (currentFrame.MouseRight2) Actions.Add(TaikoAction.RightRim);
+            if (currentFrame.MouseLeft1) Actions.Add(TaikoAction.LeftCentre);
+            if (currentFrame.MouseLeft2) Actions.Add(TaikoAction.RightCentre);
         }
     }
 }
