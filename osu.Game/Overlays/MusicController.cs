@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -24,7 +25,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        private List<BeatmapSetInfo> beatmapSets;
+        public readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
         public bool IsUserPaused { get; private set; }
 
@@ -46,7 +47,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapSets = beatmaps.GetAllUsableBeatmapSets();
+            BeatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
         }
@@ -65,8 +66,8 @@ namespace osu.Game.Overlays
         /// <param name="index">The new position.</param>
         public void ChangeBeatmapSetPosition(BeatmapSetInfo beatmapSetInfo, int index)
         {
-            beatmapSets.Remove(beatmapSetInfo);
-            beatmapSets.Insert(index, beatmapSetInfo);
+            BeatmapSets.Remove(beatmapSetInfo);
+            BeatmapSets.Insert(index, beatmapSetInfo);
         }
 
         /// <summary>
@@ -75,10 +76,10 @@ namespace osu.Game.Overlays
         public bool IsPlaying => beatmap.Value.Track.IsRunning;
 
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
-            Schedule(() => beatmapSets.Add(set));
+            Schedule(() => BeatmapSets.Add(set));
 
         private void handleBeatmapRemoved(BeatmapSetInfo set) =>
-            Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
+            Schedule(() => BeatmapSets.RemoveAll(s => s.ID == set.ID));
 
         private ScheduledDelegate seekDelegate;
 
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays
         {
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
+            var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
 
             if (playable != null)
             {
@@ -165,7 +166,7 @@ namespace osu.Game.Overlays
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
 
-            var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
+            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? BeatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -200,8 +201,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     //figure out the best direction based on order in playlist.
-                    var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap.NewValue == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
+                    var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }

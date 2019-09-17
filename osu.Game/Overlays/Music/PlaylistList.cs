@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -44,6 +45,8 @@ namespace osu.Game.Overlays.Music
 
         private class ItemsScrollContainer : OsuScrollContainer
         {
+            private BindableList<BeatmapSetInfo> beatmaps;
+
             public Action<BeatmapSetInfo> Selected;
             public Action<BeatmapSetInfo, int> OrderChanged;
 
@@ -73,20 +76,19 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, IBindable<WorkingBeatmap> beatmap)
+            private void load(MusicController musicController, IBindable<WorkingBeatmap> beatmap)
             {
-                beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
-                beatmaps.ItemAdded += addBeatmapSet;
-                beatmaps.ItemRemoved += removeBeatmapSet;
+                beatmaps = musicController.BeatmapSets.GetBoundCopy();
+
+                beatmaps.ItemsAdded += i => i.ForEach(addBeatmapSet);
+                beatmaps.ItemsRemoved += i => i.ForEach(removeBeatmapSet);
+                beatmaps.ForEach(addBeatmapSet);
 
                 beatmapBacking.BindTo(beatmap);
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
-            {
-                items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) });
-            });
+            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() => { items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) }); });
 
             private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
