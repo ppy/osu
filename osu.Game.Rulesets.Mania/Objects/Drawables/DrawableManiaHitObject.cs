@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             switch (state)
             {
                 case ArmedState.Miss:
-                    this.FadeOut(150, Easing.In).Expire();
+                    this.FadeOut(150, Easing.In);
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(150, Easing.OutQuint).Expire();
+                    this.FadeOut(150, Easing.OutQuint);
                     break;
             }
         }
