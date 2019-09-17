@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
@@ -12,6 +13,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     [Description("Player instantiated with an autoplay mod.")]
     public class TestSceneAutoplay : AllPlayersTestScene
     {
+        private ClockBackedTestWorkingBeatmap.TrackVirtualManual track;
+
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
@@ -22,11 +25,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("score above zero", () => ((ScoreAccessiblePlayer)Player).ScoreProcessor.TotalScore.Value > 0);
             AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 5));
-            AddStep("rewind", () =>
-            {
-                ((ScoreAccessiblePlayer)Player).GameplayClockContainer.Seek(0);
-            });
-            AddUntilStep("key counter counted no", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+            AddStep("rewind", () => track.Seek(-10000));
+            AddUntilStep("key counter reset", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
+        }
+
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
+        {
+            var working = base.CreateWorkingBeatmap(beatmap);
+
+            track = (ClockBackedTestWorkingBeatmap.TrackVirtualManual)working.Track;
+
+            return working;
         }
 
         private class ScoreAccessiblePlayer : TestPlayer
