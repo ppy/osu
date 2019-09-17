@@ -4,16 +4,21 @@ platform :android do
 desc 'Deploy to play store'
   lane :beta do |options|
 
-    options[:solution_path] = 'osu.Android.sln'
-
     # update csproj version
-    update_version(options)
+    update_version(
+      solution_path: 'osu.Android.sln',
+      version: options[:version],
+      build: options[:build],
+    )
 
     build()
 
-    client = HTTPClient.new
-    changelog = client.get_content 'https://gist.githubusercontent.com/peppy/ab89c29dcc0dce95f39eb218e8fad197/raw'
-    changelog.gsub!('$BUILD_ID', options[:build])
+    supply(
+      apk: './osu.Android/bin/Release/sh.ppy.osulazer-Signed.apk',
+      package_name: 'sh.ppy.osulazer',
+      track: 'alpha', # upload to alpha, we can promote it later
+      json_key: options[:json_key],
+    )
   end
 
   desc 'Compile the project'
