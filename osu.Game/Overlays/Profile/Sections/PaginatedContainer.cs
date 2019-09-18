@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Origin = Anchor.TopCentre,
                     Alpha = 0,
                     Margin = new MarginPadding { Top = 10 },
-                    Action = ShowMore,
+                    Action = showMore,
                 },
                 missingText = new OsuSpriteText
                 {
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        protected void ClearContent()
+        private void clearContent()
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -95,13 +95,13 @@ namespace osu.Game.Overlays.Profile.Sections
 
         private void onUserChanged(ValueChangedEvent<User> e)
         {
-            ClearContent();
+            clearContent();
 
             if (e.NewValue != null)
-                ShowMore();
+                showMore();
         }
 
-        protected void ShowMore()
+        private void showMore()
         {
             loadCancellation = new CancellationTokenSource();
 

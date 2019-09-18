@@ -35,15 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Ruleset.BindValueChanged(rulesetChanged);
-        }
-
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> r)
-        {
-            ClearContent();
-
-            if (r.NewValue != null)
-                ShowMore();
+            Ruleset.BindValueChanged(_ => User.TriggerChange());
         }
 
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
