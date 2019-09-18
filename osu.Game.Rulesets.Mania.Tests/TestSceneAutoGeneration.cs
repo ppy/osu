@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         /// <summary>
         /// The number of frames which are generated at the start of a replay regardless of hitobject content.
         /// </summary>
-        private const int frame_offset = 2;
+        private const int frame_offset = 1;
 
         [Test]
         public void TestSingleNote()

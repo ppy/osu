@@ -21,7 +21,8 @@ namespace osu.Game.Rulesets.Mania.Replays
         public ManiaReplayFrame(double time, params ManiaAction[] actions)
             : base(time)
         {
-            Actions.AddRange(actions);
+            if (actions.Length > 0)
+                Actions.AddRange(actions);
         }
 
         public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
