@@ -160,6 +160,15 @@ namespace osu.Game.Tests.Visual.Gameplay
             exitAndConfirm();
         }
 
+        [Test]
+        public void TestRestartAfterResume()
+        {
+            pauseAndConfirm();
+            resumeAndConfirm();
+            restart();
+            confirmExited();
+        }
+
         private void pauseAndConfirm()
         {
             pause();
@@ -198,6 +207,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player exited", () => !Player.IsCurrentScreen());
         }
 
+        private void restart() => AddStep("restart", () => Player.Restart());
         private void pause() => AddStep("pause", () => Player.Pause());
         private void resume() => AddStep("resume", () => Player.Resume());
 

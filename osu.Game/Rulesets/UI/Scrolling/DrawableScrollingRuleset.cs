@@ -70,6 +70,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual bool UserScrollSpeedAdjustment => true;
 
         /// <summary>
+        /// Whether <see cref="TimingControlPoint"/> beat lengths should scale relative to the most common beat length in the <see cref="Beatmap"/>.
+        /// </summary>
+        protected virtual bool RelativeScaleBeatLengths => false;
+
+        /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
         /// inside this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
@@ -81,7 +86,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected DrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
@@ -107,16 +112,38 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [BackgroundDependencyLoader]
         private void load()
         {
-            // Calculate default multiplier control points
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+            double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
+
+            if (RelativeScaleBeatLengths)
+            {
+                IReadOnlyList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+                double maxDuration = 0;
+
+                for (int i = 0; i < timingPoints.Count; i++)
+                {
+                    if (timingPoints[i].Time > lastObjectTime)
+                        break;
+
+                    double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime;
+                    double duration = endTime - timingPoints[i].Time;
+
+                    if (duration > maxDuration)
+                    {
+                        maxDuration = duration;
+                        baseBeatLength = timingPoints[i].BeatLength;
+                    }
+                }
+            }
+
+            // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point
             var lastTimingPoint = new TimingControlPoint();
             var lastDifficultyPoint = new DifficultyControlPoint();
-
-            // Merge timing + difficulty points
             var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
             allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
             allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
 
-            // Generate the timing points, making non-timing changes use the previous timing change
+            // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
                 var timingPoint = c as TimingControlPoint;
@@ -131,14 +158,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 return new MultiplierControlPoint(c.Time)
                 {
                     Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier,
+                    BaseBeatLength = baseBeatLength,
                     TimingPoint = lastTimingPoint,
                     DifficultyPoint = lastDifficultyPoint
                 };
             });
 
-            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
-
-            // Perform some post processing of the timing changes
+            // Trim unwanted sequences of timing changes
             timingChanges = timingChanges
                             // Collapse sections after the last hit object
                             .Where(s => s.StartTime <= lastObjectTime)
@@ -147,7 +173,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             controlPoints.AddRange(timingChanges);
 
-            // If we have no control points, add a default one
             if (controlPoints.Count == 0)
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }

@@ -133,6 +133,10 @@ namespace osu.Game.Online.Leaderboards
                         });
                         break;
 
+                    case PlaceholderState.NoneSelected:
+                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
+                        break;
+
                     case PlaceholderState.Unavailable:
                         replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
                         break;

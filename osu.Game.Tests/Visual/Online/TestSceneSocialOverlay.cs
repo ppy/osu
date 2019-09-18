@@ -13,6 +13,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneSocialOverlay : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(UserPanel),

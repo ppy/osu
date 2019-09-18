@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Users;
 using osuTK;
 
@@ -24,7 +23,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(IconPill)
         };
 
-        private BeatmapSetInfo getUndownloadableBeatmapSet(RulesetInfo ruleset) => new BeatmapSetInfo
+        private BeatmapSetInfo getUndownloadableBeatmapSet() => new BeatmapSetInfo
         {
             OnlineBeatmapSetID = 123,
             Metadata = new BeatmapMetadata
@@ -56,23 +55,62 @@ namespace osu.Game.Tests.Visual.Online
             {
                 new BeatmapInfo
                 {
-                    Ruleset = ruleset,
+                    Ruleset = Ruleset.Value,
                     Version = "Test",
                     StarDifficulty = 6.42,
                 }
             }
         };
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private BeatmapSetInfo getManyDifficultiesBeatmapSet(RulesetStore rulesets)
         {
-            var ruleset = new OsuRuleset().RulesetInfo;
+            var beatmaps = new List<BeatmapInfo>();
 
-            var normal = CreateWorkingBeatmap(ruleset).BeatmapSetInfo;
+            for (int i = 0; i < 100; i++)
+            {
+                beatmaps.Add(new BeatmapInfo
+                {
+                    Ruleset = rulesets.GetRuleset(i % 4),
+                    StarDifficulty = 2 + i % 4 * 2,
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = 3.5f,
+                    }
+                });
+            }
+
+            return new BeatmapSetInfo
+            {
+                OnlineBeatmapSetID = 1,
+                Metadata = new BeatmapMetadata
+                {
+                    Title = "many difficulties beatmap",
+                    Artist = "test",
+                    Author = new User
+                    {
+                        Username = "BanchoBot",
+                        Id = 3,
+                    }
+                },
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    HasVideo = true,
+                    HasStoryboard = true,
+                    Covers = new BeatmapSetOnlineCovers(),
+                },
+                Beatmaps = beatmaps,
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
+            var normal = CreateWorkingBeatmap(Ruleset.Value).BeatmapSetInfo;
             normal.OnlineInfo.HasVideo = true;
             normal.OnlineInfo.HasStoryboard = true;
 
-            var undownloadable = getUndownloadableBeatmapSet(ruleset);
+            var undownloadable = getUndownloadableBeatmapSet();
+            var manyDifficulties = getManyDifficultiesBeatmapSet(rulesets);
 
             Child = new BasicScrollContainer
             {
@@ -81,15 +119,17 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FillDirection.Full,
                     Padding = new MarginPadding(20),
-                    Spacing = new Vector2(0, 20),
+                    Spacing = new Vector2(5, 20),
                     Children = new Drawable[]
                     {
                         new DirectGridPanel(normal),
-                        new DirectListPanel(normal),
                         new DirectGridPanel(undownloadable),
+                        new DirectGridPanel(manyDifficulties),
+                        new DirectListPanel(normal),
                         new DirectListPanel(undownloadable),
+                        new DirectListPanel(manyDifficulties),
                     },
                 },
             };
