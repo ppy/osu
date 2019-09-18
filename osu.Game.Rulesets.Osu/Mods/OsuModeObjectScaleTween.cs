@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpinIn) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpinIn), typeof(OsuModTraceable) };
 
         public void ReadFromConfig(OsuConfigManager config)
         {
