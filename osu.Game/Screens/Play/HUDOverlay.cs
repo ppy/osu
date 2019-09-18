@@ -231,7 +231,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
-            FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),

@@ -153,6 +153,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (UseTransformStateManagement)
             {
+                LifetimeEnd = double.MaxValue;
+
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
                 base.ApplyTransformsAt(transformTime, true);
@@ -170,6 +172,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         state.Value = newState;
                     }
                 }
+
+                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
+                    Expire();
             }
             else
                 state.Value = newState;
@@ -200,6 +205,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
+        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// </summary>
         /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
@@ -308,7 +314,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
+        /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 

@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfileOverlay : OsuTestScene
     {
-        protected override bool RequiresAPIAccess => true;
+        protected override bool UseOnlineAPI => true;
 
         private readonly TestUserProfileOverlay profile;
 
