@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Sections
             User.BindValueChanged(onUserChanged, true);
         }
 
-        private void clearContent()
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
             loadCancellation?.Cancel();
             retrievalRequest?.Cancel();
@@ -91,11 +91,6 @@ namespace osu.Game.Overlays.Profile.Sections
             ItemsContainer.Clear();
 
             moreButton.IsLoading = true;
-        }
-
-        private void onUserChanged(ValueChangedEvent<User> e)
-        {
-            clearContent();
 
             if (e.NewValue != null)
                 showMore();
