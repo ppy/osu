@@ -17,9 +17,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override Player CreatePlayer(Ruleset ruleset)
         {
             Mods.Value = Array.Empty<Mod>();
-
-            var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
-            return new FailPlayer(ruleset.GetAutoplayMod().CreateReplayScore(beatmap));
+            return new FailPlayer();
         }
 
         protected override void AddCheckSteps()
@@ -29,16 +27,12 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("total judgements == 1", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits == 1);
         }
 
-        private class FailPlayer : ReplayPlayer
+        private class FailPlayer : TestPlayer
         {
-            public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
-
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
-            protected override bool PauseOnFocusLost => false;
-
-            public FailPlayer(Score score)
-                : base(score, false, false)
+            public FailPlayer()
+                : base(false, false)
             {
             }
 
