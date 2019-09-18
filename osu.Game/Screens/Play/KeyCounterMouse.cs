@@ -36,7 +36,12 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button == Button) IsLit = true;
+            if (e.Button == Button)
+            {
+                IsLit = true;
+                Increment();
+            }
+
             return base.OnMouseDown(e);
         }
 
