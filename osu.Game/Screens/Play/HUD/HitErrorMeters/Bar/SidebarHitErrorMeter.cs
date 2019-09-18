@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
 {
-    public class SidebarHitErrorMeter : BarHitErrorMeter
+    public class SideBarHitErrorMeter : BarHitErrorMeter
     {
         private readonly Anchor alignment;
 
@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters.Bar
 
         private const float chevron_size = 8;
 
-        public SidebarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
+        public SideBarHitErrorMeter(HitWindows hitWindows, bool rightAligned = false)
             : base(hitWindows)
         {
             alignment = rightAligned ? Anchor.x0 : Anchor.x2;

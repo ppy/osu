@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void createBar(bool rightAligned)
         {
-            var display = new SidebarHitErrorMeter(hitWindows, rightAligned)
+            var display = new SideBarHitErrorMeter(hitWindows, rightAligned)
             {
                 Margin = new MarginPadding(margin),
                 Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
