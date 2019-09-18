@@ -6,8 +6,6 @@ using System.Linq;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
