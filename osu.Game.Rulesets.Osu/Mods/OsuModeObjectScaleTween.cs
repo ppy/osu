@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable) };
-
         protected virtual float StartScale => 1;
 
         protected virtual float EndScale => 1;
 
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
+
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpinIn) };
 
         public void ReadFromConfig(OsuConfigManager config)
         {
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSlider _:
                 case DrawableHitCircle _:
                 {
-                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                         drawable.ScaleTo(StartScale).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
                     break;
                 }
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableHitCircle circle:
                     // we don't want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                         circle.ApproachCircle.Hide();
                     break;
             }

@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfileOverlay : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         private readonly TestUserProfileOverlay profile;
 
         [Resolved]
@@ -50,12 +52,12 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Current = 727,
                     Progress = 69,
-                }
-            },
-            RankHistory = new User.RankHistoryData
-            {
-                Mode = @"osu",
-                Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
+                RankHistory = new User.RankHistoryData
+                {
+                    Mode = @"osu",
+                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
             },
             Badges = new[]
             {

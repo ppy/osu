@@ -224,28 +224,30 @@ namespace osu.Game.Screens.Edit
 
         public override void OnResuming(IScreen last)
         {
-            Beatmap.Value.Track?.Stop();
             base.OnResuming(last);
+            Beatmap.Value.Track?.Stop();
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
             Background.FadeColour(Color4.DarkGray, 500);
-            Beatmap.Value.Track?.Stop();
+            resetTrack();
         }
 
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
-
-            if (Beatmap.Value.Track != null)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
-            }
+            resetTrack();
 
             return base.OnExiting(next);
+        }
+
+        private void resetTrack()
+        {
+            Beatmap.Value.Track?.ResetSpeedAdjustments();
+            Beatmap.Value.Track?.Stop();
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());

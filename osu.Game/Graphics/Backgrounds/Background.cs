@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public class Background : CompositeDrawable
     {
-        public Sprite Sprite;
+        public readonly Sprite Sprite;
 
         private readonly string textureName;
 
@@ -51,19 +51,20 @@ namespace osu.Game.Graphics.Backgrounds
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
         {
-            if (bufferedContainer == null)
+            if (bufferedContainer == null && newBlurSigma != Vector2.Zero)
             {
                 RemoveInternal(Sprite);
 
                 AddInternal(bufferedContainer = new BufferedContainer
                 {
-                    CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
+                    CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
                     Child = Sprite
                 });
             }
 
-            bufferedContainer.BlurTo(newBlurSigma, duration, easing);
+            bufferedContainer?.BlurTo(newBlurSigma, duration, easing);
         }
     }
 }

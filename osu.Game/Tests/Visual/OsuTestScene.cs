@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -15,6 +15,8 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
@@ -43,6 +45,29 @@ namespace osu.Game.Tests.Visual
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
+        private readonly Lazy<DatabaseContextFactory> contextFactory;
+
+        protected IAPIProvider API
+        {
+            get
+            {
+                if (UseOnlineAPI)
+                    throw new InvalidOperationException($"Using the {nameof(OsuTestScene)} dummy API is not supported when {nameof(UseOnlineAPI)} is true");
+
+                return dummyAPI;
+            }
+        }
+
+        private DummyAPIAccess dummyAPI;
+
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
+        /// <summary>
+        /// Whether this test scene requires real-world API access.
+        /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
+        /// </summary>
+        protected virtual bool UseOnlineAPI => false;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
@@ -53,12 +78,29 @@ namespace osu.Game.Tests.Visual
                 Default = working
             };
 
-            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            if (!UseOnlineAPI)
+            {
+                dummyAPI = new DummyAPIAccess();
+                Dependencies.CacheAs<IAPIProvider>(dummyAPI);
+                Add(dummyAPI);
+            }
+
+            return Dependencies;
         }
 
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+                factory.ResetDatabase();
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
         }
 
         [Resolved]
@@ -84,6 +126,9 @@ namespace osu.Game.Tests.Visual
 
             if (beatmap?.Value.TrackLoaded == true)
                 beatmap.Value.Track.Stop();
+
+            if (contextFactory.IsValueCreated)
+                contextFactory.Value.ResetDatabase();
 
             if (localStorage.IsValueCreated)
             {

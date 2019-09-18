@@ -41,6 +41,9 @@ namespace osu.Game.Database
         {
             // required to initialise native SQLite libraries on some platforms.
             SQLitePCL.Batteries_V2.Init();
+
+            // https://github.com/aspnet/EntityFrameworkCore/issues/9994#issuecomment-508588678
+            SQLitePCL.raw.sqlite3_config(2 /*SQLITE_CONFIG_MULTITHREAD*/);
         }
 
         /// <summary>

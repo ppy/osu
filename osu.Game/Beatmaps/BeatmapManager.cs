@@ -13,6 +13,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -23,6 +24,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
@@ -180,19 +182,18 @@ namespace osu.Game.Beatmaps
 
             lock (workingCache)
             {
-                var cached = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
+                var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == beatmapInfo.ID);
 
-                if (cached != null)
-                    return cached;
+                if (working == null)
+                {
+                    if (beatmapInfo.Metadata == null)
+                        beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-                if (beatmapInfo.Metadata == null)
-                    beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
-
-                WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
+                    workingCache.Add(working = new BeatmapManagerWorkingBeatmap(Files.Store,
+                        new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager));
+                }
 
                 previous?.TransferTo(working);
-                workingCache.Add(working);
-
                 return working;
             }
         }
@@ -302,12 +303,27 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Ruleset = ruleset;
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
+                    beatmap.BeatmapInfo.Length = calculateLength(beatmap);
+                    beatmap.BeatmapInfo.BPM = beatmap.ControlPointInfo.BPMMode;
 
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }
             }
 
             return beatmapInfos;
+        }
+
+        private double calculateLength(IBeatmap b)
+        {
+            if (!b.HitObjects.Any())
+                return 0;
+
+            var lastObject = b.HitObjects.Last();
+
+            double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+            double startTime = b.HitObjects.First().StartTime;
+
+            return endTime - startTime;
         }
 
         /// <summary>
@@ -325,6 +341,7 @@ namespace osu.Game.Beatmaps
 
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
+            protected override VideoSprite GetVideo() => null;
             protected override Track GetTrack() => null;
         }
 
@@ -371,7 +388,7 @@ namespace osu.Game.Beatmaps
                     beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
                 };
 
-                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap}", e); };
+                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
 
                 // intentionally blocking to limit web request concurrency
                 req.Perform(api);

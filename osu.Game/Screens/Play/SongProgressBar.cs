@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.MathUtils;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
@@ -121,6 +122,12 @@ namespace osu.Game.Screens.Play
             handleBase.X = newX;
         }
 
-        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
+        private ScheduledDelegate scheduledSeek;
+
+        protected override void OnUserChange(double value)
+        {
+            scheduledSeek?.Cancel();
+            scheduledSeek = Schedule(() => OnSeek?.Invoke(value));
+        }
     }
 }
