@@ -16,6 +16,8 @@ using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using System.Text.RegularExpressions;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
@@ -33,14 +35,24 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria
+        public FilterCriteria CreateCriteria()
         {
-            Group = groupMode.Value,
-            Sort = sortMode.Value,
-            SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted.Value,
-            Ruleset = ruleset.Value
-        };
+            var query = searchTextBox.Text;
+
+            var criteria = new FilterCriteria
+            {
+                Group = groupMode.Value,
+                Sort = sortMode.Value,
+                AllowConvertedBeatmaps = showConverted.Value,
+                Ruleset = ruleset.Value
+            };
+
+            applyQueries(criteria, ref query);
+
+            criteria.SearchText = query;
+
+            return criteria;
+        }
 
         public Action Exit;
 
@@ -169,5 +181,97 @@ namespace osu.Game.Screens.Select
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
+
+        private static readonly Regex query_syntax_regex = new Regex(
+            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status)(?<op>[:><]+)(?<value>\S*)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private void applyQueries(FilterCriteria criteria, ref string query)
+        {
+            foreach (Match match in query_syntax_regex.Matches(query))
+            {
+                var key = match.Groups["key"].Value.ToLower();
+                var op = match.Groups["op"].Value;
+                var value = match.Groups["value"].Value;
+
+                switch (key)
+                {
+                    case "stars" when double.TryParse(value, out var stars):
+                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.5);
+                        break;
+
+                    case "ar" when double.TryParse(value, out var ar):
+                        updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.3);
+                        break;
+
+                    case "dr" when double.TryParse(value, out var dr):
+                        updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.3);
+                        break;
+
+                    case "cs" when double.TryParse(value, out var cs):
+                        updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.3);
+                        break;
+
+                    case "bpm" when double.TryParse(value, out var bpm):
+                        updateCriteriaRange(ref criteria.BPM, op, bpm, 0.3);
+                        break;
+
+                    case "length" when double.TryParse(value.TrimEnd('m', 's', 'h'), out var length):
+                        var scale =
+                            value.EndsWith("ms") ? 1 :
+                            value.EndsWith("s") ? 1000 :
+                            value.EndsWith("m") ? 60000 :
+                            value.EndsWith("h") ? 3600000 : 1000;
+
+                        updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
+                        break;
+
+                    case "divisor" when op == ":" && int.TryParse(value, out var divisor):
+                        criteria.BeatDivisor = divisor;
+                        break;
+
+                    case "status" when op == ":" && Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var statusValue):
+                        criteria.OnlineStatus = statusValue;
+                        break;
+                }
+
+                query = query.Remove(match.Index, match.Length);
+            }
+        }
+
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityToleration = 0)
+        {
+            switch (op)
+            {
+                default:
+                    return;
+
+                case ":":
+                    range.IsInclusive = true;
+                    range.Min = value - equalityToleration;
+                    range.Max = value + equalityToleration;
+                    break;
+
+                case ">":
+                    range.IsInclusive = false;
+                    range.Min = value;
+                    break;
+
+                case ">:":
+                    range.IsInclusive = true;
+                    range.Min = value;
+                    break;
+
+                case "<":
+                    range.IsInclusive = false;
+                    range.Max = value;
+                    break;
+
+                case "<:":
+                    range.IsInclusive = true;
+                    range.Max = value;
+                    break;
+            }
+        }
     }
 }
