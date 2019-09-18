@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 
@@ -12,6 +13,17 @@ namespace osu.Game.Screens.Select
     {
         public GroupMode Group;
         public SortMode Sort;
+
+        public OptionalRange StarDifficulty;
+        public OptionalRange ApproachRate;
+        public OptionalRange DrainRate;
+        public OptionalRange CircleSize;
+        public OptionalRange Length;
+        public OptionalRange BPM;
+
+        public int? BeatDivisor;
+
+        public BeatmapSetOnlineStatus? OnlineStatus;
 
         public string[] SearchTerms = Array.Empty<string>();
 
@@ -26,8 +38,27 @@ namespace osu.Game.Screens.Select
             set
             {
                 searchText = value;
-                SearchTerms = searchText.Split(',', ' ', '!').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                SearchTerms = searchText.Split(new[] { ',', ' ', '!' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
             }
+        }
+
+        public struct OptionalRange : IEquatable<OptionalRange>
+        {
+            public bool IsInRange(double value)
+            {
+                if (Min.HasValue && (IsInclusive ? value < Min.Value : value <= Min.Value))
+                    return false;
+                if (Max.HasValue && (IsInclusive ? value > Max.Value : value >= Max.Value))
+                    return false;
+
+                return true;
+            }
+
+            public double? Min;
+            public double? Max;
+            public bool IsInclusive;
+
+            public bool Equals(OptionalRange range) => Min == range.Min && Max == range.Max;
         }
     }
 }
