@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
     public class KeyCounterDisplay : FillFlowContainer<KeyCounter>
     {
         private const int duration = 100;
+        private const double key_fade_time = 80;
 
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
@@ -33,15 +34,9 @@ namespace osu.Game.Screens.Play
 
             base.Add(key);
             key.IsCounting = IsCounting;
-            key.FadeTime = FadeTime;
+            key.FadeTime = key_fade_time;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
-        }
-
-        public void ResetCount()
-        {
-            foreach (var counter in Children)
-                counter.ResetCount();
         }
 
         [BackgroundDependencyLoader]
@@ -65,22 +60,6 @@ namespace osu.Game.Screens.Play
                 isCounting = value;
                 foreach (var child in Children)
                     child.IsCounting = value;
-            }
-        }
-
-        private int fadeTime;
-
-        public int FadeTime
-        {
-            get => fadeTime;
-            set
-            {
-                if (value != fadeTime)
-                {
-                    fadeTime = value;
-                    foreach (var child in Children)
-                        child.FadeTime = value;
-                }
             }
         }
 
@@ -122,11 +101,6 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => receptor == null;
 
         private Receptor receptor;
-
-        public Receptor GetReceptor()
-        {
-            return receptor ?? (receptor = new Receptor(this));
-        }
 
         public void SetReceptor(Receptor receptor)
         {
