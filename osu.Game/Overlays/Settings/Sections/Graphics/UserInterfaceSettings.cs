@@ -6,7 +6,7 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
-    public class MainMenuSettings : SettingsSubsection
+    public class UserInterfaceSettings : SettingsSubsection
     {
         protected override string Header => "User Interface";
 
@@ -15,6 +15,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             Children = new[]
             {
+                new SettingsCheckbox
+                {
+                    LabelText = "Rotate cursor when dragging",
+                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                },
                 new SettingsCheckbox
                 {
                     LabelText = "Parallax",
