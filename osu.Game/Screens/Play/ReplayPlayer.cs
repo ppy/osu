@@ -9,6 +9,9 @@ namespace osu.Game.Screens.Play
     {
         private readonly Score score;
 
+        // Block replays from failing. (see https://github.com/ppy/osu/issues/6108)
+        protected override bool BypassFail => true;
+
         public ReplayPlayer(Score score, bool allowPause = true, bool showResults = true)
             : base(allowPause, showResults)
         {
