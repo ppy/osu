@@ -65,6 +65,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private VolumeOverlay volumeOverlay { get; set; }
 
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
         private static bool muteWarningShownOnce;
 
         public PlayerLoader(Func<Player> createPlayer)
@@ -79,7 +82,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audioManager, NotificationOverlay notificationOverlay)
+        private void load()
         {
             InternalChild = (content = new LogoTrackingContainer
             {
@@ -112,8 +115,6 @@ namespace osu.Game.Screens.Play
             });
 
             loadNewPlayer();
-
-            checkVolume(audioManager);
         }
 
         private void playerLoaded(Player player) => info.Loading = false;
@@ -212,6 +213,7 @@ namespace osu.Game.Screens.Play
         {
             inputManager = GetContainingInputManager();
             base.LoadComplete();
+            checkVolume(audioManager);
         }
 
         private ScheduledDelegate pushDebounce;
@@ -525,6 +527,14 @@ namespace osu.Game.Screens.Play
                     return true;
                 };
             }
+        }
+
+        /// <summary>
+        /// Sets <see cref="muteWarningShownOnce"/> to <see cref="false"/>, reserved for testing.
+        /// </summary>
+        public static void ResetNotificationLock()
+        {
+            muteWarningShownOnce = false;
         }
     }
 }
