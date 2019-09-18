@@ -7,7 +7,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public abstract class UserBindingComponent : CompositeDrawable
+    public abstract class UserBindingComponent : Container
     {
         public readonly Bindable<User> User = new Bindable<User>();
 

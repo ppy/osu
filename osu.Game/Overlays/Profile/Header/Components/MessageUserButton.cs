@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API;
@@ -14,8 +13,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class MessageUserButton : ProfileHeaderButton
     {
-        public readonly Bindable<User> User = new Bindable<User>();
-
         public override string TooltipText => "send message";
 
         [Resolved(CanBeNull = true)]
@@ -54,14 +51,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            User.BindValueChanged(e =>
-            {
-                Content.Alpha = e.NewValue != null && !e.NewValue.PMFriendsOnly && apiProvider.LocalUser.Value.Id != e.NewValue.Id ? 1 : 0;
-            });
-        }
+        protected override void UpdateUser(User user) =>
+            Content.Alpha = user != null && !user.PMFriendsOnly && apiProvider.LocalUser.Value.Id != user.Id ? 1 : 0;
     }
 }

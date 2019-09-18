@@ -5,22 +5,51 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osuTK;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
-    public class ExpandDetailsButton : ProfileHeaderButton
+    public class ExpandDetailsButton : OsuHoverContainer
     {
         public readonly BindableBool DetailsVisible = new BindableBool();
 
         public override string TooltipText => DetailsVisible.Value ? "collapse" : "expand";
 
-        private SpriteIcon icon;
+        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+
+        private readonly Box background;
+        private readonly SpriteIcon icon;
 
         public ExpandDetailsButton()
         {
+            AutoSizeAxes = Axes.X;
+            Add(new CircularContainer
+            {
+                Masking = true,
+                AutoSizeAxes = Axes.X,
+                RelativeSizeAxes = Axes.Y,
+                Children = new Drawable[]
+                {
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    icon = new SpriteIcon
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(20, 12),
+                        Margin = new MarginPadding { Horizontal = 10 }
+                    }
+                }
+            });
+
             Action = () => DetailsVisible.Toggle();
         }
 
@@ -29,15 +58,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             IdleColour = colours.GreySeafoamLight;
             HoverColour = colours.GreySeafoamLight.Darken(0.2f);
+        }
 
-            Child = icon = new SpriteIcon
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(20, 12)
-            };
-
+        protected override void LoadComplete()
+        {
             DetailsVisible.BindValueChanged(visible => updateState(visible.NewValue), true);
+            base.LoadComplete();
         }
 
         private void updateState(bool detailsVisible) => icon.Icon = detailsVisible ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;

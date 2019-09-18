@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -15,14 +13,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class AddFriendButton : ProfileHeaderButton
     {
-        public readonly Bindable<User> User = new Bindable<User>();
-
         public override string TooltipText => "friends";
 
-        private OsuSpriteText followerText;
+        private readonly OsuSpriteText followerText;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        public AddFriendButton()
         {
             Child = new FillFlowContainer
             {
@@ -51,12 +46,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            User.BindValueChanged(user => updateUser(user.NewValue), true);
-        }
-
-        private void updateUser(User user) => followerText.Text = user?.FollowerCount.ToString("#,##0");
+        protected override void UpdateUser(User user) => followerText.Text = user?.FollowerCount.ToString("#,##0");
     }
 }
