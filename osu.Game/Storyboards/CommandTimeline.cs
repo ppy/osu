@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -15,10 +15,10 @@ namespace osu.Game.Storyboards
         public IEnumerable<TypedCommand> Commands => commands.OrderBy(c => c.StartTime);
         public bool HasCommands => commands.Count > 0;
 
-        private Cached<double> startTimeBacking;
+        private readonly Cached<double> startTimeBacking = new Cached<double>();
         public double StartTime => startTimeBacking.IsValid ? startTimeBacking : startTimeBacking.Value = HasCommands ? commands.Min(c => c.StartTime) : double.MinValue;
 
-        private Cached<double> endTimeBacking;
+        private readonly Cached<double> endTimeBacking = new Cached<double>();
         public double EndTime => endTimeBacking.IsValid ? endTimeBacking : endTimeBacking.Value = HasCommands ? commands.Max(c => c.EndTime) : double.MaxValue;
 
         public T StartValue => HasCommands ? commands.OrderBy(c => c.StartTime).First().StartValue : default;
@@ -52,6 +52,7 @@ namespace osu.Game.Storyboards
             {
                 var result = StartTime.CompareTo(other.StartTime);
                 if (result != 0) return result;
+
                 return EndTime.CompareTo(other.EndTime);
             }
 

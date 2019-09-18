@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -10,6 +10,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Replays;
@@ -24,15 +25,17 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Edit;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableManiaRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
+
+        public const string SHORT_NAME = "mania";
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
@@ -42,6 +45,11 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new ManiaModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new ManiaModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new ManiaModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
@@ -94,14 +102,8 @@ namespace osu.Game.Rulesets.Mania
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new ManiaModPerfect();
-
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new ManiaModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -115,6 +117,7 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModNoFail(),
                         new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -124,6 +127,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                     };
+
                 case ModType.Conversion:
                     return new Mod[]
                     {
@@ -140,11 +144,19 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
                     };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
+
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp(), new ModWindDown())
+                    };
+
                 default:
                     return new Mod[] { };
             }
@@ -152,9 +164,9 @@ namespace osu.Game.Rulesets.Mania
 
         public override string Description => "osu!mania";
 
-        public override string ShortName => "mania";
+        public override string ShortName => SHORT_NAME;
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_mania_o };
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);
 
@@ -162,7 +174,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
-        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaConfigManager(settings, RulesetInfo);
+        public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
@@ -207,6 +219,7 @@ namespace osu.Game.Rulesets.Mania
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1,
                     }.GenerateKeyBindingsFor(variant, out _);
+
                 case PlayfieldType.Dual:
                     int keys = getDualStageKeyCount(variant);
 
@@ -264,6 +277,7 @@ namespace osu.Game.Rulesets.Mania
             {
                 default:
                     return $"{variant}K";
+
                 case PlayfieldType.Dual:
                 {
                     var keys = getDualStageKeyCount(variant);
@@ -330,11 +344,11 @@ namespace osu.Game.Rulesets.Mania
                 for (int i = LeftKeys.Length - columns / 2; i < LeftKeys.Length; i++)
                     bindings.Add(new KeyBinding(LeftKeys[i], currentNormalAction++));
 
-                for (int i = 0; i < columns / 2; i++)
-                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
-
                 if (columns % 2 == 1)
                     bindings.Add(new KeyBinding(SpecialKey, SpecialAction));
+
+                for (int i = 0; i < columns / 2; i++)
+                    bindings.Add(new KeyBinding(RightKeys[i], currentNormalAction++));
 
                 nextNormalAction = currentNormalAction;
                 return bindings;
@@ -349,6 +363,7 @@ namespace osu.Game.Rulesets.Mania
         /// Number of columns in this stage lies at (item - Single).
         /// </summary>
         Single = 0,
+
         /// <summary>
         /// Columns are grouped into two stages.
         /// Overall number of columns lies at (item - Dual), further computation is required for

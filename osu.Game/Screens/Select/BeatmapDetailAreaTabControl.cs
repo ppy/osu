@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,22 +24,6 @@ namespace osu.Game.Screens.Select
         public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
 
         private Bindable<BeatmapDetailTab> selectedTab;
-
-        private void invokeOnFilter()
-        {
-            OnFilter?.Invoke(tabs.Current, modsCheckbox.Current);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour, OsuConfigManager config)
-        {
-            modsCheckbox.AccentColour = tabs.AccentColour = colour.YellowLight;
-
-            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
-
-            tabs.Current.BindTo(selectedTab);
-            tabs.Current.TriggerChange();
-        }
 
         public BeatmapDetailAreaTabControl()
         {
@@ -66,11 +50,30 @@ namespace osu.Game.Screens.Select
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Text = @"Mods",
+                    Alpha = 0,
                 },
             };
 
-            tabs.Current.ValueChanged += item => invokeOnFilter();
-            modsCheckbox.Current.ValueChanged += item => invokeOnFilter();
+            tabs.Current.ValueChanged += _ => invokeOnFilter();
+            modsCheckbox.Current.ValueChanged += _ => invokeOnFilter();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colour, OsuConfigManager config)
+        {
+            modsCheckbox.AccentColour = tabs.AccentColour = colour.YellowLight;
+
+            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
+
+            tabs.Current.BindTo(selectedTab);
+            tabs.Current.TriggerChange();
+        }
+
+        private void invokeOnFilter()
+        {
+            OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value);
+
+            modsCheckbox.FadeTo(tabs.Current.Value == BeatmapDetailTab.Details ? 0 : 1, 200, Easing.OutQuint);
         }
     }
 

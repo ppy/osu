@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -35,14 +37,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
-        private readonly Container<DrawableHoldNoteTick> tickContainer;
-
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
         {
+            Container<DrawableHoldNoteTick> tickContainer;
             RelativeSizeAxes = Axes.X;
 
-            InternalChildren = new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 bodyPiece = new BodyPiece
                 {
@@ -66,34 +67,28 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
-            };
+            });
 
             foreach (var tick in tickContainer)
                 AddNested(tick);
 
             AddNested(Head);
             AddNested(Tail);
-        }
 
-        protected override void OnDirectionChanged(ScrollingDirection direction)
-        {
-            base.OnDirectionChanged(direction);
-
-            bodyPiece.Anchor = bodyPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-        }
-
-        public override Color4 AccentColour
-        {
-            get { return base.AccentColour; }
-            set
+            AccentColour.BindValueChanged(colour =>
             {
-                base.AccentColour = value;
+                bodyPiece.AccentColour = colour.NewValue;
+                Head.AccentColour.Value = colour.NewValue;
+                Tail.AccentColour.Value = colour.NewValue;
+                tickContainer.ForEach(t => t.AccentColour.Value = colour.NewValue);
+            }, true);
+        }
 
-                bodyPiece.AccentColour = value;
-                Head.AccentColour = value;
-                Tail.AccentColour = value;
-                tickContainer.ForEach(t => t.AccentColour = value);
-            }
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
+        {
+            base.OnDirectionChanged(e);
+
+            bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -109,6 +104,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Make the body piece not lie under the head note
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            using (BeginDelayedSequence(HitObject.Duration, true))
+                base.UpdateStateTransforms(state);
         }
 
         protected void BeginHold()
@@ -209,6 +210,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
+                Debug.Assert(HitObject.HitWindows != null);
+
                 // Factor in the release lenience
                 timeOffset /= release_window_lenience;
 

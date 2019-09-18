@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
             Section section = Section.None;
 
             string line;
+
             while ((line = stream.ReadLine()) != null)
             {
                 if (ShouldSkipLine(line))
@@ -35,7 +36,7 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
-                        Logger.Log($"Unknown section \"{line}\" in {output}");
+                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
                         section = Section.None;
                     }
 
@@ -48,12 +49,12 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to process line \"{line}\" into {output}");
+                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
                 }
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
@@ -72,6 +73,7 @@ namespace osu.Game.Beatmaps.Formats
             var index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
+
             return line;
         }
 
@@ -94,7 +96,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
             }
-            catch (Exception e)
+            catch
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
@@ -115,6 +117,7 @@ namespace osu.Game.Beatmaps.Formats
             else
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
+
                 tHasCustomColours.CustomColours[pair.Key] = colour;
             }
         }
@@ -186,13 +189,13 @@ namespace osu.Game.Beatmaps.Formats
             Foreground = 3
         }
 
-        internal class LegacySampleControlPoint : SampleControlPoint
+        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 
-            public override SampleInfo ApplyTo(SampleInfo sampleInfo)
+            public override HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             {
-                var baseInfo = base.ApplyTo(sampleInfo);
+                var baseInfo = base.ApplyTo(hitSampleInfo);
 
                 if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
                     baseInfo.Suffix = CustomSampleBank.ToString();
@@ -200,10 +203,9 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool EquivalentTo(ControlPoint other)
-                => base.EquivalentTo(other)
-                   && other is LegacySampleControlPoint legacy
-                   && CustomSampleBank == legacy.CustomSampleBank;
+            public bool Equals(LegacySampleControlPoint other)
+                => base.Equals(other)
+                   && CustomSampleBank == other?.CustomSampleBank;
         }
     }
 }
