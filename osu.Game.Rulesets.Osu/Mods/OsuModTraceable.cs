@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModeObjectScaleTween) };
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 
         public void ReadFromConfig(OsuConfigManager config)
@@ -65,7 +65,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 case DrawableSpinner spinner:
                     spinner.Disc.Hide();
-                    //spinner.Ticks.Hide(); // do they contribute to the theme? debatable
                     spinner.Background.Hide();
                     break;
             }
