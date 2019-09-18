@@ -159,7 +159,7 @@ namespace osu.Game.Tournament.Components
             }
 
             var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
-            var length = beatmap.OnlineInfo.Length;
+            var length = beatmap.Length;
             string hardRockExtra = "";
             string srExtra = "";
 
@@ -180,7 +180,7 @@ namespace osu.Game.Tournament.Components
 
             panelContents.Children = new Drawable[]
             {
-                new DiffPiece(("Length", TimeSpan.FromSeconds(length).ToString(@"mm\:ss")))
+                new DiffPiece(("Length", TimeSpan.FromMilliseconds(length).ToString(@"mm\:ss")))
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.BottomLeft,

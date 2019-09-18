@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -11,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// <summary>
     /// A line that scrolls alongside hit objects in the playfield and visualises control points.
     /// </summary>
-    public class DrawableBarLine : DrawableHitObject<TaikoHitObject>
+    public class DrawableBarLine : DrawableHitObject<HitObject>
     {
         /// <summary>
         /// The width of the line tracker.
@@ -52,10 +53,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 EdgeSmoothness = new Vector2(0.5f, 0),
                 Alpha = 0.75f
             });
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
         }
     }
 }

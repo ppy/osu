@@ -42,6 +42,14 @@ namespace osu.Game.Online.API.Requests
                 score.Beatmap = beatmap;
                 score.Ruleset = ruleset;
             }
+
+            var userScore = r.UserScore;
+
+            if (userScore != null)
+            {
+                userScore.Score.Beatmap = beatmap;
+                userScore.Score.Ruleset = ruleset;
+            }
         }
 
         protected override string Target => $@"beatmaps/{beatmap.OnlineBeatmapID}/scores{createQueryParameters()}";

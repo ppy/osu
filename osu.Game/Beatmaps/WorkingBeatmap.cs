@@ -16,14 +16,14 @@ using osu.Framework.Audio;
 using osu.Framework.Statistics;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
+using osu.Framework.Graphics.Video;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract class WorkingBeatmap : IDisposable
+    public abstract class WorkingBeatmap : IWorkingBeatmap, IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Beatmaps
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
-            skin = new RecyclableLazy<Skin>(GetSkin);
+            skin = new RecyclableLazy<ISkin>(GetSkin);
 
             total_count.Value++;
         }
@@ -90,21 +90,18 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Constructs a playable <see cref="IBeatmap"/> from <see cref="Beatmap"/> using the applicable converters for a specific <see cref="RulesetInfo"/>.
-        /// <para>
-        /// The returned <see cref="IBeatmap"/> is in a playable state - all <see cref="HitObject"/> and <see cref="BeatmapDifficulty"/> <see cref="Mod"/>s
-        /// have been applied, and <see cref="HitObject"/>s have been fully constructed.
-        /// </para>
+        /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> for a specified <see cref="Ruleset"/>.
         /// </summary>
-        /// <param name="ruleset">The <see cref="RulesetInfo"/> to create a playable <see cref="IBeatmap"/> for.</param>
-        /// <param name="mods">The <see cref="Mod"/>s to apply to the <see cref="IBeatmap"/>.</param>
-        /// <returns>The converted <see cref="IBeatmap"/>.</returns>
-        /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
+        /// <param name="ruleset">The <see cref="Ruleset"/> for which <paramref name="beatmap"/> should be converted.</param>
+        /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
+        protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
+
         public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods)
         {
             var rulesetInstance = ruleset.CreateInstance();
 
-            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
+            IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
             // Check if the beatmap can be converted
             if (!converter.CanConvert)
@@ -140,6 +137,9 @@ namespace osu.Game.Beatmaps
                 mod.ApplyToHitObject(obj);
 
             processor?.PostProcess();
+
+            foreach (var mod in mods.OfType<IApplicableToBeatmap>())
+                mod.ApplyToBeatmap(converted);
 
             return converted;
         }
@@ -187,6 +187,10 @@ namespace osu.Game.Beatmaps
         protected abstract Texture GetBackground();
         private readonly RecyclableLazy<Texture> background;
 
+        public VideoSprite Video => GetVideo();
+
+        protected abstract VideoSprite GetVideo();
+
         public bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value;
         protected abstract Track GetTrack();
@@ -203,10 +207,10 @@ namespace osu.Game.Beatmaps
         private readonly RecyclableLazy<Storyboard> storyboard;
 
         public bool SkinLoaded => skin.IsResultAvailable;
-        public Skin Skin => skin.Value;
+        public ISkin Skin => skin.Value;
 
-        protected virtual Skin GetSkin() => new DefaultSkin();
-        private readonly RecyclableLazy<Skin> skin;
+        protected virtual ISkin GetSkin() => new DefaultSkin();
+        private readonly RecyclableLazy<ISkin> skin;
 
         /// <summary>
         /// Transfer pieces of a beatmap to a new one, where possible, to save on loading.
@@ -247,7 +251,7 @@ namespace osu.Game.Beatmaps
 
             // cancelling the beatmap load is safe for now since the retrieval is a synchronous
             // operation. if we add an async retrieval method this may need to be reconsidered.
-            beatmapCancellation.Cancel();
+            beatmapCancellation?.Cancel();
             total_count.Value--;
         }
 

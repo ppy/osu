@@ -82,8 +82,9 @@ namespace osu.Game.Beatmaps.Formats
                 storyboardSprite = null;
 
                 EventType type;
+
                 if (!Enum.TryParse(split[0], out type))
-                    throw new InvalidDataException($@"Unknown event type {split[0]}");
+                    throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
                 {
@@ -120,7 +121,7 @@ namespace osu.Game.Beatmaps.Formats
                         var layer = parseLayer(split[2]);
                         var path = cleanFilename(split[3]);
                         var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                        storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
+                        storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
                     }
                 }
@@ -245,7 +246,7 @@ namespace osu.Game.Beatmaps.Formats
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
 
                                     case "H":

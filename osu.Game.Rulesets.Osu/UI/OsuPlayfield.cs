@@ -12,6 +12,7 @@ using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -39,7 +40,12 @@ namespace osu.Game.Rulesets.Osu.UI
                     RelativeSizeAxes = Axes.Both,
                     Depth = 1,
                 },
-                HitObjectContainer,
+                // Todo: This should not exist, but currently helps to reduce LOH allocations due to unbinding skin source events on judgement disposal
+                // Todo: Remove when hitobjects are properly pooled
+                new SkinProvidingContainer(null)
+                {
+                    Child = HitObjectContainer,
+                },
                 approachCircles = new ApproachCircleProxyContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -64,13 +70,7 @@ namespace osu.Game.Rulesets.Osu.UI
             base.Add(h);
         }
 
-        private void addApproachCircleProxy(Drawable d)
-        {
-            var proxy = d.CreateProxy();
-            proxy.LifetimeStart = d.LifetimeStart;
-            proxy.LifetimeEnd = d.LifetimeEnd;
-            approachCircles.Add(proxy);
-        }
+        private void addApproachCircleProxy(Drawable d) => approachCircles.Add(d.CreateProxy());
 
         public override void PostProcess()
         {

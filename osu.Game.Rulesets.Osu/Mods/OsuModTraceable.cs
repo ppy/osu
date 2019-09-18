@@ -49,13 +49,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                     // we only want to see the approach circle
                     using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
                     {
-                        circle.Circle.Hide(); // CirclePiece
-                        circle.Circle.AlwaysPresent = true;
-                        circle.Ring.Hide();
-                        circle.Flash.Hide();
-                        circle.Explode.Hide();
-                        circle.Number.Hide();
-                        circle.Glow.Hide();
                         circle.ApproachCircle.Show();
                     }
 
@@ -64,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSlider slider:
                     ApplyTraceableState(slider.HeadCircle, state);
                     slider.Body.AccentColour = Color4.Transparent;
-                    slider.Body.BorderColour = slider.HeadCircle.AccentColour;
+                    slider.Body.BorderColour = slider.HeadCircle.AccentColour.Value;
                     break;
 
                 case DrawableSpinner spinner:

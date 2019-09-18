@@ -11,10 +11,10 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
-using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
@@ -42,6 +42,15 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private GameHost host { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private MusicController music { get; set; }
+
+        [Resolved(canBeNull: true)]
+        private LoginOverlay login { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
@@ -62,7 +71,6 @@ namespace osu.Game.Screens.Menu
                         buttons = new ButtonSystem
                         {
                             OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate { this.Push(new OnlineListing()); },
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
@@ -120,7 +128,7 @@ namespace osu.Game.Screens.Menu
             var track = Beatmap.Value.Track;
             var metadata = Beatmap.Value.Metadata;
 
-            if (last is Intro && track != null)
+            if (last is IntroScreen && track != null)
             {
                 if (!track.IsRunning)
                 {
@@ -131,6 +139,8 @@ namespace osu.Game.Screens.Menu
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
+
+        private bool loginDisplayed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
@@ -149,6 +159,21 @@ namespace osu.Game.Screens.Menu
                 this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
+            }
+            else if (!api.IsLoggedIn)
+            {
+                logo.Action += displayLogin;
+            }
+
+            bool displayLogin()
+            {
+                if (!loginDisplayed)
+                {
+                    Scheduler.AddDelayed(() => login?.Show(), 500);
+                    loginDisplayed = true;
+                }
+
+                return true;
             }
         }
 
@@ -189,6 +214,9 @@ namespace osu.Game.Screens.Menu
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
+
+            if (Beatmap.Value.Track != null && music?.IsUserPaused != true)
+                Beatmap.Value.Track.Start();
         }
 
         public override bool OnExiting(IScreen next)

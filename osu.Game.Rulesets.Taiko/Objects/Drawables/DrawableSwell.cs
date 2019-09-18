@@ -25,6 +25,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.65f;
 
+        /// <summary>
+        /// Offset away from the start time of the swell at which the ring starts appearing.
+        /// </summary>
+        private const double ring_appear_offset = 100;
+
         private readonly List<DrawableSwellTick> ticks = new List<DrawableSwellTick>();
 
         private readonly Container bodyContainer;
@@ -51,7 +56,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         Origin = Anchor.Centre,
                         Alpha = 0,
                         RelativeSizeAxes = Axes.Both,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                         Masking = true,
                         Children = new[]
                         {
@@ -70,7 +75,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         BorderThickness = target_ring_thick_border,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                         Children = new Drawable[]
                         {
                             new Box
@@ -179,26 +184,32 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateInitialTransforms()
         {
-            const float preempt = 100;
-            const float out_transition_time = 300;
+            base.UpdateInitialTransforms();
+
+            using (BeginAbsoluteSequence(HitObject.StartTime - ring_appear_offset, true))
+                targetRing.ScaleTo(target_ring_scale, 400, Easing.OutQuint);
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            const double transition_duration = 300;
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    UnproxyContent();
                     expandingRing.FadeTo(0);
-                    using (BeginAbsoluteSequence(HitObject.StartTime - preempt, true))
-                        targetRing.ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
                     break;
 
                 case ArmedState.Miss:
                 case ArmedState.Hit:
-                    this.FadeOut(out_transition_time, Easing.Out);
-                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+                    using (BeginAbsoluteSequence(Time.Current, true))
+                    {
+                        this.FadeOut(transition_duration, Easing.Out);
+                        bodyContainer.ScaleTo(1.4f, transition_duration);
+                    }
 
-                    Expire();
                     break;
             }
         }
@@ -212,9 +223,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             // Make the swell stop at the hit target
             X = Math.Max(0, X);
 
-            double t = Math.Min(HitObject.StartTime, Time.Current);
-            if (t == HitObject.StartTime)
+            if (Time.Current >= HitObject.StartTime - ring_appear_offset)
                 ProxyContent();
+            else
+                UnproxyContent();
         }
 
         private bool? lastWasCentre;

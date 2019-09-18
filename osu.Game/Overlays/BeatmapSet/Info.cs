@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public Info()
         {
-            MetadataSection source, tags;
+            MetadataSection source, tags, genre, language;
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;
@@ -83,11 +83,12 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
-                                LayoutDuration = transition_duration,
+                                Direction = FillDirection.Full,
                                 Children = new[]
                                 {
                                     source = new MetadataSection("Source"),
+                                    genre = new MetadataSection("Genre") { Width = 0.5f },
+                                    language = new MetadataSection("Language") { Width = 0.5f },
                                     tags = new MetadataSection("Tags"),
                                 },
                             },
@@ -119,6 +120,8 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
+                genre.Text = b.NewValue?.OnlineInfo?.Genre?.Name ?? string.Empty;
+                language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? string.Empty;
             };
         }
 
@@ -139,7 +142,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        this.FadeOut(transition_duration);
+                        Hide();
                         return;
                     }
 
@@ -147,12 +150,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     textFlow.Clear();
                     textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
                 }
-            }
-
-            public Color4 TextColour
-            {
-                get => textFlow.Colour;
-                set => textFlow.Colour = value;
             }
 
             public MetadataSection(string title)

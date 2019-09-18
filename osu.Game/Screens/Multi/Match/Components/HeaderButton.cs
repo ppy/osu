@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.15f,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                 },
             });
         }

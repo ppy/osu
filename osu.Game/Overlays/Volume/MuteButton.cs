@@ -65,16 +65,15 @@ namespace osu.Game.Overlays.Volume
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(20),
                 }
             });
 
-            Current.ValueChanged += muted =>
+            Current.BindValueChanged(muted =>
             {
                 icon.Icon = muted.NewValue ? FontAwesome.Solid.VolumeMute : FontAwesome.Solid.VolumeUp;
-            };
-
-            Current.TriggerChange();
+                icon.Size = new Vector2(muted.NewValue ? 18 : 20);
+                icon.Margin = new MarginPadding { Right = muted.NewValue ? 2 : 0 };
+            }, true);
         }
 
         protected override bool OnHover(HoverEvent e)
