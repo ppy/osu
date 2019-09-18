@@ -25,7 +25,9 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
+        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+
+        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
         public bool IsUserPaused { get; private set; }
 
@@ -47,7 +49,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            BeatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
+            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
         }
@@ -66,8 +68,8 @@ namespace osu.Game.Overlays
         /// <param name="index">The new position.</param>
         public void ChangeBeatmapSetPosition(BeatmapSetInfo beatmapSetInfo, int index)
         {
-            BeatmapSets.Remove(beatmapSetInfo);
-            BeatmapSets.Insert(index, beatmapSetInfo);
+            beatmapSets.Remove(beatmapSetInfo);
+            beatmapSets.Insert(index, beatmapSetInfo);
         }
 
         /// <summary>
@@ -76,10 +78,10 @@ namespace osu.Game.Overlays
         public bool IsPlaying => beatmap.Value.Track.IsRunning;
 
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
-            Schedule(() => BeatmapSets.Add(set));
+            Schedule(() => beatmapSets.Add(set));
 
         private void handleBeatmapRemoved(BeatmapSetInfo set) =>
-            Schedule(() => BeatmapSets.RemoveAll(s => s.ID == set.ID));
+            Schedule(() => beatmapSets.RemoveAll(s => s.ID == set.ID));
 
         private ScheduledDelegate seekDelegate;
 
