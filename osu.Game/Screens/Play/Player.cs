@@ -360,7 +360,9 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
+            var failOverrideMods = Mods.Value.OfType<IApplicableFailOverride>();
+
+            if (failOverrideMods.Any(m => !m.AllowFail))
                 return false;
 
             HasFailed = true;
@@ -371,13 +373,10 @@ namespace osu.Game.Screens.Play
             if (PauseOverlay.State.Value == Visibility.Visible)
                 PauseOverlay.Hide();
 
-            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
-            {
-                Restart();
-                return true;
-            }
-
             failAnimation.Start();
+            if (failOverrideMods.Any(m => m.RestartOnFail))
+                Restart();
+
             return true;
         }
 
