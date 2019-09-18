@@ -70,8 +70,7 @@ namespace osu.Game.Overlays.Profile.Header
             topLinkContainer.Clear();
             bottomLinkContainer.Clear();
 
-            if (user == null)
-                return;
+            if (user == null) return;
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
                 topLinkContainer.AddText("Here since the beginning");

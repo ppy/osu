@@ -21,15 +21,14 @@ namespace osu.Game.Overlays
 {
     public class UserProfileOverlay : FullscreenOverlay
     {
-        public const float CONTENT_X_MARGIN = 70;
-
-        protected ProfileHeader Header;
-
         private ProfileSection lastSection;
         private ProfileSection[] sections;
         private GetUserRequest userReq;
+        protected ProfileHeader Header;
         private ProfileSectionsContainer sectionsContainer;
         private ProfileTabControl tabs;
+
+        public const float CONTENT_X_MARGIN = 70;
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
