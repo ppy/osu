@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         protected override void AddCheckSteps()
         {
             AddUntilStep("score above zero", () => ((ScoreAccessiblePlayer)Player).ScoreProcessor.TotalScore.Value > 0);
-            AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 5));
+            AddUntilStep("key counter counted keys", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 2));
             AddStep("rewind", () => track.Seek(-10000));
             AddUntilStep("key counter reset", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
         }
