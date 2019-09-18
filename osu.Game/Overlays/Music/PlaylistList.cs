@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Music
     public class PlaylistList : CompositeDrawable
     {
         public Action<BeatmapSetInfo> Selected;
-        public Action<BeatmapSetInfo, int> OrderChanged;
 
         private readonly ItemsScrollContainer items;
 
@@ -29,7 +28,6 @@ namespace osu.Game.Overlays.Music
             {
                 RelativeSizeAxes = Axes.Both,
                 Selected = set => Selected?.Invoke(set),
-                OrderChanged = (s, i) => OrderChanged?.Invoke(s, i)
             };
         }
 
@@ -45,15 +43,16 @@ namespace osu.Game.Overlays.Music
 
         private class ItemsScrollContainer : OsuScrollContainer
         {
-            private BindableList<BeatmapSetInfo> beatmaps;
+            private IBindableList<BeatmapSetInfo> beatmaps;
 
             public Action<BeatmapSetInfo> Selected;
-            public Action<BeatmapSetInfo, int> OrderChanged;
 
             private readonly SearchContainer search;
             private readonly FillFlowContainer<PlaylistItem> items;
 
             private readonly IBindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
+
+            private MusicController musicController;
 
             public ItemsScrollContainer()
             {
@@ -78,6 +77,8 @@ namespace osu.Game.Overlays.Music
             [BackgroundDependencyLoader]
             private void load(MusicController musicController, IBindable<WorkingBeatmap> beatmap)
             {
+                this.musicController = musicController;
+
                 beatmaps = musicController.BeatmapSets.GetBoundCopy();
 
                 beatmaps.ItemsAdded += i => i.ForEach(addBeatmapSet);
@@ -88,10 +89,21 @@ namespace osu.Game.Overlays.Music
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() => { items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) }); });
+            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
+            {
+                if (obj == draggedItem?.BeatmapSetInfo)
+                {
+                    draggedItem = null;
+                    return;
+                }
+
+                items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) });
+            });
 
             private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
+                if (obj == draggedItem?.BeatmapSetInfo) return;
+
                 var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
                 if (itemToRemove != null)
                     items.Remove(itemToRemove);
@@ -114,6 +126,8 @@ namespace osu.Game.Overlays.Music
             private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;
 
+            private int? dragDestination;
+
             protected override bool OnDragStart(DragStartEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
@@ -133,10 +147,20 @@ namespace osu.Game.Overlays.Music
             protected override bool OnDragEnd(DragEndEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
-                var handled = draggedItem != null || base.OnDragEnd(e);
-                draggedItem = null;
 
-                return handled;
+                if (draggedItem != null)
+                {
+                    if (dragDestination != null)
+                    {
+                        // draggedItem is nulled when the BindableList's add event is received so we can quietly ignore the callbacks.
+                        musicController.ChangeBeatmapSetPosition(draggedItem.BeatmapSetInfo, dragDestination.Value);
+                        dragDestination = null;
+                    }
+
+                    return true;
+                }
+
+                return base.OnDragEnd(e);
             }
 
             protected override void Update()
@@ -212,7 +236,7 @@ namespace osu.Game.Overlays.Music
                 }
 
                 items.SetLayoutPosition(draggedItem, dstIndex);
-                OrderChanged?.Invoke(draggedItem.BeatmapSetInfo, dstIndex);
+                dragDestination = dstIndex;
             }
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
