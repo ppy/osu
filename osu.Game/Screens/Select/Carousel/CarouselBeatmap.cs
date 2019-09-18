@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -24,12 +24,12 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps;
+            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
-            if (!string.IsNullOrEmpty(criteria.SearchText))
+            foreach (var criteriaTerm in criteria.SearchTerms)
                 match &=
-                    Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteria.SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
-                    Beatmap.Version.IndexOf(criteria.SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0;
+                    Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
+                    Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
 
             Filtered.Value = !match;
         }

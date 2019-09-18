@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,8 +15,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Volume
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
-        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
         private readonly float circleSize;
         private readonly Color4 meterColour;
         private readonly string name;
@@ -140,8 +140,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Venera",
-                            TextSize = 0.16f * circleSize
+                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -169,16 +168,16 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = name
                         }
                     }
                 }
             };
-            Bindable.ValueChanged += newVolume =>
+            Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
-                    newVolume,
+                    volume.NewValue,
                     400,
                     Easing.OutQuint);
             };
@@ -218,25 +217,29 @@ namespace osu.Game.Overlays.Volume
 
         public double Volume
         {
-            get => Bindable;
+            get => Bindable.Value;
             private set => Bindable.Value = value;
         }
 
-        private const float adjust_step = 0.05f;
+        private const double adjust_step = 0.05;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
-        private double adjustAccumulator;
+        private double scrollAccumulation;
 
         private void adjust(double delta, bool isPrecise)
         {
-            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
-            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
-                return;
-            Volume += adjustAccumulator;
-            adjustAccumulator = 0;
+            scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
+
+            var precision = Bindable.Precision;
+
+            while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
+            {
+                Volume += Math.Sign(scrollAccumulation) * precision;
+                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+            }
         }
 
         protected override bool OnScroll(ScrollEvent e)

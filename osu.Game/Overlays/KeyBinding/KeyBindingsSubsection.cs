@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets;
-using OpenTK;
+using osuTK;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.KeyBinding
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.KeyBinding
             this.variant = variant;
 
             FlowContent.Spacing = new Vector2(0, 1);
-            FlowContent.Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS };
+            FlowContent.Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
         }
 
         [BackgroundDependencyLoader]
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Text = "Reset";
+            Text = "Reset all bindings in section";
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Top = 5 };
             Height = 20;

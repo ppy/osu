@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -22,14 +21,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Child = new SkinnableDrawable("Play/osu/ring-glow", name => new Sprite
+            Child = new Sprite
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Texture = textures.Get(name),
-                Blending = BlendingMode.Additive,
+                Texture = textures.Get("Gameplay/osu/ring-glow"),
+                Blending = BlendingParameters.Additive,
                 Alpha = 0.5f
-            }, s => s.GetTexture("Play/osu/hitcircle") == null);
+            };
         }
     }
 }

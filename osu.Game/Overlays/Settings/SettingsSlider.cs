@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -23,14 +22,16 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.X
         };
 
-        public float KeyboardStep;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public bool TransferValueOnCommit
         {
-            var slider = Control as U;
-            if (slider != null)
-                slider.KeyboardStep = KeyboardStep;
+            get => ((U)Control).TransferValueOnCommit;
+            set => ((U)Control).TransferValueOnCommit = value;
+        }
+
+        public float KeyboardStep
+        {
+            get => ((U)Control).KeyboardStep;
+            set => ((U)Control).KeyboardStep = value;
         }
     }
 }

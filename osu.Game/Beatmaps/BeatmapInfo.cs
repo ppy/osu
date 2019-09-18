@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -9,14 +10,13 @@ using Newtonsoft.Json;
 using osu.Game.Database;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Beatmaps
 {
     [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int ID { get; set; }
 
         public int BeatmapVersion;
@@ -50,6 +50,16 @@ namespace osu.Game.Beatmaps
 
         [NotMapped]
         public BeatmapOnlineInfo OnlineInfo { get; set; }
+
+        /// <summary>
+        /// The playable length in milliseconds of this beatmap.
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// The most common BPM of this beatmap.
+        /// </summary>
+        public double BPM { get; set; }
 
         public string Path { get; set; }
 
@@ -114,7 +124,29 @@ namespace osu.Game.Beatmaps
         [JsonProperty("difficulty_rating")]
         public double StarDifficulty { get; set; }
 
-        public override string ToString() => $"{Metadata} [{Version}]";
+        /// <summary>
+        /// Currently only populated for beatmap deletion. Use <see cref="ScoreManager"/> to query scores.
+        /// </summary>
+        public List<ScoreInfo> Scores { get; set; }
+
+        [JsonIgnore]
+        public DifficultyRating DifficultyRating
+        {
+            get
+            {
+                var rating = StarDifficulty;
+
+                if (rating < 2.0) return DifficultyRating.Easy;
+                if (rating < 2.7) return DifficultyRating.Normal;
+                if (rating < 4.0) return DifficultyRating.Hard;
+                if (rating < 5.3) return DifficultyRating.Insane;
+                if (rating < 6.5) return DifficultyRating.Expert;
+
+                return DifficultyRating.ExpertPlus;
+            }
+        }
+
+        public override string ToString() => $"{Metadata} [{Version}]".Trim();
 
         public bool Equals(BeatmapInfo other)
         {

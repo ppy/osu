@@ -1,17 +1,21 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Configuration;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
-using OpenTK.Graphics;
+using osuTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -26,6 +30,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
 
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
+
         public DrawableSlider(Slider s)
             : base(s)
         {
@@ -38,14 +49,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SnakingSliderBody(s)
-                {
-                    PathWidth = s.Scale * 64,
-                },
+                Body = new SnakingSliderBody(s),
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
                 {
+                    GetInitialHitAction = () => HeadCircle.HitAction,
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AlwaysPresent = true,
@@ -83,43 +92,55 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
-
-            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
         }
 
-        public override Color4 AccentColour
+        protected override void UpdateInitialTransforms()
         {
-            get { return base.AccentColour; }
-            set
-            {
-                base.AccentColour = value;
-                Body.AccentColour = AccentColour;
-                Ball.AccentColour = AccentColour;
+            base.UpdateInitialTransforms();
 
-                foreach (var drawableHitObject in NestedHitObjects)
-                    drawableHitObject.AccentColour = AccentColour;
-            }
+            Body.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
+            config?.BindWith(OsuRulesetSetting.SnakingInSliders, Body.SnakingIn);
+            config?.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
+
+            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            scaleBindable.BindValueChanged(scale =>
+            {
+                updatePathRadius();
+                Ball.Scale = new Vector2(scale.NewValue);
+            });
+
+            positionBindable.BindTo(HitObject.PositionBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
+            pathBindable.BindTo(slider.PathBindable);
+
+            pathBindable.BindValueChanged(_ => Body.Refresh());
+
+            AccentColour.BindValueChanged(colour =>
+            {
+                Body.AccentColour = colour.NewValue;
+
+                foreach (var drawableHitObject in NestedHitObjects)
+                    drawableHitObject.AccentColour.Value = colour.NewValue;
+            }, true);
         }
 
-        public bool Tracking;
+        public readonly Bindable<bool> Tracking = new Bindable<bool>();
 
         protected override void Update()
         {
             base.Update();
 
-            Tracking = Ball.Tracking;
+            Tracking.Value = Ball.Tracking;
 
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
-            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
+            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
             Size = Body.Size;
@@ -133,6 +154,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Ball.RelativeAnchorPosition = childAnchorPosition;
             }
         }
+
+        public override void OnKilled()
+        {
+            base.OnKilled();
+            Body.RecyclePath();
+        }
+
+        private float sliderPathRadius;
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            Body.BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? SliderBody.DEFAULT_BORDER_SIZE;
+            sliderPathRadius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
+            updatePathRadius();
+
+            Body.AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? AccentColour.Value;
+            Body.BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+        }
+
+        private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -157,8 +200,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
 
@@ -176,10 +221,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         break;
                 }
 
-                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+                this.FadeOut(fade_out_time, Easing.OutQuint);
             }
-
-            Expire(true);
         }
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;

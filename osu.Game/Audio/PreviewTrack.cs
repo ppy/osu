@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -28,6 +28,8 @@ namespace osu.Game.Audio
         private void load()
         {
             track = GetTrack();
+            if (track != null)
+                track.Completed += () => Schedule(Stop);
         }
 
         /// <summary>
@@ -50,32 +52,30 @@ namespace osu.Game.Audio
         /// </summary>
         public bool IsRunning => track?.IsRunning ?? false;
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // Todo: Track currently doesn't signal its completion, so we have to handle it manually
-            if (hasStarted && track.HasCompleted)
-                Stop();
-        }
-
         private ScheduledDelegate startDelegate;
 
         /// <summary>
         /// Starts playing this <see cref="PreviewTrack"/>.
         /// </summary>
-        public void Start() => startDelegate = Schedule(() =>
+        /// <returns>Whether the track is started or already playing.</returns>
+        public bool Start()
         {
             if (track == null)
-                return;
+                return false;
 
-            if (hasStarted)
-                return;
-            hasStarted = true;
+            startDelegate = Schedule(() =>
+            {
+                if (hasStarted)
+                    return;
 
-            track.Restart();
-            Started?.Invoke();
-        });
+                hasStarted = true;
+
+                track.Restart();
+                Started?.Invoke();
+            });
+
+            return true;
+        }
 
         /// <summary>
         /// Stops playing this <see cref="PreviewTrack"/>.
@@ -89,6 +89,7 @@ namespace osu.Game.Audio
 
             if (!hasStarted)
                 return;
+
             hasStarted = false;
 
             track.Stop();

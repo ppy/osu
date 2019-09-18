@@ -1,19 +1,19 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Settings.Sections.Gameplay;
 using osu.Game.Rulesets;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
     public class GameplaySection : SettingsSection
     {
         public override string Header => "Gameplay";
-        public override FontAwesome Icon => FontAwesome.fa_circle_o;
+        public override IconUsage Icon => FontAwesome.Regular.Circle;
 
         public GameplaySection()
         {

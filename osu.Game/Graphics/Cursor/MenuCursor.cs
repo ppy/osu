@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -11,9 +10,10 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -45,10 +45,12 @@ namespace osu.Game.Graphics.Cursor
             {
                 var position = e.MousePosition;
                 var distance = Vector2Extensions.Distance(position, positionMouseDown);
+
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
                 if (dragRotationState == DragRotationState.DragStarted && distance > 30)
                     dragRotationState = DragRotationState.Rotating;
+
                 // don't rotate when distance is zero to avoid NaN
                 if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {
@@ -80,11 +82,12 @@ namespace osu.Game.Graphics.Cursor
                 activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             }
 
-            if (e.Button == MouseButton.Left && cursorRotate)
+            if (e.Button == MouseButton.Left && cursorRotate.Value)
             {
                 dragRotationState = DragRotationState.DragStarted;
                 positionMouseDown = e.MousePosition;
             }
+
             return base.OnMouseDown(e);
         }
 
@@ -102,6 +105,7 @@ namespace osu.Game.Graphics.Cursor
                     activeCursor.RotateTo(0, 600 * (1 + Math.Abs(activeCursor.Rotation / 720)), Easing.OutElasticHalf);
                 dragRotationState = DragRotationState.NotDragging;
             }
+
             return base.OnMouseUp(e);
         }
 
@@ -120,7 +124,7 @@ namespace osu.Game.Graphics.Cursor
         public class Cursor : Container
         {
             private Container cursorContainer;
-            private Bindable<double> cursorScale;
+            private Bindable<float> cursorScale;
             private const float base_scale = 0.15f;
 
             public Sprite AdditiveLayer;
@@ -146,7 +150,7 @@ namespace osu.Game.Graphics.Cursor
                             },
                             AdditiveLayer = new Sprite
                             {
-                                Blending = BlendingMode.Additive,
+                                Blending = BlendingParameters.Additive,
                                 Colour = colour.Pink,
                                 Alpha = 0,
                                 Texture = textures.Get(@"Cursor/menu-cursor-additive"),
@@ -155,9 +159,8 @@ namespace osu.Game.Graphics.Cursor
                     }
                 };
 
-                cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
-                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
-                cursorScale.TriggerChange();
+                cursorScale = config.GetBindable<float>(OsuSetting.MenuCursorSize);
+                cursorScale.BindValueChanged(scale => cursorContainer.Scale = new Vector2(scale.NewValue * base_scale), true);
             }
         }
 

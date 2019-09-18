@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Play.Break
                             Anchor = Anchor.Centre,
                             Origin = Anchor.CentreRight,
                             X = -glow_icon_offscreen_offset,
-                            Icon = Graphics.FontAwesome.fa_chevron_right,
+                            Icon = FontAwesome.Solid.ChevronRight,
                             BlurSigma = new Vector2(glow_icon_blur_sigma),
                             Size = new Vector2(glow_icon_size),
                         },
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Play.Break
                             Anchor = Anchor.Centre,
                             Origin = Anchor.CentreLeft,
                             X = glow_icon_offscreen_offset,
-                            Icon = Graphics.FontAwesome.fa_chevron_left,
+                            Icon = FontAwesome.Solid.ChevronLeft,
                             BlurSigma = new Vector2(glow_icon_blur_sigma),
                             Size = new Vector2(glow_icon_size),
                         },
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Play.Break
                             Origin = Anchor.CentreRight,
                             Alpha = 0.7f,
                             X = -blurred_icon_offscreen_offset,
-                            Icon = Graphics.FontAwesome.fa_chevron_right,
+                            Icon = FontAwesome.Solid.ChevronRight,
                             BlurSigma = new Vector2(blurred_icon_blur_sigma),
                             Size = new Vector2(blurred_icon_size),
                         },
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Play.Break
                             Origin = Anchor.CentreLeft,
                             Alpha = 0.7f,
                             X = blurred_icon_offscreen_offset,
-                            Icon = Graphics.FontAwesome.fa_chevron_left,
+                            Icon = FontAwesome.Solid.ChevronLeft,
                             BlurSigma = new Vector2(blurred_icon_blur_sigma),
                             Size = new Vector2(blurred_icon_size),
                         },

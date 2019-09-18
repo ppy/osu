@@ -1,15 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using OpenTK.Graphics;
+using osu.Framework.Bindables;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
@@ -19,8 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// </summary>
     internal class NotePiece : Container, IHasAccentColour
     {
-        public const float NOTE_HEIGHT = 10;
-        private const float head_colour_height = 6;
+        public const float NOTE_HEIGHT = 12;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -40,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 colouredBox = new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = head_colour_height,
-                    Alpha = 0.2f
+                    Height = NOTE_HEIGHT / 2,
+                    Alpha = 0.1f
                 }
             };
         }
@@ -50,20 +48,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(direction =>
+            direction.BindValueChanged(dir =>
             {
-                colouredBox.Anchor = colouredBox.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                colouredBox.Anchor = colouredBox.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
             }, true);
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 colouredBox.Colour = AccentColour.Lighten(0.9f);

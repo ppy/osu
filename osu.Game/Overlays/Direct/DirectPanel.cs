@@ -1,13 +1,15 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -16,10 +18,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -28,15 +28,15 @@ namespace osu.Game.Overlays.Direct
         public readonly BeatmapSetInfo SetInfo;
 
         private const double hover_transition_time = 400;
+        private const int maximum_difficulty_icons = 10;
 
         private Container content;
 
-        private ProgressBar progressBar;
-        private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public PreviewTrack Preview => PlayButton.Preview;
-        public Bindable<bool> PreviewPlaying => PlayButton.Playing;
+        public Bindable<bool> PreviewPlaying => PlayButton?.Playing;
+
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
 
@@ -46,6 +46,8 @@ namespace osu.Game.Overlays.Direct
 
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
+            Debug.Assert(setInfo.OnlineBeatmapSetID != null);
+
             SetInfo = setInfo;
         }
 
@@ -65,14 +67,10 @@ namespace osu.Game.Overlays.Direct
             Colour = Color4.Black.Opacity(0.3f),
         };
 
-        private OsuColour colours;
-
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
-            this.beatmaps = beatmaps;
             this.beatmapSetOverlay = beatmapSetOverlay;
-            this.colours = colours;
 
             AddInternal(content = new Container
             {
@@ -82,40 +80,21 @@ namespace osu.Game.Overlays.Direct
                 Children = new[]
                 {
                     CreateBackground(),
-                    progressBar = new ProgressBar
+                    new DownloadProgressBar(SetInfo)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Height = 0,
-                        Alpha = 0,
-                        BackgroundColour = Color4.Black.Opacity(0.7f),
-                        FillColour = colours.Blue,
                         Depth = -1,
                     },
                 }
             });
-
-            var downloadRequest = beatmaps.GetExistingDownload(SetInfo);
-
-            if (downloadRequest != null)
-                attachDownload(downloadRequest);
-
-            beatmaps.BeatmapDownloadBegan += attachDownload;
-            beatmaps.ItemAdded += setAdded;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            beatmaps.BeatmapDownloadBegan -= attachDownload;
-            beatmaps.ItemAdded -= setAdded;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null && Preview.TrackLoaded)
+            if (PreviewPlaying.Value && Preview != null && Preview.TrackLoaded)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
@@ -135,7 +114,7 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
-            if (FadePlayButton && !PreviewPlaying)
+            if (FadePlayButton && !PreviewPlaying.Value)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(e);
@@ -143,41 +122,9 @@ namespace osu.Game.Overlays.Direct
 
         protected override bool OnClick(ClickEvent e)
         {
-            ShowInformation();
+            Debug.Assert(SetInfo.OnlineBeatmapSetID != null);
+            beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
             return true;
-        }
-
-        protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
-
-        private void attachDownload(DownloadBeatmapSetRequest request)
-        {
-            if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
-                return;
-
-            progressBar.FadeIn(400, Easing.OutQuint);
-            progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
-
-            progressBar.Current.Value = 0;
-
-            request.Failure += e =>
-            {
-                progressBar.Current.Value = 0;
-                progressBar.FadeOut(500);
-            };
-
-            request.DownloadProgressed += progress => Schedule(() => progressBar.Current.Value = progress);
-
-            request.Success += data =>
-            {
-                progressBar.Current.Value = 1;
-                progressBar.FillColour = colours.Yellow;
-            };
-        }
-
-        private void setAdded(BeatmapSetInfo s)
-        {
-            if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
-                progressBar.FadeOut(500);
         }
 
         protected override void LoadComplete()
@@ -185,16 +132,25 @@ namespace osu.Game.Overlays.Direct
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += playing =>
+            {
+                PlayButton.FadeTo(playing.NewValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
+                PreviewBar.FadeTo(playing.NewValue ? 1 : 0, 120, Easing.InOutQuint);
+            };
         }
 
-        protected List<DifficultyIcon> GetDifficultyIcons()
+        protected List<DifficultyIcon> GetDifficultyIcons(OsuColour colours)
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
-                icons.Add(new DifficultyIcon(b));
+            if (SetInfo.Beatmaps.Count > maximum_difficulty_icons)
+            {
+                foreach (var ruleset in SetInfo.Beatmaps.Select(b => b.Ruleset).Distinct())
+                    icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is DirectListPanel ? Color4.White : colours.Gray5));
+            }
+            else
+                foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
+                    icons.Add(new DifficultyIcon(b));
 
             return icons;
         }
@@ -213,7 +169,7 @@ namespace osu.Game.Overlays.Direct
 
             public int Value
             {
-                get { return value; }
+                get => value;
                 set
                 {
                     this.value = value;
@@ -221,7 +177,7 @@ namespace osu.Game.Overlays.Direct
                 }
             }
 
-            public Statistic(FontAwesome icon, int value = 0)
+            public Statistic(IconUsage icon, int value = 0)
             {
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;
@@ -231,16 +187,14 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new Drawable[]
                 {
-                    text = new OsuSpriteText
-                    {
-                        Font = @"Exo2.0-SemiBoldItalic",
-                    },
+                    text = new OsuSpriteText { Font = OsuFont.GetFont(weight: FontWeight.SemiBold, italics: true) },
                     new SpriteIcon
                     {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
                         Icon = icon,
                         Shadow = true,
                         Size = new Vector2(14),
-                        Margin = new MarginPadding { Top = 1 },
                     },
                 };
 

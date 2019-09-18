@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Utils
@@ -10,6 +11,9 @@ namespace osu.Game.Utils
     {
         public static bool IsZipArchive(string path)
         {
+            if (!File.Exists(path))
+                return false;
+
             try
             {
                 using (var arc = ZipArchive.Open(path))

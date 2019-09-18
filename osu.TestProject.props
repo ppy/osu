@@ -8,7 +8,6 @@
   </ItemGroup>
   <ItemGroup Label="Project References">
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\osu.Game\Tests\VisualTestRunner.cs">
