@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
             base.InitialiseDefaults();
             Set(OsuRulesetSetting.SnakingInSliders, true);
             Set(OsuRulesetSetting.SnakingOutSliders, true);
+            Set(OsuRulesetSetting.AlwaysTintSliderBall, true);
             Set(OsuRulesetSetting.ShowCursorTrail, true);
         }
     }
@@ -26,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Configuration
     {
         SnakingInSliders,
         SnakingOutSliders,
+        AlwaysTintSliderBall,
         ShowCursorTrail
     }
 }
