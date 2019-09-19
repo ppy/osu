@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Threading;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,10 +11,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
-using System;
-using System.Threading;
 
-namespace osu.Game.Screens.Select.Details
+namespace osu.Game.Screens.Select.Leaderboards
 {
     public class UserTopScoreContainer : VisibilityContainer
     {
