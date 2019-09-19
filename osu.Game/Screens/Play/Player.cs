@@ -87,9 +87,11 @@ namespace osu.Game.Screens.Play
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
-        /// Whether to block the player from failing.
+        /// Whether failing should be allowed.
+        ///
+        /// By default, this checks whether any selected mod disallows failing.
         /// </summary>
-        protected virtual bool BypassFail => false;
+        protected virtual bool AllowFail => !Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail);
 
         private readonly bool allowPause;
         private readonly bool showResults;
@@ -365,7 +367,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail) || BypassFail)
+            if (!AllowFail)
                 return false;
 
             HasFailed = true;
