@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Leaderboards;
@@ -14,8 +13,7 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    [Description("PlaySongSelect leaderboard")]
-    public class TestSceneLeaderboard : OsuTestScene
+    public class TestSceneBeatmapLeaderboard : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -26,7 +24,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private readonly FailableLeaderboard leaderboard;
 
-        public TestSceneLeaderboard()
+        public TestSceneBeatmapLeaderboard()
         {
             Add(leaderboard = new FailableLeaderboard
             {
