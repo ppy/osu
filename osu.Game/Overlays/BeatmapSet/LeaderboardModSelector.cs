@@ -74,10 +74,10 @@ namespace osu.Game.Overlays.BeatmapSet
             else
                 mods.Remove(mod);
 
+            SelectedMods.Value = mods;
+
             if (!mods.Any() && !IsHovered)
                 highlightAll();
-
-            SelectedMods.Value = mods;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -116,14 +116,13 @@ namespace osu.Game.Overlays.BeatmapSet
                 : base(mod)
             {
                 Scale = new Vector2(mod_scale);
+                Highlighted.Value = true;
                 Add(new HoverClickSounds());
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
-                Highlighted.Value = true;
 
                 Selected.BindValueChanged(selected =>
                 {
@@ -152,10 +151,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             private void updateState() => Highlighted.Value = IsHovered || Selected.Value;
 
-            protected override void OnHighlightedChange(ValueChangedEvent<bool> highlighted)
-            {
+            protected override void OnHighlightedChanged(ValueChangedEvent<bool> highlighted) =>
                 this.FadeColour(highlighted.NewValue ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
-            }
         }
 
         private class NoMod : Mod

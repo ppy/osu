@@ -114,10 +114,10 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Highlighted.BindValueChanged(OnHighlightedChange);
+            Highlighted.BindValueChanged(OnHighlightedChanged, true);
         }
 
-        protected virtual void OnHighlightedChange(ValueChangedEvent<bool> highlighted)
+        protected virtual void OnHighlightedChanged(ValueChangedEvent<bool> highlighted)
         {
             background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour;
         }
