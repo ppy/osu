@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -37,7 +38,24 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
+        public APILegacyUserTopScoreInfo TopScore
+        {
+            get => topScoreContainer.Score.Value;
+            set
+            {
+                if (value == null)
+                    topScoreContainer.Hide();
+                else
+                {
+                    topScoreContainer.Show();
+                    topScoreContainer.Score.Value = value;
+                }
+            }
+        }
+
         private bool filterMods;
+
+        private UserTopScoreContainer topScoreContainer;
 
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
@@ -77,6 +95,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     UpdateScores();
             };
+
+            Content.Add(topScoreContainer = new UserTopScoreContainer
+            {
+                ScoreSelected = s => ScoreSelected?.Invoke(s)
+            });
+        }
+
+        protected override void Reset()
+        {
+            base.Reset();
+            TopScore = null;
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
@@ -141,7 +170,11 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             var req = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope, requestMods);
 
-            req.Success += r => scoresCallback?.Invoke(r.Scores);
+            req.Success += r =>
+            {
+                scoresCallback?.Invoke(r.Scores);
+                TopScore = r.UserScore;
+            };
 
             return req;
         }
