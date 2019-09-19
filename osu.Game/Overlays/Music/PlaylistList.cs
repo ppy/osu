@@ -43,8 +43,6 @@ namespace osu.Game.Overlays.Music
 
         private class ItemsScrollContainer : OsuScrollContainer
         {
-            private IBindableList<BeatmapSetInfo> beatmaps;
-
             public Action<BeatmapSetInfo> Selected;
 
             private readonly SearchContainer search;
@@ -52,7 +50,10 @@ namespace osu.Game.Overlays.Music
 
             private readonly IBindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
 
-            private MusicController musicController;
+            private IBindableList<BeatmapSetInfo> beatmaps;
+
+            [Resolved]
+            private MusicController musicController { get; set; }
 
             public ItemsScrollContainer()
             {
@@ -75,12 +76,9 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(MusicController musicController, IBindable<WorkingBeatmap> beatmap)
+            private void load(IBindable<WorkingBeatmap> beatmap)
             {
-                this.musicController = musicController;
-
                 beatmaps = musicController.BeatmapSets.GetBoundCopy();
-
                 beatmaps.ItemsAdded += i => i.ForEach(addBeatmapSet);
                 beatmaps.ItemsRemoved += i => i.ForEach(removeBeatmapSet);
                 beatmaps.ForEach(addBeatmapSet);
