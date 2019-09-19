@@ -226,8 +226,8 @@ namespace osu.Game.Screens.Select
                         updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
                         break;
 
-                    case "divisor" when op == ":" && int.TryParse(value, out var divisor):
-                        criteria.BeatDivisor = divisor;
+                    case "divisor" when int.TryParse(value, out var divisor):
+                        updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
                         break;
 
                     case "status" when op == ":" && Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var statusValue):

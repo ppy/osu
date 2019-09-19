@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.Length.IsInRange(Beatmap.Length);
             match &= criteria.BPM.IsInRange(Beatmap.BPM);
 
-            match &= !criteria.BeatDivisor.HasValue || criteria.BeatDivisor == Beatmap.BeatDivisor;
+            match &= criteria.BeatDivisor.IsInRange(Beatmap.BeatDivisor);
             match &= !criteria.OnlineStatus.HasValue || criteria.OnlineStatus == Beatmap.Status;
 
             if (match)
