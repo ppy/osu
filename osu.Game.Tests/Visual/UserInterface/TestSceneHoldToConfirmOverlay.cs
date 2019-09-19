@@ -61,10 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestHoldToConfirmOverlay : ExitConfirmOverlay
         {
-            protected override bool AllowMultipleFires => true;
-
             public void Begin() => BeginConfirm();
-            public void Abort() => AbortConfirm();
         }
     }
 }
