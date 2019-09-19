@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
-        protected override VirtualInputHandler CreateVirtualInputHandler() => new OsuVirtualInputHandler();
+        protected override VirtualInputHandler CreateVirtualInputHandler() => new VirtualInputHandler<OsuAction>();
 
         public override double GameplayStartTime
         {

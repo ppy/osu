@@ -91,6 +91,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
-        protected override VirtualInputHandler CreateVirtualInputHandler() => new ManiaVirtualInputHandler();
+        protected override VirtualInputHandler CreateVirtualInputHandler() => new VirtualInputHandler<ManiaAction>();
     }
 }

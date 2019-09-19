@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
-        protected override VirtualInputHandler CreateVirtualInputHandler() => new CatchVirtualInputHandler();
+        protected override VirtualInputHandler CreateVirtualInputHandler() => new VirtualInputHandler<CatchAction>();
 
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, CreateDrawableRepresentation);
 
