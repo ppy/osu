@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
     {
         private SwitchButton switchButton;
 
-        public Bindable<bool> Current { get; } = new Bindable<bool>();
+        public Bindable<bool> Current { get; set; } = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load()

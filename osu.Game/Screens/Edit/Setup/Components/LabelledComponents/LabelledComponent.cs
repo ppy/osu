@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
@@ -36,8 +36,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public float LabelTextSize
         {
-            get => label.TextSize;
-            set => label.TextSize = value;
+            get => label.Font.Size;
+            set => label.Font = label.Font.With(size: value);
         }
 
         public Color4 LabelTextColour
@@ -88,15 +88,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Colour = Color4.White,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
                                 },
                                 component = CreateComponent(),
                             },
                         },
                         bottomText = new OsuSpriteText
                         {
-                            TextSize = 12,
-                            Font = @"Exo2.0-BoldItalic",
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true)
                         },
                     }
                 }

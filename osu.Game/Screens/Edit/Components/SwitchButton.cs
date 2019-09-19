@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -25,9 +25,15 @@ namespace osu.Game.Screens.Edit.Components
         private const float padding = 1.25f;
 
         private readonly BindableBool current = new BindableBool();
-        public Bindable<bool> Current => current;
+
+        public Bindable<bool> Current
+        {
+            get => current;
+            set { }
+        }
 
         private Color4 enabledColour;
+
         public Color4 EnabledColour
         {
             get => enabledColour;
@@ -40,6 +46,7 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         private Color4 disabledColour;
+
         public Color4 DisabledColour
         {
             get => disabledColour;
@@ -52,6 +59,7 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get => accentColour;
@@ -102,12 +110,12 @@ namespace osu.Game.Screens.Edit.Components
 
             Current.ValueChanged += newValue =>
             {
-                if (newValue)
+                if (newValue.NewValue)
                     switchCircle.MoveToX(switchContainer.DrawWidth - switchCircle.DrawWidth, 200, Easing.OutQuint);
                 else
                     switchCircle.MoveToX(0, 200, Easing.OutQuint);
                 updateHoverState();
-                fill.FadeTo(newValue ? 1 : 0, 500, Easing.OutQuint);
+                fill.FadeTo(newValue.NewValue ? 1 : 0, 500, Easing.OutQuint);
             };
         }
 
@@ -120,22 +128,22 @@ namespace osu.Game.Screens.Edit.Components
             fill.Colour = disabledColour;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             current.Toggle();
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             updateHoverState();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             updateHoverState();
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         private void updateHoverState()
