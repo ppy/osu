@@ -16,7 +16,11 @@ namespace osu.Game.Graphics.Containers
 
         private const int fadeout_delay = 200;
 
-        private bool fired;
+        /// <summary>
+        /// Whether currently in a fired state (and the confirm <see cref="Action"/> has been sent).
+        /// </summary>
+        public bool Fired { get; private set; }
+
         private bool confirming;
 
         /// <summary>
@@ -36,7 +40,7 @@ namespace osu.Game.Graphics.Containers
 
         protected void BeginConfirm()
         {
-            if (confirming || (!AllowMultipleFires && fired)) return;
+            if (confirming || (!AllowMultipleFires && Fired)) return;
 
             confirming = true;
 
@@ -46,14 +50,15 @@ namespace osu.Game.Graphics.Containers
         protected virtual void Confirm()
         {
             Action?.Invoke();
-            fired = true;
+            Fired = true;
         }
 
         protected void AbortConfirm()
         {
-            if (!AllowMultipleFires && fired) return;
+            if (!AllowMultipleFires && Fired) return;
 
             confirming = false;
+            Fired = false;
 
             this.TransformBindableTo(Progress, 0, fadeout_delay, Easing.Out);
         }

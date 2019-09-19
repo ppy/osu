@@ -64,11 +64,13 @@ namespace osu.Game.Screens.Menu
 
         private Bindable<int> holdDelay;
 
+        private ExitConfirmOverlay exitConfirmOverlay;
+
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config)
         {
             if (host.CanExit)
-                AddInternal(new ExitConfirmOverlay { Action = this.Exit });
+                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay { Action = this.Exit });
 
             holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
 
@@ -237,12 +239,15 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
-            if (holdDelay.Value == 0 && !exitConfirmed && dialogOverlay != null)
+            if (holdDelay.Value == 0 && !exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
             {
                 dialogOverlay.Push(new ConfirmExitDialog(() =>
                 {
                     exitConfirmed = true;
                     this.Exit();
+                }, () =>
+                {
+                    exitConfirmOverlay.Abort();
                 }));
 
                 return true;
@@ -253,9 +258,9 @@ namespace osu.Game.Screens.Menu
             return base.OnExiting(next);
         }
 
-        public class ConfirmExitDialog : PopupDialog
+        private class ConfirmExitDialog : PopupDialog
         {
-            public ConfirmExitDialog(Action confirm)
+            public ConfirmExitDialog(Action confirm, Action cancel)
             {
                 HeaderText = "Are you sure you want to exit?";
                 BodyText = "Last chance to back out.";
@@ -271,7 +276,8 @@ namespace osu.Game.Screens.Menu
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Just a little more"
+                        Text = @"Just a little more",
+                        Action = cancel
                     },
                 };
             }
