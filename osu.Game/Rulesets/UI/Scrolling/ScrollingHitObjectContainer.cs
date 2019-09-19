@@ -1,60 +1,45 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Lists;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.UI.Scrolling.Visualisers;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
     public class ScrollingHitObjectContainer : HitObjectContainer
     {
         /// <summary>
-        /// The duration required to scroll through one length of the <see cref="ScrollingHitObjectContainer"/> before any control point adjustments.
+        /// A multiplier applied to the length of the scrolling area to determine a safe default lifetime end for hitobjects.
+        /// This is only used to limit the lifetime end within reason, as proper lifetime management should be implemented on hitobjects themselves.
         /// </summary>
-        public readonly BindableDouble TimeRange = new BindableDouble
-        {
-            MinValue = 0,
-            MaxValue = double.MaxValue
-        };
+        private const float safe_lifetime_end_multiplier = 2;
 
-        /// <summary>
-        /// The control points that adjust the scrolling speed.
-        /// </summary>
-        protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
+        private readonly IBindable<double> timeRange = new BindableDouble();
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
 
-        private Cached initialStateCache = new Cached();
+        private readonly Cached initialStateCache = new Cached();
 
         public ScrollingHitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
-
-            TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
-            Direction.ValueChanged += _ => initialStateCache.Invalidate();
         }
 
-        private ISpeedChangeVisualiser speedChangeVisualiser;
-
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load()
         {
-            switch (config.Get<SpeedChangeVisualisationMethod>(OsuSetting.SpeedChangeVisualisation))
-            {
-                case SpeedChangeVisualisationMethod.Sequential:
-                    speedChangeVisualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
-                    break;
-                case SpeedChangeVisualisationMethod.Overlapping:
-                    speedChangeVisualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
-                    break;
-            }
+            direction.BindTo(scrollingInfo.Direction);
+            timeRange.BindTo(scrollingInfo.TimeRange);
+
+            direction.ValueChanged += _ => initialStateCache.Invalidate();
+            timeRange.ValueChanged += _ => initialStateCache.Invalidate();
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -66,22 +51,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public override bool Remove(DrawableHitObject hitObject)
         {
             var result = base.Remove(hitObject);
-            if (result)
-                initialStateCache.Invalidate();
-            return result;
-        }
 
-        public void AddControlPoint(MultiplierControlPoint controlPoint)
-        {
-            ControlPoints.Add(controlPoint);
-            initialStateCache.Invalidate();
-        }
-
-        public bool RemoveControlPoint(MultiplierControlPoint controlPoint)
-        {
-            var result = ControlPoints.Remove(controlPoint);
             if (result)
+            {
                 initialStateCache.Invalidate();
+                hitObjectInitialStateCache.Remove(hitObject);
+            }
+
             return result;
         }
 
@@ -93,23 +69,119 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
+        private float scrollLength;
+
         protected override void Update()
         {
             base.Update();
 
             if (!initialStateCache.IsValid)
             {
-                speedChangeVisualiser.ComputeInitialStates(Objects, Direction, TimeRange, DrawSize);
+                switch (direction.Value)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        scrollLength = DrawSize.Y;
+                        break;
+
+                    default:
+                        scrollLength = DrawSize.X;
+                        break;
+                }
+
+                scrollingInfo.Algorithm.Reset();
+
+                foreach (var obj in Objects)
+                {
+                    computeLifetimeStartRecursive(obj);
+                    computeInitialStateRecursive(obj);
+                }
+
                 initialStateCache.Validate();
             }
         }
+
+        private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
+        {
+            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+
+            foreach (var obj in hitObject.NestedHitObjects)
+                computeLifetimeStartRecursive(obj);
+        }
+
+        private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
+
+        // Cant use AddOnce() since the delegate is re-constructed every invocation
+        private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
+        {
+            if (!hitObjectInitialStateCache.TryGetValue(hitObject, out var cached))
+                cached = hitObjectInitialStateCache[hitObject] = new Cached();
+
+            if (cached.IsValid)
+                return;
+
+            double endTime = hitObject.HitObject.StartTime;
+
+            if (hitObject.HitObject is IHasEndTime e)
+            {
+                endTime = e.EndTime;
+
+                switch (direction.Value)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
+                        break;
+
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
+                        break;
+                }
+            }
+
+            hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, endTime, timeRange.Value, scrollLength);
+
+            foreach (var obj in hitObject.NestedHitObjects)
+            {
+                computeInitialStateRecursive(obj);
+
+                // Nested hitobjects don't need to scroll, but they do need accurate positions
+                updatePosition(obj, hitObject.HitObject.StartTime);
+            }
+
+            cached.Validate();
+        });
 
         protected override void UpdateAfterChildrenLife()
         {
             base.UpdateAfterChildrenLife();
 
-            // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            speedChangeVisualiser.UpdatePositions(AliveObjects, Direction, Time.Current, TimeRange, DrawSize);
+            // We need to calculate hitobject positions as soon as possible after lifetimes so that hitobjects get the final say in their positions
+            foreach (var obj in AliveObjects)
+                updatePosition(obj, Time.Current);
+        }
+
+        private void updatePosition(DrawableHitObject hitObject, double currentTime)
+        {
+            switch (direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    break;
+
+                case ScrollingDirection.Down:
+                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    break;
+
+                case ScrollingDirection.Left:
+                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    break;
+
+                case ScrollingDirection.Right:
+                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    break;
+            }
         }
     }
 }

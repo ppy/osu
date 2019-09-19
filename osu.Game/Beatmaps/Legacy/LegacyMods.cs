@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 
@@ -9,7 +9,7 @@ namespace osu.Game.Beatmaps.Legacy
     public enum LegacyMods
     {
         None = 0,
-        NoFail = 1 << 0,
+        NoFail = 1,
         Easy = 1 << 1,
         TouchDevice = 1 << 2,
         Hidden = 1 << 3,

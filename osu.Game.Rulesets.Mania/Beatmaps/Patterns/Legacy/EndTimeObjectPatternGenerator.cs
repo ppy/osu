@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -35,36 +35,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             switch (TotalColumns)
             {
-                case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
+                case 8 when HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
                     break;
+
                 case 8:
-                    addToPattern(pattern, getNextRandomColumn(RandomStart), generateHold);
+                    addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
                     break;
+
                 default:
                     if (TotalColumns > 0)
-                        addToPattern(pattern, getNextRandomColumn(0), generateHold);
+                        addToPattern(pattern, GetRandomColumn(), generateHold);
                     break;
             }
 
             return pattern;
-        }
-
-        /// <summary>
-        /// Picks a random column after a column.
-        /// </summary>
-        /// <param name="start">The starting column.</param>
-        /// <returns>A random column after <paramref name="start"/>.</returns>
-        private int getNextRandomColumn(int start)
-        {
-            int nextColumn = Random.Next(start, TotalColumns);
-
-            RunWhile(() => PreviousPattern.ColumnHasObject(nextColumn), () =>
-            {
-                nextColumn = Random.Next(start, TotalColumns);
-            });
-
-            return nextColumn;
         }
 
         /// <summary>
@@ -87,9 +72,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 };
 
                 if (hold.Head.Samples == null)
-                    hold.Head.Samples = new List<SampleInfo>();
+                    hold.Head.Samples = new List<HitSampleInfo>();
 
-                hold.Head.Samples.Add(new SampleInfo { Name = SampleInfo.HIT_NORMAL });
+                hold.Head.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_NORMAL });
 
                 hold.Tail.Samples = HitObject.Samples;
 

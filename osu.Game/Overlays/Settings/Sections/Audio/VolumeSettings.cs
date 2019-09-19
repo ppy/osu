@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             Children = new Drawable[]
             {
                 new SettingsSlider<double> { LabelText = "Master", Bindable = audio.Volume, KeyboardStep = 0.01f },
-                new SettingsSlider<double> { LabelText = "Master (Window Inactive)", Bindable = config.GetBindable<double>(OsuSetting.VolumeInactive), KeyboardStep = 0.01f },
+                new SettingsSlider<double> { LabelText = "Master (window inactive)", Bindable = config.GetBindable<double>(OsuSetting.VolumeInactive), KeyboardStep = 0.01f },
                 new SettingsSlider<double> { LabelText = "Effect", Bindable = audio.VolumeSample, KeyboardStep = 0.01f },
                 new SettingsSlider<double> { LabelText = "Music", Bindable = audio.VolumeTrack, KeyboardStep = 0.01f },
             };

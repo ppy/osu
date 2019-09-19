@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -14,6 +15,12 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"beatmapset_id")]
         public int OnlineBeatmapSetID { get; set; }
+
+        [JsonProperty(@"status")]
+        public BeatmapSetOnlineStatus Status { get; set; }
+
+        [JsonProperty(@"beatmapset")]
+        public APIBeatmapSet BeatmapSet { get; set; }
 
         [JsonProperty(@"playcount")]
         private int playCount { get; set; }
@@ -51,19 +58,24 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"version")]
         private string version { get; set; }
 
+        [JsonProperty(@"failtimes")]
+        private BeatmapMetrics metrics { get; set; }
+
         public BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
+            var set = BeatmapSet?.ToBeatmapSet(rulesets);
+
             return new BeatmapInfo
             {
-                Metadata = this,
+                Metadata = set?.Metadata ?? this,
                 Ruleset = rulesets.GetRuleset(ruleset),
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
-                BeatmapSet = new BeatmapSetInfo
-                {
-                    OnlineBeatmapSetID = OnlineBeatmapSetID,
-                },
                 Version = version,
+                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
+                Status = Status,
+                BeatmapSet = set,
+                Metrics = metrics,
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,
@@ -75,7 +87,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 {
                     PlayCount = playCount,
                     PassCount = passCount,
-                    Length = length,
                     CircleCount = circleCount,
                     SliderCount = sliderCount,
                 },

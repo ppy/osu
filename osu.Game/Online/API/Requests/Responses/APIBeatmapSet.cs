@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -20,12 +20,18 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"id")]
         public int? OnlineBeatmapSetID
         {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
+            get => onlineBeatmapSetID;
+            set => onlineBeatmapSetID = value > 0 ? value : null;
         }
+
+        [JsonProperty(@"status")]
+        public BeatmapSetOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
         private string preview { get; set; }
+
+        [JsonProperty(@"has_favourited")]
+        private bool hasFavourited { get; set; }
 
         [JsonProperty(@"play_count")]
         private int playCount { get; set; }
@@ -42,9 +48,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"storyboard")]
         private bool hasStoryboard { get; set; }
 
-        [JsonProperty(@"status")]
-        private BeatmapSetOnlineStatus status { get; set; }
-
         [JsonProperty(@"submitted_date")]
         private DateTimeOffset submitted { get; set; }
 
@@ -54,11 +57,23 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"last_updated")]
         private DateTimeOffset lastUpdated { get; set; }
 
+        [JsonProperty(@"ratings")]
+        private int[] ratings { get; set; }
+
         [JsonProperty(@"user_id")]
         private long creatorId
         {
-            set { Author.Id = value; }
+            set => Author.Id = value;
         }
+
+        [JsonProperty(@"availability")]
+        private BeatmapSetOnlineAvailability availability { get; set; }
+
+        [JsonProperty(@"genre")]
+        private BeatmapSetOnlineGenre genre { get; set; }
+
+        [JsonProperty(@"language")]
+        private BeatmapSetOnlineLanguage language { get; set; }
 
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; }
@@ -69,6 +84,8 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
+                Status = Status,
+                Metrics = ratings == null ? null : new BeatmapSetMetrics { Ratings = ratings },
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Covers = covers,
@@ -76,12 +93,16 @@ namespace osu.Game.Online.API.Requests.Responses
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
                     BPM = bpm,
-                    Status = status,
+                    Status = Status,
                     HasVideo = hasVideo,
                     HasStoryboard = hasStoryboard,
                     Submitted = submitted,
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
+                    Availability = availability,
+                    HasFavourited = hasFavourited,
+                    Genre = genre,
+                    Language = language
                 },
                 Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };

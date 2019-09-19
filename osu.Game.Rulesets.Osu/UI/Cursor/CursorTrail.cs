@@ -1,66 +1,35 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Buffers;
+using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.ES30;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    internal class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
+    public class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
-        private int currentIndex;
-
-        private Shader shader;
-        private Texture texture;
-
-        private Vector2 size => texture.Size * Scale;
-
-        private double timeOffset;
-
-        private float time;
-
-        public override bool IsPresent => true;
-
-        private readonly TrailDrawNodeSharedData trailDrawNodeSharedData = new TrailDrawNodeSharedData();
         private const int max_sprites = 2048;
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
-
-        private Vector2? lastPosition;
-
-        private readonly InputResampler resampler = new InputResampler();
-
-        protected override DrawNode CreateDrawNode() => new TrailDrawNode();
-
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            TrailDrawNode tNode = (TrailDrawNode)node;
-            tNode.Shader = shader;
-            tNode.Texture = texture;
-            tNode.Size = size;
-            tNode.Time = time;
-            tNode.Shared = trailDrawNodeSharedData;
-
-            for (int i = 0; i < parts.Length; ++i)
-                if (parts[i].InvalidationID > tNode.Parts[i].InvalidationID)
-                    tNode.Parts[i] = parts[i];
-        }
+        private int currentIndex;
+        private IShader shader;
+        private double timeOffset;
+        private float time;
 
         public CursorTrail()
         {
@@ -71,19 +40,16 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             for (int i = 0; i < max_sprites; i++)
             {
-                parts[i].InvalidationID = 0;
-                parts[i].WasUpdated = true;
+                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
+                // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
+                parts[i].InvalidationID = 1;
             }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, TextureStore textures)
+        private void load(ShaderManager shaders)
         {
-            shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
-            texture = textures.Get(@"Cursor/cursortrail");
-            Scale = new Vector2(1 / texture.ScaleAdjust);
+            shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
         }
 
         protected override void LoadComplete()
@@ -91,6 +57,42 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             base.LoadComplete();
             resetTime();
         }
+
+        private Texture texture = Texture.WhitePixel;
+
+        public Texture Texture
+        {
+            get => texture;
+            set
+            {
+                if (texture == value)
+                    return;
+
+                texture = value;
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
+
+        private readonly Cached<Vector2> partSizeCache = new Cached<Vector2>();
+
+        private Vector2 partSize => partSizeCache.IsValid
+            ? partSizeCache.Value
+            : (partSizeCache.Value = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight) * DrawInfo.Matrix.ExtractScale().Xy);
+
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & (Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                partSizeCache.Invalidate();
+
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
+        /// <summary>
+        /// The amount of time to fade the cursor trail pieces.
+        /// </summary>
+        protected virtual double FadeDuration => 300;
+
+        public override bool IsPresent => true;
 
         protected override void Update()
         {
@@ -100,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             const int fade_clock_reset_threshold = 1000000;
 
-            time = (float)(Time.Current - timeOffset) / 300f;
+            time = (float)((Time.Current - timeOffset) / FadeDuration);
             if (time > fade_clock_reset_threshold)
                 resetTime();
         }
@@ -117,136 +119,160 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             timeOffset = Time.Current;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        /// <summary>
+        /// Whether to interpolate mouse movements and add trail pieces at intermediate points.
+        /// </summary>
+        protected virtual bool InterpolateMovements => true;
+
+        private Vector2? lastPosition;
+        private readonly InputResampler resampler = new InputResampler();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 pos = state.Mouse.NativeState.Position;
+            Vector2 pos = e.ScreenSpaceMousePosition;
 
             if (lastPosition == null)
             {
                 lastPosition = pos;
                 resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(state);
+                return base.OnMouseMove(e);
             }
 
             foreach (Vector2 pos2 in resampler.AddPosition(pos))
             {
                 Trace.Assert(lastPosition.HasValue);
 
-                // ReSharper disable once PossibleInvalidOperationException
-                Vector2 pos1 = lastPosition.Value;
-                Vector2 diff = pos2 - pos1;
-                float distance = diff.Length;
-                Vector2 direction = diff / distance;
-
-                float interval = size.X / 2 * 0.9f;
-
-                for (float d = interval; d < distance; d += interval)
+                if (InterpolateMovements)
                 {
-                    lastPosition = pos1 + direction * d;
-                    addPosition(lastPosition.Value);
+                    // ReSharper disable once PossibleInvalidOperationException
+                    Vector2 pos1 = lastPosition.Value;
+                    Vector2 diff = pos2 - pos1;
+                    float distance = diff.Length;
+                    Vector2 direction = diff / distance;
+
+                    float interval = partSize.X / 2.5f;
+
+                    for (float d = interval; d < distance; d += interval)
+                    {
+                        lastPosition = pos1 + direction * d;
+                        addPart(lastPosition.Value);
+                    }
+                }
+                else
+                {
+                    lastPosition = pos2;
+                    addPart(lastPosition.Value);
                 }
             }
 
-            return base.OnMouseMove(state);
+            return base.OnMouseMove(e);
         }
 
-        private void addPosition(Vector2 pos)
+        private void addPart(Vector2 screenSpacePosition)
         {
-            parts[currentIndex].Position = pos;
+            parts[currentIndex].Position = screenSpacePosition;
             parts[currentIndex].Time = time;
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
         }
 
+        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
+
         private struct TrailPart
         {
             public Vector2 Position;
             public float Time;
             public long InvalidationID;
-            public bool WasUpdated;
-        }
-
-        private class TrailDrawNodeSharedData
-        {
-            public VertexBuffer<TexturedTrailVertex> VertexBuffer;
         }
 
         private class TrailDrawNode : DrawNode
         {
-            public Shader Shader;
-            public Texture Texture;
+            protected new CursorTrail Source => (CursorTrail)base.Source;
 
-            public float Time;
-            public TrailDrawNodeSharedData Shared;
+            private IShader shader;
+            private Texture texture;
 
-            public readonly TrailPart[] Parts = new TrailPart[max_sprites];
-            public Vector2 Size;
+            private float time;
 
-            public TrailDrawNode()
+            private readonly TrailPart[] parts = new TrailPart[max_sprites];
+            private Vector2 size;
+
+            private readonly TrailBatch vertexBatch = new TrailBatch(max_sprites, 1);
+
+            public TrailDrawNode(CursorTrail source)
+                : base(source)
             {
                 for (int i = 0; i < max_sprites; i++)
+                    parts[i].InvalidationID = 0;
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.partSize;
+                time = Source.time;
+
+                for (int i = 0; i < Source.parts.Length; ++i)
                 {
-                    Parts[i].InvalidationID = 0;
-                    Parts[i].WasUpdated = false;
+                    if (Source.parts[i].InvalidationID > parts[i].InvalidationID)
+                        parts[i] = Source.parts[i];
                 }
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
-                if (Shared.VertexBuffer == null)
-                    Shared.VertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
-
-                Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
-
-                int updateStart = -1, updateEnd = 0;
-                for (int i = 0; i < Parts.Length; ++i)
-                {
-                    if (Parts[i].WasUpdated)
-                    {
-                        if (updateStart == -1)
-                            updateStart = i;
-                        updateEnd = i + 1;
-
-                        int start = i * 4;
-                        int end = start;
-
-                        Vector2 pos = Parts[i].Position;
-                        float time = Parts[i].Time;
-
-                        Texture.DrawQuad(
-                            new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
-                            DrawInfo.Colour,
-                            null,
-                            v => Shared.VertexBuffer.Vertices[end++] = new TexturedTrailVertex
-                            {
-                                Position = v.Position,
-                                TexturePosition = v.TexturePosition,
-                                Time = time + 1,
-                                Colour = v.Colour,
-                            });
-
-                        Parts[i].WasUpdated = false;
-                    }
-                    else if (updateStart != -1)
-                    {
-                        Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
-                        updateStart = -1;
-                    }
-                }
-
-                // Update all remaining vertices that have been changed.
-                if (updateStart != -1)
-                    Shared.VertexBuffer.UpdateRange(updateStart * 4, updateEnd * 4);
-
                 base.Draw(vertexAction);
 
-                Shader.Bind();
+                shader.Bind();
+                shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
-                Texture.TextureGL.Bind();
-                Shared.VertexBuffer.Draw();
+                for (int i = 0; i < parts.Length; ++i)
+                {
+                    vertexBatch.DrawTime = parts[i].Time;
 
-                Shader.Unbind();
+                    Vector2 pos = parts[i].Position;
+
+                    DrawQuad(
+                        texture,
+                        new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
+                        DrawColourInfo.Colour,
+                        null,
+                        vertexBatch.AddAction);
+                }
+
+                shader.Unbind();
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                base.Dispose(isDisposing);
+
+                vertexBatch.Dispose();
+            }
+
+            // Todo: This shouldn't exist, but is currently used to reduce allocations by caching variable-capturing closures.
+            private class TrailBatch : QuadBatch<TexturedTrailVertex>
+            {
+                public new readonly Action<TexturedVertex2D> AddAction;
+                public float DrawTime;
+
+                public TrailBatch(int size, int maxBuffers)
+                    : base(size, maxBuffers)
+                {
+                    AddAction = v => Add(new TexturedTrailVertex
+                    {
+                        Position = v.Position,
+                        TexturePosition = v.TexturePosition,
+                        Time = DrawTime + 1,
+                        Colour = v.Colour,
+                    });
+                }
             }
         }
 
@@ -255,10 +281,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 Position;
+
             [VertexMember(4, VertexAttribPointerType.Float)]
             public Color4 Colour;
+
             [VertexMember(2, VertexAttribPointerType.Float)]
             public Vector2 TexturePosition;
+
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;
 

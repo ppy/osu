@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -37,13 +39,11 @@ namespace osu.Game.Overlays
             dialogContainer.Add(currentDialog);
 
             currentDialog.Show();
-            currentDialog.StateChanged += state => onDialogOnStateChanged(dialog, state);
-            State = Visibility.Visible;
+            currentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+            Show();
         }
 
-        protected override bool PlaySamplesOnStateChange => false;
-
-        protected override bool BlockPassThroughKeyboard => true;
+        protected override bool BlockNonPositionalInput => true;
 
         private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
         {
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
             dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
             if (dialog == currentDialog)
-                State = Visibility.Hidden;
+                Hide();
         }
 
         protected override void PopIn()
@@ -66,13 +66,25 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            if (currentDialog?.State == Visibility.Visible)
+            if (currentDialog?.State.Value == Visibility.Visible)
             {
                 currentDialog.Hide();
                 return;
             }
 
             this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    currentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
+                    return true;
+            }
+
+            return base.OnPressed(action);
         }
     }
 }

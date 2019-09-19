@@ -1,22 +1,22 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using OpenTK.Graphics;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -40,14 +40,13 @@ namespace osu.Game.Overlays.Settings
 
         public virtual string LabelText
         {
-            get { return text?.Text ?? string.Empty; }
+            get => text?.Text ?? string.Empty;
             set
             {
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText());
-                    FlowContent.SetLayoutPosition(text, -1);
+                    FlowContent.Insert(-1, text = new OsuSpriteText());
                 }
 
                 text.Text = value;
@@ -59,12 +58,16 @@ namespace osu.Game.Overlays.Settings
 
         public virtual Bindable<T> Bindable
         {
-            get { return bindable; }
+            get => bindable;
 
             set
             {
+                if (bindable != null)
+                    controlWithCurrent?.Current.UnbindFrom(bindable);
+
                 bindable = value;
                 controlWithCurrent?.Current.BindTo(bindable);
+
                 if (ShowsDefaultIndicator)
                 {
                     restoreDefaultButton.Bindable = bindable.GetBoundCopy();
@@ -73,22 +76,20 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public IEnumerable<string> FilterTerms => new[] { LabelText };
+        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
 
         public bool MatchingFilter
         {
-            set
-            {
-                // probably needs a better transition.
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
+
+        public bool FilteringActive { get; set; }
 
         protected SettingsItem()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsOverlay.CONTENT_MARGINS };
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
             InternalChildren = new Drawable[]
             {
@@ -97,7 +98,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS },
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
                     Child = Control = CreateControl()
                 },
             };
@@ -116,12 +117,12 @@ namespace osu.Game.Overlays.Settings
 
             public Bindable<T> Bindable
             {
-                get { return bindable; }
+                get => bindable;
                 set
                 {
                     bindable = value;
-                    bindable.ValueChanged += newValue => UpdateState();
-                    bindable.DisabledChanged += disabled => UpdateState();
+                    bindable.ValueChanged += _ => UpdateState();
+                    bindable.DisabledChanged += _ => UpdateState();
                 }
             }
 
@@ -132,7 +133,7 @@ namespace osu.Game.Overlays.Settings
             public RestoreDefaultValueButton()
             {
                 RelativeSizeAxes = Axes.Y;
-                Width = SettingsOverlay.CONTENT_MARGINS;
+                Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
             }
 
@@ -168,25 +169,25 @@ namespace osu.Game.Overlays.Settings
 
             public string TooltipText => "Revert to default";
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+            protected override bool OnMouseUp(MouseUpEvent e) => true;
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 if (bindable != null && !bindable.Disabled)
                     bindable.SetDefault();
                 return true;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hovering = true;
                 UpdateState();
                 return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 hovering = false;
                 UpdateState();

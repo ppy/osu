@@ -1,7 +1,7 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 Name = "Top",
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.5f,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Colour = ColourInfo.GradientVertical(Color4.Transparent, Color4.White.Opacity(alpha))
             },
             new Box
@@ -71,15 +71,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 Origin = Anchor.BottomLeft,
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.5f,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Colour = ColourInfo.GradientVertical(Color4.White.Opacity(alpha), Color4.Transparent)
             }
         };
 
         public Color4 AccentColour
         {
-            get { return Colour; }
-            set { Colour = value; }
+            get => Colour;
+            set => Colour = value;
         }
     }
 }

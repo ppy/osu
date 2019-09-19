@@ -1,24 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
     public class PlaylistList : CompositeDrawable
     {
         public Action<BeatmapSetInfo> Selected;
-        public Action<BeatmapSetInfo, int> OrderChanged;
 
         private readonly ItemsScrollContainer items;
 
@@ -28,14 +28,13 @@ namespace osu.Game.Overlays.Music
             {
                 RelativeSizeAxes = Axes.Both,
                 Selected = set => Selected?.Invoke(set),
-                OrderChanged = (s, i) => OrderChanged?.Invoke(s, i)
             };
         }
 
         public new MarginPadding Padding
         {
-            get { return base.Padding; }
-            set { base.Padding = value; }
+            get => base.Padding;
+            set => base.Padding = value;
         }
 
         public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
@@ -45,12 +44,16 @@ namespace osu.Game.Overlays.Music
         private class ItemsScrollContainer : OsuScrollContainer
         {
             public Action<BeatmapSetInfo> Selected;
-            public Action<BeatmapSetInfo, int> OrderChanged;
 
             private readonly SearchContainer search;
             private readonly FillFlowContainer<PlaylistItem> items;
 
             private readonly IBindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
+
+            private IBindableList<BeatmapSetInfo> beatmaps;
+
+            [Resolved]
+            private MusicController musicController { get; set; }
 
             public ItemsScrollContainer()
             {
@@ -73,11 +76,12 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
+            private void load(IBindable<WorkingBeatmap> beatmap)
             {
-                beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
-                beatmaps.ItemAdded += addBeatmapSet;
-                beatmaps.ItemRemoved += removeBeatmapSet;
+                beatmaps = musicController.BeatmapSets.GetBoundCopy();
+                beatmaps.ItemsAdded += i => i.ForEach(addBeatmapSet);
+                beatmaps.ItemsRemoved += i => i.ForEach(removeBeatmapSet);
+                beatmaps.ForEach(addBeatmapSet);
 
                 beatmapBacking.BindTo(beatmap);
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
@@ -85,17 +89,21 @@ namespace osu.Game.Overlays.Music
 
             private void addBeatmapSet(BeatmapSetInfo obj)
             {
-                var newItem = new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) };
+                if (obj == draggedItem?.BeatmapSetInfo) return;
 
-                items.Add(newItem);
-                items.SetLayoutPosition(newItem, items.Count - 1);
+                Schedule(() => items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) }));
             }
 
             private void removeBeatmapSet(BeatmapSetInfo obj)
             {
-                var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
-                if (itemToRemove != null)
-                    items.Remove(itemToRemove);
+                if (obj == draggedItem?.BeatmapSetInfo) return;
+
+                Schedule(() =>
+                {
+                    var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
+                    if (itemToRemove != null)
+                        items.Remove(itemToRemove);
+                });
             }
 
             private void updateSelectedSet()
@@ -106,8 +114,8 @@ namespace osu.Game.Overlays.Music
 
             public string SearchTerm
             {
-                get { return search.SearchTerm; }
-                set { search.SearchTerm = value; }
+                get => search.SearchTerm;
+                set => search.SearchTerm = value;
             }
 
             public BeatmapSetInfo FirstVisibleSet => items.FirstOrDefault(i => i.MatchingFilter)?.BeatmapSetInfo;
@@ -115,28 +123,38 @@ namespace osu.Game.Overlays.Music
             private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;
 
-            protected override bool OnDragStart(InputState state)
+            private int? dragDestination;
+
+            protected override bool OnDragStart(DragStartEvent e)
             {
-                nativeDragPosition = state.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 draggedItem = items.FirstOrDefault(d => d.IsDraggable);
-                return draggedItem != null || base.OnDragStart(state);
+                return draggedItem != null || base.OnDragStart(e);
             }
 
-            protected override bool OnDrag(InputState state)
+            protected override bool OnDrag(DragEvent e)
             {
-                nativeDragPosition = state.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 if (draggedItem == null)
-                    return base.OnDrag(state);
+                    return base.OnDrag(e);
+
                 return true;
             }
 
-            protected override bool OnDragEnd(InputState state)
+            protected override bool OnDragEnd(DragEndEvent e)
             {
-                nativeDragPosition = state.Mouse.NativeState.Position;
-                var handled = draggedItem != null || base.OnDragEnd(state);
-                draggedItem = null;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
 
-                return handled;
+                if (draggedItem == null)
+                    return base.OnDragEnd(e);
+
+                if (dragDestination != null)
+                    musicController.ChangeBeatmapSetPosition(draggedItem.BeatmapSetInfo, dragDestination.Value);
+
+                draggedItem = null;
+                dragDestination = null;
+
+                return true;
             }
 
             protected override void Update()
@@ -186,6 +204,7 @@ namespace osu.Game.Overlays.Music
                 // the item positions as they are being transformed
                 float heightAccumulator = 0;
                 int dstIndex = 0;
+
                 for (; dstIndex < items.Count; dstIndex++)
                 {
                     // Using BoundingBox here takes care of scale, paddings, etc...
@@ -211,7 +230,7 @@ namespace osu.Game.Overlays.Music
                 }
 
                 items.SetLayoutPosition(draggedItem, dstIndex);
-                OrderChanged?.Invoke(draggedItem.BeatmapSetInfo, dstIndex);
+                dragDestination = dstIndex;
             }
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
@@ -225,6 +244,11 @@ namespace osu.Game.Overlays.Music
                         if (value)
                             InvalidateLayout();
                     }
+                }
+
+                public bool FilteringActive
+                {
+                    set { }
                 }
 
                 public IEnumerable<IFilterable> FilterableChildren => Children;

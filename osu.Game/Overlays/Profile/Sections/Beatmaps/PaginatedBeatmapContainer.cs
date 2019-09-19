@@ -1,20 +1,21 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osu.Framework.Configuration;
+using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
-    public class PaginatedBeatmapContainer : PaginatedContainer
+    public class PaginatedBeatmapContainer : PaginatedContainer<APIBeatmapSet>
     {
         private const float panel_padding = 10f;
-
         private readonly BeatmapSetType type;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
@@ -27,34 +28,15 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
             ItemsContainer.Spacing = new Vector2(panel_padding);
         }
 
-        protected override void ShowMore()
-        {
-            base.ShowMore();
+        protected override APIRequest<List<APIBeatmapSet>> CreateRequest() =>
+            new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-            var req = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
-
-            req.Success += sets =>
+        protected override Drawable CreateDrawableItem(APIBeatmapSet model) => !model.OnlineBeatmapSetID.HasValue
+            ? null
+            : new DirectGridPanel(model.ToBeatmapSet(Rulesets))
             {
-                ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
-                ShowMoreLoading.Hide();
-
-                if (!sets.Any() && VisiblePages == 1)
-                {
-                    MissingText.Show();
-                    return;
-                }
-
-                foreach (var s in sets)
-                {
-                    if (!s.OnlineBeatmapSetID.HasValue)
-                        continue;
-
-                    var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
-                    ItemsContainer.Add(panel);
-                }
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
             };
-
-            Api.Queue(req);
-        }
     }
 }

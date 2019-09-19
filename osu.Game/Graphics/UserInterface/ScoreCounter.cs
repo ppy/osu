@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -27,9 +28,12 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="leading">How many leading zeroes the counter will have.</param>
         public ScoreCounter(uint leading = 0)
         {
-            DisplayedCountSpriteText.FixedWidth = true;
+            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             LeadingZeroes = leading;
         }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {
@@ -48,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Increment(double amount)
         {
-            Current.Value = Current + amount;
+            Current.Value = Current.Value + amount;
         }
     }
 }

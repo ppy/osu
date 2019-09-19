@@ -1,73 +1,99 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
-using osu.Framework.Configuration;
+using osuTK;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
+    [Cached(typeof(IPreviewTrackOwner))]
+    public abstract class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
-        protected virtual bool PlaySamplesOnStateChange => true;
+        protected override bool BlockNonPositionalInput => true;
 
-        protected override bool BlockPassThroughKeyboard => true;
+        /// <summary>
+        /// Temporary to allow for overlays in the main screen content to not dim theirselves.
+        /// Should be eventually replaced by dimming which is aware of the target dim container (traverse parent for certain interface type?).
+        /// </summary>
+        protected virtual bool DimMainContent => true;
 
-        private PreviewTrackManager previewTrackManager;
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        [BackgroundDependencyLoader(true)]
+        private void load(AudioManager audio)
         {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
-            return dependencies;
+            samplePopIn = audio.Samples.Get(@"UI/overlay-pop-in");
+            samplePopOut = audio.Samples.Get(@"UI/overlay-pop-out");
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, AudioManager audio, PreviewTrackManager previewTrackManager)
+        protected override void LoadComplete()
         {
-            this.previewTrackManager = previewTrackManager;
+            if (game != null)
+                OverlayActivationMode.BindTo(game.OverlayActivationMode);
 
-            if (osuGame != null)
-                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+            OverlayActivationMode.BindValueChanged(mode =>
+            {
+                if (mode.NewValue == OverlayActivation.Disabled)
+                    State.Value = Visibility.Hidden;
+            }, true);
 
-            samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
-            samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
-
-            StateChanged += onStateChanged;
+            base.LoadComplete();
         }
 
         /// <summary>
         /// Whether mouse input should be blocked screen-wide while this overlay is visible.
         /// Performing mouse actions outside of the valid extents will hide the overlay.
         /// </summary>
-        public virtual bool BlockScreenWideMouse => BlockPassThroughMouse;
+        public virtual bool BlockScreenWideMouse => BlockPositionalInput;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => BlockScreenWideMouse || base.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BlockScreenWideMouse || base.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
-            if (!base.ReceiveMouseInputAt(state.Mouse.NativeState.Position))
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                Hide();
+
+            return base.OnClick(e);
+        }
+
+        private bool closeOnDragEnd;
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                closeOnDragEnd = true;
+
+            return base.OnDragStart(e);
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            if (closeOnDragEnd)
             {
-                State = Visibility.Hidden;
-                return true;
+                Hide();
+                closeOnDragEnd = false;
             }
 
-            return base.OnClick(state);
+            return base.OnDragEnd(e);
         }
 
         public virtual bool OnPressed(GlobalAction action)
@@ -75,8 +101,9 @@ namespace osu.Game.Graphics.Containers
             switch (action)
             {
                 case GlobalAction.Back:
-                    State = Visibility.Hidden;
+                    Hide();
                     return true;
+
                 case GlobalAction.Select:
                     return true;
             }
@@ -86,28 +113,40 @@ namespace osu.Game.Graphics.Containers
 
         public bool OnReleased(GlobalAction action) => false;
 
-        private void onStateChanged(Visibility visibility)
+        protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {
-            switch (visibility)
+            switch (state.NewValue)
             {
                 case Visibility.Visible:
-                    if (OverlayActivationMode != OverlayActivation.Disabled)
+                    if (OverlayActivationMode.Value == OverlayActivation.Disabled)
                     {
-                        if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                        State.Value = Visibility.Hidden;
+                        return;
                     }
-                    else
-                        State = Visibility.Hidden;
+
+                    samplePopIn?.Play();
+                    if (BlockScreenWideMouse && DimMainContent) game?.AddBlockingOverlay(this);
                     break;
+
                 case Visibility.Hidden:
-                    if (PlaySamplesOnStateChange) samplePopOut?.Play();
+                    samplePopOut?.Play();
+                    if (BlockScreenWideMouse) game?.RemoveBlockingOverlay(this);
                     break;
             }
+
+            base.UpdateState(state);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
             previewTrackManager.StopAnyPlaying(this);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            game?.RemoveBlockingOverlay(this);
         }
     }
 }
