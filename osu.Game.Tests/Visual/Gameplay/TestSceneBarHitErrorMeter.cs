@@ -3,18 +3,18 @@
 
 using NUnit.Framework;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Taiko.Objects;
-using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Catch.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Scoring;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Catch.Scoring;
+using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddRepeatStep("New random judgement", () => newJudgement(), 40);
 
-            AddRepeatStep("New max negative", () => newJudgement(-hitWindows.HalfWindowFor(HitResult.Meh)), 20);
-            AddRepeatStep("New max positive", () => newJudgement(hitWindows.HalfWindowFor(HitResult.Meh)), 20);
+            AddRepeatStep("New max negative", () => newJudgement(-hitWindows.WindowFor(HitResult.Meh)), 20);
+            AddRepeatStep("New max positive", () => newJudgement(hitWindows.WindowFor(HitResult.Meh)), 20);
             AddStep("New fixed judgement (50ms)", () => newJudgement(50));
         }
 
@@ -85,9 +85,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AutoSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    new SpriteText { Text = $@"Great: {hitWindows?.Great}" },
-                    new SpriteText { Text = $@"Good: {hitWindows?.Good}" },
-                    new SpriteText { Text = $@"Meh: {hitWindows?.Meh}" },
+                    new SpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
+                    new SpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Good)}" },
+                    new SpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
                 }
             });
 

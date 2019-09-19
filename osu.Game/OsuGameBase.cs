@@ -207,6 +207,7 @@ namespace osu.Game
             FileStore.Cleanup();
 
             AddInternal(API);
+            AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;
 
