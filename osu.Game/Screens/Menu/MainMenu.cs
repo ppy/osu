@@ -87,11 +87,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
-                            OnExit = delegate
-                            {
-                                exitConfirmed = true;
-                                this.Exit();
-                            },
+                            OnExit = confirmAndExit,
                         }
                     }
                 },
@@ -118,6 +114,12 @@ namespace osu.Game.Screens.Menu
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
+        }
+
+        private void confirmAndExit()
+        {
+            exitConfirmed = true;
+            this.Exit();
         }
 
         private void preloadSongSelect()
@@ -241,15 +243,7 @@ namespace osu.Game.Screens.Menu
         {
             if (holdDelay.Value == 0 && !exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
             {
-                dialogOverlay.Push(new ConfirmExitDialog(() =>
-                {
-                    exitConfirmed = true;
-                    this.Exit();
-                }, () =>
-                {
-                    exitConfirmOverlay.Abort();
-                }));
-
+                dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
                 return true;
             }
 
