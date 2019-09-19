@@ -52,11 +52,18 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("start confirming", () => overlay.Begin());
             AddStep("abort confirming", () => overlay.Abort());
 
+            AddAssert("ensure not fired internally", () => !overlay.Fired);
             AddAssert("ensure aborted", () => !fired);
 
             AddStep("start confirming", () => overlay.Begin());
 
             AddUntilStep("wait until confirmed", () => fired);
+            AddAssert("ensure fired internally", () => overlay.Fired);
+
+            AddStep("abort after fire", () => overlay.Abort());
+            AddAssert("ensure not fired internally", () => !overlay.Fired);
+            AddStep("start confirming", () => overlay.Begin());
+            AddUntilStep("wait until fired again", () => overlay.Fired);
         }
 
         private class TestHoldToConfirmOverlay : ExitConfirmOverlay
