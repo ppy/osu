@@ -81,6 +81,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
 
+            Set(OsuSetting.HitLighting, true);
+
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
@@ -183,6 +185,7 @@ namespace osu.Game.Configuration
         ScalingSizeY,
         UIScale,
         IntroSequence,
-        UIHoldActivationDelay
+        UIHoldActivationDelay,
+        HitLighting
     }
 }
