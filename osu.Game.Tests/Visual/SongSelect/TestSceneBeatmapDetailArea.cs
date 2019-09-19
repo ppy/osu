@@ -163,7 +163,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             }));
 
             AddStep("null beatmap", () => detailsArea.Beatmap = null);
-            AddStep("Toggle top score visibility", () => detailsArea.TopScore.ToggleVisibility());
         }
     }
 }
