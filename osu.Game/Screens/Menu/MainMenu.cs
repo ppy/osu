@@ -85,7 +85,11 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
-                            OnExit = this.Exit,
+                            OnExit = delegate
+                            {
+                                exitConfirmed = true;
+                                this.Exit();
+                            },
                         }
                     }
                 },
