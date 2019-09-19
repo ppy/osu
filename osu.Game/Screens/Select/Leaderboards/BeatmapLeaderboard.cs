@@ -14,7 +14,6 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
