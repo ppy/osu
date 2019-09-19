@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Select.Details
 {
     public class UserTopScoreContainer : VisibilityContainer
     {
-        private const int height = 90;
         private const int duration = 500;
 
         private readonly Container scoreContainer;
@@ -30,33 +29,30 @@ namespace osu.Game.Screens.Select.Details
         public UserTopScoreContainer()
         {
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            AutoSizeAxes = Axes.Y;
 
-            Anchor = Anchor.BottomLeft;
-            Origin = Anchor.BottomLeft;
+            Margin = new MarginPadding { Vertical = 5 };
 
             Children = new Drawable[]
             {
-                new Container
+                new FillFlowContainer
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
-                    Height = height,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Margin = new MarginPadding { Top = 5 },
                             Text = @"your personal best".ToUpper(),
                             Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
                         },
                         scoreContainer = new Container
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         }
@@ -89,14 +85,8 @@ namespace osu.Game.Screens.Select.Details
             }, (loadScoreCancellation = new CancellationTokenSource()).Token);
         }
 
-        protected override void PopIn()
-        {
-            this.FadeIn(duration, Easing.OutQuint);
-        }
+        protected override void PopIn() => this.FadeIn(duration, Easing.OutQuint);
 
-        protected override void PopOut()
-        {
-            this.FadeOut(duration, Easing.OutQuint);
-        }
+        protected override void PopOut() => this.FadeOut(duration, Easing.OutQuint);
     }
 }
