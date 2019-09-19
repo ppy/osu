@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -27,6 +28,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         protected virtual float EndScale => 1;
 
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
+
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModSpinIn) };
 
         public void ReadFromConfig(OsuConfigManager config)
         {
@@ -64,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableSlider _:
                 case DrawableHitCircle _:
                 {
-                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                         drawable.ScaleTo(StartScale).Then().ScaleTo(EndScale, h.TimePreempt, Easing.OutSine);
                     break;
                 }
@@ -75,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 case DrawableHitCircle circle:
                     // we don't want to see the approach circle
-                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
                         circle.ApproachCircle.Hide();
                     break;
             }

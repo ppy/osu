@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Osu.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
-            Position = legacyFrame.Position;
-            if (legacyFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
-            if (legacyFrame.MouseRight) Actions.Add(OsuAction.RightButton);
+            Position = currentFrame.Position;
+            if (currentFrame.MouseLeft) Actions.Add(OsuAction.LeftButton);
+            if (currentFrame.MouseRight) Actions.Add(OsuAction.RightButton);
         }
     }
 }

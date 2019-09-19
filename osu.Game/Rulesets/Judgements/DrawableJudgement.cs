@@ -61,13 +61,13 @@ namespace osu.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
+                Child = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
                     Font = OsuFont.Numeric.With(size: 12),
                     Colour = judgementColour(Result.Type),
                     Scale = new Vector2(0.85f, 1),
-                }, restrictSize: false)
+                })
             };
         }
 
