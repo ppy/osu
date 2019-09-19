@@ -31,11 +31,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Hit Lighting",
                     Bindable = config.GetBindable<bool>(OsuSetting.HitLighting)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Rotate cursor when dragging",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
-                },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",

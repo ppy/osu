@@ -51,7 +51,6 @@
     <None Include="$(MSBuildThisFileDirectory)\osu.licenseheader">
       <Link>osu.licenseheader</Link>
     </None>
-    <AndroidNativeLibrary Include="$(OutputPath)\**\*.so" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -63,6 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ppy.osu.Game.Resources" Version="2019.913.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.911.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.918.0" />
   </ItemGroup>
 </Project>
