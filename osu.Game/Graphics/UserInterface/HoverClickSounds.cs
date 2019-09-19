@@ -34,12 +34,12 @@ namespace osu.Game.Graphics.UserInterface
             this.buttons = buttons ?? new[] { MouseButton.Left };
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
                 sampleClick?.Play();
 
-            return base.OnMouseUp(e);
+            return base.OnClick(e);
         }
 
         [BackgroundDependencyLoader]

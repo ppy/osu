@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Audio;
@@ -20,7 +21,7 @@ namespace osu.Game.Skinning
 
         private SampleChannel[] channels;
 
-        private AudioManager audio;
+        private ISampleStore samples;
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
@@ -33,9 +34,9 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(ISampleStore samples)
         {
-            this.audio = audio;
+            this.samples = samples;
         }
 
         private bool looping;
@@ -81,7 +82,7 @@ namespace osu.Game.Skinning
 
                 if (ch == null && allowFallback)
                     foreach (var lookup in s.LookupNames)
-                        if ((ch = audio.Samples.Get($"Gameplay/{lookup}")) != null)
+                        if ((ch = samples.Get($"Gameplay/{lookup}")) != null)
                             break;
 
                 if (ch != null)
@@ -102,8 +103,9 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            foreach (var c in channels)
-                c.Dispose();
+            if (channels != null)
+                foreach (var c in channels)
+                    c.Dispose();
         }
     }
 }

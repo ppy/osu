@@ -63,7 +63,7 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 8, Bottom = 8 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
+                        Text = CreateText(),
                         Font = OsuFont.GetFont(size: 14)
                     },
                     box = new Box
@@ -80,6 +80,8 @@ namespace osu.Game.Graphics.UserInterface
 
                 Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
+
+            protected virtual string CreateText() => (Value as Enum)?.GetDescription() ?? Value.ToString();
 
             protected override bool OnHover(HoverEvent e)
             {

@@ -26,7 +26,10 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.Automation;
         public override string Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
+
         public bool AllowFail => false;
+        public bool RestartOnFail => false;
+
         public override Type[] IncompatibleMods => new[] { typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail) };
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;

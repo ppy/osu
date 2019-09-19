@@ -15,7 +15,10 @@ using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.IO;
 using osu.Game.Tests.Resources;
+using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
+using SharpCompress.Common;
+using SharpCompress.Writers.Zip;
 
 namespace osu.Game.Tests.Beatmaps.IO
 {
@@ -135,7 +138,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     using (var zip = ZipArchive.Open(brokenOsz))
                     {
                         zip.AddEntry("broken.osu", brokenOsu, false);
-                        zip.SaveTo(outStream, SharpCompress.Common.CompressionType.Deflate);
+                        zip.SaveTo(outStream, CompressionType.Deflate);
                     }
 
                     // this will trigger purging of the existing beatmap (online set id match) but should rollback due to broken osu.
@@ -358,6 +361,51 @@ namespace osu.Game.Tests.Beatmaps.IO
                     ensureLoaded(osu);
                     File.Delete(temp);
                     Assert.IsFalse(File.Exists(temp), "We likely held a read lock on the file when we shouldn't");
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestImportNestedStructure()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportNestedStructure"))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    string subfolder = Path.Combine(extractedFolder, "subfolder");
+
+                    Directory.CreateDirectory(subfolder);
+
+                    try
+                    {
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(subfolder);
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                        ensureLoaded(osu);
+
+                        Assert.IsFalse(imported.Files.Any(f => f.Filename.Contains("subfolder")), "Files contain common subfolder");
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
                 }
                 finally
                 {

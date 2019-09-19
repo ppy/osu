@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {

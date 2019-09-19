@@ -80,10 +80,17 @@ namespace osu.Game.Screens.Play
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         protected DimmableStoryboard DimmableStoryboard { get; private set; }
+        protected DimmableVideo DimmableVideo { get; private set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected new readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
+        /// Whether failing should be allowed.
+        /// By default, this checks whether all selected mods allow failing.
+        /// </summary>
+        protected virtual bool AllowFail => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.AllowFail);
 
         private readonly bool allowPause;
         private readonly bool showResults;
@@ -142,6 +149,7 @@ namespace osu.Game.Screens.Play
 
         private void addUnderlayComponents(Container target)
         {
+            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video) { RelativeSizeAxes = Axes.Both });
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
@@ -358,7 +366,7 @@ namespace osu.Game.Screens.Play
 
         private bool onFail()
         {
-            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
+            if (!AllowFail)
                 return false;
 
             HasFailed = true;
@@ -370,6 +378,10 @@ namespace osu.Game.Screens.Play
                 PauseOverlay.Hide();
 
             failAnimation.Start();
+
+            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                Restart();
+
             return true;
         }
 
@@ -502,15 +514,18 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
-                // still want to block if we are within the cooldown period and not already paused.
-                return true;
-
-            if (HasFailed && ValidForResume && !FailOverlay.IsPresent)
-                // ValidForResume is false when restarting
+            // ValidForResume is false when restarting
+            if (ValidForResume)
             {
-                failAnimation.FinishTransforms(true);
-                return true;
+                if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
+                    // still want to block if we are within the cooldown period and not already paused.
+                    return true;
+
+                if (HasFailed && !FailOverlay.IsPresent)
+                {
+                    failAnimation.FinishTransforms(true);
+                    return true;
+                }
             }
 
             GameplayClockContainer.ResetLocalAdjustments();
