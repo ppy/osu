@@ -17,7 +17,6 @@ using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Taiko.Input;
 using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Taiko.UI
