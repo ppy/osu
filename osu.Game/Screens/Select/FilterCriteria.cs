@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -42,13 +43,13 @@ namespace osu.Game.Screens.Select
         }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
-            where T : struct, IComparable<T>
+            where T : struct, IComparable
         {
             public bool IsInRange(T value)
             {
-                if (Min.HasValue)
+                if (Min != null)
                 {
-                    int comparison = value.CompareTo(Min.Value);
+                    int comparison = Comparer<T>.Default.Compare(value, Min.Value);
 
                     if (comparison < 0)
                         return false;
@@ -57,9 +58,9 @@ namespace osu.Game.Screens.Select
                         return false;
                 }
 
-                if (Max.HasValue)
+                if (Max != null)
                 {
-                    int comparison = value.CompareTo(Max.Value);
+                    int comparison = Comparer<T>.Default.Compare(value, Max.Value);
 
                     if (comparison > 0)
                         return false;
