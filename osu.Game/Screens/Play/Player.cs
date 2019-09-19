@@ -80,6 +80,7 @@ namespace osu.Game.Screens.Play
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
         protected DimmableStoryboard DimmableStoryboard { get; private set; }
+        protected DimmableVideo DimmableVideo { get; private set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -142,6 +143,7 @@ namespace osu.Game.Screens.Play
 
         private void addUnderlayComponents(Container target)
         {
+            target.Add(DimmableVideo = new DimmableVideo(Beatmap.Value.Video) { RelativeSizeAxes = Axes.Both });
             target.Add(DimmableStoryboard = new DimmableStoryboard(Beatmap.Value.Storyboard) { RelativeSizeAxes = Axes.Both });
         }
 
@@ -502,15 +504,18 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
-                // still want to block if we are within the cooldown period and not already paused.
-                return true;
-
-            if (HasFailed && ValidForResume && !FailOverlay.IsPresent)
-                // ValidForResume is false when restarting
+            // ValidForResume is false when restarting
+            if (ValidForResume)
             {
-                failAnimation.FinishTransforms(true);
-                return true;
+                if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
+                    // still want to block if we are within the cooldown period and not already paused.
+                    return true;
+
+                if (HasFailed && !FailOverlay.IsPresent)
+                {
+                    failAnimation.FinishTransforms(true);
+                    return true;
+                }
             }
 
             GameplayClockContainer.ResetLocalAdjustments();

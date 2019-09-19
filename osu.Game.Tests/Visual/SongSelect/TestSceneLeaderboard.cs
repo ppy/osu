@@ -42,6 +42,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
             AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
             AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
+            AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
             foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
         }
