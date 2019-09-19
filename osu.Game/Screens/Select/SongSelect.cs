@@ -223,9 +223,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            void displayScore(ScoreInfo score) => this.Push(new SoloResults(score));
-
-            BeatmapDetails.Leaderboard.ScoreSelected += displayScore;
+            BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
         }
 
         [BackgroundDependencyLoader(true)]
