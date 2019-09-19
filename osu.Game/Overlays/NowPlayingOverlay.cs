@@ -81,7 +81,6 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
-                            OrderChanged = musicController.ChangeBeatmapSetPosition
                         },
                         playerContainer = new Container
                         {
