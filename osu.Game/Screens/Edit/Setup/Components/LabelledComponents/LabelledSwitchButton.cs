@@ -11,9 +11,9 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {
     public class LabelledSwitchButton : LabelledComponent, IHasCurrentValue<bool>
     {
-        private SwitchButton switchButton;
-
         public Bindable<bool> Current { get; set; } = new Bindable<bool>();
+
+        private SwitchButton switchButton;
 
         [BackgroundDependencyLoader]
         private void load()
