@@ -197,23 +197,23 @@ namespace osu.Game.Screens.Select
                 switch (key)
                 {
                     case "stars" when double.TryParse(value, out var stars):
-                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.5);
+                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars);
                         break;
 
                     case "ar" when double.TryParse(value, out var ar):
-                        updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.3);
+                        updateCriteriaRange(ref criteria.ApproachRate, op, ar);
                         break;
 
                     case "dr" when double.TryParse(value, out var dr):
-                        updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.3);
+                        updateCriteriaRange(ref criteria.DrainRate, op, dr);
                         break;
 
                     case "cs" when double.TryParse(value, out var cs):
-                        updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.3);
+                        updateCriteriaRange(ref criteria.CircleSize, op, cs);
                         break;
 
                     case "bpm" when double.TryParse(value, out var bpm):
-                        updateCriteriaRange(ref criteria.BPM, op, bpm, 0.3);
+                        updateCriteriaRange(ref criteria.BPM, op, bpm);
                         break;
 
                     case "length" when double.TryParse(value.TrimEnd('m', 's', 'h'), out var length):
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityToleration = 0)
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double tolerance = 0.05)
         {
             switch (op)
             {
@@ -249,8 +249,8 @@ namespace osu.Game.Screens.Select
                 case "=":
                 case ":":
                     range.IsInclusive = true;
-                    range.Min = value - equalityToleration;
-                    range.Max = value + equalityToleration;
+                    range.Min = value - tolerance;
+                    range.Max = value + tolerance;
                     break;
 
                 case ">":
