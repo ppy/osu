@@ -14,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using System.Net;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -149,7 +150,7 @@ namespace osu.Game.Overlays.Changelog
                         };
 
                         // todo: use markdown parsing once API returns markdown
-                        message.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
+                        message.AddText(WebUtility.HtmlDecode(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty)), t =>
                         {
                             t.Font = fontSmall;
                             t.Colour = new Color4(235, 184, 254, 255);
