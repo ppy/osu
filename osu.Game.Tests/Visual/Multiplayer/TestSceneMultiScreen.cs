@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
     [TestFixture]
     public class TestSceneMultiScreen : ScreenTestScene
     {
-        protected override bool RequiresAPIAccess => true;
+        protected override bool UseOnlineAPI => true;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

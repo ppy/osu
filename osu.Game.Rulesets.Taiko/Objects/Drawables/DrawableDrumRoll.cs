@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 case ArmedState.Hit:
                 case ArmedState.Miss:
-                    this.Delay(HitObject.Duration).FadeOut(100).Expire();
+                    this.Delay(HitObject.Duration).FadeOut(100);
                     break;
             }
         }
