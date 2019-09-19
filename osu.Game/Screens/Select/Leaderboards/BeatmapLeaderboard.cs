@@ -14,13 +14,12 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
+using osu.Game.Screens.Select.Details;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
-        public Bindable<APILegacyUserTopScoreInfo> TopScore = new Bindable<APILegacyUserTopScoreInfo>();
-
         public Action<ScoreInfo> ScoreSelected;
 
         private BeatmapInfo beatmap;
@@ -40,7 +39,24 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
+        public APILegacyUserTopScoreInfo TopScore
+        {
+            get => topScoreContainer.Score.Value;
+            set
+            {
+                if (value == null)
+                    topScoreContainer.Hide();
+                else
+                {
+                    topScoreContainer.Show();
+                    topScoreContainer.Score.Value = value;
+                }
+            }
+        }
+
         private bool filterMods;
+
+        private UserTopScoreContainer topScoreContainer;
 
         /// <summary>
         /// Whether to apply the game's currently selected mods as a filter when retrieving scores.
@@ -81,25 +97,19 @@ namespace osu.Game.Screens.Select.Leaderboards
                     UpdateScores();
             };
 
-            TopScore.BindValueChanged(newTopScore);
+            Content.Add(topScoreContainer = new UserTopScoreContainer());
         }
 
-        private void newTopScore(ValueChangedEvent<APILegacyUserTopScoreInfo> score)
+        protected override void Reset()
         {
-            Content.Clear();
-
-            if (score.NewValue != null)
-            {
-
-            }
+            base.Reset();
+            TopScore = null;
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
 
         protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
         {
-            TopScore.Value = null;
-
             if (Beatmap == null)
             {
                 PlaceholderState = PlaceholderState.NoneSelected;
@@ -161,7 +171,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             req.Success += r =>
             {
                 scoresCallback?.Invoke(r.Scores);
-                TopScore.Value = r.UserScore;
+                TopScore = r.UserScore;
             };
 
             return req;

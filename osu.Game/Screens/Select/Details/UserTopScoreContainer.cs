@@ -17,9 +17,8 @@ namespace osu.Game.Screens.Select.Details
     public class UserTopScoreContainer : VisibilityContainer
     {
         private const int height = 90;
-        private const int duration = 800;
+        private const int duration = 500;
 
-        private readonly Container contentContainer;
         private readonly Container scoreContainer;
 
         public Bindable<APILegacyUserTopScoreInfo> Score = new Bindable<APILegacyUserTopScoreInfo>();
@@ -38,7 +37,7 @@ namespace osu.Game.Screens.Select.Details
 
             Children = new Drawable[]
             {
-                contentContainer = new Container
+                new Container
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -74,14 +73,11 @@ namespace osu.Game.Screens.Select.Details
         {
             var newScore = score.NewValue;
 
-            if (newScore == null)
-            {
-                Hide();
-                return;
-            }
-
             scoreContainer.Clear();
             loadScoreCancellation?.Cancel();
+
+            if (newScore == null)
+                return;
 
             LoadComponentAsync(new LeaderboardScore(newScore.Score, newScore.Position)
             {
@@ -93,12 +89,14 @@ namespace osu.Game.Screens.Select.Details
             }, (loadScoreCancellation = new CancellationTokenSource()).Token);
         }
 
-        protected override void PopIn() => this.ResizeHeightTo(height, duration / 4f, Easing.OutQuint).OnComplete(_ => contentContainer.FadeIn(duration, Easing.OutQuint));
+        protected override void PopIn()
+        {
+            this.FadeIn(duration, Easing.OutQuint);
+        }
 
         protected override void PopOut()
         {
-            this.ResizeHeightTo(0);
-            contentContainer.FadeOut(duration / 4f, Easing.OutQuint);
+            this.FadeOut(duration, Easing.OutQuint);
         }
     }
 }
