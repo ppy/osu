@@ -241,6 +241,8 @@ namespace osu.Game.Screens.Select
 
         private void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
         {
+            updateCriteriaRange(ref range, op, value);
+
             switch (op)
             {
                 case "=":
@@ -249,12 +251,12 @@ namespace osu.Game.Screens.Select
                     range.Max = value + tolerance;
                     break;
             }
-
-            updateCriteriaRange(ref range, op, value);
         }
 
-        private void updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, string op, double value, double tolerance = 0.05f)
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, string op, double value, double tolerance = 0.05)
         {
+            updateCriteriaRange(ref range, op, value);
+
             switch (op)
             {
                 case "=":
@@ -263,8 +265,6 @@ namespace osu.Game.Screens.Select
                     range.Max = value + tolerance;
                     break;
             }
-
-            updateCriteriaRange(ref range, op, value);
         }
 
         private void updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, string op, T value)
@@ -278,6 +278,8 @@ namespace osu.Game.Screens.Select
                 case "=":
                 case ":":
                     range.IsInclusive = true;
+                    range.Min = value;
+                    range.Max = value;
                     break;
 
                 case ">":
