@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Select
                         break;
                 }
 
-                query = query.Remove(match.Index, match.Length);
+                query = query.Replace(match.ToString(), "");
             }
         }
 
