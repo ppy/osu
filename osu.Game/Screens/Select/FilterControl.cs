@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Select
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
 
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status)(?<op>[:><]+)(?<value>\S*)",
+            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status)(?<op>[=:><]+)(?<value>\S*)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private void applyQueries(FilterCriteria criteria, ref string query)
@@ -246,6 +246,7 @@ namespace osu.Game.Screens.Select
                 default:
                     return;
 
+                case "=":
                 case ":":
                     range.IsInclusive = true;
                     range.Min = value - equalityToleration;
@@ -257,6 +258,7 @@ namespace osu.Game.Screens.Select
                     range.Min = value;
                     break;
 
+                case ">=":
                 case ">:":
                     range.IsInclusive = true;
                     range.Min = value;
@@ -267,6 +269,7 @@ namespace osu.Game.Screens.Select
                     range.Max = value;
                     break;
 
+                case "<=":
                 case "<:":
                     range.IsInclusive = true;
                     range.Max = value;
