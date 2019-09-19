@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select
                     if (comparison < 0)
                         return false;
 
-                    if (!IsInclusive && comparison == 0)
+                    if (comparison == 0 && !IsInclusive)
                         return false;
                 }
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
                     if (comparison > 0)
                         return false;
 
-                    if (!IsInclusive && comparison == 0)
+                    if (comparison == 0 && !IsInclusive)
                         return false;
                 }
 
