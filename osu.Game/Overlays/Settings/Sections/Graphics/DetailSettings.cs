@@ -26,11 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Video",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowVideoBackground)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Rotate cursor when dragging",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
-                },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",

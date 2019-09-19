@@ -137,9 +137,9 @@ namespace osu.Game.Rulesets.UI
             {
             }
 
-            public bool OnPressed(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(action));
+            public bool OnPressed(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnPressed(action, Clock.ElapsedFrameTime > 0));
 
-            public bool OnReleased(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnReleased(action));
+            public bool OnReleased(T action) => Target.Children.OfType<KeyCounterAction<T>>().Any(c => c.OnReleased(action, Clock.ElapsedFrameTime > 0));
         }
 
         #endregion
