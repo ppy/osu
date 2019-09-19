@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private DialogOverlay dialogOverlay { get; set; }
 
         private BackgroundScreenDefault background;
@@ -237,9 +237,9 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
-            if (holdDelay.Value == 0 && !exitConfirmed)
+            if (holdDelay.Value == 0 && !exitConfirmed && dialogOverlay != null)
             {
-                dialogOverlay?.Push(new ConfirmExitDialog(() =>
+                dialogOverlay.Push(new ConfirmExitDialog(() =>
                 {
                     exitConfirmed = true;
                     this.Exit();
