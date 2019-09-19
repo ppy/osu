@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 1;
 
         // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween), typeof(OsuModHidden) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween), typeof(OsuModHidden), typeof(OsuModTraceable) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;
