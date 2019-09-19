@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         t.Font = fontSmall;
                         t.Colour = entryColour;
-                        t.Padding = new MarginPadding { Left = -17, Right = 5, Top= -1 };
+                        t.Padding = new MarginPadding { Left = -17, Right = 5, Top = -1 };
                     });
 
                     title.AddText(entry.Title, t =>
