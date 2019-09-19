@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
 
-        private void updateSliderBallTint() => Ball.Colour = (alwaysTintSliderBall.Value | allowSliderBallTint) ? AccentColour.Value : Color4.White;
+        private void updateSliderBallTint() => Ball.Colour = (alwaysTintSliderBall.Value || allowSliderBallTint) ? AccentColour.Value : Color4.White;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
