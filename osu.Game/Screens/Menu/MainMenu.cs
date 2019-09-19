@@ -1,18 +1,22 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Dialog;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
 using osu.Game.Screens.Edit;
@@ -51,15 +55,22 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private DialogOverlay dialogOverlay { get; set; }
+
         private BackgroundScreenDefault background;
 
         protected override BackgroundScreen CreateBackground() => background;
 
+        private Bindable<int> holdDelay;
+
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, SettingsOverlay settings)
+        private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config)
         {
             if (host.CanExit)
                 AddInternal(new ExitConfirmOverlay { Action = this.Exit });
+
+            holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
 
             AddRangeInternal(new Drawable[]
             {
@@ -141,6 +152,7 @@ namespace osu.Game.Screens.Menu
         }
 
         private bool loginDisplayed;
+        private bool exitConfirmed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
@@ -221,9 +233,44 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
+            if (holdDelay.Value == 0 && !exitConfirmed)
+            {
+                dialogOverlay?.Push(new ConfirmExitDialog(() =>
+                {
+                    exitConfirmed = true;
+                    this.Exit();
+                }));
+
+                return true;
+            }
+
             buttons.State = ButtonSystemState.Exit;
             this.FadeOut(3000);
             return base.OnExiting(next);
+        }
+
+        public class ConfirmExitDialog : PopupDialog
+        {
+            public ConfirmExitDialog(Action confirm)
+            {
+                HeaderText = "Are you sure you want to exit?";
+                BodyText = "Last chance to back out.";
+
+                Icon = FontAwesome.Solid.ExclamationTriangle;
+
+                Buttons = new PopupDialogButton[]
+                {
+                    new PopupDialogOkButton
+                    {
+                        Text = @"Good bye",
+                        Action = confirm
+                    },
+                    new PopupDialogCancelButton
+                    {
+                        Text = @"Just a little more"
+                    },
+                };
+            }
         }
     }
 }
