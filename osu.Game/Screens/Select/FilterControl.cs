@@ -239,8 +239,36 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, string op, T value, double tolerance = 0.05f)
-            where T : struct, IComparable<T>
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
+        {
+            switch (op)
+            {
+                case "=":
+                case ":":
+                    range.Min = value - tolerance;
+                    range.Max = value + tolerance;
+                    break;
+            }
+
+            updateCriteriaRange(ref range, op, value);
+        }
+
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, string op, double value, double tolerance = 0.05f)
+        {
+            switch (op)
+            {
+                case "=":
+                case ":":
+                    range.Min = value - tolerance;
+                    range.Max = value + tolerance;
+                    break;
+            }
+
+            updateCriteriaRange(ref range, op, value);
+        }
+
+        private void updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, string op, T value)
+            where T : struct, IComparable
         {
             switch (op)
             {
@@ -250,20 +278,6 @@ namespace osu.Game.Screens.Select
                 case "=":
                 case ":":
                     range.IsInclusive = true;
-
-                    switch (value)
-                    {
-                        case float _:
-                            range.Min = (T)(object)((float)(object)value - tolerance);
-                            range.Max = (T)(object)((float)(object)value + tolerance);
-                            break;
-
-                        case double _:
-                            range.Min = (T)(object)((double)(object)value - tolerance);
-                            range.Max = (T)(object)((double)(object)value + tolerance);
-                            break;
-                    }
-
                     break;
 
                 case ">":
