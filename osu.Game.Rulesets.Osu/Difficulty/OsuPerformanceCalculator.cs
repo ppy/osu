@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
-        private const double totalValueExponent = 1.5;
+        private const double totalValueExponent = 1.7f;
         private const double comboWeight = 0.5;
         private const double skillToPPExponent = 2.7;
 
