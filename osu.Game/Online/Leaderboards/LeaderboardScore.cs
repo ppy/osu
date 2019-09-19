@@ -80,7 +80,7 @@ namespace osu.Game.Online.Leaderboards
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank <= 999 ? rank.ToString() : rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },
