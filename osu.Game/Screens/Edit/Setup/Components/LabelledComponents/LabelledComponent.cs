@@ -6,9 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {
@@ -18,38 +16,19 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
         protected const float CORNER_RADIUS = 15;
 
-        private readonly Box background;
-        private readonly OsuSpriteText label;
-        private readonly OsuSpriteText bottomText;
+        protected readonly Drawable Component;
+
+        private readonly OsuTextFlowContainer label;
+        private readonly OsuTextFlowContainer bottomText;
 
         public string LabelText
         {
-            get => label.Text;
             set => label.Text = value;
         }
 
         public string BottomLabelText
         {
-            get => bottomText.Text;
             set => bottomText.Text = value;
-        }
-
-        public float LabelTextSize
-        {
-            get => label.Font.Size;
-            set => label.Font = label.Font.With(size: value);
-        }
-
-        public Color4 LabelTextColour
-        {
-            get => label.Colour;
-            set => label.Colour = value;
-        }
-
-        public Color4 BackgroundColour
-        {
-            get => background.Colour;
-            set => background.Colour = value;
         }
 
         protected LabelledComponent()
@@ -60,10 +39,9 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
             CornerRadius = CORNER_RADIUS;
             Masking = true;
 
-            Drawable component;
             InternalChildren = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex("1c2125"),
@@ -73,36 +51,51 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = CONTENT_PADDING_HORIZONTAL, Vertical = CONTENT_PADDING_VERTICAL },
-                    Spacing = new Vector2(0, 10),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new Container
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Children = new[]
+                            Content = new[]
                             {
-                                label = new OsuSpriteText
+                                new Drawable[]
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Colour = Color4.White,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold)
+                                    label = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(weight: FontWeight.Bold))
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding
+                                        {
+                                            Right = ExpandComponent ? 0 : -CONTENT_PADDING_HORIZONTAL,
+                                            Vertical = ExpandComponent ? 0 : -CONTENT_PADDING_VERTICAL
+                                        },
+                                        Child = Component = CreateComponent().With(d =>
+                                        {
+                                            d.Anchor = Anchor.TopRight;
+                                            d.Origin = Anchor.TopRight;
+                                        })
+                                    }
                                 },
-                                component = CreateComponent(),
                             },
+                            RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
                         },
-                        bottomText = new OsuSpriteText
+                        bottomText = new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true))
                         {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold, italics: true)
-                        },
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        }
                     }
                 }
             };
-
-            component.Anchor = Anchor.TopRight;
-            component.Origin = Anchor.TopRight;
         }
 
         [BackgroundDependencyLoader]
@@ -110,6 +103,11 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
         {
             bottomText.Colour = osuColour.Yellow;
         }
+
+        /// <summary>
+        /// Whether to expand the component to fill the entire available extents.
+        /// </summary>
+        protected virtual bool ExpandComponent => true;
 
         protected abstract Drawable CreateComponent();
     }
