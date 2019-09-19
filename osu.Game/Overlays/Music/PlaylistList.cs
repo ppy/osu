@@ -87,25 +87,24 @@ namespace osu.Game.Overlays.Music
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
-            {
-                if (obj == draggedItem?.BeatmapSetInfo)
-                {
-                    draggedItem = null;
-                    return;
-                }
-
-                items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) });
-            });
-
-            private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
+            private void addBeatmapSet(BeatmapSetInfo obj)
             {
                 if (obj == draggedItem?.BeatmapSetInfo) return;
 
-                var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
-                if (itemToRemove != null)
-                    items.Remove(itemToRemove);
-            });
+                Schedule(() => items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) }));
+            }
+
+            private void removeBeatmapSet(BeatmapSetInfo obj)
+            {
+                if (obj == draggedItem?.BeatmapSetInfo) return;
+
+                Schedule(() =>
+                {
+                    var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
+                    if (itemToRemove != null)
+                        items.Remove(itemToRemove);
+                });
+            }
 
             private void updateSelectedSet()
             {
@@ -146,19 +145,16 @@ namespace osu.Game.Overlays.Music
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
 
-                if (draggedItem != null)
-                {
-                    if (dragDestination != null)
-                    {
-                        // draggedItem is nulled when the BindableList's add event is received so we can quietly ignore the callbacks.
-                        musicController.ChangeBeatmapSetPosition(draggedItem.BeatmapSetInfo, dragDestination.Value);
-                        dragDestination = null;
-                    }
+                if (draggedItem == null)
+                    return base.OnDragEnd(e);
 
-                    return true;
-                }
+                if (dragDestination != null)
+                    musicController.ChangeBeatmapSetPosition(draggedItem.BeatmapSetInfo, dragDestination.Value);
 
-                return base.OnDragEnd(e);
+                draggedItem = null;
+                dragDestination = null;
+
+                return true;
             }
 
             protected override void Update()
