@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Judgements
                     Font = OsuFont.Numeric.With(size: 20),
                     Colour = judgementColour(Result.Type),
                     Scale = new Vector2(0.85f, 1),
-                })
+                }, confineMode: ConfineMode.NoScaling)
             };
         }
 
