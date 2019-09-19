@@ -70,7 +70,7 @@ namespace osu.Game.Overlays
 
             Header.Tabs.Current.ValueChanged += _ => queueUpdate();
 
-            Filter.Tabs.Current.ValueChanged += _ => queueUpdate();
+            Filter.Tabs.Current.ValueChanged += _ => onFilterUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => updateUsers(Users);
@@ -178,6 +178,17 @@ namespace osu.Game.Overlays
                 loading.Hide();
                 ScrollFlow.Add(panels = newPanels);
             }, loadCancellation.Token);
+        }
+
+        private void onFilterUpdate()
+        {
+            if (Users == null || Filter.Tabs.Current.Value == SocialSortCriteria.Rank)
+            {
+                queueUpdate();
+                return;
+            }
+
+            updateUsers(Users);
         }
 
         private void updateUsers(IEnumerable<User> newUsers)
