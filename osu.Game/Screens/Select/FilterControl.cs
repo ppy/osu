@@ -230,8 +230,8 @@ namespace osu.Game.Screens.Select
                         updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
                         break;
 
-                    case "status" when op == ":" && Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var statusValue):
-                        criteria.OnlineStatus = statusValue;
+                    case "status" when Enum.TryParse<BeatmapSetOnlineStatus>(value, true, out var statusValue):
+                        updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
                         break;
                 }
 
