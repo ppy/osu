@@ -33,6 +33,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
+        public readonly HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
@@ -84,6 +85,7 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
+                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -229,7 +231,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
-            FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
@@ -255,6 +256,8 @@ namespace osu.Game.Screens.Play
             AutoSizeAxes = Axes.Both,
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
+
+        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 

@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Select
                     Size = new Vector2(wedged_container_size.X, 1),
                     Padding = new MarginPadding
                     {
-                        Bottom = 50,
+                        Bottom = Footer.HEIGHT,
                         Top = wedged_container_size.Y + left_area_padding,
                         Left = left_area_padding,
                         Right = left_area_padding * 2,
@@ -147,20 +147,28 @@ namespace osu.Game.Screens.Select
                         Width = 0.5f,
                         Children = new Drawable[]
                         {
-                            Carousel = new BeatmapCarousel
+                            new Container
                             {
-                                Masking = false,
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1 - wedged_container_size.X, 1),
-                                Anchor = Anchor.CentreRight,
-                                Origin = Anchor.CentreRight,
-                                SelectionChanged = updateSelectedBeatmap,
-                                BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                Padding = new MarginPadding
+                                {
+                                    Top = FilterControl.HEIGHT,
+                                    Bottom = Footer.HEIGHT
+                                },
+                                Child = Carousel = new BeatmapCarousel
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(1 - wedged_container_size.X, 1),
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    SelectionChanged = updateSelectedBeatmap,
+                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                },
                             },
                             FilterControl = new FilterControl
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 100,
+                                Height = FilterControl.HEIGHT,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
                                 Exit = () =>
@@ -354,6 +362,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             beatmapNoDebounce = beatmap;
+
             performUpdateSelected();
         }
 
@@ -408,7 +417,11 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+                    WorkingBeatmap previous = Beatmap.Value;
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
+
+                    if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
+                        ensurePlayingSelected();
 
                     if (beatmap != null)
                     {
@@ -419,8 +432,6 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
-                if (this.IsCurrentScreen())
-                    ensurePlayingSelected();
                 UpdateBeatmap(Beatmap.Value);
             }
         }
@@ -581,10 +592,18 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            if ((!track.IsRunning || restart) && music?.IsUserPaused != true)
+            if (!track.IsRunning || restart)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
-                track.Restart();
+
+                if (music != null)
+                {
+                    // use the global music controller (when available) to cancel a potential local user paused state.
+                    music.SeekTo(track.RestartPoint);
+                    music.Play();
+                }
+                else
+                    track.Restart();
             }
         }
 

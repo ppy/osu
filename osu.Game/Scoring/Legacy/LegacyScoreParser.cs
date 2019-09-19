@@ -80,6 +80,9 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.OnlineScoreID = sr.ReadInt32();
 
+                if (scoreInfo.OnlineScoreID <= 0)
+                    scoreInfo.OnlineScoreID = null;
+
                 if (compressedReplay?.Length > 0)
                 {
                     using (var replayInStream = new MemoryStream(compressedReplay))
@@ -215,6 +218,7 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = 0;
+            ReplayFrame currentFrame = null;
 
             foreach (var l in reader.ReadToEnd().Split(','))
             {
@@ -237,23 +241,25 @@ namespace osu.Game.Scoring.Legacy
                 if (diff < 0)
                     continue;
 
-                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime,
+                currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
                     Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE),
                     Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE),
-                    (ReplayButtonState)Parsing.ParseInt(split[3]))));
+                    (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
+
+                replay.Frames.Add(currentFrame);
             }
         }
 
-        private ReplayFrame convertFrame(LegacyReplayFrame legacyFrame)
+        private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, ReplayFrame lastFrame)
         {
             var convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 
-            convertible.ConvertFrom(legacyFrame, currentBeatmap);
+            convertible.ConvertFrom(currentFrame, currentBeatmap, lastFrame);
 
             var frame = (ReplayFrame)convertible;
-            frame.Time = legacyFrame.Time;
+            frame.Time = currentFrame.Time;
 
             return frame;
         }

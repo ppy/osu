@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
-                    Texture = textures.Get("Play/osu/blinds-panel");
+                    Texture = textures.Get("Gameplay/osu/blinds-panel");
                 }
             }
         }

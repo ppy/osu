@@ -215,6 +215,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(1),
                                     ChildrenEnumerable = score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },

@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Drawables;
@@ -36,13 +36,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
-        protected override void UpdateInitialTransforms() => this.FadeIn(HitObject.TimeFadeIn);
-
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            base.UpdateStateTransforms(state);
+
+            switch (state)
+            {
+                case ArmedState.Idle:
+                    // Manually set to reduce the number of future alive objects to a bare minimum.
+                    LifetimeStart = HitObject.StartTime - HitObject.TimePreempt;
+                    break;
+            }
+        }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
     }
 }

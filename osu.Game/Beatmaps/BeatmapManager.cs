@@ -13,6 +13,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -340,6 +341,7 @@ namespace osu.Game.Beatmaps
 
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
+            protected override VideoSprite GetVideo() => null;
             protected override Track GetTrack() => null;
         }
 
@@ -386,7 +388,7 @@ namespace osu.Game.Beatmaps
                     beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
                 };
 
-                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap}", e); };
+                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
 
                 // intentionally blocking to limit web request concurrency
                 req.Perform(api);

@@ -2,12 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -56,6 +58,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
+        [CanBeNull]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -111,11 +114,12 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
-        /// This can be null to indicate that the <see cref="HitObject"/> has no <see cref="HitWindows"/>.
+        /// This can be null to indicate that the <see cref="HitObject"/> has no <see cref="HitWindows"/> and timing errors should not be displayed to the user.
         /// <para>
         /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter{T}"/>.
         /// </para>
         /// </summary>
+        [CanBeNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }

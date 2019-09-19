@@ -3,8 +3,10 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -12,7 +14,18 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const double OBJECT_RADIUS = 44;
 
-        public float X { get; set; }
+        private float x;
+
+        public float X
+        {
+            get => x + XOffset;
+            set => x = value;
+        }
+
+        /// <summary>
+        /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
+        /// </summary>
+        internal float XOffset { get; set; }
 
         public double TimePreempt = 1000;
 

@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        private Cached<Vector2> endPositionCache;
+        private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
         public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
 
@@ -229,5 +230,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 }
