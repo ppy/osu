@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
+namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {
     public class LabelledSwitchButton : LabelledComponent, IHasCurrentValue<bool>
     {

@@ -10,7 +10,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
+namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {
     public abstract class LabelledComponent : CompositeDrawable
     {
