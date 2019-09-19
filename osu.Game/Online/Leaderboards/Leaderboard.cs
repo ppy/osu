@@ -120,9 +120,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 if (value != PlaceholderState.Successful)
                 {
-                    getScoresRequest?.Cancel();
-                    getScoresRequest = null;
-                    Scores = null;
+                    Reset();
                 }
 
                 if (value == placeholderState)
@@ -166,7 +164,7 @@ namespace osu.Game.Online.Leaderboards
 
         protected Leaderboard()
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new GridContainer
                 {
@@ -202,6 +200,13 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Both
                 },
             };
+        }
+
+        protected virtual void Reset()
+        {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+            Scores = null;
         }
 
         private IAPIProvider api;
