@@ -76,7 +76,7 @@ namespace osu.Game.Overlays.Changelog
 
                     var entryColour = entry.Major ? colours.YellowLight : Color4.White;
 
-                    title.AddIcon(FontAwesome.Solid.Check, t =>
+                    title.AddIcon(entry.Type == "add" ? FontAwesome.Solid.Plus : FontAwesome.Solid.Check, t =>
                     {
                         t.Font = fontSmall;
                         t.Colour = entryColour;
