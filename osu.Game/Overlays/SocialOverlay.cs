@@ -182,7 +182,7 @@ namespace osu.Game.Overlays
 
         private void onFilterUpdate()
         {
-            if (Users == null || Filter.Tabs.Current.Value == SocialSortCriteria.Rank)
+            if (Filter.Tabs.Current.Value == SocialSortCriteria.Rank)
             {
                 queueUpdate();
                 return;
