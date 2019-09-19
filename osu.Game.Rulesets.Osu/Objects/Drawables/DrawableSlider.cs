@@ -163,9 +163,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private float sliderPathRadius;
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.ApplySkin(skin, allowFallback);
 
             Body.BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? SliderBody.DEFAULT_BORDER_SIZE;
             sliderPathRadius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
@@ -202,6 +202,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             Ball.FadeIn();
             Ball.ScaleTo(HitObject.Scale);
 
@@ -219,10 +221,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         break;
                 }
 
-                this.FadeOut(fade_out_time, Easing.OutQuint).Expire();
+                this.FadeOut(fade_out_time, Easing.OutQuint);
             }
-
-            Expire(true);
         }
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
