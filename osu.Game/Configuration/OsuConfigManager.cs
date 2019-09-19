@@ -69,6 +69,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowFpsDisplay, false);
 
             Set(OsuSetting.ShowStoryboard, true);
+            Set(OsuSetting.ShowVideoBackground, true);
             Set(OsuSetting.BeatmapSkins, true);
             Set(OsuSetting.BeatmapHitsounds, true);
 
@@ -79,6 +80,8 @@ namespace osu.Game.Configuration
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+
+            Set(OsuSetting.HitLighting, true);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -136,6 +139,7 @@ namespace osu.Game.Configuration
         DimLevel,
         BlurLevel,
         ShowStoryboard,
+        ShowVideoBackground,
         KeyOverlay,
         ScoreMeter,
         FloatingComments,
@@ -178,6 +182,7 @@ namespace osu.Game.Configuration
         ScalingSizeX,
         ScalingSizeY,
         UIScale,
-        IntroSequence
+        IntroSequence,
+        HitLighting
     }
 }
