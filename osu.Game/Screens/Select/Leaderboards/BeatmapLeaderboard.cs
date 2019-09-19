@@ -80,6 +80,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                 if (filterMods)
                     UpdateScores();
             };
+
+            TopScore.BindValueChanged(newTopScore);
+        }
+
+        private void newTopScore(ValueChangedEvent<APILegacyUserTopScoreInfo> score)
+        {
+            Content.Clear();
+
+            if (score.NewValue != null)
+            {
+
+            }
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
