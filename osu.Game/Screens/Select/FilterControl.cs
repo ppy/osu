@@ -196,19 +196,19 @@ namespace osu.Game.Screens.Select
 
                 switch (key)
                 {
-                    case "stars" when double.TryParse(value, out var stars):
+                    case "stars" when float.TryParse(value, out var stars):
                         updateCriteriaRange(ref criteria.StarDifficulty, op, stars);
                         break;
 
-                    case "ar" when double.TryParse(value, out var ar):
+                    case "ar" when float.TryParse(value, out var ar):
                         updateCriteriaRange(ref criteria.ApproachRate, op, ar);
                         break;
 
-                    case "dr" when double.TryParse(value, out var dr):
+                    case "dr" when float.TryParse(value, out var dr):
                         updateCriteriaRange(ref criteria.DrainRate, op, dr);
                         break;
 
-                    case "cs" when double.TryParse(value, out var cs):
+                    case "cs" when float.TryParse(value, out var cs):
                         updateCriteriaRange(ref criteria.CircleSize, op, cs);
                         break;
 
@@ -239,7 +239,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double tolerance = 0.05)
+        private void updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, string op, T value, double tolerance = 0.05f)
+            where T : struct, IComparable<T>
         {
             switch (op)
             {
@@ -249,8 +250,20 @@ namespace osu.Game.Screens.Select
                 case "=":
                 case ":":
                     range.IsInclusive = true;
-                    range.Min = value - tolerance;
-                    range.Max = value + tolerance;
+
+                    switch (value)
+                    {
+                        case float _:
+                            range.Min = (T)(object)((float)(object)value - tolerance);
+                            range.Max = (T)(object)((float)(object)value + tolerance);
+                            break;
+
+                        case double _:
+                            range.Min = (T)(object)((double)(object)value - tolerance);
+                            range.Max = (T)(object)((double)(object)value + tolerance);
+                            break;
+                    }
+
                     break;
 
                 case ">":
