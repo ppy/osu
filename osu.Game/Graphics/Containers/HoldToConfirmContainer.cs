@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -12,10 +14,7 @@ namespace osu.Game.Graphics.Containers
     {
         public Action Action;
 
-        private const int default_activation_delay = 200;
         private const int fadeout_delay = 200;
-
-        private readonly double activationDelay;
 
         private bool fired;
         private bool confirming;
@@ -27,13 +26,12 @@ namespace osu.Game.Graphics.Containers
 
         public Bindable<double> Progress = new BindableDouble();
 
-        /// <summary>
-        /// Create a new instance.
-        /// </summary>
-        /// <param name="activationDelay">The time requried before an action is confirmed.</param>
-        protected HoldToConfirmContainer(double activationDelay = default_activation_delay)
+        private Bindable<int> holdActivationDelay;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            this.activationDelay = activationDelay;
+            holdActivationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
         }
 
         protected void BeginConfirm()
@@ -42,7 +40,7 @@ namespace osu.Game.Graphics.Containers
 
             confirming = true;
 
-            this.TransformBindableTo(Progress, 1, activationDelay * (1 - Progress.Value), Easing.Out).OnComplete(_ => Confirm());
+            this.TransformBindableTo(Progress, 1, holdActivationDelay.Value * (1 - Progress.Value), Easing.Out).OnComplete(_ => Confirm());
         }
 
         protected virtual void Confirm()
