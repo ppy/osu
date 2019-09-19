@@ -240,7 +240,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         #endregion
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected sealed override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
 
@@ -250,6 +250,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
             }
+
+            ApplySkin(skin, allowFallback);
+
+            if (IsLoaded)
+                updateState(State.Value, true);
+        }
+
+        /// <summary>
+        /// Called when a change is made to the skin.
+        /// </summary>
+        /// <param name="skin">The new skin.</param>
+        /// <param name="allowFallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
+        protected virtual void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
         }
 
         /// <summary>
