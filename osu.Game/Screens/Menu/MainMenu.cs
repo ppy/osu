@@ -69,10 +69,21 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config)
         {
-            if (host.CanExit)
-                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay { Action = this.Exit });
-
             holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+
+            if (host.CanExit)
+            {
+                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
+                {
+                    Action = () =>
+                    {
+                        if (holdDelay.Value > 0)
+                            confirmAndExit();
+                        else
+                            this.Exit();
+                    }
+                });
+            }
 
             AddRangeInternal(new Drawable[]
             {
@@ -241,7 +252,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
-            if (holdDelay.Value == 0 && !exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+            if (!exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
             {
                 dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
                 return true;
