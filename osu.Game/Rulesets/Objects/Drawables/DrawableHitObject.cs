@@ -253,7 +253,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             ApplySkin(skin, allowFallback);
 
-            updateState(State.Value, true);
+            if (IsLoaded)
+                updateState(State.Value, true);
         }
 
         /// <summary>
