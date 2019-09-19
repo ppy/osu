@@ -36,15 +36,18 @@ namespace osu.Game.Tests.Visual.UserInterface
                 setMaxPages(200);
                 setCurrentPage(201);
             });
+            AddAssert("Current equals max", () => pageSelector.CurrentPage.Value == pageSelector.MaxPages.Value);
             AddStep("200 max pages, current -10", () =>
             {
                 setMaxPages(200);
                 setCurrentPage(-10);
             });
+            AddAssert("Current is 1", () => pageSelector.CurrentPage.Value == 1);
             AddStep("-10 max pages", () =>
             {
                 setMaxPages(-10);
             });
+            AddAssert("Current is 1, max is 1", () => pageSelector.CurrentPage.Value == 1 && pageSelector.MaxPages.Value == 1);
         }
 
         private void setMaxPages(int maxPages) => pageSelector.MaxPages.Value = maxPages;
