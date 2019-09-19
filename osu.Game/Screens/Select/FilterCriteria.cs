@@ -14,12 +14,12 @@ namespace osu.Game.Screens.Select
         public GroupMode Group;
         public SortMode Sort;
 
-        public OptionalRange StarDifficulty;
-        public OptionalRange ApproachRate;
-        public OptionalRange DrainRate;
-        public OptionalRange CircleSize;
-        public OptionalRange Length;
-        public OptionalRange BPM;
+        public OptionalRange<double> StarDifficulty;
+        public OptionalRange<float> ApproachRate;
+        public OptionalRange<float> DrainRate;
+        public OptionalRange<float> CircleSize;
+        public OptionalRange<double> Length;
+        public OptionalRange<double> BPM;
 
         public int? BeatDivisor;
 
@@ -42,23 +42,44 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public struct OptionalRange : IEquatable<OptionalRange>
+        public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
+            where T : struct, IComparable<T>
         {
-            public bool IsInRange(double value)
+            public bool IsInRange(T value)
             {
-                if (Min.HasValue && (IsInclusive ? value < Min.Value : value <= Min.Value))
-                    return false;
-                if (Max.HasValue && (IsInclusive ? value > Max.Value : value >= Max.Value))
-                    return false;
+                if (Min.HasValue)
+                {
+                    int comparison = value.CompareTo(Min.Value);
+
+                    if (comparison < 0)
+                        return false;
+
+                    if (!IsInclusive && comparison == 0)
+                        return false;
+                }
+
+                if (Max.HasValue)
+                {
+                    int comparison = value.CompareTo(Max.Value);
+
+                    if (comparison > 0)
+                        return false;
+
+                    if (!IsInclusive && comparison == 0)
+                        return false;
+                }
 
                 return true;
             }
 
-            public double? Min;
-            public double? Max;
+            public T? Min;
+            public T? Max;
             public bool IsInclusive;
 
-            public bool Equals(OptionalRange range) => Min == range.Min && Max == range.Max;
+            public bool Equals(OptionalRange<T> other)
+                => Min.Equals(other.Min)
+                   && Max.Equals(other.Max)
+                   && IsInclusive.Equals(other.IsInclusive);
         }
     }
 }
