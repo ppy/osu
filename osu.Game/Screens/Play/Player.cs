@@ -88,7 +88,6 @@ namespace osu.Game.Screens.Play
 
         /// <summary>
         /// Whether failing should be allowed.
-        ///
         /// By default, this checks whether all selected mods allow failing.
         /// </summary>
         protected virtual bool AllowFail => Mods.Value.OfType<IApplicableFailOverride>().All(m => m.AllowFail);
