@@ -35,6 +35,10 @@ namespace osu.Game.Online.Leaderboards
 
         private bool scoresLoadedOnce;
 
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
+
         private IEnumerable<ScoreInfo> scores;
 
         public IEnumerable<ScoreInfo> Scores
@@ -60,13 +64,13 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var sf = CreateScoreFlow();
-                sf.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
+                var scoreFlow = CreateScoreFlow();
+                scoreFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate = Schedule(() => LoadComponentAsync(sf, _ =>
+                showScoresDelegate = Schedule(() => LoadComponentAsync(scoreFlow, _ =>
                 {
-                    scrollContainer.Add(scrollFlow = sf);
+                    scrollContainer.Add(scrollFlow = scoreFlow);
 
                     int i = 0;
 
@@ -164,10 +168,33 @@ namespace osu.Game.Online.Leaderboards
         {
             Children = new Drawable[]
             {
-                scrollContainer = new OsuScrollContainer
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            scrollContainer = new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ScrollbarVisible = false,
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            content = new Container
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        }
+                    },
                 },
                 loading = new LoadingAnimation(),
                 placeholderContainer = new Container
