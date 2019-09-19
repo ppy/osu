@@ -20,8 +20,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange<float> CircleSize;
         public OptionalRange<double> Length;
         public OptionalRange<double> BPM;
-
-        public int? BeatDivisor;
+        public OptionalRange<int> BeatDivisor;
 
         public BeatmapSetOnlineStatus? OnlineStatus;
 
