@@ -378,6 +378,10 @@ namespace osu.Game.Screens.Play
                 PauseOverlay.Hide();
 
             failAnimation.Start();
+
+            if (Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+                Restart();
+
             return true;
         }
 
