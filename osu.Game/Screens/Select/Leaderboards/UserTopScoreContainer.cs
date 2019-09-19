@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -11,6 +11,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
+using osuTK;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -40,6 +41,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
