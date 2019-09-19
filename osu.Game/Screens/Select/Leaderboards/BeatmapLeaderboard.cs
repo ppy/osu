@@ -96,7 +96,10 @@ namespace osu.Game.Screens.Select.Leaderboards
                     UpdateScores();
             };
 
-            Content.Add(topScoreContainer = new UserTopScoreContainer());
+            Content.Add(topScoreContainer = new UserTopScoreContainer
+            {
+                ScoreSelected = s => ScoreSelected?.Invoke(s)
+            });
         }
 
         protected override void Reset()
