@@ -36,11 +36,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Always tint slider ball with combo colour",
-                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.AlwaysTintSliderBall)
-                },
-                new SettingsCheckbox
-                {
                     LabelText = "Cursor trail",
                     Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },

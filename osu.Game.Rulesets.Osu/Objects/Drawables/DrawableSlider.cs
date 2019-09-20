@@ -109,7 +109,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             config?.BindWith(OsuRulesetSetting.SnakingInSliders, Body.SnakingIn);
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
-            config?.BindWith(OsuRulesetSetting.AlwaysTintSliderBall, alwaysTintSliderBall);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(scale =>
@@ -124,12 +123,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             pathBindable.BindValueChanged(_ => Body.Refresh());
 
-            alwaysTintSliderBall.BindValueChanged(_ => updateSliderBallTint());
-
             AccentColour.BindValueChanged(colour =>
             {
                 Body.AccentColour = colour.NewValue;
-                updateSliderBallTint();
 
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
@@ -181,13 +177,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Body.AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? AccentColour.Value;
             Body.BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
 
-            allowSliderBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
-            updateSliderBallTint();
+            bool allowBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
+            Ball.Colour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 
         private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
-
-        private void updateSliderBallTint() => Ball.Colour = (alwaysTintSliderBall.Value || allowSliderBallTint) ? AccentColour.Value : Color4.White;
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
