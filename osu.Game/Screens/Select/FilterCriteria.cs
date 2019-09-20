@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Select
                     if (comparison < 0)
                         return false;
 
-                    if (comparison == 0 && !IsInclusive)
+                    if (comparison == 0 && !IsLowerInclusive)
                         return false;
                 }
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
                     if (comparison > 0)
                         return false;
 
-                    if (comparison == 0 && !IsInclusive)
+                    if (comparison == 0 && !IsUpperInclusive)
                         return false;
                 }
 
@@ -73,12 +73,14 @@ namespace osu.Game.Screens.Select
 
             public T? Min;
             public T? Max;
-            public bool IsInclusive;
+            public bool IsLowerInclusive;
+            public bool IsUpperInclusive;
 
             public bool Equals(OptionalRange<T> other)
                 => Min.Equals(other.Min)
                    && Max.Equals(other.Max)
-                   && IsInclusive.Equals(other.IsInclusive);
+                   && IsLowerInclusive.Equals(other.IsLowerInclusive)
+                   && IsUpperInclusive.Equals(other.IsUpperInclusive);
         }
     }
 }
