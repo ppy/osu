@@ -590,7 +590,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
-        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
         protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();

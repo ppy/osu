@@ -56,6 +56,8 @@ namespace osu.Game.Scoring
             }
         }
 
+        protected override bool CanUndelete(ScoreInfo existing, ScoreInfo import) => false;
+
         protected override IEnumerable<string> GetStableImportPaths(Storage stableStorage)
             => stableStorage.GetFiles(ImportFromStablePath).Where(p => HandledExtensions.Any(ext => Path.GetExtension(p)?.Equals(ext, StringComparison.InvariantCultureIgnoreCase) ?? false));
 
