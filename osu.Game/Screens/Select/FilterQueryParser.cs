@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using osu.Game.Beatmaps;
 
@@ -23,27 +24,27 @@ namespace osu.Game.Screens.Select
 
                 switch (key)
                 {
-                    case "stars" when float.TryParse(value, out var stars):
+                    case "stars" when parseFloatWithPoint(value, out var stars):
                         updateCriteriaRange(ref criteria.StarDifficulty, op, stars);
                         break;
 
-                    case "ar" when float.TryParse(value, out var ar):
+                    case "ar" when parseFloatWithPoint(value, out var ar):
                         updateCriteriaRange(ref criteria.ApproachRate, op, ar);
                         break;
 
-                    case "dr" when float.TryParse(value, out var dr):
+                    case "dr" when parseFloatWithPoint(value, out var dr):
                         updateCriteriaRange(ref criteria.DrainRate, op, dr);
                         break;
 
-                    case "cs" when float.TryParse(value, out var cs):
+                    case "cs" when parseFloatWithPoint(value, out var cs):
                         updateCriteriaRange(ref criteria.CircleSize, op, cs);
                         break;
 
-                    case "bpm" when double.TryParse(value, out var bpm):
+                    case "bpm" when parseDoubleWithPoint(value, out var bpm):
                         updateCriteriaRange(ref criteria.BPM, op, bpm);
                         break;
 
-                    case "length" when double.TryParse(value.TrimEnd('m', 's', 'h'), out var length):
+                    case "length" when parseDoubleWithPoint(value.TrimEnd('m', 's', 'h'), out var length):
                         var scale =
                             value.EndsWith("ms") ? 1 :
                             value.EndsWith("s") ? 1000 :
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Select
                         updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
                         break;
 
-                    case "divisor" when int.TryParse(value, out var divisor):
+                    case "divisor" when parseInt(value, out var divisor):
                         updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
                         break;
 
@@ -67,6 +68,15 @@ namespace osu.Game.Screens.Select
 
             criteria.SearchText = query;
         }
+
+        private static bool parseFloatWithPoint(string value, out float result) =>
+            float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
+
+        private static bool parseDoubleWithPoint(string value, out double result) =>
+            double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
+
+        private static bool parseInt(string value, out int result) =>
+            int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
 
         private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
         {
