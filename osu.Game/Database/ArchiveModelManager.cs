@@ -111,7 +111,7 @@ namespace osu.Game.Database
         protected async Task Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = $"{HumanisedModelName.Humanize()}s import is initialising...";
+            notification.Text = $"{HumanisedModelName.Pluralize(paths.Length == 1)} import is initialising...".Humanize();
 
             int current = 0;
 
@@ -147,7 +147,7 @@ namespace osu.Game.Database
 
             if (imported.Count == 0)
             {
-                notification.Text = $"{HumanisedModelName.Humanize()}s import failed!";
+                notification.Text = $"{HumanisedModelName.Pluralize(paths.Length == 1)} import failed!".Humanize();
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
