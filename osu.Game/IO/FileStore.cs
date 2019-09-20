@@ -50,7 +50,16 @@ namespace osu.Game.IO
                 string path = info.StoragePath;
 
                 // we may be re-adding a file to fix missing store entries.
-                if (!Storage.Exists(path))
+                bool requiresCopy = !Storage.Exists(path);
+
+                if (!requiresCopy)
+                {
+                    // even if the file already exists, check the existing checksum for safety.
+                    using (var stream = Storage.GetStream(path))
+                        requiresCopy |= stream.ComputeSHA2Hash() != hash;
+                }
+
+                if (requiresCopy)
                 {
                     data.Seek(0, SeekOrigin.Begin);
 
