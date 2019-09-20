@@ -34,9 +34,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
         private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
-        private readonly Bindable<bool> alwaysTintSliderBall = new Bindable<bool>(true);
-        private bool allowSliderBallTint;
-
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
 
