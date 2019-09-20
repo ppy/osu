@@ -17,11 +17,18 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
         protected const float CORNER_RADIUS = 15;
 
+        /// <summary>
+        /// The component that is being displayed.
+        /// </summary>
         protected readonly Drawable Component;
 
         private readonly OsuTextFlowContainer labelText;
         private readonly OsuTextFlowContainer descriptionText;
 
+        /// <summary>
+        /// Creates a new <see cref="LabelledComponent"/>.
+        /// </summary>
+        /// <param name="padded">Whether the component should be padded or should be expanded to the bounds of this <see cref="LabelledComponent"/>.</param>
         protected LabelledComponent(bool padded)
         {
             RelativeSizeAxes = Axes.X;
@@ -116,6 +123,10 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
             }
         }
 
+        /// <summary>
+        /// Creates the component that should be displayed.
+        /// </summary>
+        /// <returns>The component.</returns>
         protected abstract Drawable CreateComponent();
     }
 }
