@@ -106,30 +106,30 @@ namespace osu.Game.Screens.Select
 
                 case "=":
                 case ":":
-                    range.IsInclusive = true;
+                    range.IsLowerInclusive = range.IsUpperInclusive = true;
                     range.Min = value;
                     range.Max = value;
                     break;
 
                 case ">":
-                    range.IsInclusive = false;
+                    range.IsLowerInclusive = false;
                     range.Min = value;
                     break;
 
                 case ">=":
                 case ">:":
-                    range.IsInclusive = true;
+                    range.IsLowerInclusive = true;
                     range.Min = value;
                     break;
 
                 case "<":
-                    range.IsInclusive = false;
+                    range.IsUpperInclusive = false;
                     range.Max = value;
                     break;
 
                 case "<=":
                 case "<:":
-                    range.IsInclusive = true;
+                    range.IsUpperInclusive = true;
                     range.Max = value;
                     break;
             }
