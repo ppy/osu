@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.UI
                     highlightedColour = colours.PinkLight;
                     break;
 
-                case ModType.Custom:
+                case ModType.System:
                     backgroundColour = colours.Gray6;
                     highlightedColour = colours.Gray7;
                     modIcon.Colour = colours.Yellow;

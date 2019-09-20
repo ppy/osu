@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public override IconUsage Icon => FontAwesome.Solid.Ban;
 
-            public override ModType Type => ModType.Custom;
+            public override ModType Type => ModType.System;
         }
     }
 }
