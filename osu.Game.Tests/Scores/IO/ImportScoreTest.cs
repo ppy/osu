@@ -117,6 +117,43 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
+        [Test]
+        public async Task TestImportWithDeletedBeatmapSet()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDeletedBeatmapSet"))
+            {
+                try
+                {
+                    var osu = await loadOsu(host);
+
+                    var toImport = new ScoreInfo
+                    {
+                        Hash = Guid.NewGuid().ToString(),
+                        Statistics = new Dictionary<HitResult, int>
+                        {
+                            { HitResult.Perfect, 100 },
+                            { HitResult.Miss, 50 }
+                        }
+                    };
+
+                    var imported = await loadIntoOsu(osu, toImport);
+
+                    var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
+                    var scoreManager = osu.Dependencies.Get<ScoreManager>();
+
+                    beatmapManager.Delete(imported.Beatmap.BeatmapSet);
+                    Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
+
+                    await scoreManager.Import(imported);
+                    Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         private async Task<ScoreInfo> loadIntoOsu(OsuGameBase osu, ScoreInfo score)
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
@@ -125,9 +162,7 @@ namespace osu.Game.Tests.Scores.IO
             score.Ruleset = new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
-            await scoreManager.Import(score);
-
-            return scoreManager.GetAllUsableScores().First();
+            return await scoreManager.Import(score);
         }
 
         private async Task<OsuGameBase> loadOsu(GameHost host)
