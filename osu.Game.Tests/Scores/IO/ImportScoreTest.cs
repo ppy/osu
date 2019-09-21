@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Scores.IO
                     var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 
-                    beatmapManager.Delete(imported.Beatmap.BeatmapSet);
+                    beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.Beatmap.ID)));
                     Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
 
                     await scoreManager.Import(imported);
