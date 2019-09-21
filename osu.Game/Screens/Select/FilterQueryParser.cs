@@ -25,23 +25,23 @@ namespace osu.Game.Screens.Select
                 switch (key)
                 {
                     case "stars" when parseFloatWithPoint(value, out var stars):
-                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars);
+                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.01f / 2);
                         break;
 
                     case "ar" when parseFloatWithPoint(value, out var ar):
-                        updateCriteriaRange(ref criteria.ApproachRate, op, ar);
+                        updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.1f / 2);
                         break;
 
                     case "dr" when parseFloatWithPoint(value, out var dr):
-                        updateCriteriaRange(ref criteria.DrainRate, op, dr);
+                        updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
                         break;
 
                     case "cs" when parseFloatWithPoint(value, out var cs):
-                        updateCriteriaRange(ref criteria.CircleSize, op, cs);
+                        updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.1f / 2);
                         break;
 
                     case "bpm" when parseDoubleWithPoint(value, out var bpm):
-                        updateCriteriaRange(ref criteria.BPM, op, bpm);
+                        updateCriteriaRange(ref criteria.BPM, op, bpm, 0.01d / 2);
                         break;
 
                     case "length" when parseDoubleWithPoint(value.TrimEnd('m', 's', 'h'), out var length):
@@ -99,13 +99,32 @@ namespace osu.Game.Screens.Select
 
         private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
         {
-            updateCriteriaRange(ref range, op, value);
-
             switch (op)
             {
+                default:
+                    return;
+
                 case "=":
                 case ":":
                     range.Min = value - tolerance;
+                    range.Max = value + tolerance;
+                    break;
+
+                case ">":
+                    range.Min = value + tolerance;
+                    break;
+
+                case ">=":
+                case ">:":
+                    range.Min = value - tolerance;
+                    break;
+
+                case "<":
+                    range.Max = value - tolerance;
+                    break;
+
+                case "<=":
+                case "<:":
                     range.Max = value + tolerance;
                     break;
             }
@@ -113,13 +132,32 @@ namespace osu.Game.Screens.Select
 
         private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<double> range, string op, double value, double tolerance = 0.05)
         {
-            updateCriteriaRange(ref range, op, value);
-
             switch (op)
             {
+                default:
+                    return;
+
                 case "=":
                 case ":":
                     range.Min = value - tolerance;
+                    range.Max = value + tolerance;
+                    break;
+
+                case ">":
+                    range.Min = value + tolerance;
+                    break;
+
+                case ">=":
+                case ">:":
+                    range.Min = value - tolerance;
+                    break;
+
+                case "<":
+                    range.Max = value - tolerance;
+                    break;
+
+                case "<=":
+                case "<:":
                     range.Max = value + tolerance;
                     break;
             }

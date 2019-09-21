@@ -21,6 +21,16 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(4, filterCriteria.SearchTerms.Length);
         }
 
+        /*
+         * The following tests have been written a bit strangely (they don't check exact
+         * bound equality with what the filter says).
+         * This is to account for floating-point arithmetic issues.
+         * For example, specifying a bpm<140 filter would previously match beatmaps with BPM
+         * of 139.99999, which would be displayed in the UI as 140.
+         * Due to this the tests check the last tick inside the range and the first tick
+         * outside of the range.
+         */
+
         [Test]
         public void TestApplyStarQueries()
         {
@@ -29,8 +39,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("easy", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(4.0f, filterCriteria.StarDifficulty.Max);
-            Assert.IsFalse(filterCriteria.StarDifficulty.IsUpperInclusive);
+            Assert.IsNotNull(filterCriteria.StarDifficulty.Max);
+            Assert.Greater(filterCriteria.StarDifficulty.Max, 3.99d);
+            Assert.Less(filterCriteria.StarDifficulty.Max, 4.00d);
             Assert.IsNull(filterCriteria.StarDifficulty.Min);
         }
 
@@ -42,8 +53,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("difficult", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(9.0f, filterCriteria.ApproachRate.Min);
-            Assert.IsTrue(filterCriteria.ApproachRate.IsLowerInclusive);
+            Assert.IsNotNull(filterCriteria.ApproachRate.Min);
+            Assert.Greater(filterCriteria.ApproachRate.Min, 8.9f);
+            Assert.Less(filterCriteria.ApproachRate.Min, 9.0f);
             Assert.IsNull(filterCriteria.ApproachRate.Max);
         }
 
@@ -55,10 +67,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("quite specific", filterCriteria.SearchText.Trim());
             Assert.AreEqual(2, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(2.0f, filterCriteria.DrainRate.Min);
-            Assert.IsFalse(filterCriteria.DrainRate.IsLowerInclusive);
-            Assert.AreEqual(6.0f, filterCriteria.DrainRate.Max);
-            Assert.IsTrue(filterCriteria.DrainRate.IsUpperInclusive);
+            Assert.Greater(filterCriteria.DrainRate.Min, 2.0f);
+            Assert.Less(filterCriteria.DrainRate.Min, 2.1f);
+            Assert.Greater(filterCriteria.DrainRate.Max, 6.0f);
+            Assert.Less(filterCriteria.DrainRate.Min, 6.1f);
         }
 
         [Test]
@@ -69,8 +81,9 @@ namespace osu.Game.Tests.NonVisual.Filtering
             FilterQueryParser.ApplyQueries(filterCriteria, query);
             Assert.AreEqual("gotta go fast", filterCriteria.SearchText.Trim());
             Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
-            Assert.AreEqual(200d, filterCriteria.BPM.Min);
-            Assert.IsTrue(filterCriteria.BPM.IsLowerInclusive);
+            Assert.IsNotNull(filterCriteria.BPM.Min);
+            Assert.Greater(filterCriteria.BPM.Min, 199.99d);
+            Assert.Less(filterCriteria.BPM.Min, 200.00d);
             Assert.IsNull(filterCriteria.BPM.Max);
         }
 
@@ -93,9 +106,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual("time", filterCriteria.SearchText.Trim());
             Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
             Assert.AreEqual(expectedLength.TotalMilliseconds - scale.TotalMilliseconds / 2.0, filterCriteria.Length.Min);
-            Assert.IsTrue(filterCriteria.Length.IsLowerInclusive);
             Assert.AreEqual(expectedLength.TotalMilliseconds + scale.TotalMilliseconds / 2.0, filterCriteria.Length.Max);
-            Assert.IsTrue(filterCriteria.Length.IsUpperInclusive);
         }
 
         [Test]
