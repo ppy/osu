@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
-            double multiplier = 2; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
+            double multiplier = 2.1f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= 0.90f;
@@ -240,7 +240,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
 
-            return Math.Pow(deviationAccValue, 0.4) * Math.Pow(percentageAccValue, 0.6) * lengthFactor;
+            return Math.Pow(deviationAccValue, 0.4f) * Math.Pow(percentageAccValue, 0.6f) * lengthFactor * 0.8f;
         }
 
         private double getModifiedAcc()
