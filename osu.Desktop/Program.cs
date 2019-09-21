@@ -11,6 +11,7 @@ using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
+using osu.Game.Tournament;
 
 namespace osu.Desktop
 {
@@ -28,24 +29,36 @@ namespace osu.Desktop
 
                 if (!host.IsPrimaryInstance)
                 {
-                    var importer = new ArchiveImportIPCChannel(host);
-                    // Restore the cwd so relative paths given at the command line work correctly
-                    Directory.SetCurrentDirectory(cwd);
-                    foreach (var file in args)
+                    if (args.Length > 0 && args[0].Contains('.')) // easy way to check for a file import in args
                     {
-                        Console.WriteLine(@"Importing {0}", file);
-                        if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
-                            throw new TimeoutException(@"IPC took too long to send");
+                        var importer = new ArchiveImportIPCChannel(host);
+                        // Restore the cwd so relative paths given at the command line work correctly
+                        Directory.SetCurrentDirectory(cwd);
+
+                        foreach (var file in args)
+                        {
+                            Console.WriteLine(@"Importing {0}", file);
+                            if (!importer.ImportAsync(Path.GetFullPath(file)).Wait(3000))
+                                throw new TimeoutException(@"IPC took too long to send");
+                        }
+
+                        return 0;
                     }
+
+                    // we want to allow multiple instances to be started when in debug.
+                    if (!DebugUtils.IsDebugBuild)
+                        return 0;
                 }
-                else
+
+                switch (args.FirstOrDefault() ?? string.Empty)
                 {
-                    switch (args.FirstOrDefault() ?? string.Empty)
-                    {
-                        default:
-                            host.Run(new OsuGameDesktop(args));
-                            break;
-                    }
+                    default:
+                        host.Run(new OsuGameDesktop(args));
+                        break;
+
+                    case "--tournament":
+                        host.Run(new TournamentGame());
+                        break;
                 }
 
                 return 0;

@@ -3,7 +3,7 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osuTK.Graphics;
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Colour = Color4.White.Opacity(0.9f);
         }
 

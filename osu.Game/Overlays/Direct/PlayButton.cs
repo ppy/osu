@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Direct
 
                 if (Preview != null)
                 {
-                    Preview.Start();
+                    attemptStart();
                     return;
                 }
 
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Direct
 
                     // user may have changed their mind.
                     if (Playing.Value)
-                        preview.Start();
+                        attemptStart();
                 });
             }
             else
@@ -155,6 +155,12 @@ namespace osu.Game.Overlays.Direct
                 Preview?.Stop();
                 loading = false;
             }
+        }
+
+        private void attemptStart()
+        {
+            if (Preview?.Start() != true)
+                Playing.Value = false;
         }
 
         protected override void Dispose(bool isDisposing)

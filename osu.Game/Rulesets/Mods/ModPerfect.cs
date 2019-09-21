@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mods
@@ -14,6 +15,6 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage Icon => OsuIcon.ModPerfect;
         public override string Description => "SS or quit.";
 
-        protected override bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Accuracy.Value != 1;
+        protected override bool FailCondition(ScoreProcessor scoreProcessor, JudgementResult result) => scoreProcessor.Accuracy.Value != 1;
     }
 }

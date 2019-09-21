@@ -46,6 +46,7 @@ namespace osu.Game.Overlays.Settings
             set
             {
                 selected = value;
+
                 if (selected)
                 {
                     selectionIndicator.FadeIn(50);

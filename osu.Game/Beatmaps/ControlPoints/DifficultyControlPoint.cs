@@ -1,11 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class DifficultyControlPoint : ControlPoint
+    public class DifficultyControlPoint : ControlPoint, IEquatable<DifficultyControlPoint>
     {
         /// <summary>
         /// The speed multiplier at this control point.
@@ -18,9 +19,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private double speedMultiplier = 1;
 
-        public override bool EquivalentTo(ControlPoint other)
-            => base.EquivalentTo(other)
-               && other is DifficultyControlPoint difficulty
-               && SpeedMultiplier.Equals(difficulty.SpeedMultiplier);
+        public bool Equals(DifficultyControlPoint other)
+            => base.Equals(other)
+               && SpeedMultiplier.Equals(other?.SpeedMultiplier);
     }
 }

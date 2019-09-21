@@ -60,14 +60,7 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
             set => label.Colour = value;
         }
 
-        public Color4 BackgroundColour
-        {
-            get => content.Colour;
-            set => content.Colour = value;
-        }
-
         private readonly OsuTextBox textBox;
-        private readonly Container content;
         private readonly OsuSpriteText label;
 
         public LabelledTextBox()

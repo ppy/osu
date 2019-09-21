@@ -2,16 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -22,7 +23,8 @@ namespace osu.Game.Screens.Play
 {
     public class HUDOverlay : Container
     {
-        private const int duration = 100;
+        private const int duration = 250;
+        private const Easing easing = Easing.OutQuint;
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
@@ -31,8 +33,15 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
+        public readonly HitErrorDisplay HitErrorDisplay;
         public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
+
+        public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
+
+        private readonly ScoreProcessor scoreProcessor;
+        private readonly DrawableRuleset drawableRuleset;
+        private readonly IReadOnlyList<Mod> mods;
 
         private Bindable<bool> showHud;
         private readonly Container visibilityContainer;
@@ -42,8 +51,14 @@ namespace osu.Game.Screens.Play
 
         public Action<double> RequestSeek;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, WorkingBeatmap working)
+        private readonly Container topScoreContainer;
+
+        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
+            this.scoreProcessor = scoreProcessor;
+            this.drawableRuleset = drawableRuleset;
+            this.mods = mods;
+
             RelativeSizeAxes = Axes.Both;
 
             Children = new Drawable[]
@@ -53,11 +68,10 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new Container
+                        topScoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Y = 30,
                             AutoSizeAxes = Axes.Both,
                             AutoSizeDuration = 200,
                             AutoSizeEasing = Easing.Out,
@@ -71,6 +85,7 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
+                        HitErrorDisplay = CreateHitErrorDisplayOverlay(),
                     }
                 },
                 PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
@@ -88,23 +103,37 @@ namespace osu.Game.Screens.Play
                     }
                 }
             };
+        }
 
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
+        {
             BindProcessor(scoreProcessor);
             BindDrawableRuleset(drawableRuleset);
 
             Progress.Objects = drawableRuleset.Objects;
             Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
             Progress.RequestSeek = time => RequestSeek(time);
+            Progress.ReferenceClock = drawableRuleset.FrameStableClock;
 
-            ModDisplay.Current.BindTo(working.Mods);
-        }
+            ModDisplay.Current.Value = mods;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
-        {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
-            showHud.TriggerChange();
+            showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
+
+            ShowHealthbar.BindValueChanged(healthBar =>
+            {
+                if (healthBar.NewValue)
+                {
+                    HealthDisplay.FadeIn(duration, easing);
+                    topScoreContainer.MoveToY(30, duration, easing);
+                }
+                else
+                {
+                    HealthDisplay.FadeOut(duration, easing);
+                    topScoreContainer.MoveToY(0, duration, easing);
+                }
+            }, true);
 
             if (!showHud.Value && !hasShownNotificationOnce)
             {
@@ -121,8 +150,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            replayLoaded.ValueChanged += replayLoadedValueChanged;
-            replayLoaded.TriggerChange();
+            replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
 
         private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
@@ -203,7 +231,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual KeyCounterDisplay CreateKeyCounter() => new KeyCounterDisplay
         {
-            FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
@@ -229,6 +256,8 @@ namespace osu.Game.Screens.Play
             AutoSizeAxes = Axes.Both,
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
+
+        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 

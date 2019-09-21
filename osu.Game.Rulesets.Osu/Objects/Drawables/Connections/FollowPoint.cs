@@ -6,6 +6,7 @@ using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            Child = new SkinnableDrawable("Play/osu/followpoint", _ => new Container
+            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new Container
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
@@ -35,12 +36,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Child = new Box
                 {
                     Size = new Vector2(width),
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,
                 }
-            }, restrictSize: false);
+            }, confineMode: ConfineMode.NoScaling);
         }
     }
 }

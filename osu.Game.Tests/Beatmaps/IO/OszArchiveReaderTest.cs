@@ -75,6 +75,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
+
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {

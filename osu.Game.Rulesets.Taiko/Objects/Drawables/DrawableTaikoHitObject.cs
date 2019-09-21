@@ -78,10 +78,29 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;
 
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                base.LifetimeStart = value;
+                proxiedContent.LifetimeStart = value;
+            }
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                base.LifetimeEnd = value;
+                proxiedContent.LifetimeEnd = value;
+            }
+        }
+
         private class ProxiedContentContainer : Container
         {
-            public override double LifetimeStart => Parent?.LifetimeStart ?? base.LifetimeStart;
-            public override double LifetimeEnd => Parent?.LifetimeEnd ?? base.LifetimeEnd;
+            public override bool RemoveWhenNotAlive => false;
         }
     }
 
@@ -111,6 +130,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.KiaiMode = HitObject.Kiai;
 
             var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+
             if (strongObject != null)
             {
                 var strongHit = CreateStrongHit(strongObject);
@@ -121,9 +141,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         // Normal and clap samples are handled by the drum
-        protected override IEnumerable<SampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != SampleInfo.HIT_NORMAL && s.Name != SampleInfo.HIT_CLAP);
+        protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);
 
-        protected override string SampleNamespace => "Taiko";
+        protected override string SampleNamespace => "taiko";
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 

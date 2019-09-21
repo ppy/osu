@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
@@ -63,12 +64,12 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                 }
             };
 
-            sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
+            sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
@@ -106,6 +107,7 @@ namespace osu.Game.Screens.Select.Carousel
                 case CarouselItemState.NotSelected:
                     Deselected();
                     break;
+
                 case CarouselItemState.Selected:
                     Selected();
                     break;

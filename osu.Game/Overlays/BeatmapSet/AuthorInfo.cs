@@ -6,11 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 
@@ -127,11 +126,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 };
             }
-        }
-
-        private class ClickableArea : OsuClickableContainer, IHasTooltip
-        {
-            public string TooltipText => @"View Profile";
         }
     }
 }

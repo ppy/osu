@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
-        private Cached layout = new Cached();
+        private readonly Cached layout = new Cached();
         private ScheduledDelegate scheduledCreate;
 
         protected override void Update()
@@ -103,6 +103,7 @@ namespace osu.Game.Screens.Play
             var newColumns = new BufferedContainer<Column>
             {
                 CacheDrawnFrameBuffer = true,
+                RedrawOnScale = false,
                 RelativeSizeAxes = Axes.Both,
             };
 
@@ -169,6 +170,7 @@ namespace osu.Game.Screens.Play
             var max = values.Max();
 
             float step = values.Length / (float)ColumnCount;
+
             for (float i = 0; i < values.Length; i += step)
             {
                 newValues.Add((float)values[(int)i] / max);

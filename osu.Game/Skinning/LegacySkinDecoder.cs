@@ -5,48 +5,40 @@ using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinDecoder : LegacyDecoder<SkinConfiguration>
+    public class LegacySkinDecoder : LegacyDecoder<DefaultSkinConfiguration>
     {
         public LegacySkinDecoder()
             : base(1)
         {
         }
 
-        protected override void ParseLine(SkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
         {
-            line = StripComments(line);
-
-            var pair = SplitKeyVal(line);
-            switch (section)
+            if (section != Section.Colours)
             {
-                case Section.General:
-                    switch (pair.Key)
-                    {
-                        case @"Name":
-                            skin.SkinInfo.Name = pair.Value;
-                            break;
-                        case @"Author":
-                            skin.SkinInfo.Creator = pair.Value;
-                            break;
-                        case @"CursorExpand":
-                            skin.CursorExpand = pair.Value != "0";
-                            break;
-                    }
+                line = StripComments(line);
 
-                    break;
+                var pair = SplitKeyVal(line);
 
-                case Section.Fonts:
-                    switch (pair.Key)
-                    {
-                        case "HitCirclePrefix":
-                            skin.HitCircleFont = pair.Value;
-                            break;
-                        case "HitCircleOverlap":
-                            skin.HitCircleOverlap = int.Parse(pair.Value);
-                            break;
-                    }
+                switch (section)
+                {
+                    case Section.General:
+                        switch (pair.Key)
+                        {
+                            case @"Name":
+                                skin.SkinInfo.Name = pair.Value;
+                                return;
 
-                    break;
+                            case @"Author":
+                                skin.SkinInfo.Creator = pair.Value;
+                                return;
+                        }
+
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(pair.Key))
+                    skin.ConfigDictionary[pair.Key] = pair.Value;
             }
 
             base.ParseLine(skin, section, line);

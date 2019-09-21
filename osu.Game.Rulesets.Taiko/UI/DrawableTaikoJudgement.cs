@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case HitResult.Good:
                     JudgementBody.Colour = colours.GreenLight;
                     break;
+
                 case HitResult.Great:
                     JudgementBody.Colour = colours.BlueLight;
                     break;

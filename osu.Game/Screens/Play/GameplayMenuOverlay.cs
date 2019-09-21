@@ -19,6 +19,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using Humanizer;
+using osu.Framework.Graphics.Effects;
 
 namespace osu.Game.Screens.Play
 {
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Play
         {
             RelativeSizeAxes = Axes.Both;
 
-            StateChanged += s => selectionIndex = -1;
+            State.ValueChanged += s => selectionIndex = -1;
         }
 
         [BackgroundDependencyLoader]
@@ -221,6 +222,7 @@ namespace osu.Game.Screens.Play
                         else
                             selectionIndex--;
                         return true;
+
                     case Key.Down:
                         if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
                             selectionIndex = 0;
@@ -240,6 +242,7 @@ namespace osu.Game.Screens.Play
                 case GlobalAction.Back:
                     BackAction.Invoke();
                     return true;
+
                 case GlobalAction.Select:
                     SelectAction.Invoke();
                     return true;
@@ -301,6 +304,7 @@ namespace osu.Game.Screens.Play
 
         private class Button : DialogButton
         {
+            // required to ensure keyboard navigation always starts from an extremity (unless the cursor is moved)
             protected override bool OnHover(HoverEvent e) => true;
 
             protected override bool OnMouseMove(MouseMoveEvent e)
@@ -308,6 +312,23 @@ namespace osu.Game.Screens.Play
                 Selected.Value = true;
                 return base.OnMouseMove(e);
             }
+        }
+
+        [Resolved]
+        private GlobalActionContainer globalAction { get; set; }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case ScrollEvent _:
+                    if (ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                        return globalAction.TriggerEvent(e);
+
+                    break;
+            }
+
+            return base.Handle(e);
         }
     }
 }

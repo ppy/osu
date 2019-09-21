@@ -1,8 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -60,7 +62,13 @@ namespace osu.Game.Screens.Play.Break
             valueText.Text = newText;
         }
 
-        protected virtual string Format(T count) => count.ToString();
+        protected virtual string Format(T count)
+        {
+            if (count is Enum countEnum)
+                return countEnum.GetDescription();
+
+            return count.ToString();
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

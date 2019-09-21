@@ -12,7 +12,7 @@ namespace osu.Game.Input
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.
     /// </summary>
-    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalInput
+    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalKeyboardInput
     {
         private readonly double timeToIdle;
 
@@ -62,6 +62,7 @@ namespace osu.Game.Input
                 case MouseUpEvent _:
                 case MouseMoveEvent _:
                     return updateLastInteractionTime();
+
                 default:
                     return base.Handle(e);
             }

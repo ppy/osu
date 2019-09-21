@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.Containers
         where T : Drawable
     {
         private Drawable expandableHeader, fixedHeader, footer, headerBackground;
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container headerBackgroundContainer;
         private readonly FlowContainer<T> scrollContentContainer;
 
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.Containers
 
         public SectionsContainer()
         {
-            AddInternal(scrollContainer = new ScrollContainer
+            AddInternal(scrollContainer = new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Masking = true,
@@ -142,6 +142,17 @@ namespace osu.Game.Graphics.Containers
 
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
+        public override void InvalidateFromChild(Invalidation invalidation, Drawable source = null)
+        {
+            base.InvalidateFromChild(invalidation, source);
+
+            if ((invalidation & Invalidation.DrawSize) != 0)
+            {
+                if (source == ExpandableHeader) //We need to recalculate the positions if the ExpandableHeader changed its size
+                    lastKnownScroll = -1;
+            }
+        }
+
         private float lastKnownScroll;
 
         protected override void UpdateAfterChildren()
@@ -150,6 +161,7 @@ namespace osu.Game.Graphics.Containers
 
             float headerH = (ExpandableHeader?.LayoutSize.Y ?? 0) + (FixedHeader?.LayoutSize.Y ?? 0);
             float footerH = Footer?.LayoutSize.Y ?? 0;
+
             if (headerH != headerHeight || footerH != footerHeight)
             {
                 headerHeight = headerH;
@@ -181,6 +193,7 @@ namespace osu.Game.Graphics.Containers
                 foreach (var section in Children)
                 {
                     float diff = Math.Abs(scrollContainer.GetChildPosInContent(section) - currentScroll - scrollOffset);
+
                     if (diff < minDiff)
                     {
                         minDiff = diff;

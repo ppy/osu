@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
@@ -44,12 +45,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             if (endIndex < 0) throw new ArgumentOutOfRangeException(nameof(endIndex), $"{nameof(endIndex)} cannot be less than 0.");
 
             int extendedEndIndex = endIndex;
+
             if (endIndex < beatmap.HitObjects.Count - 1)
             {
                 // Extend the end index to include objects they are stacked on
                 for (int i = endIndex; i >= startIndex; i--)
                 {
                     int stackBaseIndex = i;
+
                     for (int n = stackBaseIndex + 1; n < beatmap.HitObjects.Count; n++)
                     {
                         OsuHitObject stackBaseObject = beatmap.HitObjects[stackBaseIndex];
@@ -67,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                             break;
 
                         if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance
-                            || stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance)
+                            || (stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance))
                         {
                             stackBaseIndex = n;
 
@@ -87,6 +90,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
             //Reverse pass for stack calculation.
             int extendedStartIndex = startIndex;
+
             for (int i = extendedEndIndex; i > startIndex; i--)
             {
                 int n = i;
@@ -138,6 +142,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
+
                             for (int j = n + 1; j <= i; j++)
                             {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
@@ -204,17 +209,22 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     if (beatmap.HitObjects[j].StartTime - stackThreshold > startTime)
                         break;
 
+                    // The start position of the hitobject, or the position at the end of the path if the hitobject is a slider
+                    Vector2 position2 = currHitObject is Slider currSlider
+                        ? currSlider.Position + currSlider.Path.PositionAt(1)
+                        : currHitObject.Position;
+
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[i].StartTime;
+                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
                     }
-                    else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.EndPosition) < stack_distance)
+                    else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
                         //Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[i].StartTime;
+                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
                     }
                 }
             }

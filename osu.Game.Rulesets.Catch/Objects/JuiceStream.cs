@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Catch.Objects
         {
             base.CreateNestedHitObjects();
 
-            var tickSamples = Samples.Select(s => new SampleInfo
+            var tickSamples = Samples.Select(s => new HitSampleInfo
             {
                 Bank = s.Bank,
                 Name = @"slidertick",
@@ -95,6 +95,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             X = X + Path.PositionAt(e.PathProgress).X / CatchPlayfield.BASE_WIDTH,
                         });
                         break;
+
                     case SliderEventType.Head:
                     case SliderEventType.Tail:
                     case SliderEventType.Repeat:
@@ -125,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Distance => Path.Distance;
 
-        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<HitSampleInfo>> NodeSamples { get; set; } = new List<List<HitSampleInfo>>();
 
         public double? LegacyLastTickOffset { get; set; }
     }

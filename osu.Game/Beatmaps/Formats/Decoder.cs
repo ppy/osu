@@ -49,6 +49,7 @@ namespace osu.Game.Beatmaps.Formats
                 throw new IOException(@"Unknown decoder type");
 
             string line;
+
             do
             {
                 line = stream.ReadLine()?.Trim();

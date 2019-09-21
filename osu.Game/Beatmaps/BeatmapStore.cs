@@ -65,7 +65,6 @@ namespace osu.Game.Beatmaps
         protected override IQueryable<BeatmapSetInfo> AddIncludesForDeletion(IQueryable<BeatmapSetInfo> query) =>
             base.AddIncludesForDeletion(query)
                 .Include(s => s.Metadata)
-                .Include(s => s.Beatmaps).ThenInclude(b => b.Scores)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.BaseDifficulty)
                 .Include(s => s.Beatmaps).ThenInclude(b => b.Metadata);
 

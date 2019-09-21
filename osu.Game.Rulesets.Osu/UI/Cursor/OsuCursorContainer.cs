@@ -1,13 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -21,17 +25,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
 
-        private readonly CursorTrail cursorTrail;
+        private readonly Drawable cursorTrail;
 
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    cursorTrail = new CursorTrail { Depth = 1 }
-                }
+                Child = cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling)
             };
         }
 
@@ -73,7 +74,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                    if (--downCount == 0)
+                    // Todo: Math.Max() is required as a temporary measure to address https://github.com/ppy/osu-framework/issues/2576
+                    downCount = Math.Max(0, downCount - 1);
+
+                    if (downCount == 0)
                         updateExpandedState();
                     break;
             }
@@ -93,6 +97,16 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
             ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
+        }
+
+        private class DefaultCursorTrail : CursorTrail
+        {
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                Texture = textures.Get(@"Cursor/cursortrail");
+                Scale = new Vector2(1 / Texture.ScaleAdjust);
+            }
         }
     }
 }

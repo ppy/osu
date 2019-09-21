@@ -7,7 +7,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 
@@ -33,11 +32,14 @@ namespace osu.Game.Online.API.Requests.Responses
             set => User = value;
         }
 
-        [JsonProperty(@"score_id")]
+        [JsonProperty(@"id")]
         private long onlineScoreID
         {
             set => OnlineScoreID = value;
         }
+
+        [JsonProperty(@"replay")]
+        public bool Replay { get; set; }
 
         [JsonProperty(@"created_at")]
         private DateTimeOffset date
@@ -71,27 +73,32 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 foreach (var kvp in value)
                 {
-                    HitResult newKey;
                     switch (kvp.Key)
                     {
                         case @"count_geki":
                             CountGeki = kvp.Value;
                             break;
+
                         case @"count_300":
                             Count300 = kvp.Value;
                             break;
+
                         case @"count_katu":
                             CountKatu = kvp.Value;
                             break;
+
                         case @"count_100":
                             Count100 = kvp.Value;
                             break;
+
                         case @"count_50":
                             Count50 = kvp.Value;
                             break;
+
                         case @"count_miss":
                             CountMiss = kvp.Value;
                             break;
+
                         default:
                             continue;
                     }
@@ -108,17 +115,6 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
-
-        public override BeatmapInfo Beatmap
-        {
-            get => base.Beatmap;
-            set
-            {
-                base.Beatmap = value;
-                if (Beatmap.Ruleset != null)
-                    Ruleset = value.Ruleset;
-            }
-        }
 
         public override RulesetInfo Ruleset
         {

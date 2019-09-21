@@ -1,49 +1,43 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osuTK;
-using osuTK.Input;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
+using osuTK.Input;
+using System.Linq;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarRulesetSelector : Container
+    public class ToolbarRulesetSelector : RulesetSelector
     {
         private const float padding = 10;
 
-        private readonly FillFlowContainer modeButtons;
-        private readonly Drawable modeButtonLine;
-        private ToolbarRulesetButton activeButton;
-
-        private RulesetStore rulesets;
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        protected Drawable ModeButtonLine { get; private set; }
 
         public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.X;
+        }
 
-            Children = new[]
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            AddRangeInternal(new[]
             {
-                new OpaqueBackground(),
-                modeButtons = new FillFlowContainer
+                new OpaqueBackground
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Padding = new MarginPadding { Left = padding, Right = padding },
+                    Depth = 1,
                 },
-                modeButtonLine = new Container
+                ModeButtonLine = new Container
                 {
                     Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
@@ -56,34 +50,49 @@ namespace osu.Game.Overlays.Toolbar
                         Radius = 15,
                         Roundness = 15,
                     },
-                    Children = new[]
+                    Child = new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        }
+                        RelativeSizeAxes = Axes.Both,
                     }
                 }
-            };
+            });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
+        protected override void LoadComplete()
         {
-            this.rulesets = rulesets;
-            foreach (var r in rulesets.AvailableRulesets)
-            {
-                modeButtons.Add(new ToolbarRulesetButton
-                {
-                    Ruleset = r,
-                    Action = delegate { ruleset.Value = r; }
-                });
-            }
+            base.LoadComplete();
 
-            ruleset.ValueChanged += rulesetChanged;
-            ruleset.DisabledChanged += disabledChanged;
-            ruleset.BindTo(parentRuleset);
+            Current.BindDisabledChanged(disabled => this.FadeColour(disabled ? Color4.Gray : Color4.White, 300), true);
+            Current.BindValueChanged(_ => moveLineToCurrent(), true);
         }
+
+        private bool hasInitialPosition;
+
+        // Scheduled to allow the flow layout to be computed before the line position is updated
+        private void moveLineToCurrent() => ScheduleAfterChildren(() =>
+        {
+            if (SelectedTab != null)
+            {
+                ModeButtonLine.MoveToX(SelectedTab.DrawPosition.X, !hasInitialPosition ? 0 : 200, Easing.OutQuint);
+                hasInitialPosition = true;
+            }
+        });
+
+        public override bool HandleNonPositionalInput => !Current.Disabled && base.HandleNonPositionalInput;
+
+        public override bool HandlePositionalInput => !Current.Disabled && base.HandlePositionalInput;
+
+        public override bool PropagatePositionalInputSubTree => !Current.Disabled && base.PropagatePositionalInputSubTree;
+
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ToolbarRulesetTabButton(value);
+
+        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
+        {
+            RelativeSizeAxes = Axes.Y,
+            AutoSizeAxes = Axes.X,
+            Direction = FillDirection.Horizontal,
+            Padding = new MarginPadding { Left = padding, Right = padding },
+        };
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -93,52 +102,13 @@ namespace osu.Game.Overlays.Toolbar
             {
                 int requested = e.Key - Key.Number1;
 
-                RulesetInfo found = rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
+                RulesetInfo found = Rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
                 if (found != null)
-                    ruleset.Value = found;
+                    Current.Value = found;
                 return true;
             }
 
             return false;
-        }
-
-        public override bool HandleNonPositionalInput => !ruleset.Disabled && base.HandleNonPositionalInput;
-        public override bool HandlePositionalInput => !ruleset.Disabled && base.HandlePositionalInput;
-
-        public override bool PropagatePositionalInputSubTree => !ruleset.Disabled && base.PropagatePositionalInputSubTree;
-
-        private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
-
-        protected override void Update()
-        {
-            base.Update();
-            Size = new Vector2(modeButtons.DrawSize.X, 1);
-        }
-
-        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
-        {
-            foreach (ToolbarRulesetButton m in modeButtons.Children.Cast<ToolbarRulesetButton>())
-            {
-                bool isActive = m.Ruleset.ID == e.NewValue.ID;
-                m.Active = isActive;
-                if (isActive)
-                    activeButton = m;
-            }
-
-            activeMode.Invalidate();
-        }
-
-        private Cached activeMode = new Cached();
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-
-            if (!activeMode.IsValid)
-            {
-                modeButtonLine.MoveToX(activeButton.DrawPosition.X, 200, Easing.OutQuint);
-                activeMode.Validate();
-            }
         }
     }
 }

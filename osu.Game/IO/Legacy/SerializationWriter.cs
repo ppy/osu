@@ -111,6 +111,7 @@ namespace osu.Game.IO.Legacy
             else
             {
                 Write(d.Count);
+
                 foreach (KeyValuePair<T, U> kvp in d)
                 {
                     WriteObject(kvp.Key);

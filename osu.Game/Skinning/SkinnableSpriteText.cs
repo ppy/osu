@@ -6,10 +6,10 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSpriteText : SkinnableDrawable<SpriteText>, IHasText
+    public class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
-        public SkinnableSpriteText(string name, Func<string, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
-            : base(name, defaultImplementation, allowFallback, restrictSize)
+        public SkinnableSpriteText(ISkinComponent component, Func<ISkinComponent, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+            : base(component, defaultImplementation, allowFallback, confineMode)
         {
         }
 

@@ -54,6 +54,7 @@ namespace osu.Game.Beatmaps.Formats
                 case Section.Events:
                     handleEvents(line);
                     return;
+
                 case Section.Variables:
                     handleVariables(line);
                     return;
@@ -65,6 +66,7 @@ namespace osu.Game.Beatmaps.Formats
         private void handleEvents(string line)
         {
             var depth = 0;
+
             while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
             {
                 ++depth;
@@ -80,8 +82,9 @@ namespace osu.Game.Beatmaps.Formats
                 storyboardSprite = null;
 
                 EventType type;
+
                 if (!Enum.TryParse(split[0], out type))
-                    throw new InvalidDataException($@"Unknown event type {split[0]}");
+                    throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
                 {
@@ -94,8 +97,9 @@ namespace osu.Game.Beatmaps.Formats
                         var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
                         storyboard.GetLayer(layer).Add(storyboardSprite);
-                    }
                         break;
+                    }
+
                     case EventType.Animation:
                     {
                         var layer = parseLayer(split[1]);
@@ -108,17 +112,18 @@ namespace osu.Game.Beatmaps.Formats
                         var loopType = split.Length > 8 ? (AnimationLoopType)Enum.Parse(typeof(AnimationLoopType), split[8]) : AnimationLoopType.LoopForever;
                         storyboardSprite = new StoryboardAnimation(path, origin, new Vector2(x, y), frameCount, frameDelay, loopType);
                         storyboard.GetLayer(layer).Add(storyboardSprite);
-                    }
                         break;
+                    }
+
                     case EventType.Sample:
                     {
                         var time = double.Parse(split[1], CultureInfo.InvariantCulture);
                         var layer = parseLayer(split[2]);
                         var path = cleanFilename(split[3]);
                         var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
-                        storyboard.GetLayer(layer).Add(new StoryboardSample(path, time, volume));
-                    }
+                        storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
+                    }
                 }
             }
             else
@@ -127,6 +132,7 @@ namespace osu.Game.Beatmaps.Formats
                     timelineGroup = storyboardSprite?.TimelineGroup;
 
                 var commandType = split[0];
+
                 switch (commandType)
                 {
                     case "T":
@@ -138,6 +144,7 @@ namespace osu.Game.Beatmaps.Formats
                         timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
                     }
                         break;
+
                     case "L":
                     {
                         var startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
@@ -145,6 +152,7 @@ namespace osu.Game.Beatmaps.Formats
                         timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
                     }
                         break;
+
                     default:
                     {
                         if (string.IsNullOrEmpty(split[3]))
@@ -163,6 +171,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
                             }
                                 break;
+
                             case "S":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -170,6 +179,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
                             }
                                 break;
+
                             case "V":
                             {
                                 var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -179,6 +189,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                             }
                                 break;
+
                             case "R":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -186,6 +197,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
                             }
                                 break;
+
                             case "M":
                             {
                                 var startX = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -196,6 +208,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
                             }
                                 break;
+
                             case "MX":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -203,6 +216,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
                             }
                                 break;
+
                             case "MY":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -210,6 +224,7 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
                             }
                                 break;
+
                             case "C":
                             {
                                 var startRed = float.Parse(split[4], CultureInfo.InvariantCulture);
@@ -223,23 +238,28 @@ namespace osu.Game.Beatmaps.Formats
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
                             }
                                 break;
+
                             case "P":
                             {
                                 var type = split[4];
+
                                 switch (type)
                                 {
                                     case "A":
-                                        timelineGroup?.BlendingMode.Add(easing, startTime, endTime, BlendingMode.Additive, startTime == endTime ? BlendingMode.Additive : BlendingMode.Inherit);
+                                        timelineGroup?.BlendingParameters.Add(easing, startTime, endTime, BlendingParameters.Additive, startTime == endTime ? BlendingParameters.Additive : BlendingParameters.Inherit);
                                         break;
+
                                     case "H":
                                         timelineGroup?.FlipH.Add(easing, startTime, endTime, true, startTime == endTime);
                                         break;
+
                                     case "V":
                                         timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
                                         break;
                                 }
                             }
                                 break;
+
                             default:
                                 throw new InvalidDataException($@"Unknown command type: {commandType}");
                         }
@@ -254,26 +274,36 @@ namespace osu.Game.Beatmaps.Formats
         private Anchor parseOrigin(string value)
         {
             var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
+
             switch (origin)
             {
                 case LegacyOrigins.TopLeft:
                     return Anchor.TopLeft;
+
                 case LegacyOrigins.TopCentre:
                     return Anchor.TopCentre;
+
                 case LegacyOrigins.TopRight:
                     return Anchor.TopRight;
+
                 case LegacyOrigins.CentreLeft:
                     return Anchor.CentreLeft;
+
                 case LegacyOrigins.Centre:
                     return Anchor.Centre;
+
                 case LegacyOrigins.CentreRight:
                     return Anchor.CentreRight;
+
                 case LegacyOrigins.BottomLeft:
                     return Anchor.BottomLeft;
+
                 case LegacyOrigins.BottomCentre:
                     return Anchor.BottomCentre;
+
                 case LegacyOrigins.BottomRight:
                     return Anchor.BottomRight;
+
                 default:
                     return Anchor.TopLeft;
             }

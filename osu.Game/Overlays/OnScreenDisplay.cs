@@ -8,32 +8,24 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osuTK;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.OSD;
 
 namespace osu.Game.Overlays
 {
+    /// <summary>
+    /// An on-screen display which automatically tracks and displays toast notifications for <seealso cref="TrackedSettings"/>.
+    /// Can also display custom content via <see cref="Display(Toast)"/>
+    /// </summary>
     public class OnScreenDisplay : Container
     {
         private readonly Container box;
 
-        private readonly SpriteText textLine1;
-        private readonly SpriteText textLine2;
-        private readonly SpriteText textLine3;
-
         private const float height = 110;
-        private const float height_notext = 98;
         private const float height_contracted = height * 0.9f;
-
-        private readonly FillFlowContainer<OptionLight> optionLights;
 
         public OnScreenDisplay()
         {
@@ -51,64 +43,6 @@ namespace osu.Game.Overlays
                     Height = height_contracted,
                     Alpha = 0,
                     CornerRadius = 20,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black,
-                            Alpha = 0.7f,
-                        },
-                        new Container // purely to add a minimum width
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Width = 240,
-                            RelativeSizeAxes = Axes.Y,
-                        },
-                        textLine1 = new OsuSpriteText
-                        {
-                            Padding = new MarginPadding(10),
-                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
-                            Spacing = new Vector2(1, 0),
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        textLine2 = new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
-                            Padding = new MarginPadding { Left = 10, Right = 10 },
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.BottomCentre,
-                        },
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Children = new Drawable[]
-                            {
-                                optionLights = new FillFlowContainer<OptionLight>
-                                {
-                                    Padding = new MarginPadding { Top = 20, Bottom = 5 },
-                                    Spacing = new Vector2(5, 0),
-                                    Direction = FillDirection.Horizontal,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    AutoSizeAxes = Axes.Both
-                                },
-                                textLine3 = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Margin = new MarginPadding { Bottom = 15 },
-                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                    Alpha = 0.3f,
-                                },
-                            }
-                        }
-                    }
                 },
             };
         }
@@ -141,7 +75,7 @@ namespace osu.Game.Overlays
                 return;
 
             configManager.LoadInto(trackedSettings);
-            trackedSettings.SettingChanged += display;
+            trackedSettings.SettingChanged += displayTrackedSettingChange;
 
             trackedConfigManagers.Add((source, configManager), trackedSettings);
         }
@@ -161,54 +95,22 @@ namespace osu.Game.Overlays
                 return;
 
             existing.Unload();
-            existing.SettingChanged -= display;
+            existing.SettingChanged -= displayTrackedSettingChange;
 
             trackedConfigManagers.Remove((source, configManager));
         }
 
-        private void display(SettingDescription description)
+        /// <summary>
+        /// Displays the provided <see cref="Toast"/> temporarily.
+        /// </summary>
+        /// <param name="toast"></param>
+        public void Display(Toast toast)
         {
-            Schedule(() =>
-            {
-                textLine1.Text = description.Name.ToUpperInvariant();
-                textLine2.Text = description.Value;
-                textLine3.Text = description.Shortcut.ToUpperInvariant();
-
-                if (string.IsNullOrEmpty(textLine3.Text))
-                    textLine3.Text = "NO KEY BOUND";
-
-                DisplayTemporarily(box);
-
-                int optionCount = 0;
-                int selectedOption = -1;
-
-                switch (description.RawValue)
-                {
-                    case bool val:
-                        optionCount = 1;
-                        if (val) selectedOption = 0;
-                        break;
-                    case Enum _:
-                        var values = Enum.GetValues(description.RawValue.GetType());
-                        optionCount = values.Length;
-                        selectedOption = Convert.ToInt32(description.RawValue);
-                        break;
-                }
-
-                textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;
-                textLine2.Y = optionCount > 0 ? 0 : 5;
-
-                if (optionLights.Children.Count != optionCount)
-                {
-                    optionLights.Clear();
-                    for (int i = 0; i < optionCount; i++)
-                        optionLights.Add(new OptionLight());
-                }
-
-                for (int i = 0; i < optionCount; i++)
-                    optionLights.Children[i].Glowing = i == selectedOption;
-            });
+            box.Child = toast;
+            DisplayTemporarily(box);
         }
+
+        private void displayTrackedSettingChange(SettingDescription description) => Schedule(() => Display(new TrackedSettingToast(description)));
 
         private TransformSequence<Drawable> fadeIn;
         private ScheduledDelegate fadeOut;
@@ -233,81 +135,6 @@ namespace osu.Game.Overlays
                     b => b.FadeOutFromOne(1500, Easing.InQuint),
                     b => b.ResizeHeightTo(height_contracted, 1500, Easing.InQuint));
             }, 500);
-        }
-
-        private class OptionLight : Container
-        {
-            private Color4 glowingColour, idleColour;
-
-            private const float transition_speed = 300;
-
-            private const float glow_strength = 0.4f;
-
-            private readonly Box fill;
-
-            public OptionLight()
-            {
-                Children = new[]
-                {
-                    fill = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 1,
-                    },
-                };
-            }
-
-            private bool glowing;
-
-            public bool Glowing
-            {
-                set
-                {
-                    glowing = value;
-                    if (!IsLoaded) return;
-
-                    updateGlow();
-                }
-            }
-
-            private void updateGlow()
-            {
-                if (glowing)
-                {
-                    fill.FadeColour(glowingColour, transition_speed, Easing.OutQuint);
-                    FadeEdgeEffectTo(glow_strength, transition_speed, Easing.OutQuint);
-                }
-                else
-                {
-                    FadeEdgeEffectTo(0, transition_speed, Easing.OutQuint);
-                    fill.FadeColour(idleColour, transition_speed, Easing.OutQuint);
-                }
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                fill.Colour = idleColour = Color4.White.Opacity(0.4f);
-                glowingColour = Color4.White;
-
-                Size = new Vector2(25, 5);
-
-                Masking = true;
-                CornerRadius = 3;
-
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Colour = colours.BlueDark.Opacity(glow_strength),
-                    Type = EdgeEffectType.Glow,
-                    Radius = 8,
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                updateGlow();
-                FinishTransforms(true);
-            }
         }
     }
 }

@@ -6,6 +6,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -16,15 +17,17 @@ namespace osu.Game.Screens.Select
 {
     public class FooterButton : OsuClickableContainer
     {
-        private static readonly Vector2 shearing = new Vector2(0.15f, 0);
+        public static readonly float SHEAR_WIDTH = 7.5f;
+
+        protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
         public string Text
         {
-            get => spriteText?.Text;
+            get => SpriteText?.Text;
             set
             {
-                if (spriteText != null)
-                    spriteText.Text = value;
+                if (SpriteText != null)
+                    SpriteText.Text = value;
             }
         }
 
@@ -53,36 +56,40 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private readonly SpriteText spriteText;
+        protected readonly Container TextContainer;
+        protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
-
         public FooterButton()
         {
+            AutoSizeAxes = Axes.Both;
+            Shear = SHEAR;
             Children = new Drawable[]
             {
                 box = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Shear = shearing,
                     EdgeSmoothness = new Vector2(2, 0),
                     Colour = Color4.White,
                     Alpha = 0,
                 },
                 light = new Box
                 {
-                    Shear = shearing,
                     Height = 4,
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                spriteText = new OsuSpriteText
+                TextContainer = new Container
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
+                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                    Shear = -SHEAR,
+                    Child = SpriteText = new OsuSpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                },
             };
         }
 

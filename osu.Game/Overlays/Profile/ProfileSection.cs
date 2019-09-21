@@ -1,25 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osuTK;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile
 {
-    public abstract class ProfileSection : FillFlowContainer
+    public abstract class ProfileSection : Container
     {
         public abstract string Title { get; }
 
         public abstract string Identifier { get; }
 
         private readonly FillFlowContainer content;
+        private readonly Box background;
+        private readonly Box underscore;
 
         protected override Container<Drawable> Content => content;
 
@@ -27,50 +31,109 @@ namespace osu.Game.Overlays.Profile
 
         protected ProfileSection()
         {
-            Direction = FillDirection.Vertical;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
+
             InternalChildren = new Drawable[]
             {
-                new OsuSpriteText
+                background = new Box
                 {
-                    Text = Title,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true),
-                    Margin = new MarginPadding
-                    {
-                        Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                        Vertical = 10
-                    }
+                    RelativeSizeAxes = Axes.Both,
                 },
-                content = new FillFlowContainer
+                new SectionTriangles
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
+                new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Padding = new MarginPadding
+                    Children = new Drawable[]
                     {
-                        Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
-                        Bottom = 20
-                    }
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 1,
-                    Colour = OsuColour.Gray(34),
-                    EdgeSmoothness = new Vector2(1)
+                        new Container
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding
+                            {
+                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
+                                Top = 15,
+                                Bottom = 10,
+                            },
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Text = Title,
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                                },
+                                underscore = new Box
+                                {
+                                    Anchor = Anchor.BottomCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Margin = new MarginPadding { Top = 4 },
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 2,
+                                }
+                            }
+                        },
+                        content = new FillFlowContainer
+                        {
+                            Direction = FillDirection.Vertical,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Padding = new MarginPadding
+                            {
+                                Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
+                                Bottom = 20
+                            }
+                        },
+                    },
                 }
             };
+        }
 
-            // placeholder
-            Add(new OsuSpriteText
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            background.Colour = colours.GreySeafoamDarker;
+            underscore.Colour = colours.Seafoam;
+        }
+
+        private class SectionTriangles : Container
+        {
+            private readonly Triangles triangles;
+            private readonly Box foreground;
+
+            public SectionTriangles()
             {
-                Text = @"coming soon!",
-                Colour = Color4.Gray,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Margin = new MarginPadding { Top = 100, Bottom = 100 }
-            });
+                RelativeSizeAxes = Axes.X;
+                Height = 100;
+                Masking = true;
+                Children = new Drawable[]
+                {
+                    triangles = new Triangles
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.Both,
+                        TriangleScale = 3,
+                    },
+                    foreground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                triangles.ColourLight = colours.GreySeafoamDark;
+                triangles.ColourDark = colours.GreySeafoamDarker.Darken(0.2f);
+                foreground.Colour = ColourInfo.GradientVertical(colours.GreySeafoamDarker, colours.GreySeafoamDarker.Opacity(0));
+            }
         }
     }
 }

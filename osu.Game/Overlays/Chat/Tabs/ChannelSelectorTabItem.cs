@@ -13,8 +13,10 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public override bool IsSwitchable => false;
 
-        public ChannelSelectorTabItem(Channel value)
-            : base(value)
+        protected override bool IsBoldWhenActive => false;
+
+        public ChannelSelectorTabItem()
+            : base(new ChannelSelectorTabChannel())
         {
             Depth = float.MaxValue;
             Width = 45;
@@ -22,14 +24,22 @@ namespace osu.Game.Overlays.Chat.Tabs
             Icon.Alpha = 0;
 
             Text.Font = Text.Font.With(size: 45);
-            TextBold.Font = Text.Font.With(size: 45);
+            Text.Truncate = false;
         }
 
         [BackgroundDependencyLoader]
-        private new void load(OsuColour colour)
+        private void load(OsuColour colour)
         {
             BackgroundInactive = colour.Gray2;
             BackgroundActive = colour.Gray3;
+        }
+
+        public class ChannelSelectorTabChannel : Channel
+        {
+            public ChannelSelectorTabChannel()
+            {
+                Name = "+";
+            }
         }
     }
 }

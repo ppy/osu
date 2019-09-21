@@ -8,6 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.MathUtils;
+using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
 {
@@ -107,11 +109,25 @@ namespace osu.Game.Screens.Play
 
         protected override void UpdateValue(float value)
         {
-            var xFill = value * UsableWidth;
-            fill.Width = xFill;
-            handleBase.X = xFill;
+            // handled in update
         }
 
-        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
+        protected override void Update()
+        {
+            base.Update();
+
+            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, MathHelper.Clamp(Time.Elapsed / 40, 0, 1));
+
+            fill.Width = newX;
+            handleBase.X = newX;
+        }
+
+        private ScheduledDelegate scheduledSeek;
+
+        protected override void OnUserChange(double value)
+        {
+            scheduledSeek?.Cancel();
+            scheduledSeek = Schedule(() => OnSeek?.Invoke(value));
+        }
     }
 }

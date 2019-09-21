@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             // We don't need to fully convert, just create the converter
             var converter = new ManiaBeatmapConverter(beatmap);
@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
             int activeColumns = (int)(legacyFrame.MouseX ?? 0);
             int counter = 0;
+
             while (activeColumns > 0)
             {
                 var isSpecial = stage.IsSpecialColumn(counter);

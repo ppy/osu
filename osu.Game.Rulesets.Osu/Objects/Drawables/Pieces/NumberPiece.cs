@@ -4,6 +4,7 @@
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new Drawable[]
             {
-                new SkinnableDrawable("Play/osu/number-glow", name => new CircularContainer
+                new CircularContainer
                 {
                     Masking = true,
                     Origin = Anchor.Centre,
@@ -40,12 +41,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         Colour = Color4.White.Opacity(0.5f),
                     },
                     Child = new Box()
-                }, s => s.GetTexture("Play/osu/hitcircle") == null),
-                number = new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
+                },
+                number = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
-                }, restrictSize: false)
+                }, confineMode: ConfineMode.NoScaling)
                 {
                     Text = @"1"
                 }

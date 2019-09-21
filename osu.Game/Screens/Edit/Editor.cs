@@ -24,12 +24,17 @@ using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : OsuScreen
+    public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
+
+        public override bool AllowBackButton => false;
 
         public override bool HideOverlaysOnEnter => true;
 
@@ -46,6 +51,8 @@ namespace osu.Game.Screens.Edit
 
         private DependencyContainer dependencies;
         private GameHost host;
+
+        protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -65,11 +72,9 @@ namespace osu.Game.Screens.Edit
             dependencies.Cache(beatDivisor);
 
             EditorMenuBar menuBar;
-            TimeInfoContainer timeInfo;
-            SummaryTimeline timeline;
-            PlaybackControl playback;
 
             var fileMenuItems = new List<MenuItem>();
+
             if (RuntimeInfo.IsDesktop)
             {
                 fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
@@ -173,6 +178,7 @@ namespace osu.Game.Screens.Edit
                 case Key.Left:
                     seek(e, -1);
                     return true;
+
                 case Key.Right:
                     seek(e, 1);
                     return true;
@@ -202,29 +208,46 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                // as we don't want to display the back button, manual handling of exit action is required.
+                this.Exit();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+
         public override void OnResuming(IScreen last)
         {
-            Beatmap.Value.Track?.Stop();
             base.OnResuming(last);
+            Beatmap.Value.Track?.Stop();
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
             Background.FadeColour(Color4.DarkGray, 500);
-            Beatmap.Value.Track?.Stop();
+            resetTrack();
         }
 
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
-            if (Beatmap.Value.Track != null)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
-            }
+            resetTrack();
 
             return base.OnExiting(next);
+        }
+
+        private void resetTrack()
+        {
+            Beatmap.Value.Track?.ResetSpeedAdjustments();
+            Beatmap.Value.Track?.Stop();
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
@@ -238,9 +261,11 @@ namespace osu.Game.Screens.Edit
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
                     break;
+
                 case EditorScreenMode.Design:
                     currentScreen = new DesignScreen();
                     break;
+
                 default:
                     currentScreen = new EditorScreen();
                     break;
