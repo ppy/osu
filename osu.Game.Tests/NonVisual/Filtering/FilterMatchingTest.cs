@@ -12,7 +12,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
     [TestFixture]
     public class FilterMatchingTest
     {
-        private readonly BeatmapInfo exampleBeatmapInfo = new BeatmapInfo
+        private BeatmapInfo getExampleBeatmap() => new BeatmapInfo
         {
             Ruleset = new RulesetInfo { ID = 5 },
             StarDifficulty = 4.0d,
@@ -25,10 +25,10 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Metadata = new BeatmapMetadata
             {
                 Artist = "The Artist",
-                ArtistUnicode = "The Artist",
+                ArtistUnicode = "check unicode too",
                 Title = "Title goes here",
                 TitleUnicode = "Title goes here",
-                AuthorString = "Author",
+                AuthorString = "The Author",
                 Source = "unit tests",
                 Tags = "look for tags too",
             },
@@ -42,6 +42,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestCriteriaMatchingNoRuleset()
         {
+            var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria();
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);
@@ -51,6 +52,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestCriteriaMatchingSpecificRuleset()
         {
+            var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { ID = 6 }
@@ -63,6 +65,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [Test]
         public void TestCriteriaMatchingConvertedBeatmaps()
         {
+            var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { ID = 6 },
@@ -78,6 +81,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase(false)]
         public void TestCriteriaMatchingRangeMin(bool inclusive)
         {
+            var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { ID = 6 },
@@ -98,6 +102,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase(false)]
         public void TestCriteriaMatchingRangeMax(bool inclusive)
         {
+            var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { ID = 6 },
@@ -122,11 +127,71 @@ namespace osu.Game.Tests.NonVisual.Filtering
         [TestCase("an auteur", true)]
         public void TestCriteriaMatchingTerms(string terms, bool filtered)
         {
+            var exampleBeatmapInfo = getExampleBeatmap();
             var criteria = new FilterCriteria
             {
                 Ruleset = new RulesetInfo { ID = 6 },
                 AllowConvertedBeatmaps = true,
                 SearchText = terms
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("", false)]
+        [TestCase("The", false)]
+        [TestCase("THE", false)]
+        [TestCase("author", false)]
+        [TestCase("the author", false)]
+        [TestCase("the author AND then something else", true)]
+        [TestCase("unknown", true)]
+        public void TestCriteriaMatchingCreator(string creatorName, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Creator = new FilterCriteria.OptionalTextFilter { SearchTerm = creatorName }
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("", false)]
+        [TestCase("The", false)]
+        [TestCase("THE", false)]
+        [TestCase("artist", false)]
+        [TestCase("the artist", false)]
+        [TestCase("the artist AND then something else", true)]
+        [TestCase("unicode too", false)]
+        [TestCase("unknown", true)]
+        public void TestCriteriaMatchingArtist(string artistName, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            var criteria = new FilterCriteria
+            {
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = artistName }
+            };
+            var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
+            carouselItem.Filter(criteria);
+            Assert.AreEqual(filtered, carouselItem.Filtered.Value);
+        }
+
+        [Test]
+        [TestCase("", false)]
+        [TestCase("artist", false)]
+        [TestCase("unknown", true)]
+        public void TestCriteriaMatchingArtistWithNullUnicodeName(string artistName, bool filtered)
+        {
+            var exampleBeatmapInfo = getExampleBeatmap();
+            exampleBeatmapInfo.Metadata.ArtistUnicode = null;
+
+            var criteria = new FilterCriteria
+            {
+                Artist = new FilterCriteria.OptionalTextFilter { SearchTerm = artistName }
             };
             var carouselItem = new CarouselBeatmap(exampleBeatmapInfo);
             carouselItem.Filter(criteria);

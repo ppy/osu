@@ -125,5 +125,49 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.AreEqual(BeatmapSetOnlineStatus.Ranked, filterCriteria.OnlineStatus.Max);
             Assert.IsTrue(filterCriteria.OnlineStatus.IsUpperInclusive);
         }
+
+        [Test]
+        public void TestApplyCreatorQueries()
+        {
+            const string query = "beatmap specifically by creator=my_fav";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("beatmap specifically by", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("my_fav", filterCriteria.Creator.SearchTerm);
+        }
+
+        [Test]
+        public void TestApplyArtistQueries()
+        {
+            const string query = "find me songs by artist=singer please";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("find me songs by  please", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(5, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("singer", filterCriteria.Artist.SearchTerm);
+        }
+
+        [Test]
+        public void TestApplyArtistQueriesWithSpaces()
+        {
+            const string query = "really like artist=\"name with space\" yes";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("really like  yes", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(3, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("name with space", filterCriteria.Artist.SearchTerm);
+        }
+
+        [Test]
+        public void TestApplyArtistQueriesOneDoubleQuote()
+        {
+            const string query = "weird artist=double\"quote";
+            var filterCriteria = new FilterCriteria();
+            FilterQueryParser.ApplyQueries(filterCriteria, query);
+            Assert.AreEqual("weird", filterCriteria.SearchText.Trim());
+            Assert.AreEqual(1, filterCriteria.SearchTerms.Length);
+            Assert.AreEqual("double\"quote", filterCriteria.Artist.SearchTerm);
+        }
     }
 }
