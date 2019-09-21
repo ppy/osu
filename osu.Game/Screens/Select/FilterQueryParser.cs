@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Select
     internal static class FilterQueryParser
     {
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status)(?<op>[=:><]+)(?<value>\S*)",
+            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|bpm|status|creator|artist)(?<op>[=:><]+)(?<value>("".*"")|(\S*))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         internal static void ApplyQueries(FilterCriteria criteria, string query)
@@ -61,6 +61,14 @@ namespace osu.Game.Screens.Select
                     case "status" when Enum.TryParse<BeatmapSetOnlineStatus>(value, true, out var statusValue):
                         updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
                         break;
+
+                    case "creator":
+                        updateCriteriaText(ref criteria.Creator, op, value);
+                        break;
+
+                    case "artist":
+                        updateCriteriaText(ref criteria.Artist, op, value);
+                        break;
                 }
 
                 query = query.Replace(match.ToString(), "");
@@ -77,6 +85,17 @@ namespace osu.Game.Screens.Select
 
         private static bool parseInt(string value, out int result) =>
             int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out result);
+
+        private static void updateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, string op, string value)
+        {
+            switch (op)
+            {
+                case "=":
+                case ":":
+                    textFilter.SearchTerm = value.Trim('"');
+                    break;
+            }
+        }
 
         private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)
         {

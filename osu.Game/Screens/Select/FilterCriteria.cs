@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
         public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
+        public OptionalTextFilter Creator;
+        public OptionalTextFilter Artist;
 
         public string[] SearchTerms = Array.Empty<string>();
 
@@ -81,6 +83,25 @@ namespace osu.Game.Screens.Select
                    && Max.Equals(other.Max)
                    && IsLowerInclusive.Equals(other.IsLowerInclusive)
                    && IsUpperInclusive.Equals(other.IsUpperInclusive);
+        }
+
+        public struct OptionalTextFilter : IEquatable<OptionalTextFilter>
+        {
+            public bool Matches(string value)
+            {
+                if (string.IsNullOrEmpty(SearchTerm))
+                    return true;
+
+                // search term is guaranteed to be non-empty, so if the string we're comparing is empty, it's not matching
+                if (string.IsNullOrEmpty(value))
+                    return false;
+
+                return value.IndexOf(SearchTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            }
+
+            public string SearchTerm;
+
+            public bool Equals(OptionalTextFilter other) => SearchTerm?.Equals(other.SearchTerm) ?? true;
         }
     }
 }
