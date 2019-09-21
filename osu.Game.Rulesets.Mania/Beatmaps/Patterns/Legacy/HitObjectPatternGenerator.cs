@@ -79,9 +79,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (!convertType.HasFlag(PatternType.KeepSingle))
             {
-                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
+                if (HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH) && TotalColumns != 8)
                     convertType |= PatternType.Mirror;
-                else if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP))
+                else if (HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP))
                     convertType |= PatternType.Gathered;
             }
         }
@@ -233,6 +233,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 noteCount = Math.Min(noteCount, TotalColumns - RandomStart - PreviousPattern.ColumnWithObjects);
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
+
             for (int i = 0; i < noteCount; i++)
             {
                 nextColumn = allowStacking
@@ -262,7 +263,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// Whether this hit object can generate a note in the special column.
         /// </summary>
-        private bool hasSpecialColumn => HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP) && HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
+        private bool hasSpecialColumn => HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP) && HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH);
 
         /// <summary>
         /// Generates a random pattern.
@@ -303,6 +304,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             int columnLimit = (TotalColumns % 2 == 0 ? TotalColumns : TotalColumns - 1) / 2;
             int nextColumn = GetRandomColumn(upperBound: columnLimit);
+
             for (int i = 0; i < noteCount; i++)
             {
                 nextColumn = FindAvailableColumn(nextColumn, upperBound: columnLimit, patterns: pattern);
@@ -340,18 +342,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p4 = 0;
                     p5 = 0;
                     break;
+
                 case 3:
                     p2 = Math.Min(p2, 0.1);
                     p3 = 0;
                     p4 = 0;
                     p5 = 0;
                     break;
+
                 case 4:
                     p2 = Math.Min(p2, 0.23);
                     p3 = Math.Min(p3, 0.04);
                     p4 = 0;
                     p5 = 0;
                     break;
+
                 case 5:
                     p3 = Math.Min(p3, 0.15);
                     p4 = Math.Min(p4, 0.03);
@@ -359,7 +364,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     break;
             }
 
-            if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP))
+            if (HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP))
                 p2 = 1;
 
             return GetRandomNoteCount(p2, p3, p4, p5);
@@ -384,20 +389,24 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     p2 = 0;
                     p3 = 0;
                     break;
+
                 case 3:
                     centreProbability = Math.Min(centreProbability, 0.03);
                     p2 = 0;
                     p3 = 0;
                     break;
+
                 case 4:
                     centreProbability = 0;
                     p2 = Math.Min(p2 * 2, 0.2);
                     p3 = 0;
                     break;
+
                 case 5:
                     centreProbability = Math.Min(centreProbability, 0.03);
                     p3 = 0;
                     break;
+
                 case 6:
                     centreProbability = 0;
                     p2 = Math.Min(p2 * 2, 0.5);

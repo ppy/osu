@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -50,7 +51,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 Scale = new Vector2(0.5f),
                 X = 10,
                 Masking = true,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Child = new Box { RelativeSizeAxes = Axes.Both }
             };
         }

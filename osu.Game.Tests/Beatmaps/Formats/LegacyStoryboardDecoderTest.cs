@@ -19,6 +19,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeStoryboardEvents()
         {
             var decoder = new LegacyStoryboardDecoder();
+
             using (var resStream = TestResources.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
             using (var stream = new StreamReader(resStream))
             {
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 int spriteCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSprite));
                 int animationCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardAnimation));
-                int sampleCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSample));
+                int sampleCount = background.Elements.Count(x => x.GetType() == typeof(StoryboardSampleInfo));
 
                 Assert.AreEqual(15, spriteCount);
                 Assert.AreEqual(1, animationCount);
@@ -91,6 +92,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeVariableWithSuffix()
         {
             var decoder = new LegacyStoryboardDecoder();
+
             using (var resStream = TestResources.OpenResource("variable-with-suffix.osb"))
             using (var stream = new StreamReader(resStream))
             {

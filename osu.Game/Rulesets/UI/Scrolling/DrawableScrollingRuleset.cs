@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
@@ -64,9 +65,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
 
         /// <summary>
-        /// Whether the player can change <see cref="VisibleTimeRange"/>.
+        /// Whether the player can change <see cref="TimeRange"/>.
         /// </summary>
         protected virtual bool UserScrollSpeedAdjustment => true;
+
+        /// <summary>
+        /// Whether <see cref="TimingControlPoint"/> beat lengths should scale relative to the most common beat length in the <see cref="Beatmap"/>.
+        /// </summary>
+        protected virtual bool RelativeScaleBeatLengths => false;
 
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
@@ -80,8 +86,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
+        protected DrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
             scrollingInfo.Direction.BindTo(Direction);
@@ -92,9 +98,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case ScrollVisualisationMethod.Sequential:
                     scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
                     break;
+
                 case ScrollVisualisationMethod.Overlapping:
                     scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
                     break;
+
                 case ScrollVisualisationMethod.Constant:
                     scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
                     break;
@@ -104,16 +112,38 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [BackgroundDependencyLoader]
         private void load()
         {
-            // Calculate default multiplier control points
+            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+            double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
+
+            if (RelativeScaleBeatLengths)
+            {
+                IReadOnlyList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+                double maxDuration = 0;
+
+                for (int i = 0; i < timingPoints.Count; i++)
+                {
+                    if (timingPoints[i].Time > lastObjectTime)
+                        break;
+
+                    double endTime = i < timingPoints.Count - 1 ? timingPoints[i + 1].Time : lastObjectTime;
+                    double duration = endTime - timingPoints[i].Time;
+
+                    if (duration > maxDuration)
+                    {
+                        maxDuration = duration;
+                        baseBeatLength = timingPoints[i].BeatLength;
+                    }
+                }
+            }
+
+            // Merge sequences of timing and difficulty control points to create the aggregate "multiplier" control point
             var lastTimingPoint = new TimingControlPoint();
             var lastDifficultyPoint = new DifficultyControlPoint();
-
-            // Merge timing + difficulty points
             var allPoints = new SortedList<ControlPoint>(Comparer<ControlPoint>.Default);
             allPoints.AddRange(Beatmap.ControlPointInfo.TimingPoints);
             allPoints.AddRange(Beatmap.ControlPointInfo.DifficultyPoints);
 
-            // Generate the timing points, making non-timing changes use the previous timing change
+            // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
                 var timingPoint = c as TimingControlPoint;
@@ -128,14 +158,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 return new MultiplierControlPoint(c.Time)
                 {
                     Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier,
+                    BaseBeatLength = baseBeatLength,
                     TimingPoint = lastTimingPoint,
                     DifficultyPoint = lastDifficultyPoint
                 };
             });
 
-            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
-
-            // Perform some post processing of the timing changes
+            // Trim unwanted sequences of timing changes
             timingChanges = timingChanges
                             // Collapse sections after the last hit object
                             .Where(s => s.StartTime <= lastObjectTime)
@@ -144,7 +173,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             controlPoints.AddRange(timingChanges);
 
-            // If we have no control points, add a default one
             if (controlPoints.Count == 0)
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }
@@ -159,6 +187,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case GlobalAction.IncreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
                     return true;
+
                 case GlobalAction.DecreaseScrollSpeed:
                     this.TransformBindableTo(TimeRange, TimeRange.Value + time_span_step, 200, Easing.OutQuint);
                     return true;

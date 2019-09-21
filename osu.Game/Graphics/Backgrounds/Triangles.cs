@@ -8,7 +8,6 @@ using osuTK.Graphics;
 using System;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
@@ -137,11 +136,13 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
+        protected int AimCount;
+
         private void addTriangles(bool randomY)
         {
-            int aimTriangleCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
+            AimCount = (int)(DrawWidth * DrawHeight * 0.002f / (triangleScale * triangleScale) * SpawnRatio);
 
-            for (int i = 0; i < aimTriangleCount - parts.Count; i++)
+            for (int i = 0; i < AimCount - parts.Count; i++)
                 parts.Add(createTriangle(randomY));
         }
 
@@ -178,71 +179,81 @@ namespace osu.Game.Graphics.Backgrounds
         /// <returns>The colour.</returns>
         protected virtual Color4 CreateTriangleShade() => Interpolation.ValueAt(RNG.NextSingle(), ColourDark, ColourLight, 0, 1);
 
-        protected override DrawNode CreateDrawNode() => new TrianglesDrawNode();
-
-        protected override void ApplyDrawNode(DrawNode node)
-        {
-            base.ApplyDrawNode(node);
-
-            var trianglesNode = (TrianglesDrawNode)node;
-
-            trianglesNode.Shader = shader;
-            trianglesNode.Texture = texture;
-            trianglesNode.Size = DrawSize;
-
-            trianglesNode.Parts.Clear();
-            trianglesNode.Parts.AddRange(parts);
-        }
+        protected override DrawNode CreateDrawNode() => new TrianglesDrawNode(this);
 
         private class TrianglesDrawNode : DrawNode
         {
-            public IShader Shader;
-            public Texture Texture;
+            protected new Triangles Source => (Triangles)base.Source;
 
-            public readonly List<TriangleParticle> Parts = new List<TriangleParticle>();
-            public Vector2 Size;
+            private IShader shader;
+            private Texture texture;
 
-            private readonly LinearBatch<TexturedVertex2D> vertexBatch = new LinearBatch<TexturedVertex2D>(100 * 3, 10, PrimitiveType.Triangles);
+            private readonly List<TriangleParticle> parts = new List<TriangleParticle>();
+            private Vector2 size;
+
+            private QuadBatch<TexturedVertex2D> vertexBatch;
+
+            public TrianglesDrawNode(Triangles source)
+                : base(source)
+            {
+            }
+
+            public override void ApplyState()
+            {
+                base.ApplyState();
+
+                shader = Source.shader;
+                texture = Source.texture;
+                size = Source.DrawSize;
+
+                parts.Clear();
+                parts.AddRange(Source.parts);
+            }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
                 base.Draw(vertexAction);
 
-                Shader.Bind();
-                Texture.TextureGL.Bind();
+                if (Source.AimCount > 0 && (vertexBatch == null || vertexBatch.Size != Source.AimCount))
+                {
+                    vertexBatch?.Dispose();
+                    vertexBatch = new QuadBatch<TexturedVertex2D>(Source.AimCount, 1);
+                }
+
+                shader.Bind();
 
                 Vector2 localInflationAmount = edge_smoothness * DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                foreach (TriangleParticle particle in Parts)
+                foreach (TriangleParticle particle in parts)
                 {
                     var offset = triangle_size * new Vector2(particle.Scale * 0.5f, particle.Scale * 0.866f);
-                    var size = new Vector2(2 * offset.X, offset.Y);
 
                     var triangle = new Triangle(
-                        Vector2Extensions.Transform(particle.Position * Size, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * Size + offset, DrawInfo.Matrix),
-                        Vector2Extensions.Transform(particle.Position * Size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
+                        Vector2Extensions.Transform(particle.Position * size, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(particle.Position * size + offset, DrawInfo.Matrix),
+                        Vector2Extensions.Transform(particle.Position * size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
                     );
 
                     ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
-                    Texture.DrawTriangle(
+                    DrawTriangle(
+                        texture,
                         triangle,
                         colourInfo,
                         null,
                         vertexBatch.AddAction,
-                        Vector2.Divide(localInflationAmount, size));
+                        Vector2.Divide(localInflationAmount, new Vector2(2 * offset.X, offset.Y)));
                 }
 
-                Shader.Unbind();
+                shader.Unbind();
             }
 
             protected override void Dispose(bool isDisposing)
             {
                 base.Dispose(isDisposing);
 
-                vertexBatch.Dispose();
+                vertexBatch?.Dispose();
             }
         }
 

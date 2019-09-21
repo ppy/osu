@@ -70,5 +70,7 @@ namespace osu.Game.Rulesets.Mods
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
         public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
+
+        public bool Equals(IMod other) => GetType() == other?.GetType();
     }
 }

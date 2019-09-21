@@ -4,11 +4,13 @@
 using System;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor
+    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor, IApplicableFailOverride
     {
         public override string Name => "Sudden Death";
         public override string Acronym => "SD";
@@ -19,11 +21,16 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
+        public bool AllowFail => true;
+        public bool RestartOnFail => true;
+
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value == 0;
+        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
+
+        protected virtual bool FailCondition(ScoreProcessor scoreProcessor, JudgementResult result) => scoreProcessor.Combo.Value == 0 && result.Judgement.AffectsCombo;
     }
 }

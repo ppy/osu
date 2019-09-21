@@ -8,6 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
@@ -16,26 +17,26 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using Humanizer;
 
 namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScore : OsuClickableContainer
     {
-        public readonly int RankPosition;
-
         public const float HEIGHT = 60;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
-        private const float rank_width = 30;
+        private const float rank_width = 35;
 
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
+        private readonly int rank;
 
         private Box background;
         private Container content;
@@ -51,7 +52,7 @@ namespace osu.Game.Online.Leaderboards
         public LeaderboardScore(ScoreInfo score, int rank)
         {
             this.score = score;
-            RankPosition = rank;
+            this.rank = rank;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -64,7 +65,7 @@ namespace osu.Game.Online.Leaderboards
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
-            Avatar innerAvatar;
+            DrawableAvatar innerAvatar;
 
             Children = new Drawable[]
             {
@@ -78,8 +79,8 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 22, italics: true),
-                            Text = RankPosition.ToString(),
+                            Font = OsuFont.GetFont(size: 20, italics: true),
+                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },
@@ -111,7 +112,7 @@ namespace osu.Game.Online.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    innerAvatar = new Avatar(user)
+                                    innerAvatar = new DrawableAvatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -156,7 +157,7 @@ namespace osu.Game.Online.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableFlag(user.Country)
+                                                        new UpdateableFlag(user.Country)
                                                         {
                                                             Width = 30,
                                                             RelativeSizeAxes = Axes.Y,
@@ -186,13 +187,19 @@ namespace osu.Game.Online.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(score.TotalScore.ToString(@"N0"), OsuFont.Numeric.With(size: 23), Color4.White, OsuColour.FromHex(@"83ccfa")),
+                                        scoreLabel = new GlowingSpriteText
+                                        {
+                                            TextColour = Color4.White,
+                                            GlowColour = OsuColour.FromHex(@"83ccfa"),
+                                            Text = score.TotalScore.ToString(@"N0"),
+                                            Font = OsuFont.Numeric.With(size: 23),
+                                        },
                                         RankContainer = new Container
                                         {
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new DrawableRank(score.Rank)
+                                                scoreRank = new UpdateableRank(score.Rank)
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -208,6 +215,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(1),
                                     ChildrenEnumerable = score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
@@ -274,49 +282,6 @@ namespace osu.Game.Online.Leaderboards
             base.OnHoverLost(e);
         }
 
-        private class GlowingSpriteText : Container
-        {
-            public GlowingSpriteText(string text, FontUsage font, Color4 textColour, Color4 glowColour)
-            {
-                AutoSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    new BufferedContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        BlurSigma = new Vector2(4),
-                        CacheDrawnFrameBuffer = true,
-                        RelativeSizeAxes = Axes.Both,
-                        Blending = BlendingMode.Additive,
-                        Size = new Vector2(3f),
-                        Children = new[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Font = font.With(fixedWidth: true),
-                                Text = text,
-                                Colour = glowColour,
-                                Shadow = false,
-                            },
-                        },
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = font.With(fixedWidth: true),
-                        Text = text,
-                        Colour = textColour,
-                        Shadow = false,
-                    },
-                };
-            }
-        }
-
         private class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
@@ -366,10 +331,14 @@ namespace osu.Game.Online.Leaderboards
                                 },
                             },
                         },
-                        new GlowingSpriteText(statistic.Value, OsuFont.GetFont(size: 17, weight: FontWeight.Bold), Color4.White, OsuColour.FromHex(@"83ccfa"))
+                        new GlowingSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
+                            TextColour = Color4.White,
+                            GlowColour = OsuColour.FromHex(@"83ccfa"),
+                            Text = statistic.Value,
+                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold),
                         },
                     },
                 };

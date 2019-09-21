@@ -13,26 +13,20 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToClock, IApplicableToBeatmap
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModTimeAdjust) };
-
-        protected abstract double FinalRateAdjustment { get; }
-    }
-
-    public abstract class ModTimeRamp<T> : ModTimeRamp, IUpdatableByPlayfield, IApplicableToClock, IApplicableToBeatmap<T>
-        where T : HitObject
-    {
-        private double finalRateTime;
-
-        private double beginRampTime;
-
-        private IAdjustableClock clock;
-
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
         /// </summary>
         private const double final_rate_progress = 0.75f;
+
+        public override Type[] IncompatibleMods => new[] { typeof(ModTimeAdjust) };
+
+        protected abstract double FinalRateAdjustment { get; }
+
+        private double finalRateTime;
+        private double beginRampTime;
+        private IAdjustableClock clock;
 
         public virtual void ApplyToClock(IAdjustableClock clock)
         {
@@ -44,7 +38,7 @@ namespace osu.Game.Rulesets.Mods
             applyAdjustment(1);
         }
 
-        public virtual void ApplyToBeatmap(Beatmap<T> beatmap)
+        public virtual void ApplyToBeatmap(IBeatmap beatmap)
         {
             HitObject lastObject = beatmap.HitObjects.LastOrDefault();
 
@@ -73,10 +67,12 @@ namespace osu.Game.Rulesets.Mods
                     pitch.PitchAdjust /= lastAdjust;
                     pitch.PitchAdjust *= adjust;
                     break;
+
                 case IHasTempoAdjust tempo:
                     tempo.TempoAdjust /= lastAdjust;
                     tempo.TempoAdjust *= adjust;
                     break;
+
                 default:
                     clock.Rate /= lastAdjust;
                     clock.Rate *= adjust;

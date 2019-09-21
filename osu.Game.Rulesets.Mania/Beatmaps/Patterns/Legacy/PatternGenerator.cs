@@ -158,6 +158,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             // Ensure that we have at least one free column, so that an endless loop is avoided
             bool hasValidColumns = false;
+
             for (int i = lowerBound.Value; i < upperBound.Value; i++)
             {
                 hasValidColumns = isValid(i);

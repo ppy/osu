@@ -6,6 +6,8 @@
 	<string>sh.ppy.osulazer</string>
 	<key>CFBundleName</key>
 	<string>osu!</string>
+	<key>CFBundleDisplayName</key>
+	<string>osu!</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.1</string>
 	<key>CFBundleVersion</key>
@@ -29,6 +31,10 @@
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+    <string>We don't really use the camera.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We don't really use the microphone.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -38,5 +44,70 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/AppIcon.appiconset</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string></string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>sh.ppy.osu.items</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>sh.ppy.osu.items</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>sh.ppy.osu.osr</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>osr</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>sh.ppy.osu.items</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>sh.ppy.osu.osk</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>osk</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>sh.ppy.osu.items</string>
+			</array>
+			<key>UTTypeIdentifier</key>
+			<string>sh.ppy.osu.osz</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>osz</string>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>CFBundleTypeName</key>
+			<string>Supported osu! files</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>sh.ppy.osu.items</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        private Cached<Vector2> endPositionCache;
+        private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
         public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
 
@@ -99,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<HitSampleInfo>> NodeSamples { get; set; } = new List<List<HitSampleInfo>>();
 
         private int repeatCount;
 
@@ -157,12 +158,12 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var e in
                 SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
             {
-                var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
+                var firstSample = Samples.Find(s => s.Name == HitSampleInfo.HIT_NORMAL)
                                   ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-                var sampleList = new List<SampleInfo>();
+                var sampleList = new List<HitSampleInfo>();
 
                 if (firstSample != null)
-                    sampleList.Add(new SampleInfo
+                    sampleList.Add(new HitSampleInfo
                     {
                         Bank = firstSample.Bank,
                         Volume = firstSample.Volume,
@@ -183,6 +184,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Samples = sampleList
                         });
                         break;
+
                     case SliderEventType.Head:
                         AddNested(HeadCircle = new SliderCircle
                         {
@@ -194,6 +196,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboIndex = ComboIndex,
                         });
                         break;
+
                     case SliderEventType.LegacyLastTick:
                         // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
                         // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
@@ -206,6 +209,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                             ComboIndex = ComboIndex,
                         });
                         break;
+
                     case SliderEventType.Repeat:
                         AddNested(new RepeatPoint
                         {
@@ -222,9 +226,11 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        private List<SampleInfo> getNodeSamples(int nodeIndex) =>
+        private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 }

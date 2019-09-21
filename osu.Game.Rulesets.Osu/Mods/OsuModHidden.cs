@@ -17,6 +17,9 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
+
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable), typeof(OsuModSpinIn) };
+
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
@@ -59,11 +62,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                         circle.FadeOut(fadeOutDuration);
 
                     break;
+
                 case DrawableSlider slider:
                     using (slider.BeginAbsoluteSequence(fadeOutStartTime, true))
                         slider.Body.FadeOut(longFadeDuration, Easing.Out);
 
                     break;
+
                 case DrawableSliderTick sliderTick:
                     // slider ticks fade out over up to one second
                     var tickFadeOutDuration = Math.Min(sliderTick.HitObject.TimePreempt - DrawableSliderTick.ANIM_DURATION, 1000);
@@ -72,6 +77,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         sliderTick.FadeOut(tickFadeOutDuration);
 
                     break;
+
                 case DrawableSpinner spinner:
                     // hide elements we don't care about.
                     spinner.Disc.Hide();

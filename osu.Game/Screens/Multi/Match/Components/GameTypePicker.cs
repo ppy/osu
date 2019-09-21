@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             AddItem(new GameTypeTimeshift());
         }
 
-        private class GameTypePickerItem : DisableableTabItem<GameType>
+        private class GameTypePickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 

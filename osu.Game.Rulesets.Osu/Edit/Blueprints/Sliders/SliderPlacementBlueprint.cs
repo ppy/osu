@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case PlacementState.Initial:
                     HitObject.Position = e.MousePosition;
                     return true;
+
                 case PlacementState.Body:
                     cursor = e.MousePosition - HitObject.Position;
                     return true;
@@ -77,6 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case PlacementState.Initial:
                     beginCurve();
                     break;
+
                 case PlacementState.Body:
                     switch (e.Button)
                     {

@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 
@@ -18,10 +20,15 @@ namespace osu.Game.Users
         [JsonProperty(@"username")]
         public string Username;
 
+        [JsonProperty(@"previous_usernames")]
+        public string[] PreviousUsernames;
+
         [JsonProperty(@"country")]
         public Country Country;
 
         public Bindable<UserStatus> Status = new Bindable<UserStatus>();
+
+        public IBindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         //public Team Team;
 
@@ -59,6 +66,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_supporter")]
         public bool IsSupporter;
 
+        [JsonProperty(@"support_level")]
+        public int SupportLevel;
+
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
@@ -70,6 +80,12 @@ namespace osu.Game.Users
 
         [JsonProperty(@"is_active")]
         public bool Active;
+
+        [JsonProperty(@"is_online")]
+        public bool IsOnline;
+
+        [JsonProperty(@"pm_friends_only")]
+        public bool PMFriendsOnly;
 
         [JsonProperty(@"interests")]
         public string Interests;
@@ -104,8 +120,16 @@ namespace osu.Game.Users
         [JsonProperty(@"post_count")]
         public int PostCount;
 
-        [JsonProperty(@"playstyle")]
-        public string[] PlayStyle;
+        [JsonProperty(@"follower_count")]
+        public int FollowerCount;
+
+        [JsonProperty]
+        private string[] playstyle
+        {
+            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+        }
+
+        public PlayStyle[] PlayStyles;
 
         [JsonProperty(@"playmode")]
         public string PlayMode;
@@ -138,10 +162,25 @@ namespace osu.Game.Users
         }
 
         [JsonProperty(@"rankHistory")]
-        public RankHistoryData RankHistory;
+        private RankHistoryData rankHistory
+        {
+            set => Statistics.RankHistory = value;
+        }
 
         [JsonProperty("badges")]
         public Badge[] Badges;
+
+        [JsonProperty("user_achievements")]
+        public UserAchievement[] Achievements;
+
+        public class UserAchievement
+        {
+            [JsonProperty("achieved_at")]
+            public DateTimeOffset AchievedAt;
+
+            [JsonProperty("achievement_id")]
+            public int ID;
+        }
 
         public override string ToString() => Username;
 
@@ -151,7 +190,23 @@ namespace osu.Game.Users
         public static readonly User SYSTEM_USER = new User
         {
             Username = "system",
+            Colour = @"9c0101",
             Id = 0
         };
+
+        public enum PlayStyle
+        {
+            [Description("Keyboard")]
+            Keyboard,
+
+            [Description("Mouse")]
+            Mouse,
+
+            [Description("Tablet")]
+            Tablet,
+
+            [Description("Touch Screen")]
+            Touch,
+        }
     }
 }

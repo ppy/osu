@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Beatmaps;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -20,12 +21,14 @@ namespace osu.Game.Graphics
             {
                 default:
                     throw new ArgumentException(@"Invalid hex string length!");
+
                 case 3:
                     return new Color4(
                         (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
                         (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
                         (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
                         255);
+
                 case 6:
                     return new Color4(
                         Convert.ToByte(hex.Substring(0, 2), 16),
@@ -35,11 +38,38 @@ namespace osu.Game.Graphics
             }
         }
 
+        public Color4 ForDifficultyRating(DifficultyRating difficulty)
+        {
+            switch (difficulty)
+            {
+                case DifficultyRating.Easy:
+                    return Green;
+
+                default:
+                case DifficultyRating.Normal:
+                    return Blue;
+
+                case DifficultyRating.Hard:
+                    return Yellow;
+
+                case DifficultyRating.Insane:
+                    return Pink;
+
+                case DifficultyRating.Expert:
+                    return Purple;
+
+                case DifficultyRating.ExpertPlus:
+                    return Gray0;
+            }
+        }
+
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = FromHex(@"eeeeff");
         public readonly Color4 PurpleLight = FromHex(@"aa88ff");
+        public readonly Color4 PurpleLightAlternative = FromHex(@"cba4da");
         public readonly Color4 Purple = FromHex(@"8866ee");
         public readonly Color4 PurpleDark = FromHex(@"6644cc");
+        public readonly Color4 PurpleDarkAlternative = FromHex(@"312436");
         public readonly Color4 PurpleDarker = FromHex(@"441188");
 
         public readonly Color4 PinkLighter = FromHex(@"ffddee");
@@ -65,6 +95,48 @@ namespace osu.Game.Graphics
         public readonly Color4 Green = FromHex(@"88b300");
         public readonly Color4 GreenDark = FromHex(@"668800");
         public readonly Color4 GreenDarker = FromHex(@"445500");
+
+        public readonly Color4 Sky = FromHex(@"6bb5ff");
+        public readonly Color4 GreySkyLighter = FromHex(@"c6e3f4");
+        public readonly Color4 GreySkyLight = FromHex(@"8ab3cc");
+        public readonly Color4 GreySky = FromHex(@"405461");
+        public readonly Color4 GreySkyDark = FromHex(@"303d47");
+        public readonly Color4 GreySkyDarker = FromHex(@"21272c");
+
+        public readonly Color4 Seafoam = FromHex(@"05ffa2");
+        public readonly Color4 GreySeafoamLighter = FromHex(@"9ebab1");
+        public readonly Color4 GreySeafoamLight = FromHex(@"4d7365");
+        public readonly Color4 GreySeafoam = FromHex(@"33413c");
+        public readonly Color4 GreySeafoamDark = FromHex(@"2c3532");
+        public readonly Color4 GreySeafoamDarker = FromHex(@"1e2422");
+
+        public readonly Color4 Cyan = FromHex(@"05f4fd");
+        public readonly Color4 GreyCyanLighter = FromHex(@"77b1b3");
+        public readonly Color4 GreyCyanLight = FromHex(@"436d6f");
+        public readonly Color4 GreyCyan = FromHex(@"293d3e");
+        public readonly Color4 GreyCyanDark = FromHex(@"243536");
+        public readonly Color4 GreyCyanDarker = FromHex(@"1e2929");
+
+        public readonly Color4 Lime = FromHex(@"82ff05");
+        public readonly Color4 GreyLimeLighter = FromHex(@"deff87");
+        public readonly Color4 GreyLimeLight = FromHex(@"657259");
+        public readonly Color4 GreyLime = FromHex(@"3f443a");
+        public readonly Color4 GreyLimeDark = FromHex(@"32352e");
+        public readonly Color4 GreyLimeDarker = FromHex(@"2e302b");
+
+        public readonly Color4 Violet = FromHex(@"bf04ff");
+        public readonly Color4 GreyVioletLighter = FromHex(@"ebb8fe");
+        public readonly Color4 GreyVioletLight = FromHex(@"685370");
+        public readonly Color4 GreyViolet = FromHex(@"46334d");
+        public readonly Color4 GreyVioletDark = FromHex(@"2c2230");
+        public readonly Color4 GreyVioletDarker = FromHex(@"201823");
+
+        public readonly Color4 Carmine = FromHex(@"ff0542");
+        public readonly Color4 GreyCarmineLighter = FromHex(@"deaab4");
+        public readonly Color4 GreyCarmineLight = FromHex(@"644f53");
+        public readonly Color4 GreyCarmine = FromHex(@"342b2d");
+        public readonly Color4 GreyCarmineDark = FromHex(@"302a2b");
+        public readonly Color4 GreyCarmineDarker = FromHex(@"241d1e");
 
         public readonly Color4 Gray0 = FromHex(@"000");
         public readonly Color4 Gray1 = FromHex(@"111");

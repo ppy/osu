@@ -9,8 +9,8 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Tests.Resources;
 using osuTK;
 
@@ -101,14 +101,14 @@ namespace osu.Game.Tests.Beatmaps.Formats
             Assert.IsNotNull(curveData);
             Assert.AreEqual(new Vector2(192, 168), positionData.Position);
             Assert.AreEqual(956, beatmap.HitObjects[0].StartTime);
-            Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
+            Assert.IsTrue(beatmap.HitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
             positionData = beatmap.HitObjects[1] as IHasPosition;
 
             Assert.IsNotNull(positionData);
             Assert.AreEqual(new Vector2(304, 56), positionData.Position);
             Assert.AreEqual(1285, beatmap.HitObjects[1].StartTime);
-            Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
+            Assert.IsTrue(beatmap.HitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
         }
 
         [TestCase(normal)]
@@ -151,6 +151,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var sr = new StreamReader(stream))
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
+
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
                 using (var sr2 = new StreamReader(ms))

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -26,6 +27,7 @@ namespace osu.Game.Overlays.Direct
         private const float height = 70;
 
         private FillFlowContainer statusContainer;
+        protected PanelDownloadButton DownloadButton;
         private PlayButton playButton;
         private Box progressBar;
 
@@ -86,8 +88,9 @@ namespace osu.Game.Overlays.Direct
                                                 {
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Size = new Vector2(height / 2),
+                                                    Size = new Vector2(height / 3),
                                                     FillMode = FillMode.Fit,
+                                                    Margin = new MarginPadding { Right = 10 },
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -126,7 +129,8 @@ namespace osu.Game.Overlays.Direct
                                                     AutoSizeAxes = Axes.X,
                                                     Height = 20,
                                                     Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                                    Children = GetDifficultyIcons(),
+                                                    Spacing = new Vector2(3),
+                                                    Children = GetDifficultyIcons(colours),
                                                 },
                                             },
                                         },
@@ -147,10 +151,10 @@ namespace osu.Game.Overlays.Direct
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Child = new DownloadButton(SetInfo)
+                                    Child = DownloadButton = new PanelDownloadButton(SetInfo)
                                     {
                                         Size = new Vector2(height - vertical_padding * 3),
-                                        Margin = new MarginPadding { Left = vertical_padding, Right = vertical_padding },
+                                        Margin = new MarginPadding { Left = vertical_padding * 2, Right = vertical_padding },
                                     },
                                 },
                                 new FillFlowContainer
@@ -163,26 +167,21 @@ namespace osu.Game.Overlays.Direct
                                     {
                                         new Statistic(FontAwesome.Solid.PlayCircle, SetInfo.OnlineInfo?.PlayCount ?? 0),
                                         new Statistic(FontAwesome.Solid.Heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
-                                        new FillFlowContainer
+                                        new LinkFlowContainer(s =>
+                                        {
+                                            s.Shadow = false;
+                                            s.Font = OsuFont.GetFont(size: 14);
+                                        })
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Children = new[]
-                                            {
-                                                new OsuSpriteText
-                                                {
-                                                    Text = "mapped by ",
-                                                    Font = OsuFont.GetFont(size: 14)
-                                                },
-                                                new OsuSpriteText
-                                                {
-                                                    Text = SetInfo.Metadata.Author.Username,
-                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
-                                                },
-                                            },
-                                        },
+                                        }.With(d =>
+                                        {
+                                            d.AutoSizeAxes = Axes.Both;
+                                            d.AddText("mapped by ");
+                                            d.AddUserLink(SetInfo.Metadata.Author);
+                                        }),
                                         new OsuSpriteText
                                         {
                                             Text = SetInfo.Metadata.Source,

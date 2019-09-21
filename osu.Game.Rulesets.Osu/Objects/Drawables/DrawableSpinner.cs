@@ -13,8 +13,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -196,9 +196,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
-        protected override void UpdatePreemptState()
+        protected override void UpdateInitialTransforms()
         {
-            base.UpdatePreemptState();
+            base.UpdateInitialTransforms();
 
             circleContainer.ScaleTo(Spinner.Scale * 0.3f);
             circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
@@ -213,24 +213,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 .ScaleTo(1, 500, Easing.OutQuint);
         }
 
-        protected override void UpdateCurrentState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {
-                case ArmedState.Idle:
-                    Expire(true);
-                    break;
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
+
                 case ArmedState.Miss:
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
             }
-
-            Expire();
         }
     }
 }

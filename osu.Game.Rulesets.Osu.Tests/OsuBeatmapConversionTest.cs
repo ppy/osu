@@ -8,7 +8,6 @@ using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -21,10 +20,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
         [TestCase("slider-ticks")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        [TestCase("repeat-slider")]
+        [TestCase("uneven-repeat-slider")]
+        [TestCase("old-stacking")]
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
@@ -32,21 +31,22 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 case Slider slider:
                     foreach (var nested in slider.NestedHitObjects)
-                        yield return createConvertValue(nested);
+                        yield return createConvertValue((OsuHitObject)nested);
 
                     break;
+
                 default:
-                    yield return createConvertValue(hitObject);
+                    yield return createConvertValue((OsuHitObject)hitObject);
 
                     break;
             }
 
-            ConvertValue createConvertValue(HitObject obj) => new ConvertValue
+            ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
             {
                 StartTime = obj.StartTime,
                 EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
-                X = (obj as IHasPosition)?.X ?? OsuPlayfield.BASE_SIZE.X / 2,
-                Y = (obj as IHasPosition)?.Y ?? OsuPlayfield.BASE_SIZE.Y / 2,
+                X = obj.StackedPosition.X,
+                Y = obj.StackedPosition.Y
             };
         }
 

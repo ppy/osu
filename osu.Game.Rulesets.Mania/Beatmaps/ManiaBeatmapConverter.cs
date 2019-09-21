@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             if (IsForCurrentRuleset)
             {
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
+
                 if (TargetColumns >= 10)
                 {
                     TargetColumns = TargetColumns / 2;
@@ -254,7 +255,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             /// </summary>
             /// <param name="time">The time to retrieve the sample info list from.</param>
             /// <returns></returns>
-            private List<SampleInfo> sampleInfoListAt(double time)
+            private List<HitSampleInfo> sampleInfoListAt(double time)
             {
                 var curveData = HitObject as IHasCurve;
 

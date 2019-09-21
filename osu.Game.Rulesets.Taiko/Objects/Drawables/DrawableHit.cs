@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -92,51 +95,40 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Size = BaseSize * Parent.RelativeChildSize;
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
-            var circlePiece = MainPiece as CirclePiece;
-            circlePiece?.FlashBox.FinishTransforms();
+            Debug.Assert(HitObject.HitWindows != null);
 
-            var offset = !AllJudged ? 0 : Time.Current - HitObject.StartTime;
-            using (BeginDelayedSequence(HitObject.StartTime - Time.Current + offset, true))
+            switch (state)
             {
-                switch (State.Value)
-                {
-                    case ArmedState.Idle:
-                        validActionPressed = false;
+                case ArmedState.Idle:
+                    validActionPressed = false;
 
-                        UnproxyContent();
-                        this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
-                        break;
-                    case ArmedState.Miss:
-                        this.FadeOut(100)
-                            .Expire();
-                        break;
-                    case ArmedState.Hit:
-                        // If we're far enough away from the left stage, we should bring outselves in front of it
-                        ProxyContent();
+                    UnproxyContent();
+                    break;
 
-                        var flash = circlePiece?.FlashBox;
-                        if (flash != null)
-                        {
-                            flash.FadeTo(0.9f);
-                            flash.FadeOut(300);
-                        }
+                case ArmedState.Miss:
+                    this.FadeOut(100);
+                    break;
 
-                        const float gravity_time = 300;
-                        const float gravity_travel_height = 200;
+                case ArmedState.Hit:
+                    // If we're far enough away from the left stage, we should bring outselves in front of it
+                    ProxyContent();
 
-                        this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                    var flash = (MainPiece as CirclePiece)?.FlashBox;
+                    flash?.FadeTo(0.9f).FadeOut(300);
 
-                        this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
-                            .Then()
-                            .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+                    const float gravity_time = 300;
+                    const float gravity_travel_height = 200;
 
-                        this.FadeOut(800)
-                            .Expire();
+                    this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
-                        break;
-                }
+                    this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
+                        .Then()
+                        .MoveToY(gravity_travel_height * 2, gravity_time * 2, Easing.In);
+
+                    this.FadeOut(800);
+                    break;
             }
         }
 

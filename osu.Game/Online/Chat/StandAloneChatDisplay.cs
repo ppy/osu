@@ -27,8 +27,6 @@ namespace osu.Game.Online.Chat
 
         protected ChannelManager ChannelManager;
 
-        private ScrollContainer scroll;
-
         private DrawableChannel drawableChannel;
 
         private readonly bool postingTextbox;
@@ -132,6 +130,11 @@ namespace osu.Game.Online.Chat
 
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 ChatLineFlow.Padding = new MarginPadding { Horizontal = 0 };
             }

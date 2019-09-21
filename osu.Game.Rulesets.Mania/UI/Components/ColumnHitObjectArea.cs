@@ -6,8 +6,10 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
@@ -16,7 +18,6 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 {
     public class ColumnHitObjectArea : CompositeDrawable, IHasAccentColour
     {
-        private const float hit_target_height = 10;
         private const float hit_target_bar_height = 2;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
@@ -31,7 +32,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                 hitTargetBar = new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = hit_target_height,
+                    Height = NotePiece.NOTE_HEIGHT,
+                    Alpha = 0.6f,
                     Colour = Color4.Black
                 },
                 hitTargetLine = new Container

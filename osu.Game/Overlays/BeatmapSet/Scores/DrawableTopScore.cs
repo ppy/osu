@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -22,10 +23,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private Color4 backgroundHoveredColour;
 
         private readonly Box background;
-        private readonly TopScoreUserSection userSection;
-        private readonly TopScoreStatisticsSection statisticsSection;
 
-        public DrawableTopScore()
+        public DrawableTopScore(ScoreInfo score, int position = 1)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -60,16 +59,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 new Drawable[]
                                 {
-                                    userSection = new TopScoreUserSection
+                                    new TopScoreUserSection
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
+                                        Score = score,
+                                        ScorePosition = position,
                                     },
                                     null,
-                                    statisticsSection = new TopScoreStatisticsSection
+                                    new TopScoreStatisticsSection
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
+                                        Score = score,
                                     }
                                 },
                             },
@@ -88,18 +90,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             backgroundHoveredColour = colours.Gray4;
 
             background.Colour = backgroundIdleColour;
-        }
-
-        /// <summary>
-        /// Sets the score to be displayed.
-        /// </summary>
-        public ScoreInfo Score
-        {
-            set
-            {
-                userSection.Score = value;
-                statisticsSection.Score = value;
-            }
         }
 
         protected override bool OnHover(HoverEvent e)

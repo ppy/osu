@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -57,7 +58,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock)
+        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken)
         {
             if (clock != null)
                 Clock = clock;
@@ -65,7 +66,11 @@ namespace osu.Game.Storyboards.Drawables
             dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+
                 Add(layer.CreateDrawable());
+            }
         }
 
         private void updateLayerVisibility()

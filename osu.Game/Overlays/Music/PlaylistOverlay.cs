@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -20,12 +20,6 @@ namespace osu.Game.Overlays.Music
     {
         private const float transition_duration = 600;
         private const float playlist_height = 510;
-
-        /// <summary>
-        /// Invoked when the order of an item in the list has changed.
-        /// The second parameter indicates the new index of the item.
-        /// </summary>
-        public Action<BeatmapSetInfo, int> OrderChanged;
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private BeatmapManager beatmaps;
@@ -64,13 +58,12 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
                             Selected = itemSelected,
-                            OrderChanged = (s, i) => OrderChanged?.Invoke(s, i)
                         },
                         filter = new FilterControl
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ExitRequested = () => State = Visibility.Hidden,
+                            ExitRequested = Hide,
                             FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },
@@ -81,6 +74,7 @@ namespace osu.Game.Overlays.Music
             filter.Search.OnCommit = (sender, newText) =>
             {
                 BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+
                 if (toSelect != null)
                 {
                     beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);

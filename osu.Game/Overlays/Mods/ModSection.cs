@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 
@@ -33,6 +34,13 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
+        private CancellationTokenSource modsLoadCts;
+
+        /// <summary>
+        /// True when all mod icons have completed loading.
+        /// </summary>
+        public bool ModIconsLoaded { get; private set; } = true;
+
         public IEnumerable<Mod> Mods
         {
             set
@@ -48,8 +56,28 @@ namespace osu.Game.Overlays.Mods
                     };
                 }).ToArray();
 
-                ButtonsContainer.Children = modContainers;
+                modsLoadCts?.Cancel();
+                ModIconsLoaded = false;
+
+                LoadComponentsAsync(modContainers, c =>
+                {
+                    ModIconsLoaded = true;
+                    ButtonsContainer.ChildrenEnumerable = c;
+                }, (modsLoadCts = new CancellationTokenSource()).Token);
+
                 buttons = modContainers.OfType<ModButton>().ToArray();
+
+                if (value.Any())
+                {
+                    headerLabel.FadeIn(200);
+                    this.FadeIn(200);
+                }
+                else
+                {
+                    // transition here looks weird as mods instantly disappear.
+                    headerLabel.Hide();
+                    Hide();
+                }
             }
         }
 
@@ -77,6 +105,7 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             int delay = 0;
+
             foreach (var button in buttons)
             {
                 Mod selected = button.SelectedMod;

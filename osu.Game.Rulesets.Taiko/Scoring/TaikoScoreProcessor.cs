@@ -3,7 +3,6 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
@@ -46,19 +45,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             hpMissMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.0018, 0.0075, 0.0120);
         }
 
-        protected override void ApplyResult(JudgementResult result)
-        {
-            base.ApplyResult(result);
-
-            double hpIncrease = result.Judgement.HealthIncreaseFor(result);
-
-            if (result.Type == HitResult.Miss)
-                hpIncrease *= hpMissMultiplier;
-            else
-                hpIncrease *= hpMultiplier;
-
-            Health.Value += hpIncrease;
-        }
+        protected override double HealthAdjustmentFactorFor(JudgementResult result)
+            => result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier;
 
         protected override void Reset(bool storeResults)
         {

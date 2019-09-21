@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -38,6 +39,7 @@ namespace osu.Game.Rulesets.Mania.UI
             var normalColumnAction = ManiaAction.Key1;
             var specialColumnAction = ManiaAction.Special1;
             int firstColumnIndex = 0;
+
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
@@ -92,6 +94,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private ManiaStage getStageByColumn(int column)
         {
             int sum = 0;
+
             foreach (var stage in stages)
             {
                 sum = sum + stage.Columns.Count;

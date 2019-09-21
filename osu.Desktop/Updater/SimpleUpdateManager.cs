@@ -78,6 +78,7 @@ namespace osu.Desktop.Updater
                 case RuntimeInfo.Platform.Windows:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe"));
                     break;
+
                 case RuntimeInfo.Platform.MacOsx:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
                     break;

@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Beatmaps;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -52,6 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     int count = 0;
                     int req = swell.RequiredHits;
                     double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
+
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
                         TaikoAction action;
@@ -62,12 +64,15 @@ namespace osu.Game.Rulesets.Taiko.Replays
                             case 0:
                                 action = TaikoAction.LeftCentre;
                                 break;
+
                             case 1:
                                 action = TaikoAction.LeftRim;
                                 break;
+
                             case 2:
                                 action = TaikoAction.RightCentre;
                                 break;
+
                             case 3:
                                 action = TaikoAction.RightRim;
                                 break;
@@ -109,7 +114,13 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 else
                     throw new InvalidOperationException("Unknown hit object type.");
 
-                Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
+                var nextHitObject = GetNextObject(i); // Get the next object that requires pressing the same button
+
+                bool canDelayKeyUp = nextHitObject == null || nextHitObject.StartTime > endTime + KEY_UP_DELAY;
+
+                double calculatedDelay = canDelayKeyUp ? KEY_UP_DELAY : (nextHitObject.StartTime - endTime) * 0.9;
+
+                Frames.Add(new TaikoReplayFrame(endTime + calculatedDelay));
 
                 if (i < Beatmap.HitObjects.Count - 1)
                 {
@@ -122,6 +133,25 @@ namespace osu.Game.Rulesets.Taiko.Replays
             }
 
             return Replay;
+        }
+
+        protected override HitObject GetNextObject(int currentIndex)
+        {
+            Type desiredType = Beatmap.HitObjects[currentIndex].GetType();
+
+            for (int i = currentIndex + 1; i < Beatmap.HitObjects.Count; i++)
+            {
+                var currentObj = Beatmap.HitObjects[i];
+
+                if (currentObj.GetType() == desiredType ||
+                    // Un-press all keys before a DrumRoll or Swell
+                    currentObj is DrumRoll || currentObj is Swell)
+                {
+                    return Beatmap.HitObjects[i];
+                }
+            }
+
+            return null;
         }
     }
 }
