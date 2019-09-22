@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// Sets the input manager child to a new test player loader container instance.
         /// </summary>
         /// <param name="interactive">If the test player should behave like the production one.</param>
-        public void ResetPlayer(bool interactive)
+        private void resetPlayer(bool interactive)
         {
             player = new TestPlayer(interactive, interactive);
             loader = new TestPlayerLoader(() => player);
