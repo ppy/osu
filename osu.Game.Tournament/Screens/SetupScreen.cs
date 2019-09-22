@@ -7,6 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Screens.Edit.Setup.Components.LabelledComponents;
 using osu.Game.Tournament.IPC;
 using osuTK;
@@ -16,12 +18,29 @@ namespace osu.Game.Tournament.Screens
 {
     public class SetupScreen : TournamentScreen
     {
+        private FillFlowContainer fillFlow;
+
+        private LoginOverlay loginOverlay;
+
         [Resolved]
         private MatchIPCInfo ipc { get; set; }
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            InternalChild = fillFlow = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Padding = new MarginPadding(10),
+                Spacing = new Vector2(10),
+            };
+
+            api.LocalUser.BindValueChanged(_ => Schedule(reload));
             reload();
         }
 
@@ -29,7 +48,7 @@ namespace osu.Game.Tournament.Screens
         {
             var fileBasedIpc = ipc as FileBasedIPC;
 
-            InternalChildren = new Drawable[]
+            fillFlow.Children = new Drawable[]
             {
                 new ActionableInfo
                 {
@@ -43,6 +62,29 @@ namespace osu.Game.Tournament.Screens
                     Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "Not found",
                     Failing = fileBasedIpc?.Storage == null,
                     Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation, and that it is registered as the default osu! install."
+                },
+                new ActionableInfo
+                {
+                    Label = "Current User",
+                    ButtonText = "Change Login",
+                    Action = () =>
+                    {
+                        api.Logout();
+
+                        if (loginOverlay == null)
+                        {
+                            AddInternal(loginOverlay = new LoginOverlay()
+                            {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                            });
+                        }
+
+                        loginOverlay.State.Value = Visibility.Visible;
+                    },
+                    Value = api?.LocalUser.Value.Username,
+                    Failing = api?.IsLoggedIn != true,
+                    Description = "In order to access the API and display metadata, a login is required."
                 }
             };
         }
