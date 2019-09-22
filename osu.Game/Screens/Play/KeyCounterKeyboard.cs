@@ -18,7 +18,12 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (e.Key == Key) IsLit = true;
+            if (e.Key == Key)
+            {
+                IsLit = true;
+                Increment();
+            }
+
             return base.OnKeyDown(e);
         }
 
