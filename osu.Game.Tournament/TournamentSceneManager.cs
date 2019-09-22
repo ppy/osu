@@ -69,6 +69,7 @@ namespace osu.Game.Tournament
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                new SetupScreen(),
                                 new ScheduleScreen(),
                                 new LadderScreen(),
                                 new LadderEditorScreen(),
