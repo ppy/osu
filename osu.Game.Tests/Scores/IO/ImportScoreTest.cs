@@ -117,17 +117,57 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
+        [Test]
+        public async Task TestImportWithDeletedBeatmapSet()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDeletedBeatmapSet"))
+            {
+                try
+                {
+                    var osu = await loadOsu(host);
+
+                    var toImport = new ScoreInfo
+                    {
+                        Hash = Guid.NewGuid().ToString(),
+                        Statistics = new Dictionary<HitResult, int>
+                        {
+                            { HitResult.Perfect, 100 },
+                            { HitResult.Miss, 50 }
+                        }
+                    };
+
+                    var imported = await loadIntoOsu(osu, toImport);
+
+                    var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
+                    var scoreManager = osu.Dependencies.Get<ScoreManager>();
+
+                    beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.Beatmap.ID)));
+                    Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
+
+                    var secondImport = await loadIntoOsu(osu, imported);
+                    Assert.That(secondImport, Is.Null);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         private async Task<ScoreInfo> loadIntoOsu(OsuGameBase osu, ScoreInfo score)
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
-            score.Beatmap = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
-            score.Ruleset = new OsuRuleset().RulesetInfo;
+            if (score.Beatmap == null)
+                score.Beatmap = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+
+            if (score.Ruleset == null)
+                score.Ruleset = new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             await scoreManager.Import(score);
 
-            return scoreManager.GetAllUsableScores().First();
+            return scoreManager.GetAllUsableScores().FirstOrDefault();
         }
 
         private async Task<OsuGameBase> loadOsu(GameHost host)
