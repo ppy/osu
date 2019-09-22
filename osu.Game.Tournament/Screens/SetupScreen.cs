@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens
 {
-    public class SetupScreen : TournamentScreen
+    public class SetupScreen : TournamentScreen, IProvideVideo
     {
         private FillFlowContainer fillFlow;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Tournament.Screens
 
                         if (loginOverlay == null)
                         {
-                            AddInternal(loginOverlay = new LoginOverlay()
+                            AddInternal(loginOverlay = new LoginOverlay
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
