@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Taiko
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new TaikoModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new TaikoModSuddenDeath();
+
             if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
@@ -66,14 +71,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new TaikoModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new TaikoModRelax();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new TaikoModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

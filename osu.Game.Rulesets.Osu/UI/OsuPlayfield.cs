@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Origin = Anchor.Centre,
                 Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
-                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale * 1.65f)
+                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale)
             };
 
             judgementLayer.Add(explosion);
