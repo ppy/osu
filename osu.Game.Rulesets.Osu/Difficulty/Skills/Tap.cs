@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static (double, double, double[], double[], List<Vector<double>>) CalculateTapAttributes
             (List<OsuHitObject> hitObjects, double clockRate)
         {
-            (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, clockRate);
+            (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, 0, clockRate);
             double burstStrain = maxTapStrain[0];
 
             var streamnessMask = CalculateStreamnessMask(hitObjects, burstStrain, clockRate);
@@ -35,27 +35,42 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Calculates the strain values at each note and the maximum strain values
         /// </summary>
-        private static (List<Vector<double>>, Vector<double>) calculateTapStrain(List<OsuHitObject> hitObjects, double clockRate)
+        private static (List<Vector<double>>, Vector<double>) calculateTapStrain(List<OsuHitObject> hitObjects,
+                                                                                 double mashLevel,
+                                                                                 double clockRate)
         {
             double prevTime = hitObjects[0].StartTime / 1000.0;
+            var strainHistory = new List<Vector<double>> { decayCoeffs * 0 };
             var currStrain = decayCoeffs * 1;
-            var maxStrain = decayCoeffs * 1;
-            var strainHistory = new List<Vector<double>> {currStrain};
 
             for (int i = 1; i < hitObjects.Count; i++)
             {
                 double currTime = hitObjects[i].StartTime / 1000.0;
                 currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                maxStrain = maxStrain.PointwiseMaximum(currStrain);
                 strainHistory.Add(currStrain);
 
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
-                currStrain += decayCoeffs * (1 + spacedBuff);
+                currStrain += decayCoeffs * calculateMashNerfFactor(relativeD, mashLevel) * (1 + spacedBuff);
                 prevTime = currTime;
             }
 
-            return (strainHistory, maxStrain);
+            var strainResult = decayCoeffs * 0;
+
+            for (int j = 0; j < decayCoeffs.Count; j++)
+            {
+                double[] singleStrain = new double[hitObjects.Count];
+                for (int i = 0; i < hitObjects.Count; i++)
+                {
+                    singleStrain[i] = strainHistory[i][j];
+                }
+                Array.Sort(singleStrain);
+                Array.Reverse(singleStrain);
+
+                strainResult[j] = singleStrain[0];
+            }
+
+            return (strainHistory, strainResult);
         }
 
         /// <summary>
@@ -84,29 +99,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 double mashLevel = (double)i / (mashLevelCount - 1);
                 mashLevels[i] = mashLevel;
-                tapSkills[i] = calculateMashTapSkill(hitObjects, mashLevel, clockRate);
+                (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, mashLevel, clockRate);
+                tapSkills[i] = maxTapStrain.Average();
             }
             return (mashLevels, tapSkills);
-        }
-
-        private static double calculateMashTapSkill(List<OsuHitObject> hitObjects, double mashLevel, double clockRate)
-        {
-            double prevTime = hitObjects[0].StartTime / 1000.0;
-            var currStrain = decayCoeffs * 1;
-            var maxStrain = decayCoeffs * 1;
-
-            for (int i = 1; i < hitObjects.Count; i++)
-            {
-                double currTime = hitObjects[i].StartTime / 1000.0;
-                currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                maxStrain = maxStrain.PointwiseMaximum(currStrain);
-
-                double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
-                double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
-                currStrain += decayCoeffs * calculateMashNerfFactor(relativeD, mashLevel) * (1 + spacedBuff);
-                prevTime = currTime;
-            }
-            return maxStrain.Average();
         }
 
         private static double calculateMashNerfFactor(double relativeD, double mashLevel)
