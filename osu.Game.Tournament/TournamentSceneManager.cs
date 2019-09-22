@@ -130,7 +130,7 @@ namespace osu.Game.Tournament
                 },
             };
 
-            SetScreen(typeof(ScheduleScreen));
+            SetScreen(typeof(SetupScreen));
         }
 
         public void SetScreen(Type screenType)
