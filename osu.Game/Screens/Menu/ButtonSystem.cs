@@ -187,7 +187,7 @@ namespace osu.Game.Screens.Menu
             {
                 if (buttonsTopLevel.Any(b => e.PressedKeys.Contains(b.TriggerKey)))
                 {
-                    logo.Click();
+                    logo?.Click();
                     return true;
                 }
             }
