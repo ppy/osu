@@ -173,6 +173,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Body.AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? AccentColour.Value;
             Body.BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+
+            bool allowBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
+            Ball.Colour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 
         private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
