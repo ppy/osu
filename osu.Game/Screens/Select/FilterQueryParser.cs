@@ -22,60 +22,66 @@ namespace osu.Game.Screens.Select
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
 
-                switch (key)
-                {
-                    case "stars" when parseFloatWithPoint(value, out var stars):
-                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.01f / 2);
-                        break;
-
-                    case "ar" when parseFloatWithPoint(value, out var ar):
-                        updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.1f / 2);
-                        break;
-
-                    case "dr" when parseFloatWithPoint(value, out var dr):
-                        updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
-                        break;
-
-                    case "cs" when parseFloatWithPoint(value, out var cs):
-                        updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.1f / 2);
-                        break;
-
-                    case "bpm" when parseDoubleWithPoint(value, out var bpm):
-                        updateCriteriaRange(ref criteria.BPM, op, bpm, 0.01d / 2);
-                        break;
-
-                    case "length" when parseDoubleWithPoint(value.TrimEnd('m', 's', 'h'), out var length):
-                        var scale =
-                            value.EndsWith("ms") ? 1 :
-                            value.EndsWith("s") ? 1000 :
-                            value.EndsWith("m") ? 60000 :
-                            value.EndsWith("h") ? 3600000 : 1000;
-
-                        updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
-                        break;
-
-                    case "divisor" when parseInt(value, out var divisor):
-                        updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
-                        break;
-
-                    case "status" when Enum.TryParse<BeatmapSetOnlineStatus>(value, true, out var statusValue):
-                        updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
-                        break;
-
-                    case "creator":
-                        updateCriteriaText(ref criteria.Creator, op, value);
-                        break;
-
-                    case "artist":
-                        updateCriteriaText(ref criteria.Artist, op, value);
-                        break;
-                }
+                parseKeywordCriteria(criteria, key, value, op);
 
                 query = query.Replace(match.ToString(), "");
             }
 
             criteria.SearchText = query;
         }
+
+        private static void parseKeywordCriteria(FilterCriteria criteria, string key, string value, string op)
+        {
+            switch (key)
+            {
+                case "stars" when parseFloatWithPoint(value, out var stars):
+                    updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.01f / 2);
+                    break;
+
+                case "ar" when parseFloatWithPoint(value, out var ar):
+                    updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.1f / 2);
+                    break;
+
+                case "dr" when parseFloatWithPoint(value, out var dr):
+                    updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.1f / 2);
+                    break;
+
+                case "cs" when parseFloatWithPoint(value, out var cs):
+                    updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.1f / 2);
+                    break;
+
+                case "bpm" when parseDoubleWithPoint(value, out var bpm):
+                    updateCriteriaRange(ref criteria.BPM, op, bpm, 0.01d / 2);
+                    break;
+
+                case "length" when parseDoubleWithPoint(value.TrimEnd('m', 's', 'h'), out var length):
+                    var scale = getLengthScale(value);
+                    updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
+                    break;
+
+                case "divisor" when parseInt(value, out var divisor):
+                    updateCriteriaRange(ref criteria.BeatDivisor, op, divisor);
+                    break;
+
+                case "status" when Enum.TryParse<BeatmapSetOnlineStatus>(value, true, out var statusValue):
+                    updateCriteriaRange(ref criteria.OnlineStatus, op, statusValue);
+                    break;
+
+                case "creator":
+                    updateCriteriaText(ref criteria.Creator, op, value);
+                    break;
+
+                case "artist":
+                    updateCriteriaText(ref criteria.Artist, op, value);
+                    break;
+            }
+        }
+
+        private static int getLengthScale(string value) =>
+            value.EndsWith("ms") ? 1 :
+            value.EndsWith("s") ? 1000 :
+            value.EndsWith("m") ? 60000 :
+            value.EndsWith("h") ? 3600000 : 1000;
 
         private static bool parseFloatWithPoint(string value, out float result) =>
             float.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out result);
