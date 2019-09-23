@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 Array.Reverse(singleStrainHistory);
 
                 double singleStrainResult = 0;
-                double k = 0.97;
+                double k = 0.95;
 
                 for (int i = 0; i < hitObjects.Count; i++)
                 {
