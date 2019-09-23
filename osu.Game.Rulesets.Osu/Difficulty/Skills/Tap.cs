@@ -39,19 +39,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                                                  double mashLevel,
                                                                                  double clockRate)
         {
-            double prevTime = hitObjects[0].StartTime / 1000.0;
-            var strainHistory = new List<Vector<double>> { decayCoeffs * 0 };
+            double prevPrevTime = hitObjects[0].StartTime / 1000.0;
+            double prevTime = hitObjects[1].StartTime / 1000.0;
+            var strainHistory = new List<Vector<double>> { decayCoeffs * 0, decayCoeffs * 0 };
             var currStrain = decayCoeffs * 1;
 
-            for (int i = 1; i < hitObjects.Count; i++)
+            for (int i = 2; i < hitObjects.Count; i++)
             {
                 double currTime = hitObjects[i].StartTime / 1000.0;
                 currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                strainHistory.Add(currStrain);
+                strainHistory.Add(currStrain.PointwisePower(1.0/3));
 
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
-                currStrain += decayCoeffs * calculateMashNerfFactor(relativeD, mashLevel) * (1 + spacedBuff);
+
+                currStrain += decayCoeffs * Math.Pow((currTime - prevPrevTime) / clockRate, -2) *
+                              calculateMashNerfFactor(relativeD, mashLevel) * (1 + spacedBuff);
+
+                prevPrevTime = prevTime;
                 prevTime = currTime;
             }
 
@@ -59,18 +64,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             for (int j = 0; j < decayCoeffs.Count; j++)
             {
-                double[] singleStrain = new double[hitObjects.Count];
+                double[] singleStrainHistory = new double[hitObjects.Count];
+
                 for (int i = 0; i < hitObjects.Count; i++)
                 {
-                    singleStrain[i] = strainHistory[i][j];
+                    singleStrainHistory[i] = strainHistory[i][j];
                 }
-                Array.Sort(singleStrain);
-                Array.Reverse(singleStrain);
 
-                strainResult[j] = singleStrain[0];
+                Array.Sort(singleStrainHistory);
+                Array.Reverse(singleStrainHistory);
+
+                double singleStrainResult = 0;
+                double k = 0.97;
+
+                for (int i = 0; i < hitObjects.Count; i++)
+                {
+                    singleStrainResult += singleStrainHistory[i] * Math.Pow(k, i);
+                }
+
+                strainResult[j] = singleStrainResult * (1 - k);
             }
 
-            return (strainHistory, strainResult);
+            return (strainHistory, strainResult * 1.6);
         }
 
         /// <summary>
