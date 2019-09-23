@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
@@ -110,7 +111,7 @@ namespace osu.Game.Database
         protected async Task Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = "Import is initialising...";
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -146,7 +147,7 @@ namespace osu.Game.Database
 
             if (imported.Count == 0)
             {
-                notification.Text = "Import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
