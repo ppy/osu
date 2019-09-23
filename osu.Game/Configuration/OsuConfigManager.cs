@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -86,6 +87,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.KeyOverlay, false);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
 
+            Set(OsuSetting.ShowVirtualTouchDisplay, RuntimeInfo.IsMobile);
+
             Set(OsuSetting.FloatingComments, false);
 
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
@@ -143,6 +146,7 @@ namespace osu.Game.Configuration
         FloatingComments,
         ShowInterface,
         ShowHealthDisplayWhenCantFail,
+        ShowVirtualTouchDisplay,
         MouseDisableButtons,
         MouseDisableWheel,
         AudioOffset,

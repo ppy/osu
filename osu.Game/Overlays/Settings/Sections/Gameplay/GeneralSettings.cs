@@ -44,6 +44,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show virtual touch display",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowVirtualTouchDisplay)
+                },
                 new SettingsEnumDropdown<ScoreMeterType>
                 {
                     LabelText = "Score meter type",
