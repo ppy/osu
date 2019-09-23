@@ -68,6 +68,8 @@ namespace osu.Game.Overlays.Changelog
 
                 foreach (APIChangelogEntry entry in categoryEntries)
                 {
+                    var entryColour = entry.Major ? colours.YellowLight : Color4.White;
+
                     LinkFlowContainer title;
 
                     Container titleContainer = new Container
@@ -75,25 +77,25 @@ namespace osu.Game.Overlays.Changelog
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Margin = new MarginPadding { Vertical = 5 },
-                        Child = title = new LinkFlowContainer
+                        Children = new Drawable[]
                         {
-                            Direction = FillDirection.Full,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
+                            new SpriteIcon
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreRight,
+                                Size = new Vector2(fontSmall.Size),
+                                Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
+                                Colour = entryColour,
+                                Margin = new MarginPadding { Right = 5 },
+                            },
+                            title = new LinkFlowContainer
+                            {
+                                Direction = FillDirection.Full,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                            }
                         }
                     };
-
-                    var entryColour = entry.Major ? colours.YellowLight : Color4.White;
-
-                    titleContainer.Add(new SpriteIcon
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreRight,
-                        Size = new Vector2(fontSmall.Size),
-                        Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
-                        Colour = entryColour,
-                        Margin = new MarginPadding { Right = 5 },
-                    });
 
                     title.AddText(entry.Title, t =>
                     {
