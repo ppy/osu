@@ -16,7 +16,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
@@ -210,20 +209,23 @@ namespace osu.Game.Rulesets.UI
                         .WithChild(ResumeOverlay)));
             }
 
-            if (RuntimeInfo.IsMobile)
-            {
-                if (!(KeyBindingInputManager is IHasVirtualHandler virtualInputManager))
-                    throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports virtual input handling is not available");
+            var showVirtualTouchDisplay = new BindableBool();
+            config.BindWith(OsuSetting.ShowVirtualTouchDisplay, showVirtualTouchDisplay);
 
-                virtualInputManager.VirtualInputHandler = CreateVirtualInputHandler();
-                resumeInputManager.UseParentInput = false;
+            if (!(KeyBindingInputManager is IHasVirtualHandler virtualInputManager))
+                throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports virtual input handling is not available");
+            
+            showVirtualTouchDisplay.BindValueChanged(v =>
+            {
+                virtualInputManager.VirtualInputHandler = v.NewValue ? CreateVirtualInputHandler() : null;
+                resumeInputManager.UseParentInput = virtualInputManager.VirtualInputHandler != null;
 
                 if (!ProvidingUserCursor)
                 {
                     // The cursor is hidden by default (see Playfield.load()), but should be shown when there's a replay
                     Playfield.Cursor?.Show();
                 }
-            }
+            }, true);
 
             applyRulesetMods(mods, config);
 
