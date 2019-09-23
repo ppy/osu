@@ -15,6 +15,7 @@ using osu.Game.Users;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using System.Net;
+using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -67,21 +68,31 @@ namespace osu.Game.Overlays.Changelog
 
                 foreach (APIChangelogEntry entry in categoryEntries)
                 {
-                    LinkFlowContainer title = new LinkFlowContainer
+                    LinkFlowContainer title;
+
+                    Container titleContainer = new Container
                     {
-                        Direction = FillDirection.Full,
-                        RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Margin = new MarginPadding { Vertical = 5 },
+                        Child = title = new LinkFlowContainer
+                        {
+                            Direction = FillDirection.Full,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
                     };
 
                     var entryColour = entry.Major ? colours.YellowLight : Color4.White;
 
-                    title.AddIcon(entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus, t =>
+                    titleContainer.Add(new SpriteIcon
                     {
-                        t.Font = fontSmall;
-                        t.Colour = entryColour;
-                        t.Padding = new MarginPadding { Left = -17, Right = 5 };
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreRight,
+                        Size = new Vector2(fontSmall.Size),
+                        Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
+                        Colour = entryColour,
+                        Margin = new MarginPadding { Right = 5 },
                     });
 
                     title.AddText(entry.Title, t =>
@@ -139,7 +150,7 @@ namespace osu.Game.Overlays.Changelog
                             t.Colour = entryColour;
                         });
 
-                    ChangelogEntries.Add(title);
+                    ChangelogEntries.Add(titleContainer);
 
                     if (!string.IsNullOrEmpty(entry.MessageHtml))
                     {
