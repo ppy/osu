@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0f = { 0, 1, 1.7, 2.3 };
-        private static readonly double[] ks0f = { -14.4, -9.5, -6.5, -2 };
+        private static readonly double[] ks0f = { -14.4, -9.5, -7.3, -2 };
         private static readonly double[] scales0f = { 1, 1, 1, 1 };
         private static readonly double[,,] coeffs0f = new double[,,]  {{{ 0   , -1   , -1.7 , -2   },
                                                                         { 0   ,  0   ,  0   ,  0   },
