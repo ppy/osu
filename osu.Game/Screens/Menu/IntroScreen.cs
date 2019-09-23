@@ -4,12 +4,19 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Skinning;
+using osu.Game.Online.API;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -17,6 +24,10 @@ namespace osu.Game.Screens.Menu
 {
     public abstract class IntroScreen : StartupScreen
     {
+        protected abstract string BeatmapHash { get; }
+
+        protected abstract string BeatmapFile { get; }
+
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
         public const int EXIT_DELAY = 3000;
@@ -24,24 +35,83 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private AudioManager audio { get; set; }
 
+        protected SampleChannel Welcome;
+
         private SampleChannel seeya;
 
-        private Bindable<bool> menuVoice;
+        protected Bindable<bool> MenuVoice;
+
+        protected Bindable<bool> MenuMusic;
+
+        protected Track Track;
+
+        protected WorkingBeatmap IntroBeatmap;
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
         public new Bindable<WorkingBeatmap> Beatmap => beatmap;
 
+        protected Bindable<User> User;
+
+        protected Bindable<Skin> Skin;
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, IAPIProvider api, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
         {
             // prevent user from changing beatmap while the intro is still runnning.
             beatmap = base.Beatmap.BeginLease(false);
 
-            menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
-            seeya = audio.Samples.Get(@"seeya");
+            MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
+            MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
+
+            User = api.LocalUser.GetBoundCopy();
+            Skin = skinManager.CurrentSkin.GetBoundCopy();
+
+            Skin.BindValueChanged(_ => updateSeeya(), true);
+
+            BeatmapSetInfo setInfo = null;
+
+            if (!MenuMusic.Value)
+            {
+                var sets = beatmaps.GetAllUsableBeatmapSets();
+                if (sets.Count > 0)
+                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
+            }
+
+            if (setInfo == null)
+            {
+                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == BeatmapHash);
+
+                if (setInfo == null)
+                {
+                    // we need to import the default menu background beatmap
+                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream($"Tracks/{BeatmapFile}"), BeatmapFile)).Result;
+
+                    setInfo.Protected = true;
+                    beatmaps.Update(setInfo);
+                }
+            }
+
+            IntroBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+            Track = IntroBeatmap.Track;
+        }
+
+        private void updateSeeya()
+        {
+            if (User.Value?.IsSupporter ?? false)
+                seeya = Skin.Value.GetSample(new SampleInfo("seeya")) ?? audio.Samples.Get(@"seeya");
+            else
+                seeya = audio.Samples.Get(@"seeya");
+        }
+
+        protected void SetWelcome()
+        {
+            if (User.Value?.IsSupporter ?? false)
+                Welcome = Skin.Value.GetSample(new SampleInfo("welcome")) ?? audio.Samples.Get(@"welcome");
+            else
+                Welcome = audio.Samples.Get(@"welcome");
         }
 
         /// <summary>
@@ -61,7 +131,7 @@ namespace osu.Game.Screens.Menu
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
-            if (menuVoice.Value)
+            if (MenuVoice.Value)
                 seeya.Play();
             else
                 fadeOutTime = 500;
