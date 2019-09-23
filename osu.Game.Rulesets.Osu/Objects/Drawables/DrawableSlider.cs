@@ -163,9 +163,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private float sliderPathRadius;
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
         {
-            base.SkinChanged(skin, allowFallback);
+            base.ApplySkin(skin, allowFallback);
 
             Body.BorderSize = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderBorderSize)?.Value ?? SliderBody.DEFAULT_BORDER_SIZE;
             sliderPathRadius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
@@ -173,6 +173,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Body.AccentColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderTrackOverride)?.Value ?? AccentColour.Value;
             Body.BorderColour = skin.GetConfig<OsuSkinColour, Color4>(OsuSkinColour.SliderBorder)?.Value ?? Color4.White;
+
+            bool allowBallTint = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false;
+            Ball.Colour = allowBallTint ? AccentColour.Value : Color4.White;
         }
 
         private void updatePathRadius() => Body.PathRadius = slider.Scale * sliderPathRadius;
