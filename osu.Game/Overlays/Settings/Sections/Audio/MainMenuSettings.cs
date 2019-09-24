@@ -34,6 +34,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                     Bindable = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
                     Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
+                new SettingsDropdown<BackgroundMode>
+                {
+                    LabelText = "Background",
+                    Bindable = config.GetBindable<BackgroundMode>(OsuSetting.BackgroundMode),
+                    Items = Enum.GetValues(typeof(BackgroundMode)).Cast<BackgroundMode>()
+                }
             };
         }
     }
