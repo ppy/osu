@@ -20,7 +20,7 @@ namespace osu.Game.Updater
         private OsuGameBase game { get; set; }
 
         [Resolved]
-        protected NotificationOverlay Notifications { get; set; }
+        protected NotificationOverlay Notifications { get; private set; }
 
         protected override void LoadComplete()
         {
