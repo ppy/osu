@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
@@ -14,19 +16,20 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    [Description("PlaySongSelect leaderboard")]
-    public class TestSceneLeaderboard : OsuTestScene
+    public class TestSceneBeatmapLeaderboard : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(Placeholder),
             typeof(MessagePlaceholder),
             typeof(RetrievalFailurePlaceholder),
+            typeof(UserTopScoreContainer),
+            typeof(Leaderboard<BeatmapLeaderboardScope, ScoreInfo>),
         };
 
         private readonly FailableLeaderboard leaderboard;
 
-        public TestSceneLeaderboard()
+        public TestSceneBeatmapLeaderboard()
         {
             Add(leaderboard = new FailableLeaderboard
             {
@@ -37,6 +40,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddStep(@"New Scores", newScores);
+            AddStep(@"Show personal best", showPersonalBest);
             AddStep(@"Empty Scores", () => leaderboard.SetRetrievalState(PlaceholderState.NoScores));
             AddStep(@"Network failure", () => leaderboard.SetRetrievalState(PlaceholderState.NetworkFailure));
             AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
@@ -45,6 +49,32 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"None selected", () => leaderboard.SetRetrievalState(PlaceholderState.NoneSelected));
             foreach (BeatmapSetOnlineStatus status in Enum.GetValues(typeof(BeatmapSetOnlineStatus)))
                 AddStep($"{status} beatmap", () => showBeatmapWithStatus(status));
+        }
+
+        private void showPersonalBest()
+        {
+            leaderboard.TopScore = new APILegacyUserTopScoreInfo
+            {
+                Position = 999,
+                Score = new APILegacyScoreInfo
+                {
+                    Rank = ScoreRank.XH,
+                    Accuracy = 1,
+                    MaxCombo = 244,
+                    TotalScore = 1707827,
+                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    User = new User
+                    {
+                        Id = 6602580,
+                        Username = @"waaiiru",
+                        Country = new Country
+                        {
+                            FullName = @"Spain",
+                            FlagName = @"ES",
+                        },
+                    },
+                }
+            };
         }
 
         private void newScores()

@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        public const float CORNER_RADIUS = NotePiece.NOTE_HEIGHT / 2;
-
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject)
