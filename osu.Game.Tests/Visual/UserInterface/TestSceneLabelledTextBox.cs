@@ -8,7 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Setup.Components.LabelledComponents;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
