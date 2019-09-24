@@ -202,7 +202,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
                         Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 10, Left = 25, Right = shear_width * 2.5f, Bottom = 20 },
+                        Padding = new MarginPadding { Top = 10, Left = 25, Right = shear_width * 2.5f },
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 14, Left = 10, Right = shear_width / 2, Bottom = 20 },
+                        Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
@@ -239,9 +239,9 @@ namespace osu.Game.Screens.Select
                         Name = "Centre-aligned metadata",
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.TopLeft,
-                        Y = -22,
+                        Y = -7,
                         Direction = FillDirection.Vertical,
-                        Padding = new MarginPadding { Top = 15, Left = 25, Right = shear_width, Bottom = 20 },
+                        Padding = new MarginPadding { Left = 25, Right = shear_width },
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
