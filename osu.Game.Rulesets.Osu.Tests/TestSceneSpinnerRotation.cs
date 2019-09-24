@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
             return new TestPlayer();
         }
-        
+
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
         {
             HitObjects = new List<HitObject>
