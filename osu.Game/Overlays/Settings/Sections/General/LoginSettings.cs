@@ -225,13 +225,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         PlaceholderText = "email address",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.ProvidedUsername ?? string.Empty,
-                        TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
                     {
                         PlaceholderText = "password",
                         RelativeSizeAxes = Axes.X,
-                        TabbableContentContainer = this,
                         OnCommit = (sender, newText) => performLogin()
                     },
                     new SettingsCheckbox

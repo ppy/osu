@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
-                                        new Container
+                                        new TabbableContentContainer
                                         {
                                             Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                                             RelativeSizeAxes = Axes.X,
@@ -119,7 +119,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                             Child = NameField = new SettingsTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                TabbableContentContainer = this,
                                                                 OnCommit = (sender, text) => apply(),
                                                             },
                                                         },
@@ -170,7 +169,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                             Child = MaxParticipantsField = new SettingsNumberTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                TabbableContentContainer = this,
                                                                 ReadOnly = true,
                                                                 OnCommit = (sender, text) => apply()
                                                             },
@@ -201,7 +199,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                             Child = new SettingsPasswordTextBox
                                                             {
                                                                 RelativeSizeAxes = Axes.X,
-                                                                TabbableContentContainer = this,
                                                                 ReadOnly = true,
                                                                 OnCommit = (sender, text) => apply()
                                                             },

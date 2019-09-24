@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public OsuPasswordTextBox()
         {
-            Add(warning = new CapsWarning
+            AddInternal(warning = new CapsWarning
             {
                 Size = new Vector2(20),
                 Origin = Anchor.CentreRight,

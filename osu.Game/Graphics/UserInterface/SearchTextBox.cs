@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
         public SearchTextBox()
         {
             Height = 35;
-            AddRange(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new SpriteIcon
                 {
