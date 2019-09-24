@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
-
+using System.IO;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -48,8 +48,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
 
             // Aim
-            (var aimDiff, var fcTimeTP, var comboTPs, var missTPs, var missCounts, var cheeseNoteCount, var cheeseLevels, var cheeseFactors) =
+            (var aimDiff, var fcTimeTP, var comboTPs, var missTPs, var missCounts,
+             var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory);
+
+            // graph for aim
+            string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}.txt");
+            File.WriteAllText(graphFilePath, graphText);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);

@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int difficultyCount = 20;
 
 
-        public static (double, double, double[], double[], double[], double, double[], double[])
+        public static (double, double, double[], double[], double[], double, double[], double[], string)
             CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                    double clockRate,
                                    List<Vector<double>> strainHistory)
@@ -45,14 +45,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double fcProbTP = calculateFCProbTP(movements);
             double fcTimeTP = calculateFCTimeTP(movements);
 
-            graph(movements, fcProbTP);
+            string graphText = generateGraphText(movements, fcProbTP);
 
             double[] comboTPs = calculateComboTps(movements);
             (var missTPs, var missCounts) = calculateMissTPsMissCounts(movements, fcTimeTP);
             (var cheeseLevels, var cheeseFactors) = calculateCheeseLevelsVSCheeseFactors(movements, fcProbTP);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTP);
 
-            return (fcProbTP, fcTimeTP, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors);
+            return (fcProbTP, fcTimeTP, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
         }
 
         private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
@@ -114,10 +114,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         }
 
-        private static void graph(List<OsuMovement> movements, double tp)
+        private static string generateGraphText(List<OsuMovement> movements, double tp)
         {
-            string path = Path.Combine("cache", "graph.txt");
-
             var sw = new StringWriter();
 
             foreach (var movement in movements)
@@ -130,8 +128,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 sw.WriteLine($"{time} {ipRaw} {ipCorrected} {missProb}");
             }
 
-            File.WriteAllText(path, sw.ToString());
+            string graphText = sw.ToString();
             sw.Dispose();
+            return graphText;
         }
 
 
