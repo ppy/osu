@@ -89,7 +89,7 @@ namespace osu.Game.Tournament.Screens
             };
         }
 
-        private class ActionableInfo : LabelledComponent
+        private class ActionableInfo : LabelledComponent<Drawable>
         {
             private OsuButton button;
 
