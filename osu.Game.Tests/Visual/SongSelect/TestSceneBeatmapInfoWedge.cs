@@ -75,7 +75,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testBeatmapLabels(instance);
 
-                // TODO: adjust cases once more info is shown for other gamemodes
                 switch (instance)
                 {
                     case OsuRuleset _:
@@ -99,8 +98,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                         break;
                 }
             }
-
-            testNullBeatmap();
         }
 
         private void testBeatmapLabels(Ruleset ruleset)
@@ -117,7 +114,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
         }
 
-        private void testNullBeatmap()
+        [Test]
+        public void testNullBeatmap()
         {
             selectBeatmap(null);
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
