@@ -155,13 +155,11 @@ namespace osu.Game.Graphics.Containers
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault
         {
-            private Bindable<WorkingBeatmap> beatmap;
 
             [BackgroundDependencyLoader]
             private void load(IBindable<WorkingBeatmap> beatmap)
             {
-                this.beatmap = (Bindable<WorkingBeatmap>)beatmap;
-                this.beatmap.ValueChanged += _ => Next();
+                beatmap.ValueChanged += _ => Next();
             }
 
             public override void OnEntering(IScreen last)
