@@ -41,10 +41,10 @@ namespace osu.Game.Screens.Menu
         private BackgroundScreenDefault background;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             if (MenuVoice.Value && !MenuMusic.Value)
-                SetWelcome();
+                Welcome = audio.Samples.Get(@"welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)

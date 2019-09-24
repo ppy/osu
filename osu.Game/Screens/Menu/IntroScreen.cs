@@ -9,14 +9,11 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO.Archives;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Skinning;
-using osu.Game.Online.API;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -51,14 +48,10 @@ namespace osu.Game.Screens.Menu
 
         public new Bindable<WorkingBeatmap> Beatmap => beatmap;
 
-        protected Bindable<User> User;
-
-        protected Bindable<Skin> Skin;
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IAPIProvider api, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
+        private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
         {
             // prevent user from changing beatmap while the intro is still runnning.
             beatmap = base.Beatmap.BeginLease(false);
@@ -66,10 +59,7 @@ namespace osu.Game.Screens.Menu
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
-            User = api.LocalUser.GetBoundCopy();
-            Skin = skinManager.CurrentSkin.GetBoundCopy();
-
-            Skin.BindValueChanged(_ => updateSeeya(), true);
+            seeya = audio.Samples.Get(@"seeya");
 
             BeatmapSetInfo setInfo = null;
 
@@ -96,22 +86,6 @@ namespace osu.Game.Screens.Menu
 
             IntroBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
             Track = IntroBeatmap.Track;
-        }
-
-        private void updateSeeya()
-        {
-            if (User.Value?.IsSupporter ?? false)
-                seeya = Skin.Value.GetSample(new SampleInfo("seeya")) ?? audio.Samples.Get(@"seeya");
-            else
-                seeya = audio.Samples.Get(@"seeya");
-        }
-
-        protected void SetWelcome()
-        {
-            if (User.Value?.IsSupporter ?? false)
-                Welcome = Skin.Value.GetSample(new SampleInfo("welcome")) ?? audio.Samples.Get(@"welcome");
-            else
-                Welcome = audio.Samples.Get(@"welcome");
         }
 
         /// <summary>
