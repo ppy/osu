@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
-            double multiplier = 2.1f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
+            double multiplier = 2.14f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
                 multiplier *= 0.90f;
@@ -246,11 +246,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double getModifiedAcc()
         {
             // Treat 300 as 300, 100 as 200, 50 as 100
-            // add 1 to denominator so that later erf gives resonable result
+            // add 2 to countHitCircles in the denominator so that later erfinv gives resonable result for ss scores
             double modifiedAcc;
             if (countHitCircles > 0)
                 modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
-                              ((countHitCircles + 1) * 3);
+                              ((countHitCircles + 2) * 3);
             else
                 modifiedAcc = 0;
 
