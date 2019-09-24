@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
@@ -154,6 +155,15 @@ namespace osu.Game.Graphics.Containers
 
         private class ScalingBackgroundScreen : BackgroundScreenDefault
         {
+            private Bindable<WorkingBeatmap> beatmap;
+
+            [BackgroundDependencyLoader]
+            private void load(IBindable<WorkingBeatmap> beatmap)
+            {
+                this.beatmap = (Bindable<WorkingBeatmap>)beatmap;
+                this.beatmap.ValueChanged += _ => Next();
+            }
+
             public override void OnEntering(IScreen last)
             {
                 this.FadeInFromZero(4000, Easing.OutQuint);
