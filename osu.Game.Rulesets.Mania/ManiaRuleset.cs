@@ -46,6 +46,11 @@ namespace osu.Game.Rulesets.Mania
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new ManiaModDoubleTime();
 
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new ManiaModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new ManiaModSuddenDeath();
+
             if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
 
@@ -97,14 +102,8 @@ namespace osu.Game.Rulesets.Mania
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new ManiaModPerfect();
-
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new ManiaModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

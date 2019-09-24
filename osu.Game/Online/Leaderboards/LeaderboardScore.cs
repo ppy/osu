@@ -20,23 +20,23 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using Humanizer;
 
 namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScore : OsuClickableContainer
     {
-        public readonly int RankPosition;
-
         public const float HEIGHT = 60;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
-        private const float rank_width = 30;
+        private const float rank_width = 35;
 
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
+        private readonly int rank;
 
         private Box background;
         private Container content;
@@ -52,7 +52,7 @@ namespace osu.Game.Online.Leaderboards
         public LeaderboardScore(ScoreInfo score, int rank)
         {
             this.score = score;
-            RankPosition = rank;
+            this.rank = rank;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -79,8 +79,8 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 22, italics: true),
-                            Text = RankPosition.ToString(),
+                            Font = OsuFont.GetFont(size: 20, italics: true),
+                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
                         },
                     },
                 },
@@ -215,6 +215,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(1),
                                     ChildrenEnumerable = score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
