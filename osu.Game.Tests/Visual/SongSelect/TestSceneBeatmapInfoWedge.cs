@@ -127,6 +127,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
+        [Test]
+        public void testTruncation()
+        {
+            selectBeatmap(createLongMetadata());
+        }
+
         private void selectBeatmap([CanBeNull] IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
@@ -163,6 +169,25 @@ namespace osu.Game.Tests.Visual.SongSelect
                     BaseDifficulty = new BeatmapDifficulty()
                 },
                 HitObjects = objects
+            };
+        }
+
+        private IBeatmap createLongMetadata()
+        {
+            return new Beatmap
+            {
+                BeatmapInfo = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        AuthorString = $"WWWWWWWWWWWWWWW",
+                        Artist = $"Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
+                        Source = $"Verrrrry long Source",
+                        Title = $"Verrrrry long Title"
+                    },
+                    Version = $"Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
+                    Status = BeatmapSetOnlineStatus.Graveyard,
+                },
             };
         }
 
