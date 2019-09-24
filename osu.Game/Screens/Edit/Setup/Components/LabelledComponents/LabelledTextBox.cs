@@ -9,11 +9,9 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {
-    public class LabelledTextBox : LabelledComponent
+    public class LabelledTextBox : LabelledComponent<OsuTextBox>
     {
         public event TextBox.OnCommitHandler OnCommit;
-
-        protected new OsuTextBox Component => (OsuTextBox)base.Component;
 
         public LabelledTextBox()
             : base(false)
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
             Component.BorderColour = colours.Blue;
         }
 
-        protected override Drawable CreateComponent() => new OsuTextBox
+        protected override OsuTextBox CreateComponent() => new OsuTextBox
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
