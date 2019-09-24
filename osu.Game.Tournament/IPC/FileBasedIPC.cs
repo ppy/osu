@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Platform.Windows;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Online.API;
@@ -26,103 +27,120 @@ namespace osu.Game.Tournament.IPC
         [Resolved]
         protected RulesetStore Rulesets { get; private set; }
 
+        [Resolved]
+        private GameHost host { get; set; }
+
+        [Resolved]
+        private LadderInfo ladder { get; set; }
+
         private int lastBeatmapId;
+        private ScheduledDelegate scheduled;
+
+        public Storage Storage { get; private set; }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, GameHost host)
+        private void load()
         {
-            StableStorage stable;
+            LocateStableStorage();
+        }
+
+        public Storage LocateStableStorage()
+        {
+            scheduled?.Cancel();
+
+            Storage = null;
 
             try
             {
-                stable = new StableStorage(host as DesktopGameHost);
+                Storage = new StableStorage(host as DesktopGameHost);
+
+                const string file_ipc_filename = "ipc.txt";
+                const string file_ipc_state_filename = "ipc-state.txt";
+                const string file_ipc_scores_filename = "ipc-scores.txt";
+                const string file_ipc_channel_filename = "ipc-channel.txt";
+
+                if (Storage.Exists(file_ipc_filename))
+                    scheduled = Scheduler.AddDelayed(delegate
+                    {
+                        try
+                        {
+                            using (var stream = Storage.GetStream(file_ipc_filename))
+                            using (var sr = new StreamReader(stream))
+                            {
+                                var beatmapId = int.Parse(sr.ReadLine());
+                                var mods = int.Parse(sr.ReadLine());
+
+                                if (lastBeatmapId != beatmapId)
+                                {
+                                    lastBeatmapId = beatmapId;
+
+                                    var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
+
+                                    if (existing != null)
+                                        Beatmap.Value = existing.BeatmapInfo;
+                                    else
+                                    {
+                                        var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
+                                        req.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
+                                        API.Queue(req);
+                                    }
+                                }
+
+                                Mods.Value = (LegacyMods)mods;
+                            }
+                        }
+                        catch
+                        {
+                            // file might be in use.
+                        }
+
+                        try
+                        {
+                            using (var stream = Storage.GetStream(file_ipc_channel_filename))
+                            using (var sr = new StreamReader(stream))
+                            {
+                                ChatChannel.Value = sr.ReadLine();
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // file might be in use.
+                        }
+
+                        try
+                        {
+                            using (var stream = Storage.GetStream(file_ipc_state_filename))
+                            using (var sr = new StreamReader(stream))
+                            {
+                                State.Value = (TourneyState)Enum.Parse(typeof(TourneyState), sr.ReadLine());
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // file might be in use.
+                        }
+
+                        try
+                        {
+                            using (var stream = Storage.GetStream(file_ipc_scores_filename))
+                            using (var sr = new StreamReader(stream))
+                            {
+                                Score1.Value = int.Parse(sr.ReadLine());
+                                Score2.Value = int.Parse(sr.ReadLine());
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // file might be in use.
+                        }
+                    }, 250, true);
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Stable installation could not be found; disabling file based IPC");
-                return;
             }
 
-            const string file_ipc_filename = "ipc.txt";
-            const string file_ipc_state_filename = "ipc-state.txt";
-            const string file_ipc_scores_filename = "ipc-scores.txt";
-            const string file_ipc_channel_filename = "ipc-channel.txt";
-
-            if (stable.Exists(file_ipc_filename))
-                Scheduler.AddDelayed(delegate
-                {
-                    try
-                    {
-                        using (var stream = stable.GetStream(file_ipc_filename))
-                        using (var sr = new StreamReader(stream))
-                        {
-                            var beatmapId = int.Parse(sr.ReadLine());
-                            var mods = int.Parse(sr.ReadLine());
-
-                            if (lastBeatmapId != beatmapId)
-                            {
-                                lastBeatmapId = beatmapId;
-
-                                var existing = ladder.CurrentMatch.Value?.Round.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
-
-                                if (existing != null)
-                                    Beatmap.Value = existing.BeatmapInfo;
-                                else
-                                {
-                                    var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
-                                    req.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
-                                    API.Queue(req);
-                                }
-                            }
-
-                            Mods.Value = (LegacyMods)mods;
-                        }
-                    }
-                    catch
-                    {
-                        // file might be in use.
-                    }
-
-                    try
-                    {
-                        using (var stream = stable.GetStream(file_ipc_channel_filename))
-                        using (var sr = new StreamReader(stream))
-                        {
-                            ChatChannel.Value = sr.ReadLine();
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // file might be in use.
-                    }
-
-                    try
-                    {
-                        using (var stream = stable.GetStream(file_ipc_state_filename))
-                        using (var sr = new StreamReader(stream))
-                        {
-                            State.Value = (TourneyState)Enum.Parse(typeof(TourneyState), sr.ReadLine());
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // file might be in use.
-                    }
-
-                    try
-                    {
-                        using (var stream = stable.GetStream(file_ipc_scores_filename))
-                        using (var sr = new StreamReader(stream))
-                        {
-                            Score1.Value = int.Parse(sr.ReadLine());
-                            Score2.Value = int.Parse(sr.ReadLine());
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        // file might be in use.
-                    }
-                }, 250, true);
+            return Storage;
         }
 
         /// <summary>
