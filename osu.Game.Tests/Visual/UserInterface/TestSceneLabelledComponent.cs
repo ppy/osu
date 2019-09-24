@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create component", () =>
             {
-                LabelledComponent component;
+                LabelledComponent<Drawable> component;
 
                 Child = new Container
                 {
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Width = 500,
                     AutoSizeAxes = Axes.Y,
-                    Child = component = padded ? (LabelledComponent)new PaddedLabelledComponent() : new NonPaddedLabelledComponent(),
+                    Child = component = padded ? (LabelledComponent<Drawable>)new PaddedLabelledComponent() : new NonPaddedLabelledComponent(),
                 };
 
                 component.Label = "a sample component";
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class PaddedLabelledComponent : LabelledComponent
+        private class PaddedLabelledComponent : LabelledComponent<Drawable>
         {
             public PaddedLabelledComponent()
                 : base(true)
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class NonPaddedLabelledComponent : LabelledComponent
+        private class NonPaddedLabelledComponent : LabelledComponent<Drawable>
         {
             public NonPaddedLabelledComponent()
                 : base(false)
