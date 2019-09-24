@@ -53,6 +53,9 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay login { get; set; }
 
         [Resolved]
+        private SessionStatics statics { get; set; }
+
+        [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -170,7 +173,6 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        private bool loginDisplayed;
         private bool exitConfirmed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -198,10 +200,12 @@ namespace osu.Game.Screens.Menu
 
             bool displayLogin()
             {
-                if (!loginDisplayed)
+                var loginDisplayed = statics.GetBindable<bool>(Statics.LoginOverlayDisplayed);
+
+                if (!loginDisplayed.Value)
                 {
                     Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed = true;
+                    loginDisplayed.Value = true;
                 }
 
                 return true;
