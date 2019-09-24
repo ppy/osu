@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Text = @"Mods",
+                    Text = @"Selected Mods",
                     Alpha = 0,
                 },
             };

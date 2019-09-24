@@ -33,14 +33,21 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria
+        public FilterCriteria CreateCriteria()
         {
-            Group = groupMode.Value,
-            Sort = sortMode.Value,
-            SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted.Value,
-            Ruleset = ruleset.Value
-        };
+            var query = searchTextBox.Text;
+
+            var criteria = new FilterCriteria
+            {
+                Group = groupMode.Value,
+                Sort = sortMode.Value,
+                AllowConvertedBeatmaps = showConverted.Value,
+                Ruleset = ruleset.Value
+            };
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            return criteria;
+        }
 
         public Action Exit;
 

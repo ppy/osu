@@ -4,7 +4,6 @@
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Text;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Skinning
@@ -18,7 +17,7 @@ namespace osu.Game.Skinning
             Shadow = false;
             UseFullGlyphHeight = false;
 
-            Font = new FontUsage(font, OsuFont.DEFAULT_FONT_SIZE);
+            Font = new FontUsage(font, 1);
             glyphStore = new LegacyGlyphStore(skin);
         }
 
@@ -36,10 +35,6 @@ namespace osu.Game.Skinning
             public ITexturedCharacterGlyph Get(string fontName, char character)
             {
                 var texture = skin.GetTexture($"{fontName}-{character}");
-
-                if (texture != null)
-                    // Approximate value that brings character sizing roughly in-line with stable
-                    texture.ScaleAdjust *= 18;
 
                 if (texture == null)
                     return null;

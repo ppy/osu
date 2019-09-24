@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = colour.NewValue.Lighten(1f).Opacity(0.6f),
+                    Colour = colour.NewValue.Lighten(1f).Opacity(0.2f),
                     Radius = 10,
                 };
             }, true);
