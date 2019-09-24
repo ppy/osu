@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Setup.Components.LabelledComponents;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -27,7 +28,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create component", () =>
             {
-                LabelledComponent component;
+                LabelledComponent<OsuTextBox> component;
 
                 Child = new Container
                 {
