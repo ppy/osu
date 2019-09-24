@@ -150,6 +150,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // penalize misses
             aimValue *= Math.Pow(0.985, effectiveMissCount);
 
+            // Buff very high AR and low AR
+            double approachRateFactor = 1.0f;
+            if (Attributes.ApproachRate > 10.33f)
+                approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
+            else if (Attributes.ApproachRate < 8.0f)
+                approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
+
+            aimValue *= approachRateFactor;
+
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
                 aimValue *= 1.0f + 0.04f * (12.0f - Attributes.ApproachRate);
