@@ -87,15 +87,7 @@ namespace osu.Game.Screens.Backgrounds
                 }
             }
             else
-            {
-                switch (mode.Value)
-                {
-                    case BackgroundMode.Seasonal:
-                    default:
-                        newBackground = new Background(backgroundName);
-                        break;
-                }
-            }
+                newBackground = new Background(backgroundName);
 
             newBackground.Depth = currentDisplay;
 
