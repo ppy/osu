@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     if (duration > maxDuration)
                     {
                         maxDuration = duration;
-                        baseBeatLength = timingPoints[i].BeatLength;
+                        baseBeatLength = timingPoints[i].BeatLength / Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
                     }
                 }
             }
