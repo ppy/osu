@@ -123,7 +123,7 @@
     <PackageReference Include="SharpCompress" Version="0.24.0" />
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
     <PackageReference Include="ppy.osu.Framework.NativeLibs" Version="2019.813.0" ExcludeAssets="all" />
   </ItemGroup>
 </Project>
