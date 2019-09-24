@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void testNullBeatmap()
+        public void TestNullBeatmap()
         {
             selectBeatmap(null);
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void testTruncation()
+        public void TestTruncation()
         {
             selectBeatmap(createLongMetadata());
         }
@@ -178,12 +178,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                 {
                     Metadata = new BeatmapMetadata
                     {
-                        AuthorString = $"WWWWWWWWWWWWWWW",
-                        Artist = $"Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
-                        Source = $"Verrrrry long Source",
-                        Title = $"Verrrrry long Title"
+                        AuthorString = "WWWWWWWWWWWWWWW",
+                        Artist = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
+                        Source = "Verrrrry long Source",
+                        Title = "Verrrrry long Title"
                     },
-                    Version = $"Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
+                    Version = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
                     Status = BeatmapSetOnlineStatus.Graveyard,
                 },
             };
