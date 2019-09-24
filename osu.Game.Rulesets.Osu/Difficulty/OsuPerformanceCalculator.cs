@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Buff high acc
             double accBuff1 = Math.Pow(urOnStreams / 10, -skillToPPExponent) * 5000;
-            double accBuff2 = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2;
+            double accBuff2 = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.1f;
 
             tapValue += accBuff1 + accBuff2;
 
@@ -250,7 +250,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
 
-            return Math.Pow(deviationAccValue, 0.4f) * Math.Pow(percentageAccValue, 0.6f) * lengthFactor * 0.8f;
+            return Math.Pow(deviationAccValue, 0.5f) * Math.Pow(percentageAccValue, 0.5f) * lengthFactor * 0.8f;
         }
 
         private double getModifiedAcc()
