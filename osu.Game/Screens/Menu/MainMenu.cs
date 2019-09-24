@@ -200,12 +200,10 @@ namespace osu.Game.Screens.Menu
 
             bool displayLogin()
             {
-                var loginDisplayed = statics.GetBindable<bool>(Statics.LoginOverlayDisplayed);
-
-                if (!loginDisplayed.Value)
+                if (!statics.Get<bool>(Statics.LoginOverlayDisplayed))
                 {
                     Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed.Value = true;
+                    statics.Set(Statics.LoginOverlayDisplayed, true);
                 }
 
                 return true;
