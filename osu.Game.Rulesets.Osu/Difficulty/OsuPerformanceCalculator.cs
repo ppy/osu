@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
+        private double greatWindow;
+
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
@@ -60,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+
+            greatWindow = 79.5f - 6 * Attributes.OverallDifficulty;
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -133,8 +137,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnStreams is close to 1
             double accOnCheeseNotesPositive = Math.Exp(accOnCheeseNotes - 1);
 
-            double urOnCheeseNotes = 10 * (80 - 6 * Attributes.OverallDifficulty) /
-                                 (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
+            double urOnCheeseNotes = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
 
             double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDiff) - 3600) / 1200);
 
@@ -175,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             // Scale the aim value down slightly with accuracy
-            double accLeniency = (80 - 6 * Attributes.OverallDifficulty) * Attributes.AimDiff / 300;
+            double accLeniency = greatWindow * Attributes.AimDiff / 300;
             double accPenalty = (SpecialFunctions.Logistic((accuracy-0.94) * (-200.0/3)) - SpecialFunctions.Logistic(-4)) *
                                 Math.Pow(accLeniency, 2) * 0.1;
 
@@ -196,8 +199,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnStreams is close to 1
             double accOnStreamsPositive = Math.Exp(accOnStreams - 1);
 
-            double urOnStreams = 10 * (80 - 6 * Attributes.OverallDifficulty) /
-                                 (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
+            double urOnStreams = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
 
             double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 3000) / 600);
             
@@ -240,8 +242,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnCircles is close to 1
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
-            double deviationOnCircles = (79.5 - 6 * Attributes.OverallDifficulty) /
-                                        (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
+            double deviationOnCircles = greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
             double deviationAccValue = Math.Pow(deviationOnCircles, -skillToPPExponent) * 50000;
 
             // another algorithm that only focuses on acc instead of acc and od
