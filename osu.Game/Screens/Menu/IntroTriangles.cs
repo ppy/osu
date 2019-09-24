@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Menu
         private BackgroundScreenDefault background;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             if (MenuVoice.Value && !MenuMusic.Value)
                 SetWelcome();

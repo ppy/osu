@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 
@@ -18,7 +17,7 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_two = 600;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
             if (MenuVoice.Value)
                 SetWelcome();
