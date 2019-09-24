@@ -17,5 +17,6 @@ namespace osu.Game.Configuration
 
     public enum Statics
     {
+        LoginOverlayDisplayed,
     }
 }
