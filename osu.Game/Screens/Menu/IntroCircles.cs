@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 
@@ -17,10 +18,10 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_two = 600;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
             if (MenuVoice.Value)
-                SetWelcome();
+                Welcome = audio.Samples.Get(@"welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
