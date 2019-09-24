@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Logging;
 using osu.Framework.MathUtils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
