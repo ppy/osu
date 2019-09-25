@@ -34,7 +34,7 @@ namespace osu.Game.Utils
         /// <returns>simplified number with a suffix</returns>
         public static string Humanize(long input)
         {
-            int k = 1000;
+            const int k = 1000;
 
             var suffixes = new[]
             {
@@ -50,7 +50,7 @@ namespace osu.Game.Utils
             if (input < k)
                 return input.ToString();
 
-            int i = (int)Math.Floor(Math.Log(input) / Math.Log(k));
+            int i = (int)Math.Floor(Math.Log(input, k));
             return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
         }
     }
