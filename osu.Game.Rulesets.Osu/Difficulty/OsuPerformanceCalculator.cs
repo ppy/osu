@@ -233,6 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             double mapAimValue = tpToPP(Attributes.MissTPs[0]);
             double mapSpeedValue = tapSkillToPP(Attributes.TapDiff);
+            double fingerControlDiff = Attributes.FingerControlDiff;
             double softCap = Mean.PowerMean(0.8 * mapAimValue, 1.3 * mapSpeedValue, 3);
 
             double modifiedAcc = getModifiedAcc();
@@ -243,7 +244,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
             double deviationOnCircles = greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double deviationAccValue = Math.Pow(deviationOnCircles, -skillToPPExponent) * 50000;
+            double deviationAccValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 11000;
 
             // another algorithm that only focuses on acc instead of acc and od
             double percentageAccValue = Math.Exp((accOnCircles - 1) * 20) * softCap;
