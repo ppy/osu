@@ -234,7 +234,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double mapAimValue = tpToPP(Attributes.MissTPs[0]);
             double mapSpeedValue = tapSkillToPP(Attributes.TapDiff);
             double fingerControlDiff = Attributes.FingerControlDiff;
-            double softCap = Mean.PowerMean(0.8 * mapAimValue, 1.3 * mapSpeedValue, 3);
+            double mapFingerControlValue = fingerControlDiffToPP(fingerControlDiff);
+            double softCap = Mean.PowerMean(new double[] { 0.91f * mapAimValue, 1.48f * mapSpeedValue, 1.8f * mapFingerControlValue}, 3);
 
             double modifiedAcc = getModifiedAcc();
             double accOnCircles = 1 - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
@@ -271,6 +272,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.126;
 
         private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.204f;
+
+        private double fingerControlDiffToPP(double fingerControlDiff) => Math.Pow(fingerControlDiff, skillToPPExponent);
 
         private double totalHits => countGreat + countGood + countMeh + countMiss;
         private double totalSuccessfulHits => countGreat + countGood + countMeh;
