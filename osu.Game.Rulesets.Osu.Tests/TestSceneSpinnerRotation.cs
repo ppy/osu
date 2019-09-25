@@ -41,10 +41,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             base.SetUpSteps();
 
+            AddUntilStep("wait for track to start running", () => track.IsRunning);
             AddStep("retrieve spinner", () => drawableSpinner = (DrawableSpinner)((TestPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.First());
-
-            // wait for frame stable clock time to hit 0 (for some reason, executing a seek while current time is below 0 doesn't seek successfully)
-            addSeekStep(0);
         }
 
         [Test]
