@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Strong Rim", () => addRimHit(true));
             AddStep("Add bar line", () => addBarLine(false));
             AddStep("Add major bar line", () => addBarLine(true));
+            AddStep("Add centre w/ bar line", () =>
+            {
+                addCentreHit(false);
+                addBarLine(true);
+            });
             AddStep("Height test 1", () => changePlayfieldSize(1));
             AddStep("Height test 2", () => changePlayfieldSize(2));
             AddStep("Height test 3", () => changePlayfieldSize(3));
