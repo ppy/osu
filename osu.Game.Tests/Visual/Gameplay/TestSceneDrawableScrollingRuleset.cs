@@ -129,6 +129,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 assertPosition(i, i / 5f);
         }
 
+        [Test]
+        public void TestSliderMultiplierAffectsNonRelativeBeatLength()
+        {
+            var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range });
+            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+
+            createTest(beatmap);
+            AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);
+
+            assertPosition(0, 0);
+            assertPosition(1, 1);
+        }
+
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
             () => Precision.AlmostEquals(drawableRuleset.Playfield.AllHitObjects.ElementAt(index).DrawPosition.Y, drawableRuleset.Playfield.HitObjectContainer.DrawHeight * relativeY));
 
