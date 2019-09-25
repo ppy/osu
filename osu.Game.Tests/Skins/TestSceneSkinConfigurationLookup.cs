@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -17,6 +18,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Skins
 {
     [TestFixture]
+    [HeadlessTest]
     public class TestSceneSkinConfigurationLookup : OsuTestScene
     {
         private LegacySkin source1;

@@ -69,6 +69,7 @@ namespace osu.Game.Tournament
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                new SetupScreen(),
                                 new ScheduleScreen(),
                                 new LadderScreen(),
                                 new LadderEditorScreen(),
@@ -106,6 +107,8 @@ namespace osu.Game.Tournament
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Setup", Action = () => SetScreen(typeof(SetupScreen)) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Team Editor", Action = () => SetScreen(typeof(TeamEditorScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Rounds Editor", Action = () => SetScreen(typeof(RoundEditorScreen)) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
@@ -127,7 +130,7 @@ namespace osu.Game.Tournament
                 },
             };
 
-            SetScreen(typeof(ScheduleScreen));
+            SetScreen(typeof(SetupScreen));
         }
 
         public void SetScreen(Type screenType)
