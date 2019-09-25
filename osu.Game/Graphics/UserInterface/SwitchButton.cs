@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -73,20 +74,20 @@ namespace osu.Game.Graphics.UserInterface
 
             switchContainer.Colour = enabledColour;
             fill.Colour = disabledColour;
-
-            updateBorder();
         }
 
-        protected override void OnUserChange(bool value)
+        protected override void LoadComplete()
         {
-            base.OnUserChange(value);
+            base.LoadComplete();
 
-            if (value)
-                switchCircle.MoveToX(switchContainer.DrawWidth - switchCircle.DrawWidth, 200, Easing.OutQuint);
-            else
-                switchCircle.MoveToX(0, 200, Easing.OutQuint);
+            Current.BindValueChanged(updateState, true);
+            FinishTransforms(true);
+        }
 
-            fill.FadeTo(value ? 1 : 0, 250, Easing.OutQuint);
+        private void updateState(ValueChangedEvent<bool> state)
+        {
+            switchCircle.MoveToX(state.NewValue ? switchContainer.DrawWidth - switchCircle.DrawWidth : 0, 200, Easing.OutQuint);
+            fill.FadeTo(state.NewValue ? 1 : 0, 250, Easing.OutQuint);
 
             updateBorder();
         }
