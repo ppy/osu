@@ -13,6 +13,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -88,7 +89,7 @@ namespace osu.Game.Beatmaps
         protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
-                beatmapSet.Beatmaps = createBeatmapDifficulties(archive);
+                beatmapSet.Beatmaps = createBeatmapDifficulties(beatmapSet.Files);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -278,13 +279,13 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
         /// </summary>
-        private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
+        private List<BeatmapInfo> createBeatmapDifficulties(List<BeatmapSetFileInfo> files)
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
-            foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
+            foreach (var file in files.Where(f => f.Filename.EndsWith(".osu")))
             {
-                using (var raw = reader.GetStream(name))
+                using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
                 using (var ms = new MemoryStream()) //we need a memory stream so we can seek
                 using (var sr = new StreamReader(ms))
                 {
@@ -294,12 +295,13 @@ namespace osu.Game.Beatmaps
                     var decoder = Decoder.GetDecoder<Beatmap>(sr);
                     IBeatmap beatmap = decoder.Decode(sr);
 
-                    beatmap.BeatmapInfo.Path = name;
+                    beatmap.BeatmapInfo.Path = file.Filename;
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
                     var ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
                     beatmap.BeatmapInfo.Ruleset = ruleset;
+
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
                     beatmap.BeatmapInfo.Length = calculateLength(beatmap);
@@ -340,6 +342,7 @@ namespace osu.Game.Beatmaps
 
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
+            protected override VideoSprite GetVideo() => null;
             protected override Track GetTrack() => null;
         }
 

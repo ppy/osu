@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {

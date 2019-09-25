@@ -12,8 +12,6 @@ namespace osu.Game.Skinning
     {
         public DefaultSkinConfiguration()
         {
-            HitCircleFont = "default";
-
             ComboColours.AddRange(new[]
             {
                 new Color4(17, 136, 170, 255),
@@ -21,8 +19,6 @@ namespace osu.Game.Skinning
                 new Color4(204, 102, 0, 255),
                 new Color4(121, 9, 13, 255)
             });
-
-            CursorExpand = true;
         }
     }
 }

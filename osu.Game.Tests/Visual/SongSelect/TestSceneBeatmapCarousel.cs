@@ -242,6 +242,21 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
 
             AddAssert("Selection is non-null", () => currentSelection != null);
+
+            setSelected(1, 3);
+            AddStep("Apply a range filter", () => carousel.Filter(new FilterCriteria
+            {
+                SearchText = "#3",
+                StarDifficulty = new FilterCriteria.OptionalRange<double>
+                {
+                    Min = 2,
+                    Max = 5.5,
+                    IsLowerInclusive = true
+                }
+            }, false));
+            checkSelected(3, 2);
+
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
         }
 
         /// <summary>

@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osuTK.Graphics;
@@ -146,7 +145,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         private void createColourBars(OsuColour colours)
         {
-            var windows = HitWindows.GetAllAvailableHalfWindows().ToArray();
+            var windows = HitWindows.GetAllAvailableWindows().ToArray();
 
             maxHitWindow = windows.First().length;
 
