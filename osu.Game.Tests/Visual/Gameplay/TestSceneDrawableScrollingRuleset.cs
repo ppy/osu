@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestSliderMultiplierDoesnotAffectRelativeBeatLength()
+        public void TestSliderMultiplierDoesNotAffectRelativeBeatLength()
         {
             var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range });
             beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
