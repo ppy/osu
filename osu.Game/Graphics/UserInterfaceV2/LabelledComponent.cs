@@ -5,11 +5,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
+namespace osu.Game.Graphics.UserInterfaceV2
 {
     public abstract class LabelledComponent<T> : CompositeDrawable
         where T : Drawable
