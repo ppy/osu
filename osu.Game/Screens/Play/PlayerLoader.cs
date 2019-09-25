@@ -530,7 +530,7 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Sets <see cref="muteWarningShownOnce"/> to <see cref="false"/>, reserved for testing.
+        /// Sets <see cref="muteWarningShownOnce"/> to false, reserved for testing.
         /// </summary>
         public static void ResetNotificationLock()
         {
