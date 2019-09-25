@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public DrawableManiaRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
-            BarLines = new BarLineGenerator(Beatmap).BarLines;
+            BarLines = new BarLineGenerator<BarLine>(Beatmap).BarLines;
         }
 
         [BackgroundDependencyLoader]
