@@ -13,7 +13,7 @@ using osu.Framework.Input.Events;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Graphics.UserInterfaceV2
 {
     public class SwitchButton : Checkbox
     {
