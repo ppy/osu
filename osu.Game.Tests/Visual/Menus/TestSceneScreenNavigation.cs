@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -21,6 +22,7 @@ using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
+using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Tests.Visual.Menus
 {
@@ -60,6 +62,10 @@ namespace osu.Game.Tests.Visual.Menus
 
                 osuGame = new TestOsuGame(LocalStorage, API);
                 osuGame.SetHost(host);
+
+                // todo: this can be removed once we can run audio trakcs without a device present
+                // see https://github.com/ppy/osu/issues/1302
+                osuGame.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
 
                 Add(osuGame);
             });
@@ -160,6 +166,8 @@ namespace osu.Game.Tests.Visual.Menus
             public new BackButton BackButton => base.BackButton;
 
             public new SettingsPanel Settings => base.Settings;
+
+            public new OsuConfigManager LocalConfig => base.LocalConfig;
 
             protected override Loader CreateLoader() => new TestLoader();
 
