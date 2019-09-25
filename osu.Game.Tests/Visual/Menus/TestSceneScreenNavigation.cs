@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Menus
     {
         private const float click_padding = 25;
 
-        private GameHost gameHost;
+        private GameHost host;
         private TestOsuGame osuGame;
 
         private Vector2 backButtonPosition => osuGame.ToScreenSpace(new Vector2(click_padding, osuGame.LayoutRectangle.Bottom - click_padding));
@@ -36,9 +36,9 @@ namespace osu.Game.Tests.Visual.Menus
         private Vector2 optionsButtonPosition => osuGame.ToScreenSpace(new Vector2(click_padding, click_padding));
 
         [BackgroundDependencyLoader]
-        private void load(GameHost gameHost)
+        private void load(GameHost host)
         {
-            this.gameHost = gameHost;
+            this.host = host;
 
             Child = new Box
             {
@@ -58,8 +58,8 @@ namespace osu.Game.Tests.Visual.Menus
                     osuGame.Dispose();
                 }
 
-                osuGame = new TestOsuGame();
-                osuGame.SetHost(gameHost);
+                osuGame = new TestOsuGame(LocalStorage, API);
+                osuGame.SetHost(host);
 
                 Add(osuGame);
             });
@@ -163,19 +163,16 @@ namespace osu.Game.Tests.Visual.Menus
 
             protected override Loader CreateLoader() => new TestLoader();
 
-            private DependencyContainer dependencies;
-
-            private DummyAPIAccess dummyAPI;
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-                dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            public TestOsuGame(Storage storage, IAPIProvider api)
+            {
+                Storage = storage;
+                API = api;
+            }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                dependencies.CacheAs<IAPIProvider>(dummyAPI = new DummyAPIAccess());
-
-                dummyAPI.Login("Rhythm Champion", "osu!");
+                API.Login("Rhythm Champion", "osu!");
             }
         }
 
