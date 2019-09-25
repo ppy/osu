@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
             double fingerControlSR = fingerControlMultiplier * Math.Pow(fingerControlDiff, srExponent);
-            double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
+            double sr = Mean.PowerMean(new double[] { tapSR, aimSR, fingerControlSR }, 7) * 1.131;
 
             HitWindows hitWindows = new OsuHitWindows();
             hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
