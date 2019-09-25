@@ -106,8 +106,6 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
-        protected virtual Loader CreateLoader() => new Loader();
-
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -321,6 +319,8 @@ namespace osu.Game
                 menuScreen.Push(new ReplayPlayerLoader(databasedScore));
             }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
+
+        protected virtual Loader CreateLoader() => new Loader();
 
         #region Beatmap progression
 
