@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
