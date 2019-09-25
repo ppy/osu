@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const double aimMultiplier = 0.585;
         private const double tapMultiplier = 0.732;
+        private const double fingerControlMultiplier = 1;
+        
         private const double srExponent = 0.85;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
@@ -47,6 +49,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
 
+            // Finger Control
+            double fingerControlDiff = FingerControl.CalculateFingerControlDiff(hitObjects, clockRate);
+
             // Aim
             (var aimDiff, var fcTimeTP, var comboTPs, var missTPs, var missCounts,
              var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
@@ -58,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
             double aimSR = aimMultiplier * Math.Pow(aimDiff, srExponent);
+            double fingerControlSR = fingerControlMultiplier * Math.Pow(fingerControlDiff, srExponent);
             double sr = Mean.PowerMean(tapSR, aimSR, 7) * 1.069;
 
             HitWindows hitWindows = new OsuHitWindows();
@@ -82,6 +88,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 StreamNoteCount = streamNoteCount,
                 MashLevels = mashLevels,
                 TapSkills = tapSkills,
+
+                FingerControlSR = fingerControlSR,
+                FingerControlDiff = fingerControlDiff,
 
                 AimSR = aimSR,
                 AimDiff = aimDiff,

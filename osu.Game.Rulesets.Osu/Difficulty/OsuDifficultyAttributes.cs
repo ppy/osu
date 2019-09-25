@@ -13,6 +13,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double[] MashLevels;
         public double[] TapSkills;
 
+        public double FingerControlSR;
+        public double FingerControlDiff;
+
         public double AimSR;
         public double AimDiff;
         public double[] ComboTPs;
