@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Select
 
         private const float padding = 80;
 
+        private const float offset = 1.5f;
+
         private readonly FillFlowContainer<FooterButton> buttons;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
@@ -94,7 +96,9 @@ namespace osu.Game.Screens.Select
                         buttons = new FillFlowContainer<FooterButton>
                         {
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH, 0),
+                            //Compensate by 1.5f to correct the next button's origin,
+                            //so that button1 ends at x=100 & button2 starts at x=101
+                            Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + offset, 0),
                             AutoSizeAxes = Axes.Both,
                         }
                     }
