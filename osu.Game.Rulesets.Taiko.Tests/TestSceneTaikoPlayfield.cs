@@ -14,13 +14,13 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Strong Rim", () => addRimHit(true));
             AddStep("Add bar line", () => addBarLine(false));
             AddStep("Add major bar line", () => addBarLine(true));
+            AddStep("Add centre w/ bar line", () =>
+            {
+                addCentreHit(false);
+                addBarLine(true);
+            });
             AddStep("Height test 1", () => changePlayfieldSize(1));
             AddStep("Height test 2", () => changePlayfieldSize(2));
             AddStep("Height test 3", () => changePlayfieldSize(3));

@@ -11,6 +11,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Skinning;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -218,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 RelativeSizeAxes = Axes.Both;
 
-                float radius = skin.GetValue<SkinConfiguration, float?>(s => s.SliderPathRadius) ?? OsuHitObject.OBJECT_RADIUS;
+                float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
 
                 InternalChild = new CircularContainer
                 {
