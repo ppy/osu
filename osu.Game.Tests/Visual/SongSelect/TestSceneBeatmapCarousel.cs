@@ -381,14 +381,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHiding()
         {
-            BeatmapSetInfo hidingSet = null;
+            BeatmapSetInfo hidingSet = createTestBeatmapSet(1);
+            hidingSet.Beatmaps[1].Hidden = true;
 
-            AddStep("Add set with diff 2 hidden", () =>
-            {
-                hidingSet = createTestBeatmapSet(1);
-                hidingSet.Beatmaps[1].Hidden = true;
-                carousel.UpdateBeatmapSet(hidingSet);
-            });
+            loadBeatmaps(new List<BeatmapSetInfo> { hidingSet });
 
             setSelected(1, 1);
 
