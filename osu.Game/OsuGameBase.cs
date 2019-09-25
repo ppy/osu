@@ -65,13 +65,15 @@ namespace osu.Game
 
         protected RulesetConfigCache RulesetConfigCache;
 
-        protected APIAccess API;
+        protected IAPIProvider API;
 
         protected MenuCursorContainer MenuCursorContainer;
 
         private Container content;
 
         protected override Container<Drawable> Content => content;
+
+        protected Storage Storage { get; set; }
 
         private Bindable<WorkingBeatmap> beatmap; // cached via load() method
 
@@ -123,7 +125,7 @@ namespace osu.Game
         {
             Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
 
-            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
             var largeStore = new LargeTextureStore(Host.CreateTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
             largeStore.AddStore(Host.CreateTextureLoaderStore(new OnlineStore()));
@@ -158,21 +160,21 @@ namespace osu.Game
 
             runMigrations();
 
-            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
+            dependencies.Cache(SkinManager = new SkinManager(Storage, contextFactory, Host, Audio, new NamespacedResourceStore<byte[]>(Resources, "Skins/Legacy")));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            API = new APIAccess(LocalConfig);
+            if (API == null) API = new APIAccess(LocalConfig);
 
-            dependencies.CacheAs<IAPIProvider>(API);
+            dependencies.CacheAs(API);
 
             var defaultBeatmap = new DummyWorkingBeatmap(Audio, Textures);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
-            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Storage));
 
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
-            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Host.Storage, API, contextFactory, Host));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
+            dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, API, contextFactory, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
 
             // this should likely be moved to ArchiveModelManager when another case appers where it is necessary
             // to have inter-dependent model managers. this could be obtained with an IHasForeign<T> interface to
@@ -206,7 +208,8 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            AddInternal(API);
+            if (API is APIAccess apiAcces)
+                AddInternal(apiAcces);
             AddInternal(RulesetConfigCache);
 
             GlobalActionContainer globalBinding;
@@ -266,9 +269,13 @@ namespace osu.Game
 
         public override void SetHost(GameHost host)
         {
-            if (LocalConfig == null)
-                LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
+
+            if (Storage == null)
+                Storage = host.Storage;
+
+            if (LocalConfig == null)
+                LocalConfig = new OsuConfigManager(Storage);
         }
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
