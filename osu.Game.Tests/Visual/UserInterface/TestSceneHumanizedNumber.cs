@@ -23,10 +23,15 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new DrawableNumber(0),
                     new DrawableNumber(1001),
+                    new DrawableNumber(1000000),
                     new DrawableNumber(845006456),
+                    new DrawableNumber(1000000000),
                     new DrawableNumber(9875454545),
+                    new DrawableNumber(1000000000000),
                     new DrawableNumber(987545454554545),
+                    new DrawableNumber(1000000000000000),
                     new DrawableNumber(987545454554545455),
+                    new DrawableNumber(1000000000000000000),
                     new DrawableNumber(long.MaxValue),
                 }
             };
