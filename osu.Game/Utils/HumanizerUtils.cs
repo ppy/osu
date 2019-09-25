@@ -50,7 +50,7 @@ namespace osu.Game.Utils
             if (input < k)
                 return input.ToString();
 
-            int i = (int)Math.Floor(Math.Log(input, k));
+            int i = (int)Math.Floor(Math.Round(Math.Log(input, k)));
             return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
         }
     }
