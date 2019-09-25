@@ -53,9 +53,6 @@ namespace osu.Game.Screens.Menu
         private LoginOverlay login { get; set; }
 
         [Resolved]
-        private SessionStatics statics { get; set; }
-
-        [Resolved]
         private IAPIProvider api { get; set; }
 
         [Resolved(canBeNull: true)]
@@ -66,13 +63,15 @@ namespace osu.Game.Screens.Menu
         protected override BackgroundScreen CreateBackground() => background;
 
         private Bindable<int> holdDelay;
+        private Bindable<bool> loginDisplayed;
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config)
+        private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+            loginDisplayed = statics.GetBindable<bool>(Statics.LoginOverlayDisplayed);
 
             if (host.CanExit)
             {
@@ -200,10 +199,10 @@ namespace osu.Game.Screens.Menu
 
             bool displayLogin()
             {
-                if (!statics.Get<bool>(Statics.LoginOverlayDisplayed))
+                if (!loginDisplayed.Value)
                 {
                     Scheduler.AddDelayed(() => login?.Show(), 500);
-                    statics.Set(Statics.LoginOverlayDisplayed, true);
+                    loginDisplayed.Value = true;
                 }
 
                 return true;
