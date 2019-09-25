@@ -7,9 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Setup.Components.LabelledComponents;
 using osu.Game.Tournament.IPC;
 using osuTK;
 using osuTK.Graphics;
@@ -89,7 +89,7 @@ namespace osu.Game.Tournament.Screens
             };
         }
 
-        private class ActionableInfo : LabelledComponent
+        private class ActionableInfo : LabelledComponent<Drawable>
         {
             private OsuButton button;
 
