@@ -131,7 +131,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     if (duration > maxDuration)
                     {
                         maxDuration = duration;
-                        baseBeatLength = timingPoints[i].BeatLength;
+                        // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
+                        // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
+                        baseBeatLength = timingPoints[i].BeatLength / Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
                     }
                 }
             }

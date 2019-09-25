@@ -316,8 +316,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             get => lifetimeStart ?? (HitObject.StartTime - InitialLifetimeOffset);
             set
             {
-                base.LifetimeStart = value;
                 lifetimeStart = value;
+                base.LifetimeStart = value;
             }
         }
 
