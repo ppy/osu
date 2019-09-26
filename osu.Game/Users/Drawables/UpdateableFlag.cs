@@ -1,13 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
+using osu.Game.Overlays;
 
 namespace osu.Game.Users.Drawables
 {
     public class UpdateableFlag : ModelBackedDrawable<Country>
     {
+        [Resolved]
+        private RankingsOverlay rankingsOverlay { get; set; }
+
         public Country Country
         {
             get => Model;
@@ -33,6 +39,14 @@ namespace osu.Game.Users.Drawables
             {
                 RelativeSizeAxes = Axes.Both,
             };
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (Country != null)
+                rankingsOverlay?.ShowCountry(Country);
+
+            return true;
         }
     }
 }
