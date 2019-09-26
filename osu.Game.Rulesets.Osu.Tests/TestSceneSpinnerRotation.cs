@@ -27,6 +27,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private TrackVirtualManual track;
 
+        protected override bool Autoplay => true;
+
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
         {
             var working = new ClockBackedTestWorkingBeatmap(beatmap, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
@@ -73,12 +75,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep($"seek to {time}", () => track.Seek(time));
 
             AddUntilStep("wait for seek to finish", () => Precision.AlmostEquals(time, ((TestPlayer)Player).DrawableRuleset.FrameStableClock.CurrentTime, 100));
-        }
-
-        protected override Player CreatePlayer(Ruleset ruleset)
-        {
-            Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
-            return new TestPlayer();
         }
 
         protected override IBeatmap CreateBeatmap(RulesetInfo ruleset) => new Beatmap
