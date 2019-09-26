@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Audio;
@@ -81,6 +82,15 @@ namespace osu.Game.Rulesets.Objects
             nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
+
+            if (this is IHasComboInformation hasCombo)
+            {
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                {
+                    n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
+                    n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
+                }
+            }
 
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
