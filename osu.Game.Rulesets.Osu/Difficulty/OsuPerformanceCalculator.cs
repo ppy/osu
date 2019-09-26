@@ -222,10 +222,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 approachRateFactor += 0.2f * (Attributes.ApproachRate - 10.33f);
             tapValue *= approachRateFactor;
 
-            if (mods.Any(m => m is OsuModHidden))
-                tapValue *= 1.0f + 0.04f * (12.0f - Attributes.ApproachRate);
-
-
             return tapValue;
         }
 
