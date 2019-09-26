@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
 
                 currStrain += decayCoeffs * Math.Pow((currTime - prevPrevTime) / clockRate, -2) *
-                              calculateMashNerfFactor(relativeD, mashLevel) * (1 + spacedBuff);
+                              Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) * (1 + spacedBuff);
 
                 prevPrevTime = prevTime;
                 prevTime = currTime;
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         private static double calculateMashNerfFactor(double relativeD, double mashLevel)
         {
-            double fullMashFactor = 0.73f + 0.27f * SpecialFunctions.Logistic(relativeD * 7 - 6);
+            double fullMashFactor = 0.73 + 0.27 * SpecialFunctions.Logistic(relativeD * 7 - 6);
             return mashLevel * fullMashFactor + (1 - mashLevel);
         }
 
