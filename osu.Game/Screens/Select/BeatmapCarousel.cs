@@ -82,6 +82,9 @@ namespace osu.Game.Screens.Select
             var _ = newRoot.Drawables;
 
             root = newRoot;
+            if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
+                selectedBeatmapSet = null;
+
             scrollableContent.Clear(false);
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();

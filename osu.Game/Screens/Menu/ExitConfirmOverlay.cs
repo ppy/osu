@@ -9,6 +9,10 @@ namespace osu.Game.Screens.Menu
 {
     public class ExitConfirmOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
+        protected override bool AllowMultipleFires => true;
+
+        public void Abort() => AbortConfirm();
+
         public bool OnPressed(GlobalAction action)
         {
             if (action == GlobalAction.Back)
@@ -24,7 +28,8 @@ namespace osu.Game.Screens.Menu
         {
             if (action == GlobalAction.Back)
             {
-                AbortConfirm();
+                if (!Fired)
+                    AbortConfirm();
                 return true;
             }
 

@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.UI
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            var resources = Ruleset.CreateReourceStore();
+            var resources = Ruleset.CreateResourceStore();
 
             if (resources != null)
             {
