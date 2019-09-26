@@ -63,9 +63,13 @@ namespace osu.Game.Screens.Play.HUD
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            text.Text = config.Get<int>(OsuSetting.UIHoldActivationDelay) > 0
-                ? "hold for menu"
-                : "press for menu";
+            var activationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay).GetBoundCopy();
+            activationDelay.BindValueChanged(v =>
+            {
+                text.Text = v.NewValue > 0
+                    ? "hold for menu"
+                    : "press for menu";
+            }, true);
         }
 
         protected override void LoadComplete()
