@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Buff very high AR and low AR
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
+                approachRateFactor += 0.2f * (Attributes.ApproachRate - 10.33f);
             else if (Attributes.ApproachRate < 8.0f)
                 approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
 
@@ -219,7 +219,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
+                approachRateFactor += 0.2f * (Attributes.ApproachRate - 10.33f);
             tapValue *= approachRateFactor;
 
             if (mods.Any(m => m is OsuModHidden))
