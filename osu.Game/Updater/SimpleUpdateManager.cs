@@ -6,31 +6,25 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.IO.Network;
 using osu.Framework.Platform;
-using osu.Game;
-using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
-namespace osu.Desktop.Updater
+namespace osu.Game.Updater
 {
     /// <summary>
     /// An update manager that shows notifications if a newer release is detected.
     /// Installation is left up to the user.
     /// </summary>
-    internal class SimpleUpdateManager : CompositeDrawable
+    public class SimpleUpdateManager : UpdateManager
     {
-        private NotificationOverlay notificationOverlay;
         private string version;
         private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuGameBase game, GameHost host)
+        private void load(OsuGameBase game, GameHost host)
         {
-            notificationOverlay = notification;
-
             this.host = host;
             version = game.Version;
 
@@ -50,7 +44,7 @@ namespace osu.Desktop.Updater
 
                 if (latest.TagName != version)
                 {
-                    notificationOverlay.Post(new SimpleNotification
+                    Notifications.Post(new SimpleNotification
                     {
                         Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
                                + "Click here to download the new version, which can be installed over the top of your existing installation",
@@ -81,6 +75,11 @@ namespace osu.Desktop.Updater
 
                 case RuntimeInfo.Platform.MacOsx:
                     bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
+                    break;
+
+                case RuntimeInfo.Platform.Android:
+                    // on our testing device this causes the download to magically disappear.
+                    //bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".apk"));
                     break;
             }
 
