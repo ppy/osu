@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     lastAngle -= 360;
 
                 currentRotation += thisAngle - lastAngle;
-                RotationAbsolute += Math.Abs(thisAngle - lastAngle);
+                RotationAbsolute += Math.Abs(thisAngle - lastAngle) * Math.Sign(Clock.ElapsedFrameTime);
             }
 
             lastAngle = thisAngle;

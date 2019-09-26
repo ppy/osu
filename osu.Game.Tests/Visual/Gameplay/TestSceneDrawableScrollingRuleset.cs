@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -115,6 +116,32 @@ namespace osu.Game.Tests.Visual.Gameplay
             assertPosition(4, 1f);
         }
 
+        [Test]
+        public void TestSliderMultiplierDoesNotAffectRelativeBeatLength()
+        {
+            var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range });
+            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+
+            createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
+            AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 5000);
+
+            for (int i = 0; i < 5; i++)
+                assertPosition(i, i / 5f);
+        }
+
+        [Test]
+        public void TestSliderMultiplierAffectsNonRelativeBeatLength()
+        {
+            var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range });
+            beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
+
+            createTest(beatmap);
+            AddStep("adjust time range", () => drawableRuleset.TimeRange.Value = 2000);
+
+            assertPosition(0, 0);
+            assertPosition(1, 1);
+        }
+
         private void assertPosition(int index, float relativeY) => AddAssert($"hitobject {index} at {relativeY}",
             () => Precision.AlmostEquals(drawableRuleset.Playfield.AllHitObjects.ElementAt(index).DrawPosition.Y, drawableRuleset.Playfield.HitObjectContainer.DrawHeight * relativeY));
 
@@ -192,6 +219,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override bool RelativeScaleBeatLengths => RelativeScaleBeatLengthsOverride;
 
             protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
+
+            public new Bindable<double> TimeRange => base.TimeRange;
 
             public TestDrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
                 : base(ruleset, beatmap, mods)
