@@ -52,7 +52,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Set country 2", () => countryBindable.Value = countryB);
             AddStep("Set null country", () => countryBindable.Value = null);
             AddStep("Set scope to Performance", () => scope.Value = RankingsScope.Performance);
-            AddStep("Set scope to Spotlights", () => scope.Value = RankingsScope.Spotlights);
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
             AddStep("Set scope to Country", () => scope.Value = RankingsScope.Country);
         }

@@ -91,6 +91,7 @@ namespace osu.Game.Overlays.Rankings
                                         RelativeSizeAxes = Axes.X,
                                         Width = 0.8f,
                                         Current = Spotlight,
+                                        Alpha = 0,
                                     }
                                 }
                             },
@@ -102,12 +103,10 @@ namespace osu.Game.Overlays.Rankings
 
         protected override void LoadComplete()
         {
-            Scope.BindValueChanged(onScopeChanged, true);
+            // Will be added back after api implementation
+            //Scope.BindValueChanged(scope => dropdown.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint), true);
             base.LoadComplete();
         }
-
-        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope) =>
-            dropdown.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
 
         private class HeaderBackground : Sprite
         {

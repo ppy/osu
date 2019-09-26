@@ -19,7 +19,6 @@ namespace osu.Game.Overlays.Rankings
     public enum RankingsScope
     {
         Performance,
-        Spotlights,
         Score,
         Country
     }

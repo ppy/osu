@@ -42,7 +42,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep(@"Select country", () => scope.Value = RankingsScope.Country);
             AddStep(@"Select performance", () => scope.Value = RankingsScope.Performance);
             AddStep(@"Select score", () => scope.Value = RankingsScope.Score);
-            AddStep(@"Select spotlights", () => scope.Value = RankingsScope.Spotlights);
         }
 
         [BackgroundDependencyLoader]
