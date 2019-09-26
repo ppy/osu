@@ -52,8 +52,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 prevStrainTime = strainTime;
             }
 
-            return strainHistory.Max();
-        }
+            var strainHistoryArray = strainHistory.ToArray();
 
+            Array.Sort(strainHistoryArray);
+            Array.Reverse(strainHistoryArray);
+
+            double diff = 0;
+            double k = 0.95;
+
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                diff += strainHistoryArray[i] * Math.Pow(k, i);
+            }
+
+            return diff * (1 - k) * 1.1;
+        }
     }
 }
