@@ -9,9 +9,9 @@ using osu.Game.Utils;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneHumanizedNumber : OsuTestScene
+    public class TestSceneMetricNumbers : OsuTestScene
     {
-        public TestSceneHumanizedNumber()
+        public TestSceneMetricNumbers()
         {
             Child = new FillFlowContainer
             {
@@ -23,20 +23,20 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new DrawableNumber(0),
                     new DrawableNumber(1001),
-                    new DrawableNumber(999999),
-                    new DrawableNumber(1000000),
-                    new DrawableNumber(845006456),
-                    new DrawableNumber(999999999),
-                    new DrawableNumber(1000000000),
-                    new DrawableNumber(7875454545),
-                    new DrawableNumber(999999999999),
-                    new DrawableNumber(1000000000000),
-                    new DrawableNumber(687545454554545),
-                    new DrawableNumber(999999999999999),
-                    new DrawableNumber(1000000000000000),
-                    new DrawableNumber(587545454554545455),
-                    new DrawableNumber(999999999999999999),
-                    new DrawableNumber(1000000000000000000),
+                    new DrawableNumber(999_999),
+                    new DrawableNumber(1_000_000),
+                    new DrawableNumber(845_006_456),
+                    new DrawableNumber(999_999_999),
+                    new DrawableNumber(1_000_000_000),
+                    new DrawableNumber(7_875_454_545),
+                    new DrawableNumber(999_999_999_999),
+                    new DrawableNumber(1_000_000_000_000),
+                    new DrawableNumber(687_545_454_554_545),
+                    new DrawableNumber(999_999_999_999_999),
+                    new DrawableNumber(1_000_000_000_000_000),
+                    new DrawableNumber(587_545_454_554_545_455),
+                    new DrawableNumber(999_999_999_999_999_999),
+                    new DrawableNumber(1_000_000_000_000_000_000),
                     new DrawableNumber(long.MaxValue),
                 }
             };
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public DrawableNumber(long value)
             {
                 this.value = value;
-                Text = HumanizerUtils.Humanize(value);
+                Text = HumanizerUtils.ToMetric(value);
             }
         }
     }

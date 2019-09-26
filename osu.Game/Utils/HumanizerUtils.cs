@@ -28,11 +28,11 @@ namespace osu.Game.Utils
         }
 
         /// <summary>
-        /// Turns the current or provided big number into a readable string
+        /// Turns the current or provided big number into a readable string.
         /// </summary>
-        /// <param name="input">The number to be humanized</param>
-        /// <returns>simplified number with a suffix</returns>
-        public static string Humanize(long input)
+        /// <param name="input">The number to be humanized.</param>
+        /// <returns>Simplified number with a suffix.</returns>
+        public static string ToMetric(long input)
         {
             const int k = 1000;
 
