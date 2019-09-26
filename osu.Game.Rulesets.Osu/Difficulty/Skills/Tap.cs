@@ -54,7 +54,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
 
                 currStrain += decayCoeffs * Math.Pow((currTime - prevPrevTime) / clockRate, -2) *
-                              Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) * (1 + spacedBuff);
+                              Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
+                              Math.Pow(1 + spacedBuff, 3);
 
                 prevPrevTime = prevTime;
                 prevTime = currTime;
