@@ -11,7 +11,7 @@ namespace osu.Game.Users.Drawables
 {
     public class UpdateableFlag : ModelBackedDrawable<Country>
     {
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private RankingsOverlay rankingsOverlay { get; set; }
 
         public Country Country
