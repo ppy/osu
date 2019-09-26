@@ -10,17 +10,32 @@ using osu.Game.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using System.Threading;
+using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Rankings.Tables;
 
 namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
+        private const int margin = 30;
+
         private readonly Bindable<Country> country = new Bindable<Country>();
         private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly BasicScrollContainer scrollFlow;
         private readonly Box background;
+        private readonly Container contentPlaceholder;
+        private readonly DimmedLoadingLayer loading;
+
+        private APIRequest request;
+        private CancellationTokenSource cancellationToken;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public RankingsOverlay()
         {
@@ -49,6 +64,23 @@ namespace osu.Game.Overlays
                                 Scope = { BindTarget = scope },
                                 Ruleset = { BindTarget = ruleset }
                             },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    contentPlaceholder = new Container
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Margin = new MarginPadding { Vertical = margin }
+                                    },
+                                    loading = new DimmedLoadingLayer(),
+                                }
+                            }
                         }
                     }
                 }
@@ -90,6 +122,95 @@ namespace osu.Game.Overlays
         private void redraw()
         {
             scrollFlow.ScrollToStart();
+
+            loading.Show();
+
+            cancellationToken?.Cancel();
+            request?.Cancel();
+
+            cancellationToken = new CancellationTokenSource();
+
+            switch (scope.Value)
+            {
+                default:
+                    loading.Hide();
+                    return;
+
+                case RankingsScope.Performance:
+                    createPerformanceTable();
+                    return;
+
+                case RankingsScope.Country:
+                    createCountryTable();
+                    return;
+
+                case RankingsScope.Score:
+                    createScoreTable();
+                    return;
+            }
+        }
+
+        private void createCountryTable()
+        {
+            request = new GetCountryRankingsRequest(ruleset.Value);
+            (request as GetCountryRankingsRequest).Success += rankings => Schedule(() =>
+            {
+                var table = new CountriesTable()
+                {
+                    Rankings = rankings,
+                };
+
+                LoadComponentAsync(table, t =>
+                {
+                    contentPlaceholder.Clear();
+                    contentPlaceholder.Add(t);
+                    loading.Hide();
+                }, cancellationToken.Token);
+            });
+
+            api.Queue(request);
+        }
+
+        private void createPerformanceTable()
+        {
+            request = new GetUserRankingsRequest(ruleset.Value, country: country.Value?.FlagName);
+            (request as GetUserRankingsRequest).Success += rankings => Schedule(() =>
+            {
+                var table = new PerformanceTable()
+                {
+                    Rankings = rankings,
+                };
+
+                LoadComponentAsync(table, t =>
+                {
+                    contentPlaceholder.Clear();
+                    contentPlaceholder.Add(t);
+                    loading.Hide();
+                }, cancellationToken.Token);
+            });
+
+            api.Queue(request);
+        }
+
+        private void createScoreTable()
+        {
+            request = new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
+            (request as GetUserRankingsRequest).Success += rankings => Schedule(() =>
+            {
+                var table = new ScoresTable()
+                {
+                    Rankings = rankings,
+                };
+
+                LoadComponentAsync(table, t =>
+                {
+                    contentPlaceholder.Clear();
+                    contentPlaceholder.Add(t);
+                    loading.Hide();
+                }, cancellationToken.Token);
+            });
+
+            api.Queue(request);
         }
     }
 }
