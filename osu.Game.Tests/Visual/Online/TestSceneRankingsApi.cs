@@ -73,12 +73,10 @@ namespace osu.Game.Tests.Visual.Online
                 updateUserRequest(new GetUserRankingsRequest(new CatchRuleset().RulesetInfo), updatePerformanceRankings));
 
             AddStep("Get mania scores for BY", () =>
-                updateUserRequest(new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo, UserRankingsType.Score, country: "BY")
-                , updateScoreRankings));
+                updateUserRequest(new GetUserRankingsRequest(new ManiaRuleset().RulesetInfo, UserRankingsType.Score, country: "BY"), updateScoreRankings));
 
             AddStep("Get osu country rankings", () =>
-                updateCountryRequest(new GetCountryRankingsRequest(new OsuRuleset().RulesetInfo)
-                , updateCountryRankings));
+                updateCountryRequest(new GetCountryRankingsRequest(new OsuRuleset().RulesetInfo), updateCountryRankings));
         }
 
         private void updateUserRequest(GetUserRankingsRequest newRequest, APISuccessHandler<List<APIUserRankings>> onSuccess)
