@@ -68,6 +68,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
+        private RankingsOverlay rankingsOverlay;
+
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
@@ -509,6 +511,7 @@ namespace osu.Game
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
+            loadComponentSingleFile(rankingsOverlay = new RankingsOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
 
@@ -552,7 +555,7 @@ namespace osu.Game
             }
 
             // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
-            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
+            var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile, rankingsOverlay };
             overlays.AddRange(informationalOverlays);
 
             foreach (var overlay in informationalOverlays)
