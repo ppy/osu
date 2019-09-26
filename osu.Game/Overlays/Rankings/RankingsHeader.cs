@@ -101,13 +101,6 @@ namespace osu.Game.Overlays.Rankings
             });
         }
 
-        protected override void LoadComplete()
-        {
-            // Will be added back after api implementation
-            //Scope.BindValueChanged(scope => dropdown.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint), true);
-            base.LoadComplete();
-        }
-
         private class HeaderBackground : Sprite
         {
             public HeaderBackground()

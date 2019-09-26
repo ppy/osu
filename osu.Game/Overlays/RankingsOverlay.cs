@@ -153,9 +153,9 @@ namespace osu.Game.Overlays
         private void createCountryTable()
         {
             request = new GetCountryRankingsRequest(ruleset.Value);
-            (request as GetCountryRankingsRequest).Success += rankings => Schedule(() =>
+            ((GetCountryRankingsRequest)request).Success += rankings => Schedule(() =>
             {
-                var table = new CountriesTable()
+                var table = new CountriesTable
                 {
                     Rankings = rankings,
                 };
@@ -174,9 +174,9 @@ namespace osu.Game.Overlays
         private void createPerformanceTable()
         {
             request = new GetUserRankingsRequest(ruleset.Value, country: country.Value?.FlagName);
-            (request as GetUserRankingsRequest).Success += rankings => Schedule(() =>
+            ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
-                var table = new PerformanceTable()
+                var table = new PerformanceTable
                 {
                     Rankings = rankings,
                 };
@@ -195,9 +195,9 @@ namespace osu.Game.Overlays
         private void createScoreTable()
         {
             request = new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
-            (request as GetUserRankingsRequest).Success += rankings => Schedule(() =>
+            ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
-                var table = new ScoresTable()
+                var table = new ScoresTable
                 {
                     Rankings = rankings,
                 };
