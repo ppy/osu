@@ -250,9 +250,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // another algorithm that only focuses on acc instead of acc and od
             double percentageAccValue = Math.Exp((accOnCircles - 1) * 20) * softCap;
 
-            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
+            double accuracyValue = Math.Pow(deviationAccValue, 0.5f) * Math.Pow(percentageAccValue, 0.5f) * 0.8f;
 
-            return Math.Pow(deviationAccValue, 0.5f) * Math.Pow(percentageAccValue, 0.5f) * lengthFactor * 0.8f;
+            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
+            accuracyValue *= lengthFactor;
+
+            if (mods.Any(m => m is OsuModHidden))
+                accuracyValue *= 1.08f;
+            if (mods.Any(m => m is OsuModFlashlight))
+                accuracyValue *= 1.02f;
+
+            return accuracyValue;
         }
 
         private double getModifiedAcc()
