@@ -41,7 +41,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// </summary>
         /// <param name="interactive">If the test player should behave like the production one.</param>
         /// <param name="beforeLoadAction">An action to run before player load but after bindable leases are returned.</param>
-        public void ResetPlayer(bool interactive, Action beforeLoadAction = null)
+        /// <param name="afterLoadAction">An action to run after container load.</param>
+        public void ResetPlayer(bool interactive, Action beforeLoadAction = null, Action afterLoadAction = null)
         {
             audioManager.Volume.SetDefault();
 
@@ -51,7 +52,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             InputManager.Child = container = new TestPlayerLoaderContainer(
-                loader = new TestPlayerLoader(() => player = new TestPlayer(interactive, interactive)));
+                loader = new TestPlayerLoader(() =>
+                {
+                    afterLoadAction?.Invoke();
+                    return player = new TestPlayer(interactive, interactive);
+                }));
         }
 
         [Test]
@@ -115,11 +120,26 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotification()
-        {
-            AddStep("reset notification", PlayerLoader.ResetNotificationLock);
+        public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
 
-            AddStep("load player", () => ResetPlayer(false, () => audioManager.Volume.Value = 0));
+        [Test]
+        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+
+        [Test]
+        public void TestMutedNotificationMuteButton() => addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+
+        /// <remarks>
+        /// Created for avoiding copy pasting code for the same steps.
+        /// </remarks>
+        /// <param name="volumeName">What part of the volume system is checked</param>
+        /// <param name="beforeLoad">The action to be invoked to set the volume before loading</param>
+        /// <param name="afterLoad">The action to be invoked to set the volume after loading</param>
+        /// <param name="assert">The function to be invoked and checked</param>
+        private void addVolumeSteps(string volumeName, Action beforeLoad, Action afterLoad, Func<bool> assert)
+        {
+            AddStep("reset notification lock", PlayerLoader.ResetNotificationLock);
+
+            AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
             AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
@@ -132,14 +152,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 InputManager.MoveMouseTo(notification);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("check master volume", () => audioManager.Volume.IsDefault);
 
-            AddStep("restart player", () =>
-            {
-                var lastPlayer = player;
-                player = null;
-                lastPlayer.Restart();
-            });
+            AddAssert("check " + volumeName, assert);
         }
 
         private class TestPlayerLoaderContainer : Container
