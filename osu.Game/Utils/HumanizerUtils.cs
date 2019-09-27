@@ -43,7 +43,7 @@ namespace osu.Game.Utils
             return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
         }
 
-        private static readonly string[] suffixes = new[]
+        private static readonly string[] suffixes = 
         {
             "",
             "k",
