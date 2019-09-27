@@ -12,14 +12,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
-    public class SpinnerPiece : HitObjectPiece
+    public class SpinnerPiece : CompositeDrawable
     {
         private readonly Spinner spinner;
         private readonly CircularContainer circle;
         private readonly RingPiece ring;
 
         public SpinnerPiece(Spinner spinner)
-            : base(spinner)
         {
             this.spinner = spinner;
 
