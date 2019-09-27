@@ -60,21 +60,23 @@ namespace osu.Game.Screens.Play.HUD
             AutoSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private Bindable<int> activationDelay;
+
+        protected override void LoadComplete()
         {
-            var activationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay).GetBoundCopy();
+            activationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
                     ? "hold for menu"
                     : "press for menu";
             }, true);
-        }
 
-        protected override void LoadComplete()
-        {
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+
             base.LoadComplete();
         }
 
