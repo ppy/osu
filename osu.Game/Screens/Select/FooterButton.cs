@@ -66,8 +66,8 @@ namespace osu.Game.Screens.Select
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
-            //Masks away one or two overlapping pixel
-            //when UI scale is at minimum.
+            // Masks away one or two overlapping pixel
+            // when UI scale is at minimum.
             Masking = true;
             Children = new Drawable[]
             {
@@ -81,10 +81,10 @@ namespace osu.Game.Screens.Select
                 LightContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    //Make container for light slightly smaller than parent.
+                    // Make container for light slightly smaller than parent.
                     Size = new Vector2(0.996f, 4),
-                    //Anchor is at top right because ModIcons are added to the right
-                    //and rounding errors (relative size od x) are hidden to the left.
+                    // Anchor is at top right because ModIcons are added to the right
+                    // and rounding errors (relative size od x) are hidden to the left.
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Child = light = new Box
