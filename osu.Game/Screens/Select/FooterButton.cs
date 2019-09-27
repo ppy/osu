@@ -57,6 +57,7 @@ namespace osu.Game.Screens.Select
         }
 
         protected readonly Container TextContainer;
+        protected readonly Container LightContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
@@ -65,6 +66,9 @@ namespace osu.Game.Screens.Select
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
+            //Masks away one or two overlapping pixel
+            //when UI scale is at minimum.
+            Masking = true;
             Children = new Drawable[]
             {
                 box = new Box
@@ -74,11 +78,23 @@ namespace osu.Game.Screens.Select
                     Colour = Color4.White,
                     Alpha = 0,
                 },
-                light = new Box
+                LightContainer = new Container
                 {
-                    Height = 4,
-                    EdgeSmoothness = new Vector2(2, 0),
-                    RelativeSizeAxes = Axes.X,
+                    RelativeSizeAxes = Axes.Both,
+                    //Make container for light slightly smaller than parent.
+                    Size = new Vector2(0.996f, 4),
+                    //Anchor is at top right because ModIcons are added to the right
+                    //and rounding errors (relative size od x) are hidden to the left.
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Child = light = new Box
+                    {
+                        Size = new Vector2(0.998f, 4),
+                        EdgeSmoothness = new Vector2(2, 0),
+                        RelativeSizeAxes = Axes.X,
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    }
                 },
                 TextContainer = new Container
                 {
