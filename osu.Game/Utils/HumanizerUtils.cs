@@ -36,22 +36,22 @@ namespace osu.Game.Utils
         {
             const int k = 1000;
 
-            var suffixes = new[]
-            {
-                "",
-                "k",
-                "million",
-                "billion",
-                "trillion",
-                "quadrillion",
-                "quintillion",
-            };
-
             if (input < k)
                 return input.ToString();
 
             int i = (int)Math.Floor(Math.Round(Math.Log(input, k)));
             return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
         }
+
+        private static readonly string[] suffixes = new[]
+        {
+            "",
+            "k",
+            "million",
+            "billion",
+            "trillion",
+            "quadrillion",
+            "quintillion",
+        };
     }
 }
