@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -11,13 +12,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : SliderPiece
+    public class SliderBodyPiece : CompositeDrawable
     {
         private readonly Slider slider;
         private readonly ManualSliderBody body;
 
         public SliderBodyPiece(Slider slider)
-            : base(slider)
         {
             this.slider = slider;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.Update();
 
             Position = slider.StackedPosition;
-            body.PathRadius = HitObject.Scale * OsuHitObject.OBJECT_RADIUS;
+            body.PathRadius = slider.Scale * OsuHitObject.OBJECT_RADIUS;
 
             var vertices = new List<Vector2>();
             slider.Path.GetPathToProgress(vertices, 0, 1);

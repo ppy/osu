@@ -7,14 +7,13 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointVisualiser : SliderPiece
+    public class PathControlPointVisualiser : CompositeDrawable
     {
         private readonly Slider slider;
 
         private readonly Container<PathControlPointPiece> pieces;
 
         public PathControlPointVisualiser(Slider slider)
-            : base(slider)
         {
             this.slider = slider;
 

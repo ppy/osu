@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -10,12 +11,11 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : HitObjectPiece
+    public class HitCirclePiece : CompositeDrawable
     {
         private readonly HitCircle hitCircle;
 
         public HitCirclePiece(HitCircle hitCircle)
-            : base(hitCircle)
         {
             this.hitCircle = hitCircle;
             Origin = Anchor.Centre;
