@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Play
 
         private IdleTracker idleTracker;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private NotificationOverlay notificationOverlay { get; set; }
 
         [Resolved]
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
             //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
             if (!muteWarningShownOnce && (volumeOverlay.IsMuted.Value || audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue))
             {
-                notificationOverlay.Post(new MutedNotification());
+                notificationOverlay?.Post(new MutedNotification());
                 muteWarningShownOnce = true;
             }
         }
