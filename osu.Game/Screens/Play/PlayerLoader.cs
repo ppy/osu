@@ -59,17 +59,6 @@ namespace osu.Game.Screens.Play
 
         private IdleTracker idleTracker;
 
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notificationOverlay { get; set; }
-
-        [Resolved]
-        private VolumeOverlay volumeOverlay { get; set; }
-
-        [Resolved]
-        private AudioManager audioManager { get; set; }
-
-        private static bool muteWarningShownOnce;
-
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
@@ -159,10 +148,24 @@ namespace osu.Game.Screens.Play
             content.FadeOut(250);
         }
 
-        private void checkVolume(AudioManager audio)
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notificationOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private VolumeOverlay volumeOverlay { get; set; }
+
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        private static bool muteWarningShownOnce;
+
+        private void checkVolume()
         {
+            if (muteWarningShownOnce)
+                return;
+
             //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-            if (!muteWarningShownOnce && (volumeOverlay.IsMuted.Value || audio.Volume.Value <= audio.Volume.MinValue || audio.VolumeTrack.Value <= audio.VolumeTrack.MinValue))
+            if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
             {
                 notificationOverlay?.Post(new MutedNotification());
                 muteWarningShownOnce = true;
@@ -213,7 +216,8 @@ namespace osu.Game.Screens.Play
         {
             inputManager = GetContainingInputManager();
             base.LoadComplete();
-            checkVolume(audioManager);
+
+            checkVolume();
         }
 
         private ScheduledDelegate pushDebounce;
