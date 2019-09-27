@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -12,18 +11,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : CompositeDrawable
+    public class SliderBodyPiece : BlueprintPiece<Slider>
     {
-        private readonly Slider slider;
         private readonly ManualSliderBody body;
 
-        public SliderBodyPiece(Slider slider)
+        public SliderBodyPiece()
         {
-            this.slider = slider;
-
             InternalChild = body = new ManualSliderBody
             {
-                AccentColour = Color4.Transparent,
+                AccentColour = Color4.Transparent
             };
         }
 
@@ -33,17 +29,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             body.BorderColour = colours.Yellow;
         }
 
-        private void updatePosition() => Position = slider.StackedPosition;
-
-        protected override void Update()
+        public override void UpdateFrom(Slider hitObject)
         {
-            base.Update();
+            base.UpdateFrom(hitObject);
 
-            Position = slider.StackedPosition;
-            body.PathRadius = slider.Scale * OsuHitObject.OBJECT_RADIUS;
+            body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
 
             var vertices = new List<Vector2>();
-            slider.Path.GetPathToProgress(vertices, 0, 1);
+            hitObject.Path.GetPathToProgress(vertices, 0, 1);
 
             body.SetVertices(vertices);
 

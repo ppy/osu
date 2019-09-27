@@ -7,12 +7,21 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
-    public class HitCircleSelectionBlueprint : OsuSelectionBlueprint
+    public class HitCircleSelectionBlueprint : OsuSelectionBlueprint<HitCircle>
     {
+        private readonly HitCirclePiece circlePiece;
+
         public HitCircleSelectionBlueprint(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
-            InternalChild = new HitCirclePiece((HitCircle)hitCircle.HitObject);
+            InternalChild = circlePiece = new HitCirclePiece();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            circlePiece.UpdateFrom(HitObject);
         }
     }
 }

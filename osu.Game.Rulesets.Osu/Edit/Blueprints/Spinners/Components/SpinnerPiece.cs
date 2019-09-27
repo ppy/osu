@@ -12,16 +12,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
-    public class SpinnerPiece : CompositeDrawable
+    public class SpinnerPiece : BlueprintPiece<Spinner>
     {
-        private readonly Spinner spinner;
         private readonly CircularContainer circle;
         private readonly RingPiece ring;
 
-        public SpinnerPiece(Spinner spinner)
+        public SpinnerPiece()
         {
-            this.spinner = spinner;
-
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
@@ -43,8 +40,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
                     Origin = Anchor.Centre
                 }
             };
-
-            ring.Scale = new Vector2(spinner.Scale);
         }
 
         [BackgroundDependencyLoader]
@@ -53,12 +48,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
             Colour = colours.Yellow;
         }
 
-        protected override void Update()
+        public override void UpdateFrom(Spinner hitObject)
         {
-            base.Update();
+            base.UpdateFrom(hitObject);
 
-            Position = spinner.Position;
-            ring.Scale = new Vector2(spinner.Scale);
+            ring.Scale = new Vector2(hitObject.Scale);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.ReceivePositionalInputAt(screenSpacePos);
