@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
 
         [Test]
-        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
 
         [Test]
         public void TestMutedNotificationMuteButton() => addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
