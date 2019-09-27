@@ -9,8 +9,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public class SliderSelectionBlueprint : OsuSelectionBlueprint
+    public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
+        private readonly SliderBodyPiece bodyPiece;
         private readonly SliderCircleSelectionBlueprint headBlueprint;
 
         public SliderSelectionBlueprint(DrawableSlider slider)
@@ -20,11 +21,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             InternalChildren = new Drawable[]
             {
-                new SliderBodyPiece(sliderObject),
-                headBlueprint = new SliderCircleSelectionBlueprint(slider.HeadCircle, sliderObject, SliderPosition.Start),
-                new SliderCircleSelectionBlueprint(slider.TailCircle, sliderObject, SliderPosition.End),
+                bodyPiece = new SliderBodyPiece(),
+                headBlueprint = new SliderCircleSelectionBlueprint(slider, SliderPosition.Start),
+                new SliderCircleSelectionBlueprint(slider, SliderPosition.End),
                 new PathControlPointVisualiser(sliderObject),
             };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            bodyPiece.UpdateFrom(HitObject);
         }
 
         public override Vector2 SelectionPoint => headBlueprint.SelectionPoint;
