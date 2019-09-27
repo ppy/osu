@@ -31,10 +31,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+        }
 
-            PositionBindable.BindValueChanged(_ => UpdatePosition(), true);
-            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
-            ScaleBindable.BindValueChanged(scale => Scale = new Vector2(scale.NewValue), true);
+        protected override void Update()
+        {
+            base.Update();
+
+            UpdatePosition();
+            Scale = new Vector2(hitCircle.Scale);
         }
 
         protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
