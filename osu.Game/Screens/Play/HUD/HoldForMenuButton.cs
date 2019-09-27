@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -45,7 +46,6 @@ namespace osu.Game.Screens.Play.HUD
             {
                 text = new OsuSpriteText
                 {
-                    Text = "hold for menu",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
@@ -60,9 +60,23 @@ namespace osu.Game.Screens.Play.HUD
             AutoSizeAxes = Axes.Both;
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private Bindable<int> activationDelay;
+
         protected override void LoadComplete()
         {
+            activationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+            activationDelay.BindValueChanged(v =>
+            {
+                text.Text = v.NewValue > 0
+                    ? "hold for menu"
+                    : "press for menu";
+            }, true);
+
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+
             base.LoadComplete();
         }
 
