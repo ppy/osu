@@ -80,16 +80,18 @@ namespace osu.Game.Screens.Select
                 },
                 LightContainer = new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     // Make container for light slightly smaller than parent.
-                    Size = new Vector2(0.996f, 4),
+                    Width = 0.996f,
                     // Anchor is at top right because ModIcons are added to the right
-                    // and rounding errors (relative size od x) are hidden to the left.
+                    // so rounding errors (relative size of x) are hidden to the left.
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Child = light = new Box
                     {
-                        Size = new Vector2(0.998f, 4),
+                        Height = 4,
+                        Width = 0.998f,
                         EdgeSmoothness = new Vector2(2, 0),
                         RelativeSizeAxes = Axes.X,
                         Anchor = Anchor.TopRight,
