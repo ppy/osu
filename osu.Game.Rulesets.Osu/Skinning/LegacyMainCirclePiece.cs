@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Skinning;
 using osuTK;
@@ -25,13 +24,16 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
-
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
+            OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
+
             Sprite hitCircleSprite;
+            SkinnableSpriteText hitCircleText;
 
             InternalChildren = new Drawable[]
             {
@@ -42,14 +44,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
+                hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
-                }, confineMode: ConfineMode.NoScaling)
-                {
-                    Text = (((IHasComboInformation)drawableObject.HitObject).IndexInCurrentCombo + 1).ToString()
-                },
+                }, confineMode: ConfineMode.NoScaling),
                 new Sprite
                 {
                     Texture = skin.GetTexture("hitcircleoverlay"),
@@ -63,6 +62,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             accentColour.BindTo(drawableObject.AccentColour);
             accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
+
+            indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
+            indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)
