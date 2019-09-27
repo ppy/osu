@@ -297,11 +297,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
-            var drawable = new DrawableSlider(slider)
-            {
-                Anchor = Anchor.Centre,
-                Depth = depthIndex++
-            };
+            var drawable = CreateDrawableSlider(slider);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
@@ -310,6 +306,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             return drawable;
         }
+
+        protected virtual DrawableSlider CreateDrawableSlider(Slider slider) => new DrawableSlider(slider)
+        {
+            Anchor = Anchor.Centre,
+            Depth = depthIndex++
+        };
 
         private float judgementOffsetDirection = 1;
 
