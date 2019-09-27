@@ -44,8 +44,8 @@ namespace osu.Game.Overlays
             Clear();
             lastSection = null;
 
-            sections = !user.IsBot ?
-                new ProfileSection[]
+            sections = !user.IsBot
+                ? new ProfileSection[]
                 {
                     //new AboutSection(),
                     new RecentSection(),
@@ -54,8 +54,8 @@ namespace osu.Game.Overlays
                     new HistoricalSection(),
                     new BeatmapsSection(),
                     new KudosuSection()
-                } :
-                new ProfileSection[]
+                }
+                : new ProfileSection[]
                 {
                     //new AboutSection(),
                 };
