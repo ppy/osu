@@ -14,7 +14,6 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            //typeof(Screens.Select.SongSelect),
             typeof(Footer),
             typeof(FooterButton),
         };
