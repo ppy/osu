@@ -52,13 +52,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            StackHeightBindable.BindValueChanged(_ => updatePosition());
-            ScaleBindable.BindValueChanged(scale => ring.Scale = new Vector2(scale.NewValue), true);
         }
 
-        private void updatePosition() => Position = spinner.Position;
+        protected override void Update()
+        {
+            base.Update();
+
+            Position = spinner.Position;
+            ring.Scale = new Vector2(spinner.Scale);
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.ReceivePositionalInputAt(screenSpacePos);
     }

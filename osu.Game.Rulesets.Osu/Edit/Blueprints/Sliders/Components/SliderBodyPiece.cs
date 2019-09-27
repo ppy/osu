@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            ScaleBindable.BindValueChanged(scale => body.PathRadius = scale.NewValue * OsuHitObject.OBJECT_RADIUS, true);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;
@@ -41,6 +38,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override void Update()
         {
             base.Update();
+
+            Position = slider.StackedPosition;
+            body.PathRadius = HitObject.Scale * OsuHitObject.OBJECT_RADIUS;
 
             var vertices = new List<Vector2>();
             slider.Path.GetPathToProgress(vertices, 0, 1);
