@@ -60,10 +60,10 @@ namespace osu.Game.Screens
 
         private IntroScreen getIntroSequence()
         {
-            Random random = new Random();
             switch (introSequence)
             {
                 case IntroSequence.Random:
+                    var random = new Random();
                     if (random.Next(2) == 0)
                         return new IntroCircles();
                     else
