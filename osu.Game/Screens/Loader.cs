@@ -59,7 +59,7 @@ namespace osu.Game.Screens
         }
 
         private IntroScreen getIntroSequence()
-        {//вот именно что не показывает ни всплывающих подсказок нихера
+        {
             Random random = new Random();
             switch (introSequence)
             {
