@@ -3,15 +3,18 @@
 
 namespace osu.Game.Configuration
 {
-    public class SessionStatics : InMemoryConfigManager<Statics>
+    /// <summary>
+    /// Stores global per-session statics. These will not be stored after exiting the game.
+    /// </summary>
+    public class SessionStatics : InMemoryConfigManager<Static>
     {
         protected override void InitialiseDefaults()
         {
-            Set(Statics.LoginOverlayDisplayed, false);
+            Set(Static.LoginOverlayDisplayed, false);
         }
     }
 
-    public enum Statics
+    public enum Static
     {
         LoginOverlayDisplayed,
     }

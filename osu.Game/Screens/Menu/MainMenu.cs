@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Menu
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
-            loginDisplayed = statics.GetBindable<bool>(Statics.LoginOverlayDisplayed);
+            loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
             if (host.CanExit)
             {
