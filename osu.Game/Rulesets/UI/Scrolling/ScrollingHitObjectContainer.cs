@@ -77,6 +77,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!initialStateCache.IsValid)
             {
+                foreach (var cached in hitObjectInitialStateCache.Values)
+                    cached.Invalidate();
+
                 switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
