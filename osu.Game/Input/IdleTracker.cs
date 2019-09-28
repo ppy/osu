@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -13,9 +14,10 @@ namespace osu.Game.Input
     /// <summary>
     /// Track whether the end-user is in an idle state, based on their last interaction with the game.
     /// </summary>
-    public class IdleTracker : Component
+    public class IdleTracker : Container
     {
         private readonly double timeToIdle;
+        private readonly bool receiveFullInput;
 
         private readonly BindableBool isIdle = new BindableBool();
 
@@ -35,9 +37,12 @@ namespace osu.Game.Input
         /// Intstantiate a new <see cref="IdleTracker"/>.
         /// </summary>
         /// <param name="timeToIdle">The length in milliseconds until an idle state should be assumed.</param>
-        public IdleTracker(double timeToIdle)
+        /// <param name="receiveFullInput">Whether inputs outside the draw hierarchy should be received as well. If true, the interaction time receptor would be added to the game itself.</param>
+        public IdleTracker(double timeToIdle, bool receiveFullInput = false)
         {
             this.timeToIdle = timeToIdle;
+            this.receiveFullInput = receiveFullInput;
+
             RelativeSizeAxes = Axes.Both;
         }
 
@@ -48,7 +53,8 @@ namespace osu.Game.Input
         {
             base.LoadComplete();
 
-            game.Add(Receptor = new InteractionTimeReceptor());
+            var target = receiveFullInput ? game : this as Container;
+            target.Add(Receptor = new InteractionTimeReceptor());
         }
 
         protected override void Update()

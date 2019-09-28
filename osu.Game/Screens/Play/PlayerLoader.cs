@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Play
                         new InputSettings()
                     }
                 },
-                idleTracker = new IdleTracker(750)
+                idleTracker = new IdleTracker(750, true)
             });
 
             loadNewPlayer();
