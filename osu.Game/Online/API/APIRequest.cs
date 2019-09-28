@@ -64,7 +64,10 @@ namespace osu.Game.Online.API
         public void Perform(IAPIProvider api)
         {
             if (!(api is APIAccess apiAccess))
-                throw new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests.");
+            {
+                Fail(new NotSupportedException($"A {nameof(APIAccess)} is required to perform requests."));
+                return;
+            }
 
             API = apiAccess;
 
