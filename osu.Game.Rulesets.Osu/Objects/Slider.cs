@@ -33,28 +33,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public override int ComboIndex
-        {
-            get => base.ComboIndex;
-            set
-            {
-                base.ComboIndex = value;
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
-                    n.ComboIndex = value;
-            }
-        }
-
-        public override int IndexInCurrentCombo
-        {
-            get => base.IndexInCurrentCombo;
-            set
-            {
-                base.IndexInCurrentCombo = value;
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
-                    n.IndexInCurrentCombo = value;
-            }
-        }
-
         public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
 
         public SliderPath Path
@@ -192,8 +170,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position,
                             Samples = getNodeSamples(0),
                             SampleControlPoint = SampleControlPoint,
-                            IndexInCurrentCombo = IndexInCurrentCombo,
-                            ComboIndex = ComboIndex,
                         });
                         break;
 
@@ -205,8 +181,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                         {
                             StartTime = e.Time,
                             Position = EndPosition,
-                            IndexInCurrentCombo = IndexInCurrentCombo,
-                            ComboIndex = ComboIndex,
                         });
                         break;
 
