@@ -13,7 +13,6 @@ using osu.Framework.Screens;
 using osu.Game.Configuration;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
 
-
 namespace osu.Game.Screens
 {
     public class Loader : StartupScreen
