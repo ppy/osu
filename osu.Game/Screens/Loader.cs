@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -11,6 +12,7 @@ using osuTK;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using IntroSequence = osu.Game.Configuration.IntroSequence;
+
 
 namespace osu.Game.Screens
 {
@@ -58,9 +60,16 @@ namespace osu.Game.Screens
         }
 
         private IntroScreen getIntroSequence()
-        {
+        {//вот именно что не показывает ни всплывающих подсказок нихера
+            Random random = new Random();
             switch (introSequence)
             {
+                case IntroSequence.Random:
+                    if (random.Next(2) == 0)
+                        return new IntroCircles();
+                    else
+                        return new IntroTriangles();
+
                 case IntroSequence.Circles:
                     return new IntroCircles();
 
