@@ -42,6 +42,7 @@ namespace osu.Game.Utils
             int i = (int)Math.Floor(Math.Round(Math.Log(input, k)));
             return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
         }
+
         private static readonly string[] suffixes =
         {
             "",
