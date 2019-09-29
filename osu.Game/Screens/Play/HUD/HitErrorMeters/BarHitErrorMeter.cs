@@ -251,11 +251,24 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             private const int judgement_fade_duration = 10000;
 
-            public JudgementLine()
+            private readonly bool isVertical;
+
+            public JudgementLine(bool isVertical = false)
             {
-                RelativeSizeAxes = Axes.X;
-                RelativePositionAxes = Axes.Y;
-                Height = 3;
+                this.isVertical = isVertical;
+
+                if (isVertical)
+                {
+                    RelativeSizeAxes = Axes.Y;
+                    RelativePositionAxes = Axes.X;
+                    Width = 3;
+                }
+                else
+                {
+                    RelativeSizeAxes = Axes.X;
+                    RelativePositionAxes = Axes.Y;
+                    Height = 3;
+                }
 
                 InternalChild = new CircularContainer
                 {
@@ -273,9 +286,17 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 base.LoadComplete();
 
-                Width = 0;
+                if (isVertical)
+                {
+                    Height = 0;
+                    this.ResizeHeightTo(1, 200, Easing.OutElasticHalf);
+                }
+                else
+                {
+                    Width = 0;
+                    this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
+                }
 
-                this.ResizeWidthTo(1, 200, Easing.OutElasticHalf);
                 this.FadeTo(0.8f, 150).Then().FadeOut(judgement_fade_duration, Easing.OutQuint).Expire();
             }
         }
