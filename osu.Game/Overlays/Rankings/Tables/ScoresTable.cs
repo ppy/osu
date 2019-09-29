@@ -79,7 +79,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 {
                     Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new ColoredMetricNumber(item.RankedScore)
+                new MetricNumber(item.RankedScore)
                 {
                     Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },

@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             {
                 this.value = value;
 
-                Text = HumanizerUtils.ToMetric(value);
+                Text = HumanizerUtils.ToReadableString(value);
             }
         }
 
