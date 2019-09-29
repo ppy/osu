@@ -106,6 +106,7 @@ namespace osu.Game.Tests.Visual.Online
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             }, api.IsLoggedIn));
+
             AddStep("Show bancho", () => profile.ShowUser(new User
             {
                 Username = @"BanchoBot",
