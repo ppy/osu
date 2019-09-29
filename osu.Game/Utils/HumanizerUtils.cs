@@ -32,7 +32,7 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="input">The number to be humanized.</param>
         /// <returns>Simplified number with a suffix.</returns>
-        public static string ToMetric(long input)
+        public static string ToReadableString(long input)
         {
             const int k = 1000;
 
