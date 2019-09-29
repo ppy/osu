@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             public DrawableNumber(long value)
             {
                 this.value = value;
-                Text = HumanizerUtils.ToMetric(value);
+                Text = HumanizerUtils.ToReadableString(value);
             }
         }
     }
