@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.MathUtils;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osu.Framework.Screens;
@@ -60,15 +60,11 @@ namespace osu.Game.Screens
 
         private IntroScreen getIntroSequence()
         {
+            if (introSequence == IntroSequence.Random)
+                introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
+
             switch (introSequence)
             {
-                case IntroSequence.Random:
-                    var random = new Random();
-                    if (random.Next(2) == 0)
-                        return new IntroCircles();
-                    else
-                        return new IntroTriangles();
-
                 case IntroSequence.Circles:
                     return new IntroCircles();
 
