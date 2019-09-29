@@ -99,6 +99,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 this.value = value;
 
                 Text = HumanizerUtils.ToReadableString(value);
+                Font = OsuFont.GetFont(size: TEXT_SIZE);
             }
         }
 
@@ -118,6 +119,11 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected class ColoredText : OsuSpriteText
         {
+            public ColoredText()
+            {
+                Font = OsuFont.GetFont(size: TEXT_SIZE);
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
