@@ -28,6 +28,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private HitErrorMeter meter;
         private HitErrorMeter meter2;
+        private HitErrorMeter meter3;
         private HitWindows hitWindows;
 
         public TestSceneBarHitErrorMeter()
@@ -102,6 +103,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
             });
+
+            Add(meter3 = new BarHitErrorMeter(hitWindows, false)
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre
+            });
         }
 
         private void newJudgement(double offset = 0)
@@ -114,6 +121,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             meter.OnNewJudgement(judgement);
             meter2.OnNewJudgement(judgement);
+            meter3.OnNewJudgement(judgement);
         }
     }
 }
