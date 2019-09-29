@@ -32,7 +32,7 @@ namespace osu.Game.Utils
         /// </summary>
         /// <param name="input">The number to be humanized.</param>
         /// <returns>Simplified number with a suffix.</returns>
-        public static string ToMetric(long input)
+        public static string ToReadableString(long input)
         {
             const int k = 1000;
 
@@ -42,8 +42,7 @@ namespace osu.Game.Utils
             int i = (int)Math.Floor(Math.Round(Math.Log(input, k)));
             return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
         }
-
-        private static readonly string[] suffixes = new[]
+        private static readonly string[] suffixes =
         {
             "",
             "k",
