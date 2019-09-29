@@ -60,28 +60,14 @@ namespace osu.Game.Overlays.Rankings.Tables
             new ColoredText
             {
                 Text = $@"{item.ActiveUsers:N0}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
             },
-            new ColoredMetricNumber(item.PlayCount)
-            {
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-            },
-            new ColoredMetricNumber(item.RankedScore)
-            {
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-            },
-            new ColoredMetricNumber(item.RankedScore / Math.Max(item.ActiveUsers, 1))
-            {
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-            },
-            new MetricNumber(item.Performance)
-            {
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
-            },
+            new ColoredMetricNumber(item.PlayCount),
+            new ColoredMetricNumber(item.RankedScore),
+            new ColoredMetricNumber(item.RankedScore / Math.Max(item.ActiveUsers, 1)),
+            new MetricNumber(item.Performance),
             new ColoredText
             {
                 Text = $@"{item.Performance / Math.Max(item.ActiveUsers, 1):N0}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE),
             }
         };
     }
