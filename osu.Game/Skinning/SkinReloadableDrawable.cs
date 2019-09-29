@@ -12,13 +12,17 @@ namespace osu.Game.Skinning
     /// </summary>
     public abstract class SkinReloadableDrawable : CompositeDrawable
     {
+        /// <summary>
+        /// The current skin source.
+        /// </summary>
+        protected ISkinSource CurrentSkin { get; private set; }
+
         private readonly Func<ISkinSource, bool> allowFallback;
-        private ISkinSource skin;
 
         /// <summary>
         /// Whether fallback to default skin should be allowed if the custom skin is missing this resource.
         /// </summary>
-        private bool allowDefaultFallback => allowFallback == null || allowFallback.Invoke(skin);
+        private bool allowDefaultFallback => allowFallback == null || allowFallback.Invoke(CurrentSkin);
 
         /// <summary>
         /// Create a new <see cref="SkinReloadableDrawable"/>
@@ -32,19 +36,19 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
-            skin = source;
-            skin.SourceChanged += onChange;
+            CurrentSkin = source;
+            CurrentSkin.SourceChanged += onChange;
         }
 
         private void onChange() =>
             // schedule required to avoid calls after disposed.
             // note that this has the side-effect of components only performing a skin change when they are alive.
-            Scheduler.AddOnce(() => SkinChanged(skin, allowDefaultFallback));
+            Scheduler.AddOnce(() => SkinChanged(CurrentSkin, allowDefaultFallback));
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
-            SkinChanged(skin, allowDefaultFallback);
+            SkinChanged(CurrentSkin, allowDefaultFallback);
         }
 
         /// <summary>
@@ -60,8 +64,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (skin != null)
-                skin.SourceChanged -= onChange;
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= onChange;
         }
     }
 }
