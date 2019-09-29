@@ -82,8 +82,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void ensureRandomFetchSuccess() =>
             AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
 
-        private void checkSelected(int set, int? diff = null) =>
-            AddAssert($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
+        private void waitForSelection(int set, int? diff = null) =>
+            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
             {
                 if (diff != null)
                     return carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
@@ -168,24 +168,24 @@ namespace osu.Game.Tests.Visual.SongSelect
             loadBeatmaps();
 
             advanceSelection(direction: 1, diff: false);
-            checkSelected(1, 1);
+            waitForSelection(1, 1);
 
             advanceSelection(direction: 1, diff: true);
-            checkSelected(1, 2);
+            waitForSelection(1, 2);
 
             advanceSelection(direction: -1, diff: false);
-            checkSelected(set_count, 1);
+            waitForSelection(set_count, 1);
 
             advanceSelection(direction: -1, diff: true);
-            checkSelected(set_count - 1, 3);
+            waitForSelection(set_count - 1, 3);
 
             advanceSelection(diff: false);
             advanceSelection(diff: false);
-            checkSelected(1, 2);
+            waitForSelection(1, 2);
 
             advanceSelection(direction: -1, diff: true);
             advanceSelection(direction: -1, diff: true);
-            checkSelected(set_count, 3);
+            waitForSelection(set_count, 3);
         }
 
         /// <summary>
@@ -203,10 +203,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3!" }, false));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 3);
-            checkSelected(3, 1);
+            waitForSelection(3, 1);
 
             advanceSelection(diff: true, count: 4);
-            checkSelected(3, 2);
+            waitForSelection(3, 2);
 
             AddStep("Un-filter (debounce)", () => carousel.Filter(new FilterCriteria()));
             AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
@@ -217,10 +217,10 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             setSelected(1, 2);
             AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
-            checkSelected(1, 1);
+            waitForSelection(1, 1);
 
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
-            checkSelected(1, 1);
+            waitForSelection(1, 1);
 
             AddStep("Filter all", () => carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false));
 
@@ -249,7 +249,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     IsLowerInclusive = true
                 }
             }, false));
-            checkSelected(3, 2);
+            waitForSelection(3, 2);
 
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
         }
@@ -317,7 +317,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             checkVisibleItemCount(false, set_count);
 
-            checkSelected(set_count);
+            waitForSelection(set_count);
         }
 
         /// <summary>
@@ -343,11 +343,11 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is non-null", () => currentSelection != null);
 
             AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet));
-            checkSelected(2);
+            waitForSelection(2);
 
             AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
             AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
-            checkSelected(1);
+            waitForSelection(1);
 
             AddUntilStep("Remove all", () =>
             {
@@ -390,17 +390,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             checkVisibleItemCount(true, 2);
             advanceSelection(true);
-            checkSelected(1, 3);
+            waitForSelection(1, 3);
 
             setHidden(3);
-            checkSelected(1, 1);
+            waitForSelection(1, 1);
 
             setHidden(2, false);
             advanceSelection(true);
-            checkSelected(1, 2);
+            waitForSelection(1, 2);
 
             setHidden(1);
-            checkSelected(1, 2);
+            waitForSelection(1, 2);
 
             setHidden(2);
             checkNoSelection();
