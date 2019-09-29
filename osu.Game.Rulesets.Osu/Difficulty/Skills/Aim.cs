@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Aim : Skill
     {
         private const double probabilityThreshold = 0.02;
-        private const double timeThreshold = 3600;
+        private const double timeThresholdBase = 3600;
         private const double tpMin = 0.1;
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
@@ -96,9 +96,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return Brent.FindRoot(fcProbMinusThreshold, tpMin, tpMax, tpPrecision);
         }
 
+        /// <summary>
+        /// Calculates the throughput at which the expected time to FC the given movements =
+        /// timeThresholdBase + time span of the movements
+        /// </summary>
         private static double calculateFCTimeTP(IEnumerable<OsuMovement> movements)
         {
-            
+            double mapLength = movements.Last().Time - movements.First().Time;
+            double timeThreshold = timeThresholdBase + mapLength;
+
             double maxFCTime = calculateFCTime(movements, tpMin);
 
             if (maxFCTime <= timeThreshold)
@@ -111,7 +117,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double fcTimeMinusThreshold(double tp) => calculateFCTime(movements, tp) - timeThreshold;
             return Brent.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, tpPrecision);
-
         }
 
         private static string generateGraphText(List<OsuMovement> movements, double tp)
@@ -251,21 +256,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         }
 
 
-        // Uses dynamic programming to calculate expected fc time.
-        // The length of map is subtracted from the result so that the result is not
-        // broken for maps longer than (or close to) timeThreshold.
+        // Uses dynamic programming to calculate expected fc time
         private static double calculateFCTime(IEnumerable<OsuMovement> movements, double tp,
                                               double cheeseLevel = defaultCheeseLevel)
         {
             double fcTime = 0;
-            double mapLength = movements.Last().Time - movements.First().Time;
 
             foreach (OsuMovement movement in movements)
             {
                 double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
                 fcTime = (fcTime + movement.RawMT) / hitProb;
             }
-            return fcTime - mapLength;
+            return fcTime;
         }
 
         private static double calculateCheeseHitProb(OsuMovement movement, double tp, double cheeseLevel)
