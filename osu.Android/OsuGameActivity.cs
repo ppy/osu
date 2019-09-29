@@ -21,5 +21,12 @@ namespace osu.Android
             Window.AddFlags(WindowManagerFlags.Fullscreen);
             Window.AddFlags(WindowManagerFlags.KeepScreenOn);
         }
+
+        /// <summary>
+        /// Overriding this method avoids that osu! closes when the backbutton is pressed.
+        /// </summary>
+        public override void OnBackPressed()
+        {
+        }
     }
 }
