@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             hasHitCircle = new Lazy<bool>(() => source.GetTexture("hitcircle") != null);
         }
 
+        public SkinInfo SkinInfo => source.SkinInfo;
+
         public Drawable GetDrawableComponent(ISkinComponent component)
         {
             if (!(component is OsuSkinComponent osuComponent))

@@ -37,6 +37,8 @@ namespace osu.Game.Skinning
 
         protected override string ImportFromStablePath => "Skins";
 
+        public SkinInfo SkinInfo => CurrentSkin.Value.SkinInfo;
+
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio, IResourceStore<byte[]> legacyDefaultResources)
             : base(storage, contextFactory, new SkinStore(contextFactory, storage), importHost)
         {

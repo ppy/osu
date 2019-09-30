@@ -120,6 +120,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.identifier = identifier;
             }
 
+            public SkinInfo SkinInfo => null;
+
             public Drawable GetDrawableComponent(ISkinComponent component)
             {
                 if (!enabled) return null;

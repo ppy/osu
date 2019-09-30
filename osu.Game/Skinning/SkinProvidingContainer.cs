@@ -31,6 +31,8 @@ namespace osu.Game.Skinning
 
         protected virtual bool AllowConfigurationLookup => true;
 
+        public SkinInfo SkinInfo => skin?.SkinInfo ?? fallbackSource.SkinInfo;
+
         public SkinProvidingContainer(ISkin skin)
         {
             this.skin = skin;

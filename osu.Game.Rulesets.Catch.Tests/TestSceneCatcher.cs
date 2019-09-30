@@ -83,6 +83,8 @@ namespace osu.Game.Rulesets.Catch.Tests
                 remove { }
             }
 
+            public SkinInfo SkinInfo => throw new NotImplementedException();
+
             public Drawable GetDrawableComponent(ISkinComponent component)
             {
                 switch (component.LookupName)

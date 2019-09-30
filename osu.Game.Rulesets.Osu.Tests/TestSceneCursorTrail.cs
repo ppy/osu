@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both;
             }
 
+            public SkinInfo SkinInfo => throw new NotImplementedException();
+
             public Drawable GetDrawableComponent(ISkinComponent component) => throw new NotImplementedException();
 
             public Texture GetTexture(string componentName)

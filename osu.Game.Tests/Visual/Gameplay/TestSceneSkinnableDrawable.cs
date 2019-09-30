@@ -288,6 +288,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                 this.size = size;
             }
 
+            public SkinInfo SkinInfo => throw new NotImplementedException();
+
             public Drawable GetDrawableComponent(ISkinComponent componentName) =>
                 componentName.LookupName == "available"
                     ? new DrawWidthBox
@@ -306,6 +308,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class SecondarySource : ISkin
         {
+            public SkinInfo SkinInfo => throw new NotImplementedException();
+
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new SecondarySourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();
@@ -318,6 +322,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Cached(typeof(ISkinSource))]
         private class SkinSourceContainer : Container, ISkinSource
         {
+            public SkinInfo SkinInfo => throw new NotImplementedException();
+
             public Drawable GetDrawableComponent(ISkinComponent componentName) => new BaseSourceBox();
 
             public Texture GetTexture(string componentName) => throw new NotImplementedException();

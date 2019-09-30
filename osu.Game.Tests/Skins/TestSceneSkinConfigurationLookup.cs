@@ -146,6 +146,8 @@ namespace osu.Game.Tests.Skins
                 this.skin = skin;
             }
 
+            public SkinInfo SkinInfo => skin.SkinInfo;
+
             public Drawable GetDrawableComponent(ISkinComponent component) => skin.GetDrawableComponent(component);
 
             public Texture GetTexture(string componentName) => skin.GetTexture(componentName);
