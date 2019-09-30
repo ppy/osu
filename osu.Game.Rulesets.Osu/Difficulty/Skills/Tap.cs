@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
 
-                currStrain += decayCoeffs * Math.Pow((currTime - prevPrevTime) / clockRate, -2) *
+                currStrain += decayCoeffs * Math.Pow((currTime - prevPrevTime) / clockRate, -2.3) *
                               Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
                               Math.Pow(1 + spacedBuff, 3);
 
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainResult[j] = singleStrainResult * (1 - k);
             }
 
-            return (strainHistory, strainResult * 1.6);
+            return (strainHistory, strainResult);
         }
 
         /// <summary>

@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.126;
 
-        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.181f;
+        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent + 0.5f) * 0.0945f;
 
         private double fingerControlDiffToPP(double fingerControlDiff) => Math.Pow(fingerControlDiff, skillToPPExponent);
 
