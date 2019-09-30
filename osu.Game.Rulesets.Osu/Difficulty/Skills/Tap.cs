@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             (List<OsuHitObject> hitObjects, double clockRate)
         {
             (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, 0, clockRate);
-            double burstStrain = maxTapStrain[0];
+            double burstStrain = strainHistory.Max(v => v[0]);
 
             var streamnessMask = CalculateStreamnessMask(hitObjects, burstStrain, clockRate);
             double streamNoteCount = streamnessMask.Sum();
@@ -98,11 +98,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double[] streamnessMask = new double[hitObjects.Count];
             streamnessMask[0] = 0;
 
+            double streamTimeThreshold = Math.Pow(skill, -2.7 / 3.2);
+
             for (int i = 1; i < hitObjects.Count; i++)
             {
                 double t = (hitObjects[i].StartTime - hitObjects[i - 1].StartTime) / 1000 / clockRate;
-                //streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / (1 / skill) - 1.3) * 15);
-                streamnessMask[i] = 1;
+                streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / streamTimeThreshold - 1) * 15);
             }
             return streamnessMask;
         }
