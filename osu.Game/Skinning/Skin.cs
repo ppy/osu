@@ -12,7 +12,7 @@ namespace osu.Game.Skinning
 {
     public abstract class Skin : IDisposable, ISkin
     {
-        public readonly SkinInfo SkinInfo;
+        public SkinInfo SkinInfo { get; }
 
         public SkinConfiguration Configuration { get; protected set; }
 

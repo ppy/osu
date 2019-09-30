@@ -16,6 +16,11 @@ namespace osu.Game.Skinning
     public interface ISkin
     {
         /// <summary>
+        /// Provides information about this skin.
+        /// </summary>
+        SkinInfo SkinInfo { get; }
+
+        /// <summary>
         /// Retrieve a <see cref="Drawable"/> component implementation.
         /// </summary>
         /// <param name="component">The requested component.</param>
