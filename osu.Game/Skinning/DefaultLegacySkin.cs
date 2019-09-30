@@ -26,7 +26,8 @@ namespace osu.Game.Skinning
         {
             ID = -1, // this is temporary until database storage is decided upon.
             Name = "osu!classic",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            Version = "2",
         };
     }
 }

@@ -18,6 +18,8 @@ namespace osu.Game.Skinning
 
         public string Creator { get; set; }
 
+        public string Version { get; set; }
+
         public List<SkinFileInfo> Files { get; set; }
 
         public List<DatabasedSetting> Settings { get; set; }
@@ -29,7 +31,8 @@ namespace osu.Game.Skinning
         public static SkinInfo Default { get; } = new SkinInfo
         {
             Name = "osu!lazer",
-            Creator = "team osu!"
+            Creator = "team osu!",
+            Version = "latest",
         };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;

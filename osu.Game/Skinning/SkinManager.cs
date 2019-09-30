@@ -97,6 +97,7 @@ namespace osu.Game.Skinning
             {
                 model.Name = model.Name.Replace(".osk", "");
                 model.Creator = model.Creator ?? "Unknown";
+                model.Version = "latest";
             }
         }
 
