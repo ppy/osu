@@ -381,7 +381,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             // Correction #6 - Small circle bonus
-            double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.2;
+            double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.3;
 
             // Apply the corrections
             double d12WithCorrection = d12 * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
