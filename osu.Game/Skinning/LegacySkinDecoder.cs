@@ -32,6 +32,10 @@ namespace osu.Game.Skinning
                             case @"Author":
                                 skin.SkinInfo.Creator = pair.Value;
                                 return;
+
+                            case @"Version":
+                                skin.SkinInfo.Version = pair.Value;
+                                return;
                         }
 
                         break;

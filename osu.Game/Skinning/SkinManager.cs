@@ -92,6 +92,7 @@ namespace osu.Game.Skinning
             {
                 model.Name = reference.Configuration.SkinInfo.Name;
                 model.Creator = reference.Configuration.SkinInfo.Creator;
+                model.Version = reference.Configuration.SkinInfo.Version;
             }
             else
             {
