@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 double currTime = hitObjects[i].StartTime / 1000.0;
                 currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                strainHistory.Add(currStrain.PointwisePower(1.0 / 3));
+                strainHistory.Add(currStrain.PointwisePower(3.2 / 8.1));
 
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
@@ -101,7 +101,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 1; i < hitObjects.Count; i++)
             {
                 double t = (hitObjects[i].StartTime - hitObjects[i - 1].StartTime) / 1000 / clockRate;
-                streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / (1 / skill) - 1.3) * 15);
+                //streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / (1 / skill) - 1.3) * 15);
+                streamnessMask[i] = 1;
             }
             return streamnessMask;
         }
