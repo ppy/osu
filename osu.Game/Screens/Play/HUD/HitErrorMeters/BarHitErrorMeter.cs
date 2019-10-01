@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Anchor = alignment == Anchor.x1 ? Anchor.CentreLeft : Anchor.y1 | alignment,
                                 Origin = alignment == Anchor.x1 ? Anchor.CentreRight : alignment,
                                 RelativeSizeAxes = Axes.Both,
-                                Scale = alignment == Anchor.x1 ? new Vector2(-1, 1) : new Vector2(1, -1) 
+                                Scale = alignment == Anchor.x1 ? new Vector2(-1, 1) : new Vector2(1, -1)
                             },
                             colourBarsLate = new Container
                             {
