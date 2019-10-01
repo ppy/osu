@@ -179,8 +179,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Scale the aim value down slightly with accuracy
             double accLeniency = greatWindow * Attributes.AimDiff / 300;
-            double accPenalty = (SpecialFunctions.Logistic((accuracy-0.94) * (-200.0/3)) - SpecialFunctions.Logistic(-4)) *
-                                Math.Pow(accLeniency, 2) * 0.1;
+            double accPenalty = (SpecialFunctions.Logistic((modifiedAcc - 0.98f) * (-70)) - SpecialFunctions.Logistic(-1.4f)) *
+                                Math.Pow(accLeniency, 2) * 0.15;
 
             aimValue *= Math.Exp(-accPenalty);
 
