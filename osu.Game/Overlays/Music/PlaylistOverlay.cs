@@ -63,7 +63,6 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ExitRequested = Hide,
                             FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },
