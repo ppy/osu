@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -35,6 +36,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         [Resolved]
         private AudioManager audioManager { get; set; }
+
+        [Resolved]
+        private SessionStatics sessionStatics { get; set; }
 
         /// <summary>
         /// Sets the input manager child to a new test player loader container instance.
@@ -137,7 +141,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// <param name="assert">The function to be invoked and checked</param>
         private void addVolumeSteps(string volumeName, Action beforeLoad, Action afterLoad, Func<bool> assert)
         {
-            AddStep("reset notification lock", PlayerLoader.ResetNotificationLock);
+            AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
             AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
             AddUntilStep("wait for player", () => player.IsLoaded);
