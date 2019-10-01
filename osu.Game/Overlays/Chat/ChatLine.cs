@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Chat
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                MaxWidth = default_message_padding - TimestampPadding
+                MaxWidth = MessagePadding - TimestampPadding
             };
 
             if (hasBackground)
@@ -151,7 +151,6 @@ namespace osu.Game.Overlays.Chat
                         new MessageSender(message.Sender)
                         {
                             AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = TimestampPadding },
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Child = effectedUsername,
