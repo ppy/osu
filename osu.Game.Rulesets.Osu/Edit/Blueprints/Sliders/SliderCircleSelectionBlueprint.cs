@@ -9,14 +9,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderCircleSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
+        protected readonly HitCirclePiece CirclePiece;
+
         private readonly SliderPosition position;
-        private readonly HitCirclePiece circlePiece;
 
         public SliderCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position)
             : base(slider)
         {
             this.position = position;
-            InternalChild = circlePiece = new HitCirclePiece();
+            InternalChild = CirclePiece = new HitCirclePiece();
 
             Select();
         }
@@ -25,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.Update();
 
-            circlePiece.UpdateFrom(position == SliderPosition.Start ? HitObject.HeadCircle : HitObject.TailCircle);
+            CirclePiece.UpdateFrom(position == SliderPosition.Start ? HitObject.HeadCircle : HitObject.TailCircle);
         }
 
         // Todo: This is temporary, since the slider circle masks don't do anything special yet. In the future they will handle input.

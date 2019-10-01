@@ -11,8 +11,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
-        private readonly SliderBodyPiece bodyPiece;
-        private readonly SliderCircleSelectionBlueprint headBlueprint;
+        protected readonly SliderBodyPiece BodyPiece;
+        protected readonly SliderCircleSelectionBlueprint HeadBlueprint;
+        protected readonly SliderCircleSelectionBlueprint TailBlueprint;
 
         public SliderSelectionBlueprint(DrawableSlider slider)
             : base(slider)
@@ -21,9 +22,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             InternalChildren = new Drawable[]
             {
-                bodyPiece = new SliderBodyPiece(),
-                headBlueprint = new SliderCircleSelectionBlueprint(slider, SliderPosition.Start),
-                new SliderCircleSelectionBlueprint(slider, SliderPosition.End),
+                BodyPiece = new SliderBodyPiece(),
+                HeadBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.Start),
+                TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
                 new PathControlPointVisualiser(sliderObject),
             };
         }
@@ -32,9 +33,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.Update();
 
-            bodyPiece.UpdateFrom(HitObject);
+            BodyPiece.UpdateFrom(HitObject);
         }
 
-        public override Vector2 SelectionPoint => headBlueprint.SelectionPoint;
+        public override Vector2 SelectionPoint => HeadBlueprint.SelectionPoint;
+
+        protected virtual SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new SliderCircleSelectionBlueprint(slider, position);
     }
 }
