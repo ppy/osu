@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Mania.Tests
 {
     public class TestSceneNoteSelectionBlueprint : ManiaSelectionBlueprintTestScene
     {
-        private readonly DrawableNote drawableObject;
-
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
 
@@ -27,6 +25,8 @@ namespace osu.Game.Rulesets.Mania.Tests
             var note = new Note { Column = 0 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
+            DrawableNote drawableObject;
+
             base.Content.Child = content = new ScrollingTestContainer(ScrollingDirection.Down)
             {
                 Anchor = Anchor.Centre,
@@ -34,8 +34,10 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Size = new Vector2(50, 20),
                 Child = drawableObject = new DrawableNote(note)
             };
+
+            AddBlueprint(new NoteSelectionBlueprint(drawableObject));
         }
 
-        protected override SelectionBlueprint CreateBlueprint() => new NoteSelectionBlueprint(drawableObject);
+        protected override SelectionBlueprint CreateBlueprint() => new NoteSelectionBlueprint(null);
     }
 }
