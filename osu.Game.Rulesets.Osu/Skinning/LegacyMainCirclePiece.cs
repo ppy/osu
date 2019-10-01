@@ -10,9 +10,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -23,17 +26,24 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
         }
 
+        private Sprite hitCircleSprite;
+        private SkinnableSpriteText hitCircleText;
+
+        private List<Drawable> scalables;
+
         private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
         private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+        private readonly IBindable<bool> expandNumberPiece = new BindableBool();
+
+        [Resolved]
+        private DrawableHitObject drawableObject { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(DrawableHitObject drawableObject, ISkinSource skin)
+        private void load(ISkinSource skin)
         {
             OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
-
-            Sprite hitCircleSprite;
-            SkinnableSpriteText hitCircleText;
+            DrawableHitCircle drawableCircle = (DrawableHitCircle)drawableObject;
 
             InternalChildren = new Drawable[]
             {
@@ -58,13 +68,25 @@ namespace osu.Game.Rulesets.Osu.Skinning
             };
 
             state.BindTo(drawableObject.State);
-            state.BindValueChanged(updateState, true);
-
             accentColour.BindTo(drawableObject.AccentColour);
-            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
-
             indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
+            expandNumberPiece.BindTo(drawableCircle.ExpandNumberPiece);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            state.BindValueChanged(updateState, true);
+            accentColour.BindValueChanged(colour => hitCircleSprite.Colour = colour.NewValue, true);
             indexInCurrentCombo.BindValueChanged(index => hitCircleText.Text = (index.NewValue + 1).ToString(), true);
+            expandNumberPiece.BindValueChanged(expand =>
+            {
+                scalables = InternalChildren.ToList();
+
+                if (!expand.NewValue)
+                    scalables.Remove(hitCircleText);
+            }, true);
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)
@@ -75,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
             {
                 case ArmedState.Hit:
                     this.FadeOut(legacy_fade_duration, Easing.Out);
-                    this.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
+                    scalables.ForEach(d => d.ScaleTo(1.4f, legacy_fade_duration, Easing.Out));
                     break;
             }
         }
