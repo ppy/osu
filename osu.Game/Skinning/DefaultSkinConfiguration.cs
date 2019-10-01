@@ -19,6 +19,8 @@ namespace osu.Game.Skinning
                 new Color4(204, 102, 0, 255),
                 new Color4(121, 9, 13, 255)
             });
+
+            ConfigDictionary.Add(@"Version", "latest");
         }
     }
 }
