@@ -9,19 +9,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
     public class HitCircleSelectionBlueprint : OsuSelectionBlueprint<HitCircle>
     {
-        private readonly HitCirclePiece circlePiece;
+        protected readonly HitCirclePiece CirclePiece;
 
         public HitCircleSelectionBlueprint(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
-            InternalChild = circlePiece = new HitCirclePiece();
+            InternalChild = CirclePiece = new HitCirclePiece();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            circlePiece.UpdateFrom(HitObject);
+            CirclePiece.UpdateFrom(HitObject);
         }
     }
 }
