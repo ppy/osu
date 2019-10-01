@@ -10,15 +10,20 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
-using osuTK;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         public ApproachCircle ApproachCircle { get; }
+
+        public IBindable<bool> ExpandNumberPiece => expandNumberPiece;
+
+        private readonly BindableBool expandNumberPiece = new BindableBool();
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
@@ -104,6 +109,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.LifetimeEnd = value;
                 ApproachCircle.LifetimeEnd = value;
             }
+        }
+
+        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
+            base.ApplySkin(skin, allowFallback);
+
+            expandNumberPiece.Value = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece).Value;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
