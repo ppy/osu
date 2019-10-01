@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                     AccentColour = { Value = OsuColour.Gray(0.3f) }
                 }
             };
+
+            AddBlueprint(new HoldNoteSelectionBlueprint(drawableObject));
         }
 
         protected override void Update()
@@ -52,6 +54,6 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
         }
 
-        protected override SelectionBlueprint CreateBlueprint() => new HoldNoteSelectionBlueprint(drawableObject);
+        protected override SelectionBlueprint CreateBlueprint() => new HoldNoteSelectionBlueprint(null);
     }
 }
