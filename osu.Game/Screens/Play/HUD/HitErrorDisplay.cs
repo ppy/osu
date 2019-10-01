@@ -65,27 +65,27 @@ namespace osu.Game.Screens.Play.HUD
             switch (type.NewValue)
             {
                 case ScoreMeterType.HitErrorBoth:
-                    createBar(false);
-                    createBar(true);
+                    createBar(Anchor.x0);
+                    createBar(Anchor.x2);
                     break;
 
                 case ScoreMeterType.HitErrorLeft:
-                    createBar(false);
+                    createBar(Anchor.x2);
                     break;
 
                 case ScoreMeterType.HitErrorRight:
-                    createBar(true);
+                    createBar(Anchor.x0);
                     break;
             }
         }
 
-        private void createBar(bool rightAligned)
+        private void createBar(Anchor alignment)
         {
-            var display = new BarHitErrorMeter(hitWindows, rightAligned)
+            var display = new BarHitErrorMeter(hitWindows, alignment)
             {
                 Margin = new MarginPadding(margin),
-                Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
-                Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Anchor = alignment == Anchor.x0 ? Anchor.CentreRight : Anchor.CentreLeft,
+                Origin = alignment == Anchor.x0 ? Anchor.CentreRight : Anchor.CentreLeft,
                 Alpha = 0,
             };
 

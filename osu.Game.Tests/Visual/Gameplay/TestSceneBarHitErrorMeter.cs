@@ -92,19 +92,19 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(meter = new BarHitErrorMeter(hitWindows, true)
+            Add(meter = new BarHitErrorMeter(hitWindows, Anchor.x0)
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
 
-            Add(meter2 = new BarHitErrorMeter(hitWindows, false)
+            Add(meter2 = new BarHitErrorMeter(hitWindows, Anchor.x2)
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
             });
 
-            Add(meter3 = new BarHitErrorMeter(hitWindows, false)
+            Add(meter3 = new BarHitErrorMeter(hitWindows, Anchor.x1)
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre
