@@ -26,32 +26,5 @@ namespace osu.Game.Utils
                 return input.Humanize(culture: new CultureInfo("en-US"));
             }
         }
-
-        /// <summary>
-        /// Turns the current or provided big number into a readable string.
-        /// </summary>
-        /// <param name="input">The number to be humanized.</param>
-        /// <returns>Simplified number with a suffix.</returns>
-        public static string ToReadableString(long input)
-        {
-            const int k = 1000;
-
-            if (input < k)
-                return input.ToString();
-
-            int i = (int)Math.Floor(Math.Round(Math.Log(input, k)));
-            return $"{input / Math.Pow(k, i):F} {suffixes[i]}";
-        }
-
-        private static readonly string[] suffixes =
-        {
-            "",
-            "k",
-            "million",
-            "billion",
-            "trillion",
-            "quadrillion",
-            "quintillion",
-        };
     }
 }

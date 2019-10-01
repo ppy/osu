@@ -63,28 +63,27 @@ namespace osu.Game.Overlays.Rankings.Tables
                         username
                     }
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.Accuracy:F2}%",
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.PlayCount:N0}",
                 },
-                new OsuSpriteText
+                new RowText
                 {
                     Text = $@"{item.PP:N0}",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}",
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}",
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.A:N0}",
                 },

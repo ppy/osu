@@ -64,25 +64,31 @@ namespace osu.Game.Overlays.Rankings.Tables
                         username
                     }
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.Accuracy:F2}%",
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.PlayCount:N0}",
                 },
-                new ColoredMetricNumber(item.TotalScore),
-                new MetricNumber(item.RankedScore),
-                new ColoredText
+                new ColoredRowText
+                {
+                    Text = $@"{item.TotalScore:N0}",
+                },
+                new RowText
+                {
+                    Text = $@"{item.RankedScore:N0}",
+                },
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}",
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}",
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.A:N0}",
                 },

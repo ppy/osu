@@ -10,8 +10,6 @@ using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Cursor;
-using osu.Game.Utils;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -88,42 +86,16 @@ namespace osu.Game.Overlays.Rankings.Tables
             }
         }
 
-        protected class MetricNumber : OsuSpriteText, IHasTooltip
+        protected class RowText : OsuSpriteText
         {
-            public string TooltipText => $"{value:N0}";
-
-            private readonly long value;
-
-            public MetricNumber(long value)
+            public RowText()
             {
-                this.value = value;
-
-                Text = HumanizerUtils.ToReadableString(value);
                 Font = OsuFont.GetFont(size: TEXT_SIZE);
             }
         }
 
-        protected class ColoredMetricNumber : MetricNumber
+        protected class ColoredRowText : RowText
         {
-            public ColoredMetricNumber(long value)
-                : base(value)
-            {
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Colour = colours.GreySeafoamLighter;
-            }
-        }
-
-        protected class ColoredText : OsuSpriteText
-        {
-            public ColoredText()
-            {
-                Font = OsuFont.GetFont(size: TEXT_SIZE);
-            }
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
