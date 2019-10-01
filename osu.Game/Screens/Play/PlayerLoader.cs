@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -15,6 +16,7 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -71,8 +73,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SessionStatics sessionStatics)
         {
+            muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+
             InternalChild = (content = new LogoTrackingContainer
             {
                 Anchor = Anchor.Centre,
@@ -157,18 +161,18 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        private static bool muteWarningShownOnce;
+        private Bindable<bool> muteWarningShownOnce;
 
         private void checkVolume()
         {
-            if (muteWarningShownOnce)
+            if (muteWarningShownOnce.Value)
                 return;
 
             //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
             if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
             {
                 notificationOverlay?.Post(new MutedNotification());
-                muteWarningShownOnce = true;
+                muteWarningShownOnce.Value = true;
             }
         }
 
