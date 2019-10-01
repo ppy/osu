@@ -191,6 +191,7 @@ namespace osu.Game
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
             dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+            dependencies.Cache(new SessionStatics());
             dependencies.Cache(new OsuColour());
 
             fileImporters.Add(BeatmapManager);
