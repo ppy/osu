@@ -73,10 +73,13 @@ namespace osu.Game.Tests.Visual
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
             var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
 
-            beatmap = new OsuTestBeatmap(working)
+            beatmap = new OsuTestBeatmap(working) { Default = working };
+            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
-                Default = working
-            };
+                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
+                    b.OldValue.RecycleTrack();
+            }));
 
             Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
