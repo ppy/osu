@@ -28,9 +28,9 @@ namespace osu.Game.Tests.Visual
     {
         [Cached(typeof(Bindable<WorkingBeatmap>))]
         [Cached(typeof(IBindable<WorkingBeatmap>))]
-        private OsuTestBeatmap beatmap;
+        private NonNullableBindable<WorkingBeatmap> beatmap;
 
-        protected BindableBeatmap Beatmap => beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
             var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
 
-            beatmap = new OsuTestBeatmap(working) { Default = working };
+            beatmap = new NonNullableBindable<WorkingBeatmap>(working) { Default = working };
             beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
@@ -319,14 +319,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
-        }
-
-        private class OsuTestBeatmap : BindableBeatmap
-        {
-            public OsuTestBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
-            {
-            }
         }
     }
 }
