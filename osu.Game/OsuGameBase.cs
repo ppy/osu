@@ -203,6 +203,12 @@ namespace osu.Game
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
             beatmap = new OsuBindableBeatmap(defaultBeatmap);
+            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
+            {
+                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
+                    b.OldValue.RecycleTrack();
+            }));
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
             dependencies.CacheAs(beatmap);
