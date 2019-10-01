@@ -50,22 +50,33 @@ namespace osu.Game.Overlays.Rankings.Tables
                         Size = new Vector2(20, 13),
                         ShowPlaceholderOnNull = false,
                     },
-                    new OsuSpriteText
+                    new RowText
                     {
                         Text = $@"{item.Country.FullName}",
-                        Font = OsuFont.GetFont(size: TEXT_SIZE),
                     }
                 }
             },
-            new ColoredText
+            new ColoredRowText
             {
                 Text = $@"{item.ActiveUsers:N0}",
             },
-            new ColoredMetricNumber(item.PlayCount),
-            new ColoredMetricNumber(item.RankedScore),
-            new ColoredMetricNumber(item.RankedScore / Math.Max(item.ActiveUsers, 1)),
-            new MetricNumber(item.Performance),
-            new ColoredText
+            new ColoredRowText
+            {
+                Text = $@"{item.PlayCount:N0}",
+            },
+            new ColoredRowText
+            {
+                Text = $@"{item.RankedScore:N0}",
+            },
+            new ColoredRowText
+            {
+                Text = $@"{item.RankedScore / Math.Max(item.ActiveUsers, 1):N0}",
+            },
+            new RowText
+            {
+                Text = $@"{item.Performance:N0}",
+            },
+            new ColoredRowText
             {
                 Text = $@"{item.Performance / Math.Max(item.ActiveUsers, 1):N0}",
             }
