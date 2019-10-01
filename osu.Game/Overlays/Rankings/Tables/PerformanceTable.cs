@@ -46,53 +46,46 @@ namespace osu.Game.Overlays.Rankings.Tables
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE)) { AutoSizeAxes = Axes.Both };
             username.AddUserLink(item.User);
 
-            content.Add(new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(7, 0),
-                Children = new Drawable[]
-                {
-                    new UpdateableFlag(item.User.Country)
-                    {
-                        Size = new Vector2(20, 13),
-                        ShowPlaceholderOnNull = false,
-                    },
-                    username
-                }
-            });
-
             content.AddRange(new Drawable[]
             {
-                new ColoredText
+                new FillFlowContainer
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(7, 0),
+                    Children = new Drawable[]
+                    {
+                        new UpdateableFlag(item.User.Country)
+                        {
+                            Size = new Vector2(20, 13),
+                            ShowPlaceholderOnNull = false,
+                        },
+                        username
+                    }
+                },
+                new ColoredRowText
                 {
                     Text = $@"{item.Accuracy:F2}%",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.PlayCount:N0}",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new OsuSpriteText
+                new RowText
                 {
                     Text = $@"{item.PP:N0}",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
-                new ColoredText
+                new ColoredRowText
                 {
                     Text = $@"{item.GradesCount.A:N0}",
-                    Font = OsuFont.GetFont(size: TEXT_SIZE),
                 },
             });
 
