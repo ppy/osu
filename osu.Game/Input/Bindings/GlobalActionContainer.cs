@@ -63,7 +63,8 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.TrackNext, GlobalAction.MusicNext),
             new KeyBinding(InputKey.F5, GlobalAction.MusicNext),
             new KeyBinding(InputKey.PlayPause, GlobalAction.MusicPlay),
-            new KeyBinding(InputKey.F3, GlobalAction.MusicPlay)
+            new KeyBinding(InputKey.F3, GlobalAction.MusicPlay),
+            new KeyBinding(InputKey.F2, GlobalAction.MusicRestart)
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -136,5 +137,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Play / pause")]
         MusicPlay,
+
+        [Description("Restart track")]
+        MusicRestart,
     }
 }

@@ -46,6 +46,8 @@ namespace osu.Game.Overlays
         [Resolved(canBeNull: true)]
         private OnScreenDisplay onScreenDisplay { get; set; }
 
+        private bool isRestart;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -181,6 +183,35 @@ namespace osu.Game.Overlays
             return false;
         }
 
+        private bool restartTrack()
+        {
+            var track = current?.Track;
+
+            if (track == null)
+            {
+                if (beatmap.Disabled)
+                    return false;
+
+                next(true);
+                return true;
+            }
+
+            if (track.IsRunning)
+            {
+                SeekTo(0);
+                isRestart = true;
+            }
+            else
+            {
+                track.Start();
+
+                IsUserPaused = false;
+                isRestart = false;
+            }
+
+            return true;
+        }
+
         private WorkingBeatmap current;
 
         private TrackChangeDirection? queuedDirection;
@@ -262,6 +293,12 @@ namespace osu.Game.Overlays
                 case GlobalAction.MusicPrev:
                     if (PrevTrack())
                         onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
+
+                    return true;
+
+                case GlobalAction.MusicRestart:
+                    if (restartTrack())
+                        onScreenDisplay?.Display(new MusicControllerToast(isRestart ? "Restart track" : "Play track"));
 
                     return true;
             }
