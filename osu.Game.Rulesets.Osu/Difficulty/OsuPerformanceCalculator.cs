@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double urOnStreams = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
 
-            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 3000) / 600);
+            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4600) / 1000);
             
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
