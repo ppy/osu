@@ -107,6 +107,15 @@ namespace osu.Game.Tests.Visual.Online
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
             }, api.IsLoggedIn));
 
+            AddStep("Show bancho", () => profile.ShowUser(new User
+            {
+                Username = @"BanchoBot",
+                Id = 3,
+                IsBot = true,
+                Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
+            }, api.IsLoggedIn));
+
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
         }
