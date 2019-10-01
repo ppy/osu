@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
     {
         HitCirclePrefix,
         HitCircleOverlap,
+        ExpandNumberPiece,
         SliderBorderSize,
         SliderPathRadius,
         AllowSliderBallTint,

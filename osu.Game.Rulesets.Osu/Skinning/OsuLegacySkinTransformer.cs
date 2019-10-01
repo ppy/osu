@@ -123,6 +123,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
                                 return SkinUtils.As<TValue>(new BindableFloat(legacy_circle_radius));
 
                             break;
+
+                        case OsuSkinConfiguration.ExpandNumberPiece:
+                            string legacyVersion = source.GetConfig<string, string>("Version")?.Value ?? "1";
+                            return SkinUtils.As<TValue>(new BindableBool(double.TryParse(legacyVersion, out double version) && version < 2.0));
                     }
 
                     break;
