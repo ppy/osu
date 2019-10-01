@@ -76,6 +76,10 @@ namespace osu.Game.Screens.Play.HUD
                 case ScoreMeterType.HitErrorRight:
                     createBar(Anchor.x0);
                     break;
+
+                case ScoreMeterType.HitErrorBottom:
+                    createBar(Anchor.x1);
+                    break;
             }
         }
 
@@ -83,9 +87,9 @@ namespace osu.Game.Screens.Play.HUD
         {
             var display = new BarHitErrorMeter(hitWindows, alignment)
             {
-                Margin = new MarginPadding(margin),
-                Anchor = alignment == Anchor.x0 ? Anchor.CentreRight : Anchor.CentreLeft,
-                Origin = alignment == Anchor.x0 ? Anchor.CentreRight : Anchor.CentreLeft,
+                Margin = alignment == Anchor.x1 ? new MarginPadding(margin) { Bottom = 3 * margin } : new MarginPadding(margin),
+                Anchor = alignment == Anchor.x1 ? Anchor.BottomCentre : (alignment == Anchor.x0 ? Anchor.CentreRight : Anchor.CentreLeft),
+                Origin = alignment == Anchor.x1 ? Anchor.BottomCentre : (alignment == Anchor.x0 ? Anchor.CentreRight : Anchor.CentreLeft),
                 Alpha = 0,
             };
 
