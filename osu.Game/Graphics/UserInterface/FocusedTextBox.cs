@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.UserInterface
             if (!HasFocus) return false;
 
             if (e.Key == Key.Escape)
-                return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
+                return false; // disable the framework-level handling of escape key for conformity (we use GlobalAction.Back).
 
             return base.OnKeyDown(e);
         }
