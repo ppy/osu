@@ -80,6 +80,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Anchor = alignment == Anchor.x1 ? Anchor.CentreLeft : Anchor.y1 | alignment,
                                 Origin = alignment == Anchor.x1 ? Anchor.CentreRight : alignment,
                                 RelativeSizeAxes = Axes.Both,
+                                Scale = alignment == Anchor.x1 ? new Vector2(-1, 1) : new Vector2(1, -1) 
                             },
                             colourBarsLate = new Container
                             {
@@ -93,6 +94,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Icon = FontAwesome.Solid.ShippingFast,
                                 Anchor = alignment == Anchor.x1 ? Anchor.CentreLeft : Anchor.TopCentre,
                                 Origin = alignment == Anchor.x1 ? Anchor.CentreLeft : Anchor.TopCentre,
+                                Y = alignment == Anchor.x1 ? 0 : -10,
+                                X = alignment == Anchor.x1 ? -10 : 0,
                             },
                             new SpriteIcon
                             {
@@ -100,6 +103,8 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                                 Icon = FontAwesome.Solid.Bicycle,
                                 Anchor = alignment == Anchor.x1 ? Anchor.CentreRight : Anchor.BottomCentre,
                                 Origin = alignment == Anchor.x1 ? Anchor.CentreRight : Anchor.BottomCentre,
+                                Y = alignment == Anchor.x1 ? 0 : 10,
+                                X = alignment == Anchor.x1 ? 10 : 0,
                             }
                         }
                     },
@@ -124,8 +129,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 InternalChild.Width = bar_height;
                 judgementsContainer.Height = judgement_line_width;
-                colourBars.Height = 2;
-                colourBarsEarly.Scale = new Vector2(-1, 1);
+                colourBars.Height = bar_width;
                 colourBarsEarly.Width = 0.5f;
                 colourBarsLate.Width = 0.5f;
                 arrowContainer.Height = chevron_size;
@@ -135,7 +139,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 InternalChild.Height = bar_height;
                 judgementsContainer.Width = judgement_line_width;
                 colourBars.Width = bar_width;
-                colourBarsEarly.Scale = new Vector2(1, -1);
                 colourBarsEarly.Height = 0.5f;
                 colourBarsLate.Height = 0.5f;
                 arrowContainer.Width = chevron_size;
