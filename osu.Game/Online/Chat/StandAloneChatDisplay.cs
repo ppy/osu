@@ -146,6 +146,7 @@ namespace osu.Game.Online.Chat
 
             protected override float HorizontalPadding => 10;
             protected override float MessagePadding => 120;
+            protected override float TimestampPadding => 130;
 
             public StandAloneMessage(Message message)
                 : base(message)
