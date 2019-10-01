@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.ApplySkin(skin, allowFallback);
 
-            expandNumberPiece.Value = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece).Value;
+            expandNumberPiece.Value = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece)?.Value ?? false;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
