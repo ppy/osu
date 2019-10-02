@@ -119,7 +119,6 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     PlaceholderText = @"Search",
-                                    Exit = Hide,
                                 },
                             },
                         },
