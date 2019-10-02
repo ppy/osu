@@ -31,7 +31,6 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
-                            Exit = () => ExitRequested?.Invoke(),
                         },
                         new CollectionsDropdown<PlaylistCollection>
                         {
@@ -46,8 +45,6 @@ namespace osu.Game.Overlays.Music
         }
 
         private void current_ValueChanged(ValueChangedEvent<string> e) => FilterChanged?.Invoke(e.NewValue);
-
-        public Action ExitRequested;
 
         public Action<string> FilterChanged;
 
