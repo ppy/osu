@@ -516,8 +516,6 @@ namespace osu.Game.Screens.Play
 
             public override bool IsImportant => true;
 
-            public override bool RequestsFocus => true;
-
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
             {
