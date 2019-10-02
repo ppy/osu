@@ -81,8 +81,8 @@ namespace osu.Game.Screens.Menu
                     {
                         if (holdDelay.Value > 0)
                             confirmAndExit();
-                        else if (!exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
-                            dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                        else
+                            this.Exit();
                     }
                 });
             }
@@ -253,6 +253,12 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
+            if (!exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+            {
+                dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                return true;
+            }
+
             buttons.State = ButtonSystemState.Exit;
             this.FadeOut(3000);
             return base.OnExiting(next);
