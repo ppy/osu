@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
-        private Bindable<int> holdDelay;
+        private Bindable<float> holdDelay;
         private Bindable<bool> loginDisplayed;
 
         private ExitConfirmOverlay exitConfirmOverlay;
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
-            holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+            holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
             if (host.CanExit)

@@ -114,7 +114,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
-            Set(OsuSetting.UIHoldActivationDelay, 200, 0, 500);
+            Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
         }

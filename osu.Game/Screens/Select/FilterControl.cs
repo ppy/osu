@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Select
             return criteria;
         }
 
-        public Action Exit;
-
         private readonly SearchTextBox searchTextBox;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
@@ -75,11 +73,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Exit = () => Exit?.Invoke(),
-                        },
+                        searchTextBox = new SearchTextBox { RelativeSizeAxes = Axes.X },
                         new Box
                         {
                             RelativeSizeAxes = Axes.X,
