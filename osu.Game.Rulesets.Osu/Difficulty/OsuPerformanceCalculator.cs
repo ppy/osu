@@ -150,6 +150,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = tpToPP(tp * cheeseFactor);
 
+            // buff very long maps
+            double lengthFactor = 1 + SpecialFunctions.Logistic((Attributes.Length - 360.0f) / 60.0f) * 0.06;
+            aimValue *= lengthFactor;
+
             // penalize misses
             aimValue *= Math.Pow(0.985, effectiveMissCount);
 
