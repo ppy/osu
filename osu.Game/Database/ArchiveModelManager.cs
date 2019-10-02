@@ -400,20 +400,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var b in items)
             {
-                foreach (var b in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
-                    Delete(b);
+                Delete(b);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
