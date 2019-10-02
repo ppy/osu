@@ -132,9 +132,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("exit", () => Player.Exit());
 
-            confirmPaused();
-
-            exitAndConfirm();
+            confirmExited();
         }
 
         [Test]
