@@ -80,9 +80,9 @@ namespace osu.Game.Screens.Menu
                     Action = () =>
                     {
                         if (holdDelay.Value > 0)
-                            confirmAndExit();
-                        else if (!exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
-                            dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                            this.Exit();
+                        else if (dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+                            dialogOverlay.Push(new ConfirmExitDialog(this.Exit, () => exitConfirmOverlay.Abort()));
                     }
                 });
             }
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Menu
                             OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
                             OnMulti = delegate { this.Push(new Multiplayer()); },
-                            OnExit = confirmAndExit,
+                            OnExit = this.Exit,
                         }
                     }
                 },
@@ -127,12 +127,6 @@ namespace osu.Game.Screens.Menu
 
             LoadComponentAsync(background = new BackgroundScreenDefault());
             preloadSongSelect();
-        }
-
-        private void confirmAndExit()
-        {
-            exitConfirmed = true;
-            this.Exit();
         }
 
         private void preloadSongSelect()
@@ -171,8 +165,6 @@ namespace osu.Game.Screens.Menu
 
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
-
-        private bool exitConfirmed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
