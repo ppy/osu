@@ -91,7 +91,6 @@ namespace osu.Game.Overlays
                                 Top = 20,
                                 Bottom = 20
                             },
-                            Exit = Hide,
                         },
                         Footer = CreateFooter()
                     },

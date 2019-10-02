@@ -138,7 +138,6 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "type your message",
-                                            Exit = Hide,
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
