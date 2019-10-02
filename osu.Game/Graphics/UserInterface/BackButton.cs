@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public BackButton(Receptor receptor)
         {
-            receptor.OnBackPressed = () => Action?.Invoke();
+            receptor.OnBackPressed = () => button.Click();
 
             Size = TwoLayerButton.SIZE_EXTENDED;
 

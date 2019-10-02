@@ -63,11 +63,11 @@ namespace osu.Game.Screens.Play.HUD
         [Resolved]
         private OsuConfigManager config { get; set; }
 
-        private Bindable<int> activationDelay;
+        private Bindable<float> activationDelay;
 
         protected override void LoadComplete()
         {
-            activationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+            activationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
