@@ -299,7 +299,10 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
-            this.Exit();
+            if (canPause)
+                Pause();
+            else
+                this.Exit();
         }
 
         public void Restart()
@@ -505,12 +508,6 @@ namespace osu.Game.Screens.Play
             {
                 // proceed to result screen if beatmap already finished playing
                 completionProgressDelegate.RunTask();
-                return true;
-            }
-
-            if (canPause)
-            {
-                Pause();
                 return true;
             }
 
