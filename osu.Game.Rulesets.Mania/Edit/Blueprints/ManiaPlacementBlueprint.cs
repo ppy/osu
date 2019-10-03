@@ -111,8 +111,23 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private Vector2 applyPositionOffset(Vector2 position, bool reverse)
         {
-            position.Y += (scrollingInfo.Direction.Value == ScrollingDirection.Up && !reverse ? -1 : 1) * NotePiece.NOTE_HEIGHT / 2;
-            return position;
+            float offset = 0;
+
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    offset = -NotePiece.NOTE_HEIGHT / 2;
+                    break;
+
+                case ScrollingDirection.Down:
+                    offset = NotePiece.NOTE_HEIGHT / 2;
+                    break;
+            }
+
+            if (reverse)
+                offset = -offset;
+
+            return new Vector2(position.X, position.Y + offset);
         }
     }
 }
