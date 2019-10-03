@@ -20,6 +20,8 @@ namespace osu.Game.Skinning
                 new Color4(18, 124, 255, 255),
                 new Color4(242, 24, 57, 255),
             });
+
+            Configuration.ConfigDictionary["Version"] = "2";
         }
 
         public static SkinInfo Info { get; } = new SkinInfo
