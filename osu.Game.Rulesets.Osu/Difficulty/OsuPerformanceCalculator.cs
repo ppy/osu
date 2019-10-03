@@ -173,10 +173,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                aimValue *= 1.0f + 0.3f * Math.Min(1.0f, totalHits / 200.0f) +
+                aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
                             (totalHits > 200
-                                ? 0.2f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
-                                  (totalHits > 500 ? (totalHits - 500) / 3000.0f : 0.0f)
+                                ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
+                                  (totalHits > 500 ? (totalHits - 500) / 2000.0f : 0.0f)
                                 : 0.0f);
             }
 
