@@ -14,9 +14,20 @@ namespace osu.Game.Screens.Edit
     public class EditorBeatmap<T> : IEditorBeatmap<T>
         where T : HitObject
     {
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap{T}"/>.
+        /// </summary>
         public event Action<HitObject> HitObjectAdded;
+
+        /// <summary>
+        /// Invoked when a <see cref="HitObject"/> is removed from this <see cref="EditorBeatmap{T}"/>.
+        /// </summary>
         public event Action<HitObject> HitObjectRemoved;
-        public event Action<HitObject> HitObjectChanged;
+
+        /// <summary>
+        /// Invoked when the start time of a <see cref="HitObject"/> in this <see cref="EditorBeatmap{T}"/> was changed.
+        /// </summary>
+        public event Action<HitObject> StartTimeChanged;
 
         private readonly Dictionary<T, Bindable<double>> startTimeBindables = new Dictionary<T, Bindable<double>>();
         private readonly Beatmap<T> beatmap;
@@ -93,7 +104,7 @@ namespace osu.Game.Screens.Edit
                 var insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
                 beatmap.HitObjects.Insert(insertionIndex + 1, hitObject);
 
-                HitObjectChanged?.Invoke(hitObject);
+                StartTimeChanged?.Invoke(hitObject);
             };
         }
 
