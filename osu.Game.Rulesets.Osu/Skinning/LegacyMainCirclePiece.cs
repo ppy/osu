@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -41,7 +40,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private void load()
         {
             OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
-            DrawableHitCircle drawableCircle = (DrawableHitCircle)drawableObject;
 
             InternalChildren = new Drawable[]
             {
@@ -95,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     hitCircleSprite.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
                     hitCircleOverlay.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
-                    if (skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece).Value)
+                    if (skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece)?.Value ?? true)
                         hitCircleText.ScaleTo(1.4f, legacy_fade_duration, Easing.Out);
 
                     break;
