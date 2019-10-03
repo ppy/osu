@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
@@ -22,8 +23,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Container<PlacementBlueprint> placementBlueprintContainer;
         private PlacementBlueprint currentPlacement;
-
         private SelectionHandler selectionHandler;
+        private InputManager inputManager;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
@@ -66,6 +67,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             beatmap.HitObjectAdded += addBlueprintFor;
             beatmap.HitObjectRemoved += removeBlueprintFor;
+
+            inputManager = GetContainingInputManager();
         }
 
         private HitObjectCompositionTool currentTool;
@@ -136,6 +139,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (currentPlacement != null)
+            {
+                currentPlacement.UpdatePosition(e.ScreenSpaceMousePosition);
+                return true;
+            }
+
+            return base.OnMouseMove(e);
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -158,8 +172,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             currentPlacement = null;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
+
             if (blueprint != null)
+            {
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
+
+                // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+                blueprint.UpdatePosition(inputManager.CurrentState.Mouse.Position);
+            }
         }
 
         /// <summary>
