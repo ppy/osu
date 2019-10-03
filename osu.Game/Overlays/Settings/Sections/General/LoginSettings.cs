@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             api?.Register(this);
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state) => Schedule(() =>
         {
             form = null;
 
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             if (form != null) GetContainingInputManager()?.ChangeFocus(form);
-        }
+        });
 
         public override bool AcceptsFocus => true;
 

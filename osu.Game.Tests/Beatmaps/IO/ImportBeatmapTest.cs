@@ -91,6 +91,48 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public async Task TestImportCorruptThenImport()
+        {
+            //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportThenImport"))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var imported = await LoadOszIntoOsu(osu);
+
+                    var firstFile = imported.Files.First();
+
+                    var files = osu.Dependencies.Get<FileStore>();
+
+                    long originalLength;
+                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.StoragePath))
+                        originalLength = stream.Length;
+
+                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.StoragePath, FileAccess.Write, FileMode.Create))
+                        stream.WriteByte(0);
+
+                    var importedSecondTime = await LoadOszIntoOsu(osu);
+
+                    using (var stream = files.Storage.GetStream(firstFile.FileInfo.StoragePath))
+                        Assert.AreEqual(stream.Length, originalLength, "Corruption was not fixed on second import");
+
+                    // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
+                    Assert.IsTrue(imported.ID == importedSecondTime.ID);
+                    Assert.IsTrue(imported.Beatmaps.First().ID == importedSecondTime.Beatmaps.First().ID);
+
+                    checkBeatmapSetCount(osu, 1);
+                    checkSingleReferencedFileCount(osu, 18);
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public async Task TestRollbackOnFailure()
         {
             //unfortunately for the time being we need to reference osu.Framework.Desktop for a game host here.

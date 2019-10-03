@@ -27,16 +27,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Parallax",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsSlider<int, TimeSlider>
+                new SettingsSlider<float, TimeSlider>
                 {
                     LabelText = "Hold-to-confirm activation time",
-                    Bindable = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay),
+                    Bindable = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
                     KeyboardStep = 50
                 },
             };
         }
 
-        private class TimeSlider : OsuSliderBar<int>
+        private class TimeSlider : OsuSliderBar<float>
         {
             public override string TooltipText => Current.Value.ToString("N0") + "ms";
         }
