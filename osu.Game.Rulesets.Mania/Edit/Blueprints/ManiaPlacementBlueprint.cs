@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             // If we're scrolling downwards, a position of 0 is actually further away from the hit target
             // so we need to flip the vertical coordinate in the hitobject container's space
-            var hitObjectPos = applyPositionOffset(Column.HitObjectContainer.ToLocalSpace(screenSpacePosition), false).Y;
+            var hitObjectPos = mouseToHitObjectPosition(Column.HitObjectContainer.ToLocalSpace(screenSpacePosition)).Y;
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
                 hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
 
@@ -106,31 +106,55 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
                 pos = Column.HitObjectContainer.DrawHeight - pos;
 
-            return applyPositionOffset(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent), true).Y;
+            return hitObjectToMousePosition(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent)).Y;
         }
 
         protected Column ColumnAt(Vector2 screenSpacePosition)
             => composer.ColumnAt(screenSpacePosition);
 
-        private Vector2 applyPositionOffset(Vector2 position, bool reverse)
+        /// <summary>
+        /// Converts a mouse position to a hitobject position.
+        /// </summary>
+        /// <remarks>
+        /// Blueprints are centred on the mouse position, such that the hitobject position is anchored at the top or bottom of the blueprint depending on the scroll direction.
+        /// </remarks>
+        /// <param name="mousePosition">The mouse position.</param>
+        /// <returns>The resulting hitobject position, acnhored at the top or bottom of the blueprint depending on the scroll direction.</returns>
+        private Vector2 mouseToHitObjectPosition(Vector2 mousePosition)
         {
-            float offset = 0;
-
             switch (scrollingInfo.Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    offset = -NotePiece.NOTE_HEIGHT / 2;
+                    mousePosition.Y -= NotePiece.NOTE_HEIGHT / 2;
                     break;
 
                 case ScrollingDirection.Down:
-                    offset = NotePiece.NOTE_HEIGHT / 2;
+                    mousePosition.Y += NotePiece.NOTE_HEIGHT / 2;
                     break;
             }
 
-            if (reverse)
-                offset = -offset;
+            return mousePosition;
+        }
 
-            return new Vector2(position.X, position.Y + offset);
+        /// <summary>
+        /// Converts a hitobject position to a mouse position.
+        /// </summary>
+        /// <param name="hitObjectPosition">The hitobject position.</param>
+        /// <returns>The resulting mouse position, anchored at the centre of the hitobject.</returns>
+        private Vector2 hitObjectToMousePosition(Vector2 hitObjectPosition)
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    hitObjectPosition.Y += NotePiece.NOTE_HEIGHT / 2;
+                    break;
+
+                case ScrollingDirection.Down:
+                    hitObjectPosition.Y -= NotePiece.NOTE_HEIGHT / 2;
+                    break;
+            }
+
+            return hitObjectPosition;
         }
     }
 }
