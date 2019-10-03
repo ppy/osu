@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int mashLevelCount = 11;
         private const double spacedBuffFactor = 0.10f;
 
-        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 1.7, -0.7))
+        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 2.3, -2.2))
                                                                                  .PointwiseExp();
 
 
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             (List<OsuHitObject> hitObjects, double clockRate)
         {
             (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, 0, clockRate);
-            double burstStrain = maxTapStrain[0];
+            double burstStrain = strainHistory.Max(v => v[0]);
 
             var streamnessMask = CalculateStreamnessMask(hitObjects, burstStrain, clockRate);
             double streamNoteCount = streamnessMask.Sum();
@@ -48,12 +48,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 double currTime = hitObjects[i].StartTime / 1000.0;
                 currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                strainHistory.Add(currStrain.PointwisePower(1.0 / 3));
+                strainHistory.Add(currStrain.PointwisePower(1.1 / 3) * 1.5);
 
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
 
-                currStrain += decayCoeffs * Math.Pow((currTime - prevPrevTime) / clockRate, -2) *
+                double deltaTime = (currTime - prevPrevTime) / clockRate;
+
+                // for 1/4 notes above 200 bpm the exponent is -2.3, otherwise it's -2
+                double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.5) * 0.387, Math.Pow(deltaTime, -2));
+
+                currStrain += decayCoeffs * currStrainBase *
                               Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
                               Math.Pow(1 + spacedBuff, 3);
 
@@ -76,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 Array.Reverse(singleStrainHistory);
 
                 double singleStrainResult = 0;
-                double k = 0.95;
+                double k = 1 - 0.03 * Math.Sqrt(decayCoeffs[j]);
 
                 for (int i = 0; i < hitObjects.Count; i++)
                 {
@@ -86,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainResult[j] = singleStrainResult * (1 - k);
             }
 
-            return (strainHistory, strainResult * 1.6);
+            return (strainHistory, strainResult);
         }
 
         /// <summary>
@@ -98,10 +103,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double[] streamnessMask = new double[hitObjects.Count];
             streamnessMask[0] = 0;
 
+            double streamTimeThreshold = Math.Pow(skill, -2.7 / 3.2);
+
             for (int i = 1; i < hitObjects.Count; i++)
             {
                 double t = (hitObjects[i].StartTime - hitObjects[i - 1].StartTime) / 1000 / clockRate;
-                streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / (1 / skill) - 1.3) * 15);
+                streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / streamTimeThreshold - 1) * 15);
             }
             return streamnessMask;
         }
