@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const int mashLevelCount = 11;
         private const double spacedBuffFactor = 0.10f;
 
-        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 1.7, -0.7))
+        private static readonly Vector<double> decayCoeffs = Vector<double>.Build.Dense(Generate.LinearSpaced(4, 2.3, -2.2))
                                                                                  .PointwiseExp();
 
 
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 Array.Reverse(singleStrainHistory);
 
                 double singleStrainResult = 0;
-                double k = 0.95;
+                double k = 1 - 0.03 * Math.Sqrt(decayCoeffs[j]);
 
                 for (int i = 0; i < hitObjects.Count; i++)
                 {
