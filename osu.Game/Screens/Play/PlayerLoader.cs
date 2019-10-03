@@ -58,8 +58,18 @@ namespace osu.Game.Screens.Play
         private Task loadTask;
 
         private InputManager inputManager;
-
         private IdleTracker idleTracker;
+
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notificationOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private VolumeOverlay volumeOverlay { get; set; }
+
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        private Bindable<bool> muteWarningShownOnce;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -110,7 +120,22 @@ namespace osu.Game.Screens.Play
             loadNewPlayer();
         }
 
-        private void playerLoaded(Player player) => info.Loading = false;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+
+            if (!muteWarningShownOnce.Value)
+            {
+                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
+                {
+                    notificationOverlay?.Post(new MutedNotification());
+                    muteWarningShownOnce.Value = true;
+                }
+            }
+        }
 
         public override void OnResuming(IScreen last)
         {
@@ -134,7 +159,7 @@ namespace osu.Game.Screens.Play
             player.RestartCount = restartCount;
             player.RestartRequested = restartRequested;
 
-            loadTask = LoadComponentAsync(player, playerLoaded);
+            loadTask = LoadComponentAsync(player, _ => info.Loading = false);
         }
 
         private void contentIn()
@@ -150,30 +175,6 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
-        }
-
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notificationOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private VolumeOverlay volumeOverlay { get; set; }
-
-        [Resolved]
-        private AudioManager audioManager { get; set; }
-
-        private Bindable<bool> muteWarningShownOnce;
-
-        private void checkVolume()
-        {
-            if (muteWarningShownOnce.Value)
-                return;
-
-            //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-            if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
-            {
-                notificationOverlay?.Post(new MutedNotification());
-                muteWarningShownOnce.Value = true;
-            }
         }
 
         public override void OnEntering(IScreen last)
@@ -214,14 +215,6 @@ namespace osu.Game.Screens.Play
         {
             base.LogoExiting(logo);
             content.StopTracking();
-        }
-
-        protected override void LoadComplete()
-        {
-            inputManager = GetContainingInputManager();
-            base.LoadComplete();
-
-            checkVolume();
         }
 
         private ScheduledDelegate pushDebounce;
