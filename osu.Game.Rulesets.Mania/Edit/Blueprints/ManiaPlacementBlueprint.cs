@@ -103,6 +103,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 scrollingInfo.TimeRange.Value,
                 Column.HitObjectContainer.DrawHeight);
 
+            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
+                pos = Column.HitObjectContainer.DrawHeight - pos;
+
             return applyPositionOffset(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent), true).Y;
         }
 
