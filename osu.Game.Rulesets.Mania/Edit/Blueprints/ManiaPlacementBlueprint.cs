@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         }
 
         protected Column ColumnAt(Vector2 screenSpacePosition)
-            => composer.ColumnAt(applyPositionOffset(screenSpacePosition, false));
+            => composer.ColumnAt(screenSpacePosition);
 
         private Vector2 applyPositionOffset(Vector2 position, bool reverse)
         {
