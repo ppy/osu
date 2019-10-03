@@ -318,18 +318,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             {
                 this.isVertical = isVertical;
 
-                if (isVertical)
-                {
-                    RelativeSizeAxes = Axes.Y;
-                    RelativePositionAxes = Axes.X;
-                    Width = 3;
-                }
-                else
-                {
-                    RelativeSizeAxes = Axes.X;
-                    RelativePositionAxes = Axes.Y;
-                    Height = 3;
-                }
+                RelativeSizeAxes = isVertical ? Axes.Y : Axes.X;
+                RelativePositionAxes = isVertical ? Axes.X : Axes.Y;
+                Size = isVertical ? new Vector2(3, Size.Y) : new Vector2(Size.X, 3);
 
                 InternalChild = new CircularContainer
                 {
