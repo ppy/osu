@@ -21,10 +21,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public ApproachCircle ApproachCircle { get; }
 
-        public IBindable<bool> ExpandNumberPiece => expandNumberPiece;
-
-        private readonly BindableBool expandNumberPiece = new BindableBool();
-
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
@@ -109,13 +105,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.LifetimeEnd = value;
                 ApproachCircle.LifetimeEnd = value;
             }
-        }
-
-        protected override void ApplySkin(ISkinSource skin, bool allowFallback)
-        {
-            base.ApplySkin(skin, allowFallback);
-
-            expandNumberPiece.Value = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.ExpandNumberPiece)?.Value ?? false;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
