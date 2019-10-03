@@ -30,7 +30,5 @@ namespace osu.Game.Tests.Visual
                 d.Select();
             }));
         }
-
-        protected abstract SelectionBlueprint CreateBlueprint();
     }
 }

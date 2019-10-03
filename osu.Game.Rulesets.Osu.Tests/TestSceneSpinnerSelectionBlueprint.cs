@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -47,7 +46,5 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddBlueprint(new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) });
         }
-
-        protected override SelectionBlueprint CreateBlueprint() => new SpinnerSelectionBlueprint(null) { Size = new Vector2(0.5f) };
     }
 }
