@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -37,7 +36,5 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddBlueprint(new NoteSelectionBlueprint(drawableObject));
         }
-
-        protected override SelectionBlueprint CreateBlueprint() => new NoteSelectionBlueprint(null);
     }
 }

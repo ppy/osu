@@ -7,7 +7,6 @@ using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
@@ -97,8 +96,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("tail positioned correctly",
                 () => Precision.AlmostEquals(blueprint.TailBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
         }
-
-        protected override SelectionBlueprint CreateBlueprint() => new SliderSelectionBlueprint(drawableObject);
 
         private class TestSliderBlueprint : SliderSelectionBlueprint
         {

@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -52,8 +51,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("move hitobject", () => hitCircle.Position = new Vector2(300, 225));
             AddAssert("blueprint positioned over hitobject", () => blueprint.CirclePiece.Position == hitCircle.Position);
         }
-
-        protected override SelectionBlueprint CreateBlueprint() => new HitCircleSelectionBlueprint(drawableObject);
 
         private class TestBlueprint : HitCircleSelectionBlueprint
         {
