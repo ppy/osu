@@ -56,7 +56,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 {
                     Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
-                }, confineMode: ConfineMode.NoScaling),
+                }, confineMode: ConfineMode.NoScaling)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
                 hitCircleOverlay = new Sprite
                 {
                     Texture = skin.GetTexture("hitcircleoverlay"),
