@@ -74,9 +74,9 @@ namespace osu.Game.Skinning
                     switch (legacy)
                     {
                         case LegacySkinConfiguration.LegacyVersion:
-                            var versionString = GetConfig<string, string>("Version").Value;
+                            var versionString = GetConfig<string, string>("Version")?.Value ?? "1";
                             if (!double.TryParse(versionString, out double version))
-                                version = versionString == "latest" ? 2.7 : 1;
+                                version = versionString == "latest" ? 2.7 : 1.0;
 
                             return SkinUtils.As<TValue>(new BindableDouble(version));
                     }
