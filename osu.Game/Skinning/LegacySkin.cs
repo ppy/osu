@@ -70,6 +70,19 @@ namespace osu.Game.Skinning
                 case GlobalSkinColour colour:
                     return SkinUtils.As<TValue>(getCustomColour(colour.ToString()));
 
+                case LegacySkinConfiguration legacy:
+                    switch (legacy)
+                    {
+                        case LegacySkinConfiguration.LegacyVersion:
+                            var versionString = GetConfig<string, string>("Version").Value;
+                            if (!double.TryParse(versionString, out double version))
+                                version = versionString == "latest" ? 2.7 : 1;
+
+                            return SkinUtils.As<TValue>(new BindableDouble(version));
+                    }
+
+                    break;
+
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
 
