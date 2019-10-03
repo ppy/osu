@@ -239,6 +239,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selection is non-null", () => currentSelection != null);
 
             setSelected(1, 3);
+        }
+
+        [Test]
+        public void TestFilterRange()
+        {
+            loadBeatmaps();
+
+            // buffer the selection
+            setSelected(3, 2);
+
+            setSelected(1, 3);
+
             AddStep("Apply a range filter", () => carousel.Filter(new FilterCriteria
             {
                 SearchText = "#3",
@@ -249,9 +261,9 @@ namespace osu.Game.Tests.Visual.SongSelect
                     IsLowerInclusive = true
                 }
             }, false));
-            waitForSelection(3, 2);
 
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            // should reselect the buffered selection.
+            waitForSelection(3, 2);
         }
 
         /// <summary>
