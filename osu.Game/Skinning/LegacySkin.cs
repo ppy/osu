@@ -38,7 +38,7 @@ namespace osu.Game.Skinning
                 using (StreamReader reader = new StreamReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
-                Configuration = new DefaultSkinConfiguration();
+                Configuration = new DefaultSkinConfiguration("latest");
 
             if (storage != null)
             {
