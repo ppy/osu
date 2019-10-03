@@ -54,8 +54,6 @@ namespace osu.Game.Screens.Play
 
         private InputManager inputManager;
 
-        private IdleTracker idleTracker;
-
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
@@ -97,7 +95,6 @@ namespace osu.Game.Screens.Play
                         new InputSettings()
                     }
                 },
-                idleTracker = new IdleTracker(750, true)
             });
 
             loadNewPlayer();
@@ -197,7 +194,7 @@ namespace osu.Game.Screens.Play
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && (IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
+        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && inputManager?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
