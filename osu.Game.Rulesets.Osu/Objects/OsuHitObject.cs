@@ -58,13 +58,37 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual bool NewCombo { get; set; }
 
-        public int ComboOffset { get; set; }
+        public readonly Bindable<int> ComboOffsetBindable = new Bindable<int>();
 
-        public virtual int IndexInCurrentCombo { get; set; }
+        public int ComboOffset
+        {
+            get => ComboOffsetBindable.Value;
+            set => ComboOffsetBindable.Value = value;
+        }
 
-        public virtual int ComboIndex { get; set; }
+        public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
 
-        public bool LastInCombo { get; set; }
+        public virtual int IndexInCurrentCombo
+        {
+            get => IndexInCurrentComboBindable.Value;
+            set => IndexInCurrentComboBindable.Value = value;
+        }
+
+        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
+
+        public virtual int ComboIndex
+        {
+            get => ComboIndexBindable.Value;
+            set => ComboIndexBindable.Value = value;
+        }
+
+        public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
+
+        public bool LastInCombo
+        {
+            get => LastInComboBindable.Value;
+            set => LastInComboBindable.Value = value;
+        }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {

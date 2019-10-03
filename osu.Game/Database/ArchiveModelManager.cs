@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
@@ -110,7 +111,7 @@ namespace osu.Game.Database
         protected async Task Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = "Import is initialising...";
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -146,7 +147,7 @@ namespace osu.Game.Database
 
             if (imported.Count == 0)
             {
-                notification.Text = "Import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
@@ -399,20 +400,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var b in items)
             {
-                foreach (var b in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
-                    Delete(b);
+                Delete(b);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -438,20 +436,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Restoring ({++i} of {items.Count})";
+                notification.Text = $"Restoring ({++i} of {items.Count})";
 
-                    Undelete(item);
+                Undelete(item);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -590,7 +585,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
-        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
         protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();

@@ -135,9 +135,9 @@ namespace osu.Game.Rulesets
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
             }
-            catch
+            catch (Exception e)
             {
-                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
         }
 
