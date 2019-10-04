@@ -11,11 +11,13 @@ namespace osu.Game.Configuration
         protected override void InitialiseDefaults()
         {
             Set(Static.LoginOverlayDisplayed, false);
+            Set(Static.MutedAudioNotificationShownOnce, false);
         }
     }
 
     public enum Static
     {
         LoginOverlayDisplayed,
+        MutedAudioNotificationShownOnce
     }
 }

@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
-        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
+        public static readonly Vector2 WEDGED_CONTAINER_SIZE = new Vector2(0.5f, 245);
 
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Right = -150 },
-                            Size = new Vector2(wedged_container_size.X, 1),
+                            Size = new Vector2(WEDGED_CONTAINER_SIZE.X, 1),
                         }
                     }
                 },
@@ -118,11 +118,11 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(wedged_container_size.X, 1),
+                    Size = new Vector2(WEDGED_CONTAINER_SIZE.X, 1),
                     Padding = new MarginPadding
                     {
                         Bottom = Footer.HEIGHT,
-                        Top = wedged_container_size.Y + left_area_padding,
+                        Top = WEDGED_CONTAINER_SIZE.Y + left_area_padding,
                         Left = left_area_padding,
                         Right = left_area_padding * 2,
                     },
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Select
                                 Child = Carousel = new BeatmapCarousel
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1 - wedged_container_size.X, 1),
+                                    Size = new Vector2(1 - WEDGED_CONTAINER_SIZE.X, 1),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     SelectionChanged = updateSelectedBeatmap,
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Select
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
-                    Size = wedged_container_size,
+                    Size = WEDGED_CONTAINER_SIZE,
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding
                     {
