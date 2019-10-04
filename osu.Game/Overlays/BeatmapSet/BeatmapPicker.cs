@@ -17,6 +17,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -27,9 +28,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float tile_icon_padding = 7;
         private const float tile_spacing = 2;
 
-        private readonly DifficultiesContainer difficulties;
         private readonly OsuSpriteText version, starRating;
         private readonly Statistic plays, favourites;
+
+        public readonly DifficultiesContainer Difficulties;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
@@ -50,11 +52,11 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            difficulties.Clear();
+            Difficulties.Clear();
 
             if (BeatmapSet != null)
             {
-                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty).Select(b => new DifficultySelectorButton(b)
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
                 {
                     State = DifficultySelectorState.NotSelected,
                     OnHovered = beatmap =>
@@ -68,7 +70,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
 
             starRating.FadeOut(100);
-            Beatmap.Value = BeatmapSet?.Beatmaps.FirstOrDefault();
+            Beatmap.Value = Difficulties.FirstOrDefault()?.Beatmap;
             plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
             favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
 
@@ -89,7 +91,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        difficulties = new DifficultiesContainer
+                        Difficulties = new DifficultiesContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -147,6 +149,9 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -157,6 +162,8 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            ruleset.ValueChanged += r => updateDisplay();
 
             // done here so everything can bind in intialization and get the first trigger
             Beatmap.TriggerChange();
@@ -169,10 +176,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDifficultyButtons()
         {
-            difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
+            Difficulties.Children.ToList().ForEach(diff => diff.State = diff.Beatmap == Beatmap.Value ? DifficultySelectorState.Selected : DifficultySelectorState.NotSelected);
         }
 
-        private class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
+        public class DifficultiesContainer : FillFlowContainer<DifficultySelectorButton>
         {
             public Action OnLostHover;
 
@@ -183,7 +190,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
+        public class DifficultySelectorButton : OsuClickableContainer, IStateful<DifficultySelectorState>
         {
             private const float transition_duration = 100;
             private const float size = 52;
@@ -320,7 +327,7 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        private enum DifficultySelectorState
+        public enum DifficultySelectorState
         {
             Selected,
             NotSelected,
