@@ -75,7 +75,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Returns whether the current beatmap track is playing.
         /// </summary>
-        public bool IsPlaying => beatmap.Value?.Track.IsRunning ?? false;
+        public bool IsPlaying => current?.Track.IsRunning ?? false;
 
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
             Schedule(() => beatmapSets.Add(set));
