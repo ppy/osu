@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 beatmapSet = value;
 
-                foreach (BeatmapRulesetTabItem tab in TabContainer.TabItems)
+                foreach (var tab in TabContainer.TabItems.OfType<BeatmapRulesetTabItem>())
                     tab.SetBeatmaps(beatmapSet?.Beatmaps.FindAll(b => b.Ruleset.Equals(tab.Value)));
 
                 var firstRuleset = beatmapSet?.Beatmaps.OrderBy(b => b.Ruleset.ID).FirstOrDefault()?.Ruleset;
