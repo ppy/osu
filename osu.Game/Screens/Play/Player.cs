@@ -299,7 +299,7 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
-            if (HasFailed && !FailOverlay.IsPresent)
+            if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
             {
                 failAnimation.FinishTransforms(true);
                 return;
