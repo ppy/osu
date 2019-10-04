@@ -115,17 +115,16 @@ namespace osu.Game.Rulesets.UI
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             validState = true;
+            requireMoreUpdateLoops = false;
 
             var newProposedTime = parentGameplayClock.CurrentTime;
 
             try
             {
                 if (!FrameStablePlayback)
-                {
-                    requireMoreUpdateLoops = false;
                     return;
-                }
-                else if (firstConsumption)
+
+                if (firstConsumption)
                 {
                     // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
                     // Instead we perform an initial seek to the proposed time.
@@ -159,8 +158,6 @@ namespace osu.Game.Rulesets.UI
 
                     newProposedTime = newTime.Value;
                 }
-
-                requireMoreUpdateLoops = manualClock.CurrentTime != parentGameplayClock.CurrentTime;
             }
             finally
             {
@@ -170,6 +167,8 @@ namespace osu.Game.Rulesets.UI
                 manualClock.CurrentTime = newProposedTime;
                 manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
                 manualClock.IsRunning = parentGameplayClock.IsRunning;
+
+                requireMoreUpdateLoops |= manualClock.CurrentTime != parentGameplayClock.CurrentTime;
 
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
