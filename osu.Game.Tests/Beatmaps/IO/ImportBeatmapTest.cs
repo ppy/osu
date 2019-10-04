@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     var breakTemp = TestResources.GetTestBeatmapForImport();
 
-                    MemoryStream brokenOsu = new MemoryStream(new byte[] { 1, 3, 3, 7 });
+                    MemoryStream brokenOsu = new MemoryStream();
                     MemoryStream brokenOsz = new MemoryStream(File.ReadAllBytes(breakTemp));
 
                     File.Delete(breakTemp);
