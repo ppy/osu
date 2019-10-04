@@ -7,10 +7,16 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens;
+using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Scoring;
@@ -18,25 +24,49 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestScenePlayerLoader : ManualInputManagerTestScene
     {
         private TestPlayerLoader loader;
-        private OsuScreenStack stack;
+        private TestPlayerLoaderContainer container;
+        private TestPlayer player;
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        [Resolved]
+        private SessionStatics sessionStatics { get; set; }
+
+        /// <summary>
+        /// Sets the input manager child to a new test player loader container instance.
+        /// </summary>
+        /// <param name="interactive">If the test player should behave like the production one.</param>
+        /// <param name="beforeLoadAction">An action to run before player load but after bindable leases are returned.</param>
+        /// <param name="afterLoadAction">An action to run after container load.</param>
+        public void ResetPlayer(bool interactive, Action beforeLoadAction = null, Action afterLoadAction = null)
         {
-            InputManager.Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            audioManager.Volume.SetDefault();
+
+            InputManager.Clear();
+
+            beforeLoadAction?.Invoke();
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
-        });
+
+            InputManager.Child = container = new TestPlayerLoaderContainer(
+                loader = new TestPlayerLoader(() =>
+                {
+                    afterLoadAction?.Invoke();
+                    return player = new TestPlayer(interactive, interactive);
+                }));
+        }
 
         [Test]
         public void TestBlockLoadViaMouseMovement()
         {
-            AddStep("load dummy beatmap", () => stack.Push(loader = new TestPlayerLoader(() => new TestPlayer(false, false))));
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
             AddAssert("loader still active", () => loader.IsCurrentScreen());
@@ -46,16 +76,17 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestLoadContinuation()
         {
-            Player player = null;
             SlowLoadPlayer slowPlayer = null;
 
-            AddStep("load dummy beatmap", () => stack.Push(loader = new TestPlayerLoader(() => player = new TestPlayer(false, false))));
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
             AddStep("load slow dummy beatmap", () =>
             {
-                stack.Push(loader = new TestPlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
+                InputManager.Child = container = new TestPlayerLoaderContainer(
+                    loader = new TestPlayerLoader(() => slowPlayer = new SlowLoadPlayer(false, false)));
+
                 Scheduler.AddDelayed(() => slowPlayer.AllowLoad.Set(), 5000);
             });
 
@@ -65,16 +96,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestModReinstantiation()
         {
-            TestPlayer player = null;
             TestMod gameMod = null;
             TestMod playerMod1 = null;
             TestMod playerMod2 = null;
 
-            AddStep("load player", () =>
-            {
-                Mods.Value = new[] { gameMod = new TestMod() };
-                stack.Push(loader = new TestPlayerLoader(() => player = new TestPlayer()));
-            });
+            AddStep("load player", () => { ResetPlayer(true, () => Mods.Value = new[] { gameMod = new TestMod() }); });
 
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
@@ -95,6 +121,75 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("game mods not applied", () => gameMod.Applied == false);
             AddAssert("player has different mods", () => playerMod1 != playerMod2);
             AddAssert("player mods applied", () => playerMod2.Applied);
+        }
+
+        [Test]
+        public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+
+        [Test]
+        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+
+        [Test]
+        public void TestMutedNotificationMuteButton() => addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+
+        /// <remarks>
+        /// Created for avoiding copy pasting code for the same steps.
+        /// </remarks>
+        /// <param name="volumeName">What part of the volume system is checked</param>
+        /// <param name="beforeLoad">The action to be invoked to set the volume before loading</param>
+        /// <param name="afterLoad">The action to be invoked to set the volume after loading</param>
+        /// <param name="assert">The function to be invoked and checked</param>
+        private void addVolumeSteps(string volumeName, Action beforeLoad, Action afterLoad, Func<bool> assert)
+        {
+            AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
+
+            AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
+            AddUntilStep("wait for player", () => player.IsLoaded);
+
+            AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
+            AddStep("click notification", () =>
+            {
+                var scrollContainer = (OsuScrollContainer)container.NotificationOverlay.Children.Last();
+                var flowContainer = scrollContainer.Children.OfType<FillFlowContainer<NotificationSection>>().First();
+                var notification = flowContainer.First();
+
+                InputManager.MoveMouseTo(notification);
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddAssert("check " + volumeName, assert);
+        }
+
+        private class TestPlayerLoaderContainer : Container
+        {
+            [Cached]
+            public readonly NotificationOverlay NotificationOverlay;
+
+            [Cached]
+            public readonly VolumeOverlay VolumeOverlay;
+
+            public TestPlayerLoaderContainer(IScreen screen)
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChildren = new Drawable[]
+                {
+                    new OsuScreenStack(screen)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    NotificationOverlay = new NotificationOverlay
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                    },
+                    VolumeOverlay = new VolumeOverlay
+                    {
+                        Anchor = Anchor.TopLeft,
+                        Origin = Anchor.TopLeft,
+                    }
+                };
+            }
         }
 
         private class TestPlayerLoader : PlayerLoader
