@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
 using osuTK;
@@ -67,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[0], Anchor.TopCentre));
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[1], Anchor.BottomCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[0], Anchor.TopCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[1], Anchor.BottomCentre));
 
             AddStep("flip direction", () =>
             {
@@ -76,9 +77,13 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[0], Anchor.BottomCentre));
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[1], Anchor.TopCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[0], Anchor.BottomCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[1], Anchor.TopCentre));
         }
 
         private bool notesInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.Columns.SelectMany(c => c.AllHitObjects).All(o => o.Anchor == anchor);
+
+        private bool barsInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.AllHitObjects.Where(obj => obj is DrawableBarLine).All(o => o.Anchor == anchor);
 
         private void createNote()
         {

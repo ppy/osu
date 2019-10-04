@@ -21,8 +21,6 @@ namespace osu.Game.Online.Chat
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
-        public Action Exit;
-
         private readonly FocusedTextBox textbox;
 
         protected ChannelManager ChannelManager;
@@ -66,8 +64,6 @@ namespace osu.Game.Online.Chat
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
-
-                textbox.Exit += () => Exit?.Invoke();
             }
 
             Channel.BindValueChanged(channelChanged);
@@ -146,6 +142,7 @@ namespace osu.Game.Online.Chat
 
             protected override float HorizontalPadding => 10;
             protected override float MessagePadding => 120;
+            protected override float TimestampPadding => 50;
 
             public StandAloneMessage(Message message)
                 : base(message)

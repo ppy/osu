@@ -57,7 +57,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             beatmap.BindValueChanged(beatmapChanged, true);
-            mods.BindValueChanged(_ => updateAudioAdjustments(), true);
+            mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
             base.LoadComplete();
         }
 
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Returns whether the current beatmap track is playing.
         /// </summary>
-        public bool IsPlaying => beatmap.Value.Track.IsRunning;
+        public bool IsPlaying => current?.Track.IsRunning ?? false;
 
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
             Schedule(() => beatmapSets.Add(set));
@@ -213,12 +213,12 @@ namespace osu.Game.Overlays
             current = beatmap.NewValue;
             TrackChanged?.Invoke(current, direction);
 
-            updateAudioAdjustments();
+            ResetTrackAdjustments();
 
             queuedDirection = null;
         }
 
-        private void updateAudioAdjustments()
+        public void ResetTrackAdjustments()
         {
             var track = current?.Track;
             if (track == null)
