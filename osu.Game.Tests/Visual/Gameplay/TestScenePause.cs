@@ -128,6 +128,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestExitFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("exit", () => Player.Exit());
+
+            confirmExited();
+        }
+
+        [Test]
         public void TestExitFromGameplay()
         {
             AddStep("exit", () => Player.Exit());
