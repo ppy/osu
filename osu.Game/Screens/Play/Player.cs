@@ -299,6 +299,12 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
+            if (HasFailed && !FailOverlay.IsPresent)
+            {
+                failAnimation.FinishTransforms(true);
+                return;
+            }
+
             if (canPause)
                 Pause();
             else
@@ -517,12 +523,6 @@ namespace osu.Game.Screens.Play
                 if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
                     // still want to block if we are within the cooldown period and not already paused.
                     return true;
-
-                if (HasFailed && !FailOverlay.IsPresent)
-                {
-                    failAnimation.FinishTransforms(true);
-                    return true;
-                }
             }
 
             GameplayClockContainer.ResetLocalAdjustments();
