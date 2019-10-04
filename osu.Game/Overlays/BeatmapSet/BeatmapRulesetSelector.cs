@@ -36,15 +36,15 @@ namespace osu.Game.Overlays.BeatmapSet
         public BeatmapRulesetSelector()
         {
             AutoSizeAxes = Axes.Both;
-            TabContainer.Spacing = new Vector2(10, 0);
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new BeatmapRulesetTabItem(value);
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
-            Direction = FillDirection.Horizontal,
             AutoSizeAxes = Axes.Both,
+            Direction = FillDirection.Horizontal,
+            Spacing = new Vector2(10, 0),
         };
     }
 }
