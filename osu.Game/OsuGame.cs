@@ -106,6 +106,8 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
+        private SafeAreaContainer overlaySafeAreaContainer;
+
         public OsuGame(string[] args = null)
         {
             this.args = args;
@@ -457,7 +459,7 @@ namespace osu.Game
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                new SafeAreaContainer
+                overlaySafeAreaContainer = new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -830,7 +832,7 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+            screenContainer.Padding = new MarginPadding { Top = overlaySafeAreaContainer.Padding.Top + ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (ScreenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
