@@ -39,7 +39,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         private Container colourBarsLate;
 
         private Container judgementsContainer;
-        private Container arrowContainer;
 
         private double maxHitWindow;
 
@@ -56,6 +55,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             InternalChild = new FillFlowContainer
             {
+                Size = alignment == Anchor.x1 ? new Vector2(bar_height, 0) : new Vector2(0, bar_height),
                 AutoSizeAxes = alignment == Anchor.x1 ? Axes.Y : Axes.X,
                 Direction = alignment == Anchor.x1 ? FillDirection.Vertical : FillDirection.Horizontal,
                 Spacing = alignment == Anchor.x1 ? new Vector2(0, spacing) : new Vector2(spacing, 0),
@@ -66,10 +66,12 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                     {
                         Anchor = Anchor.y1 | alignment,
                         Origin = Anchor.y1 | alignment,
+                        Size = alignment == Anchor.x1 ? new Vector2(0, judgement_line_width) : new Vector2(judgement_line_width, 0),
                         RelativeSizeAxes = alignment == Anchor.x1 ? Axes.X : Axes.Y,
                     },
                     colourBars = new Container
                     {
+                        Size = alignment == Anchor.x1 ? new Vector2(0, bar_width) : new Vector2(bar_width, 0),
                         RelativeSizeAxes = alignment == Anchor.x1 ? Axes.X : Axes.Y,
                         Anchor = Anchor.y1 | alignment,
                         Origin = Anchor.y1 | alignment,
@@ -79,6 +81,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             {
                                 Anchor = alignment == Anchor.x1 ? Anchor.CentreLeft : Anchor.y1 | alignment,
                                 Origin = alignment == Anchor.x1 ? Anchor.CentreRight : alignment,
+                                Size = alignment == Anchor.x1 ? new Vector2(0.5f, 0) : new Vector2(0, 0.5f),
                                 RelativeSizeAxes = Axes.Both,
                                 Scale = alignment == Anchor.x1 ? new Vector2(-1, 1) : new Vector2(1, -1)
                             },
@@ -86,6 +89,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             {
                                 Anchor = alignment == Anchor.x1 ? Anchor.CentreRight : Anchor.y1 | alignment,
                                 Origin = alignment == Anchor.x1 ? Anchor.CentreRight : alignment,
+                                Size = alignment == Anchor.x1 ? new Vector2(0.5f, 0f) : new Vector2(0, 0.5f),
                                 RelativeSizeAxes = Axes.Both,
                             },
                             new SpriteIcon
@@ -108,10 +112,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             }
                         }
                     },
-                    arrowContainer = new Container
+                    new Container
                     {
                         Anchor = Anchor.y1 | alignment,
                         Origin = Anchor.y1 | alignment,
+                        Size = alignment == Anchor.x1 ? new Vector2(0, chevron_size) : new Vector2(chevron_size, 0),
                         RelativeSizeAxes = alignment == Anchor.x1 ? Axes.X : Axes.Y,
                         Child = arrow = new SpriteIcon
                         {
@@ -120,30 +125,11 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             RelativePositionAxes = alignment == Anchor.x1 ? Axes.X : Axes.Y,
                             Icon = alignment == Anchor.x1 ? FontAwesome.Solid.ChevronUp : (alignment == Anchor.x2 ? FontAwesome.Solid.ChevronRight : FontAwesome.Solid.ChevronLeft),
                             Size = new Vector2(chevron_size),
+                            Position = alignment == Anchor.x1 ? new Vector2(0, 0.5f) : new Vector2(0, 0)
                         }
                     },
                 }
             };
-
-            if (alignment == Anchor.x1)
-            {
-                InternalChild.Width = bar_height;
-                judgementsContainer.Height = judgement_line_width;
-                colourBars.Height = bar_width;
-                colourBarsEarly.Width = 0.5f;
-                colourBarsLate.Width = 0.5f;
-                arrowContainer.Height = chevron_size;
-            }
-            else
-            {
-                InternalChild.Height = bar_height;
-                judgementsContainer.Width = judgement_line_width;
-                colourBars.Width = bar_width;
-                colourBarsEarly.Height = 0.5f;
-                colourBarsLate.Height = 0.5f;
-                arrowContainer.Width = chevron_size;
-                arrow.Y = 0.5f;
-            }
 
             createColourBars(colours);
         }
