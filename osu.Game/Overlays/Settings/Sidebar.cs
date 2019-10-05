@@ -33,7 +33,8 @@ namespace osu.Game.Overlays.Settings
             {
                 new SafeAreaContainer
                 {
-                    SafeAreaOverrideEdges = Edges.Left,
+                    RelativeSizeAxes = Axes.Both,
+                    SafeAreaOverrideEdges = Edges.Left | Edges.Bottom,
                     Child = new Box
                     {
                         Colour = Color4.Black,
