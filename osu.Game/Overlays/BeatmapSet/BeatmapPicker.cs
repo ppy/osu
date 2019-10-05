@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet != null)
             {
-                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Where(b => b.Ruleset.Equals(ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
                 {
                     State = DifficultySelectorState.NotSelected,
                     OnHovered = beatmap =>
