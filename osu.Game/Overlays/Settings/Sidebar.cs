@@ -31,10 +31,14 @@ namespace osu.Game.Overlays.Settings
             RelativeSizeAxes = Axes.Y;
             InternalChildren = new Drawable[]
             {
-                new Box
+                new SafeAreaContainer
                 {
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
+                    SafeAreaOverrideEdges = Edges.Left,
+                    Child = new Box
+                    {
+                        Colour = Color4.Black,
+                        RelativeSizeAxes = Axes.Both,
+                    },
                 },
                 new SidebarScrollContainer
                 {
