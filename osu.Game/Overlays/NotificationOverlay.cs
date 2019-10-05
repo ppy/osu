@@ -37,11 +37,16 @@ namespace osu.Game.Overlays
 
             Children = new Drawable[]
             {
-                new Box
+                new SafeAreaContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                    Alpha = 0.6f
+                    SafeAreaOverrideEdges = Edges.Right | Edges.Bottom,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black,
+                        Alpha = 0.6f
+                    },
                 },
                 new OsuScrollContainer
                 {
