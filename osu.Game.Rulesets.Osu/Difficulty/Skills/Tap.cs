@@ -55,8 +55,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                 double deltaTime = (currTime - prevPrevTime) / clockRate;
 
-                // for 1/4 notes above 200 bpm the exponent is -2.3, otherwise it's -2
-                double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.5) * 0.387, Math.Pow(deltaTime, -2));
+                // for 1/4 notes above 200 bpm the exponent is -2.7, otherwise it's -2
+                double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.7) * 0.265, Math.Pow(deltaTime, -2));
 
                 currStrain += decayCoeffs * currStrainBase *
                               Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
