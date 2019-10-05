@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static (double, double, double[], double[], List<Vector<double>>) CalculateTapAttributes
             (List<OsuHitObject> hitObjects, double clockRate)
         {
-            (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, 0, clockRate);
+            (var strainHistory, var tapDiff) = calculateTapStrain(hitObjects, 0, clockRate);
             double burstStrain = strainHistory.Max(v => v[0]);
 
             var streamnessMask = CalculateStreamnessMask(hitObjects, burstStrain, clockRate);
@@ -29,13 +29,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             (var mashLevels, var tapSkills) = calculateMashLevelsVSTapSkills(hitObjects, clockRate);
 
-            return (maxTapStrain.Average(), streamNoteCount, mashLevels, tapSkills, strainHistory);
+            return (tapDiff, streamNoteCount, mashLevels, tapSkills, strainHistory);
         }
 
         /// <summary>
         /// Calculates the strain values at each note and the maximum strain values
         /// </summary>
-        private static (List<Vector<double>>, Vector<double>) calculateTapStrain(List<OsuHitObject> hitObjects,
+        private static (List<Vector<double>>, double) calculateTapStrain(List<OsuHitObject> hitObjects,
                                                                                  double mashLevel,
                                                                                  double clockRate)
         {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainResult[j] = singleStrainResult * (1 - k);
             }
 
-            return (strainHistory, strainResult);
+            return (strainHistory, strainResult.Average());
         }
 
         /// <summary>
@@ -122,8 +122,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 double mashLevel = (double)i / (mashLevelCount - 1);
                 mashLevels[i] = mashLevel;
-                (var strainHistory, var maxTapStrain) = calculateTapStrain(hitObjects, mashLevel, clockRate);
-                tapSkills[i] = maxTapStrain.Average();
+                (var strainHistory, var tapDiff) = calculateTapStrain(hitObjects, mashLevel, clockRate);
+                tapSkills[i] = tapDiff;
             }
             return (mashLevels, tapSkills);
         }
