@@ -20,6 +20,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new VolumeSettings(),
                 new OffsetSettings(),
                 new MainMenuSettings(),
+                new PlaylistSettings()
             };
         }
     }
