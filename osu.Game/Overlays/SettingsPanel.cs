@@ -48,6 +48,8 @@ namespace osu.Game.Overlays
 
         protected Box Background;
 
+        private SafeAreaContainer safeAreaContainer;
+
         protected SettingsPanel(bool showSidebar)
         {
             this.showSidebar = showSidebar;
@@ -60,46 +62,51 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = ContentContainer = new Container
+            InternalChild = safeAreaContainer = new SafeAreaContainer
             {
-                Width = WIDTH,
-                RelativeSizeAxes = Axes.Y,
-                Children = new Drawable[]
+                RelativeSizeAxes = Axes.Both,
+                SafeAreaOverrideEdges = Edges.Bottom,
+                Child = ContentContainer = new Container
                 {
-                    Background = new Box
+                    Width = WIDTH,
+                    RelativeSizeAxes = Axes.Y,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Scale = new Vector2(2, 1), // over-extend to the left for transitions
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = 0.6f,
-                    },
-                    SectionsContainer = new SettingsSectionsContainer
-                    {
-                        Masking = true,
-                        RelativeSizeAxes = Axes.Both,
-                        ExpandableHeader = CreateHeader(),
-                        FixedHeader = searchTextBox = new SearchTextBox
+                        Background = new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Width = 0.95f,
-                            Margin = new MarginPadding
-                            {
-                                Top = 20,
-                                Bottom = 20
-                            },
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            Scale = new Vector2(2, 1), // over-extend to the left for transitions
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = Color4.Black,
+                            Alpha = 0.6f,
                         },
-                        Footer = CreateFooter()
-                    },
+                        SectionsContainer = new SettingsSectionsContainer
+                        {
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            ExpandableHeader = CreateHeader(),
+                            FixedHeader = searchTextBox = new SearchTextBox
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                Width = 0.95f,
+                                Margin = new MarginPadding
+                                {
+                                    Top = 20,
+                                    Bottom = 20
+                                },
+                            },
+                            Footer = CreateFooter()
+                        },
+                    }
                 }
             };
 
             if (showSidebar)
             {
-                AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
+                safeAreaContainer.Add(Sidebar = new Sidebar { Width = sidebar_width });
 
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
