@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using osu.Game.Rulesets.Osu.Difficulty.MathUtil;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 strainResult[j] = singleStrainResult * (1 - k);
             }
 
-            return (strainHistory, strainResult.Average());
+            double diff = Mean.PowerMean(strainResult, 2);
+
+            return (strainHistory, diff);
         }
 
         /// <summary>
