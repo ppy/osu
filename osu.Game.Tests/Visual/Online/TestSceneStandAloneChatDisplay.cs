@@ -32,6 +32,12 @@ namespace osu.Game.Tests.Visual.Online
             Id = 4,
         };
 
+        private readonly User longUsernameUser = new User
+        {
+            Username = "Very Long Long Username",
+            Id = 5,
+        };
+
         [Cached]
         private ChannelManager channelManager = new ChannelManager();
 
@@ -98,6 +104,12 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Sender = admin,
                 Content = "Okay okay, calm down guys. Let's do this!"
+            }));
+
+            AddStep("message from long username", () => testChannel.AddNewMessages(new Message(sequence++)
+            {
+                Sender = longUsernameUser,
+                Content = "Hi guys, my new username is lit!"
             }));
         }
     }
