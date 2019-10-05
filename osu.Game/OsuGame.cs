@@ -457,10 +457,17 @@ namespace osu.Game
                         logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                     }
                 },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
-                topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                new SafeAreaContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        overlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        rightFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        leftFloatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                        topMostOverlayContent = new Container { RelativeSizeAxes = Axes.Both },
+                    }
+                },
                 idleTracker
             });
 
