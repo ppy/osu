@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 Array.Reverse(singleStrainHistory);
 
                 double singleStrainResult = 0;
-                double k = 1 - 0.03 * Math.Sqrt(decayCoeffs[j]);
+                double k = 1 - 0.04 * Math.Sqrt(decayCoeffs[j]);
 
                 for (int i = 0; i < hitObjects.Count; i++)
                 {
