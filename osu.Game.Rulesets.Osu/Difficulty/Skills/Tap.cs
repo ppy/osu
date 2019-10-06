@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
                 double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
 
-                double deltaTime = (currTime - prevPrevTime) / clockRate;
+                double deltaTime = Math.Max((currTime - prevPrevTime) / clockRate, 0.01);
 
                 // for 1/4 notes above 200 bpm the exponent is -2.7, otherwise it's -2
                 double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.7) * 0.265, Math.Pow(deltaTime, -2));
