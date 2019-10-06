@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var distribution = new PoissonBinomial(missProbabilities);
 
             Func<double, double> cdfMinusProb = missCount => distribution.Cdf(missCount) - p;
-            return Brent.FindRoot(cdfMinusProb, -100, 1000);
+            return Brent.FindRootExpand(cdfMinusProb, -100, 1000);
         }
 
         private static (double[], double[]) calculateCheeseLevelsVSCheeseFactors(IList<OsuMovement> movements, double fcProbTP)
@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             foreach (OsuMovement movement in movements)
             {
                 double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
-                fcTime = (fcTime + movement.RawMT) / hitProb;
+                fcTime = (fcTime + movement.RawMT) / (hitProb + 1e-10);
             }
             return fcTime;
         }

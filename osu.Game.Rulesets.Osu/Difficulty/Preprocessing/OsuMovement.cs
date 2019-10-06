@@ -353,7 +353,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double ip01;
                 if (obj0 != null)
                 {
-                    t01Reciprocal = 1 / t01;
+                    t01Reciprocal = 1 / (t01 + 1e-10);
                     ip01 = FittsLaw.CalculateIP(d01, t01);
                 }
                 else
@@ -368,7 +368,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 double ip23;
                 if (obj3 != null)
                 {
-                    t23Reciprocal = 1 / t23;
+                    t23Reciprocal = 1 / (t23 + 1e-10);
                     ip23 = FittsLaw.CalculateIP(d23, t23);
                 }
                 else
@@ -399,7 +399,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             movement.D = d12WithCorrection;
             movement.MT = t12;
             movement.Cheesablility = cheesabilityEarly + cheesabilityLate;
-            movement.CheesableRatio = (timeEarly + timeLate) / t12;
+            movement.CheesableRatio = (timeEarly + timeLate) / (t12 + 1e-10);
 
             var movementWithNested = new List<OsuMovement>() { movement };
 
