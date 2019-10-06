@@ -102,6 +102,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         private static double calculateFCTimeTP(IEnumerable<OsuMovement> movements)
         {
+            if (movements.Count() == 0)
+                return 0;
+
             double mapLength = movements.Last().Time - movements.First().Time;
             double timeThreshold = timeThresholdBase + mapLength;
 
