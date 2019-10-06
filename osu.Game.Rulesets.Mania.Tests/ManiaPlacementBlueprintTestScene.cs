@@ -27,8 +27,13 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
+        [Cached(typeof(IScrollingInfo))]
+        private IScrollingInfo scrollingInfo;
+
         protected ManiaPlacementBlueprintTestScene()
         {
+            scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
+
             Add(column = new Column(0)
             {
                 Anchor = Anchor.Centre,
@@ -36,15 +41,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AccentColour = Color4.OrangeRed,
                 Clock = new FramedClock(new StopwatchClock()), // No scroll
             });
-        }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            dependencies.CacheAs(((ScrollingTestContainer)HitObjectContainer).ScrollingInfo);
-
-            return dependencies;
+            AddStep("change direction", () => ((ScrollingTestContainer)HitObjectContainer).Flip());
         }
 
         protected override Container CreateHitObjectContainer() => new ScrollingTestContainer(ScrollingDirection.Down) { RelativeSizeAxes = Axes.Both };
