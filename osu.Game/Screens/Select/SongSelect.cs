@@ -413,7 +413,7 @@ namespace osu.Game.Screens.Select
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
 
                     if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
-                        ensurePlayingSelected();
+                        ensurePlayingSelected(true);
 
                     if (beatmap != null)
                     {
@@ -585,18 +585,14 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning || restart)
+            if (!track.IsRunning)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
-                if (music != null)
-                {
-                    // use the global music controller (when available) to cancel a potential local user paused state.
-                    music.SeekTo(track.RestartPoint);
-                    music.Play();
-                }
-                else
+                if (restart)
                     track.Restart();
+                else
+                    track.Start();
             }
         }
 
