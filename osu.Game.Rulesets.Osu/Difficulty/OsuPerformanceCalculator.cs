@@ -227,11 +227,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAccuracyValue()
         {
-            double mapAimValue = tpToPP(Attributes.MissTPs[0]);
-            double mapSpeedValue = tapSkillToPP(Attributes.TapDiff);
             double fingerControlDiff = Attributes.FingerControlDiff;
-            double mapFingerControlValue = fingerControlDiffToPP(fingerControlDiff);
-            double softCap = Mean.PowerMean(new double[] { 0.91f * mapAimValue, 1.48f * mapSpeedValue, 1.8f * mapFingerControlValue}, 3);
 
             double modifiedAcc = getModifiedAcc();
             double accOnCircles = 1 - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
@@ -240,13 +236,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnCircles is close to 1
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
-            double deviationOnCircles = greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double deviationAccValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 11000;
-
-            // another algorithm that only focuses on acc instead of acc and od
-            double percentageAccValue = Math.Exp((accOnCircles - 1) * 20) * softCap;
-
-            double accuracyValue = Math.Pow(deviationAccValue, 0.5f) * Math.Pow(percentageAccValue, 0.5f) * 0.8f;
+            double deviationOnCircles = (greatWindow + 8) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
+            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 19800;
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
             accuracyValue *= lengthFactor;
