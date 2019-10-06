@@ -62,19 +62,18 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return base.OnMouseUp(e);
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        public override void UpdatePosition(Vector2 screenSpacePosition)
         {
             if (!PlacementBegun)
-                Column = ColumnAt(e.ScreenSpaceMousePosition);
+                Column = ColumnAt(screenSpacePosition);
 
-            if (Column == null) return false;
+            if (Column == null) return;
 
             SnappedWidth = Column.DrawWidth;
 
             // Snap to the column
             var parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
-            SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
-            return true;
+            SnappedMousePosition = new Vector2(parentPos.X, Parent.ToLocalSpace(screenSpacePosition).Y);
         }
 
         protected double TimeAt(Vector2 screenSpacePosition)

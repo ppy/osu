@@ -230,9 +230,9 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number3);
             }
 
             if (this.beatmaps == null)
@@ -413,7 +413,7 @@ namespace osu.Game.Screens.Select
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
 
                     if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
-                        ensurePlayingSelected();
+                        ensurePlayingSelected(true);
 
                     if (beatmap != null)
                     {
@@ -585,18 +585,14 @@ namespace osu.Game.Screens.Select
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning || restart)
+            if (!track.IsRunning)
             {
                 track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
-                if (music != null)
-                {
-                    // use the global music controller (when available) to cancel a potential local user paused state.
-                    music.SeekTo(track.RestartPoint);
-                    music.Play();
-                }
-                else
+                if (restart)
                     track.Restart();
+                else
+                    track.Start();
             }
         }
 
