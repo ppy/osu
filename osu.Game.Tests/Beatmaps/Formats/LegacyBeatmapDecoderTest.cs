@@ -591,5 +591,27 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.Throws<IOException>(() => Decoder.GetDecoder<Beatmap>(stream));
             }
         }
+
+        [Test]
+        public void TestAllowFallbackDecoderOverwrite()
+        {
+            Decoder<Beatmap> decoder = null;
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+            }
+
+            Assert.DoesNotThrow(LegacyDifficultyCalculatorBeatmapDecoder.Register);
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyDifficultyCalculatorBeatmapDecoder>(decoder);
+            }
+        }
     }
 }
