@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
@@ -18,16 +20,17 @@ namespace osu.Game.Tests.Visual
         protected Container HitObjectContainer;
         private PlacementBlueprint currentBlueprint;
 
+        private InputManager inputManager;
+
         protected PlacementBlueprintTestScene()
         {
-            Add(HitObjectContainer = CreateHitObjectContainer());
+            Add(HitObjectContainer = CreateHitObjectContainer().With(c => c.Clock = new FramedClock(new StopwatchClock())));
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
-            Add(currentBlueprint = CreateBlueprint());
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -36,6 +39,14 @@ namespace osu.Game.Tests.Visual
             dependencies.CacheAs<IAdjustableClock>(new StopwatchClock());
 
             return dependencies;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+            Add(currentBlueprint = CreateBlueprint());
         }
 
         public void BeginPlacement(HitObject hitObject)
@@ -54,9 +65,26 @@ namespace osu.Game.Tests.Visual
         {
         }
 
-        protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            currentBlueprint.UpdatePosition(e.ScreenSpaceMousePosition);
+            return true;
+        }
+
+        public override void Add(Drawable drawable)
+        {
+            base.Add(drawable);
+
+            if (drawable is PlacementBlueprint blueprint)
+            {
+                blueprint.Show();
+                blueprint.UpdatePosition(inputManager.CurrentState.Mouse.Position);
+            }
+        }
 
         protected virtual void AddHitObject(DrawableHitObject hitObject) => HitObjectContainer.Add(hitObject);
+
+        protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
         protected abstract PlacementBlueprint CreateBlueprint();
