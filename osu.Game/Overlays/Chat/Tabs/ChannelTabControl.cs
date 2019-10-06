@@ -9,7 +9,6 @@ using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -25,18 +24,10 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public ChannelTabControl()
         {
-            TabContainer.Margin = new MarginPadding { Left = 50 };
+            Padding = new MarginPadding { Left = 50 };
+
             TabContainer.Spacing = new Vector2(-SHEAR_WIDTH, 0);
             TabContainer.Masking = false;
-
-            AddInternal(new SpriteIcon
-            {
-                Icon = FontAwesome.Solid.Comments,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Size = new Vector2(20),
-                Margin = new MarginPadding(10),
-            });
 
             AddTabItem(selectorTab = new ChannelSelectorTabItem());
 
