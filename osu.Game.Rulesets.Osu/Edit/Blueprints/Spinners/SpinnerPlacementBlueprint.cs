@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
@@ -49,6 +50,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             }
 
             return true;
+        }
+
+        public override void UpdatePosition(Vector2 screenSpacePosition)
+        {
         }
     }
 }
