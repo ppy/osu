@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Screens.Play;
@@ -12,7 +11,6 @@ using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [TestFixture]
     public class TestSceneKeyCounter : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

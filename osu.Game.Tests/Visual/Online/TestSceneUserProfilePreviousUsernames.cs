@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -14,7 +13,6 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneUserProfilePreviousUsernames : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

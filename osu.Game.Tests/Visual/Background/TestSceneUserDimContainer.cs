@@ -35,7 +35,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Background
 {
-    [TestFixture]
     public class TestSceneUserDimContainer : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

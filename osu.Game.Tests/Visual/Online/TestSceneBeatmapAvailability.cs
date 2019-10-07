@@ -7,7 +7,6 @@ using osu.Game.Overlays.BeatmapSet;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneBeatmapAvailability : OsuTestScene
     {
         private readonly BeatmapAvailability container;

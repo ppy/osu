@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -20,7 +19,6 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [TestFixture]
     public class TestSceneScrollingHitObjects : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };

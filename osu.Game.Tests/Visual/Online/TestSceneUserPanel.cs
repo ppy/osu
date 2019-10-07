@@ -10,7 +10,6 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneUserPanel : OsuTestScene
     {
         private readonly UserPanel peppy;

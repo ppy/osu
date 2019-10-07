@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
@@ -19,7 +18,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    [TestFixture]
     public class TestSceneEditorComposeTimeline : EditorClockTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

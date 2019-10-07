@@ -11,7 +11,6 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [TestFixture]
     public class TestSceneBreakOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

@@ -21,7 +21,6 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    [TestFixture]
     public class TestSceneBeatmapInfoWedge : OsuTestScene
     {
         private RulesetStore rulesets;

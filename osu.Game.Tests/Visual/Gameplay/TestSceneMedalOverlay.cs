@@ -3,14 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Game.Overlays;
 using osu.Game.Overlays.MedalSplash;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    [TestFixture]
     public class TestSceneMedalOverlay : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

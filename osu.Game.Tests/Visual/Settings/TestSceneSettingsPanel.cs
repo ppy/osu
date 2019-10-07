@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
@@ -11,7 +10,6 @@ using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Tests.Visual.Settings
 {
-    [TestFixture]
     public class TestSceneSettingsPanel : OsuTestScene
     {
         private readonly SettingsPanel settings;

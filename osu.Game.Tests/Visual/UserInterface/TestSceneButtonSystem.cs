@@ -14,7 +14,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    [TestFixture]
     public class TestSceneButtonSystem : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -21,7 +20,6 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    [TestFixture]
     public class TestSceneHitObjectComposer : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

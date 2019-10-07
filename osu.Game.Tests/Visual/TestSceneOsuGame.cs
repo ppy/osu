@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -31,7 +30,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    [TestFixture]
     public class TestSceneOsuGame : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

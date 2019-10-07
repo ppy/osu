@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Tests.Visual.Menus
 {
-    [TestFixture]
     public class TestSceneToolbar : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
@@ -13,7 +12,6 @@ using osu.Game.Screens.Multi.Match.Components;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    [TestFixture]
     public class TestSceneMatchInfo : MultiplayerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]

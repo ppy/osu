@@ -19,7 +19,6 @@ using osu.Game.Screens.Select.Filter;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
-    [TestFixture]
     public class TestSceneBeatmapCarousel : OsuTestScene
     {
         private TestBeatmapCarousel carousel;

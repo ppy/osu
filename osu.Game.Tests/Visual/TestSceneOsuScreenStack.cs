@@ -13,7 +13,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    [TestFixture]
     public class TestSceneOsuScreenStack : OsuTestScene
     {
         private TestOsuScreenStack stack;

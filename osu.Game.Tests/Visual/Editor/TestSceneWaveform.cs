@@ -16,7 +16,6 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    [TestFixture]
     public class TestSceneWaveform : OsuTestScene
     {
         private WorkingBeatmap waveformBeatmap;

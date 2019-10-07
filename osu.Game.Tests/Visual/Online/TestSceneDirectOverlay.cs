@@ -2,13 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
     public class TestSceneDirectOverlay : OsuTestScene
     {
         private DirectOverlay direct;
