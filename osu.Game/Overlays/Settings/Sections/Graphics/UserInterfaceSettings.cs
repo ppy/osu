@@ -19,11 +19,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Scroll playlist on song change",
-                    Bindable = config.GetBindable<bool>(OsuSetting.FollowPlayback)
-                },
-                new SettingsCheckbox
-                {
                     LabelText = "Rotate cursor when dragging",
                     Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
