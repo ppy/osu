@@ -58,107 +58,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
-        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
-        {
-            if (beatmapSets == null)
-            {
-                beatmapSets = new List<BeatmapSetInfo>();
-
-                for (int i = 1; i <= set_count; i++)
-                    beatmapSets.Add(createTestBeatmapSet(i));
-            }
-
-            bool changed = false;
-            AddStep($"Load {beatmapSets.Count} Beatmaps", () =>
-            {
-                carousel.Filter(new FilterCriteria());
-                carousel.BeatmapSetsChanged = () => changed = true;
-                carousel.BeatmapSets = beatmapSets;
-            });
-
-            AddUntilStep("Wait for load", () => changed);
-        }
-
-        private void ensureRandomFetchSuccess() =>
-            AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
-
-        private void waitForSelection(int set, int? diff = null) =>
-            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
-            {
-                if (diff != null)
-                    return carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
-
-                return carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Contains(carousel.SelectedBeatmap);
-            });
-
-        private void setSelected(int set, int diff) =>
-            AddStep($"select set{set} diff{diff}", () =>
-                carousel.SelectBeatmap(carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First()));
-
-        private void advanceSelection(bool diff, int direction = 1, int count = 1)
-        {
-            if (count == 1)
-                AddStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
-                    carousel.SelectNext(direction, !diff));
-            else
-            {
-                AddRepeatStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
-                    carousel.SelectNext(direction, !diff), count);
-            }
-        }
-
-        private void checkVisibleItemCount(bool diff, int count) =>
-            AddAssert($"{count} {(diff ? "diffs" : "sets")} visible", () =>
-                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
-
-        private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);
-
-        private void nextRandom() =>
-            AddStep("select random next", () =>
-            {
-                carousel.RandomAlgorithm.Value = RandomSelectAlgorithm.RandomPermutation;
-
-                if (!selectedSets.Any() && carousel.SelectedBeatmap != null)
-                    selectedSets.Push(carousel.SelectedBeatmapSet);
-
-                carousel.SelectNextRandom();
-                selectedSets.Push(carousel.SelectedBeatmapSet);
-            });
-
-        private void ensureRandomDidntRepeat() =>
-            AddAssert("ensure no repeats", () => selectedSets.Distinct().Count() == selectedSets.Count);
-
-        private void prevRandom() => AddStep("select random last", () =>
-        {
-            carousel.SelectPreviousRandom();
-            selectedSets.Pop();
-        });
-
-        private bool selectedBeatmapVisible()
-        {
-            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
-            if (currentlySelected == null)
-                return true;
-
-            return currentlySelected.Item.Visible;
-        }
-
-        private void checkInvisibleDifficultiesUnselectable()
-        {
-            nextRandom();
-            AddAssert("Selection is visible", selectedBeatmapVisible);
-        }
-
-        private void checkNonmatchingFilter()
-        {
-            AddStep("Toggle non-matching filter", () =>
-            {
-                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
-                carousel.Filter(new FilterCriteria(), false);
-                eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-            });
-        }
-
         /// <summary>
         /// Test keyboard traversal
         /// </summary>
@@ -480,6 +379,107 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkNonmatchingFilter();
             checkNonmatchingFilter();
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
+        }
+
+        private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
+        {
+            if (beatmapSets == null)
+            {
+                beatmapSets = new List<BeatmapSetInfo>();
+
+                for (int i = 1; i <= set_count; i++)
+                    beatmapSets.Add(createTestBeatmapSet(i));
+            }
+
+            bool changed = false;
+            AddStep($"Load {beatmapSets.Count} Beatmaps", () =>
+            {
+                carousel.Filter(new FilterCriteria());
+                carousel.BeatmapSetsChanged = () => changed = true;
+                carousel.BeatmapSets = beatmapSets;
+            });
+
+            AddUntilStep("Wait for load", () => changed);
+        }
+
+        private void ensureRandomFetchSuccess() =>
+            AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
+
+        private void waitForSelection(int set, int? diff = null) =>
+            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
+            {
+                if (diff != null)
+                    return carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
+
+                return carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Contains(carousel.SelectedBeatmap);
+            });
+
+        private void setSelected(int set, int diff) =>
+            AddStep($"select set{set} diff{diff}", () =>
+                carousel.SelectBeatmap(carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff - 1).First()));
+
+        private void advanceSelection(bool diff, int direction = 1, int count = 1)
+        {
+            if (count == 1)
+                AddStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
+                    carousel.SelectNext(direction, !diff));
+            else
+            {
+                AddRepeatStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
+                    carousel.SelectNext(direction, !diff), count);
+            }
+        }
+
+        private void checkVisibleItemCount(bool diff, int count) =>
+            AddAssert($"{count} {(diff ? "diffs" : "sets")} visible", () =>
+                carousel.Items.Count(s => (diff ? s.Item is CarouselBeatmap : s.Item is CarouselBeatmapSet) && s.Item.Visible) == count);
+
+        private void checkNoSelection() => AddAssert("Selection is null", () => currentSelection == null);
+
+        private void nextRandom() =>
+            AddStep("select random next", () =>
+            {
+                carousel.RandomAlgorithm.Value = RandomSelectAlgorithm.RandomPermutation;
+
+                if (!selectedSets.Any() && carousel.SelectedBeatmap != null)
+                    selectedSets.Push(carousel.SelectedBeatmapSet);
+
+                carousel.SelectNextRandom();
+                selectedSets.Push(carousel.SelectedBeatmapSet);
+            });
+
+        private void ensureRandomDidntRepeat() =>
+            AddAssert("ensure no repeats", () => selectedSets.Distinct().Count() == selectedSets.Count);
+
+        private void prevRandom() => AddStep("select random last", () =>
+        {
+            carousel.SelectPreviousRandom();
+            selectedSets.Pop();
+        });
+
+        private bool selectedBeatmapVisible()
+        {
+            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
+            if (currentlySelected == null)
+                return true;
+
+            return currentlySelected.Item.Visible;
+        }
+
+        private void checkInvisibleDifficultiesUnselectable()
+        {
+            nextRandom();
+            AddAssert("Selection is visible", selectedBeatmapVisible);
+        }
+
+        private void checkNonmatchingFilter()
+        {
+            AddStep("Toggle non-matching filter", () =>
+            {
+                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
+                carousel.Filter(new FilterCriteria(), false);
+                eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+            });
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int id)
