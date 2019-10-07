@@ -246,6 +246,30 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestSortingWithFiltered()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var set = createTestBeatmapSet(i);
+                set.Beatmaps[0].StarDifficulty = 3 - i;
+                set.Beatmaps[2].StarDifficulty = 6 + i;
+                sets.Add(set);
+            }
+
+            loadBeatmaps(sets);
+
+            AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
+            AddAssert("Check first set at end", () => carousel.BeatmapSets.First() == sets.Last());
+            AddAssert("Check last set at start", () => carousel.BeatmapSets.Last() == sets.First());
+
+            AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
+            AddAssert("Check first set at start", () => carousel.BeatmapSets.First() == sets.First());
+            AddAssert("Check last set at end", () => carousel.BeatmapSets.Last() == sets.Last());
+        }
+
+        [Test]
         public void TestRemoveAll()
         {
             loadBeatmaps();
