@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Select
         public static readonly float HEIGHT = 24;
         private readonly OsuTabControlCheckbox modsCheckbox;
         private readonly OsuTabControl<BeatmapDetailTab> tabs;
-        private readonly Container tabsContainer;
 
         public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
 
@@ -40,9 +39,10 @@ namespace osu.Game.Screens.Select
                     Height = 1,
                     Colour = Color4.White.Opacity(0.2f),
                 },
-                tabsContainer = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Right = 100 },
                     Child = tabs = new OsuTabControl<BeatmapDetailTab>
                     {
                         Anchor = Anchor.BottomLeft,
@@ -72,13 +72,6 @@ namespace osu.Game.Screens.Select
 
             tabs.Current.BindTo(selectedTab);
             tabs.Current.TriggerChange();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            tabsContainer.Padding = new MarginPadding { Right = modsCheckbox.Width };
         }
 
         private void invokeOnFilter()

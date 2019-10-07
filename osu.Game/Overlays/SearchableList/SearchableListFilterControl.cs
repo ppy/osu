@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.SearchableList
         private const float padding = 10;
 
         private readonly Container filterContainer;
-        private readonly Container tabsContainer;
         private readonly Box tabStrip;
 
         public readonly SearchTextBox Search;
@@ -86,10 +85,11 @@ namespace osu.Game.Overlays.SearchableList
                                     AutoSizeAxes = Axes.Y,
                                     Margin = new MarginPadding { Top = controls != null ? padding : 0 },
                                 },
-                                tabsContainer = new Container
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Right = 225 },
                                     Child = Tabs = new PageTabControl<T>
                                     {
                                         RelativeSizeAxes = Axes.X,
@@ -133,8 +133,6 @@ namespace osu.Game.Overlays.SearchableList
 
             Height = filterContainer.Height;
             DisplayStyleControl.Margin = new MarginPadding { Top = filterContainer.Height - 35, Right = SearchableListOverlay.WIDTH_PADDING };
-
-            tabsContainer.Padding = new MarginPadding { Right = DisplayStyleControl.Width };
         }
 
         private class FilterSearchTextBox : SearchTextBox
