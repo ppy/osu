@@ -52,16 +52,16 @@ namespace osu.Game.Online.API.Requests.Responses
         public DateTimeOffset CreatedAt { get; set; }
 
         [JsonProperty(@"updated_at")]
-        public DateTimeOffset UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         [JsonProperty(@"deleted_at")]
-        public DateTimeOffset DeletedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
 
         [JsonProperty(@"edited_at")]
-        public DateTimeOffset EditedAt { get; set; }
+        public DateTimeOffset? EditedAt { get; set; }
 
         [JsonProperty(@"edited_by_id")]
-        public long EditedById { get; set; }
+        public long? EditedById { get; set; }
 
         public bool IsTopLevel { get; set; }
     }
