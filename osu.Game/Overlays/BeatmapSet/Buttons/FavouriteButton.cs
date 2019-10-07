@@ -10,6 +10,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
@@ -20,8 +23,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly Bindable<bool> favourited = new Bindable<bool>();
 
+        private PostBeatmapFavouriteRequest request;
+        private DimmedLoadingLayer loading;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api)
         {
             Container pink;
             SpriteIcon icon;
@@ -55,6 +61,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Size = new Vector2(18),
                     Shadow = false,
                 },
+                loading = new DimmedLoadingLayer(),
             });
 
             BeatmapSet.BindValueChanged(setInfo =>
@@ -67,6 +74,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             favourited.ValueChanged += favourited =>
             {
+                loading.Hide();
+
                 if (favourited.NewValue)
                 {
                     pink.FadeIn(200);
@@ -77,6 +86,19 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     pink.FadeOut(200);
                     icon.Icon = FontAwesome.Regular.Heart;
                 }
+            };
+
+            Action = () =>
+            {
+                if (loading.State.Value == Visibility.Visible)
+                    return;
+
+                loading.Show();
+
+                request?.Cancel();
+                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value?.OnlineBeatmapSetID ?? 0, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
+                request.Success += () => favourited.Value = !favourited.Value;
+                api.Queue(request);
             };
         }
 
