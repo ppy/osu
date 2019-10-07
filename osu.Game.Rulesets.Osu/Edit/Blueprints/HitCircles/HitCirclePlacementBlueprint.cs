@@ -21,6 +21,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
             InternalChild = circlePiece = new HitCirclePiece();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            circlePiece.UpdateFrom(HitObject);
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             HitObject.StartTime = EditorClock.CurrentTime;
