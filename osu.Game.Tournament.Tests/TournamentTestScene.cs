@@ -8,21 +8,21 @@ namespace osu.Game.Tournament.Tests
 {
     public abstract class TournamentTestScene : OsuTestScene
     {
-        protected override ITestSceneTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
+        protected override ITestSuiteTestRunner CreateRunner() => new TournamentTestSceneTestRunner();
 
-        public class TournamentTestSceneTestRunner : TournamentGameBase, ITestSceneTestRunner
+        public class TournamentTestSceneTestRunner : TournamentGameBase, ITestSuiteTestRunner
         {
-            private TestSceneTestRunner.TestRunner runner;
+            private TestSuiteTestRunner.TestRunner runner;
 
             protected override void LoadAsyncComplete()
             {
                 // this has to be run here rather than LoadComplete because
                 // TestScene.cs is checking the IsLoaded state (on another thread) and expects
                 // the runner to be loaded at that point.
-                Add(runner = new TestSceneTestRunner.TestRunner());
+                Add(runner = new TestSuiteTestRunner.TestRunner());
             }
 
-            public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
+            public void RunTestBlocking(TestSuite test) => runner.RunTestBlocking(test);
         }
     }
 }

@@ -24,7 +24,11 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class OsuTestScene : TestScene
+    public abstract class OsuTestScene : OsuTestScene<EmptyTestScene>
+    {
+    }
+
+    public abstract class OsuTestScene<T> : TestSuite<T> where T : TestScene, new()
     {
         [Cached(typeof(Bindable<WorkingBeatmap>))]
         [Cached(typeof(IBindable<WorkingBeatmap>))]
@@ -146,7 +150,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        protected override ITestSceneTestRunner CreateRunner() => new OsuTestSceneTestRunner();
+        protected override ITestSuiteTestRunner CreateRunner() => new OsuTestSceneTestRunner();
 
         public class ClockBackedTestWorkingBeatmap : TestWorkingBeatmap
         {
@@ -210,7 +214,7 @@ namespace osu.Game.Tests.Visual
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = Double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity)
                 {
                     var track = new TrackVirtualManual(referenceClock) { Length = length };
                     AddItem(track);
@@ -306,19 +310,19 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        public class OsuTestSceneTestRunner : OsuGameBase, ITestSceneTestRunner
+        public class OsuTestSceneTestRunner : OsuGameBase, ITestSuiteTestRunner
         {
-            private TestSceneTestRunner.TestRunner runner;
+            private TestSuiteTestRunner.TestRunner runner;
 
             protected override void LoadAsyncComplete()
             {
                 // this has to be run here rather than LoadComplete because
                 // TestScene.cs is checking the IsLoaded state (on another thread) and expects
                 // the runner to be loaded at that point.
-                Add(runner = new TestSceneTestRunner.TestRunner());
+                Add(runner = new TestSuiteTestRunner.TestRunner());
             }
 
-            public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
+            public void RunTestBlocking(TestSuite test) => runner.RunTestBlocking(test);
         }
     }
 }
