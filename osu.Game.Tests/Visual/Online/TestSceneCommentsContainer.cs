@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Overlays;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -17,12 +19,21 @@ namespace osu.Game.Tests.Visual.Online
             typeof(CommentsContainer),
         };
 
+        protected override bool UseOnlineAPI => true;
+
         public TestSceneCommentsContainer()
         {
+            BasicScrollContainer scrollFlow;
+
+            Add(scrollFlow = new BasicScrollContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+            });
+
             AddStep("Big Black comments", () =>
             {
-                Clear();
-                Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
+                scrollFlow.Clear();
+                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
             });
         }
     }

@@ -16,7 +16,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool HasMore { get; set; }
 
         [JsonProperty(@"has_more_id")]
-        public long HasMoreId { get; set; }
+        public long? HasMoreId { get; set; }
 
         [JsonProperty(@"user_follow")]
         public bool UserFollow { get; set; }

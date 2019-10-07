@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays
 {
@@ -24,8 +25,14 @@ namespace osu.Game.Overlays
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
+        private GetCommentsRequest request;
+
         private readonly CommentsHeader header;
         private readonly Box background;
+        private readonly FillFlowContainer content;
 
         public CommentsContainer(CommentableType type, long id)
         {
@@ -40,15 +47,86 @@ namespace osu.Game.Overlays
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                header = new CommentsHeader
+                new FillFlowContainer
                 {
-                    Sort = { BindTarget = Sort }
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        header = new CommentsHeader
+                        {
+                            Sort = { BindTarget = Sort }
+                        },
+                        content = new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                        }
+                    }
+                }
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            Sort.BindValueChanged(onSortChanged, true);
+            base.LoadComplete();
+        }
+
+        private void onSortChanged(ValueChangedEvent<SortCommentsBy> sort) => getComments();
+
+        private void getComments()
+        {
+            request?.Cancel();
+            request = new GetCommentsRequest(type, id, Sort.Value);
+            request.Success += onSuccess;
+            api.Queue(request);
+        }
+
+        private void onSuccess(APIComments response)
+        {
+            content.Clear();
+
+            foreach (var c in response.Comments)
+            {
+                createDrawableComment(c);
+            }
+        }
+
+        private void createDrawableComment(Comment comment)
+        {
+            content.Add(new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                Height = 70,
+                Children = new Drawable[]
+                {
+                    new SpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Text = comment.MessageHTML,
+                    },
+                    new Container
+                    {
+                        Anchor = Anchor.BottomCentre,
+                        Origin = Anchor.BottomCentre,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 1,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = colours.Gray1,
+                        }
+                    }
                 }
             });
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             background.Colour = colours.Gray3;
         }
