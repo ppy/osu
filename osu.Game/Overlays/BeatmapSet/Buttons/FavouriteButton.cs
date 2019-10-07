@@ -5,11 +5,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -17,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class FavouriteButton : HeaderButton
+    public class FavouriteButton : HeaderButton, IHasTooltip
     {
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -26,33 +24,14 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private PostBeatmapFavouriteRequest request;
         private DimmedLoadingLayer loading;
 
+        public string TooltipText => (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
-            Container pink;
             SpriteIcon icon;
             AddRange(new Drawable[]
             {
-                pink = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0f,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex(@"9f015f"),
-                        },
-                        new Triangles
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            ColourLight = OsuColour.FromHex(@"cb2187"),
-                            ColourDark = OsuColour.FromHex(@"9f015f"),
-                            TriangleScale = 1.5f,
-                        },
-                    },
-                },
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
@@ -76,16 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             {
                 loading.Hide();
 
-                if (favourited.NewValue)
-                {
-                    pink.FadeIn(200);
-                    icon.Icon = FontAwesome.Solid.Heart;
-                }
-                else
-                {
-                    pink.FadeOut(200);
-                    icon.Icon = FontAwesome.Regular.Heart;
-                }
+                icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
             };
 
             Action = () =>
