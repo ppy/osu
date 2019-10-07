@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -53,8 +52,6 @@ namespace osu.Game.Overlays.Music
 
             private IBindableList<BeatmapSetInfo> beatmaps;
 
-            private IBindable<bool> followPlayback;
-
             [Resolved]
             private MusicController musicController { get; set; }
 
@@ -79,10 +76,8 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(IBindable<WorkingBeatmap> beatmap, OsuConfigManager configManager)
+            private void load(IBindable<WorkingBeatmap> beatmap)
             {
-                followPlayback = configManager.GetBindable<bool>(OsuSetting.FollowPlayback);
-
                 beatmaps = musicController.BeatmapSets.GetBoundCopy();
                 beatmaps.ItemsAdded += i => i.ForEach(addBeatmapSet);
                 beatmaps.ItemsRemoved += i => i.ForEach(removeBeatmapSet);
@@ -116,7 +111,7 @@ namespace osu.Game.Overlays.Music
                 foreach (PlaylistItem s in items.Children)
                 {
                     s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo?.ID;
-                    if (s.Selected && followPlayback.Value)
+                    if (s.Selected)
                         ScrollIntoView(s);
                 }
             }

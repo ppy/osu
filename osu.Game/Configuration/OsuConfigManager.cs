@@ -117,8 +117,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
-
-            Set(OsuSetting.FollowPlayback, true);
         }
 
         public OsuConfigManager(Storage storage)
@@ -188,7 +186,6 @@ namespace osu.Game.Configuration
         UIScale,
         IntroSequence,
         UIHoldActivationDelay,
-        HitLighting,
-        FollowPlayback
+        HitLighting
     }
 }
