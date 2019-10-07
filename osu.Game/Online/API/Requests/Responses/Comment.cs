@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 parentId = value;
-                IsTopLevel = value != null;
+                IsTopLevel = value == null;
             }
         }
 
@@ -54,8 +54,18 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"updated_at")]
         public DateTimeOffset? UpdatedAt { get; set; }
 
+        private DateTimeOffset? deletedAt;
+
         [JsonProperty(@"deleted_at")]
-        public DateTimeOffset? DeletedAt { get; set; }
+        public DateTimeOffset? DeletedAt
+        {
+            get => deletedAt;
+            set
+            {
+                deletedAt = value;
+                IsDeleted = value != null;
+            }
+        }
 
         [JsonProperty(@"edited_at")]
         public DateTimeOffset? EditedAt { get; set; }
@@ -64,5 +74,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public long? EditedById { get; set; }
 
         public bool IsTopLevel { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

@@ -30,7 +30,6 @@ namespace osu.Game.Overlays
 
         private GetCommentsRequest request;
 
-        private readonly CommentsHeader header;
         private readonly Box background;
         private readonly FillFlowContainer content;
 
@@ -54,7 +53,7 @@ namespace osu.Game.Overlays
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        header = new CommentsHeader
+                        new CommentsHeader
                         {
                             Sort = { BindTarget = Sort }
                         },
@@ -91,7 +90,8 @@ namespace osu.Game.Overlays
 
             foreach (var c in response.Comments)
             {
-                createDrawableComment(c);
+                if (!c.IsDeleted)
+                    createDrawableComment(c);
             }
         }
 
