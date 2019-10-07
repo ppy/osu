@@ -11,8 +11,18 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"id")]
         public long Id { get; set; }
 
+        private long? parentId;
+
         [JsonProperty(@"parent_id")]
-        public long ParentId { get; set; }
+        public long? ParentId
+        {
+            get => parentId;
+            set
+            {
+                parentId = value;
+                IsTopLevel = value != null;
+            }
+        }
 
         [JsonProperty(@"user_id")]
         public long UserId { get; set; }
@@ -52,5 +62,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"edited_by_id")]
         public long EditedById { get; set; }
+
+        public bool IsTopLevel { get; set; }
     }
 }
