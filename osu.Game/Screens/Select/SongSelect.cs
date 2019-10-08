@@ -581,14 +581,24 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
+        private readonly WeakReference<Track> lastTrack = new WeakReference<Track>(null);
+
+        /// <summary>
+        /// Ensures some music is playing for the current track.
+        /// Will resume playback from a manual user pause if the track has changed.
+        /// </summary>
         private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
 
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
+
             track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
-            if (!track.IsRunning)
+            if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
                 track.Restart();
+
+            lastTrack.SetTarget(track);
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
