@@ -37,9 +37,9 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         protected abstract string BeatmapFile { get; }
 
-        protected Bindable<bool> MenuVoice;
+        protected IBindable<bool> MenuVoice { get; private set; }
 
-        protected Bindable<bool> MenuMusic;
+        protected IBindable<bool> MenuMusic { get; private set; }
 
         protected WorkingBeatmap IntroBeatmap;
 
