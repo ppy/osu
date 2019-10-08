@@ -19,6 +19,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(CommentsContainer),
             typeof(CommentsHeader),
             typeof(DrawableComment),
+            typeof(HeaderButton),
         };
 
         protected override bool UseOnlineAPI => true;
