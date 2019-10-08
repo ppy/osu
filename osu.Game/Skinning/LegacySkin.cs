@@ -63,7 +63,7 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinConfiguration.ComboColours:
-                            return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.ComboColours));
+                            return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.Colours.ComboColours));
                     }
 
                     break;
@@ -99,7 +99,7 @@ namespace osu.Game.Skinning
             return null;
         }
 
-        private IBindable<Color4> getCustomColour(string lookup) => Configuration.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
+        private IBindable<Color4> getCustomColour(string lookup) => Configuration.Colours.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
         {

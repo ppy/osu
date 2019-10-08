@@ -16,7 +16,7 @@ namespace osu.Game.Skinning
         public DefaultSkin()
             : base(SkinInfo.Default)
         {
-            Configuration = new DefaultSkinConfiguration();
+            Configuration.Colours = new DefaultColourConfiguration();
         }
 
         public override Drawable GetDrawableComponent(ISkinComponent component) => null;
@@ -35,7 +35,7 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinConfiguration.ComboColours:
-                            return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.ComboColours));
+                            return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.Colours.ComboColours));
                     }
 
                     break;
