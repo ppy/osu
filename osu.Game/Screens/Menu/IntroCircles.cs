@@ -30,19 +30,11 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                Beatmap.Value = IntroBeatmap;
-                IntroBeatmap = null;
-
                 Welcome?.Play();
 
                 Scheduler.AddDelayed(delegate
                 {
-                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-                    if (MenuMusic.Value)
-                    {
-                        Track.Restart();
-                        Track = null;
-                    }
+                    StartTrack();
 
                     PrepareMenuLoad();
 
@@ -57,8 +49,6 @@ namespace osu.Game.Screens.Menu
 
         public override void OnSuspending(IScreen next)
         {
-            Track = null;
-
             this.FadeOut(300);
             base.OnSuspending(next);
         }

@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Menu
 
         protected Bindable<bool> MenuMusic;
 
-        protected Track Track;
+        protected Track Track { get; private set; }
 
         protected WorkingBeatmap IntroBeatmap;
 
@@ -56,6 +56,13 @@ namespace osu.Game.Screens.Menu
         public new Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+
+        protected void StartTrack()
+        {
+            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
+            if (MenuMusic.Value)
+                Track.Restart();
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
@@ -136,6 +143,9 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
+                Beatmap.Value = IntroBeatmap;
+                IntroBeatmap = null;
+
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);
                 logo.Hide();
@@ -154,6 +164,12 @@ namespace osu.Game.Screens.Menu
                     .RotateTo(20, exit_delay * 1.5f)
                     .FadeOut(exit_delay);
             }
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+            Track = null;
         }
 
         private MainMenu mainMenu;
