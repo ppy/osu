@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
@@ -30,16 +29,16 @@ namespace osu.Game.Rulesets.Mania.Edit
             editorClock = clock;
         }
 
-        public override void HandleDrag(SelectionBlueprint blueprint, SelectionDragEvent dragEvent)
+        public override void HandleMovement(MoveSelectionEvent moveEvent)
         {
-            var maniaBlueprint = (ManiaSelectionBlueprint)blueprint;
+            var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
             int lastColumn = maniaBlueprint.HitObject.HitObject.Column;
 
             adjustOrigins(maniaBlueprint);
-            performDragMovement(dragEvent);
-            performColumnMovement(lastColumn, dragEvent);
+            performDragMovement(moveEvent);
+            performColumnMovement(lastColumn, moveEvent);
 
-            base.HandleDrag(blueprint, dragEvent);
+            base.HandleMovement(moveEvent);
         }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                 b.HitObject.Y += movementDelta;
         }
 
-        private void performDragMovement(SelectionDragEvent dragEvent)
+        private void performDragMovement(MoveSelectionEvent moveEvent)
         {
             foreach (var b in SelectedBlueprints)
             {
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
                 // Using the hitobject position is required since AdjustPosition can be invoked multiple times per frame
                 // without the position having been updated by the parenting ScrollingHitObjectContainer
-                hitObject.Y += dragEvent.InstantDragDelta.Y;
+                hitObject.Y += moveEvent.InstantDelta.Y;
 
                 float targetPosition;
 
@@ -96,9 +95,9 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
         }
 
-        private void performColumnMovement(int lastColumn, SelectionDragEvent dragEvent)
+        private void performColumnMovement(int lastColumn, MoveSelectionEvent moveEvent)
         {
-            var currentColumn = composer.ColumnAt(dragEvent.ScreenSpaceDragPosition);
+            var currentColumn = composer.ColumnAt(moveEvent.ScreenSpacePosition);
             if (currentColumn == null)
                 return;
 

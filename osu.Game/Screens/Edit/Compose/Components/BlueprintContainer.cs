@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Todo: Snap dragPosition
 
-            selectionHandler.HandleDrag(blueprint, new SelectionDragEvent(blueprint, blueprint.ScreenSpaceDragStartPosition, dragPosition));
+            selectionHandler.HandleMovement(new MoveSelectionEvent(blueprint, blueprint.ScreenSpaceDragStartPosition, dragPosition));
         }
 
         protected override void Dispose(bool isDisposing)
