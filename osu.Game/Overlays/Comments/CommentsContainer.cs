@@ -79,6 +79,7 @@ namespace osu.Game.Overlays.Comments
         private void getComments()
         {
             request?.Cancel();
+            content.Clear();
             request = new GetCommentsRequest(type, id, Sort.Value);
             request.Success += onSuccess;
             api.Queue(request);
@@ -86,8 +87,6 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(APICommentsController response)
         {
-            content.Clear();
-
             foreach (var c in response.Comments)
             {
                 if (!c.IsDeleted && c.IsTopLevel)
