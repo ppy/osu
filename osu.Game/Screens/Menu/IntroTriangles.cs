@@ -55,9 +55,6 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                Beatmap.Value = IntroBeatmap;
-                IntroBeatmap = null;
-
                 PrepareMenuLoad();
 
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
@@ -70,9 +67,7 @@ namespace osu.Game.Screens.Menu
                     AddInternal(t);
                     Welcome?.Play();
 
-                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-                    if (MenuMusic.Value)
-                        Track.Start();
+                    StartTrack();
                 });
             }
         }
@@ -81,12 +76,6 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
             background.FadeOut(100);
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            Track = null;
-            base.OnSuspending(next);
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
