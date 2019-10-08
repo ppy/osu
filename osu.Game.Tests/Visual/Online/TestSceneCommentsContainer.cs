@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Game.Overlays;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
+using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
 {
