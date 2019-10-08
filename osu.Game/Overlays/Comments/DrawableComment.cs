@@ -10,6 +10,8 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Utils;
+using osu.Framework.Input.Events;
+using System;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -18,11 +20,39 @@ namespace osu.Game.Overlays.Comments
         private const int avatar_size = 40;
         private const int margin = 10;
         private const int child_margin = 20;
+        private const int duration = 200;
+
+        private bool childExpanded = true;
+
+        public bool ChildExpanded
+        {
+            get => childExpanded;
+            set
+            {
+                if (childExpanded == value)
+                    return;
+
+                childExpanded = value;
+
+                childCommentsVisibilityContainer.ClearTransforms();
+
+                if (childExpanded)
+                    childCommentsVisibilityContainer.AutoSizeAxes = Axes.Y;
+                else
+                {
+                    childCommentsVisibilityContainer.AutoSizeAxes = Axes.None;
+                    childCommentsVisibilityContainer.ResizeHeightTo(0, duration, Easing.OutQuint);
+                }
+            }
+        }
+
+        private readonly Container childCommentsVisibilityContainer;
 
         public DrawableComment(Comment comment)
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
+            RepliesButton replies;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -86,22 +116,40 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new SpriteText
+                                new FillFlowContainer
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: 12),
-                                    Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5, 0),
+                                    Children = new Drawable[]
+                                    {
+                                        new SpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(size: 12),
+                                            Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                        },
+                                        replies = new RepliesButton(comment.RepliesCount),
+                                    }
                                 }
                             }
                         }
                     },
-                    childCommentsContainer = new FillFlowContainer
+                    childCommentsVisibilityContainer = new Container
                     {
-                        Margin = new MarginPadding { Left = child_margin },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical
+                        AutoSizeDuration = duration,
+                        AutoSizeEasing = Easing.OutQuint,
+                        Masking = true,
+                        Child = childCommentsContainer = new FillFlowContainer
+                        {
+                            Margin = new MarginPadding { Left = child_margin },
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical
+                        }
                     }
                 }
             };
@@ -113,6 +161,40 @@ namespace osu.Game.Overlays.Comments
                 if (!c.IsDeleted)
                     childCommentsContainer.Add(new DrawableComment(c));
             });
+
+            replies.Action += expanded => ChildExpanded = expanded;
+        }
+
+        private class RepliesButton : Container
+        {
+            private readonly SpriteText text;
+            private bool expanded;
+            private readonly int count;
+
+            public Action<bool> Action;
+
+            public RepliesButton(int count)
+            {
+                this.count = count;
+
+                AutoSizeAxes = Axes.Both;
+                Alpha = count == 0 ? 0 : 1;
+                Child = text = new SpriteText
+                {
+                    Font = OsuFont.GetFont(size: 12),
+                    Text = $@"[-] replies ({count})"
+                };
+
+                expanded = true;
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                text.Text = $@"{(expanded ? "[+]" : "[-]")} replies ({count})";
+                expanded = !expanded;
+                Action?.Invoke(expanded);
+                return base.OnClick(e);
+            }
         }
     }
 }
