@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Music
                 beatmaps.ForEach(addBeatmapSet);
 
                 beatmapBacking.BindTo(beatmap);
-                beatmapBacking.ValueChanged += _ => updateSelectedSet();
+                beatmapBacking.ValueChanged += _ => Scheduler.AddOnce(updateSelectedSet);
             }
 
             private void addBeatmapSet(BeatmapSetInfo obj)
