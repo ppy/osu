@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5, 0),
+                                    Spacing = new Vector2(10, 0),
                                     Children = new Drawable[]
                                     {
                                         new SpriteText
