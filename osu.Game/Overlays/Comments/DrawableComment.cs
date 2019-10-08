@@ -204,7 +204,7 @@ namespace osu.Game.Overlays.Comments
                 Alpha = count == 0 ? 0 : 1;
                 Child = text = new SpriteText
                 {
-                    Font = OsuFont.GetFont(size: 12),
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 };
             }
 
