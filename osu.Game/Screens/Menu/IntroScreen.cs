@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Menu
 
         protected IBindable<bool> MenuMusic { get; private set; }
 
-        protected WorkingBeatmap IntroBeatmap;
+        private WorkingBeatmap introBeatmap;
 
         protected Track Track { get; private set; }
 
@@ -92,8 +92,8 @@ namespace osu.Game.Screens.Menu
                 }
             }
 
-            IntroBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-            Track = IntroBeatmap.Track;
+            introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
+            Track = introBeatmap.Track;
         }
 
         public override bool OnExiting(IScreen next) => !DidLoadMenu;
@@ -143,8 +143,8 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                Beatmap.Value = IntroBeatmap;
-                IntroBeatmap = null;
+                Beatmap.Value = introBeatmap;
+                introBeatmap = null;
 
                 logo.MoveTo(new Vector2(0.5f));
                 logo.ScaleTo(Vector2.One);
