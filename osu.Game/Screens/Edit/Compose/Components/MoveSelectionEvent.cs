@@ -40,14 +40,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             ScreenSpaceStartPosition = screenSpaceStartPosition;
             ScreenSpacePosition = screenSpacePosition;
 
-            InstantDelta = toLocalSpace(ScreenSpacePosition) - Blueprint.HitObject.Position;
+            InstantDelta = Blueprint.HitObject.Parent.ToLocalSpace(ScreenSpacePosition) - Blueprint.HitObject.Position;
         }
-
-        /// <summary>
-        /// Converts a screen-space position into the coordinate space of the hitobject's parents.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        /// <returns>The position in the coordinate space of the hitobject's parent.</returns>
-        private Vector2 toLocalSpace(Vector2 screenSpacePosition) => Blueprint.HitObject.Parent.ToLocalSpace(screenSpacePosition);
     }
 }
