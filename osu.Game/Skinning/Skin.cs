@@ -14,7 +14,7 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo;
 
-        public SkinConfiguration Configuration { get; protected set; }
+        public SkinConfiguration Configuration { get; protected set; } = new SkinConfiguration();
 
         public abstract Drawable GetDrawableComponent(ISkinComponent componentName);
 
