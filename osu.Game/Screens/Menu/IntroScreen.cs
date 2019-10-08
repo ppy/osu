@@ -143,7 +143,7 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                Beatmap.Value = introBeatmap;
+                beatmap.Value = introBeatmap;
                 introBeatmap = null;
 
                 logo.MoveTo(new Vector2(0.5f));
