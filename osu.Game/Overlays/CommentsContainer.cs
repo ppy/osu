@@ -107,7 +107,7 @@ namespace osu.Game.Overlays
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Text = comment.MessageHTML,
+                        Text = comment.GetMessage(),
                     },
                     new Container
                     {
