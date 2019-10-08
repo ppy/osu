@@ -83,8 +83,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             var children = new List<CarouselItem>(InternalChildren);
 
-            children.Sort((x, y) => x.CompareTo(criteria, y));
             children.ForEach(c => c.Filter(criteria));
+            children.Sort((x, y) => x.CompareTo(criteria, y));
 
             InternalChildren = children;
         }

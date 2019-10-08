@@ -109,7 +109,11 @@ namespace osu.Game.Overlays.Music
             private void updateSelectedSet()
             {
                 foreach (PlaylistItem s in items.Children)
+                {
                     s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo?.ID;
+                    if (s.Selected)
+                        ScrollIntoView(s);
+                }
             }
 
             public string SearchTerm

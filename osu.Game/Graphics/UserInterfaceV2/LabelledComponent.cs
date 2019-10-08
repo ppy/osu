@@ -5,13 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
+namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract class LabelledComponent : CompositeDrawable
+    public abstract class LabelledComponent<T> : CompositeDrawable
+        where T : Drawable
     {
         protected const float CONTENT_PADDING_VERTICAL = 10;
         protected const float CONTENT_PADDING_HORIZONTAL = 15;
@@ -20,15 +20,15 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
         /// <summary>
         /// The component that is being displayed.
         /// </summary>
-        protected readonly Drawable Component;
+        protected readonly T Component;
 
         private readonly OsuTextFlowContainer labelText;
         private readonly OsuTextFlowContainer descriptionText;
 
         /// <summary>
-        /// Creates a new <see cref="LabelledComponent"/>.
+        /// Creates a new <see cref="LabelledComponent{T}"/>.
         /// </summary>
-        /// <param name="padded">Whether the component should be padded or should be expanded to the bounds of this <see cref="LabelledComponent"/>.</param>
+        /// <param name="padded">Whether the component should be padded or should be expanded to the bounds of this <see cref="LabelledComponent{T}"/>.</param>
         protected LabelledComponent(bool padded)
         {
             RelativeSizeAxes = Axes.X;
@@ -127,6 +127,6 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
         /// Creates the component that should be displayed.
         /// </summary>
         /// <returns>The component.</returns>
-        protected abstract Drawable CreateComponent();
+        protected abstract T CreateComponent();
     }
 }
