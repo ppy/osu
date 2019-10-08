@@ -7,7 +7,6 @@ using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
-using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -56,17 +55,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
-        protected virtual void ParseLine(T output, Section section, string line)
-        {
-            line = StripComments(line);
-
-            switch (section)
-            {
-                case Section.Colours:
-                    handleColours(output, line);
-                    return;
-            }
-        }
+        protected abstract void ParseLine(T output, Section section, string line);
 
         protected string StripComments(string line)
         {
@@ -75,51 +64,6 @@ namespace osu.Game.Beatmaps.Formats
                 return line.Substring(0, index);
 
             return line;
-        }
-
-        private bool hasComboColours;
-
-        private void handleColours(T output, string line)
-        {
-            var pair = SplitKeyVal(line);
-
-            bool isCombo = pair.Key.StartsWith(@"Combo");
-
-            string[] split = pair.Value.Split(',');
-
-            if (split.Length != 3 && split.Length != 4)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
-
-            Color4 colour;
-
-            try
-            {
-                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
-            }
-            catch
-            {
-                throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
-            }
-
-            if (isCombo)
-            {
-                if (!(output is IHasComboColours tHasComboColours)) return;
-
-                if (!hasComboColours)
-                {
-                    // remove default colours.
-                    tHasComboColours.ComboColours.Clear();
-                    hasComboColours = true;
-                }
-
-                tHasComboColours.ComboColours.Add(colour);
-            }
-            else
-            {
-                if (!(output is IHasCustomColours tHasCustomColours)) return;
-
-                tHasCustomColours.CustomColours[pair.Key] = colour;
-            }
         }
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')

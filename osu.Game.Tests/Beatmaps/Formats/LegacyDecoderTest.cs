@@ -38,6 +38,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
             }
 
+            protected override void ParseLine(TestModel output, Section section, string line)
+            {
+            }
+
             protected override bool ShouldSkipLine(string line)
             {
                 var result = base.ShouldSkipLine(line);

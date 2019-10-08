@@ -96,8 +96,6 @@ namespace osu.Game.Beatmaps.Formats
                     handleHitObject(strippedLine);
                     return;
             }
-
-            base.ParseLine(beatmap, section, line);
         }
 
         private void handleGeneral(string line)

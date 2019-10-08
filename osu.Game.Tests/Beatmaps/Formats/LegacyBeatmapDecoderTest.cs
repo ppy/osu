@@ -265,7 +265,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         [Test]
         public void TestDecodeBeatmapColours()
         {
-            var decoder = new LegacySkinDecoder();
+            var decoder = new LegacySkinColourDecoder();
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
             using (var stream = new LineBufferedReader(resStream))

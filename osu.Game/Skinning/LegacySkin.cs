@@ -31,15 +31,20 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string coloursFilename)
             : base(skin)
         {
-            Stream stream = storage?.GetStream(filename);
+            Stream stream = storage?.GetStream("skin.ini");
             if (stream != null)
                 using (LineBufferedReader reader = new LineBufferedReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
+
+            stream = storage?.GetStream(coloursFilename);
+            if (stream != null)
+                using (LineBufferedReader reader = new LineBufferedReader(stream))
+                    Configuration.Colours = new LegacySkinColourDecoder().Decode(reader);
             else
-                Configuration = new DefaultSkinConfiguration();
+                Configuration.Colours = new DefaultColourConfiguration();
 
             if (storage != null)
             {

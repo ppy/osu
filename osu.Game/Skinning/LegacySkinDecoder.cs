@@ -5,14 +5,14 @@ using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinDecoder : LegacyDecoder<DefaultSkinConfiguration>
+    public class LegacySkinDecoder : LegacyDecoder<SkinConfiguration>
     {
         public LegacySkinDecoder()
             : base(1)
         {
         }
 
-        protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(SkinConfiguration skin, Section section, string line)
         {
             if (section != Section.Colours)
             {
@@ -40,8 +40,6 @@ namespace osu.Game.Skinning
                 if (!string.IsNullOrEmpty(pair.Key))
                     skin.ConfigDictionary[pair.Key] = pair.Value;
             }
-
-            base.ParseLine(skin, section, line);
         }
     }
 }

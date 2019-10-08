@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestColourLookup()
         {
-            AddStep("Add config colour", () => source1.Configuration.CustomColours["Lookup"] = Color4.Red);
+            AddStep("Add config colour", () => source1.Configuration.Colours.CustomColours["Lookup"] = Color4.Red);
             AddAssert("Check colour lookup", () => requester.GetConfig<SkinCustomColourLookup, Color4>(new SkinCustomColourLookup("Lookup"))?.Value == Color4.Red);
         }
 
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestWrongColourType()
         {
-            AddStep("Add config colour", () => source1.Configuration.CustomColours["Lookup"] = Color4.Red);
+            AddStep("Add config colour", () => source1.Configuration.Colours.CustomColours["Lookup"] = Color4.Red);
 
             AddAssert("perform incorrect lookup", () =>
             {

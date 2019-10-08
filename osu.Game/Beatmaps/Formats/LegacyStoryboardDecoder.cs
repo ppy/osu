@@ -61,8 +61,6 @@ namespace osu.Game.Beatmaps.Formats
                     handleVariables(line);
                     return;
             }
-
-            base.ParseLine(storyboard, section, line);
         }
 
         private void handleEvents(string line)
