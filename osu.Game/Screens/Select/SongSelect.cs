@@ -412,9 +412,6 @@ namespace osu.Game.Screens.Select
                     WorkingBeatmap previous = Beatmap.Value;
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
 
-                    if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
-                        ensurePlayingSelected(true);
-
                     if (beatmap != null)
                     {
                         if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
@@ -423,6 +420,9 @@ namespace osu.Game.Screens.Select
                             sampleChangeBeatmap.Play();
                     }
                 }
+
+                if (this.IsCurrentScreen())
+                    ensurePlayingSelected();
 
                 UpdateBeatmap(Beatmap.Value);
             }
@@ -581,19 +581,14 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
-        private void ensurePlayingSelected(bool restart = false)
+        private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning)
-            {
-                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
-                if (restart)
-                    track.Restart();
-                else
-                    track.Start();
-            }
+            if (!track.IsRunning)
+                track.Restart();
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
