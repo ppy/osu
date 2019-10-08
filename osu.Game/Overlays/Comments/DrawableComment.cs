@@ -13,6 +13,8 @@ using osu.Game.Utils;
 using osu.Framework.Input.Events;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -60,12 +62,28 @@ namespace osu.Game.Overlays.Comments
                         {
                             new Drawable[]
                             {
-                                new UpdateableAvatar(comment.User)
+                                new FillFlowContainer
                                 {
-                                    Size = new Vector2(avatar_size),
+                                    AutoSizeAxes = Axes.Both,
                                     Margin = new MarginPadding { Horizontal = margin },
-                                    Masking = true,
-                                    CornerRadius = avatar_size / 2,
+                                    Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5, 0),
+                                    Children = new Drawable[]
+                                    {
+                                        new VotePill(comment.VotesCount)
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                        },
+                                        new UpdateableAvatar(comment.User)
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Size = new Vector2(avatar_size),
+                                            Masking = true,
+                                            CornerRadius = avatar_size / 2,
+                                        },
+                                    }
                                 },
                                 new FillFlowContainer
                                 {
@@ -235,6 +253,35 @@ namespace osu.Game.Overlays.Comments
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                         Text = comment.ParentComment?.User?.Username
+                    }
+                };
+            }
+        }
+
+        private class VotePill : CircularContainer
+        {
+            private const int height = 20;
+            private const int margin = 10;
+
+            public VotePill(int count)
+            {
+                AutoSizeAxes = Axes.X;
+                Height = height;
+                Masking = true;
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Black
+                    },
+                    new SpriteText
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Margin = new MarginPadding { Horizontal = margin },
+                        Font = OsuFont.GetFont(size: 14),
+                        Text = $"+{count}"
                     }
                 };
             }
