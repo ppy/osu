@@ -103,11 +103,29 @@ namespace osu.Game.Overlays
                 Height = 70,
                 Children = new Drawable[]
                 {
-                    new SpriteText
+                    new FillFlowContainer
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Text = comment.GetMessage(),
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 3),
+                        Children = new[]
+                        {
+                            new SpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = $"user: {comment.User.Username}",
+                            },
+                            new SpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                Text = $"message: {comment.GetMessage()}",
+                            },
+                        }
                     },
                     new Container
                     {
