@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using NUnit.Framework;
 using osuTK;
-using osuTK.Graphics;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Game.Audio;
@@ -20,7 +19,6 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -259,32 +257,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500).Within(0.1));
-            }
-        }
-
-        [Test]
-        public void TestDecodeBeatmapColours()
-        {
-            var decoder = new LegacySkinColourDecoder();
-
-            using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new LineBufferedReader(resStream))
-            {
-                var comboColors = decoder.Decode(stream).ComboColours;
-
-                Color4[] expectedColors =
-                {
-                    new Color4(142, 199, 255, 255),
-                    new Color4(255, 128, 128, 255),
-                    new Color4(128, 255, 255, 255),
-                    new Color4(128, 255, 128, 255),
-                    new Color4(255, 187, 255, 255),
-                    new Color4(255, 177, 140, 255),
-                    new Color4(100, 100, 100, 100),
-                };
-                Assert.AreEqual(expectedColors.Length, comboColors.Count);
-                for (int i = 0; i < expectedColors.Length; i++)
-                    Assert.AreEqual(expectedColors[i], comboColors[i]);
             }
         }
 
