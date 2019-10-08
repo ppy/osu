@@ -53,8 +53,6 @@ namespace osu.Game.Screens.Menu
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
-        public new Bindable<WorkingBeatmap> Beatmap => beatmap;
-
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         protected void StartTrack()
@@ -68,7 +66,7 @@ namespace osu.Game.Screens.Menu
         private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
         {
             // prevent user from changing beatmap while the intro is still runnning.
-            beatmap = base.Beatmap.BeginLease(false);
+            beatmap = Beatmap.BeginLease(false);
 
             MenuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             MenuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
