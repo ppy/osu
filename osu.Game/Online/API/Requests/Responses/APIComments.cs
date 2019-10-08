@@ -24,8 +24,26 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
+        private List<User> users;
+
         [JsonProperty(@"users")]
-        public List<User> Users { get; set; }
+        public List<User> Users
+        {
+            get => users;
+            set
+            {
+                users = value;
+
+                value.ForEach(u =>
+                {
+                    Comments.ForEach(c =>
+                    {
+                        if (c.UserId == u.Id)
+                            c.User = u;
+                    });
+                });
+            }
+        }
 
         [JsonProperty(@"total")]
         public int Total { get; set; }

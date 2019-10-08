@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using Newtonsoft.Json;
+using osu.Game.Users;
 using System;
 
 namespace osu.Game.Online.API.Requests.Responses
@@ -26,6 +27,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"user_id")]
         public long UserId { get; set; }
+
+        public User User { get; set; }
 
         [JsonProperty(@"message")]
         public string Message { get; set; }
