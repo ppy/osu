@@ -76,5 +76,11 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsTopLevel { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public string GetMessage()
+        {
+            //temporary fix until HTML parsing will be implemented
+            return MessageHTML.Remove(MessageHTML.LastIndexOf("</p>")).Substring(65);
+        }
     }
 }
