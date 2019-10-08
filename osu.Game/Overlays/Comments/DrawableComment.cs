@@ -12,6 +12,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Utils;
 using osu.Framework.Input.Events;
 using System;
+using osu.Framework.Graphics.Cursor;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -97,9 +98,19 @@ namespace osu.Game.Overlays.Comments
                                     Spacing = new Vector2(0, 2),
                                     Children = new Drawable[]
                                     {
-                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                        new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(7, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                },
+                                                new ParentUsername(comment)
+                                            }
                                         },
                                         new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                         {
@@ -194,6 +205,38 @@ namespace osu.Game.Overlays.Comments
                 expanded = !expanded;
                 Action?.Invoke(expanded);
                 return base.OnClick(e);
+            }
+        }
+
+        private class ParentUsername : FillFlowContainer, IHasTooltip
+        {
+            private const int spacing = 3;
+
+            public string TooltipText => comment.ParentComment?.GetMessage() ?? "";
+
+            private readonly Comment comment;
+
+            public ParentUsername(Comment comment)
+            {
+                this.comment = comment;
+
+                AutoSizeAxes = Axes.Both;
+                Direction = FillDirection.Horizontal;
+                Spacing = new Vector2(spacing, 0);
+                Alpha = comment.ParentId == null ? 0 : 1;
+                Children = new Drawable[]
+                {
+                    new SpriteIcon
+                    {
+                        Icon = FontAwesome.Solid.Reply,
+                        Size = new Vector2(14),
+                    },
+                    new SpriteText
+                    {
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                        Text = comment.ParentComment?.User?.Username
+                    }
+                };
             }
         }
     }
