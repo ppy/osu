@@ -54,13 +54,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 base.Position = value;
 
+                endPositionCache.Invalidate();
+
                 if (HeadCircle != null)
                     HeadCircle.Position = value;
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
-
-                endPositionCache.Invalidate();
             }
         }
 
