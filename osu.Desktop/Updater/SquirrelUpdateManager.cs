@@ -20,7 +20,7 @@ using LogLevel = Splat.LogLevel;
 
 namespace osu.Desktop.Updater
 {
-    public class SquirrelUpdateManager : Component
+    public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;

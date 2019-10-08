@@ -299,7 +299,16 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
-            this.Exit();
+            if (ValidForResume && HasFailed && !FailOverlay.IsPresent)
+            {
+                failAnimation.FinishTransforms(true);
+                return;
+            }
+
+            if (canPause)
+                Pause();
+            else
+                this.Exit();
         }
 
         public void Restart()
@@ -508,24 +517,12 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if (canPause)
-            {
-                Pause();
-                return true;
-            }
-
             // ValidForResume is false when restarting
             if (ValidForResume)
             {
                 if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
                     // still want to block if we are within the cooldown period and not already paused.
                     return true;
-
-                if (HasFailed && !FailOverlay.IsPresent)
-                {
-                    failAnimation.FinishTransforms(true);
-                    return true;
-                }
             }
 
             GameplayClockContainer.ResetLocalAdjustments();
