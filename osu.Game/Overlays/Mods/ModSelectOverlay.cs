@@ -330,6 +330,7 @@ namespace osu.Game.Overlays.Mods
             if (mods != null) SelectedMods.BindTo(mods);
 
             SelectedMods.ValueChanged += updateModSettings;
+            Ruleset.ValueChanged += _ => ModSettingsContent.Clear();
 
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
