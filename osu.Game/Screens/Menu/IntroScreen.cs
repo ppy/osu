@@ -21,8 +21,15 @@ namespace osu.Game.Screens.Menu
 {
     public abstract class IntroScreen : StartupScreen
     {
+        /// <summary>
+        /// A hash used to find the associated beatmap if already imported.
+        /// </summary>
         protected abstract string BeatmapHash { get; }
 
+        /// <summary>
+        /// A source file to use as an import source if the intro beatmap is not yet present.
+        /// Should be within the "Tracks" namespace of game resources.
+        /// </summary>
         protected abstract string BeatmapFile { get; }
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
