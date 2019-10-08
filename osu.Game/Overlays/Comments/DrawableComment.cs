@@ -54,21 +54,16 @@ namespace osu.Game.Overlays.Comments
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Margin = new MarginPadding { Top = margin / 2 },
                             Spacing = new Vector2(0, 2),
                             Children = new Drawable[]
                             {
                                 username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
                                     AutoSizeAxes = Axes.Both,
                                 },
-                                new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 18))
+                                new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Text = comment.GetMessage()
