@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 
@@ -17,11 +18,13 @@ namespace osu.Game.Screens.Menu
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
+        private SampleChannel welcome;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             if (MenuVoice.Value)
-                Welcome = audio.Samples.Get(@"welcome");
+                welcome = audio.Samples.Get(@"welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -30,7 +33,7 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                Welcome?.Play();
+                welcome?.Play();
 
                 Scheduler.AddDelayed(delegate
                 {

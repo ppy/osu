@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -40,11 +41,13 @@ namespace osu.Game.Screens.Menu
 
         private BackgroundScreenDefault background;
 
+        private SampleChannel welcome;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
             if (MenuVoice.Value && !MenuMusic.Value)
-                Welcome = audio.Samples.Get(@"welcome");
+                welcome = audio.Samples.Get(@"welcome");
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -65,7 +68,7 @@ namespace osu.Game.Screens.Menu
                 }, t =>
                 {
                     AddInternal(t);
-                    Welcome?.Play();
+                    welcome?.Play();
 
                     StartTrack();
                 });
