@@ -216,7 +216,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent) => selectionHandler.HandleDrag(blueprint, dragEvent);
+        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent)
+        {
+            var dragPosition = blueprint.ScreenSpaceDragStartPosition + dragEvent.ScreenSpaceMousePosition - dragEvent.ScreenSpaceMouseDownPosition;
+
+            // Todo: Snap dragPosition
+
+            selectionHandler.HandleDrag(blueprint, new SelectionDragEvent(blueprint, blueprint.ScreenSpaceDragStartPosition, dragPosition));
+        }
 
         protected override void Dispose(bool isDisposing)
         {

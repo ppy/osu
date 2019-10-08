@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="blueprint">The <see cref="SelectionBlueprint"/> that received the drag event.</param>
         /// <param name="dragEvent">The drag event.</param>
-        public virtual void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
+        public virtual void HandleDrag(SelectionBlueprint blueprint, SelectionDragEvent dragEvent)
         {
         }
 
