@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Menu
 
         private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
 
-        public const int EXIT_DELAY = 3000;
+        private const int exit_delay = 3000;
 
         [Resolved]
         private AudioManager audio { get; set; }
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Menu
         {
             this.FadeIn(300);
 
-            double fadeOutTime = EXIT_DELAY;
+            double fadeOutTime = exit_delay;
             //we also handle the exit transition.
             if (MenuVoice.Value)
                 seeya.Play();
@@ -151,8 +151,8 @@ namespace osu.Game.Screens.Menu
                     .ScaleTo(1, initialMovementTime, Easing.OutQuint)
                     .FadeIn(quick_appear, Easing.OutQuint)
                     .Then()
-                    .RotateTo(20, EXIT_DELAY * 1.5f)
-                    .FadeOut(EXIT_DELAY);
+                    .RotateTo(20, exit_delay * 1.5f)
+                    .FadeOut(exit_delay);
             }
         }
 
