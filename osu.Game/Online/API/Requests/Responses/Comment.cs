@@ -4,6 +4,7 @@
 using Newtonsoft.Json;
 using osu.Game.Users;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Online.API.Requests.Responses
                 IsTopLevel = value == null;
             }
         }
+
+        public List<Comment> ChildComments = new List<Comment>();
 
         [JsonProperty(@"user_id")]
         public long UserId { get; set; }

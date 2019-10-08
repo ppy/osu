@@ -17,6 +17,8 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
+        private const float separator_height = 1.5f;
+
         private readonly CommentableType type;
         private readonly long id;
 
@@ -97,7 +99,7 @@ namespace osu.Game.Overlays.Comments
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 1,
+                            Height = separator_height,
                             Child = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
