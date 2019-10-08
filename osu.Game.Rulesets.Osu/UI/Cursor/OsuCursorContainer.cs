@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
             }
 
-            ActiveCursor.Scale = new Vector2(scale);
+            ActiveCursor.Scale = cursorTrail.Scale = new Vector2(scale);
         }
 
         protected override void LoadComplete()
