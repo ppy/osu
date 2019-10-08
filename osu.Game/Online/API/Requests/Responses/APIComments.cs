@@ -9,8 +9,28 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class APIComments
     {
+        private List<Comment> comments;
+
         [JsonProperty(@"comments")]
-        public List<Comment> Comments { get; set; }
+        public List<Comment> Comments
+        {
+            get => comments;
+            set
+            {
+                comments = value;
+                comments.ForEach(child =>
+                {
+                    if (child.ParentId != null)
+                    {
+                        comments.ForEach(parent =>
+                        {
+                            if (parent.Id == child.ParentId)
+                                parent.ChildComments.Add(child);
+                        });
+                    }
+                });
+            }
+        }
 
         [JsonProperty(@"has_more")]
         public bool HasMore { get; set; }
