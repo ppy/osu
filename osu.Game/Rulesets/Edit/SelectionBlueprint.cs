@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
+        /// <summary>
+        /// The screen-space position of <see cref="HitObject"/> when a drag was started.
+        /// </summary>
+        public Vector2 ScreenSpaceDragStartPosition { get; private set; }
+
         protected override bool ShouldBeAlive => (HitObject.IsAlive && HitObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
@@ -131,7 +136,11 @@ namespace osu.Game.Rulesets.Edit
             return base.OnClick(e);
         }
 
-        protected override bool OnDragStart(DragStartEvent e) => true;
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            ScreenSpaceDragStartPosition = HitObject.ToScreenSpace(HitObject.OriginPosition);
+            return true;
+        }
 
         protected override bool OnDrag(DragEvent e)
         {
