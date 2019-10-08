@@ -11,8 +11,8 @@ using osu.Game.Users.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Utils;
 using osu.Framework.Input.Events;
-using System;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -23,29 +23,7 @@ namespace osu.Game.Overlays.Comments
         private const int child_margin = 20;
         private const int duration = 200;
 
-        private bool childExpanded = true;
-
-        public bool ChildExpanded
-        {
-            get => childExpanded;
-            set
-            {
-                if (childExpanded == value)
-                    return;
-
-                childExpanded = value;
-
-                childCommentsVisibilityContainer.ClearTransforms();
-
-                if (childExpanded)
-                    childCommentsVisibilityContainer.AutoSizeAxes = Axes.Y;
-                else
-                {
-                    childCommentsVisibilityContainer.AutoSizeAxes = Axes.None;
-                    childCommentsVisibilityContainer.ResizeHeightTo(0, duration, Easing.OutQuint);
-                }
-            }
-        }
+        private readonly BindableBool childExpanded = new BindableBool(true);
 
         private readonly Container childCommentsVisibilityContainer;
 
@@ -53,7 +31,6 @@ namespace osu.Game.Overlays.Comments
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
-            RepliesButton replies;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -141,7 +118,8 @@ namespace osu.Game.Overlays.Comments
                                             Font = OsuFont.GetFont(size: 12),
                                             Text = HumanizerUtils.Humanize(comment.CreatedAt)
                                         },
-                                        replies = new RepliesButton(comment.RepliesCount),
+                                        new RepliesButton(comment.RepliesCount)
+                                        { Expanded = { BindTarget = childExpanded } },
                                     }
                                 }
                             }
@@ -172,17 +150,33 @@ namespace osu.Game.Overlays.Comments
                 if (!c.IsDeleted)
                     childCommentsContainer.Add(new DrawableComment(c));
             });
+        }
 
-            replies.Action += expanded => ChildExpanded = expanded;
+        protected override void LoadComplete()
+        {
+            childExpanded.BindValueChanged(onChildExpandedChanged, true);
+            base.LoadComplete();
+        }
+
+        private void onChildExpandedChanged(ValueChangedEvent<bool> expanded)
+        {
+            childCommentsVisibilityContainer.ClearTransforms();
+
+            if (expanded.NewValue)
+                childCommentsVisibilityContainer.AutoSizeAxes = Axes.Y;
+            else
+            {
+                childCommentsVisibilityContainer.AutoSizeAxes = Axes.None;
+                childCommentsVisibilityContainer.ResizeHeightTo(0, duration, Easing.OutQuint);
+            }
         }
 
         private class RepliesButton : Container
         {
             private readonly SpriteText text;
-            private bool expanded;
             private readonly int count;
 
-            public Action<bool> Action;
+            public readonly BindableBool Expanded = new BindableBool(true);
 
             public RepliesButton(int count)
             {
@@ -193,17 +187,23 @@ namespace osu.Game.Overlays.Comments
                 Child = text = new SpriteText
                 {
                     Font = OsuFont.GetFont(size: 12),
-                    Text = $@"[-] replies ({count})"
                 };
+            }
 
-                expanded = true;
+            protected override void LoadComplete()
+            {
+                Expanded.BindValueChanged(onExpandedChanged, true);
+                base.LoadComplete();
+            }
+
+            private void onExpandedChanged(ValueChangedEvent<bool> expanded)
+            {
+                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                text.Text = $@"{(expanded ? "[+]" : "[-]")} replies ({count})";
-                expanded = !expanded;
-                Action?.Invoke(expanded);
+                Expanded.Value = !Expanded.Value;
                 return base.OnClick(e);
             }
         }
