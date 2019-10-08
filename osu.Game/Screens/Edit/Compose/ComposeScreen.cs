@@ -11,6 +11,7 @@ using osu.Framework.Logging;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osu.Game.Skinning;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose
@@ -115,7 +116,17 @@ namespace osu.Game.Screens.Edit.Compose
                 return;
             }
 
-            composerContainer.Child = composer;
+            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+
+            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
+            // full access to all skin sources.
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+
+            // load the skinning hierarchy first.
+            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
+            composerContainer.Add(
+                beatmapSkinProvider.WithChild(
+                    rulesetSkinProvider.WithChild(composer)));
         }
     }
 }
