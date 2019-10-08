@@ -8,6 +8,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
@@ -27,6 +29,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
+        private Bindable<float> cursorScale;
+        private Bindable<bool> autoCursorScale;
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
@@ -37,9 +43,33 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config)
+        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig, IBindable<WorkingBeatmap> beatmap)
         {
-            config?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+            rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+
+            this.beatmap.BindTo(beatmap);
+            this.beatmap.ValueChanged += _ => calculateScale();
+
+            cursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
+            cursorScale.ValueChanged += _ => calculateScale();
+
+            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+            autoCursorScale.ValueChanged += _ => calculateScale();
+
+            calculateScale();
+        }
+
+        private void calculateScale()
+        {
+            float scale = cursorScale.Value;
+
+            if (autoCursorScale.Value && beatmap.Value != null)
+            {
+                // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
+                scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
+            }
+
+            ActiveCursor.Scale = new Vector2(scale);
         }
 
         protected override void LoadComplete()
