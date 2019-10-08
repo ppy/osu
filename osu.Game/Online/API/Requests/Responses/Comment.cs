@@ -28,6 +28,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public List<Comment> ChildComments = new List<Comment>();
 
+        public Comment ParentComment { get; set; }
+
         [JsonProperty(@"user_id")]
         public long UserId { get; set; }
 

@@ -25,7 +25,10 @@ namespace osu.Game.Online.API.Requests.Responses
                         comments.ForEach(parent =>
                         {
                             if (parent.Id == child.ParentId)
+                            {
                                 parent.ChildComments.Add(child);
+                                child.ParentComment = parent;
+                            }
                         });
                     }
                 });
