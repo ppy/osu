@@ -22,6 +22,11 @@ namespace osu.Game.Screens.Menu
     public abstract class IntroScreen : StartupScreen
     {
         /// <summary>
+        /// Whether we have loaded the menu previously.
+        /// </summary>
+        public bool DidLoadMenu { get; private set; }
+
+        /// <summary>
         /// A hash used to find the associated beatmap if already imported.
         /// </summary>
         protected abstract string BeatmapHash { get; }
@@ -32,35 +37,28 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         protected abstract string BeatmapFile { get; }
 
-        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
-
-        private const int exit_delay = 3000;
-
-        [Resolved]
-        private AudioManager audio { get; set; }
-
         protected SampleChannel Welcome;
-
-        private SampleChannel seeya;
 
         protected Bindable<bool> MenuVoice;
 
         protected Bindable<bool> MenuMusic;
 
+        protected WorkingBeatmap IntroBeatmap;
+
         protected Track Track { get; private set; }
 
-        protected WorkingBeatmap IntroBeatmap;
+        private readonly BindableDouble exitingVolumeFade = new BindableDouble(1);
+
+        private const int exit_delay = 3000;
+
+        private SampleChannel seeya;
 
         private LeasedBindable<WorkingBeatmap> beatmap;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+        private MainMenu mainMenu;
 
-        protected void StartTrack()
-        {
-            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-            if (MenuMusic.Value)
-                Track.Restart();
-        }
+        [Resolved]
+        private AudioManager audio { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skinManager, BeatmapManager beatmaps, Framework.Game game)
@@ -100,16 +98,7 @@ namespace osu.Game.Screens.Menu
             Track = IntroBeatmap.Track;
         }
 
-        /// <summary>
-        /// Whether we have loaded the menu previously.
-        /// </summary>
-        public bool DidLoadMenu { get; private set; }
-
-        public override bool OnExiting(IScreen next)
-        {
-            //cancel exiting if we haven't loaded the menu yet.
-            return !DidLoadMenu;
-        }
+        public override bool OnExiting(IScreen next) => !DidLoadMenu;
 
         public override void OnResuming(IScreen last)
         {
@@ -129,6 +118,21 @@ namespace osu.Game.Screens.Menu
             Game.FadeTo(0.01f, fadeOutTime);
 
             base.OnResuming(last);
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+            Track = null;
+        }
+
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
+
+        protected void StartTrack()
+        {
+            // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
+            if (MenuMusic.Value)
+                Track.Restart();
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -151,7 +155,7 @@ namespace osu.Game.Screens.Menu
             else
             {
                 const int quick_appear = 350;
-                int initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
+                var initialMovementTime = logo.Alpha > 0.2f ? quick_appear : 0;
 
                 logo.MoveTo(new Vector2(0.5f), initialMovementTime, Easing.OutQuint);
 
@@ -164,18 +168,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override void OnSuspending(IScreen next)
-        {
-            base.OnSuspending(next);
-            Track = null;
-        }
-
-        private MainMenu mainMenu;
-
-        protected void PrepareMenuLoad()
-        {
-            LoadComponentAsync(mainMenu = new MainMenu());
-        }
+        protected void PrepareMenuLoad() => LoadComponentAsync(mainMenu = new MainMenu());
 
         protected void LoadMenu()
         {
