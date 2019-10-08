@@ -53,8 +53,16 @@ namespace osu.Game.Overlays.Comments
                             {
                                 new SpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     Font = OsuFont.GetFont(size: text_size),
                                     Text = @"Sort by"
+                                },
+                                new SortSelector
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Current = { BindTarget = Sort }
                                 }
                             }
                         },

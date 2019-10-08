@@ -55,14 +55,18 @@ namespace osu.Game.Overlays.Comments
 
         protected override bool OnHover(HoverEvent e)
         {
-            background.FadeIn(duration, Easing.OutQuint);
+            FadeInBackground();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            background.FadeOut(duration, Easing.OutQuint);
+            FadeOutBackground();
         }
+
+        public void FadeInBackground() => background.FadeIn(duration, Easing.OutQuint);
+
+        public void FadeOutBackground() => background.FadeOut(duration, Easing.OutQuint);
     }
 }

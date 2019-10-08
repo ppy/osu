@@ -161,7 +161,14 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            username.AddUserLink(comment.User);
+            if (comment.UserId == null)
+            {
+                username.AddText(comment.LegacyName);
+            }
+            else
+            {
+                username.AddUserLink(comment.User);
+            }
 
             comment.ChildComments.ForEach(c =>
             {

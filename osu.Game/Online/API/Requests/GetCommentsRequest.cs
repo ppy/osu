@@ -28,7 +28,7 @@ namespace osu.Game.Online.API.Requests
 
             req.AddParameter("commentable_type", type.ToString().Underscore().ToLowerInvariant());
             req.AddParameter("commentable_id", id.ToString());
-            req.AddParameter("sort", sort.ToString());
+            req.AddParameter("sort", sort.ToString().ToLowerInvariant());
             req.AddParameter("page", page.ToString());
 
             return req;

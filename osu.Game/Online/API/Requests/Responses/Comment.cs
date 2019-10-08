@@ -31,7 +31,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public Comment ParentComment { get; set; }
 
         [JsonProperty(@"user_id")]
-        public long UserId { get; set; }
+        public long? UserId { get; set; }
 
         public User User { get; set; }
 
