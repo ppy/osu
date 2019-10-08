@@ -181,14 +181,12 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private bool restartTrack(out bool isRestart)
+        private bool restartTrack()
         {
             var track = current?.Track;
 
             if (track == null)
             {
-                isRestart = false;
-
                 if (beatmap.Disabled)
                     return false;
 
@@ -197,16 +195,11 @@ namespace osu.Game.Overlays
             }
 
             if (track.IsRunning)
-            {
                 SeekTo(0);
-                isRestart = true;
-            }
             else
             {
                 track.Start();
-
                 IsUserPaused = false;
-                isRestart = false;
             }
 
             return true;
@@ -297,8 +290,9 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicRestart:
-                    if (restartTrack(out bool isRestart))
-                        onScreenDisplay?.Display(new MusicControllerToast(isRestart ? "Restart track" : "Play track"));
+                    var wasPlaying = IsPlaying;
+                    if (restartTrack())
+                        onScreenDisplay?.Display(new MusicControllerToast(wasPlaying ? "Restart track" : "Play track"));
 
                     return true;
             }
