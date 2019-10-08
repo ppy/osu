@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Game.Online.API.Requests.Responses;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
@@ -90,57 +90,22 @@ namespace osu.Game.Overlays
 
             foreach (var c in response.Comments)
             {
-                if (!c.IsDeleted)
-                    createDrawableComment(c);
+                if (!c.IsDeleted && c.IsTopLevel)
+                    content.AddRange(new Drawable[]
+                    {
+                        new DrawableComment(c),
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 1,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = colours.Gray1,
+                            }
+                        }
+                    });
             }
-        }
-
-        private void createDrawableComment(Comment comment)
-        {
-            content.Add(new Container
-            {
-                RelativeSizeAxes = Axes.X,
-                Height = 70,
-                Children = new Drawable[]
-                {
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 3),
-                        Children = new[]
-                        {
-                            new SpriteText
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Text = $"user: {comment.User.Username}",
-                            },
-                            new SpriteText
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                Text = $"message: {comment.GetMessage()}",
-                            },
-                        }
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 1,
-                        Child = new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Gray1,
-                        }
-                    }
-                }
-            });
         }
 
         [BackgroundDependencyLoader]
