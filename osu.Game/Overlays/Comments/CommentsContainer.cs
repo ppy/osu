@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Comments
             api.Queue(request);
         }
 
-        private void onSuccess(APIComments response)
+        private void onSuccess(APICommentsController response)
         {
             content.Clear();
 

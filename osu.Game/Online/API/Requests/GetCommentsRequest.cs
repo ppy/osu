@@ -7,7 +7,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetCommentsRequest : APIRequest<APIComments>
+    public class GetCommentsRequest : APIRequest<APICommentsController>
     {
         private readonly long id;
         private readonly int page;
