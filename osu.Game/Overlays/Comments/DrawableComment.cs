@@ -281,7 +281,7 @@ namespace osu.Game.Overlays.Comments
                     new SpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = comment.ParentComment?.User?.Username
+                        Text = comment.ParentComment?.User?.Username ?? comment.ParentComment?.LegacyName
                     }
                 };
             }
