@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osu.Game.Skinning;
@@ -22,8 +21,6 @@ namespace osu.Game.Screens.Edit.Compose
         private const float horizontal_margins = 20;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-
-        private HitObjectComposer composer;
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
@@ -107,26 +104,32 @@ namespace osu.Game.Screens.Edit.Compose
                 return;
             }
 
-            composer = ruleset.CreateHitObjectComposer();
+            var composer = ruleset.CreateHitObjectComposer();
 
-            if (composer == null)
+            Drawable content;
+
+            if (composer != null)
             {
-                Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
-                // ExitRequested?.Invoke();
-                return;
+                var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+
+                // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
+                // full access to all skin sources.
+                var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+
+                // load the skinning hierarchy first.
+                // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
+                content = beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(ruleset.CreateHitObjectComposer()));
+            }
+            else
+            {
+                content = new ScreenWhiteBox.UnderConstructionMessage($"{ruleset.Description}'s composer");
             }
 
-            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
-
-            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
-            // full access to all skin sources.
-            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
-
-            // load the skinning hierarchy first.
-            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
-            composerContainer.Add(
-                beatmapSkinProvider.WithChild(
-                    rulesetSkinProvider.WithChild(composer)));
+            LoadComponentAsync(content, _ =>
+            {
+                composerContainer.Add(content);
+                content.FadeInFromZero(300, Easing.OutQuint);
+            });
         }
     }
 }
