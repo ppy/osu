@@ -40,6 +40,12 @@ namespace osu.Game.Tests.Visual.Online
                 scrollFlow.Clear();
                 scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
             });
+
+            AddStep("Airman comments", () =>
+            {
+                scrollFlow.Clear();
+                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
+            });
         }
     }
 }
