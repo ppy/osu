@@ -87,8 +87,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string GetMessage()
         {
-            //temporary fix until HTML parsing will be implemented
-            return MessageHTML.Remove(MessageHTML.LastIndexOf("</p>")).Substring(65);
+            return MessageHTML.Replace("<div class='osu-md-default'>", "").Replace("<p class=\"osu-md-default__paragraph\">", "").Replace("<br />", "").Replace("</p>", "").Replace("</div>", "");
         }
     }
 }
