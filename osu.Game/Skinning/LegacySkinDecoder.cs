@@ -5,14 +5,14 @@ using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinDecoder : LegacyDecoder<DefaultSkinConfiguration>
+    public class LegacySkinDecoder : LegacyDecoder<LegacySkinConfiguration>
     {
         public LegacySkinDecoder()
             : base(1)
         {
         }
 
-        protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(LegacySkinConfiguration skin, Section section, string line)
         {
             if (section != Section.Colours)
             {
@@ -31,6 +31,14 @@ namespace osu.Game.Skinning
 
                             case @"Author":
                                 skin.SkinInfo.Creator = pair.Value;
+                                return;
+
+                            case @"Version":
+                                if (pair.Value == "latest" || pair.Value == "User")
+                                    skin.LegacyVersion = LegacySkinConfiguration.LATEST_VERSION;
+                                else if (double.TryParse(pair.Value, out var version))
+                                    skin.LegacyVersion = version;
+
                                 return;
                         }
 
