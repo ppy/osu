@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Tests.Visual.Editor
+namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
     public class TestSceneWaveContainer : OsuTestScene

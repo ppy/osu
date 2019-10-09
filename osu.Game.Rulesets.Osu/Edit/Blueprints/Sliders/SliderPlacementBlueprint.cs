@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osuTK;
 using osuTK.Input;
@@ -20,6 +21,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
     public class SliderPlacementBlueprint : PlacementBlueprint
     {
         public new Objects.Slider HitObject => (Objects.Slider)base.HitObject;
+
+        private SliderBodyPiece bodyPiece;
+        private HitCirclePiece headCirclePiece;
+        private HitCirclePiece tailCirclePiece;
 
         private readonly List<Segment> segments = new List<Segment>();
         private Vector2 cursor;
@@ -38,9 +43,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             InternalChildren = new Drawable[]
             {
-                new SliderBodyPiece(HitObject),
-                new SliderCirclePiece(HitObject, SliderPosition.Start),
-                new SliderCirclePiece(HitObject, SliderPosition.End),
+                bodyPiece = new SliderBodyPiece(),
+                headCirclePiece = new HitCirclePiece(),
+                tailCirclePiece = new HitCirclePiece(),
                 new PathControlPointVisualiser(HitObject),
             };
 
@@ -120,6 +125,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             var newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
             HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+
+            bodyPiece.UpdateFrom(HitObject);
+            headCirclePiece.UpdateFrom(HitObject.HeadCircle);
+            tailCirclePiece.UpdateFrom(HitObject.TailCircle);
         }
 
         private void setState(PlacementState newState)
