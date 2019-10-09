@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -21,8 +22,8 @@ namespace osu.Game.Tests.Skins
     [HeadlessTest]
     public class TestSceneSkinConfigurationLookup : OsuTestScene
     {
-        private LegacySkin source1;
-        private LegacySkin source2;
+        private SkinSource source1;
+        private SkinSource source2;
         private SkinRequester requester;
 
         [SetUp]
@@ -116,6 +117,26 @@ namespace osu.Game.Tests.Skins
             });
         }
 
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestEmptyComboColours(bool allowFallback)
+        {
+            AddStep("Add custom combo colours to fallback source", () => source1.Configuration.ComboColours = new List<Color4>
+            {
+                new Color4(100, 150, 200, 255),
+                new Color4(55, 110, 166, 255),
+                new Color4(75, 125, 175, 255),
+            });
+            AddStep("Clear combo colours from source", () => source2.Configuration.ComboColours.Clear());
+            AddStep("Disable default fallback in source", () => source2.AllowColoursFallback = allowFallback);
+
+            AddAssert($"Check retrieved combo colours from {(allowFallback ? "default skin" : "fallback source")}", () =>
+            {
+                var expectedColours = allowFallback ? new DefaultSkinConfiguration().ComboColours : source1.Configuration.ComboColours;
+                return requester.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(expectedColours) ?? false;
+            });
+        }
+
         public enum LookupType
         {
             Test
@@ -130,6 +151,9 @@ namespace osu.Game.Tests.Skins
 
         public class SkinSource : LegacySkin
         {
+            public bool AllowColoursFallback = true;
+            protected override bool AllowDefaultColoursFallback => AllowColoursFallback;
+
             public SkinSource()
                 : base(new SkinInfo(), null, null, string.Empty)
             {
