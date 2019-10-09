@@ -104,9 +104,6 @@ namespace osu.Game.Online.API.Requests.Responses
                         count++;
                 });
 
-            if (IsDeleted)
-                count++;
-
             return count;
         }
     }

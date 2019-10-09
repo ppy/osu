@@ -21,7 +21,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DrawableComment),
             typeof(HeaderButton),
             typeof(SortSelector),
-            typeof(ShowChildsButton)
+            typeof(ShowChildsButton),
+            typeof(DeletedChildsPlaceholder)
         };
 
         protected override bool UseOnlineAPI => true;

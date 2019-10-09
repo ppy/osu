@@ -93,6 +93,19 @@ namespace osu.Game.Overlays.Comments
                     content.Add(new DrawableComment(c)
                     { ShowDeleted = { BindTarget = ShowDeleted } });
             }
+
+            int deletedComments = 0;
+
+            response.Comments.ForEach(comment =>
+            {
+                if (comment.IsDeleted && comment.IsTopLevel)
+                    deletedComments++;
+            });
+
+            content.Add(new DeletedChildsPlaceholder(deletedComments)
+            {
+                ShowDeleted = { BindTarget = ShowDeleted }
+            });
         }
 
         [BackgroundDependencyLoader]

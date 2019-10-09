@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Comments
         private const int chevron_margin = 30;
         private const int message_padding = 40;
         private const float separator_height = 1.5f;
-        private const int deleted_placeholder_margin = 80;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
 
@@ -175,7 +174,6 @@ namespace osu.Game.Overlays.Comments
                                 },
                                 new DeletedChildsPlaceholder(comment.GetDeletedChildsCount())
                                 {
-                                    Margin = new MarginPadding { Bottom = margin, Left = deleted_placeholder_margin },
                                     ShowDeleted = { BindTarget = ShowDeleted }
                                 }
                             }
@@ -214,6 +212,8 @@ namespace osu.Game.Overlays.Comments
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = separator_height,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -266,48 +266,6 @@ namespace osu.Game.Overlays.Comments
                     AutoSizeAxes = Axes.None;
                     this.ResizeHeightTo(0);
                 }
-            }
-        }
-
-        private class DeletedChildsPlaceholder : FillFlowContainer
-        {
-            public readonly BindableBool ShowDeleted = new BindableBool();
-
-            private readonly bool canBeVisible;
-
-            public DeletedChildsPlaceholder(int count)
-            {
-                canBeVisible = count != 0;
-
-                AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
-                Spacing = new Vector2(3, 0);
-                Alpha = 0;
-                Children = new Drawable[]
-                {
-                    new SpriteIcon
-                    {
-                        Icon = FontAwesome.Solid.Trash,
-                        Size = new Vector2(14),
-                    },
-                    new SpriteText
-                    {
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = $@"{count} deleted comments"
-                    }
-                };
-            }
-
-            protected override void LoadComplete()
-            {
-                ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
-                base.LoadComplete();
-            }
-
-            private void onShowDeletedChanged(ValueChangedEvent<bool> showDeleted)
-            {
-                if (canBeVisible)
-                    this.FadeTo(showDeleted.NewValue ? 0 : 1);
             }
         }
 
