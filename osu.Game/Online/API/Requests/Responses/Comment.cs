@@ -81,6 +81,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"edited_by_id")]
         public long? EditedById { get; set; }
 
+        public User EditedUser { get; set; }
+
         public bool IsTopLevel { get; set; }
 
         public bool IsDeleted { get; set; }
