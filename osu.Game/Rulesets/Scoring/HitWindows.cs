@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 switch (result)
                 {
-                    case HitResult.Great:
+                    case HitResult.Perfect:
                     case HitResult.Miss:
                         return true;
                 }
