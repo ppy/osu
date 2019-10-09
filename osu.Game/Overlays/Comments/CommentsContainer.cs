@@ -15,12 +15,11 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private const float separator_height = 1.5f;
-
         private readonly CommentableType type;
         private readonly long id;
 
         public readonly Bindable<SortCommentsBy> Sort = new Bindable<SortCommentsBy>();
+        public readonly BindableBool ShowDeleted = new BindableBool();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -55,7 +54,8 @@ namespace osu.Game.Overlays.Comments
                     {
                         new CommentsHeader
                         {
-                            Sort = { BindTarget = Sort }
+                            Sort = { BindTarget = Sort },
+                            ShowDeleted = { BindTarget = ShowDeleted }
                         },
                         content = new FillFlowContainer
                         {
@@ -89,21 +89,9 @@ namespace osu.Game.Overlays.Comments
         {
             foreach (var c in response.Comments)
             {
-                if (!c.IsDeleted && c.IsTopLevel)
-                    content.AddRange(new Drawable[]
-                    {
-                        new DrawableComment(c),
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = separator_height,
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = colours.Gray1,
-                            }
-                        }
-                    });
+                if (c.IsTopLevel)
+                    content.Add(new DrawableComment(c)
+                    { ShowDeleted = { BindTarget = ShowDeleted } });
             }
         }
 

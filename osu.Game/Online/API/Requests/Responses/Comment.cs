@@ -89,7 +89,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string GetMessage()
         {
-            return MessageHTML.Replace("<div class='osu-md-default'>", "").Replace("<p class=\"osu-md-default__paragraph\">", "").Replace("<br />", "").Replace("</p>", "").Replace("</div>", "").Replace("&quot;", "\"");
+            return IsDeleted ? @"deleted" : MessageHTML.Replace("<div class='osu-md-default'>", "").Replace("<p class=\"osu-md-default__paragraph\">", "").Replace("<br />", "").Replace("</p>", "").Replace("</div>", "").Replace("&quot;", "\"");
         }
     }
 }
