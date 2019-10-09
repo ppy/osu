@@ -36,7 +36,7 @@ namespace osu.Game.Skinning
                             case @"Version":
                                 if (pair.Value == "latest" || pair.Value == "User")
                                     skin.LegacyVersion = LegacySkinConfiguration.LATEST_VERSION;
-                                else if (double.TryParse(pair.Value, out var version))
+                                else if (decimal.TryParse(pair.Value, out var version))
                                     skin.LegacyVersion = version;
 
                                 return;

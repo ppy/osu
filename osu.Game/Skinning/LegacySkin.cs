@@ -78,7 +78,7 @@ namespace osu.Game.Skinning
                     {
                         case LegacySkinConfigurations.Version:
                             if (Configuration.LegacyVersion.HasValue)
-                                return SkinUtils.As<TValue>(new BindableDouble(Configuration.LegacyVersion.Value));
+                                return SkinUtils.As<TValue>(new Bindable<decimal>(Configuration.LegacyVersion.Value));
 
                             break;
                     }
