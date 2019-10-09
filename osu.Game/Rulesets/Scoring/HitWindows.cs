@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 
@@ -39,7 +40,8 @@ namespace osu.Game.Rulesets.Scoring
 
         public HitWindows()
         {
-            Debug.Assert(GetRanges().Length >= 1, $"{nameof(HitWindows)}");
+            Debug.Assert(GetRanges().Any(r => r.Result == HitResult.Miss), $"{nameof(GetRanges)} should always contain {nameof(HitResult.Miss)}");
+            Debug.Assert(GetRanges().Any(r => r.Result != HitResult.Miss), $"{nameof(GetRanges)} should always contain at least one result type other than {nameof(HitResult.Miss)}.");
         }
 
         /// <summary>
