@@ -39,7 +39,7 @@ namespace osu.Game.Skinning
                 using (LineBufferedReader reader = new LineBufferedReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
-                Configuration = new DefaultSkinConfiguration();
+                Configuration = new SkinConfiguration();
 
             if (storage != null)
             {
