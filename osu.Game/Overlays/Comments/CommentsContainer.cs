@@ -16,7 +16,6 @@ namespace osu.Game.Overlays.Comments
     public class CommentsContainer : CompositeDrawable
     {
         private const float separator_height = 1.5f;
-        private const int padding = 40;
 
         private readonly CommentableType type;
         private readonly long id;
@@ -93,13 +92,7 @@ namespace osu.Game.Overlays.Comments
                 if (!c.IsDeleted && c.IsTopLevel)
                     content.AddRange(new Drawable[]
                     {
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Right = padding },
-                            Child = new DrawableComment(c)
-                        },
+                        new DrawableComment(c),
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,

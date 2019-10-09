@@ -10,11 +10,11 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Utils;
-using osu.Framework.Input.Events;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
+using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Comments
         private const int avatar_size = 40;
         private const int margin = 10;
         private const int child_margin = 20;
+        private const int chevron_margin = 30;
+        private const int message_padding = 40;
         private const int duration = 200;
 
         private readonly BindableBool childExpanded = new BindableBool(true);
@@ -93,25 +95,41 @@ namespace osu.Game.Overlays.Comments
                                     Spacing = new Vector2(0, 2),
                                     Children = new Drawable[]
                                     {
-                                        new FillFlowContainer
+                                        new Container
                                         {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(7, 0),
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
                                             Children = new Drawable[]
                                             {
-                                                username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(7, 0),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                        {
+                                                            AutoSizeAxes = Axes.Both,
+                                                        },
+                                                        new ParentUsername(comment)
+                                                    }
                                                 },
-                                                new ParentUsername(comment)
+                                                new ChevronButton(comment)
+                                                {
+                                                    Anchor = Anchor.TopRight,
+                                                    Origin = Anchor.TopRight,
+                                                    Margin = new MarginPadding { Right = chevron_margin },
+                                                    Expanded = { BindTarget = childExpanded }
+                                                }
                                             }
                                         },
                                         new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = comment.GetMessage()
+                                            Text = comment.GetMessage(),
+                                            Padding = new MarginPadding { Right = message_padding }
                                         }
                                     }
                                 }
@@ -196,18 +214,34 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class RepliesButton : Container
+        private class ChevronButton : ShowChildsButton
+        {
+            private readonly SpriteIcon icon;
+
+            public ChevronButton(Comment comment)
+            {
+                Alpha = comment.IsTopLevel && comment.ChildComments.Any() ? 1 : 0;
+                Child = icon = new SpriteIcon
+                {
+                    Size = new Vector2(12),
+                };
+            }
+
+            protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
+            {
+                icon.Icon = expanded.NewValue ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
+            }
+        }
+
+        private class RepliesButton : ShowChildsButton
         {
             private readonly SpriteText text;
             private readonly int count;
-
-            public readonly BindableBool Expanded = new BindableBool(true);
 
             public RepliesButton(int count)
             {
                 this.count = count;
 
-                AutoSizeAxes = Axes.Both;
                 Alpha = count == 0 ? 0 : 1;
                 Child = text = new SpriteText
                 {
@@ -215,21 +249,9 @@ namespace osu.Game.Overlays.Comments
                 };
             }
 
-            protected override void LoadComplete()
-            {
-                Expanded.BindValueChanged(onExpandedChanged, true);
-                base.LoadComplete();
-            }
-
-            private void onExpandedChanged(ValueChangedEvent<bool> expanded)
+            protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
                 text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                Expanded.Value = !Expanded.Value;
-                return base.OnClick(e);
             }
         }
 
