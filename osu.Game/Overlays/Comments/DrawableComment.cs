@@ -25,7 +25,6 @@ namespace osu.Game.Overlays.Comments
         private const int child_margin = 20;
         private const int chevron_margin = 30;
         private const int message_padding = 40;
-        private const int duration = 200;
         private const float separator_height = 1.5f;
         private const int deleted_placeholder_margin = 80;
 
@@ -159,8 +158,6 @@ namespace osu.Game.Overlays.Comments
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        AutoSizeDuration = duration,
-                        AutoSizeEasing = Easing.OutQuint,
                         Masking = true,
                         Child = new FillFlowContainer
                         {
@@ -249,14 +246,12 @@ namespace osu.Game.Overlays.Comments
 
         private void onChildExpandedChanged(ValueChangedEvent<bool> expanded)
         {
-            childCommentsVisibilityContainer.ClearTransforms();
-
             if (expanded.NewValue)
                 childCommentsVisibilityContainer.AutoSizeAxes = Axes.Y;
             else
             {
                 childCommentsVisibilityContainer.AutoSizeAxes = Axes.None;
-                childCommentsVisibilityContainer.ResizeHeightTo(0, duration, Easing.OutQuint);
+                childCommentsVisibilityContainer.ResizeHeightTo(0);
             }
         }
 
