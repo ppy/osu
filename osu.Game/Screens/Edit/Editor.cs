@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Edit.Setup;
+using osu.Game.Screens.Edit.Timing;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
@@ -258,12 +260,20 @@ namespace osu.Game.Screens.Edit
 
             switch (e.NewValue)
             {
+                case EditorScreenMode.SongSetup:
+                    currentScreen = new SetupScreen();
+                    break;
+
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
                     break;
 
                 case EditorScreenMode.Design:
                     currentScreen = new DesignScreen();
+                    break;
+
+                case EditorScreenMode.Timing:
+                    currentScreen = new TimingScreen();
                     break;
 
                 default:
