@@ -63,6 +63,9 @@ namespace osu.Game.Online.API.Requests.Responses
                     {
                         if (c.UserId == u.Id)
                             c.User = u;
+
+                        if (c.EditedById == u.Id)
+                            c.EditedUser = u;
                     });
                 });
             }

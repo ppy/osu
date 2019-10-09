@@ -35,6 +35,7 @@ namespace osu.Game.Overlays.Comments
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
+            FillFlowContainer info;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -140,7 +141,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new FillFlowContainer
+                                info = new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
@@ -186,6 +187,17 @@ namespace osu.Game.Overlays.Comments
             else
             {
                 username.AddUserLink(comment.User);
+            }
+
+            if (comment.EditedAt.HasValue)
+            {
+                info.Add(new SpriteText
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Font = OsuFont.GetFont(size: 12),
+                    Text = $@"edited {HumanizerUtils.Humanize(comment.EditedAt.Value)} by {comment.EditedUser.Username}"
+                });
             }
 
             comment.ChildComments.ForEach(c =>
