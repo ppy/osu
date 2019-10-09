@@ -128,12 +128,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        [Ignore("needs fixing")]
         public void TestImportUnderDifferentRuleset()
         {
             createSongSelect();
-            changeRuleset(2);
-            addRulesetImportStep(0);
+            addRulesetImportStep(2);
             AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
         }
 
