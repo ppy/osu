@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit.Compose
                 return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(ruleset.CreateHitObjectComposer()));
             }
 
-            return new ScreenWhiteBox.UnderConstructionMessage($"{ruleset.Description}'s composer");
+            return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
         }
     }
 }
