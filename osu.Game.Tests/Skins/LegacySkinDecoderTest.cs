@@ -56,5 +56,16 @@ namespace osu.Game.Tests.Skins
                 Assert.AreEqual("TestValue", config.ConfigDictionary["TestLookup"]);
             }
         }
+
+        [TestCase("skin-20.ini", 2.0)]
+        [TestCase("skin-latest.ini", LegacySkinConfiguration.LATEST_VERSION)]
+        [TestCase("skin-empty.ini", null)]
+        public void TestDecodeVersion(string filename, double? expected)
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource(filename))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.AreEqual(expected, decoder.Decode(stream).LegacyVersion);
+        }
     }
 }
