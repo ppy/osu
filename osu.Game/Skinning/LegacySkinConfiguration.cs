@@ -5,12 +5,12 @@ namespace osu.Game.Skinning
 {
     public class LegacySkinConfiguration : DefaultSkinConfiguration
     {
-        public const double LATEST_VERSION = 2.5;
+        public const decimal LATEST_VERSION = 2.5m;
 
         /// <summary>
         /// Legacy version of this skin.
         /// </summary>
-        public double? LegacyVersion { get; internal set; }
+        public decimal? LegacyVersion { get; internal set; }
     }
 
     public enum LegacySkinConfigurations

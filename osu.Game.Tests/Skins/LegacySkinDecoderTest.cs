@@ -57,15 +57,31 @@ namespace osu.Game.Tests.Skins
             }
         }
 
-        [TestCase("skin-20.ini", 2.0)]
-        [TestCase("skin-latest.ini", LegacySkinConfiguration.LATEST_VERSION)]
-        [TestCase("skin-empty.ini", null)]
-        public void TestDecodeVersion(string filename, double? expected)
+        [Test]
+        public void TestDecodeSpecifiedVersion()
         {
             var decoder = new LegacySkinDecoder();
-            using (var resStream = TestResources.OpenResource(filename))
+            using (var resStream = TestResources.OpenResource("skin-20.ini"))
             using (var stream = new LineBufferedReader(resStream))
-                Assert.AreEqual(expected, decoder.Decode(stream).LegacyVersion);
+                Assert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
+        }
+
+        [Test]
+        public void TestDecodeLatestVersion()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-latest.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.AreEqual(LegacySkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
+        }
+
+        [Test]
+        public void TestDecodeNoVersion()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-empty.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.IsNull(decoder.Decode(stream).LegacyVersion);
         }
     }
 }
