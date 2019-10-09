@@ -26,19 +26,29 @@ namespace osu.Game.Overlays.Comments
         private const int chevron_margin = 30;
         private const int message_padding = 40;
         private const int duration = 200;
+        private const float separator_height = 1.5f;
+
+        public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly BindableBool childExpanded = new BindableBool(true);
 
         private readonly Container childCommentsVisibilityContainer;
+        private readonly Comment comment;
 
         public DrawableComment(Comment comment)
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
             FillFlowContainer info;
+            TextFlowContainer message;
+            GridContainer content;
+            VotePill votePill;
+
+            this.comment = comment;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Masking = true;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -46,7 +56,7 @@ namespace osu.Game.Overlays.Comments
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new GridContainer
+                    content = new GridContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
@@ -58,7 +68,6 @@ namespace osu.Game.Overlays.Comments
                         },
                         RowDimensions = new[]
                         {
-                            new Dimension(GridSizeMode.AutoSize),
                             new Dimension(GridSizeMode.AutoSize)
                         },
                         Content = new[]
@@ -73,10 +82,11 @@ namespace osu.Game.Overlays.Comments
                                     Spacing = new Vector2(5, 0),
                                     Children = new Drawable[]
                                     {
-                                        new VotePill(comment.VotesCount)
+                                        votePill = new VotePill(comment.VotesCount)
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
+                                            AlwaysPresent = true,
                                         },
                                         new UpdateableAvatar(comment.User)
                                         {
@@ -92,71 +102,53 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Margin = new MarginPadding { Top = margin / 2 },
-                                    Spacing = new Vector2(0, 2),
+                                    Spacing = new Vector2(0, 3),
                                     Children = new Drawable[]
                                     {
-                                        new Container
+                                        new FillFlowContainer
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(7, 0),
                                             Children = new Drawable[]
                                             {
-                                                new FillFlowContainer
+                                                username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
-                                                    Spacing = new Vector2(7, 0),
-                                                    Children = new Drawable[]
-                                                    {
-                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
-                                                        {
-                                                            AutoSizeAxes = Axes.Both,
-                                                        },
-                                                        new ParentUsername(comment)
-                                                    }
                                                 },
-                                                new ChevronButton(comment)
+                                                new ParentUsername(comment),
+                                                new SpriteText
                                                 {
-                                                    Anchor = Anchor.TopRight,
-                                                    Origin = Anchor.TopRight,
-                                                    Margin = new MarginPadding { Right = chevron_margin },
-                                                    Expanded = { BindTarget = childExpanded }
+                                                    Alpha = comment.IsDeleted? 1 : 0,
+                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                                                    Text = @"deleted",
                                                 }
                                             }
                                         },
-                                        new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                                        message = new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Text = comment.GetMessage(),
                                             Padding = new MarginPadding { Right = message_padding }
-                                        }
-                                    }
-                                }
-                            },
-                            new Drawable[]
-                            {
-                                new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
-                                info = new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(10, 0),
-                                    Children = new Drawable[]
-                                    {
-                                        new SpriteText
-                                        {
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
-                                            Font = OsuFont.GetFont(size: 12),
-                                            Text = HumanizerUtils.Humanize(comment.CreatedAt)
                                         },
-                                        new RepliesButton(comment.RepliesCount)
-                                        { Expanded = { BindTarget = childExpanded } },
+                                        info = new FillFlowContainer
+                                        {
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(10, 0),
+                                            Children = new Drawable[]
+                                            {
+                                                new SpriteText
+                                                {
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                    Font = OsuFont.GetFont(size: 12),
+                                                    Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                                },
+                                                new RepliesButton(comment.RepliesCount)
+                                                { Expanded = { BindTarget = childExpanded } },
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -181,13 +173,9 @@ namespace osu.Game.Overlays.Comments
             };
 
             if (comment.UserId == null)
-            {
                 username.AddText(comment.LegacyName);
-            }
             else
-            {
                 username.AddUserLink(comment.User);
-            }
 
             if (comment.EditedAt.HasValue)
             {
@@ -200,15 +188,45 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
-            comment.ChildComments.ForEach(c =>
+            if (!comment.IsDeleted)
+                message.Text = comment.GetMessage();
+            else
             {
-                if (!c.IsDeleted)
-                    childCommentsContainer.Add(new DrawableComment(c));
-            });
+                content.FadeColour(OsuColour.Gray(0.5f));
+                votePill.Hide();
+            }
+
+            if (comment.IsTopLevel)
+            {
+                AddInternal(new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = separator_height,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = OsuColour.Gray(0.1f)
+                    }
+                });
+
+                if (comment.ChildComments.Any())
+                {
+                    AddInternal(new ChevronButton(comment)
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Margin = new MarginPadding { Right = chevron_margin, Top = margin },
+                        Expanded = { BindTarget = childExpanded }
+                    });
+                }
+            }
+
+            comment.ChildComments.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)));
         }
 
         protected override void LoadComplete()
         {
+            ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
             childExpanded.BindValueChanged(onChildExpandedChanged, true);
             base.LoadComplete();
         }
@@ -223,6 +241,20 @@ namespace osu.Game.Overlays.Comments
             {
                 childCommentsVisibilityContainer.AutoSizeAxes = Axes.None;
                 childCommentsVisibilityContainer.ResizeHeightTo(0, duration, Easing.OutQuint);
+            }
+        }
+
+        private void onShowDeletedChanged(ValueChangedEvent<bool> show)
+        {
+            if (comment.IsDeleted)
+            {
+                if (show.NewValue)
+                    AutoSizeAxes = Axes.Y;
+                else
+                {
+                    AutoSizeAxes = Axes.None;
+                    this.ResizeHeightTo(0);
+                }
             }
         }
 
