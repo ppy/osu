@@ -129,11 +129,9 @@ namespace osu.Game.Overlays
         {
             var track = current?.Track;
 
-            if (track.IsRunning)
-            {
-                IsUserPaused = true;
+            IsUserPaused = true;
+            if (track?.IsRunning == true)
                 track.Stop();
-            }
         }
 
         /// <summary>
