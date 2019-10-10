@@ -136,11 +136,20 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Play the previous track.
+        /// Play the previous track or restart the current track if it's current time below 5000ms
         /// </summary>
         /// <returns>Whether the operation was successful.</returns>
         public bool PrevTrack()
         {
+            var currentTrackPosition = current?.Track.CurrentTime;
+
+            if (currentTrackPosition >= 5000)
+            {
+                SeekTo(0);
+
+                return true;
+            }
+
             queuedDirection = TrackChangeDirection.Prev;
 
             var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
@@ -260,8 +269,9 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicPrev:
+                    var shouldRestart = current?.Track.CurrentTime >= 5000;
                     if (PrevTrack())
-                        onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
+                        onScreenDisplay?.Display(new MusicControllerToast(shouldRestart ? "Restart track" : "Previous track"));
 
                     return true;
             }
