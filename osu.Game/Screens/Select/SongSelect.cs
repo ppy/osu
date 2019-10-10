@@ -490,7 +490,9 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected(false);
+
+                // restart playback on returning to song select, regardless.
+                music?.Play();
             }
 
             base.OnResuming(last);
@@ -587,8 +589,7 @@ namespace osu.Game.Screens.Select
         /// Ensures some music is playing for the current track.
         /// Will resume playback from a manual user pause if the track has changed.
         /// </summary>
-        /// <param name="fromPreviewPoint">Whether to restart from the preview point, rather than resuming from previous location.</param>
-        private void ensurePlayingSelected(bool fromPreviewPoint = true)
+        private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
 
@@ -597,7 +598,7 @@ namespace osu.Game.Screens.Select
             track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
             if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
-                music?.Play(fromPreviewPoint);
+                music?.Play(true);
 
             lastTrack.SetTarget(track);
         }

@@ -92,8 +92,9 @@ namespace osu.Game.Tests.Visual.Menus
             exitViaEscapeAndConfirm();
         }
 
-        [Test]
-        public void TestSongContinuesAfterExitPlayer()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestSongContinuesAfterExitPlayer(bool withUserPause)
         {
             Player player = null;
 
@@ -105,6 +106,9 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Wait());
 
             AddUntilStep("wait for selected", () => !game.Beatmap.IsDefault);
+
+            if (withUserPause)
+                AddStep("pause", () => game.Dependencies.Get<MusicController>().Stop());
 
             AddStep("press enter", () => pressAndRelease(Key.Enter));
 
