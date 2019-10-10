@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childExpanded = new BindableBool(true);
 
-        private readonly Container childCommentsVisibilityContainer;
+        private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
@@ -47,7 +47,6 @@ namespace osu.Game.Overlays.Comments
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Masking = true;
             InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -145,7 +144,9 @@ namespace osu.Game.Overlays.Comments
                                                     Text = HumanizerUtils.Humanize(comment.CreatedAt)
                                                 },
                                                 new RepliesButton(comment.RepliesCount)
-                                                { Expanded = { BindTarget = childExpanded } },
+                                                {
+                                                    Expanded = { BindTarget = childExpanded }
+                                                },
                                             }
                                         }
                                     }
@@ -153,29 +154,23 @@ namespace osu.Game.Overlays.Comments
                             }
                         }
                     },
-                    childCommentsVisibilityContainer = new Container
+                    childCommentsVisibilityContainer = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Masking = true,
-                        Child = new FillFlowContainer
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Children = new Drawable[]
+                            childCommentsContainer = new FillFlowContainer
                             {
-                                childCommentsContainer = new FillFlowContainer
-                                {
-                                    Margin = new MarginPadding { Left = child_margin },
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical
-                                },
-                                new DeletedChildsPlaceholder(comment.GetDeletedChildsCount())
-                                {
-                                    ShowDeleted = { BindTarget = ShowDeleted }
-                                }
+                                Margin = new MarginPadding { Left = child_margin },
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical
+                            },
+                            new DeletedChildsPlaceholder(comment.GetDeletedChildsCount())
+                            {
+                                ShowDeleted = { BindTarget = ShowDeleted }
                             }
                         }
                     }
@@ -234,7 +229,9 @@ namespace osu.Game.Overlays.Comments
             }
 
             comment.ChildComments.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
-            { ShowDeleted = { BindTarget = ShowDeleted } }));
+            {
+                ShowDeleted = { BindTarget = ShowDeleted }
+            }));
         }
 
         protected override void LoadComplete()
@@ -246,27 +243,13 @@ namespace osu.Game.Overlays.Comments
 
         private void onChildExpandedChanged(ValueChangedEvent<bool> expanded)
         {
-            if (expanded.NewValue)
-                childCommentsVisibilityContainer.AutoSizeAxes = Axes.Y;
-            else
-            {
-                childCommentsVisibilityContainer.AutoSizeAxes = Axes.None;
-                childCommentsVisibilityContainer.ResizeHeightTo(0);
-            }
+            childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0);
         }
 
         private void onShowDeletedChanged(ValueChangedEvent<bool> show)
         {
             if (comment.IsDeleted)
-            {
-                if (show.NewValue)
-                    AutoSizeAxes = Axes.Y;
-                else
-                {
-                    AutoSizeAxes = Axes.None;
-                    this.ResizeHeightTo(0);
-                }
-            }
+                this.FadeTo(show.NewValue ? 1 : 0);
         }
 
         private class ChevronButton : ShowChildsButton

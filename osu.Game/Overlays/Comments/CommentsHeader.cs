@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
@@ -62,7 +61,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Current = { BindTarget = Sort }
+                                    Current = Sort
                                 }
                             }
                         },

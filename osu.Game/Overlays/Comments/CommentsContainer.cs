@@ -91,7 +91,9 @@ namespace osu.Game.Overlays.Comments
             {
                 if (c.IsTopLevel)
                     content.Add(new DrawableComment(c)
-                    { ShowDeleted = { BindTarget = ShowDeleted } });
+                    {
+                        ShowDeleted = { BindTarget = ShowDeleted }
+                    });
             }
 
             int deletedComments = 0;

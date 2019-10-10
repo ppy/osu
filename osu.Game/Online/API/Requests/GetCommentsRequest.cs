@@ -4,6 +4,7 @@
 using osu.Framework.IO.Network;
 using Humanizer;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -42,12 +43,5 @@ namespace osu.Game.Online.API.Requests
         Build,
         Beatmapset,
         NewsPost
-    }
-
-    public enum SortCommentsBy
-    {
-        New,
-        Old,
-        Top
     }
 }
