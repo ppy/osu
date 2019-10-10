@@ -456,6 +456,60 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        [Test]
+        public async Task TestImportWithIgnoredDirectoryInArchive()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportWithIgnoredDirectoryInArchive)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    string dataFolder = Path.Combine(extractedFolder, "actual_data");
+                    string resourceForkFolder = Path.Combine(extractedFolder, "__MACOSX");
+                    string resourceForkFilePath = Path.Combine(resourceForkFolder, ".extracted");
+
+                    Directory.CreateDirectory(dataFolder);
+                    Directory.CreateDirectory(resourceForkFolder);
+
+                    using (var resourceForkFile = File.CreateText(resourceForkFilePath))
+                    {
+                        resourceForkFile.WriteLine("adding content so that it's not empty");
+                    }
+
+                    try
+                    {
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(dataFolder);
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        var imported = await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                        ensureLoaded(osu);
+
+                        Assert.IsFalse(imported.Files.Any(f => f.Filename.Contains("__MACOSX")), "Files contain resource fork folder, which should be ignored");
+                        Assert.IsFalse(imported.Files.Any(f => f.Filename.Contains("actual_data")), "Files contain common subfolder");
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null)
         {
             var temp = path ?? TestResources.GetTestBeatmapForImport();
