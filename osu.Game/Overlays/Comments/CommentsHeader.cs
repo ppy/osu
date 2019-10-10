@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Comments
         private const int padding = 50;
         private const int text_size = 14;
 
-        public readonly Bindable<SortCommentsBy> Sort = new Bindable<SortCommentsBy>();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly Box background;
