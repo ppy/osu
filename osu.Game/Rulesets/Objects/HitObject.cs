@@ -66,7 +66,6 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
-        [CanBeNull]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -113,10 +112,7 @@ namespace osu.Game.Rulesets.Objects
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
-            {
-                h.HitWindows = HitWindows;
                 h.ApplyDefaults(controlPointInfo, difficulty);
-            }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -147,7 +143,7 @@ namespace osu.Game.Rulesets.Objects
         /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter{T}"/>.
         /// </para>
         /// </summary>
-        [CanBeNull]
+        [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }
