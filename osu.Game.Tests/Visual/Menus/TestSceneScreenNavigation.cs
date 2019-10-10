@@ -102,9 +102,9 @@ namespace osu.Game.Tests.Visual.Menus
 
             pushAndConfirm(() => new TestSongSelect());
 
-            AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(game).Wait());
+            AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(game, virtualTrack: true).Wait());
 
-            AddUntilStep("wait for selected", () => !(track() is TrackVirtual));
+            AddUntilStep("wait for selected", () => !game.Beatmap.IsDefault);
 
             AddStep("press enter", () => pressAndRelease(Key.Enter));
 
