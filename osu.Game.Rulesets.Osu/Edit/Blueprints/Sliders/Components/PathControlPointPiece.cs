@@ -14,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointPiece : CompositeDrawable
+    public class PathControlPointPiece : BlueprintPiece<Slider>
     {
         private readonly Slider slider;
         private readonly int index;
