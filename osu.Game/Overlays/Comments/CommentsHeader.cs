@@ -84,8 +84,6 @@ namespace osu.Game.Overlays.Comments
 
         private class ShowDeletedButton : HeaderButton
         {
-            private const int spacing = 5;
-
             public readonly BindableBool Checked = new BindableBool();
 
             private readonly SpriteIcon checkboxIcon;
@@ -96,7 +94,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(spacing, 0),
+                    Spacing = new Vector2(5, 0),
                     Children = new Drawable[]
                     {
                         checkboxIcon = new SpriteIcon
