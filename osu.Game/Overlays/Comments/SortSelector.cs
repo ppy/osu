@@ -15,13 +15,13 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class SortSelector : OsuTabControl<SortCommentsBy>
+    public class SortSelector : OsuTabControl<CommentsSortCriteria>
     {
         private const int spacing = 5;
 
-        protected override Dropdown<SortCommentsBy> CreateDropdown() => null;
+        protected override Dropdown<CommentsSortCriteria> CreateDropdown() => null;
 
-        protected override TabItem<SortCommentsBy> CreateTabItem(SortCommentsBy value) => new SortTabItem(value);
+        protected override TabItem<CommentsSortCriteria> CreateTabItem(CommentsSortCriteria value) => new SortTabItem(value);
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
@@ -35,11 +35,11 @@ namespace osu.Game.Overlays.Comments
             AutoSizeAxes = Axes.Both;
         }
 
-        private class SortTabItem : TabItem<SortCommentsBy>
+        private class SortTabItem : TabItem<CommentsSortCriteria>
         {
             private readonly TabContent content;
 
-            public SortTabItem(SortCommentsBy value)
+            public SortTabItem(CommentsSortCriteria value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Comments
 
                 private readonly SpriteText text;
 
-                public TabContent(SortCommentsBy value)
+                public TabContent(CommentsSortCriteria value)
                 {
                     Add(text = new SpriteText
                     {
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Comments
         }
     }
 
-    public enum SortCommentsBy
+    public enum CommentsSortCriteria
     {
         New,
         Old,

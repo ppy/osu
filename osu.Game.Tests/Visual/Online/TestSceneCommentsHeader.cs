@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(SortSelector),
         };
 
-        private readonly Bindable<SortCommentsBy> sort = new Bindable<SortCommentsBy>();
+        private readonly Bindable<CommentsSortCriteria> sort = new Bindable<CommentsSortCriteria>();
         private readonly BindableBool showDeleted = new BindableBool();
 
         public TestSceneCommentsHeader()
@@ -31,9 +31,9 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             AddStep("Trigger ShowDeleted", () => showDeleted.Value = !showDeleted.Value);
-            AddStep("Select old", () => sort.Value = SortCommentsBy.Old);
-            AddStep("Select new", () => sort.Value = SortCommentsBy.New);
-            AddStep("Select top", () => sort.Value = SortCommentsBy.Top);
+            AddStep("Select old", () => sort.Value = CommentsSortCriteria.Old);
+            AddStep("Select new", () => sort.Value = CommentsSortCriteria.New);
+            AddStep("Select top", () => sort.Value = CommentsSortCriteria.Top);
         }
     }
 }
