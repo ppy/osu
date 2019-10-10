@@ -7,6 +7,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Bindables;
+using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Comments
                 new SpriteText
                 {
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                    Text = $@"{count} deleted comments"
+                    Text = $@"{count} deleted comment{(count.ToString().ToCharArray().Last() == '1' ? "" : "s")}"
                 }
             };
         }
