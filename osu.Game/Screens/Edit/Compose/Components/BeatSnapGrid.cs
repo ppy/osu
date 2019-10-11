@@ -17,8 +17,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract class BeatSnapGrid : CompositeDrawable
     {
+        /// <summary>
+        /// The velocity of the beatmap at the point of placement in pixels per millisecond.
+        /// </summary>
         protected double Velocity { get; private set; }
 
+        /// <summary>
+        /// The spacing between each tick of the beat snapping grid.
+        /// </summary>
         protected float DistanceSpacing { get; private set; }
 
         protected readonly Vector2 StartPosition;
@@ -88,32 +94,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         /// <summary>
-        /// Draws the grid.
+        /// Creates the content which visualises the grid ticks.
         /// </summary>
         protected abstract void CreateGrid(Vector2 startPosition);
 
         /// <summary>
-        /// Retrieves the velocity of gameplay at a time.
+        /// Retrieves the velocity of gameplay at a point in time in pixels per millisecond.
         /// </summary>
         /// <param name="time">The time to retrieve the velocity at.</param>
-        /// <param name="controlPointInfo">The beatmap's <see cref="ControlPointInfo"/> at the requested time.</param>
-        /// <param name="difficulty">The beatmap's <see cref="BeatmapDifficulty"/> at the requested time.</param>
-        /// <returns>The velocity in pixels per millisecond.</returns>
+        /// <param name="controlPointInfo">The beatmap's <see cref="ControlPointInfo"/> at the point in time.</param>
+        /// <param name="difficulty">The beatmap's <see cref="BeatmapDifficulty"/> at the point in time.</param>
+        /// <returns>The velocity.</returns>
         protected abstract float GetVelocity(double time, ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty);
 
         /// <summary>
-        /// Snaps a position to this grid.
+        /// Snaps a screen-space position to this grid.
         /// </summary>
         /// <param name="screenSpacePosition">The original screen-space position.</param>
-        /// <returns>The snapped position.</returns>
+        /// <returns>The snapped screen-space position.</returns>
         public abstract Vector2 GetSnapPosition(Vector2 screenSpacePosition);
 
         /// <summary>
-        /// Retrieves the time at a snapped position.
+        /// Retrieves the time at a snapped screen-space position.
         /// </summary>
-        /// <param name="snappedPosition">The snapped position.</param>
+        /// <param name="screenSpacePosition">The snapped screen-space position.</param>
         /// <returns>The time at the snapped position.</returns>
-        public double GetSnapTime(Vector2 snappedPosition) => startTime + (ToLocalSpace(snappedPosition) - StartPosition).Length / Velocity;
+        public double GetSnapTime(Vector2 screenSpacePosition) => startTime + (ToLocalSpace(screenSpacePosition) - CentrePosition).Length / Velocity;
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
