@@ -31,7 +31,9 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapInfoWedge : OverlayContainer
     {
-        private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
+        private const float shear_width = 36.75f;
+
+        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGED_CONTAINER_SIZE.Y, 0);
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
@@ -200,14 +202,17 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
                         Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
-                        AutoSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = 10, Left = 25, Right = shear_width * 2.5f },
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
                             VersionLabel = new OsuSpriteText
                             {
                                 Text = beatmapInfo.Version,
                                 Font = OsuFont.GetFont(size: 24, italics: true),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
                         }
                     },
@@ -217,7 +222,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding { Top = 14, Left = 10, Right = 18, Bottom = 20 },
+                        Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
@@ -234,19 +239,24 @@ namespace osu.Game.Screens.Select
                         Name = "Centre-aligned metadata",
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.TopLeft,
-                        Y = -22,
+                        Y = -7,
                         Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding { Top = 15, Left = 25, Right = 10, Bottom = 20 },
-                        AutoSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Left = 25, Right = shear_width },
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
                             TitleLabel = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 28, italics: true),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
                             ArtistLabel = new OsuSpriteText
                             {
                                 Font = OsuFont.GetFont(size: 17, italics: true),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
                             MapperContainer = new FillFlowContainer
                             {
