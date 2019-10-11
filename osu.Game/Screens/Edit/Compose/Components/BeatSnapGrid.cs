@@ -6,7 +6,6 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -22,6 +21,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected float DistanceSpacing { get; private set; }
 
+        protected readonly Vector2 StartPosition;
 
         [Resolved]
         private IEditorBeatmap beatmap { get; set; }
@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly Cached gridCache = new Cached();
         private readonly HitObject hitObject;
-        private readonly Vector2 startPosition;
 
         private double startTime;
         private double beatLength;
@@ -42,7 +41,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected BeatSnapGrid(HitObject hitObject, Vector2 startPosition)
         {
             this.hitObject = hitObject;
-            this.startPosition = startPosition;
+            this.StartPosition = startPosition;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!gridCache.IsValid)
             {
                 ClearInternal();
-                CreateGrid(startPosition);
+                CreateGrid(StartPosition);
                 gridCache.Validate();
             }
         }
@@ -114,7 +113,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="snappedPosition">The snapped position.</param>
         /// <returns>The time at the snapped position.</returns>
-        public double GetSnapTime(Vector2 snappedPosition) => startTime + (ToLocalSpace(snappedPosition) - startPosition).Length / Velocity;
+        public double GetSnapTime(Vector2 snappedPosition) => startTime + (ToLocalSpace(snappedPosition) - StartPosition).Length / Velocity;
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
