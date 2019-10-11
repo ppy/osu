@@ -426,11 +426,11 @@ namespace osu.Game.Rulesets.UI
             {
                 foreach (var h in Objects)
                 {
-                    if (h.HitWindows != null)
+                    if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
                         return h.HitWindows;
 
                     foreach (var n in h.NestedHitObjects)
-                        if (n.HitWindows != null)
+                        if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
                             return n.HitWindows;
                 }
 

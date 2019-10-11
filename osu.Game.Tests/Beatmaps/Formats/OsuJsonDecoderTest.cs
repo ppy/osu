@@ -8,6 +8,7 @@ using NUnit.Framework;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -148,13 +149,13 @@ namespace osu.Game.Tests.Beatmaps.Formats
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
             using (var stream = TestResources.OpenResource(filename))
-            using (var sr = new StreamReader(stream))
+            using (var sr = new LineBufferedReader(stream))
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
 
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))
-                using (var sr2 = new StreamReader(ms))
+                using (var sr2 = new LineBufferedReader(ms))
                 {
                     sw.Write(legacyDecoded.Serialize());
                     sw.Flush();
