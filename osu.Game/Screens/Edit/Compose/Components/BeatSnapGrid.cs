@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!gridCache.IsValid)
             {
                 ClearInternal();
-                CreateGrid(StartPosition);
+                CreateContent(CentrePosition);
                 gridCache.Validate();
             }
         }
@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Creates the content which visualises the grid ticks.
         /// </summary>
-        protected abstract void CreateGrid(Vector2 startPosition);
+        protected abstract void CreateContent(Vector2 centrePosition);
 
         /// <summary>
         /// Retrieves the velocity of gameplay at a point in time in pixels per millisecond.
