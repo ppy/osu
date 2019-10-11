@@ -138,63 +138,63 @@ namespace osu.Game.Tests.Visual.Editor
             {
             }
 
-            protected override void CreateGrid(Vector2 startPosition)
+            protected override void CreateContent(Vector2 centrePosition)
             {
                 AddInternal(new Circle
                 {
                     Origin = Anchor.Centre,
                     Size = new Vector2(5),
-                    Position = startPosition
+                    Position = centrePosition
                 });
 
                 int beatIndex = 0;
 
-                for (float s = startPosition.X + DistanceSpacing; s <= DrawWidth; s += DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.X + DistanceSpacing; s <= DrawWidth; s += DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
-                        Position = new Vector2(s, startPosition.Y),
+                        Position = new Vector2(s, centrePosition.Y),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
 
                 beatIndex = 0;
 
-                for (float s = startPosition.X - DistanceSpacing; s >= 0; s -= DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.X - DistanceSpacing; s >= 0; s -= DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
-                        Position = new Vector2(s, startPosition.Y),
+                        Position = new Vector2(s, centrePosition.Y),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
 
                 beatIndex = 0;
 
-                for (float s = startPosition.Y + DistanceSpacing; s <= DrawHeight; s += DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.Y + DistanceSpacing; s <= DrawHeight; s += DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
-                        Position = new Vector2(startPosition.X, s),
+                        Position = new Vector2(centrePosition.X, s),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
 
                 beatIndex = 0;
 
-                for (float s = startPosition.Y - DistanceSpacing; s >= 0; s -= DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.Y - DistanceSpacing; s >= 0; s -= DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
-                        Position = new Vector2(startPosition.X, s),
+                        Position = new Vector2(centrePosition.X, s),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
