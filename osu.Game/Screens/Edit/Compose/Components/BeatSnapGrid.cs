@@ -112,18 +112,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected abstract float GetVelocity(double time, ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty);
 
         /// <summary>
-        /// Snaps a screen-space position to this grid.
+        /// Snaps a position to this grid.
         /// </summary>
-        /// <param name="screenSpacePosition">The original screen-space position.</param>
-        /// <returns>The snapped screen-space position.</returns>
-        public abstract Vector2 GetSnapPosition(Vector2 screenSpacePosition);
+        /// <param name="position">The original position in coordinate space local to this <see cref="BeatSnapGrid"/>.</param>
+        /// <returns>The snapped position in coordinate space local to this <see cref="BeatSnapGrid"/>.</returns>
+        public abstract Vector2 GetSnapPosition(Vector2 position);
 
         /// <summary>
-        /// Retrieves the time at a snapped screen-space position.
+        /// Retrieves the time at a snapped position.
         /// </summary>
-        /// <param name="screenSpacePosition">The snapped screen-space position.</param>
+        /// <param name="position">The snapped position in coordinate space local to this <see cref="BeatSnapGrid"/>.</param>
         /// <returns>The time at the snapped position.</returns>
-        public double GetSnapTime(Vector2 screenSpacePosition) => startTime + (ToLocalSpace(screenSpacePosition) - CentrePosition).Length / Velocity;
+        public double GetSnapTime(Vector2 position) => startTime + (position - CentrePosition).Length / Velocity;
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
