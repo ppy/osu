@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual.Editor
             AddStep("get first tick position", () => screenSpacePosition = grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0)));
             AddAssert("snap time is 1 beat away", () => Precision.AlmostEquals(beat_length, grid.GetSnapTime(screenSpacePosition), 0.01));
 
-            createGrid(g => g.Velocity = 2, " with velocity = 2");
+            createGrid(g => g.Velocity = 2, "with velocity = 2");
             AddAssert("snap time is now 0.5 beats away", () => Precision.AlmostEquals(beat_length / 2, grid.GetSnapTime(screenSpacePosition), 0.01));
         }
 
