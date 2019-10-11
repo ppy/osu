@@ -27,6 +27,8 @@ namespace osu.Game.Overlays
 
         public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
 
+        private const double restart_cutoff_point = 5000;
+
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
         public bool IsUserPaused { get; private set; }
@@ -135,22 +137,26 @@ namespace osu.Game.Overlays
             return true;
         }
 
+        private PreviousButtonAction? prevAction;
+
         /// <summary>
-        /// Play the previous track or restart the current track if it's current time below 5000ms
+        /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>
         /// </summary>
         /// <returns>Whether the operation was successful.</returns>
         public bool PrevTrack()
         {
             var currentTrackPosition = current?.Track.CurrentTime;
 
-            if (currentTrackPosition >= 5000)
+            if (currentTrackPosition >= restart_cutoff_point)
             {
                 SeekTo(0);
+                prevAction = PreviousButtonAction.Restart;
 
                 return true;
             }
 
             queuedDirection = TrackChangeDirection.Prev;
+            prevAction = PreviousButtonAction.Previous;
 
             var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
 
@@ -269,9 +275,8 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicPrev:
-                    var shouldRestart = current?.Track.CurrentTime >= 5000;
                     if (PrevTrack())
-                        onScreenDisplay?.Display(new MusicControllerToast(shouldRestart ? "Restart track" : "Previous track"));
+                        onScreenDisplay?.Display(new MusicControllerToast(prevAction == PreviousButtonAction.Restart ? "Restart track" : "Previous track"));
 
                     return true;
             }
@@ -295,5 +300,12 @@ namespace osu.Game.Overlays
         None,
         Next,
         Prev
+    }
+
+    internal enum PreviousButtonAction
+    {
+        None,
+        Restart,
+        Previous
     }
 }
