@@ -27,7 +27,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         protected float DistanceSpacing { get; private set; }
 
-        protected readonly Vector2 StartPosition;
+        /// <summary>
+        /// The position which the grid is centred on.
+        /// The first beat snapping tick is located at <see cref="CentrePosition"/> + <see cref="DistanceSpacing"/> in the desired direction.
+        /// </summary>
+        protected readonly Vector2 CentrePosition;
 
         [Resolved]
         private IEditorBeatmap beatmap { get; set; }
@@ -44,10 +48,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private double startTime;
         private double beatLength;
 
-        protected BeatSnapGrid(HitObject hitObject, Vector2 startPosition)
+        protected BeatSnapGrid(HitObject hitObject, Vector2 centrePosition)
         {
             this.hitObject = hitObject;
-            this.StartPosition = startPosition;
+            this.CentrePosition = centrePosition;
 
             RelativeSizeAxes = Axes.Both;
         }
