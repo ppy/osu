@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected float DistanceSpacing { get; private set; }
 
-        [Resolved]
-        private IFrameBasedClock framedClock { get; set; }
 
         [Resolved]
         private IEditorBeatmap beatmap { get; set; }
