@@ -32,6 +32,9 @@ namespace osu.Game.Tests.Visual.Editor
         public TestSceneBeatSnapGrid()
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+
+            createGrid();
         }
 
         [SetUp]
