@@ -58,7 +58,7 @@ namespace osu.Game.IO.Archives
             archiveStream.Dispose();
         }
 
-        private static bool canBeIgnored(IEntry entry) => filename_ignore_list.Any(ignoredName => entry.Key.IndexOf(ignoredName, StringComparison.InvariantCultureIgnoreCase) >= 0);
+        private static bool canBeIgnored(IEntry entry) => filename_ignore_list.Any(ignoredName => entry.Key.IndexOf(ignoredName, StringComparison.OrdinalIgnoreCase) >= 0);
 
         public override IEnumerable<string> Filenames => archive.Entries.Where(e => !canBeIgnored(e)).Select(e => e.Key).ToArray();
 
