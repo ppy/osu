@@ -65,11 +65,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region User Input Handling
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being dragged.
+        /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
-        /// <param name="blueprint">The <see cref="SelectionBlueprint"/> that received the drag event.</param>
-        /// <param name="dragEvent">The drag event.</param>
-        public virtual void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
+        /// <param name="moveEvent">The move event.</param>
+        public virtual void HandleMovement(MoveSelectionEvent moveEvent)
         {
         }
 
