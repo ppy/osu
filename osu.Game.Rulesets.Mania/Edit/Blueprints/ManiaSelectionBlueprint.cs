@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public Vector2 ScreenSpaceDragPosition { get; private set; }
         public Vector2 DragPosition { get; private set; }
 
-        protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
+        public new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
 
         protected IClock EditorClock { get; private set; }
 
