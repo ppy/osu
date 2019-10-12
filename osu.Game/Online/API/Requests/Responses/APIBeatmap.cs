@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -71,6 +72,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
+                Length = TimeSpan.FromSeconds(length).TotalMilliseconds,
                 Status = Status,
                 BeatmapSet = set,
                 Metrics = metrics,
@@ -85,7 +87,6 @@ namespace osu.Game.Online.API.Requests.Responses
                 {
                     PlayCount = playCount,
                     PassCount = passCount,
-                    Length = length,
                     CircleCount = circleCount,
                     SliderCount = sliderCount,
                 },

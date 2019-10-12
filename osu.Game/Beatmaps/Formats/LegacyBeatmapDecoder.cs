@@ -5,10 +5,10 @@ using System;
 using System.IO;
 using System.Linq;
 using osu.Framework.IO.File;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.IO;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -26,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
         public static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
+            SetFallbackDecoder<Beatmap>(() => new LegacyBeatmapDecoder());
         }
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace osu.Game.Beatmaps.Formats
             offset = FormatVersion < 5 ? 24 : 0;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
+        protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
@@ -290,14 +291,20 @@ namespace osu.Game.Beatmaps.Formats
             string[] split = line.Split(',');
 
             EventType type;
+
             if (!Enum.TryParse(split[0], out type))
-                throw new InvalidDataException($@"Unknown event type {split[0]}");
+                throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
             switch (type)
             {
                 case EventType.Background:
-                    string filename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(filename);
+                    string bgFilename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(bgFilename);
+                    break;
+
+                case EventType.Video:
+                    string videoFilename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.VideoFile = FileSafety.PathStandardise(videoFilename);
                     break;
 
                 case EventType.Break:
@@ -319,90 +326,79 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingPoint(string line)
         {
-            try
+            string[] split = line.Split(',');
+
+            double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
+            double beatLength = Parsing.ParseDouble(split[1].Trim());
+            double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
+
+            TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
+            if (split.Length >= 3)
+                timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)Parsing.ParseInt(split[2]);
+
+            LegacySampleBank sampleSet = defaultSampleBank;
+            if (split.Length >= 4)
+                sampleSet = (LegacySampleBank)Parsing.ParseInt(split[3]);
+
+            int customSampleBank = 0;
+            if (split.Length >= 5)
+                customSampleBank = Parsing.ParseInt(split[4]);
+
+            int sampleVolume = defaultSampleVolume;
+            if (split.Length >= 6)
+                sampleVolume = Parsing.ParseInt(split[5]);
+
+            bool timingChange = true;
+            if (split.Length >= 7)
+                timingChange = split[6][0] == '1';
+
+            bool kiaiMode = false;
+            bool omitFirstBarSignature = false;
+
+            if (split.Length >= 8)
             {
-                string[] split = line.Split(',');
-
-                double time = getOffsetTime(Parsing.ParseDouble(split[0].Trim()));
-                double beatLength = Parsing.ParseDouble(split[1].Trim());
-                double speedMultiplier = beatLength < 0 ? 100.0 / -beatLength : 1;
-
-                TimeSignatures timeSignature = TimeSignatures.SimpleQuadruple;
-                if (split.Length >= 3)
-                    timeSignature = split[2][0] == '0' ? TimeSignatures.SimpleQuadruple : (TimeSignatures)Parsing.ParseInt(split[2]);
-
-                LegacySampleBank sampleSet = defaultSampleBank;
-                if (split.Length >= 4)
-                    sampleSet = (LegacySampleBank)Parsing.ParseInt(split[3]);
-
-                int customSampleBank = 0;
-                if (split.Length >= 5)
-                    customSampleBank = Parsing.ParseInt(split[4]);
-
-                int sampleVolume = defaultSampleVolume;
-                if (split.Length >= 6)
-                    sampleVolume = Parsing.ParseInt(split[5]);
-
-                bool timingChange = true;
-                if (split.Length >= 7)
-                    timingChange = split[6][0] == '1';
-
-                bool kiaiMode = false;
-                bool omitFirstBarSignature = false;
-
-                if (split.Length >= 8)
-                {
-                    EffectFlags effectFlags = (EffectFlags)Parsing.ParseInt(split[7]);
-                    kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
-                    omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
-                }
-
-                string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
-                if (stringSampleSet == @"none")
-                    stringSampleSet = @"normal";
-
-                if (timingChange)
-                {
-                    var controlPoint = CreateTimingControlPoint();
-                    controlPoint.Time = time;
-                    controlPoint.BeatLength = beatLength;
-                    controlPoint.TimeSignature = timeSignature;
-
-                    handleTimingControlPoint(controlPoint);
-                }
-
-                handleDifficultyControlPoint(new DifficultyControlPoint
-                {
-                    Time = time,
-                    SpeedMultiplier = speedMultiplier,
-                    AutoGenerated = timingChange
-                });
-
-                handleEffectControlPoint(new EffectControlPoint
-                {
-                    Time = time,
-                    KiaiMode = kiaiMode,
-                    OmitFirstBarLine = omitFirstBarSignature,
-                    AutoGenerated = timingChange
-                });
-
-                handleSampleControlPoint(new LegacySampleControlPoint
-                {
-                    Time = time,
-                    SampleBank = stringSampleSet,
-                    SampleVolume = sampleVolume,
-                    CustomSampleBank = customSampleBank,
-                    AutoGenerated = timingChange
-                });
+                EffectFlags effectFlags = (EffectFlags)Parsing.ParseInt(split[7]);
+                kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
             }
-            catch (FormatException)
+
+            string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
+            if (stringSampleSet == @"none")
+                stringSampleSet = @"normal";
+
+            if (timingChange)
             {
-                Logger.Log("A timing point could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
+                var controlPoint = CreateTimingControlPoint();
+                controlPoint.Time = time;
+                controlPoint.BeatLength = beatLength;
+                controlPoint.TimeSignature = timeSignature;
+
+                handleTimingControlPoint(controlPoint);
             }
-            catch (OverflowException)
+
+            handleDifficultyControlPoint(new DifficultyControlPoint
             {
-                Logger.Log("A timing point could not be parsed correctly and will be ignored", LoggingTarget.Runtime, LogLevel.Important);
-            }
+                Time = time,
+                SpeedMultiplier = speedMultiplier,
+                AutoGenerated = timingChange
+            });
+
+            handleEffectControlPoint(new EffectControlPoint
+            {
+                Time = time,
+                KiaiMode = kiaiMode,
+                OmitFirstBarLine = omitFirstBarSignature,
+                AutoGenerated = timingChange
+            });
+
+            handleSampleControlPoint(new LegacySampleControlPoint
+            {
+                Time = time,
+                SampleBank = stringSampleSet,
+                SampleVolume = sampleVolume,
+                CustomSampleBank = customSampleBank,
+                AutoGenerated = timingChange
+            });
         }
 
         private void handleTimingControlPoint(TimingControlPoint newPoint)

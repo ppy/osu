@@ -6,9 +6,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -22,17 +25,14 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Bindable<bool> showTrail = new Bindable<bool>(true);
 
-        private readonly CursorTrail cursorTrail;
+        private readonly Drawable cursorTrail;
 
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    cursorTrail = new CursorTrail { Depth = 1 }
-                }
+                Child = cursorTrail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.CursorTrail), _ => new DefaultCursorTrail(), confineMode: ConfineMode.NoScaling)
             };
         }
 
@@ -40,6 +40,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void load(OsuRulesetConfigManager config)
         {
             config?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
         }
@@ -97,6 +102,16 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
             ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
+        }
+
+        private class DefaultCursorTrail : CursorTrail
+        {
+            [BackgroundDependencyLoader]
+            private void load(TextureStore textures)
+            {
+                Texture = textures.Get(@"Cursor/cursortrail");
+                Scale = new Vector2(1 / Texture.ScaleAdjust);
+            }
         }
     }
 }

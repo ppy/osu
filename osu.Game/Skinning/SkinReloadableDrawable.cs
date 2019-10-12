@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -12,13 +12,17 @@ namespace osu.Game.Skinning
     /// </summary>
     public abstract class SkinReloadableDrawable : CompositeDrawable
     {
+        /// <summary>
+        /// The current skin source.
+        /// </summary>
+        protected ISkinSource CurrentSkin { get; private set; }
+
         private readonly Func<ISkinSource, bool> allowFallback;
-        private ISkinSource skin;
 
         /// <summary>
         /// Whether fallback to default skin should be allowed if the custom skin is missing this resource.
         /// </summary>
-        private bool allowDefaultFallback => allowFallback == null || allowFallback.Invoke(skin);
+        private bool allowDefaultFallback => allowFallback == null || allowFallback.Invoke(CurrentSkin);
 
         /// <summary>
         /// Create a new <see cref="SkinReloadableDrawable"/>
@@ -32,16 +36,19 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
-            skin = source;
-            skin.SourceChanged += onChange;
+            CurrentSkin = source;
+            CurrentSkin.SourceChanged += onChange;
         }
 
-        private void onChange() => SkinChanged(skin, allowDefaultFallback);
+        private void onChange() =>
+            // schedule required to avoid calls after disposed.
+            // note that this has the side-effect of components only performing a skin change when they are alive.
+            Scheduler.AddOnce(() => SkinChanged(CurrentSkin, allowDefaultFallback));
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
-            onChange();
+            SkinChanged(CurrentSkin, allowDefaultFallback);
         }
 
         /// <summary>
@@ -57,8 +64,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            if (skin != null)
-                skin.SourceChanged -= onChange;
+            if (CurrentSkin != null)
+                CurrentSkin.SourceChanged -= onChange;
         }
     }
 }

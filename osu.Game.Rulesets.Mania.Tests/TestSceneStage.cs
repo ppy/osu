@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[0], Anchor.TopCentre));
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[1], Anchor.BottomCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[0], Anchor.TopCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[1], Anchor.BottomCentre));
 
             AddStep("flip direction", () =>
             {
@@ -75,9 +77,13 @@ namespace osu.Game.Rulesets.Mania.Tests
 
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[0], Anchor.BottomCentre));
             AddAssert("check note anchors", () => notesInStageAreAnchored(stages[1], Anchor.TopCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[0], Anchor.BottomCentre));
+            AddAssert("check bar anchors", () => barsInStageAreAnchored(stages[1], Anchor.TopCentre));
         }
 
         private bool notesInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.Columns.SelectMany(c => c.AllHitObjects).All(o => o.Anchor == anchor);
+
+        private bool barsInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.AllHitObjects.Where(obj => obj is DrawableBarLine).All(o => o.Anchor == anchor);
 
         private void createNote()
         {
@@ -114,8 +120,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 var obj = new BarLine
                 {
                     StartTime = Time.Current + 2000,
-                    ControlPoint = new TimingControlPoint(),
-                    BeatIndex = major ? 0 : 1
+                    Major = major,
                 };
 
                 obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

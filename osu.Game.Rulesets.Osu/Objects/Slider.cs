@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -26,33 +27,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        private Cached<Vector2> endPositionCache;
+        private readonly Cached<Vector2> endPositionCache = new Cached<Vector2>();
 
         public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
-
-        public override int ComboIndex
-        {
-            get => base.ComboIndex;
-            set
-            {
-                base.ComboIndex = value;
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
-                    n.ComboIndex = value;
-            }
-        }
-
-        public override int IndexInCurrentCombo
-        {
-            get => base.IndexInCurrentCombo;
-            set
-            {
-                base.IndexInCurrentCombo = value;
-                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
-                    n.IndexInCurrentCombo = value;
-            }
-        }
 
         public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
 
@@ -75,13 +54,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 base.Position = value;
 
+                endPositionCache.Invalidate();
+
                 if (HeadCircle != null)
                     HeadCircle.Position = value;
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
-
-                endPositionCache.Invalidate();
             }
         }
 
@@ -191,8 +170,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position,
                             Samples = getNodeSamples(0),
                             SampleControlPoint = SampleControlPoint,
-                            IndexInCurrentCombo = IndexInCurrentCombo,
-                            ComboIndex = ComboIndex,
                         });
                         break;
 
@@ -204,8 +181,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                         {
                             StartTime = e.Time,
                             Position = EndPosition,
-                            IndexInCurrentCombo = IndexInCurrentCombo,
-                            ComboIndex = ComboIndex,
                         });
                         break;
 
@@ -229,5 +204,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

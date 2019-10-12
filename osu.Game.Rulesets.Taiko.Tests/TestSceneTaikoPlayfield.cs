@@ -14,13 +14,13 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Visual;
 using osuTK;
-using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
@@ -53,6 +53,11 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Strong Rim", () => addRimHit(true));
             AddStep("Add bar line", () => addBarLine(false));
             AddStep("Add major bar line", () => addBarLine(true));
+            AddStep("Add centre w/ bar line", () =>
+            {
+                addCentreHit(false);
+                addBarLine(true);
+            });
             AddStep("Height test 1", () => changePlayfieldSize(1));
             AddStep("Height test 2", () => changePlayfieldSize(2));
             AddStep("Height test 3", () => changePlayfieldSize(3));
@@ -144,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
         }
 
         private void addStrongHitJudgement(bool kiai)
@@ -159,13 +164,13 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(h, new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new HitObject(), new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
         {
-            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new TaikoJudgement()) { Type = HitResult.Miss });
+            ((TaikoPlayfield)drawableRuleset.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new HitObject(), new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
@@ -245,10 +250,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
         {
             public DrawableTestHit(TaikoHitObject hitObject)
                 : base(hitObject)
-            {
-            }
-
-            protected override void UpdateState(ArmedState state)
             {
             }
         }

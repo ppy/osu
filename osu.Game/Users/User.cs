@@ -20,6 +20,9 @@ namespace osu.Game.Users
         [JsonProperty(@"username")]
         public string Username;
 
+        [JsonProperty(@"previous_usernames")]
+        public string[] PreviousUsernames;
+
         [JsonProperty(@"country")]
         public Country Country;
 
@@ -75,6 +78,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_bng")]
         public bool IsBNG;
 
+        [JsonProperty(@"is_bot")]
+        public bool IsBot;
+
         [JsonProperty(@"is_active")]
         public bool Active;
 
@@ -118,7 +124,7 @@ namespace osu.Game.Users
         public int PostCount;
 
         [JsonProperty(@"follower_count")]
-        public int[] FollowerCount;
+        public int FollowerCount;
 
         [JsonProperty]
         private string[] playstyle
@@ -159,7 +165,10 @@ namespace osu.Game.Users
         }
 
         [JsonProperty(@"rankHistory")]
-        public RankHistoryData RankHistory;
+        private RankHistoryData rankHistory
+        {
+            set => Statistics.RankHistory = value;
+        }
 
         [JsonProperty("badges")]
         public Badge[] Badges;
@@ -184,6 +193,7 @@ namespace osu.Game.Users
         public static readonly User SYSTEM_USER = new User
         {
             Username = "system",
+            Colour = @"9c0101",
             Id = 0
         };
 

@@ -31,6 +31,10 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float MessagePadding => default_message_padding;
 
+        private const float default_timestamp_padding = 65;
+
+        protected virtual float TimestampPadding => default_timestamp_padding;
+
         private const float default_horizontal_padding = 15;
 
         protected virtual float HorizontalPadding => default_horizontal_padding;
@@ -85,8 +89,14 @@ namespace osu.Game.Overlays.Chat
 
             Drawable effectedUsername = username = new OsuSpriteText
             {
+                Shadow = false,
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
-                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
+                Truncate = true,
+                EllipsisString = "… :",
+                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                MaxWidth = MessagePadding - TimestampPadding
             };
 
             if (hasBackground)
@@ -133,6 +143,7 @@ namespace osu.Game.Overlays.Chat
                     {
                         timestamp = new OsuSpriteText
                         {
+                            Shadow = false,
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true)
@@ -155,6 +166,8 @@ namespace osu.Game.Overlays.Chat
                     {
                         contentFlow = new LinkFlowContainer(t =>
                         {
+                            t.Shadow = false;
+
                             if (Message.IsAction)
                             {
                                 t.Font = OsuFont.GetFont(italics: true);

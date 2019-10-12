@@ -7,10 +7,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -21,13 +23,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Container<PlacementBlueprint> placementBlueprintContainer;
         private PlacementBlueprint currentPlacement;
-
         private SelectionHandler selectionHandler;
+        private InputManager inputManager;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
+
+        [Resolved]
+        private IEditorBeatmap beatmap { get; set; }
 
         public BlueprintContainer()
         {
@@ -53,7 +58,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
 
             foreach (var obj in composer.HitObjects)
-                AddBlueprintFor(obj);
+                addBlueprintFor(obj);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            beatmap.HitObjectAdded += addBlueprintFor;
+            beatmap.HitObjectRemoved += removeBlueprintFor;
+
+            inputManager = GetContainingInputManager();
         }
 
         private HitObjectCompositionTool currentTool;
@@ -75,11 +90,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        /// <summary>
-        /// Adds a blueprint for a <see cref="DrawableHitObject"/> which adds movement support.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a blueprint for.</param>
-        public void AddBlueprintFor(DrawableHitObject hitObject)
+        private void addBlueprintFor(HitObject hitObject)
+        {
+            var drawable = composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+            if (drawable == null)
+                return;
+
+            addBlueprintFor(drawable);
+        }
+
+        private void removeBlueprintFor(HitObject hitObject)
+        {
+            var blueprint = selectionBlueprints.Single(m => m.HitObject.HitObject == hitObject);
+            if (blueprint == null)
+                return;
+
+            blueprint.Deselect();
+
+            blueprint.Selected -= onBlueprintSelected;
+            blueprint.Deselected -= onBlueprintDeselected;
+            blueprint.SelectionRequested -= onSelectionRequested;
+            blueprint.DragRequested -= onDragRequested;
+
+            selectionBlueprints.Remove(blueprint);
+        }
+
+        private void addBlueprintFor(DrawableHitObject hitObject)
         {
             refreshTool();
 
@@ -95,30 +131,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionBlueprints.Add(blueprint);
         }
 
-        /// <summary>
-        /// Removes a blueprint for a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> for which to remove the blueprint.</param>
-        public void RemoveBlueprintFor(DrawableHitObject hitObject)
-        {
-            var blueprint = selectionBlueprints.Single(m => m.HitObject == hitObject);
-            if (blueprint == null)
-                return;
-
-            blueprint.Deselect();
-
-            blueprint.Selected -= onBlueprintSelected;
-            blueprint.Deselected -= onBlueprintDeselected;
-            blueprint.SelectionRequested -= onSelectionRequested;
-            blueprint.DragRequested -= onDragRequested;
-
-            selectionBlueprints.Remove(blueprint);
-        }
+        private void removeBlueprintFor(DrawableHitObject hitObject) => removeBlueprintFor(hitObject.HitObject);
 
         protected override bool OnClick(ClickEvent e)
         {
             deselectAll();
             return true;
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            if (currentPlacement != null)
+            {
+                currentPlacement.UpdatePosition(e.ScreenSpaceMousePosition);
+                return true;
+            }
+
+            return base.OnMouseMove(e);
         }
 
         protected override void Update()
@@ -143,8 +172,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             currentPlacement = null;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
+
             if (blueprint != null)
+            {
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
+
+                // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+                blueprint.UpdatePosition(inputManager.CurrentState.Mouse.Position);
+            }
         }
 
         /// <summary>
@@ -181,7 +216,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent) => selectionHandler.HandleDrag(blueprint, dragEvent);
+        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent)
+        {
+            var movePosition = blueprint.ScreenSpaceMovementStartPosition + dragEvent.ScreenSpaceMousePosition - dragEvent.ScreenSpaceMouseDownPosition;
+
+            selectionHandler.HandleMovement(new MoveSelectionEvent(blueprint, blueprint.ScreenSpaceMovementStartPosition, movePosition));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmap != null)
+            {
+                beatmap.HitObjectAdded -= addBlueprintFor;
+                beatmap.HitObjectRemoved -= removeBlueprintFor;
+            }
+        }
 
         private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {

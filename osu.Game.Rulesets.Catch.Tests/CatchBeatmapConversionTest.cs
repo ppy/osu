@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
+using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
@@ -22,10 +23,10 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("spinner")]
         [TestCase("spinner-and-circles")]
         [TestCase("slider")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        [TestCase("hardrock-stream", new[] { typeof(CatchModHardRock) })]
+        [TestCase("hardrock-repeat-slider", new[] { typeof(CatchModHardRock) })]
+        [TestCase("hardrock-spinner", new[] { typeof(CatchModHardRock) })]
+        public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {

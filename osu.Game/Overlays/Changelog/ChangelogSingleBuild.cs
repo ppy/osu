@@ -92,24 +92,16 @@ namespace osu.Game.Overlays.Changelog
                     });
                 }
 
-                NavigationIconButton left, right;
-
-                fill.AddRange(new[]
+                fill.Insert(-1, new NavigationIconButton(Build.Versions?.Previous)
                 {
-                    left = new NavigationIconButton(Build.Versions?.Previous)
-                    {
-                        Icon = FontAwesome.Solid.ChevronLeft,
-                        SelectBuild = b => SelectBuild(b)
-                    },
-                    right = new NavigationIconButton(Build.Versions?.Next)
-                    {
-                        Icon = FontAwesome.Solid.ChevronRight,
-                        SelectBuild = b => SelectBuild(b)
-                    },
+                    Icon = FontAwesome.Solid.ChevronLeft,
+                    SelectBuild = b => SelectBuild(b)
                 });
-
-                fill.SetLayoutPosition(left, -1);
-                fill.SetLayoutPosition(right, 1);
+                fill.Insert(1, new NavigationIconButton(Build.Versions?.Next)
+                {
+                    Icon = FontAwesome.Solid.ChevronRight,
+                    SelectBuild = b => SelectBuild(b)
+                });
 
                 return fill;
             }

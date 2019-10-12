@@ -8,11 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
-using osu.Game.Overlays.Notifications;
 using osuTK;
 using osuTK.Graphics;
 
@@ -20,17 +17,9 @@ namespace osu.Desktop.Overlays
 {
     public class VersionManager : OverlayContainer
     {
-        private OsuConfigManager config;
-        private OsuGameBase game;
-        private NotificationOverlay notificationOverlay;
-
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config)
+        private void load(OsuColour colours, TextureStore textures, OsuGameBase game)
         {
-            notificationOverlay = notification;
-            this.config = config;
-            this.game = game;
-
             AutoSizeAxes = Axes.Both;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
@@ -83,47 +72,6 @@ namespace osu.Desktop.Overlays
                     }
                 }
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            var version = game.Version;
-            var lastVersion = config.Get<string>(OsuSetting.Version);
-
-            if (game.IsDeployedBuild && version != lastVersion)
-            {
-                config.Set(OsuSetting.Version, version);
-
-                // only show a notification if we've previously saved a version to the config file (ie. not the first run).
-                if (!string.IsNullOrEmpty(lastVersion))
-                    notificationOverlay.Post(new UpdateCompleteNotification(version));
-            }
-        }
-
-        private class UpdateCompleteNotification : SimpleNotification
-        {
-            private readonly string version;
-
-            public UpdateCompleteNotification(string version)
-            {
-                this.version = version;
-                Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChangelogOverlay changelog)
-            {
-                Icon = FontAwesome.Solid.CheckSquare;
-                IconBackgound.Colour = colours.BlueDark;
-
-                Activated = delegate
-                {
-                    changelog.ShowBuild(OsuGameBase.CLIENT_STREAM_NAME, version);
-                    return true;
-                };
-            }
         }
 
         protected override void PopIn()
