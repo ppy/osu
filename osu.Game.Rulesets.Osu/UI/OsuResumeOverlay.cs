@@ -38,7 +38,13 @@ namespace osu.Game.Rulesets.Osu.UI
             clickToResumeCursor.ShowAt(GameplayCursor.ActiveCursor.Position);
 
             if (localCursorContainer == null)
-                Add(localCursorContainer = new OsuCursorContainer());
+            {
+                var newContainer = new OsuCursorContainer();
+                Add(localCursorContainer = newContainer);
+
+                clickToResumeCursor.CursorScale = newContainer.CalculatedCursorScale.Value;
+                newContainer.CalculatedCursorScale.ValueChanged += e => clickToResumeCursor.CursorScale = e.NewValue;
+            }
         }
 
         public override void Hide()
@@ -56,6 +62,8 @@ namespace osu.Game.Rulesets.Osu.UI
             public override bool HandlePositionalInput => true;
 
             public Action ResumeRequested;
+
+            public float CursorScale;
 
             public OsuClickToResumeCursor()
             {
@@ -82,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     case OsuAction.RightButton:
                         if (!IsHovered) return false;
 
-                        this.ScaleTo(new Vector2(2), TRANSITION_TIME, Easing.OutQuint);
+                        this.ScaleTo(2 * CursorScale, TRANSITION_TIME, Easing.OutQuint);
 
                         ResumeRequested?.Invoke();
                         return true;
@@ -97,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 updateColour();
                 this.MoveTo(activeCursorPosition);
-                this.ScaleTo(new Vector2(4)).Then().ScaleTo(Vector2.One, 1000, Easing.OutQuint);
+                this.ScaleTo(4 * CursorScale).Then().ScaleTo(CursorScale, 1000, Easing.OutQuint);
             });
 
             private void updateColour()
