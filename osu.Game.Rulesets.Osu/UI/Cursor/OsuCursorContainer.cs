@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private Bindable<float> cursorScale;
         private Bindable<bool> autoCursorScale;
+        private float calculatedCursorScale;
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public OsuCursorContainer()
@@ -69,6 +70,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
             }
 
+            calculatedCursorScale = scale;
             ActiveCursor.Scale = cursorTrail.Scale = new Vector2(scale);
         }
 
@@ -125,13 +127,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void PopIn()
         {
             fadeContainer.FadeTo(1, 300, Easing.OutQuint);
-            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
+            ActiveCursor.ScaleTo(calculatedCursorScale, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(calculatedCursorScale * 0.8f, 450, Easing.OutQuint);
         }
 
         private class DefaultCursorTrail : CursorTrail
