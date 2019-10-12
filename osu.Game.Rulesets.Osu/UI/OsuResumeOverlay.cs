@@ -43,7 +43,13 @@ namespace osu.Game.Rulesets.Osu.UI
                 Add(localCursorContainer = newContainer);
 
                 clickToResumeCursor.CursorScale = newContainer.CalculatedCursorScale.Value;
-                newContainer.CalculatedCursorScale.ValueChanged += e => clickToResumeCursor.CursorScale = e.NewValue;
+                clickToResumeCursor.Scale = new Vector2(newContainer.CalculatedCursorScale.Value);
+
+                newContainer.CalculatedCursorScale.ValueChanged += e =>
+                {
+                    clickToResumeCursor.CursorScale = e.NewValue;
+                    clickToResumeCursor.Scale = new Vector2(e.NewValue);
+                };
             }
         }
 
