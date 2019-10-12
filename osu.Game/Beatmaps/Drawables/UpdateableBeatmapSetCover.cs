@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Drawables
 {
     public class UpdateableBeatmapSetCover : ModelBackedDrawable<BeatmapSetInfo>
     {
-        protected readonly BeatmapSetCoverType CoverType;
+        private readonly BeatmapSetCoverType type;
 
         public BeatmapSetInfo BeatmapSet
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public UpdateableBeatmapSetCover(BeatmapSetCoverType type = BeatmapSetCoverType.Cover)
         {
-            CoverType = type;
+            this.type = type;
         }
 
         protected override Drawable CreateDrawable(BeatmapSetInfo beatmapSet)

@@ -21,28 +21,25 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapSetCover),
         };
 
-        private readonly FillFlowContainer coversContainer;
+        private readonly FillFlowContainer<TestUpdateableBeatmapSetCover> covers;
 
         public TestSceneUpdateableBeatmapSetCover()
         {
-            Child = coversContainer = new FillFlowContainer
+            Child = covers = new FillFlowContainer<TestUpdateableBeatmapSetCover>
             {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(10),
-                Children = new[]
-                {
-                    new TestUpdateableBeatmapSetCover(BeatmapSetCoverType.Cover),
-                    new TestUpdateableBeatmapSetCover(BeatmapSetCoverType.Card),
-                    new TestUpdateableBeatmapSetCover(BeatmapSetCoverType.List),
-                }
+                Children = Enum.GetValues(typeof(BeatmapSetCoverType)).Cast<BeatmapSetCoverType>().Select(t => new TestUpdateableBeatmapSetCover(t)).ToList(),
             };
         }
 
         [SetUp]
         public void SetUp()
         {
-            foreach (var cover in coversContainer.Children.OfType<TestUpdateableBeatmapSetCover>())
+            foreach (var cover in covers)
                 cover.BeatmapSet = null;
         }
 
@@ -62,28 +59,32 @@ namespace osu.Game.Tests.Visual.Online
                 }
             };
 
-            foreach (var cover in coversContainer.Children.OfType<TestUpdateableBeatmapSetCover>())
+            foreach (var cover in covers)
             {
-                var coverType = cover.CoverType.ToString().ToLower();
+                var coverType = cover.Type.ToString().ToLower();
                 AddStep($"set beatmap for {coverType}", () => cover.BeatmapSet = setInfo);
-                AddUntilStep($"wait until {coverType} drawable is displayed", () => cover.DisplayedDrawable is BeatmapSetCover);
-                AddAssert($"verify {coverType} drawable has correct beatmapset", () => (cover.DisplayedDrawable as BeatmapSetCover)?.BeatmapSet == setInfo);
-                AddAssert($"verify {coverType} drawable has correct type", () => (cover.DisplayedDrawable as BeatmapSetCover)?.CoverType == cover.CoverType);
+                AddUntilStep($"{coverType} drawable is displayed", () => cover.DisplayedDrawable is BeatmapSetCover);
+                AddAssert($"ensure {coverType} has correct props", () => (cover.DisplayedDrawable as BeatmapSetCover)?.BeatmapSet == setInfo && (cover.DisplayedDrawable as BeatmapSetCover)?.CoverType == cover.Type);
             }
         }
 
         private class TestUpdateableBeatmapSetCover : UpdateableBeatmapSetCover
         {
-            public new BeatmapSetCoverType CoverType => base.CoverType;
-            public new Drawable DisplayedDrawable => base.DisplayedDrawable;
+            public readonly BeatmapSetCoverType Type;
 
-            public TestUpdateableBeatmapSetCover(BeatmapSetCoverType coverType)
-                : base(coverType)
+            public new Drawable DisplayedDrawable => base.DisplayedDrawable as BeatmapSetCover;
+
+            public TestUpdateableBeatmapSetCover(BeatmapSetCoverType type)
+                : base(type)
             {
-                switch (coverType)
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Masking = true;
+
+                switch (Type = type)
                 {
                     case BeatmapSetCoverType.Cover:
-                        Size = new Vector2(400);
+                        Size = new Vector2(600, 300);
                         break;
 
                     case BeatmapSetCoverType.Card:
@@ -91,7 +92,7 @@ namespace osu.Game.Tests.Visual.Online
                         break;
 
                     case BeatmapSetCoverType.List:
-                        Size = new Vector2(600, 150);
+                        Size = new Vector2(150, 75);
                         break;
                 }
             }
