@@ -510,9 +510,9 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null)
+        public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null, bool virtualTrack = false)
         {
-            var temp = path ?? TestResources.GetTestBeatmapForImport();
+            var temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
 
             var manager = osu.Dependencies.Get<BeatmapManager>();
 

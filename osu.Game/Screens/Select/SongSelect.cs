@@ -486,7 +486,9 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected();
+
+                // restart playback on returning to song select, regardless.
+                music?.Play();
             }
 
             base.OnResuming(last);
@@ -592,7 +594,7 @@ namespace osu.Game.Screens.Select
             track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
 
             if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
-                track.Restart();
+                music?.Play(true);
 
             lastTrack.SetTarget(track);
         }
