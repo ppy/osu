@@ -29,9 +29,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
+        public IBindable<float> CalculatedCursorScale => calculatedCursorScale;
+        private Bindable<float> calculatedCursorScale;
         private Bindable<float> cursorScale;
         private Bindable<bool> autoCursorScale;
-        private float calculatedCursorScale;
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public OsuCursorContainer()
@@ -57,6 +58,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
             autoCursorScale.ValueChanged += _ => calculateScale();
 
+            calculatedCursorScale = new Bindable<float>();
+            calculatedCursorScale.ValueChanged += e => ActiveCursor.Scale = cursorTrail.Scale = new Vector2(e.NewValue);
+
             calculateScale();
         }
 
@@ -70,8 +74,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
             }
 
-            calculatedCursorScale = scale;
-            ActiveCursor.Scale = cursorTrail.Scale = new Vector2(scale);
+            calculatedCursorScale.Value = scale;
         }
 
         protected override void LoadComplete()
@@ -127,13 +130,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void PopIn()
         {
             fadeContainer.FadeTo(1, 300, Easing.OutQuint);
-            ActiveCursor.ScaleTo(calculatedCursorScale, 400, Easing.OutQuint);
+            ActiveCursor.ScaleTo(calculatedCursorScale.Value, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
-            ActiveCursor.ScaleTo(calculatedCursorScale * 0.8f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(calculatedCursorScale.Value * 0.8f, 450, Easing.OutQuint);
         }
 
         private class DefaultCursorTrail : CursorTrail
