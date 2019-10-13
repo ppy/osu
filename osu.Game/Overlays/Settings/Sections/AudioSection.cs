@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new AudioDevicesSettings(),
                 new VolumeSettings(),
                 new OffsetSettings(),
-                new MainMenuSettings(),
+                new MainMenuSettings()
             };
         }
     }
