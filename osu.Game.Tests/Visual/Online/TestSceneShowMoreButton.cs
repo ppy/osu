@@ -5,6 +5,7 @@ using osu.Game.Overlays.Profile.Sections;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -17,11 +18,11 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneShowMoreButton()
         {
-            ShowMoreButton button = null;
+            ProfileShowMoreButton button = null;
 
             int fireCount = 0;
 
-            Add(button = new ShowMoreButton
+            Add(button = new ProfileShowMoreButton
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

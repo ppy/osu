@@ -7,7 +7,6 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Bindables;
-using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -66,7 +65,12 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            countText.Text = $@"{count.NewValue} deleted comment{(count.NewValue.ToString().ToCharArray().Last() == '1' ? "" : "s")}";
+            string str = $@"{count.NewValue} deleted comment";
+
+            if (!(count.NewValue.ToString().EndsWith("1") && !count.NewValue.ToString().EndsWith("11")))
+                str += "s";
+
+            countText.Text = str;
             Show();
         }
     }

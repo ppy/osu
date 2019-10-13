@@ -16,6 +16,8 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
+        private const int more_button_margin = 5;
+
         private readonly CommentableType type;
         private readonly long id;
 
@@ -30,11 +32,13 @@ namespace osu.Game.Overlays.Comments
 
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
+        private int currentPage;
+        private int loadedTopLevelComments;
 
         private readonly Box background;
         private readonly FillFlowContainer content;
-        private readonly FillFlowContainer footer;
         private readonly DeletedChildsPlaceholder deletedChildsPlaceholder;
+        private readonly CommentsShowMoreButton moreButton;
 
         public CommentsContainer(CommentableType type, long id)
         {
@@ -78,7 +82,7 @@ namespace osu.Game.Overlays.Comments
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.Gray(0.2f)
                                 },
-                                footer = new FillFlowContainer
+                                new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -88,6 +92,18 @@ namespace osu.Game.Overlays.Comments
                                         deletedChildsPlaceholder = new DeletedChildsPlaceholder
                                         {
                                             ShowDeleted = { BindTarget = ShowDeleted }
+                                        },
+                                        new Container
+                                        {
+                                            AutoSizeAxes = Axes.Y,
+                                            RelativeSizeAxes = Axes.X,
+                                            Child = moreButton = new CommentsShowMoreButton
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Margin = new MarginPadding(more_button_margin),
+                                                Action = () => getComments(false),
+                                            }
                                         }
                                     }
                                 }
@@ -106,16 +122,25 @@ namespace osu.Game.Overlays.Comments
 
         private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort) => getComments();
 
-        private void getComments()
+        private void getComments(bool initial = true)
         {
+            if (initial)
+            {
+                currentPage = 1;
+                loadedTopLevelComments = 0;
+                deletedChildsPlaceholder.DeletedCount.Value = 0;
+                moreButton.IsLoading = true;
+                content.Clear();
+            }
+
             request?.Cancel();
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id, Sort.Value);
-            request.Success += onSuccess;
+            request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
+            request.Success += response => onSuccess(response, initial);
             api.Queue(request);
         }
 
-        private void onSuccess(APICommentsController response)
+        private void onSuccess(APICommentsController response, bool initial)
         {
             loadCancellation = new CancellationTokenSource();
 
@@ -137,8 +162,6 @@ namespace osu.Game.Overlays.Comments
 
             LoadComponentAsync(page, loaded =>
             {
-                content.Clear();
-
                 content.Add(loaded);
 
                 int deletedComments = 0;
@@ -149,7 +172,20 @@ namespace osu.Game.Overlays.Comments
                         deletedComments++;
                 });
 
-                deletedChildsPlaceholder.DeletedCount.Value = deletedComments;
+                deletedChildsPlaceholder.DeletedCount.Value = initial ? deletedComments : deletedChildsPlaceholder.DeletedCount.Value + deletedComments;
+
+                if (response.HasMore)
+                {
+                    response.Comments.ForEach(comment =>
+                    {
+                        if (comment.IsTopLevel)
+                            loadedTopLevelComments++;
+                    });
+                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
+                    moreButton.IsLoading = false;
+                }
+                moreButton.FadeTo(response.HasMore ? 1 : 0);
+
             }, loadCancellation.Token);
         }
 

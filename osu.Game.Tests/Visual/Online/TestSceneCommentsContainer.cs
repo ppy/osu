@@ -47,6 +47,12 @@ namespace osu.Game.Tests.Visual.Online
                 scrollFlow.Clear();
                 scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
             });
+
+            AddStep("lazer build comments", () =>
+            {
+                scrollFlow.Clear();
+                scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
+            });
         }
     }
 }
