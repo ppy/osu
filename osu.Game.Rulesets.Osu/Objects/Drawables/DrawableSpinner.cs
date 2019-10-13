@@ -12,7 +12,6 @@ using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
@@ -279,7 +278,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             if (state != ArmedState.Idle)
-                Schedule(() => NestedHitObjects.Where(t => !t.IsHit).OfType<DrawableSpinnerTick>().ForEach(t => t.TriggerResult(HitResult.Miss)));
+            {
+                Schedule(() =>
+                {
+                    foreach (var tick in ticks.Where(t => !t.IsHit))
+                        tick.TriggerResult(HitResult.Miss);
+                });
+            }
         }
     }
 }
