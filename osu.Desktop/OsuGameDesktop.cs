@@ -17,6 +17,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
+using osu.Game.Updater;
 
 namespace osu.Desktop
 {

@@ -14,6 +14,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -47,9 +48,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for track to start running", () => track.IsRunning);
             addSeekStep(3000);
             AddAssert("all judged", () => player.DrawableRuleset.Playfield.AllHitObjects.All(h => h.Judged));
+            AddUntilStep("key counter counted keys", () => player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses >= 7));
             AddStep("clear results", () => player.AppliedResults.Clear());
             addSeekStep(0);
             AddAssert("none judged", () => player.DrawableRuleset.Playfield.AllHitObjects.All(h => !h.Judged));
+            AddUntilStep("key counters reset", () => player.HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
             AddAssert("no results triggered", () => player.AppliedResults.Count == 0);
         }
 
@@ -89,6 +92,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class RulesetExposingPlayer : Player
         {
             public readonly List<JudgementResult> AppliedResults = new List<JudgementResult>();
+
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+
+            public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
             public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
 

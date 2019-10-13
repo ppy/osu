@@ -44,6 +44,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override Judgement CreateJudgement() => new OsuJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

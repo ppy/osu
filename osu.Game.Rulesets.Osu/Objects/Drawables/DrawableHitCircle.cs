@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        public ApproachCircle ApproachCircle;
+        public ApproachCircle ApproachCircle { get; }
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly HitArea hitArea;
 
-        private readonly SkinnableDrawable mainContent;
+        public SkinnableDrawable CirclePiece { get; }
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        mainContent = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
+                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece()),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -84,6 +84,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             scaleBindable.BindTo(HitObject.ScaleBindable);
 
             AccentColour.BindValueChanged(accent => ApproachCircle.Colour = accent.NewValue, true);
+        }
+
+        public override double LifetimeStart
+        {
+            get => base.LifetimeStart;
+            set
+            {
+                base.LifetimeStart = value;
+                ApproachCircle.LifetimeStart = value;
+            }
+        }
+
+        public override double LifetimeEnd
+        {
+            get => base.LifetimeEnd;
+            set
+            {
+                base.LifetimeEnd = value;
+                ApproachCircle.LifetimeEnd = value;
+            }
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -113,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            mainContent.FadeInFromZero(HitObject.TimeFadeIn);
+            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
@@ -122,6 +142,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             Debug.Assert(HitObject.HitWindows != null);
 
             switch (state)
@@ -132,22 +154,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Expire(true);
 
                     hitArea.HitAction = null;
-
-                    // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
-                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.WindowFor(HitResult.Miss);
                     break;
 
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
                     this.FadeOut(100);
-                    Expire();
                     break;
 
                 case ArmedState.Hit:
                     ApproachCircle.FadeOut(50);
 
                     // todo: temporary / arbitrary
-                    this.Delay(800).Expire();
+                    this.Delay(800).FadeOut();
                     break;
             }
         }

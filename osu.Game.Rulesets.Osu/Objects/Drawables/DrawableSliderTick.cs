@@ -75,6 +75,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             switch (state)
             {
                 case ArmedState.Idle:

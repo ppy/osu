@@ -50,6 +50,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         public Func<CatchHitObject, bool> CheckPosition;
 
+        public bool IsOnPlate;
+
+        public override bool RemoveWhenNotAlive => IsOnPlate;
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (CheckPosition == null) return;
@@ -71,11 +75,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 switch (state)
                 {
                     case ArmedState.Miss:
-                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out).Expire();
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
                         break;
 
                     case ArmedState.Hit:
-                        this.FadeOut().Expire();
+                        this.FadeOut();
                         break;
                 }
             }

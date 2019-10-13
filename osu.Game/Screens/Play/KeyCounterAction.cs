@@ -1,11 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Input.Bindings;
-
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterAction<T> : KeyCounter, IKeyBindingHandler<T>
+    public class KeyCounterAction<T> : KeyCounter
         where T : struct
     {
         public T Action { get; }
@@ -16,15 +14,25 @@ namespace osu.Game.Screens.Play
             Action = action;
         }
 
-        public bool OnPressed(T action)
+        public bool OnPressed(T action, bool forwards)
         {
-            if (action.Equals(Action)) IsLit = true;
+            if (!action.Equals(Action))
+                return false;
+
+            IsLit = true;
+            if (forwards)
+                Increment();
             return false;
         }
 
-        public bool OnReleased(T action)
+        public bool OnReleased(T action, bool forwards)
         {
-            if (action.Equals(Action)) IsLit = false;
+            if (!action.Equals(Action))
+                return false;
+
+            IsLit = false;
+            if (!forwards)
+                Decrement();
             return false;
         }
     }

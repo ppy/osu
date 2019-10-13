@@ -33,16 +33,21 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria
+        public FilterCriteria CreateCriteria()
         {
-            Group = groupMode.Value,
-            Sort = sortMode.Value,
-            SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted.Value,
-            Ruleset = ruleset.Value
-        };
+            var query = searchTextBox.Text;
 
-        public Action Exit;
+            var criteria = new FilterCriteria
+            {
+                Group = groupMode.Value,
+                Sort = sortMode.Value,
+                AllowConvertedBeatmaps = showConverted.Value,
+                Ruleset = ruleset.Value
+            };
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            return criteria;
+        }
 
         private readonly SearchTextBox searchTextBox;
 
@@ -68,11 +73,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Exit = () => Exit?.Invoke(),
-                        },
+                        searchTextBox = new SearchTextBox { RelativeSizeAxes = Axes.X },
                         new Box
                         {
                             RelativeSizeAxes = Axes.X,
