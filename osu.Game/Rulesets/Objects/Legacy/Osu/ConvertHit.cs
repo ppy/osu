@@ -22,6 +22,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public int ComboOffset { get; set; }
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

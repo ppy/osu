@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Vertices;
@@ -20,30 +21,15 @@ using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    internal class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
+    public class CursorTrail : Drawable, IRequireHighFrequencyMousePosition
     {
-        private int currentIndex;
-
-        private IShader shader;
-        private Texture texture;
-
-        private Vector2 size => texture.Size * Scale;
-
-        private double timeOffset;
-
-        private float time;
-
-        public override bool IsPresent => true;
-
         private const int max_sprites = 2048;
 
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
-
-        private Vector2? lastPosition;
-
-        private readonly InputResampler resampler = new InputResampler();
-
-        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
+        private int currentIndex;
+        private IShader shader;
+        private double timeOffset;
+        private float time;
 
         public CursorTrail()
         {
@@ -54,20 +40,15 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             for (int i = 0; i < max_sprites; i++)
             {
-                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
-                // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
-                parts[i].InvalidationID = 1;
+                // -1 signals that the part is unusable, and should not be drawn
+                parts[i].InvalidationID = -1;
             }
         }
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, TextureStore textures)
+        private void load(ShaderManager shaders)
         {
             shader = shaders.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
-            texture = textures.Get(@"Cursor/cursortrail");
-            Scale = new Vector2(1 / texture.ScaleAdjust);
         }
 
         protected override void LoadComplete()
@@ -75,6 +56,42 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             base.LoadComplete();
             resetTime();
         }
+
+        private Texture texture = Texture.WhitePixel;
+
+        public Texture Texture
+        {
+            get => texture;
+            set
+            {
+                if (texture == value)
+                    return;
+
+                texture = value;
+                Invalidate(Invalidation.DrawNode);
+            }
+        }
+
+        private readonly Cached<Vector2> partSizeCache = new Cached<Vector2>();
+
+        private Vector2 partSize => partSizeCache.IsValid
+            ? partSizeCache.Value
+            : (partSizeCache.Value = new Vector2(Texture.DisplayWidth, Texture.DisplayHeight) * DrawInfo.Matrix.ExtractScale().Xy);
+
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+        {
+            if ((invalidation & (Invalidation.DrawInfo | Invalidation.RequiredParentSizeToFit | Invalidation.Presence)) > 0)
+                partSizeCache.Invalidate();
+
+            return base.Invalidate(invalidation, source, shallPropagate);
+        }
+
+        /// <summary>
+        /// The amount of time to fade the cursor trail pieces.
+        /// </summary>
+        protected virtual double FadeDuration => 300;
+
+        public override bool IsPresent => true;
 
         protected override void Update()
         {
@@ -84,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             const int fade_clock_reset_threshold = 1000000;
 
-            time = (float)(Time.Current - timeOffset) / 300f;
+            time = (float)((Time.Current - timeOffset) / FadeDuration);
             if (time > fade_clock_reset_threshold)
                 resetTime();
         }
@@ -94,12 +111,24 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             for (int i = 0; i < parts.Length; ++i)
             {
                 parts[i].Time -= time;
-                ++parts[i].InvalidationID;
+
+                if (parts[i].InvalidationID != -1)
+                    ++parts[i].InvalidationID;
             }
 
             time = 0;
             timeOffset = Time.Current;
         }
+
+        /// <summary>
+        /// Whether to interpolate mouse movements and add trail pieces at intermediate points.
+        /// </summary>
+        protected virtual bool InterpolateMovements => true;
+
+        private Vector2? lastPosition;
+        private readonly InputResampler resampler = new InputResampler();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -116,32 +145,42 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             {
                 Trace.Assert(lastPosition.HasValue);
 
-                // ReSharper disable once PossibleInvalidOperationException
-                Vector2 pos1 = lastPosition.Value;
-                Vector2 diff = pos2 - pos1;
-                float distance = diff.Length;
-                Vector2 direction = diff / distance;
-
-                float interval = size.X / 2 * 0.9f;
-
-                for (float d = interval; d < distance; d += interval)
+                if (InterpolateMovements)
                 {
-                    lastPosition = pos1 + direction * d;
-                    addPosition(lastPosition.Value);
+                    // ReSharper disable once PossibleInvalidOperationException
+                    Vector2 pos1 = lastPosition.Value;
+                    Vector2 diff = pos2 - pos1;
+                    float distance = diff.Length;
+                    Vector2 direction = diff / distance;
+
+                    float interval = partSize.X / 2.5f;
+
+                    for (float d = interval; d < distance; d += interval)
+                    {
+                        lastPosition = pos1 + direction * d;
+                        addPart(lastPosition.Value);
+                    }
+                }
+                else
+                {
+                    lastPosition = pos2;
+                    addPart(lastPosition.Value);
                 }
             }
 
             return base.OnMouseMove(e);
         }
 
-        private void addPosition(Vector2 pos)
+        private void addPart(Vector2 screenSpacePosition)
         {
-            parts[currentIndex].Position = pos;
+            parts[currentIndex].Position = screenSpacePosition;
             parts[currentIndex].Time = time;
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
         }
+
+        protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
 
         private struct TrailPart
         {
@@ -167,8 +206,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public TrailDrawNode(CursorTrail source)
                 : base(source)
             {
-                for (int i = 0; i < max_sprites; i++)
-                    parts[i].InvalidationID = 0;
             }
 
             public override void ApplyState()
@@ -177,14 +214,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 shader = Source.shader;
                 texture = Source.texture;
-                size = Source.size;
+                size = Source.partSize;
                 time = Source.time;
 
-                for (int i = 0; i < Source.parts.Length; ++i)
-                {
-                    if (Source.parts[i].InvalidationID > parts[i].InvalidationID)
-                        parts[i] = Source.parts[i];
-                }
+                Source.parts.CopyTo(parts, 0);
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
@@ -196,6 +229,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 for (int i = 0; i < parts.Length; ++i)
                 {
+                    if (parts[i].InvalidationID == -1)
+                        continue;
+
                     vertexBatch.DrawTime = parts[i].Time;
 
                     Vector2 pos = parts[i].Position;

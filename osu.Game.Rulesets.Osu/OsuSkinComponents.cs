@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Osu
         HitCircle,
         FollowPoint,
         Cursor,
+        CursorTrail,
         SliderScorePoint,
         ApproachCircle,
         ReverseArrow,

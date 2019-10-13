@@ -8,6 +8,7 @@ using osu.Framework.IO.File;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.IO;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -25,6 +26,7 @@ namespace osu.Game.Beatmaps.Formats
         public static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyBeatmapDecoder(Parsing.ParseInt(m.Split('v').Last())));
+            SetFallbackDecoder<Beatmap>(() => new LegacyBeatmapDecoder());
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace osu.Game.Beatmaps.Formats
             offset = FormatVersion < 5 ? 24 : 0;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, Beatmap beatmap)
+        protected override void ParseStreamInto(LineBufferedReader stream, Beatmap beatmap)
         {
             this.beatmap = beatmap;
             this.beatmap.BeatmapInfo.BeatmapVersion = FormatVersion;
@@ -296,8 +298,13 @@ namespace osu.Game.Beatmaps.Formats
             switch (type)
             {
                 case EventType.Background:
-                    string filename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(filename);
+                    string bgFilename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(bgFilename);
+                    break;
+
+                case EventType.Video:
+                    string videoFilename = split[2].Trim('"');
+                    beatmap.BeatmapInfo.Metadata.VideoFile = FileSafety.PathStandardise(videoFilename);
                     break;
 
                 case EventType.Break:

@@ -263,14 +263,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateStateTransforms(ArmedState state)
         {
+            base.UpdateStateTransforms(state);
+
             var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {
-                case ArmedState.Idle:
-                    Expire(true);
-                    break;
-
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;
@@ -282,8 +280,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (state != ArmedState.Idle)
                 Schedule(() => NestedHitObjects.Where(t => !t.IsHit).OfType<DrawableSpinnerTick>().ForEach(t => t.TriggerResult(HitResult.Miss)));
-
-            Expire();
         }
     }
 }

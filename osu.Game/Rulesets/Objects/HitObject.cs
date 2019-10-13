@@ -2,8 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -26,10 +28,16 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         private const double control_point_leniency = 1;
 
+        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
+
         /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
-        public virtual double StartTime { get; set; }
+        public virtual double StartTime
+        {
+            get => StartTimeBindable.Value;
+            set => StartTimeBindable.Value = value;
+        }
 
         private List<HitSampleInfo> samples;
 
@@ -58,13 +66,23 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
-        [CanBeNull]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
 
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
+
+        public HitObject()
+        {
+            StartTimeBindable.ValueChanged += time =>
+            {
+                double offset = time.NewValue - time.OldValue;
+
+                foreach (var nested in NestedHitObjects)
+                    nested.StartTime += offset;
+            };
+        }
 
         /// <summary>
         /// Applies default values to this HitObject.
@@ -82,13 +100,19 @@ namespace osu.Game.Rulesets.Objects
 
             CreateNestedHitObjects();
 
+            if (this is IHasComboInformation hasCombo)
+            {
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                {
+                    n.ComboIndexBindable.BindTo(hasCombo.ComboIndexBindable);
+                    n.IndexInCurrentComboBindable.BindTo(hasCombo.IndexInCurrentComboBindable);
+                }
+            }
+
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
-            {
-                h.HitWindows = HitWindows;
                 h.ApplyDefaults(controlPointInfo, difficulty);
-            }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -119,7 +143,7 @@ namespace osu.Game.Rulesets.Objects
         /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter{T}"/>.
         /// </para>
         /// </summary>
-        [CanBeNull]
+        [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }

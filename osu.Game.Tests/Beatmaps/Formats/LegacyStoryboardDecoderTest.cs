@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.IO;
 using System.Linq;
 using NUnit.Framework;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Resources;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyStoryboardDecoder();
 
             using (var resStream = TestResources.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var storyboard = decoder.Decode(stream);
 
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyStoryboardDecoder();
 
             using (var resStream = TestResources.OpenResource("variable-with-suffix.osb"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var storyboard = decoder.Decode(stream);
 
