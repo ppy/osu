@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Comments
         private const int padding = 50;
         private const int text_size = 14;
 
-        public readonly Bindable<SortCommentsBy> Sort = new Bindable<SortCommentsBy>();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly Box background;
@@ -79,13 +79,11 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray4;
+            background.Colour = colours.Gray3;
         }
 
         private class ShowDeletedButton : HeaderButton
         {
-            private const int spacing = 5;
-
             public readonly BindableBool Checked = new BindableBool();
 
             private readonly SpriteIcon checkboxIcon;
@@ -96,7 +94,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(spacing, 0),
+                    Spacing = new Vector2(5, 0),
                     Children = new Drawable[]
                     {
                         checkboxIcon = new SpriteIcon
