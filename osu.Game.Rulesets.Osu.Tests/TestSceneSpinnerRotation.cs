@@ -15,6 +15,8 @@ using osu.Game.Tests.Visual;
 using osuTK;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -27,6 +29,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         private TrackVirtualManual track;
 
         protected override bool Autoplay => true;
+
+        protected override Player CreatePlayer(Ruleset ruleset) => new ScoreExposedPlayer();
 
         protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
         {
@@ -69,6 +73,32 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is rotation absolute almost same", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, estimatedRotation, 100));
         }
 
+        [Test]
+        public void TestSpinnerNormalBonusRewinding()
+        {
+            addSeekStep(1000);
+
+            AddAssert("player score matching expected bonus score", () =>
+            {
+                // multipled by 2 to nullify the score multiplier. (autoplay mod selected)
+                var totalScore = ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value * 2;
+                return totalScore == (int)(drawableSpinner.Disc.RotationAbsolute / 360) * 100;
+            });
+
+            addSeekStep(0);
+
+            AddAssert("player score is 0", () => ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value == 0);
+        }
+
+        [Test]
+        public void TestSpinnerCompleteBonusRewinding()
+        {
+            addSeekStep(2500);
+            addSeekStep(0);
+
+            AddAssert("player score is 0", () => ((ScoreExposedPlayer)Player).ScoreProcessor.TotalScore.Value == 0);
+        }
+
         private void addSeekStep(double time)
         {
             AddStep($"seek to {time}", () => track.Seek(time));
@@ -85,12 +115,17 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Position = new Vector2(256, 192),
                     EndTime = 5000,
                 },
-                // placeholder object to avoid hitting the results screen
-                new HitObject
-                {
-                    StartTime = 99999,
-                }
             }
         };
+
+        private class ScoreExposedPlayer : TestPlayer
+        {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+
+            public ScoreExposedPlayer()
+                : base(false, false)
+            {
+            }
+        }
     }
 }
