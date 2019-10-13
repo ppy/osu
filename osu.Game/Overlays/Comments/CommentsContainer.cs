@@ -33,6 +33,8 @@ namespace osu.Game.Overlays.Comments
 
         private readonly Box background;
         private readonly FillFlowContainer content;
+        private readonly FillFlowContainer footer;
+        private readonly DeletedChildsPlaceholder deletedChildsPlaceholder;
 
         public CommentsContainer(CommentableType type, long id)
         {
@@ -64,6 +66,32 @@ namespace osu.Game.Overlays.Comments
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.Gray(0.2f)
+                                },
+                                footer = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        deletedChildsPlaceholder = new DeletedChildsPlaceholder
+                                        {
+                                            ShowDeleted = { BindTarget = ShowDeleted }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -121,10 +149,7 @@ namespace osu.Game.Overlays.Comments
                         deletedComments++;
                 });
 
-                content.Add(new DeletedChildsPlaceholder(deletedComments)
-                {
-                    ShowDeleted = { BindTarget = ShowDeleted }
-                });
+                deletedChildsPlaceholder.DeletedCount.Value = deletedComments;
             }, loadCancellation.Token);
         }
 

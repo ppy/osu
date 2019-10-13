@@ -17,18 +17,18 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly BindableInt DeletedCount = new BindableInt();
 
-        private readonly bool canBeVisible;
+        private bool canBeShown;
 
-        public DeletedChildsPlaceholder(int count)
+        private readonly SpriteText countText;
+
+        public DeletedChildsPlaceholder()
         {
-            canBeVisible = count != 0;
-
             AutoSizeAxes = Axes.Both;
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(3, 0);
             Margin = new MarginPadding { Vertical = margin, Left = deleted_placeholder_margin };
-            Alpha = 0;
             Children = new Drawable[]
             {
                 new SpriteIcon
@@ -36,24 +36,38 @@ namespace osu.Game.Overlays.Comments
                     Icon = FontAwesome.Solid.Trash,
                     Size = new Vector2(14),
                 },
-                new SpriteText
+                countText = new SpriteText
                 {
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                    Text = $@"{count} deleted comment{(count.ToString().ToCharArray().Last() == '1' ? "" : "s")}"
                 }
             };
         }
 
         protected override void LoadComplete()
         {
+            DeletedCount.BindValueChanged(onCountChanged, true);
             ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
             base.LoadComplete();
         }
 
         private void onShowDeletedChanged(ValueChangedEvent<bool> showDeleted)
         {
-            if (canBeVisible)
+            if (canBeShown)
                 this.FadeTo(showDeleted.NewValue ? 0 : 1);
+        }
+
+        private void onCountChanged(ValueChangedEvent<int> count)
+        {
+            canBeShown = count.NewValue != 0;
+
+            if (!canBeShown)
+            {
+                Hide();
+                return;
+            }
+
+            countText.Text = $@"{count.NewValue} deleted comment{(count.NewValue.ToString().ToCharArray().Last() == '1' ? "" : "s")}";
+            Show();
         }
     }
 }
