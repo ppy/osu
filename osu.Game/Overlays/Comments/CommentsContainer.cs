@@ -10,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using System.Threading;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -28,6 +29,7 @@ namespace osu.Game.Overlays.Comments
         private OsuColour colours { get; set; }
 
         private GetCommentsRequest request;
+        private CancellationTokenSource loadCancellation;
 
         private readonly Box background;
         private readonly FillFlowContainer content;
@@ -79,7 +81,7 @@ namespace osu.Game.Overlays.Comments
         private void getComments()
         {
             request?.Cancel();
-            content.Clear();
+            loadCancellation?.Cancel();
             request = new GetCommentsRequest(type, id, Sort.Value);
             request.Success += onSuccess;
             api.Queue(request);
@@ -87,27 +89,43 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(APICommentsController response)
         {
+            loadCancellation = new CancellationTokenSource();
+
+            FillFlowContainer page = new FillFlowContainer
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+            };
+
             foreach (var c in response.Comments)
             {
                 if (c.IsTopLevel)
-                    content.Add(new DrawableComment(c)
+                    page.Add(new DrawableComment(c)
                     {
                         ShowDeleted = { BindTarget = ShowDeleted }
                     });
             }
 
-            int deletedComments = 0;
-
-            response.Comments.ForEach(comment =>
+            LoadComponentAsync(page, loaded =>
             {
-                if (comment.IsDeleted && comment.IsTopLevel)
-                    deletedComments++;
-            });
+                content.Clear();
 
-            content.Add(new DeletedChildsPlaceholder(deletedComments)
-            {
-                ShowDeleted = { BindTarget = ShowDeleted }
-            });
+                content.Add(loaded);
+
+                int deletedComments = 0;
+
+                response.Comments.ForEach(comment =>
+                {
+                    if (comment.IsDeleted && comment.IsTopLevel)
+                        deletedComments++;
+                });
+
+                content.Add(new DeletedChildsPlaceholder(deletedComments)
+                {
+                    ShowDeleted = { BindTarget = ShowDeleted }
+                });
+            }, loadCancellation.Token);
         }
 
         [BackgroundDependencyLoader]
