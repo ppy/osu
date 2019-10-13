@@ -194,5 +194,12 @@ namespace osu.Game.Overlays.Comments
         {
             background.Colour = colours.Gray2;
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            request?.Cancel();
+            loadCancellation?.Cancel();
+            base.Dispose(isDisposing);
+        }
     }
 }
