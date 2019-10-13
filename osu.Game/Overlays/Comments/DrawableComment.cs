@@ -13,7 +13,6 @@ using osu.Game.Utils;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
 using System.Linq;
 
 namespace osu.Game.Overlays.Comments
@@ -134,6 +133,7 @@ namespace osu.Game.Overlays.Comments
                                             AutoSizeAxes = Axes.Both,
                                             Direction = FillDirection.Horizontal,
                                             Spacing = new Vector2(10, 0),
+                                            Colour = OsuColour.Gray(0.7f),
                                             Children = new Drawable[]
                                             {
                                                 new SpriteText
@@ -262,6 +262,7 @@ namespace osu.Game.Overlays.Comments
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
+                    Colour = OsuColour.Gray(0.7f)
                 };
             }
 
@@ -340,7 +341,7 @@ namespace osu.Game.Overlays.Comments
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black
+                        Colour = OsuColour.Gray(0.05f)
                     },
                     new SpriteText
                     {

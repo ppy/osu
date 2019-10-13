@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load()
         {
-            background.Colour = colours.Gray3;
+            background.Colour = colours.Gray2;
         }
     }
 }
