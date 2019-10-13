@@ -32,6 +32,7 @@ namespace osu.Game.Overlays.Comments
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
+        private readonly DeletedChildsPlaceholder deletedChildsPlaceholder;
 
         public DrawableComment(Comment comment)
         {
@@ -168,7 +169,7 @@ namespace osu.Game.Overlays.Comments
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical
                             },
-                            new DeletedChildsPlaceholder(comment.GetDeletedChildsCount())
+                            deletedChildsPlaceholder = new DeletedChildsPlaceholder
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
                             }
@@ -176,6 +177,8 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             };
+
+            deletedChildsPlaceholder.DeletedCount.Value = comment.GetDeletedChildsCount();
 
             if (comment.UserId == null)
                 username.AddText(comment.LegacyName);
