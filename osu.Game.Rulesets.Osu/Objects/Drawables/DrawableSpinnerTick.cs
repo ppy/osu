@@ -44,6 +44,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Samples.AddAdjustment(AdjustableProperty.Volume, bonusSampleVolume);
         }
 
-        public void TriggerResult(HitResult result) => ApplyResult(r => r.Type = result);
+        public void TriggerResult(HitResult result)
+        {
+            HitObject.StartTime = Time.Current;
+            ApplyResult(r => r.Type = result);
+        }
     }
 }
