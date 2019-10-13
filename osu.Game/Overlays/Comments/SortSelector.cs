@@ -10,16 +10,18 @@ using osuTK;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Bindables;
+using osu.Framework.Allocation;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class SortSelector : OsuTabControl<SortCommentsBy>
+    public class SortSelector : OsuTabControl<CommentsSortCriteria>
     {
         private const int spacing = 5;
 
-        protected override Dropdown<SortCommentsBy> CreateDropdown() => null;
+        protected override Dropdown<CommentsSortCriteria> CreateDropdown() => null;
 
-        protected override TabItem<SortCommentsBy> CreateTabItem(SortCommentsBy value) => new SortTabItem(value);
+        protected override TabItem<CommentsSortCriteria> CreateTabItem(CommentsSortCriteria value) => new SortTabItem(value);
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
@@ -33,21 +35,23 @@ namespace osu.Game.Overlays.Comments
             AutoSizeAxes = Axes.Both;
         }
 
-        private class SortTabItem : TabItem<SortCommentsBy>
+        private class SortTabItem : TabItem<CommentsSortCriteria>
         {
             private readonly TabContent content;
 
-            public SortTabItem(SortCommentsBy value)
+            public SortTabItem(CommentsSortCriteria value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;
                 Child = content = new TabContent(value)
-                { Active = { BindTarget = Active } };
+                {
+                    Active = { BindTarget = Active }
+                };
             }
 
-            protected override void OnActivated() => content.FadeInBackground();
+            protected override void OnActivated() => content.Activate();
 
-            protected override void OnDeactivated() => content.FadeOutBackground();
+            protected override void OnDeactivated() => content.Deactivate();
 
             private class TabContent : HeaderButton
             {
@@ -55,13 +59,34 @@ namespace osu.Game.Overlays.Comments
 
                 public readonly BindableBool Active = new BindableBool();
 
-                public TabContent(SortCommentsBy value)
+                [Resolved]
+                private OsuColour colours { get; set; }
+
+                private readonly SpriteText text;
+
+                public TabContent(CommentsSortCriteria value)
                 {
-                    Add(new SpriteText
+                    Add(text = new SpriteText
                     {
                         Font = OsuFont.GetFont(size: text_size),
                         Text = value.ToString()
                     });
+                }
+
+                public void Activate()
+                {
+                    FadeInBackground();
+                    text.Font = text.Font.With(weight: FontWeight.Bold);
+                    text.Colour = colours.BlueLighter;
+                }
+
+                public void Deactivate()
+                {
+                    if (!IsHovered)
+                        FadeOutBackground();
+
+                    text.Font = text.Font.With(weight: FontWeight.Medium);
+                    text.Colour = Color4.White;
                 }
 
                 protected override void OnHoverLost(HoverLostEvent e)
@@ -72,7 +97,7 @@ namespace osu.Game.Overlays.Comments
         }
     }
 
-    public enum SortCommentsBy
+    public enum CommentsSortCriteria
     {
         New,
         Old,

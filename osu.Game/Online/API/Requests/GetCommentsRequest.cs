@@ -13,9 +13,9 @@ namespace osu.Game.Online.API.Requests
         private readonly long id;
         private readonly int page;
         private readonly CommentableType type;
-        private readonly SortCommentsBy sort;
+        private readonly CommentsSortCriteria sort;
 
-        public GetCommentsRequest(CommentableType type, long id, SortCommentsBy sort = SortCommentsBy.New, int page = 1)
+        public GetCommentsRequest(CommentableType type, long id, CommentsSortCriteria sort = CommentsSortCriteria.New, int page = 1)
         {
             this.type = type;
             this.sort = sort;

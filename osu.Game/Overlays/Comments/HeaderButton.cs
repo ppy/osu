@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray6;
+            background.Colour = colours.Gray4;
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -65,8 +65,8 @@ namespace osu.Game.Overlays.Comments
             FadeOutBackground();
         }
 
-        public void FadeInBackground() => background.FadeIn(duration, Easing.OutQuint);
+        protected void FadeInBackground() => background.FadeIn(duration, Easing.OutQuint);
 
-        public void FadeOutBackground() => background.FadeOut(duration, Easing.OutQuint);
+        protected void FadeOutBackground() => background.FadeOut(duration, Easing.OutQuint);
     }
 }

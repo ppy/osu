@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Comments
         private readonly CommentableType type;
         private readonly long id;
 
-        public readonly Bindable<SortCommentsBy> Sort = new Bindable<SortCommentsBy>();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         [Resolved]
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        private void onSortChanged(ValueChangedEvent<SortCommentsBy> sort) => getComments();
+        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort) => getComments();
 
         private void getComments()
         {
