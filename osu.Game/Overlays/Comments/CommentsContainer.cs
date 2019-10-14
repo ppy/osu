@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
+using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -162,13 +163,7 @@ namespace osu.Game.Overlays.Comments
             {
                 content.Add(loaded);
 
-                int deletedComments = 0;
-
-                response.Comments.ForEach(comment =>
-                {
-                    if (comment.IsDeleted && comment.IsTopLevel)
-                        deletedComments++;
-                });
+                int deletedComments = response.Comments.Select(c => c.IsDeleted && c.IsTopLevel).Where(c => c).Count();
 
                 deletedChildrenPlaceholder.DeletedCount.Value = initial ? deletedComments : deletedChildrenPlaceholder.DeletedCount.Value + deletedComments;
 
