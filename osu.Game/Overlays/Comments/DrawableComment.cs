@@ -51,100 +51,105 @@ namespace osu.Game.Overlays.Comments
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    content = new GridContainer
+                    new Container
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding(margin),
-                        ColumnDimensions = new[]
+                        Padding = new MarginPadding(margin),
+                        Child = content = new GridContainer
                         {
-                            new Dimension(GridSizeMode.AutoSize),
-                            new Dimension(),
-                        },
-                        RowDimensions = new[]
-                        {
-                            new Dimension(GridSizeMode.AutoSize)
-                        },
-                        Content = new[]
-                        {
-                            new Drawable[]
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            ColumnDimensions = new[]
                             {
-                                new FillFlowContainer
+                                new Dimension(GridSizeMode.AutoSize),
+                                new Dimension(),
+                            },
+                            RowDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.AutoSize)
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Margin = new MarginPadding { Horizontal = margin },
-                                    Direction = FillDirection.Horizontal,
-                                    Spacing = new Vector2(5, 0),
-                                    Children = new Drawable[]
+                                    new FillFlowContainer
                                     {
-                                        votePill = new VotePill(comment.VotesCount)
+                                        AutoSizeAxes = Axes.Both,
+                                        Margin = new MarginPadding { Horizontal = margin },
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(5, 0),
+                                        Children = new Drawable[]
                                         {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            AlwaysPresent = true,
-                                        },
-                                        new UpdateableAvatar(comment.User)
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Size = new Vector2(avatar_size),
-                                            Masking = true,
-                                            CornerRadius = avatar_size / 2,
-                                        },
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Spacing = new Vector2(0, 3),
-                                    Children = new Drawable[]
-                                    {
-                                        new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(7, 0),
-                                            Children = new Drawable[]
+                                            votePill = new VotePill(comment.VotesCount)
                                             {
-                                                username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                AlwaysPresent = true,
+                                            },
+                                            new UpdateableAvatar(comment.User)
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Size = new Vector2(avatar_size),
+                                                Masking = true,
+                                                CornerRadius = avatar_size / 2,
+                                            },
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Spacing = new Vector2(0, 3),
+                                        Children = new Drawable[]
+                                        {
+                                            new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(7, 0),
+                                                Children = new Drawable[]
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
-                                                },
-                                                new ParentUsername(comment),
-                                                new SpriteText
-                                                {
-                                                    Alpha = comment.IsDeleted? 1 : 0,
-                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                                    Text = @"deleted",
+                                                    username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                    {
+                                                        AutoSizeAxes = Axes.Both,
+                                                    },
+                                                    new ParentUsername(comment),
+                                                    new SpriteText
+                                                    {
+                                                        Alpha = comment.IsDeleted? 1 : 0,
+                                                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                                                        Text = @"deleted",
+                                                    }
                                                 }
-                                            }
-                                        },
-                                        message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            AutoSizeAxes = Axes.Y,
-                                            Padding = new MarginPadding { Right = 40 }
-                                        },
-                                        info = new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
-                                            Spacing = new Vector2(10, 0),
-                                            Colour = OsuColour.Gray(0.7f),
-                                            Children = new Drawable[]
+                                            },
+                                            message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                             {
-                                                new SpriteText
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Padding = new MarginPadding { Right = 40 }
+                                            },
+                                            info = new FillFlowContainer
+                                            {
+                                                AutoSizeAxes = Axes.Both,
+                                                Direction = FillDirection.Horizontal,
+                                                Spacing = new Vector2(10, 0),
+                                                Colour = OsuColour.Gray(0.7f),
+                                                Children = new Drawable[]
                                                 {
-                                                    Anchor = Anchor.CentreLeft,
-                                                    Origin = Anchor.CentreLeft,
-                                                    Font = OsuFont.GetFont(size: 12),
-                                                    Text = HumanizerUtils.Humanize(comment.CreatedAt)
-                                                },
-                                                new RepliesButton(comment.RepliesCount)
-                                                {
-                                                    Expanded = { BindTarget = childExpanded }
-                                                },
+                                                    new SpriteText
+                                                    {
+                                                        Anchor = Anchor.CentreLeft,
+                                                        Origin = Anchor.CentreLeft,
+                                                        Font = OsuFont.GetFont(size: 12),
+                                                        Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                                    },
+                                                    new RepliesButton(comment.RepliesCount)
+                                                    {
+                                                        Expanded = { BindTarget = childExpanded }
+                                                    },
+                                                }
                                             }
                                         }
                                     }
@@ -161,7 +166,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             childCommentsContainer = new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Left = 20 },
+                                Padding = new MarginPadding { Left = 20 },
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical
