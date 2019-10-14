@@ -10,7 +10,7 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class DeletedChildsPlaceholder : FillFlowContainer
+    public class DeletedChildrenPlaceholder : FillFlowContainer
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly BindableInt DeletedCount = new BindableInt();
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Comments
 
         private readonly SpriteText countText;
 
-        public DeletedChildsPlaceholder()
+        public DeletedChildrenPlaceholder()
         {
             AutoSizeAxes = Axes.Both;
             Direction = FillDirection.Horizontal;

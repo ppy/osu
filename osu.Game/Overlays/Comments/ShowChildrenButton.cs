@@ -8,11 +8,11 @@ using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class ShowChildsButton : OsuHoverContainer
+    public abstract class ShowChildrenButton : OsuHoverContainer
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 
-        protected ShowChildsButton()
+        protected ShowChildrenButton()
         {
             AutoSizeAxes = Axes.Both;
         }
