@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Comments
             protected override bool OnClick(ClickEvent e)
             {
                 Checked.Value = !Checked.Value;
-                return base.OnClick(e);
+                return true;
             }
         }
     }
