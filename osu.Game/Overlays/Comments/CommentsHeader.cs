@@ -114,13 +114,8 @@ namespace osu.Game.Overlays.Comments
 
             protected override void LoadComplete()
             {
-                Checked.BindValueChanged(onCheckedChanged, true);
+                Checked.BindValueChanged(isChecked => checkboxIcon.Icon = isChecked.NewValue ? FontAwesome.Solid.CheckSquare : FontAwesome.Regular.Square, true);
                 base.LoadComplete();
-            }
-
-            private void onCheckedChanged(ValueChangedEvent<bool> isChecked)
-            {
-                checkboxIcon.Icon = isChecked.NewValue ? FontAwesome.Solid.CheckSquare : FontAwesome.Regular.Square;
             }
 
             protected override bool OnClick(ClickEvent e)
