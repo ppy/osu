@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
+using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -35,7 +36,7 @@ namespace osu.Game.Overlays.Comments
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
             FillFlowContainer info;
-            TextFlowContainer message;
+            LinkFlowContainer message;
             GridContainer content;
             VotePill votePill;
 
@@ -119,7 +120,7 @@ namespace osu.Game.Overlays.Comments
                                                 }
                                             }
                                         },
-                                        message = new TextFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                                        message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
@@ -193,7 +194,10 @@ namespace osu.Game.Overlays.Comments
             }
 
             if (!comment.IsDeleted)
-                message.Text = comment.GetMessage();
+            {
+                var formattedSource = MessageFormatter.FormatText(comment.GetMessage());
+                message.AddLinks(formattedSource.Text, formattedSource.Links);
+            }
             else
             {
                 content.FadeColour(OsuColour.Gray(0.5f));
