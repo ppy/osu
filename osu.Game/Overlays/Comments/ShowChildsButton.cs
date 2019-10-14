@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 
-        public ShowChildsButton()
+        protected ShowChildsButton()
         {
             AutoSizeAxes = Axes.Both;
         }

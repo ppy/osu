@@ -23,13 +23,13 @@ namespace osu.Game.Graphics.UserInterface
         public Color4 ChevronIconColour
         {
             get => chevronIconColour;
-            set { chevronIconColour = leftChevron.AccentColour = rightChevron.AccentColour = value; }
+            set => chevronIconColour = leftChevron.AccentColour = rightChevron.AccentColour = value;
         }
 
         public string Text
         {
             get => text.Text;
-            set { text.Text = value; }
+            set => text.Text = value;
         }
 
         private bool isLoading;
@@ -136,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
             public Color4 AccentColour
             {
                 get => accentColour;
-                set { accentColour = Colour = value; }
+                set => accentColour = Colour = value;
             }
 
             public ChevronIcon()
