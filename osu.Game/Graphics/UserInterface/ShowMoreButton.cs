@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
         public Color4 ChevronIconColour
         {
             get => chevronIconColour;
-            set => chevronIconColour = leftChevron.AccentColour = rightChevron.AccentColour = value;
+            set => chevronIconColour = leftChevron.Colour = rightChevron.Colour = value;
         }
 
         public string Text
@@ -130,14 +130,6 @@ namespace osu.Game.Graphics.UserInterface
         private class ChevronIcon : SpriteIcon
         {
             private const int icon_size = 8;
-
-            private Color4 accentColour;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set => accentColour = Colour = value;
-            }
 
             public ChevronIcon()
             {
