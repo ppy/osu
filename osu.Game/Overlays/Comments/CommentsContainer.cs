@@ -183,7 +183,6 @@ namespace osu.Game.Overlays.Comments
                     moreButton.IsLoading = false;
                 }
                 moreButton.FadeTo(response.HasMore ? 1 : 0);
-
             }, loadCancellation.Token);
         }
 
