@@ -66,11 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Container FooterPanels;
 
-        protected override BackgroundScreen CreateBackground()
-        {
-            var background = new BackgroundScreenBeatmap();
-            return background;
-        }
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
@@ -412,9 +408,6 @@ namespace osu.Game.Screens.Select
                     WorkingBeatmap previous = Beatmap.Value;
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
 
-                    if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
-                        ensurePlayingSelected(true);
-
                     if (beatmap != null)
                     {
                         if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
@@ -423,6 +416,9 @@ namespace osu.Game.Screens.Select
                             sampleChangeBeatmap.Play();
                     }
                 }
+
+                if (this.IsCurrentScreen())
+                    ensurePlayingSelected();
 
                 UpdateBeatmap(Beatmap.Value);
             }
@@ -490,7 +486,9 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected();
+
+                // restart playback on returning to song select, regardless.
+                music?.Play();
             }
 
             base.OnResuming(last);
@@ -581,19 +579,24 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
-        private void ensurePlayingSelected(bool restart = false)
+        private readonly WeakReference<Track> lastTrack = new WeakReference<Track>(null);
+
+        /// <summary>
+        /// Ensures some music is playing for the current track.
+        /// Will resume playback from a manual user pause if the track has changed.
+        /// </summary>
+        private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning)
-            {
-                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
 
-                if (restart)
-                    track.Restart();
-                else
-                    track.Start();
-            }
+            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+
+            if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
+                music?.Play(true);
+
+            lastTrack.SetTarget(track);
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
