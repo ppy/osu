@@ -40,6 +40,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void load(OsuRulesetConfigManager config)
         {
             config?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
         }

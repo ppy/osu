@@ -30,12 +30,12 @@ namespace osu.Game.Graphics.Containers
 
         public Bindable<double> Progress = new BindableDouble();
 
-        private Bindable<int> holdActivationDelay;
+        private Bindable<float> holdActivationDelay;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            holdActivationDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+            holdActivationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
         }
 
         protected void BeginConfirm()
