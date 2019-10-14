@@ -42,7 +42,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public string Message { get; set; }
 
         [JsonProperty(@"message_html")]
-        public string MessageHTML { get; set; }
+        public string MessageHtml { get; set; }
 
         [JsonProperty(@"replies_count")]
         public int RepliesCount { get; set; }
@@ -95,7 +95,7 @@ namespace osu.Game.Online.API.Requests.Responses
             if (IsDeleted)
                 return @"deleted";
 
-            return WebUtility.HtmlDecode(Regex.Replace(MessageHTML, @"<(.|\n)*?>", string.Empty));
+            return WebUtility.HtmlDecode(Regex.Replace(MessageHtml, @"<(.|\n)*?>", string.Empty));
         }
 
         public int GetDeletedChildsCount()

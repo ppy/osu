@@ -28,13 +28,13 @@ namespace osu.Game.Overlays.Comments
         private readonly BindableBool childExpanded = new BindableBool(true);
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
-        private readonly DeletedChildsPlaceholder deletedChildsPlaceholder;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
+            DeletedChildsPlaceholder deletedChildsPlaceholder;
             FillFlowContainer info;
             LinkFlowContainer message;
             GridContainer content;
@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Comments
                                                 Origin = Anchor.Centre,
                                                 Size = new Vector2(avatar_size),
                                                 Masking = true,
-                                                CornerRadius = avatar_size / 2,
+                                                CornerRadius = avatar_size / 2f,
                                             },
                                         }
                                     },
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Comments
                                                     new ParentUsername(comment),
                                                     new SpriteText
                                                     {
-                                                        Alpha = comment.IsDeleted? 1 : 0,
+                                                        Alpha = comment.IsDeleted ? 1 : 0,
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                                                         Text = @"deleted",
                                                     }
@@ -299,8 +299,6 @@ namespace osu.Game.Overlays.Comments
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            private const int spacing = 3;
-
             public string TooltipText => comment.ParentComment?.GetMessage() ?? "";
 
             private readonly Comment comment;
@@ -311,7 +309,7 @@ namespace osu.Game.Overlays.Comments
 
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
-                Spacing = new Vector2(spacing, 0);
+                Spacing = new Vector2(3, 0);
                 Alpha = comment.ParentId == null ? 0 : 1;
                 Children = new Drawable[]
                 {
@@ -331,13 +329,10 @@ namespace osu.Game.Overlays.Comments
 
         private class VotePill : CircularContainer
         {
-            private const int height = 20;
-            private const int margin = 10;
-
             public VotePill(int count)
             {
                 AutoSizeAxes = Axes.X;
-                Height = height;
+                Height = 20;
                 Masking = true;
                 Children = new Drawable[]
                 {
