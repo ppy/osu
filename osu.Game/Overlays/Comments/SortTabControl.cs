@@ -17,8 +17,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class SortTabControl : OsuTabControl<CommentsSortCriteria>
     {
-        private const int spacing = 5;
-
         protected override Dropdown<CommentsSortCriteria> CreateDropdown() => null;
 
         protected override TabItem<CommentsSortCriteria> CreateTabItem(CommentsSortCriteria value) => new SortTabItem(value);
@@ -27,7 +25,7 @@ namespace osu.Game.Overlays.Comments
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(spacing, 0),
+            Spacing = new Vector2(5, 0),
         };
 
         public SortTabControl()
@@ -55,8 +53,6 @@ namespace osu.Game.Overlays.Comments
 
             private class TabButton : HeaderButton
             {
-                private const int text_size = 14;
-
                 public readonly BindableBool Active = new BindableBool();
 
                 [Resolved]
@@ -68,7 +64,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     Add(text = new SpriteText
                     {
-                        Font = OsuFont.GetFont(size: text_size),
+                        Font = OsuFont.GetFont(size: 14),
                         Text = value.ToString()
                     });
                 }
