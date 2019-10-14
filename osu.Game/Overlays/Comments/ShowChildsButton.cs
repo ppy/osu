@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Comments
         protected override bool OnClick(ClickEvent e)
         {
             Expanded.Value = !Expanded.Value;
-            return base.OnClick(e);
+            return true;
         }
     }
 }

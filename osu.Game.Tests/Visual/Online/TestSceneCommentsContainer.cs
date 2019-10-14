@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(CommentsHeader),
             typeof(DrawableComment),
             typeof(HeaderButton),
-            typeof(SortSelector),
+            typeof(SortTabControl),
             typeof(ShowChildsButton),
             typeof(DeletedChildsPlaceholder)
         };

@@ -12,9 +12,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class DeletedChildsPlaceholder : FillFlowContainer
     {
-        private const int deleted_placeholder_margin = 80;
-        private const int margin = 10;
-
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly BindableInt DeletedCount = new BindableInt();
 
@@ -27,7 +24,7 @@ namespace osu.Game.Overlays.Comments
             AutoSizeAxes = Axes.Both;
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(3, 0);
-            Margin = new MarginPadding { Vertical = margin, Left = deleted_placeholder_margin };
+            Margin = new MarginPadding { Vertical = 10, Left = 80 };
             Children = new Drawable[]
             {
                 new SpriteIcon

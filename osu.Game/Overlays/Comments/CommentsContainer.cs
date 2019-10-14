@@ -16,8 +16,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private const int more_button_margin = 5;
-
         private readonly CommentableType type;
         private readonly long id;
 
@@ -101,7 +99,7 @@ namespace osu.Game.Overlays.Comments
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                Margin = new MarginPadding(more_button_margin),
+                                                Margin = new MarginPadding(5),
                                                 Action = () => getComments(false),
                                             }
                                         }

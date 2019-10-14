@@ -21,18 +21,14 @@ namespace osu.Game.Overlays.Comments
     {
         private const int avatar_size = 40;
         private const int margin = 10;
-        private const int child_margin = 20;
-        private const int chevron_margin = 30;
-        private const int message_padding = 40;
-        private const float separator_height = 1.5f;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly BindableBool childExpanded = new BindableBool(true);
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
-        private readonly Comment comment;
         private readonly DeletedChildsPlaceholder deletedChildsPlaceholder;
+        private readonly Comment comment;
 
         public DrawableComment(Comment comment)
         {
@@ -127,7 +123,7 @@ namespace osu.Game.Overlays.Comments
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             AutoSizeAxes = Axes.Y,
-                                            Padding = new MarginPadding { Right = message_padding }
+                                            Padding = new MarginPadding { Right = 40 }
                                         },
                                         info = new FillFlowContainer
                                         {
@@ -164,7 +160,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             childCommentsContainer = new FillFlowContainer
                             {
-                                Margin = new MarginPadding { Left = child_margin },
+                                Margin = new MarginPadding { Left = 20 },
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical
@@ -180,10 +176,10 @@ namespace osu.Game.Overlays.Comments
 
             deletedChildsPlaceholder.DeletedCount.Value = comment.GetDeletedChildsCount();
 
-            if (comment.UserId == null)
-                username.AddText(comment.LegacyName);
-            else
+            if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
+            else
+                username.AddText(comment.LegacyName);
 
             if (comment.EditedAt.HasValue)
             {
@@ -209,7 +205,7 @@ namespace osu.Game.Overlays.Comments
                 AddInternal(new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = separator_height,
+                    Height = 1.5f,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Child = new Box
@@ -225,7 +221,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Margin = new MarginPadding { Right = chevron_margin, Top = margin },
+                        Margin = new MarginPadding { Right = 30, Top = margin },
                         Expanded = { BindTarget = childExpanded }
                     });
                 }
@@ -240,13 +236,8 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
-            childExpanded.BindValueChanged(onChildExpandedChanged, true);
+            childExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             base.LoadComplete();
-        }
-
-        private void onChildExpandedChanged(ValueChangedEvent<bool> expanded)
-        {
-            childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0);
         }
 
         private void onShowDeletedChanged(ValueChangedEvent<bool> show)
