@@ -53,7 +53,7 @@ namespace osu.Game.Skinning
             if (AllowTextureLookup(componentName) && (sourceTexture = skin?.GetTexture(componentName)) != null)
                 return sourceTexture;
 
-            return fallbackSource.GetTexture(componentName);
+            return fallbackSource?.GetTexture(componentName);
         }
 
         public SampleChannel GetSample(ISampleInfo sampleInfo)

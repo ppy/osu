@@ -58,6 +58,353 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
         }
 
+        /// <summary>
+        /// Test keyboard traversal
+        /// </summary>
+        [Test]
+        public void TestTraversal()
+        {
+            loadBeatmaps();
+
+            advanceSelection(direction: 1, diff: false);
+            waitForSelection(1, 1);
+
+            advanceSelection(direction: 1, diff: true);
+            waitForSelection(1, 2);
+
+            advanceSelection(direction: -1, diff: false);
+            waitForSelection(set_count, 1);
+
+            advanceSelection(direction: -1, diff: true);
+            waitForSelection(set_count - 1, 3);
+
+            advanceSelection(diff: false);
+            advanceSelection(diff: false);
+            waitForSelection(1, 2);
+
+            advanceSelection(direction: -1, diff: true);
+            advanceSelection(direction: -1, diff: true);
+            waitForSelection(set_count, 3);
+        }
+
+        /// <summary>
+        /// Test filtering
+        /// </summary>
+        [Test]
+        public void TestFiltering()
+        {
+            loadBeatmaps();
+
+            // basic filtering
+
+            setSelected(1, 1);
+
+            AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3!" }, false));
+            checkVisibleItemCount(diff: false, count: 1);
+            checkVisibleItemCount(diff: true, count: 3);
+            waitForSelection(3, 1);
+
+            advanceSelection(diff: true, count: 4);
+            waitForSelection(3, 2);
+
+            AddStep("Un-filter (debounce)", () => carousel.Filter(new FilterCriteria()));
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
+            checkVisibleItemCount(diff: false, count: set_count);
+            checkVisibleItemCount(diff: true, count: 3);
+
+            // test filtering some difficulties (and keeping current beatmap set selected).
+
+            setSelected(1, 2);
+            AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
+            waitForSelection(1, 1);
+
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            waitForSelection(1, 1);
+
+            AddStep("Filter all", () => carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false));
+
+            checkVisibleItemCount(false, 0);
+            checkVisibleItemCount(true, 0);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(true);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            advanceSelection(false);
+            AddAssert("Selection is null", () => currentSelection == null);
+
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+
+            AddAssert("Selection is non-null", () => currentSelection != null);
+
+            setSelected(1, 3);
+        }
+
+        [Test]
+        public void TestFilterRange()
+        {
+            loadBeatmaps();
+
+            // buffer the selection
+            setSelected(3, 2);
+
+            setSelected(1, 3);
+
+            AddStep("Apply a range filter", () => carousel.Filter(new FilterCriteria
+            {
+                SearchText = "#3",
+                StarDifficulty = new FilterCriteria.OptionalRange<double>
+                {
+                    Min = 2,
+                    Max = 5.5,
+                    IsLowerInclusive = true
+                }
+            }, false));
+
+            // should reselect the buffered selection.
+            waitForSelection(3, 2);
+        }
+
+        /// <summary>
+        /// Test random non-repeating algorithm
+        /// </summary>
+        [Test]
+        public void TestRandom()
+        {
+            loadBeatmaps();
+
+            setSelected(1, 1);
+
+            nextRandom();
+            ensureRandomDidntRepeat();
+            nextRandom();
+            ensureRandomDidntRepeat();
+            nextRandom();
+            ensureRandomDidntRepeat();
+
+            prevRandom();
+            ensureRandomFetchSuccess();
+            prevRandom();
+            ensureRandomFetchSuccess();
+
+            nextRandom();
+            ensureRandomDidntRepeat();
+            nextRandom();
+            ensureRandomDidntRepeat();
+
+            nextRandom();
+            AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
+
+            AddStep("Add set with 100 difficulties", () => carousel.UpdateBeatmapSet(createTestBeatmapSetWithManyDifficulties(set_count + 1)));
+            AddStep("Filter Extra", () => carousel.Filter(new FilterCriteria { SearchText = "Extra 10" }, false));
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            checkInvisibleDifficultiesUnselectable();
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+        }
+
+        /// <summary>
+        /// Test adding and removing beatmap sets
+        /// </summary>
+        [Test]
+        public void TestAddRemove()
+        {
+            loadBeatmaps();
+
+            AddStep("Add new set", () => carousel.UpdateBeatmapSet(createTestBeatmapSet(set_count + 1)));
+            AddStep("Add new set", () => carousel.UpdateBeatmapSet(createTestBeatmapSet(set_count + 2)));
+
+            checkVisibleItemCount(false, set_count + 2);
+
+            AddStep("Remove set", () => carousel.RemoveBeatmapSet(createTestBeatmapSet(set_count + 2)));
+
+            checkVisibleItemCount(false, set_count + 1);
+
+            setSelected(set_count + 1, 1);
+
+            AddStep("Remove set", () => carousel.RemoveBeatmapSet(createTestBeatmapSet(set_count + 1)));
+
+            checkVisibleItemCount(false, set_count);
+
+            waitForSelection(set_count);
+        }
+
+        /// <summary>
+        /// Test sorting
+        /// </summary>
+        [Test]
+        public void TestSorting()
+        {
+            loadBeatmaps();
+
+            AddStep("Sort by author", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Author }, false));
+            AddAssert("Check zzzzz is at bottom", () => carousel.BeatmapSets.Last().Metadata.AuthorString == "zzzzz");
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!"));
+        }
+
+        [Test]
+        public void TestSortingWithFiltered()
+        {
+            List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var set = createTestBeatmapSet(i);
+                set.Beatmaps[0].StarDifficulty = 3 - i;
+                set.Beatmaps[2].StarDifficulty = 6 + i;
+                sets.Add(set);
+            }
+
+            loadBeatmaps(sets);
+
+            AddStep("Filter to normal", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Normal" }, false));
+            AddAssert("Check first set at end", () => carousel.BeatmapSets.First() == sets.Last());
+            AddAssert("Check last set at start", () => carousel.BeatmapSets.Last() == sets.First());
+
+            AddStep("Filter to insane", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Difficulty, SearchText = "Insane" }, false));
+            AddAssert("Check first set at start", () => carousel.BeatmapSets.First() == sets.First());
+            AddAssert("Check last set at end", () => carousel.BeatmapSets.Last() == sets.Last());
+        }
+
+        [Test]
+        public void TestRemoveAll()
+        {
+            loadBeatmaps();
+
+            setSelected(2, 1);
+            AddAssert("Selection is non-null", () => currentSelection != null);
+
+            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet));
+            waitForSelection(2);
+
+            AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
+            AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
+            waitForSelection(1);
+
+            AddUntilStep("Remove all", () =>
+            {
+                if (!carousel.BeatmapSets.Any()) return true;
+
+                carousel.RemoveBeatmapSet(carousel.BeatmapSets.Last());
+                return false;
+            });
+
+            checkNoSelection();
+        }
+
+        [Test]
+        public void TestEmptyTraversal()
+        {
+            loadBeatmaps(new List<BeatmapSetInfo>());
+
+            advanceSelection(direction: 1, diff: false);
+            checkNoSelection();
+
+            advanceSelection(direction: 1, diff: true);
+            checkNoSelection();
+
+            advanceSelection(direction: -1, diff: false);
+            checkNoSelection();
+
+            advanceSelection(direction: -1, diff: true);
+            checkNoSelection();
+        }
+
+        [Test]
+        public void TestHiding()
+        {
+            BeatmapSetInfo hidingSet = createTestBeatmapSet(1);
+            hidingSet.Beatmaps[1].Hidden = true;
+
+            loadBeatmaps(new List<BeatmapSetInfo> { hidingSet });
+
+            setSelected(1, 1);
+
+            checkVisibleItemCount(true, 2);
+            advanceSelection(true);
+            waitForSelection(1, 3);
+
+            setHidden(3);
+            waitForSelection(1, 1);
+
+            setHidden(2, false);
+            advanceSelection(true);
+            waitForSelection(1, 2);
+
+            setHidden(1);
+            waitForSelection(1, 2);
+
+            setHidden(2);
+            checkNoSelection();
+
+            void setHidden(int diff, bool hidden = true)
+            {
+                AddStep((hidden ? "" : "un") + $"hide diff {diff}", () =>
+                {
+                    hidingSet.Beatmaps[diff - 1].Hidden = hidden;
+                    carousel.UpdateBeatmapSet(hidingSet);
+                });
+            }
+        }
+
+        [Test]
+        public void TestSelectingFilteredRuleset()
+        {
+            var testMixed = createTestBeatmapSet(set_count + 1);
+            AddStep("add mixed ruleset beatmapset", () =>
+            {
+                for (int i = 0; i <= 2; i++)
+                {
+                    testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
+                    testMixed.Beatmaps[i].RulesetID = i;
+                }
+
+                carousel.UpdateBeatmapSet(testMixed);
+            });
+            AddStep("filter to ruleset 0", () =>
+                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
+            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
+            AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
+
+            AddStep("remove mixed set", () =>
+            {
+                carousel.RemoveBeatmapSet(testMixed);
+                testMixed = null;
+            });
+            var testSingle = createTestBeatmapSet(set_count + 2);
+            testSingle.Beatmaps.ForEach(b =>
+            {
+                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
+                b.RulesetID = b.Ruleset.ID ?? 1;
+            });
+            AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
+            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
+            checkNoSelection();
+            AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
+        }
+
+        [Test]
+        public void TestCarouselRootIsRandom()
+        {
+            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
+
+            for (int i = 1; i <= 50; i++)
+                manySets.Add(createTestBeatmapSet(i));
+
+            loadBeatmaps(manySets);
+
+            advanceSelection(direction: 1, diff: false);
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            checkNonmatchingFilter();
+            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
+        }
+
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
         {
             if (beatmapSets == null)
@@ -82,8 +429,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void ensureRandomFetchSuccess() =>
             AddAssert("ensure prev random fetch worked", () => selectedSets.Peek() == carousel.SelectedBeatmapSet);
 
-        private void checkSelected(int set, int? diff = null) =>
-            AddAssert($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
+        private void waitForSelection(int set, int? diff = null) =>
+            AddUntilStep($"selected is set{set}{(diff.HasValue ? $" diff{diff.Value}" : "")}", () =>
             {
                 if (diff != null)
                     return carousel.SelectedBeatmap == carousel.BeatmapSets.Skip(set - 1).First().Beatmaps.Skip(diff.Value - 1).First();
@@ -157,317 +504,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 carousel.Filter(new FilterCriteria(), false);
                 eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
             });
-        }
-
-        /// <summary>
-        /// Test keyboard traversal
-        /// </summary>
-        [Test]
-        public void TestTraversal()
-        {
-            loadBeatmaps();
-
-            advanceSelection(direction: 1, diff: false);
-            checkSelected(1, 1);
-
-            advanceSelection(direction: 1, diff: true);
-            checkSelected(1, 2);
-
-            advanceSelection(direction: -1, diff: false);
-            checkSelected(set_count, 1);
-
-            advanceSelection(direction: -1, diff: true);
-            checkSelected(set_count - 1, 3);
-
-            advanceSelection(diff: false);
-            advanceSelection(diff: false);
-            checkSelected(1, 2);
-
-            advanceSelection(direction: -1, diff: true);
-            advanceSelection(direction: -1, diff: true);
-            checkSelected(set_count, 3);
-        }
-
-        /// <summary>
-        /// Test filtering
-        /// </summary>
-        [Test]
-        public void TestFiltering()
-        {
-            loadBeatmaps();
-
-            // basic filtering
-
-            setSelected(1, 1);
-
-            AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3!" }, false));
-            checkVisibleItemCount(diff: false, count: 1);
-            checkVisibleItemCount(diff: true, count: 3);
-            checkSelected(3, 1);
-
-            advanceSelection(diff: true, count: 4);
-            checkSelected(3, 2);
-
-            AddStep("Un-filter (debounce)", () => carousel.Filter(new FilterCriteria()));
-            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
-            checkVisibleItemCount(diff: false, count: set_count);
-            checkVisibleItemCount(diff: true, count: 3);
-
-            // test filtering some difficulties (and keeping current beatmap set selected).
-
-            setSelected(1, 2);
-            AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
-            checkSelected(1, 1);
-
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
-            checkSelected(1, 1);
-
-            AddStep("Filter all", () => carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false));
-
-            checkVisibleItemCount(false, 0);
-            checkVisibleItemCount(true, 0);
-            AddAssert("Selection is null", () => currentSelection == null);
-
-            advanceSelection(true);
-            AddAssert("Selection is null", () => currentSelection == null);
-
-            advanceSelection(false);
-            AddAssert("Selection is null", () => currentSelection == null);
-
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
-
-            AddAssert("Selection is non-null", () => currentSelection != null);
-
-            setSelected(1, 3);
-            AddStep("Apply a range filter", () => carousel.Filter(new FilterCriteria
-            {
-                SearchText = "#3",
-                StarDifficulty = new FilterCriteria.OptionalRange<double>
-                {
-                    Min = 2,
-                    Max = 5.5,
-                    IsLowerInclusive = true
-                }
-            }, false));
-            checkSelected(3, 2);
-
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
-        }
-
-        /// <summary>
-        /// Test random non-repeating algorithm
-        /// </summary>
-        [Test]
-        public void TestRandom()
-        {
-            loadBeatmaps();
-
-            setSelected(1, 1);
-
-            nextRandom();
-            ensureRandomDidntRepeat();
-            nextRandom();
-            ensureRandomDidntRepeat();
-            nextRandom();
-            ensureRandomDidntRepeat();
-
-            prevRandom();
-            ensureRandomFetchSuccess();
-            prevRandom();
-            ensureRandomFetchSuccess();
-
-            nextRandom();
-            ensureRandomDidntRepeat();
-            nextRandom();
-            ensureRandomDidntRepeat();
-
-            nextRandom();
-            AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
-
-            AddStep("Add set with 100 difficulties", () => carousel.UpdateBeatmapSet(createTestBeatmapSetWithManyDifficulties(set_count + 1)));
-            AddStep("Filter Extra", () => carousel.Filter(new FilterCriteria { SearchText = "Extra 10" }, false));
-            checkInvisibleDifficultiesUnselectable();
-            checkInvisibleDifficultiesUnselectable();
-            checkInvisibleDifficultiesUnselectable();
-            checkInvisibleDifficultiesUnselectable();
-            checkInvisibleDifficultiesUnselectable();
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
-        }
-
-        /// <summary>
-        /// Test adding and removing beatmap sets
-        /// </summary>
-        [Test]
-        public void TestAddRemove()
-        {
-            loadBeatmaps();
-
-            AddStep("Add new set", () => carousel.UpdateBeatmapSet(createTestBeatmapSet(set_count + 1)));
-            AddStep("Add new set", () => carousel.UpdateBeatmapSet(createTestBeatmapSet(set_count + 2)));
-
-            checkVisibleItemCount(false, set_count + 2);
-
-            AddStep("Remove set", () => carousel.RemoveBeatmapSet(createTestBeatmapSet(set_count + 2)));
-
-            checkVisibleItemCount(false, set_count + 1);
-
-            setSelected(set_count + 1, 1);
-
-            AddStep("Remove set", () => carousel.RemoveBeatmapSet(createTestBeatmapSet(set_count + 1)));
-
-            checkVisibleItemCount(false, set_count);
-
-            checkSelected(set_count);
-        }
-
-        /// <summary>
-        /// Test sorting
-        /// </summary>
-        [Test]
-        public void TestSorting()
-        {
-            loadBeatmaps();
-
-            AddStep("Sort by author", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Author }, false));
-            AddAssert("Check zzzzz is at bottom", () => carousel.BeatmapSets.Last().Metadata.AuthorString == "zzzzz");
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
-            AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!"));
-        }
-
-        [Test]
-        public void TestRemoveAll()
-        {
-            loadBeatmaps();
-
-            setSelected(2, 1);
-            AddAssert("Selection is non-null", () => currentSelection != null);
-
-            AddStep("Remove selected", () => carousel.RemoveBeatmapSet(carousel.SelectedBeatmapSet));
-            checkSelected(2);
-
-            AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
-            AddStep("Remove first", () => carousel.RemoveBeatmapSet(carousel.BeatmapSets.First()));
-            checkSelected(1);
-
-            AddUntilStep("Remove all", () =>
-            {
-                if (!carousel.BeatmapSets.Any()) return true;
-
-                carousel.RemoveBeatmapSet(carousel.BeatmapSets.Last());
-                return false;
-            });
-
-            checkNoSelection();
-        }
-
-        [Test]
-        public void TestEmptyTraversal()
-        {
-            loadBeatmaps(new List<BeatmapSetInfo>());
-
-            advanceSelection(direction: 1, diff: false);
-            checkNoSelection();
-
-            advanceSelection(direction: 1, diff: true);
-            checkNoSelection();
-
-            advanceSelection(direction: -1, diff: false);
-            checkNoSelection();
-
-            advanceSelection(direction: -1, diff: true);
-            checkNoSelection();
-        }
-
-        [Test]
-        public void TestHiding()
-        {
-            BeatmapSetInfo hidingSet = createTestBeatmapSet(1);
-            hidingSet.Beatmaps[1].Hidden = true;
-
-            loadBeatmaps(new List<BeatmapSetInfo> { hidingSet });
-
-            setSelected(1, 1);
-
-            checkVisibleItemCount(true, 2);
-            advanceSelection(true);
-            checkSelected(1, 3);
-
-            setHidden(3);
-            checkSelected(1, 1);
-
-            setHidden(2, false);
-            advanceSelection(true);
-            checkSelected(1, 2);
-
-            setHidden(1);
-            checkSelected(1, 2);
-
-            setHidden(2);
-            checkNoSelection();
-
-            void setHidden(int diff, bool hidden = true)
-            {
-                AddStep((hidden ? "" : "un") + $"hide diff {diff}", () =>
-                {
-                    hidingSet.Beatmaps[diff - 1].Hidden = hidden;
-                    carousel.UpdateBeatmapSet(hidingSet);
-                });
-            }
-        }
-
-        [Test]
-        public void TestSelectingFilteredRuleset()
-        {
-            var testMixed = createTestBeatmapSet(set_count + 1);
-            AddStep("add mixed ruleset beatmapset", () =>
-            {
-                for (int i = 0; i <= 2; i++)
-                {
-                    testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
-                    testMixed.Beatmaps[i].RulesetID = i;
-                }
-
-                carousel.UpdateBeatmapSet(testMixed);
-            });
-            AddStep("filter to ruleset 0", () =>
-                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
-            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
-            AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
-
-            AddStep("remove mixed set", () =>
-            {
-                carousel.RemoveBeatmapSet(testMixed);
-                testMixed = null;
-            });
-            var testSingle = createTestBeatmapSet(set_count + 2);
-            testSingle.Beatmaps.ForEach(b =>
-            {
-                b.Ruleset = rulesets.AvailableRulesets.ElementAt(1);
-                b.RulesetID = b.Ruleset.ID ?? 1;
-            });
-            AddStep("add single ruleset beatmapset", () => carousel.UpdateBeatmapSet(testSingle));
-            AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testSingle.Beatmaps[0], false));
-            checkNoSelection();
-            AddStep("remove single ruleset set", () => carousel.RemoveBeatmapSet(testSingle));
-        }
-
-        [Test]
-        public void TestCarouselRootIsRandom()
-        {
-            List<BeatmapSetInfo> manySets = new List<BeatmapSetInfo>();
-
-            for (int i = 1; i <= 50; i++)
-                manySets.Add(createTestBeatmapSet(i));
-
-            loadBeatmaps(manySets);
-
-            advanceSelection(direction: 1, diff: false);
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            checkNonmatchingFilter();
-            AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
 
         private BeatmapSetInfo createTestBeatmapSet(int id)

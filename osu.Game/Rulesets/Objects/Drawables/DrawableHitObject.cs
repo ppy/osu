@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     UpdateInitialTransforms();
 
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.WindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+                    var judgementOffset = Result?.TimeOffset ?? 0;
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
@@ -379,7 +379,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            Result.TimeOffset = Time.Current - endTime;
+
+            Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
             switch (Result.Type)
             {

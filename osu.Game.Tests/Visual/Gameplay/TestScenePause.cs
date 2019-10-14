@@ -128,13 +128,46 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestExitFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("exit", () => Player.Exit());
+
+            confirmExited();
+        }
+
+        [Test]
+        public void TestQuickRetryFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("quick retry", () => Player.GameplayClockContainer.OfType<HotkeyRetryOverlay>().First().Action?.Invoke());
+
+            confirmExited();
+        }
+
+        [Test]
+        public void TestQuickExitFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+
+            confirmExited();
+        }
+
+        [Test]
         public void TestExitFromGameplay()
         {
             AddStep("exit", () => Player.Exit());
 
-            confirmPaused();
+            confirmExited();
+        }
 
-            exitAndConfirm();
+        [Test]
+        public void TestQuickExitFromGameplay()
+        {
+            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+
+            confirmExited();
         }
 
         [Test]

@@ -44,16 +44,21 @@ namespace osu.Game.Overlays
             Clear();
             lastSection = null;
 
-            sections = new ProfileSection[]
-            {
-                //new AboutSection(),
-                new RecentSection(),
-                new RanksSection(),
-                //new MedalsSection(),
-                new HistoricalSection(),
-                new BeatmapsSection(),
-                new KudosuSection()
-            };
+            sections = !user.IsBot
+                ? new ProfileSection[]
+                {
+                    //new AboutSection(),
+                    new RecentSection(),
+                    new RanksSection(),
+                    //new MedalsSection(),
+                    new HistoricalSection(),
+                    new BeatmapsSection(),
+                    new KudosuSection()
+                }
+                : new ProfileSection[]
+                {
+                    //new AboutSection(),
+                };
 
             tabs = new ProfileTabControl
             {

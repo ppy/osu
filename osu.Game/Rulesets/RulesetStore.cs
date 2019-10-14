@@ -168,9 +168,9 @@ namespace osu.Game.Rulesets
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
 
             return rulesetAssemblies;
