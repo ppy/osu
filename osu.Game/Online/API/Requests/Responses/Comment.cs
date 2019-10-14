@@ -16,20 +16,10 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"id")]
         public long Id { get; set; }
 
-        private long? parentId;
-
         [JsonProperty(@"parent_id")]
-        public long? ParentId
-        {
-            get => parentId;
-            set
-            {
-                parentId = value;
-                IsTopLevel = value == null;
-            }
-        }
+        public long? ParentId { get; set; }
 
-        public List<Comment> ChildComments = new List<Comment>();
+        public readonly List<Comment> ChildComments = new List<Comment>();
 
         public Comment ParentComment { get; set; }
 
@@ -65,18 +55,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"updated_at")]
         public DateTimeOffset? UpdatedAt { get; set; }
 
-        private DateTimeOffset? deletedAt;
-
         [JsonProperty(@"deleted_at")]
-        public DateTimeOffset? DeletedAt
-        {
-            get => deletedAt;
-            set
-            {
-                deletedAt = value;
-                IsDeleted = value != null;
-            }
-        }
+        public DateTimeOffset? DeletedAt { get; set; }
 
         [JsonProperty(@"edited_at")]
         public DateTimeOffset? EditedAt { get; set; }
@@ -86,9 +66,9 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public User EditedUser { get; set; }
 
-        public bool IsTopLevel { get; set; }
+        public bool IsTopLevel => !ParentId.HasValue;
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted => DeletedAt.HasValue;
 
         public string GetMessage()
         {
