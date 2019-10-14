@@ -6,6 +6,7 @@ using osu.Game.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -90,7 +91,10 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public string GetMessage()
         {
-            return IsDeleted ? @"deleted" : MessageHTML.Replace("<div class='osu-md-default'>", "").Replace("<p class=\"osu-md-default__paragraph\">", "").Replace("<br />", "").Replace("</p>", "").Replace("</div>", "").Replace("&quot;", "\"");
+            if (IsDeleted)
+                return @"deleted";
+
+            return Regex.Replace(MessageHTML, @"\<.*?\>", "");
         }
 
         public int GetDeletedChildsCount()
