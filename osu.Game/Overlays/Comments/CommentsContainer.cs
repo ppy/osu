@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Comments
             {
                 content.Add(loaded);
 
-                int deletedComments = response.Comments.Select(c => c.IsDeleted && c.IsTopLevel).Where(c => c).Count();
+                int deletedComments = response.Comments.Select(c => c.IsDeleted && c.IsTopLevel).Count(c => c);
 
                 deletedChildrenPlaceholder.DeletedCount.Value = initial ? deletedComments : deletedChildrenPlaceholder.DeletedCount.Value + deletedComments;
 
