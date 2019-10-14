@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        private readonly BindableBool childExpanded = new BindableBool(true);
+        private readonly BindableBool childrenExpanded = new BindableBool(true);
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Comments
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
-            DeletedChildsPlaceholder deletedChildsPlaceholder;
+            DeletedChildrenPlaceholder deletedChildrenPlaceholder;
             FillFlowContainer info;
             LinkFlowContainer message;
             GridContainer content;
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Comments
                                                     },
                                                     new RepliesButton(comment.RepliesCount)
                                                     {
-                                                        Expanded = { BindTarget = childExpanded }
+                                                        Expanded = { BindTarget = childrenExpanded }
                                                     },
                                                 }
                                             }
@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.Comments
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical
                             },
-                            deletedChildsPlaceholder = new DeletedChildsPlaceholder
+                            deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
                             }
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            deletedChildsPlaceholder.DeletedCount.Value = comment.GetDeletedChildsCount();
+            deletedChildrenPlaceholder.DeletedCount.Value = comment.GetDeletedChildrenCount();
 
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
@@ -231,7 +231,7 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         Margin = new MarginPadding { Right = 30, Top = margin },
-                        Expanded = { BindTarget = childExpanded }
+                        Expanded = { BindTarget = childrenExpanded }
                     });
                 }
             }
@@ -245,7 +245,7 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
-            childExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+            childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             base.LoadComplete();
         }
 
@@ -255,7 +255,7 @@ namespace osu.Game.Overlays.Comments
                 this.FadeTo(show.NewValue ? 1 : 0);
         }
 
-        private class ChevronButton : ShowChildsButton
+        private class ChevronButton : ShowChildrenButton
         {
             private readonly SpriteIcon icon;
 
@@ -275,7 +275,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class RepliesButton : ShowChildsButton
+        private class RepliesButton : ShowChildrenButton
         {
             private readonly SpriteText text;
             private readonly int count;

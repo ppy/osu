@@ -78,7 +78,7 @@ namespace osu.Game.Online.API.Requests.Responses
             return WebUtility.HtmlDecode(Regex.Replace(MessageHtml, @"<(.|\n)*?>", string.Empty));
         }
 
-        public int GetDeletedChildsCount()
+        public int GetDeletedChildrenCount()
         {
             int count = 0;
 
