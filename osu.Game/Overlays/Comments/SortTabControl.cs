@@ -15,10 +15,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class SortSelector : OsuTabControl<CommentsSortCriteria>
+    public class SortTabControl : OsuTabControl<CommentsSortCriteria>
     {
-        private const int spacing = 5;
-
         protected override Dropdown<CommentsSortCriteria> CreateDropdown() => null;
 
         protected override TabItem<CommentsSortCriteria> CreateTabItem(CommentsSortCriteria value) => new SortTabItem(value);
@@ -27,36 +25,33 @@ namespace osu.Game.Overlays.Comments
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(spacing, 0),
+            Spacing = new Vector2(5, 0),
         };
 
-        public SortSelector()
+        public SortTabControl()
         {
             AutoSizeAxes = Axes.Both;
         }
 
         private class SortTabItem : TabItem<CommentsSortCriteria>
         {
-            private readonly TabContent content;
-
             public SortTabItem(CommentsSortCriteria value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;
-                Child = content = new TabContent(value)
-                {
-                    Active = { BindTarget = Active }
-                };
+                Child = new TabButton(value) { Active = { BindTarget = Active } };
             }
 
-            protected override void OnActivated() => content.Activate();
-
-            protected override void OnDeactivated() => content.Deactivate();
-
-            private class TabContent : HeaderButton
+            protected override void OnActivated()
             {
-                private const int text_size = 14;
+            }
 
+            protected override void OnDeactivated()
+            {
+            }
+
+            private class TabButton : HeaderButton
+            {
                 public readonly BindableBool Active = new BindableBool();
 
                 [Resolved]
@@ -64,34 +59,42 @@ namespace osu.Game.Overlays.Comments
 
                 private readonly SpriteText text;
 
-                public TabContent(CommentsSortCriteria value)
+                public TabButton(CommentsSortCriteria value)
                 {
                     Add(text = new SpriteText
                     {
-                        Font = OsuFont.GetFont(size: text_size),
+                        Font = OsuFont.GetFont(size: 14),
                         Text = value.ToString()
                     });
                 }
 
-                public void Activate()
+                protected override void LoadComplete()
                 {
-                    FadeInBackground();
-                    text.Font = text.Font.With(weight: FontWeight.Bold);
-                    text.Colour = colours.BlueLighter;
+                    base.LoadComplete();
+
+                    Active.BindValueChanged(active =>
+                    {
+                        updateBackgroundState();
+
+                        text.Font = text.Font.With(weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium);
+                        text.Colour = active.NewValue ? colours.BlueLighter : Color4.White;
+                    }, true);
                 }
 
-                public void Deactivate()
+                protected override bool OnHover(HoverEvent e)
                 {
-                    if (!IsHovered)
-                        FadeOutBackground();
-
-                    text.Font = text.Font.With(weight: FontWeight.Medium);
-                    text.Colour = Color4.White;
+                    updateBackgroundState();
+                    return true;
                 }
 
-                protected override void OnHoverLost(HoverLostEvent e)
+                protected override void OnHoverLost(HoverLostEvent e) => updateBackgroundState();
+
+                private void updateBackgroundState()
                 {
-                    if (!Active.Value) base.OnHoverLost(e);
+                    if (Active.Value || IsHovered)
+                        ShowBackground();
+                    else
+                        HideBackground();
                 }
             }
         }

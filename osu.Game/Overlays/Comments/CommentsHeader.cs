@@ -15,10 +15,7 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsHeader : CompositeDrawable
     {
-        private const int height = 40;
-        private const int spacing = 10;
-        private const int padding = 50;
-        private const int text_size = 14;
+        private const int font_size = 14;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
@@ -28,7 +25,8 @@ namespace osu.Game.Overlays.Comments
         public CommentsHeader()
         {
             RelativeSizeAxes = Axes.X;
-            Height = height;
+            Height = 40;
+
             AddRangeInternal(new Drawable[]
             {
                 background = new Box
@@ -38,14 +36,14 @@ namespace osu.Game.Overlays.Comments
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = padding },
+                    Padding = new MarginPadding { Horizontal = 50 },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(spacing, 0),
+                            Spacing = new Vector2(10, 0),
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
@@ -54,10 +52,10 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Font = OsuFont.GetFont(size: text_size),
+                                    Font = OsuFont.GetFont(size: font_size),
                                     Text = @"Sort by"
                                 },
-                                new SortSelector
+                                new SortTabControl
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -107,7 +105,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: text_size),
+                            Font = OsuFont.GetFont(size: font_size),
                             Text = @"Show deleted"
                         }
                     },
@@ -116,19 +114,14 @@ namespace osu.Game.Overlays.Comments
 
             protected override void LoadComplete()
             {
-                Checked.BindValueChanged(onCheckedChanged, true);
+                Checked.BindValueChanged(isChecked => checkboxIcon.Icon = isChecked.NewValue ? FontAwesome.Solid.CheckSquare : FontAwesome.Regular.Square, true);
                 base.LoadComplete();
-            }
-
-            private void onCheckedChanged(ValueChangedEvent<bool> isChecked)
-            {
-                checkboxIcon.Icon = isChecked.NewValue ? FontAwesome.Solid.CheckSquare : FontAwesome.Regular.Square;
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 Checked.Value = !Checked.Value;
-                return base.OnClick(e);
+                return true;
             }
         }
     }
