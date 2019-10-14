@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private OsuClickToResumeCursor clickToResumeCursor;
 
-        private GameplayCursorContainer localCursorContainer;
+        private OsuCursorContainer localCursorContainer;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
@@ -39,17 +38,13 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (localCursorContainer == null)
             {
-                var newContainer = new OsuCursorContainer();
-                Add(localCursorContainer = newContainer);
+                Add(localCursorContainer = new OsuCursorContainer());
 
-                clickToResumeCursor.CursorScale = newContainer.CalculatedCursorScale.Value;
-                clickToResumeCursor.Scale = new Vector2(newContainer.CalculatedCursorScale.Value);
-
-                newContainer.CalculatedCursorScale.ValueChanged += e =>
+                localCursorContainer.CalculatedCursorScale.BindValueChanged(scale =>
                 {
-                    clickToResumeCursor.CursorScale = e.NewValue;
-                    clickToResumeCursor.Scale = new Vector2(e.NewValue);
-                };
+                    clickToResumeCursor.CursorScale = scale.NewValue;
+                    clickToResumeCursor.Scale = new Vector2(scale.NewValue);
+                }, true);
             }
         }
 
