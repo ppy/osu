@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Comments
 
                 public void Activate()
                 {
-                    FadeInBackground();
+                    ShowBackground();
                     text.Font = text.Font.With(weight: FontWeight.Bold);
                     text.Colour = colours.BlueLighter;
                 }
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Comments
                 public void Deactivate()
                 {
                     if (!IsHovered)
-                        FadeOutBackground();
+                        HideBackground();
 
                     text.Font = text.Font.With(weight: FontWeight.Medium);
                     text.Colour = Color4.White;
