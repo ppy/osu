@@ -13,10 +13,7 @@ namespace osu.Game.Overlays.Comments
 {
     public class HeaderButton : Container
     {
-        private const int height = 20;
-        private const int corner_radius = 3;
-        private const int margin = 10;
-        private const int duration = 200;
+        private const int transition_duration = 200;
 
         protected override Container<Drawable> Content => content;
 
@@ -26,9 +23,9 @@ namespace osu.Game.Overlays.Comments
         public HeaderButton()
         {
             AutoSizeAxes = Axes.X;
-            Height = height;
+            Height = 20;
             Masking = true;
-            CornerRadius = corner_radius;
+            CornerRadius = 3;
             AddRangeInternal(new Drawable[]
             {
                 background = new Box
@@ -41,7 +38,7 @@ namespace osu.Game.Overlays.Comments
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding { Horizontal = margin }
+                    Margin = new MarginPadding { Horizontal = 10 }
                 },
                 new HoverClickSounds(),
             });
@@ -55,18 +52,18 @@ namespace osu.Game.Overlays.Comments
 
         protected override bool OnHover(HoverEvent e)
         {
-            FadeInBackground();
+            ShowBackground();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            FadeOutBackground();
+            HideBackground();
         }
 
-        protected void FadeInBackground() => background.FadeIn(duration, Easing.OutQuint);
+        protected void ShowBackground() => background.FadeIn(transition_duration, Easing.OutQuint);
 
-        protected void FadeOutBackground() => background.FadeOut(duration, Easing.OutQuint);
+        protected void HideBackground() => background.FadeOut(transition_duration, Easing.OutQuint);
     }
 }
