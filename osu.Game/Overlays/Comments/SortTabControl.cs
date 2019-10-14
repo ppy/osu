@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class SortSelector : OsuTabControl<CommentsSortCriteria>
+    public class SortTabControl : OsuTabControl<CommentsSortCriteria>
     {
         private const int spacing = 5;
 
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Comments
             Spacing = new Vector2(spacing, 0),
         };
 
-        public SortSelector()
+        public SortTabControl()
         {
             AutoSizeAxes = Axes.Both;
         }

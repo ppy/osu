@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(CommentsHeader),
             typeof(HeaderButton),
-            typeof(SortSelector),
+            typeof(SortTabControl),
         };
 
         private readonly Bindable<CommentsSortCriteria> sort = new Bindable<CommentsSortCriteria>();

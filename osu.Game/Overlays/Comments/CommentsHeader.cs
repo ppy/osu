@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Comments
                                     Font = OsuFont.GetFont(size: font_size),
                                     Text = @"Sort by"
                                 },
-                                new SortSelector
+                                new SortTabControl
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
