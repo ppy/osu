@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets
     /// </summary>
     public class RulesetStore : DatabaseBackedStore
     {
-        private static readonly Lazy<Dictionary<Assembly, Type>> loaded_assemblies = new Lazy<Dictionary<Assembly, Type>>(() => loadRulesets());
+        private static readonly Lazy<Dictionary<Assembly, Type>> loaded_assemblies = new Lazy<Dictionary<Assembly, Type>>(loadRulesets);
 
         static RulesetStore()
         {
