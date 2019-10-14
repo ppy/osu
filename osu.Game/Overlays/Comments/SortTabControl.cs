@@ -37,23 +37,23 @@ namespace osu.Game.Overlays.Comments
 
         private class SortTabItem : TabItem<CommentsSortCriteria>
         {
-            private readonly TabContent content;
+            private readonly TabButton button;
 
             public SortTabItem(CommentsSortCriteria value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;
-                Child = content = new TabContent(value)
+                Child = button = new TabButton(value)
                 {
                     Active = { BindTarget = Active }
                 };
             }
 
-            protected override void OnActivated() => content.Activate();
+            protected override void OnActivated() => button.Activate();
 
-            protected override void OnDeactivated() => content.Deactivate();
+            protected override void OnDeactivated() => button.Deactivate();
 
-            private class TabContent : HeaderButton
+            private class TabButton : HeaderButton
             {
                 private const int text_size = 14;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Comments
 
                 private readonly SpriteText text;
 
-                public TabContent(CommentsSortCriteria value)
+                public TabButton(CommentsSortCriteria value)
                 {
                     Add(text = new SpriteText
                     {
