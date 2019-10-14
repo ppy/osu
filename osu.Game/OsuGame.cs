@@ -102,7 +102,7 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        private readonly List<OverlayContainer> toolbarElements = new List<OverlayContainer>();
+        private readonly List<VisibilityContainer> toolbarElements = new List<VisibilityContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
