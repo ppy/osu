@@ -35,21 +35,20 @@ namespace osu.Game.Overlays.Comments
 
         private class SortTabItem : TabItem<CommentsSortCriteria>
         {
-            private readonly TabButton button;
-
             public SortTabItem(CommentsSortCriteria value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.Both;
-                Child = button = new TabButton(value)
-                {
-                    Active = { BindTarget = Active }
-                };
+                Child = new TabButton(value) { Active = { BindTarget = Active } };
             }
 
-            protected override void OnActivated() => button.Activate();
+            protected override void OnActivated()
+            {
+            }
 
-            protected override void OnDeactivated() => button.Deactivate();
+            protected override void OnDeactivated()
+            {
+            }
 
             private class TabButton : HeaderButton
             {
@@ -69,25 +68,33 @@ namespace osu.Game.Overlays.Comments
                     });
                 }
 
-                public void Activate()
+                protected override void LoadComplete()
                 {
-                    ShowBackground();
-                    text.Font = text.Font.With(weight: FontWeight.Bold);
-                    text.Colour = colours.BlueLighter;
+                    base.LoadComplete();
+
+                    Active.BindValueChanged(active =>
+                    {
+                        updateBackgroundState();
+
+                        text.Font = text.Font.With(weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium);
+                        text.Colour = active.NewValue ? colours.BlueLighter : Color4.White;
+                    }, true);
                 }
 
-                public void Deactivate()
+                protected override bool OnHover(HoverEvent e)
                 {
-                    if (!IsHovered)
+                    updateBackgroundState();
+                    return true;
+                }
+
+                protected override void OnHoverLost(HoverLostEvent e) => updateBackgroundState();
+
+                private void updateBackgroundState()
+                {
+                    if (Active.Value || IsHovered)
+                        ShowBackground();
+                    else
                         HideBackground();
-
-                    text.Font = text.Font.With(weight: FontWeight.Medium);
-                    text.Colour = Color4.White;
-                }
-
-                protected override void OnHoverLost(HoverLostEvent e)
-                {
-                    if (!Active.Value) base.OnHoverLost(e);
                 }
             }
         }
