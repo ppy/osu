@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets
         }
 
         /// <summary>
-        /// Loads the rulesets that are in the current appdomain an in the current directory.
+        /// Loads the rulesets that are in the current appdomain and in the current directory.
         /// </summary>
         /// <returns>The rulesets that were loaded.</returns>
         private static Dictionary<Assembly, Type> loadRulesets()
@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets
 
         /// <summary>
         /// Scans the current appdomain and current directory for ruleset assemblies.
-        /// Rulesets that were found in the current directory are automaticly loaded.
+        /// Rulesets that were found in the current directory are automatically loaded.
         /// </summary>
         /// <returns>The ruleset assemblies that were found in the current appdomain or in the current directory.</returns>
         private static IEnumerable<Assembly> getRulesetAssemblies()
