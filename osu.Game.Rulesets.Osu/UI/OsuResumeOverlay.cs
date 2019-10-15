@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuResumeOverlay : ResumeOverlay
     {
+        private Container cursorScaleContainer;
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
@@ -28,23 +29,24 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume });
+            Add(cursorScaleContainer = new Container
+            {
+                RelativePositionAxes = Axes.Both,
+                Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
+            });
         }
 
         public override void Show()
         {
             base.Show();
-            clickToResumeCursor.ShowAt(GameplayCursor.ActiveCursor.Position);
+            cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
+            clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)
             {
                 Add(localCursorContainer = new OsuCursorContainer());
 
-                localCursorContainer.CursorScale.BindValueChanged(scale =>
-                {
-                    clickToResumeCursor.CursorScale = scale.NewValue;
-                    clickToResumeCursor.Scale = new Vector2(scale.NewValue);
-                }, true);
+                localCursorContainer.CursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
             }
         }
 
@@ -63,8 +65,6 @@ namespace osu.Game.Rulesets.Osu.UI
             public override bool HandlePositionalInput => true;
 
             public Action ResumeRequested;
-
-            public float CursorScale;
 
             public OsuClickToResumeCursor()
             {
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     case OsuAction.RightButton:
                         if (!IsHovered) return false;
 
-                        this.ScaleTo(2 * CursorScale, TRANSITION_TIME, Easing.OutQuint);
+                        this.ScaleTo(2, TRANSITION_TIME, Easing.OutQuint);
 
                         ResumeRequested?.Invoke();
                         return true;
@@ -102,11 +102,10 @@ namespace osu.Game.Rulesets.Osu.UI
 
             public bool OnReleased(OsuAction action) => false;
 
-            public void ShowAt(Vector2 activeCursorPosition) => Schedule(() =>
+            public void Appear() => Schedule(() =>
             {
                 updateColour();
-                this.MoveTo(activeCursorPosition);
-                this.ScaleTo(4 * CursorScale).Then().ScaleTo(CursorScale, 1000, Easing.OutQuint);
+                this.ScaleTo(4).Then().ScaleTo(1, 1000, Easing.OutQuint);
             });
 
             private void updateColour()
