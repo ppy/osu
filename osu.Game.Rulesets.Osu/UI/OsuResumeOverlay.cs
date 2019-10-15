@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Add(localCursorContainer = new OsuCursorContainer());
 
-                localCursorContainer.CalculatedCursorScale.BindValueChanged(scale =>
+                localCursorContainer.CursorScale.BindValueChanged(scale =>
                 {
                     clickToResumeCursor.CursorScale = scale.NewValue;
                     clickToResumeCursor.Scale = new Vector2(scale.NewValue);
