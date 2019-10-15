@@ -198,12 +198,13 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
-            if (!comment.IsDeleted)
+            if (comment.HasMessage)
             {
-                var formattedSource = MessageFormatter.FormatText(comment.GetMessage());
+                var formattedSource = MessageFormatter.FormatText(comment.GetMessage);
                 message.AddLinks(formattedSource.Text, formattedSource.Links);
             }
-            else
+
+            if (comment.IsDeleted)
             {
                 content.FadeColour(OsuColour.Gray(0.5f));
                 votePill.Hide();
@@ -297,13 +298,13 @@ namespace osu.Game.Overlays.Comments
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            public string TooltipText => comment.ParentComment?.GetMessage() ?? "";
+            public string TooltipText => getParentMessage();
 
-            private readonly Comment comment;
+            private readonly Comment parentComment;
 
             public ParentUsername(Comment comment)
             {
-                this.comment = comment;
+                parentComment = comment.ParentComment;
 
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
@@ -319,9 +320,17 @@ namespace osu.Game.Overlays.Comments
                     new SpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = comment.ParentComment?.User?.Username ?? comment.ParentComment?.LegacyName
+                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName
                     }
                 };
+            }
+
+            private string getParentMessage()
+            {
+                if (parentComment == null)
+                    return string.Empty;
+
+                return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
         }
 
