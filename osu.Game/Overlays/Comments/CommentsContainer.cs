@@ -113,6 +113,12 @@ namespace osu.Game.Overlays.Comments
             });
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            background.Colour = colours.Gray2;
+        }
+
         protected override void LoadComplete()
         {
             Sort.BindValueChanged(onSortChanged, true);
@@ -182,12 +188,6 @@ namespace osu.Game.Overlays.Comments
 
                 moreButton.FadeTo(response.HasMore ? 1 : 0);
             }, loadCancellation.Token);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            background.Colour = colours.Gray2;
         }
 
         protected override void Dispose(bool isDisposing)
