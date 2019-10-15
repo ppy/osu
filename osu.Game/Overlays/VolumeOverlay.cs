@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class VolumeOverlay : OverlayContainer
+    public class VolumeOverlay : VisibilityContainer
     {
         private const float offset = 10;
 
@@ -27,8 +27,6 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterEffect;
         private VolumeMeter volumeMeterMusic;
         private MuteButton muteButton;
-
-        protected override bool BlockPositionalInput => false;
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
