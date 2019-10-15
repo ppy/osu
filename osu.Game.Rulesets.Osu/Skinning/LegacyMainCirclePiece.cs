@@ -31,13 +31,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
         private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
 
         [Resolved]
-        private DrawableHitObject drawableObject { get; set; }
-
-        [Resolved]
         private ISkinSource skin { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject drawableObject)
         {
             OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
 
