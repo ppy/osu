@@ -11,9 +11,6 @@ using osu.Game.Database;
 
 namespace osu.Game.Rulesets
 {
-    /// <summary>
-    /// Todo: All of this needs to be moved to a RulesetStore.
-    /// </summary>
     public class RulesetStore : DatabaseBackedStore, IDisposable
     {
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
