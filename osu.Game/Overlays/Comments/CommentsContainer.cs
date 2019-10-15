@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = () => getComments(false),
+                                                Action = getComments
                                             }
                                         }
                                     }
@@ -119,27 +119,31 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort) => getComments();
-
-        private void getComments(bool initial = true)
+        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
         {
-            if (initial)
-            {
-                currentPage = 1;
-                loadedTopLevelComments = 0;
-                deletedChildrenPlaceholder.DeletedCount.Value = 0;
-                moreButton.IsLoading = true;
-                content.Clear();
-            }
+            clearComments();
+            getComments();
+        }
 
+        private void getComments()
+        {
             request?.Cancel();
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
-            request.Success += response => onSuccess(response, initial);
+            request.Success += response => onSuccess(response);
             api.Queue(request);
         }
 
-        private void onSuccess(CommentBundle response, bool initial)
+        private void clearComments()
+        {
+            currentPage = 1;
+            loadedTopLevelComments = 0;
+            deletedChildrenPlaceholder.DeletedCount.Value = 0;
+            moreButton.IsLoading = true;
+            content.Clear();
+        }
+
+        private void onSuccess(CommentBundle response)
         {
             loadCancellation = new CancellationTokenSource();
 
@@ -163,9 +167,7 @@ namespace osu.Game.Overlays.Comments
             {
                 content.Add(loaded);
 
-                int deletedComments = response.Comments.Select(c => c.IsDeleted && c.IsTopLevel).Count(c => c);
-
-                deletedChildrenPlaceholder.DeletedCount.Value = initial ? deletedComments : deletedChildrenPlaceholder.DeletedCount.Value + deletedComments;
+                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
                 if (response.HasMore)
                 {
