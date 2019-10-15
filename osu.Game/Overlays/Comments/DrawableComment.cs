@@ -244,15 +244,13 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
+            ShowDeleted.BindValueChanged(show =>
+            {
+                if (comment.IsDeleted)
+                    this.FadeTo(show.NewValue ? 1 : 0);
+            }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             base.LoadComplete();
-        }
-
-        private void onShowDeletedChanged(ValueChangedEvent<bool> show)
-        {
-            if (comment.IsDeleted)
-                this.FadeTo(show.NewValue ? 1 : 0);
         }
 
         private class ChevronButton : ShowChildrenButton
