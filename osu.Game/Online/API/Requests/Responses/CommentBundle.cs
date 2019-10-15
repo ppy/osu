@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APICommentsController
+    public class CommentBundle
     {
         private List<Comment> comments;
 

@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Comments
             api.Queue(request);
         }
 
-        private void onSuccess(APICommentsController response, bool initial)
+        private void onSuccess(CommentBundle response, bool initial)
         {
             loadCancellation = new CancellationTokenSource();
 

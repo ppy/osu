@@ -8,7 +8,7 @@ using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetCommentsRequest : APIRequest<APICommentsController>
+    public class GetCommentsRequest : APIRequest<CommentBundle>
     {
         private readonly long id;
         private readonly int page;
