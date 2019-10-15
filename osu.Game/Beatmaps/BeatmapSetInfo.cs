@@ -63,6 +63,12 @@ namespace osu.Game.Beatmaps
 
         public bool Protected { get; set; }
 
-        public bool Equals(BeatmapSetInfo other) => OnlineBeatmapSetID == other?.OnlineBeatmapSetID;
+        public bool Equals(BeatmapSetInfo other)
+        {
+            if (!OnlineBeatmapSetID.HasValue || !(other?.OnlineBeatmapSetID.HasValue ?? false))
+                return ReferenceEquals(this, other);
+
+            return OnlineBeatmapSetID == other.OnlineBeatmapSetID;
+        }
     }
 }
