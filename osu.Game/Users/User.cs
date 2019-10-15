@@ -78,6 +78,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_bng")]
         public bool IsBNG;
 
+        [JsonProperty(@"is_bot")]
+        public bool IsBot;
+
         [JsonProperty(@"is_active")]
         public bool Active;
 

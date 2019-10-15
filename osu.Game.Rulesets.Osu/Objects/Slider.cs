@@ -54,13 +54,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 base.Position = value;
 
+                endPositionCache.Invalidate();
+
                 if (HeadCircle != null)
                     HeadCircle.Position = value;
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
-
-                endPositionCache.Invalidate();
             }
         }
 
@@ -205,6 +205,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override Judgement CreateJudgement() => new OsuJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }
