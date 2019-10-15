@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,8 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
-using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         private readonly OsuSpriteText name, count;
         private readonly Box bar;
+
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
         public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
 
@@ -90,6 +92,15 @@ namespace osu.Game.Overlays.BeatmapSet
                 new HoverClickSounds(),
             };
 
+            BeatmapSet.BindValueChanged(setInfo =>
+            {
+                var beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.Equals(Value)) ?? 0;
+                count.Text = beatmapsCount.ToString();
+
+                count.Alpha = beatmapsCount > 0 ? 1f : 0f;
+                Enabled.Value = beatmapsCount > 0;
+            }, true);
+
             Enabled.BindValueChanged(v => nameContainer.Alpha = v.NewValue ? 1f : 0.5f, true);
         }
 
@@ -104,17 +115,6 @@ namespace osu.Game.Overlays.BeatmapSet
             bar.Colour = colour.Blue;
 
             updateState();
-        }
-
-        public void SetBeatmaps(List<BeatmapInfo> beatmaps)
-        {
-            Trace.Assert(beatmaps?.TrueForAll(b => b.Ruleset.Equals(Value)) ?? true, "A beatmap has a ruleset not of this tab value");
-
-            count.Text = beatmaps?.Count.ToString();
-
-            var hasBeatmaps = (beatmaps?.Count ?? 0) > 0;
-            count.Alpha = hasBeatmaps ? 1f : 0f;
-            Enabled.Value = hasBeatmaps;
         }
 
         private void updateState()

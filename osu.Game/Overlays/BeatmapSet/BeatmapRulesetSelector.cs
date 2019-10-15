@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -13,23 +14,17 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapRulesetSelector : RulesetSelector
     {
-        private BeatmapSetInfo beatmapSet;
+        private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
         public BeatmapSetInfo BeatmapSet
         {
-            get => beatmapSet;
+            get => beatmapSet.Value;
             set
             {
-                if (value == beatmapSet)
-                    return;
+                // propagate value to tab items first to enable only available rulesets.
+                beatmapSet.Value = value;
 
-                beatmapSet = value;
-
-                foreach (var tab in TabContainer.TabItems.OfType<BeatmapRulesetTabItem>())
-                    tab.SetBeatmaps(beatmapSet?.Beatmaps.FindAll(b => b.Ruleset.Equals(tab.Value)));
-
-                var firstRuleset = beatmapSet?.Beatmaps.OrderBy(b => b.Ruleset.ID).FirstOrDefault()?.Ruleset;
-                SelectTab(TabContainer.TabItems.FirstOrDefault(t => t.Value.Equals(firstRuleset)));
+                SelectTab(TabContainer.TabItems.FirstOrDefault(t => t.Enabled.Value));
             }
         }
 
@@ -38,7 +33,10 @@ namespace osu.Game.Overlays.BeatmapSet
             AutoSizeAxes = Axes.Both;
         }
 
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new BeatmapRulesetTabItem(value);
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new BeatmapRulesetTabItem(value)
+        {
+            BeatmapSet = { BindTarget = beatmapSet }
+        };
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
