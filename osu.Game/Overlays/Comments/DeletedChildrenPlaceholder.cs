@@ -16,8 +16,6 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly BindableInt DeletedCount = new BindableInt();
 
-        private bool canBeShown;
-
         private readonly SpriteText countText;
 
         public DeletedChildrenPlaceholder()
@@ -42,29 +40,22 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            DeletedCount.BindValueChanged(onCountChanged, true);
-            ShowDeleted.BindValueChanged(onShowDeletedChanged, true);
+            DeletedCount.BindValueChanged(_ => updateDisplay(), true);
+            ShowDeleted.BindValueChanged(_ => updateDisplay(), true);
             base.LoadComplete();
         }
 
-        private void onShowDeletedChanged(ValueChangedEvent<bool> showDeleted)
+        private void updateDisplay()
         {
-            if (canBeShown)
-                this.FadeTo(showDeleted.NewValue ? 0 : 1);
-        }
-
-        private void onCountChanged(ValueChangedEvent<int> count)
-        {
-            canBeShown = count.NewValue != 0;
-
-            if (!canBeShown)
+            if (DeletedCount.Value != 0)
+            {
+                countText.Text = @"deleted comment".ToQuantity(DeletedCount.Value);
+                this.FadeTo(ShowDeleted.Value ? 0 : 1);
+            }
+            else
             {
                 Hide();
-                return;
             }
-
-            countText.Text = @"deleted comment".ToQuantity(count.NewValue);
-            Show();
         }
     }
 }
