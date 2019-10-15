@@ -136,7 +136,7 @@ namespace osu.Game.Overlays.Comments
             request?.Cancel();
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
-            request.Success += response => onSuccess(response);
+            request.Success += onSuccess;
             api.Queue(request);
         }
 
