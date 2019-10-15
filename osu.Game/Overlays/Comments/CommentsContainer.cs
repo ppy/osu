@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -32,7 +33,6 @@ namespace osu.Game.Overlays.Comments
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
-        private int loadedTopLevelComments;
 
         private readonly Box background;
         private readonly FillFlowContainer content;
@@ -143,7 +143,6 @@ namespace osu.Game.Overlays.Comments
         private void clearComments()
         {
             currentPage = 1;
-            loadedTopLevelComments = 0;
             deletedChildrenPlaceholder.DeletedCount.Value = 0;
             moreButton.IsLoading = true;
             content.Clear();
@@ -177,11 +176,9 @@ namespace osu.Game.Overlays.Comments
 
                 if (response.HasMore)
                 {
-                    response.Comments.ForEach(comment =>
-                    {
-                        if (comment.IsTopLevel)
-                            loadedTopLevelComments++;
-                    });
+                    int loadedTopLevelComments = 0;
+                    content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
+
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
