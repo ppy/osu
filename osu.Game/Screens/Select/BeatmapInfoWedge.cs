@@ -29,7 +29,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapInfoWedge : OverlayContainer
+    public class BeatmapInfoWedge : VisibilityContainer
     {
         private const float shear_width = 36.75f;
 
@@ -61,8 +61,6 @@ namespace osu.Game.Screens.Select
             ruleset.BindTo(parentRuleset);
             ruleset.ValueChanged += _ => updateDisplay();
         }
-
-        protected override bool BlockPositionalInput => false;
 
         protected override void PopIn()
         {
