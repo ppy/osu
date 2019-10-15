@@ -78,6 +78,6 @@ namespace osu.Game.Online.API.Requests.Responses
             return WebUtility.HtmlDecode(Regex.Replace(MessageHtml, @"<(.|\n)*?>", string.Empty));
         }
 
-        public int GetDeletedChildrenCount => ChildComments.Select(c => c.IsDeleted).Count(c => c);
+        public int DeletedChildrenCount => ChildComments.Count(c => c.IsDeleted);
     }
 }

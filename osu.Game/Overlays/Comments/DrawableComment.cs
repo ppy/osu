@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            deletedChildrenPlaceholder.DeletedCount.Value = comment.GetDeletedChildrenCount;
+            deletedChildrenPlaceholder.DeletedCount.Value = comment.DeletedChildrenCount;
 
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
