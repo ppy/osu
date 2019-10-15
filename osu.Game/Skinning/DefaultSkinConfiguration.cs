@@ -10,7 +10,7 @@ namespace osu.Game.Skinning
     /// </summary>
     public class DefaultSkinConfiguration : SkinConfiguration
     {
-        public DefaultSkinConfiguration(string version)
+        public DefaultSkinConfiguration()
         {
             ComboColours.AddRange(new[]
             {
@@ -19,13 +19,6 @@ namespace osu.Game.Skinning
                 new Color4(18, 124, 255, 255),
                 new Color4(242, 24, 57, 255),
             });
-
-            ConfigDictionary["Version"] = version;
-        }
-
-        public DefaultSkinConfiguration()
-            : this("1")
-        {
         }
     }
 }
