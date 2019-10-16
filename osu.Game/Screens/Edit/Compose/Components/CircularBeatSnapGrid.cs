@@ -43,6 +43,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public override Vector2 GetSnapPosition(Vector2 position)
         {
             Vector2 direction = position - CentrePosition;
+
+            if (direction == Vector2.Zero)
+                direction = new Vector2(0.001f, 0.001f);
+
             float distance = direction.Length;
 
             float radius = DistanceSpacing;
