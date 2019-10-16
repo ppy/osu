@@ -242,6 +242,8 @@ namespace osu.Game.Rulesets.Edit
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
+        public override Vector2 GetSnappedPosition(Vector2 position) => beatSnapGrid?.GetSnapPosition(position) ?? position;
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -290,5 +292,7 @@ namespace osu.Game.Rulesets.Edit
         /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>.</returns>
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
+
+        public abstract Vector2 GetSnappedPosition(Vector2 position);
     }
 }
