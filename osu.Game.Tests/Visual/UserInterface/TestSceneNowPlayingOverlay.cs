@@ -49,9 +49,10 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"Call PrevTrack", () => musicController.PrevTrack());
             AddAssert(@"Check if it restarted", () => currentTrack == Beatmap.Value);
 
-            AddStep(@"Seek track to 1 second", () => musicController.SeekTo(1000));
+            AddStep(@"Seek track to 2 second", () => musicController.SeekTo(2000));
             AddStep(@"Call PrevTrack", () => musicController.PrevTrack());
-            AddAssert(@"Check if it changed to prev track'", () => currentTrack != Beatmap.Value);
+            // If the track isn't changing, check the current track's time instead
+            AddAssert(@"Check if it changed to prev track'", () => currentTrack != Beatmap.Value || currentTrack.Track.CurrentTime < 2000);
         }
     }
 }
