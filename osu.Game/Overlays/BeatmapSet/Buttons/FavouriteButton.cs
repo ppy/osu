@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Notifications;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
@@ -26,8 +27,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         public string TooltipText => (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        [BackgroundDependencyLoader(true)]
+        private void load(IAPIProvider api, NotificationOverlay notifications)
         {
             SpriteIcon icon;
             AddRange(new Drawable[]
@@ -68,6 +69,18 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 request?.Cancel();
                 request = new PostBeatmapFavouriteRequest(BeatmapSet.Value?.OnlineBeatmapSetID ?? 0, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
                 request.Success += () => favourited.Value = !favourited.Value;
+                request.Failure += exception =>
+                {
+                    if (exception.Message == "UnprocessableEntity")
+                    {
+                        notifications.Post(new SimpleNotification
+                        {
+                            Text = @"You have too many favourited beatmaps! Please unfavourite some before trying again.",
+                            Icon = FontAwesome.Solid.Times,
+                        });
+                        loading.Hide();
+                    }
+                };
                 api.Queue(request);
             };
         }
