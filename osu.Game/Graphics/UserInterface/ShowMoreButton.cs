@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private Color4 chevronIconColour;
 
-        public Color4 ChevronIconColour
+        protected Color4 ChevronIconColour
         {
             get => chevronIconColour;
             set => chevronIconColour = leftChevron.Colour = rightChevron.Colour = value;
