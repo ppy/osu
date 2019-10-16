@@ -244,6 +244,8 @@ namespace osu.Game.Rulesets.Edit
 
         public override Vector2 GetSnappedPosition(Vector2 position) => beatSnapGrid?.GetSnapPosition(position) ?? position;
 
+        public override double GetSnappedTime(double startTime, Vector2 position) => beatSnapGrid?.GetSnapTime(position) ?? startTime;
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -294,5 +296,7 @@ namespace osu.Game.Rulesets.Edit
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
         public abstract Vector2 GetSnappedPosition(Vector2 position);
+
+        public abstract double GetSnappedTime(double startTime, Vector2 screenSpacePosition);
     }
 }
