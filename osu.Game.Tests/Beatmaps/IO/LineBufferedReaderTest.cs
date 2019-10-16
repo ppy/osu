@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
@@ -14,9 +15,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadLineByLine()
         {
-            const string contents = @"line 1
-line 2
-line 3";
+            const string contents = "line 1\rline 2\nline 3";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
@@ -31,9 +30,7 @@ line 3";
         [Test]
         public void TestPeekLineOnce()
         {
-            const string contents = @"line 1
-peek this
-line 3";
+            const string contents = "line 1\r\npeek this\nline 3";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
@@ -49,9 +46,7 @@ line 3";
         [Test]
         public void TestPeekLineMultipleTimes()
         {
-            const string contents = @"peek this once
-line 2
-peek this a lot";
+            const string contents = "peek this once\nline 2\rpeek this a lot";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
@@ -70,8 +65,7 @@ peek this a lot";
         [Test]
         public void TestPeekLineAtEndOfStream()
         {
-            const string contents = @"first line
-second line";
+            const string contents = "first line\r\nsecond line";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
@@ -100,8 +94,7 @@ second line";
         [Test]
         public void TestReadToEndNoPeeks()
         {
-            const string contents = @"first line
-second line";
+            const string contents = "first line\r\nsecond line";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
@@ -113,20 +106,19 @@ second line";
         [Test]
         public void TestReadToEndAfterReadsAndPeeks()
         {
-            const string contents = @"this line is gone
-this one shouldn't be
-these ones
-definitely not";
+            const string contents = "this line is gone\rthis one shouldn't be\r\nthese ones\ndefinitely not";
 
             using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(contents)))
             using (var bufferedReader = new LineBufferedReader(stream))
             {
                 Assert.AreEqual("this line is gone", bufferedReader.ReadLine());
                 Assert.AreEqual("this one shouldn't be", bufferedReader.PeekLine());
-                const string ending = @"this one shouldn't be
-these ones
-definitely not";
-                Assert.AreEqual(ending, bufferedReader.ReadToEnd());
+
+                var endingLines = bufferedReader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                Assert.AreEqual(3, endingLines.Length);
+                Assert.AreEqual("this one shouldn't be", endingLines[0]);
+                Assert.AreEqual("these ones", endingLines[1]);
+                Assert.AreEqual("definitely not", endingLines[2]);
             }
         }
     }
