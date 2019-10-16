@@ -230,9 +230,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
-            var movePosition = blueprint.ScreenSpaceMovementStartPosition + dragEvent.ScreenSpaceMousePosition - dragEvent.ScreenSpaceMouseDownPosition;
+            HitObject draggedObject = blueprint.HitObject.HitObject;
 
-            selectionHandler.HandleMovement(new MoveSelectionEvent(blueprint, blueprint.ScreenSpaceMovementStartPosition, movePosition));
+            Vector2 movePosition = blueprint.ScreenSpaceMovementStartPosition + dragEvent.ScreenSpaceMousePosition - dragEvent.ScreenSpaceMouseDownPosition;
+            Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
+
+            // Move the hitobjects
+            selectionHandler.HandleMovement(new MoveSelectionEvent(blueprint, blueprint.ScreenSpaceMovementStartPosition, ToScreenSpace(snappedPosition)));
         }
 
         protected override void Dispose(bool isDisposing)
