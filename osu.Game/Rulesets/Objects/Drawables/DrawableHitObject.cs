@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
-        public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
@@ -125,6 +125,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
+            Apply(HitObject);
+
             if (HitObject is IHasComboInformation combo)
             {
                 comboIndexBindable = combo.ComboIndexBindable.GetBoundCopy();
@@ -133,6 +135,37 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             updateState(ArmedState.Idle, true);
         }
+
+        protected void Apply(HitObject hitObject)
+        {
+            if (nestedHitObjects.IsValueCreated)
+            {
+                nestedHitObjects.Value.Clear();
+                ClearNested();
+            }
+
+            foreach (var h in hitObject.NestedHitObjects)
+            {
+                var drawableNested = CreateNested(h) ?? throw new InvalidOperationException($"{nameof(CreateNested)} returned null for {h.GetType().ReadableName()}.");
+
+                drawableNested.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
+                drawableNested.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
+                drawableNested.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
+                nestedHitObjects.Value.Add(drawableNested);
+                AddNested(drawableNested);
+            }
+        }
+
+        protected virtual void AddNested(DrawableHitObject h)
+        {
+        }
+
+        protected virtual void ClearNested()
+        {
+        }
+
+        protected virtual DrawableHitObject CreateNested(HitObject hitObject) => null;
 
         #region State / Transform Management
 
@@ -354,15 +387,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 nested.OnKilled();
 
             UpdateResult(false);
-        }
-
-        protected virtual void AddNested(DrawableHitObject h)
-        {
-            h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-            h.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
-            h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
-
-            nestedHitObjects.Value.Add(h);
         }
 
         /// <summary>
