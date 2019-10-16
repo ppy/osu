@@ -18,13 +18,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void CreateContent(Vector2 centrePosition)
         {
-            float maxDistance = Math.Max(
-                Vector2.Distance(centrePosition, Vector2.Zero),
-                Math.Max(
-                    Vector2.Distance(centrePosition, new Vector2(DrawWidth, 0)),
-                    Math.Max(
-                        Vector2.Distance(centrePosition, new Vector2(0, DrawHeight)),
-                        Vector2.Distance(centrePosition, DrawSize))));
+            float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
+            float dy = Math.Max(centrePosition.Y, DrawHeight - centrePosition.Y);
+            float maxDistance = new Vector2(dx, dy).Length;
 
             int requiredCircles = (int)(maxDistance / DistanceSpacing);
 
