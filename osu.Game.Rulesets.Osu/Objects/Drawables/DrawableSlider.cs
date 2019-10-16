@@ -94,13 +94,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void UpdateInitialTransforms()
-        {
-            base.UpdateInitialTransforms();
-
-            Body.FadeInFromZero(HitObject.TimeFadeIn);
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -127,6 +120,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
+        }
+
+        protected override void UpdateInitialTransforms()
+        {
+            base.UpdateInitialTransforms();
+
+            Body.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         public readonly Bindable<bool> Tracking = new Bindable<bool>();
