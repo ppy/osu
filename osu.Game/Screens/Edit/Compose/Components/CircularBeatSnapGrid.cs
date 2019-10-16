@@ -48,11 +48,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float radius = DistanceSpacing;
             int radialCount = Math.Max(1, (int)Math.Round(distance / radius));
 
-            if (radialCount <= 0)
-                return position;
-
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
-
             return CentrePosition + normalisedDirection * radialCount * radius;
         }
     }
