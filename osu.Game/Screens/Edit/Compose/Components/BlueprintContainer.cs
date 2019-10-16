@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -19,14 +20,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public class BlueprintContainer : CompositeDrawable
     {
-        private SelectionBlueprintContainer selectionBlueprints;
+        public event Action<IEnumerable<HitObject>> SelectionChanged;
 
+        private SelectionBlueprintContainer selectionBlueprints;
         private Container<PlacementBlueprint> placementBlueprintContainer;
         private PlacementBlueprint currentPlacement;
         private SelectionHandler selectionHandler;
         private InputManager inputManager;
-
-        private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
@@ -196,9 +196,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         private void select(RectangleF rect)
         {
-            foreach (var blueprint in selections.ToList())
+            foreach (var blueprint in selectionBlueprints)
             {
-                if (blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
+                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
                     blueprint.Select();
                 else
                     blueprint.Deselect();
@@ -208,18 +208,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void deselectAll() => selections.ToList().ForEach(m => m.Deselect());
+        private void deselectAll() => selectionHandler.SelectedBlueprints.ToList().ForEach(m => m.Deselect());
 
         private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleSelected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 1);
+
+            SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleDeselected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 0);
+
+            SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
