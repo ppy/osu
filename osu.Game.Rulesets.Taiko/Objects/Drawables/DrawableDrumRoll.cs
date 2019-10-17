@@ -55,9 +55,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             OnNewResult += onNewResult;
         }
 
-        protected override void AddNested(DrawableHitObject hitObject)
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
-            base.AddNested(hitObject);
+            base.AddNestedHitObject(hitObject);
 
             switch (hitObject)
             {
@@ -67,13 +67,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void ClearNested()
+        protected override void ClearNestedHitObjects()
         {
-            base.ClearNested();
+            base.ClearNestedHitObjects();
             tickContainer.Clear();
         }
 
-        protected override DrawableHitObject CreateNested(HitObject hitObject)
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return new DrawableDrumRollTick(tick);
             }
 
-            return base.CreateNested(hitObject);
+            return base.CreateNestedHitObject(hitObject);
         }
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();

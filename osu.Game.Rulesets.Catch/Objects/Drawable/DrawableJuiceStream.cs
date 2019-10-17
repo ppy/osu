@@ -25,19 +25,19 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
         }
 
-        protected override void AddNested(DrawableHitObject hitObject)
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
-            base.AddNested(hitObject);
+            base.AddNestedHitObject(hitObject);
             dropletContainer.Add(hitObject);
         }
 
-        protected override void ClearNested()
+        protected override void ClearNestedHitObjects()
         {
-            base.ClearNested();
+            base.ClearNestedHitObjects();
             dropletContainer.Clear();
         }
 
-        protected override DrawableHitObject CreateNested(HitObject hitObject)
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     return createDrawableRepresentation?.Invoke(catchObject)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
             }
 
-            return base.CreateNested(hitObject);
+            return base.CreateNestedHitObject(hitObject);
         }
     }
 }

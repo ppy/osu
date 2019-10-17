@@ -134,9 +134,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
-        protected override void AddNested(DrawableHitObject hitObject)
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
-            base.AddNested(hitObject);
+            base.AddNestedHitObject(hitObject);
 
             switch (hitObject)
             {
@@ -146,13 +146,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override void ClearNested()
+        protected override void ClearNestedHitObjects()
         {
-            base.ClearNested();
+            base.ClearNestedHitObjects();
             strongHitContainer.Clear();
         }
 
-        protected override DrawableHitObject CreateNested(HitObject hitObject)
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     return CreateStrongHit(strong);
             }
 
-            return base.CreateNested(hitObject);
+            return base.CreateNestedHitObject(hitObject);
         }
 
         // Normal and clap samples are handled by the drum

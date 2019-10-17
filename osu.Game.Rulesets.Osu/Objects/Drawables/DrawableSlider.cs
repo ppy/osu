@@ -93,9 +93,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }, true);
         }
 
-        protected override void AddNested(DrawableHitObject hitObject)
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
-            base.AddNested(hitObject);
+            base.AddNestedHitObject(hitObject);
 
             switch (hitObject)
             {
@@ -117,9 +117,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void ClearNested()
+        protected override void ClearNestedHitObjects()
         {
-            base.ClearNested();
+            base.ClearNestedHitObjects();
 
             headContainer.Clear();
             tailContainer.Clear();
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             tickContainer.Clear();
         }
 
-        protected override DrawableHitObject CreateNested(HitObject hitObject)
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
         {
             switch (hitObject)
             {
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     return new DrawableRepeatPoint(repeat, this) { Position = repeat.Position - slider.Position };
             }
 
-            return base.CreateNested(hitObject);
+            return base.CreateNestedHitObject(hitObject);
         }
 
         protected override void UpdateInitialTransforms()
