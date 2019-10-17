@@ -9,9 +9,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract class CircularBeatSnapGrid : BeatSnapGrid
+    public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        protected CircularBeatSnapGrid(HitObject hitObject, Vector2 centrePosition)
+        protected CircularDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
             : base(hitObject, centrePosition)
         {
         }

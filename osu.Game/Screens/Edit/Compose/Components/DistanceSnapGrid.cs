@@ -15,7 +15,10 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract class BeatSnapGrid : CompositeDrawable
+    /// <summary>
+    /// A grid which takes user input and returns a quantized ("snapped") position and time.
+    /// </summary>
+    public abstract class DistanceSnapGrid : CompositeDrawable
     {
         /// <summary>
         /// The velocity of the beatmap at the point of placement in pixels per millisecond.
@@ -48,7 +51,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private double startTime;
         private double beatLength;
 
-        protected BeatSnapGrid(HitObject hitObject, Vector2 centrePosition)
+        protected DistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
         {
             this.hitObject = hitObject;
             this.CentrePosition = centrePosition;
@@ -114,14 +117,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Snaps a position to this grid.
         /// </summary>
-        /// <param name="position">The original position in coordinate space local to this <see cref="BeatSnapGrid"/>.</param>
-        /// <returns>The snapped position in coordinate space local to this <see cref="BeatSnapGrid"/>.</returns>
+        /// <param name="position">The original position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
+        /// <returns>The snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</returns>
         public abstract Vector2 GetSnapPosition(Vector2 position);
 
         /// <summary>
         /// Retrieves the time at a snapped position.
         /// </summary>
-        /// <param name="position">The snapped position in coordinate space local to this <see cref="BeatSnapGrid"/>.</param>
+        /// <param name="position">The snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
         /// <returns>The time at the snapped position.</returns>
         public double GetSnapTime(Vector2 position) => startTime + (position - CentrePosition).Length / Velocity;
 
