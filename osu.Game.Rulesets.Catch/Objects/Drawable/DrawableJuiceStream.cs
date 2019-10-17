@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
         }
 
-        protected override void AddNested(DrawableHitObject h)
+        protected override void AddNested(DrawableHitObject hitObject)
         {
-            base.AddNested(h);
-            dropletContainer.Add(h);
+            base.AddNested(hitObject);
+            dropletContainer.Add(hitObject);
         }
 
         protected override void ClearNested()

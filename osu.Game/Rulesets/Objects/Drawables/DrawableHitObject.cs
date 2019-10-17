@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        protected virtual void AddNested(DrawableHitObject h)
+        protected virtual void AddNested(DrawableHitObject hitObject)
         {
         }
 

@@ -93,11 +93,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }, true);
         }
 
-        protected override void AddNested(DrawableHitObject h)
+        protected override void AddNested(DrawableHitObject hitObject)
         {
-            base.AddNested(h);
+            base.AddNested(hitObject);
 
-            switch (h)
+            switch (hitObject)
             {
                 case DrawableSliderHead head:
                     headContainer.Child = HeadCircle = head;
