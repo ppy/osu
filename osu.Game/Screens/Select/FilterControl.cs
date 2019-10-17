@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
             return criteria;
         }
 
-        private readonly SongSelectTextBox searchTextBox;
+        private readonly FixedSearchTextBox searchTextBox;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SongSelectTextBox { RelativeSizeAxes = Axes.X },
+                        searchTextBox = new FixedSearchTextBox { RelativeSizeAxes = Axes.X },
                         new Box
                         {
                             RelativeSizeAxes = Axes.X,
@@ -170,10 +170,5 @@ namespace osu.Game.Screens.Select
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
-
-        private class SongSelectTextBox : SearchTextBox
-        {
-            public override bool HandleLeftRightArrows => false;
-        }
     }
 }
