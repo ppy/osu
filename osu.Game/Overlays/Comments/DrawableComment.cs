@@ -15,6 +15,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Online.Chat;
+using osu.Framework.Allocation;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -81,7 +83,7 @@ namespace osu.Game.Overlays.Comments
                                         Spacing = new Vector2(5, 0),
                                         Children = new Drawable[]
                                         {
-                                            votePill = new VotePill(comment.VotesCount)
+                                            votePill = new VotePill(comment)
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
@@ -336,27 +338,37 @@ namespace osu.Game.Overlays.Comments
 
         private class VotePill : CircularContainer
         {
-            public VotePill(int count)
+            private readonly Box background;
+            private readonly Comment comment;
+
+            public VotePill(Comment comment)
             {
+                this.comment = comment;
+
                 AutoSizeAxes = Axes.X;
                 Height = 20;
                 Masking = true;
                 Children = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.05f)
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Margin = new MarginPadding { Horizontal = margin },
                         Font = OsuFont.GetFont(size: 14),
-                        Text = $"+{count}"
+                        Text = $"+{comment.VotesCount}"
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                background.Colour = comment.IsVoted ? colours.GreenLight : OsuColour.Gray(0.05f);
             }
         }
     }
