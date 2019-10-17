@@ -22,7 +22,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(HeaderButton),
             typeof(SortTabControl),
             typeof(ShowChildrenButton),
-            typeof(DeletedChildrenPlaceholder)
+            typeof(DeletedChildrenPlaceholder),
+            typeof(VotePill)
         };
 
         protected override bool UseOnlineAPI => true;

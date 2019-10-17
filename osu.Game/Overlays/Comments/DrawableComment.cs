@@ -15,12 +15,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Online.Chat;
-using osu.Framework.Allocation;
-using osu.Game.Graphics.Sprites;
-using osuTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -337,94 +331,6 @@ namespace osu.Game.Overlays.Comments
                     return string.Empty;
 
                 return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
-            }
-        }
-
-        private class VotePill : Container, IHasAccentColour
-        {
-            public Color4 AccentColour { get; set; }
-
-            private readonly Box background;
-            private readonly Box hoverLayer;
-            private readonly Comment comment;
-            private readonly CircularContainer borderContainer;
-            private readonly SpriteText sideNumber;
-
-            public VotePill(Comment comment)
-            {
-                this.comment = comment;
-
-                AutoSizeAxes = Axes.X;
-                Height = 20;
-                Children = new Drawable[]
-                {
-                    borderContainer = new CircularContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            background = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both
-                            },
-                            hoverLayer = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0
-                            }
-                        }
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Horizontal = margin },
-                        Font = OsuFont.GetFont(size: 14),
-                        Text = $"+{comment.VotesCount}"
-                    },
-                    sideNumber = new SpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreRight,
-                        Text = "+1",
-                        Font = OsuFont.GetFont(size: 14),
-                        Margin = new MarginPadding { Right = 3 },
-                        Alpha = 0,
-                    },
-                    new HoverClickSounds(),
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
-                background.Colour = comment.IsVoted ? AccentColour : OsuColour.Gray(0.05f);
-                hoverLayer.Colour = Color4.Black.Opacity(0.5f);
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                if (comment.IsVoted)
-                    hoverLayer.Show();
-                else
-                    sideNumber.Show();
-
-                borderContainer.BorderThickness = 3;
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                base.OnHoverLost(e);
-
-                if (comment.IsVoted)
-                    hoverLayer.Hide();
-                else
-                    sideNumber.Hide();
-
-                borderContainer.BorderThickness = 0;
             }
         }
     }
