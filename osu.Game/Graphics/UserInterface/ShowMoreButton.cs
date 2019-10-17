@@ -38,11 +38,6 @@ namespace osu.Game.Graphics.UserInterface
         public ShowMoreButton()
         {
             AutoSizeAxes = Axes.Both;
-            AddInternal(new CircularContainer
-            {
-                Masking = true,
-                Size = new Vector2(140, 30)
-            });
         }
 
         protected override Container CreateBackground() => new CircularContainer
