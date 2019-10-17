@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        public DrawableSliderHead HeadCircle { get; private set; }
-        public DrawableSliderTail TailCircle { get; private set; }
+        public DrawableSliderHead HeadCircle => headContainer.Child;
+        public DrawableSliderTail TailCircle => tailContainer.Child;
 
         public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
@@ -100,11 +100,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             switch (hitObject)
             {
                 case DrawableSliderHead head:
-                    headContainer.Child = HeadCircle = head;
+                    headContainer.Child = head;
                     break;
 
                 case DrawableSliderTail tail:
-                    tailContainer.Child = TailCircle = tail;
+                    tailContainer.Child = tail;
                     break;
 
                 case DrawableSliderTick tick:

@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
+        public DrawableNote Head => headContainer.Child;
+        public DrawableNote Tail => tailContainer.Child;
+
         private readonly Container<DrawableHeadNote> headContainer;
         private readonly Container<DrawableTailNote> tailContainer;
         private readonly Container<DrawableHoldNoteTick> tickContainer;
-
-        public DrawableNote Head { get; private set; }
-        public DrawableNote Tail { get; private set; }
 
         private readonly BodyPiece bodyPiece;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             switch (hitObject)
             {
                 case TailNote _:
-                    return Tail = new DrawableTailNote(this)
+                    return new DrawableTailNote(this)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     };
 
                 case Note _:
-                    return Head = new DrawableHeadNote(this)
+                    return new DrawableHeadNote(this)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
