@@ -15,6 +15,10 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using osuTK;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Framework.Bindables;
+using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -24,26 +28,57 @@ namespace osu.Game.Overlays.Comments
 
         protected override IEnumerable<Drawable> EffectTargets => null;
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private readonly Comment comment;
         private Box background;
         private Box hoverLayer;
         private CircularContainer borderContainer;
         private SpriteText sideNumber;
         private OsuSpriteText votesCounter;
+        private CommentVoteRequest request;
+
+        private readonly BindableBool isVoted = new BindableBool();
 
         public VotePill(Comment comment)
         {
             this.comment = comment;
-            votesCounter.Text = $"+{comment.VotesCount}";
+            setCount(comment.VotesCount);
+
+            Action = onAction;
 
             AutoSizeAxes = Axes.X;
             Height = 20;
             LoadingAnimationSize = new Vector2(10);
+        }
 
-            Action = () =>
-            {
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
+            hoverLayer.Colour = Color4.Black.Opacity(0.5f);
+        }
 
-            };
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            isVoted.Value = comment.IsVoted;
+            isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
+        }
+
+        private void onAction()
+        {
+            request = new CommentVoteRequest(comment.Id, isVoted.Value ? CommentVoteAction.UnVote : CommentVoteAction.Vote);
+            request.Success += onSuccess;
+            api.Queue(request);
+        }
+
+        private void onSuccess(CommentBundle response)
+        {
+            isVoted.Value = !isVoted.Value;
+            setCount(response.Comments.First().VotesCount);
+            IsLoading = false;
         }
 
         protected override Container CreateBackground() => new Container
@@ -90,46 +125,55 @@ namespace osu.Game.Overlays.Comments
             AlwaysPresent = true,
         };
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
-            background.Colour = comment.IsVoted ? AccentColour : OsuColour.Gray(0.05f);
-            hoverLayer.Colour = Color4.Black.Opacity(0.5f);
-        }
+        protected override void OnLoadingStart() => onHoverLostAction();
 
-        protected override void OnLoadingStart()
+        protected override void OnLoadingFinished()
         {
-            sideNumber.Hide();
-            borderContainer.BorderThickness = 0;
+            if (IsHovered)
+                onHoverAction();
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (comment.IsVoted)
-                hoverLayer.Show();
-
-            if (!IsLoading)
-            {
-                borderContainer.BorderThickness = 3;
-
-                if (!comment.IsVoted)
-                    sideNumber.Show();
-            }
-
+            onHoverAction();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            onHoverLostAction();
             base.OnHoverLost(e);
+        }
 
-            if (comment.IsVoted)
+        private void onHoverLostAction()
+        {
+            if (isVoted.Value)
                 hoverLayer.Hide();
             else
                 sideNumber.Hide();
 
             borderContainer.BorderThickness = 0;
+        }
+
+        private void onHoverAction()
+        {
+            if (!IsLoading)
+            {
+                borderContainer.BorderThickness = 3;
+
+                if (!isVoted.Value)
+                    sideNumber.Show();
+                else
+                    hoverLayer.Show();
+            }
+        }
+
+        private void setCount(int count) => votesCounter.Text = $"+{count}";
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            request?.Cancel();
         }
     }
 }
