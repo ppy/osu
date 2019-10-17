@@ -78,8 +78,9 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(CommentBundle response)
         {
-            isVoted.Value = !isVoted.Value;
-            votesCount.Value = response.Comments.Single().VotesCount;
+            var receivedComment = response.Comments.Single();
+            isVoted.Value = receivedComment.IsVoted;
+            votesCount.Value = receivedComment.VotesCount;
             IsLoading = false;
         }
 
