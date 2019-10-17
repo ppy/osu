@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneOsuBeatSnapGrid : ManualInputManagerTestScene
+    public class TestSceneOsuDistanceSnapGrid : ManualInputManagerTestScene
     {
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
@@ -31,9 +31,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        private TestOsuBeatSnapGrid grid;
+        private TestOsuDistanceSnapGrid grid;
 
-        public TestSceneOsuBeatSnapGrid()
+        public TestSceneOsuDistanceSnapGrid()
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
 
@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    grid = new TestOsuBeatSnapGrid(new HitCircle { Position = grid_position }),
+                    grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
                     new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnapPosition(grid.ToLocalSpace(v)) }
                 };
             });
@@ -197,11 +197,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class TestOsuBeatSnapGrid : OsuBeatSnapGrid
+        private class TestOsuDistanceSnapGrid : OsuDistanceSnapGrid
         {
             public new float DistanceSpacing => base.DistanceSpacing;
 
-            public TestOsuBeatSnapGrid(OsuHitObject hitObject)
+            public TestOsuDistanceSnapGrid(OsuHitObject hitObject)
                 : base(hitObject)
             {
             }

@@ -8,14 +8,14 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuBeatSnapGrid : CircularBeatSnapGrid
+    public class OsuDistanceSnapGrid : CircularDistanceSnapGrid
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public OsuBeatSnapGrid(OsuHitObject hitObject)
+        public OsuDistanceSnapGrid(OsuHitObject hitObject)
             : base(hitObject, hitObject.StackedEndPosition)
         {
         }
