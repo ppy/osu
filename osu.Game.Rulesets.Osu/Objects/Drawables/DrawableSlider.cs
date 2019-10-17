@@ -258,7 +258,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public Drawable ProxiedLayer => new Container(); // Todo:
+        public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Body.ReceivePositionalInputAt(screenSpacePos);
     }
