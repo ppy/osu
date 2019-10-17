@@ -165,11 +165,6 @@ namespace osu.Game.Rulesets
             }
         }
 
-        ~RulesetStore()
-        {
-            Dispose(false);
-        }
-
         public void Dispose()
         {
             Dispose(true);
