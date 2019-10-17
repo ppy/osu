@@ -10,11 +10,6 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuDistanceSnapGrid : CircularDistanceSnapGrid
     {
-        /// <summary>
-        /// Scoring distance with a speed-adjusted beat length of 1 second.
-        /// </summary>
-        private const float base_scoring_distance = 100;
-
         public OsuDistanceSnapGrid(OsuHitObject hitObject)
             : base(hitObject, hitObject.StackedEndPosition)
         {
@@ -25,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(time);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(time);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            double scoringDistance = OsuHitObject.BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
 
             return (float)(scoringDistance / timingPoint.BeatLength);
         }
