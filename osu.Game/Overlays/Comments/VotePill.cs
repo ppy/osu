@@ -40,11 +40,11 @@ namespace osu.Game.Overlays.Comments
         private CommentVoteRequest request;
 
         private readonly BindableBool isVoted = new BindableBool();
+        private readonly BindableInt votesCount = new BindableInt();
 
         public VotePill(Comment comment)
         {
             this.comment = comment;
-            setCount(comment.VotesCount);
 
             Action = onAction;
 
@@ -64,7 +64,9 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
             isVoted.Value = comment.IsVoted;
+            votesCount.Value = comment.VotesCount;
             isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
+            votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
         }
 
         private void onAction()
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Comments
         private void onSuccess(CommentBundle response)
         {
             isVoted.Value = !isVoted.Value;
-            setCount(response.Comments.First().VotesCount);
+            votesCount.Value = response.Comments.Single().VotesCount;
             IsLoading = false;
         }
 
@@ -167,8 +169,6 @@ namespace osu.Game.Overlays.Comments
                     hoverLayer.Show();
             }
         }
-
-        private void setCount(int count) => votesCounter.Text = $"+{count}";
 
         protected override void Dispose(bool isDisposing)
         {
