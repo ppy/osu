@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Comments
                                                 Origin = Anchor.Centre,
                                                 Width = 40,
                                                 AutoSizeAxes = Axes.Y,
-                                                Child =  votePill = new VotePill(comment)
+                                                Child = votePill = new VotePill(comment)
                                                 {
                                                     Anchor = Anchor.CentreRight,
                                                     Origin = Anchor.CentreRight,
