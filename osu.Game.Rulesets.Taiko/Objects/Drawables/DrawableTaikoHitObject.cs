@@ -134,11 +134,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
         }
 
-        protected override void AddNested(DrawableHitObject h)
+        protected override void AddNested(DrawableHitObject hitObject)
         {
-            base.AddNested(h);
+            base.AddNested(hitObject);
 
-            switch (h)
+            switch (hitObject)
             {
                 case DrawableStrongNestedHit strong:
                     strongHitContainer.Add(strong);

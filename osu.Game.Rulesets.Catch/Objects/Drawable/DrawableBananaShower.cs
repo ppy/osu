@@ -25,10 +25,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             AddInternal(bananaContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
-        protected override void AddNested(DrawableHitObject h)
+        protected override void AddNested(DrawableHitObject hitObject)
         {
-            base.AddNested(h);
-            bananaContainer.Add(h);
+            base.AddNested(hitObject);
+            bananaContainer.Add(hitObject);
         }
 
         protected override void ClearNested()
