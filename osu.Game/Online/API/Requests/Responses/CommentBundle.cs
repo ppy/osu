@@ -47,15 +47,11 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
-        private List<long> userVotes;
-
         [JsonProperty(@"user_votes")]
-        public List<long> UserVotes
+        private List<long> userVotes
         {
-            get => userVotes;
             set
             {
-                userVotes = value;
                 value.ForEach(v =>
                 {
                     Comments.ForEach(c =>
