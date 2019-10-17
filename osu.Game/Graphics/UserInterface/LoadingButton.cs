@@ -45,15 +45,16 @@ namespace osu.Game.Graphics.UserInterface
             set => loading.Size = value;
         }
 
-        private readonly Container background;
         private readonly LoadingAnimation loading;
         private readonly Drawable content;
 
-        public LoadingButton()
+        protected LoadingButton()
         {
+            Container background;
+
             Child = background = CreateBackground();
 
-            background.AddRange(new Drawable[]
+            background.AddRange(new[]
             {
                 content = CreateContent(),
                 loading = new LoadingAnimation

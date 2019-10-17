@@ -81,11 +81,17 @@ namespace osu.Game.Overlays.Comments
                                         Spacing = new Vector2(5, 0),
                                         Children = new Drawable[]
                                         {
-                                            votePill = new VotePill(comment)
+                                            new Container
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                AlwaysPresent = true,
+                                                Width = 40,
+                                                AutoSizeAxes = Axes.Y,
+                                                Child =  votePill = new VotePill(comment)
+                                                {
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                }
                                             },
                                             new UpdateableAvatar(comment.User)
                                             {
