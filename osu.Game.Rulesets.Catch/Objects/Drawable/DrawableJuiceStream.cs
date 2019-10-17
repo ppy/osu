@@ -2,38 +2,50 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableJuiceStream : DrawableCatchHitObject<JuiceStream>
     {
+        private readonly Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation;
         private readonly Container dropletContainer;
 
         public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
             : base(s)
         {
+            this.createDrawableRepresentation = createDrawableRepresentation;
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor.BottomLeft;
             X = 0;
 
             AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
-
-            foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
-                AddNested(createDrawableRepresentation?.Invoke(o));
         }
 
         protected override void AddNested(DrawableHitObject h)
         {
-            var catchObject = (DrawableCatchHitObject)h;
-
-            catchObject.CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
-
-            dropletContainer.Add(h);
             base.AddNested(h);
+            dropletContainer.Add(h);
+        }
+
+        protected override void ClearNested()
+        {
+            base.ClearNested();
+            dropletContainer.Clear();
+        }
+
+        protected override DrawableHitObject CreateNested(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case CatchHitObject catchObject:
+                    return createDrawableRepresentation?.Invoke(catchObject)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
+            }
+
+            return base.CreateNested(hitObject);
         }
     }
 }
