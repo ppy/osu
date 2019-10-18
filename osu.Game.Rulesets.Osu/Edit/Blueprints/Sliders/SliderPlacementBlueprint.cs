@@ -104,8 +104,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void beginCurve()
         {
             BeginPlacement();
-
-            HitObject.StartTime = EditorClock.CurrentTime;
             setState(PlacementState.Body);
         }
 
