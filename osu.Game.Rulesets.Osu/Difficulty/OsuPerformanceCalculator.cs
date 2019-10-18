@@ -230,14 +230,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double fingerControlDiff = Attributes.FingerControlDiff;
 
             double modifiedAcc = getModifiedAcc();
-            double accOnCircles = 1 - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
+            double accOnCircles = 0.998f - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
 
             // accOnCircles can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnCircles is close to 1
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
             double deviationOnCircles = (greatWindow + 8) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 19800;
+            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 22000;
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
             accuracyValue *= lengthFactor;
