@@ -77,6 +77,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
+        private Bindable<double> startTimeBindable;
         private Bindable<int> comboIndexBindable;
 
         public override bool RemoveWhenNotAlive => false;
@@ -126,7 +127,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            Apply(HitObject);
+            HitObject.DefaultsApplied += onDefaultsApplied;
+
+            startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.BindValueChanged(_ => updateState(ArmedState.Idle, true));
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -135,9 +139,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             updateState(ArmedState.Idle, true);
+            onDefaultsApplied();
         }
 
-        protected void Apply(HitObject hitObject)
+        private void onDefaultsApplied() => apply(HitObject);
+
+        private void apply(HitObject hitObject)
         {
 #pragma warning disable 618 // can be removed 20200417
             if (GetType().GetMethod(nameof(AddNested), BindingFlags.NonPublic | BindingFlags.Instance)?.DeclaringType != typeof(DrawableHitObject))
@@ -493,6 +500,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
         protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            HitObject.DefaultsApplied -= onDefaultsApplied;
+        }
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
