@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Editor
 {
-    public class TestSceneBeatSnapGrid : EditorClockTestScene
+    public class TestSceneDistanceSnapGrid : EditorClockTestScene
     {
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
@@ -27,9 +27,9 @@ namespace osu.Game.Tests.Visual.Editor
         [Cached(typeof(IEditorBeatmap))]
         private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
 
-        private TestBeatSnapGrid grid;
+        private TestDistanceSnapGrid grid;
 
-        public TestSceneBeatSnapGrid()
+        public TestSceneDistanceSnapGrid()
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
             editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual.Editor
             AddAssert("snap time is now 0.5 beats away", () => Precision.AlmostEquals(beat_length / 2, grid.GetSnapTime(snapPosition), 0.01));
         }
 
-        private void createGrid(Action<TestBeatSnapGrid> func = null, string description = null)
+        private void createGrid(Action<TestDistanceSnapGrid> func = null, string description = null)
         {
             AddStep($"create grid {description ?? string.Empty}", () =>
             {
@@ -123,20 +123,20 @@ namespace osu.Game.Tests.Visual.Editor
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    grid = new TestBeatSnapGrid(new HitObject(), grid_position)
+                    grid = new TestDistanceSnapGrid(new HitObject(), grid_position)
                 };
 
                 func?.Invoke(grid);
             });
         }
 
-        private class TestBeatSnapGrid : BeatSnapGrid
+        private class TestDistanceSnapGrid : DistanceSnapGrid
         {
             public new float Velocity = 1;
 
             public new float DistanceSpacing => base.DistanceSpacing;
 
-            public TestBeatSnapGrid(HitObject hitObject, Vector2 centrePosition)
+            public TestDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
                 : base(hitObject, centrePosition)
             {
             }
