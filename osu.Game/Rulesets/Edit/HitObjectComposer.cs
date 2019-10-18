@@ -240,7 +240,8 @@ namespace osu.Game.Rulesets.Edit
 
         public void BeginPlacement(HitObject hitObject)
         {
-            hitObject.StartTime = GetSnappedTime(hitObject.StartTime, inputManager.CurrentState.Mouse.Position);
+            if (distanceSnapGrid != null)
+                hitObject.StartTime = GetSnappedTime(hitObject.StartTime, distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position));
         }
 
         public void EndPlacement(HitObject hitObject) => EditorBeatmap.Add(hitObject);
