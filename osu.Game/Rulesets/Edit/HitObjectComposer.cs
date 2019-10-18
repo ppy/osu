@@ -242,9 +242,9 @@ namespace osu.Game.Rulesets.Edit
 
         public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
 
-        public override Vector2 GetSnappedPosition(Vector2 position) => beatSnapGrid?.GetSnapPosition(position) ?? position;
+        public override Vector2 GetSnappedPosition(Vector2 position) => distanceSnapGrid?.GetSnapPosition(position) ?? position;
 
-        public override double GetSnappedTime(double startTime, Vector2 position) => beatSnapGrid?.GetSnapTime(position) ?? startTime;
+        public override double GetSnappedTime(double startTime, Vector2 position) => distanceSnapGrid?.GetSnapTime(position) ?? startTime;
 
         protected override void Dispose(bool isDisposing)
         {
