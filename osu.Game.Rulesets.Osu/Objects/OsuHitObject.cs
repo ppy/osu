@@ -14,7 +14,15 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
+        /// <summary>
+        /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
+        /// </summary>
         public const float OBJECT_RADIUS = 64;
+
+        /// <summary>
+        /// Scoring distance with a speed-adjusted beat length of 1 second (ie. the speed slider balls move through their track).
+        /// </summary>
+        internal const float BASE_SCORING_DISTANCE = 100;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
