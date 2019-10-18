@@ -57,7 +57,8 @@ namespace osu.Game.Rulesets.Edit
             {
                 drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap, Array.Empty<Mod>()))
                 {
-                    Clock = framedClock
+                    Clock = framedClock,
+                    ProcessCustomClock = false
                 };
             }
             catch (Exception e)

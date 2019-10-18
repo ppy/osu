@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (HitObject is IHasComboInformation combo)
             {
                 comboIndexBindable = combo.ComboIndexBindable.GetBoundCopy();
-                comboIndexBindable.BindValueChanged(_ => updateAccentColour());
+                comboIndexBindable.BindValueChanged(_ => updateAccentColour(), true);
             }
 
             updateState(ArmedState.Idle, true);
