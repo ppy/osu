@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Comments
             AlwaysPresent = true,
         };
 
-        protected override void OnLoadingStart() => onHoverLostAction();
+        protected override void OnLoadingStart() => updateDisplay();
 
         protected override void OnLoadingFinished()
         {
@@ -144,31 +144,27 @@ namespace osu.Game.Overlays.Comments
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            onHoverLostAction();
+            updateDisplay();
             base.OnHoverLost(e);
         }
 
-        private void onHoverLostAction()
+        private void updateDisplay()
         {
             if (isVoted.Value)
-                hoverLayer.Hide();
-            else
+            {
+                hoverLayer.FadeTo(IsHovered ? 1 : 0);
                 sideNumber.Hide();
+            }
+            else
+                sideNumber.FadeTo(IsHovered ? 1 : 0);
 
-            borderContainer.BorderThickness = 0;
+            borderContainer.BorderThickness = IsHovered ? 3 : 0;
         }
 
         private void onHoverAction()
         {
             if (!IsLoading)
-            {
-                borderContainer.BorderThickness = 3;
-
-                if (!isVoted.Value)
-                    sideNumber.Show();
-                else
-                    hoverLayer.Show();
-            }
+                updateDisplay();
         }
 
         protected override void Dispose(bool isDisposing)
