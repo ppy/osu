@@ -230,7 +230,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double fingerControlDiff = Attributes.FingerControlDiff;
 
             double modifiedAcc = getModifiedAcc();
-            double accOnCircles = 0.998f - (1 - modifiedAcc) * Beatmap.HitObjects.Count / countHitCircles;
+
+            // technically accOnCircles = modifiedAcc
+            // -0.003f exists so that the difference between 99.5% and 100% is not too big
+            double accOnCircles = modifiedAcc - 0.003f;
 
             // accOnCircles can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnCircles is close to 1
