@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            Apply(HitObject);
+            apply(HitObject);
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             updateState(ArmedState.Idle, true);
         }
 
-        protected void Apply(HitObject hitObject)
+        private void apply(HitObject hitObject)
         {
 #pragma warning disable 618 // can be removed 20200417
             if (GetType().GetMethod(nameof(AddNested), BindingFlags.NonPublic | BindingFlags.Instance)?.DeclaringType != typeof(DrawableHitObject))
