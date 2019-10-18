@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
             if (objects.Count == 0)
             {
-                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime < EditorClock.CurrentTime);
+                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime <= EditorClock.CurrentTime);
 
                 if (lastObject == null)
                     return null;
