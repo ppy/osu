@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (currentPlacement != null)
             {
-                currentPlacement.UpdatePosition(e.ScreenSpaceMousePosition);
+                updatePlacementPosition(e.ScreenSpaceMousePosition);
                 return true;
             }
 
@@ -187,9 +187,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                blueprint.UpdatePosition(inputManager.CurrentState.Mouse.Position);
+                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
             }
         }
+
+        private void updatePlacementPosition(Vector2 screenSpacePosition) => currentPlacement.UpdatePosition(ToScreenSpace(composer.GetSnappedPosition(ToLocalSpace(screenSpacePosition))));
 
         /// <summary>
         /// Select all masks in a given rectangle selection area.
