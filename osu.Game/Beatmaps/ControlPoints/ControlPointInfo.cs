@@ -36,6 +36,12 @@ namespace osu.Game.Beatmaps.ControlPoints
         [JsonProperty]
         public SortedList<EffectControlPoint> EffectPoints { get; private set; } = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
 
+        public IReadOnlyList<ControlPoint> AllControlPoints =>
+            TimingPoints
+                .Concat((IEnumerable<ControlPoint>)DifficultyPoints)
+                .Concat(SamplePoints)
+                .Concat(EffectPoints).ToArray();
+
         /// <summary>
         /// Finds the difficulty control point that is active at <paramref name="time"/>.
         /// </summary>
