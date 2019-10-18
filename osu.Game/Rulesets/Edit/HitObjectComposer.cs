@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Configuration;
@@ -23,6 +24,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -212,19 +214,21 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
+        private ScheduledDelegate scheduledUpdate;
+
         private void addHitObject(HitObject hitObject) => updateHitObject(hitObject);
 
-        private void removeHitObject(HitObject hitObject)
-        {
-            beatmapProcessor?.PreProcess();
-            beatmapProcessor?.PostProcess();
-        }
+        private void removeHitObject(HitObject hitObject) => updateHitObject(null);
 
-        private void updateHitObject(HitObject hitObject)
+        private void updateHitObject([CanBeNull] HitObject hitObject)
         {
-            beatmapProcessor?.PreProcess();
-            hitObject.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
-            beatmapProcessor?.PostProcess();
+            scheduledUpdate?.Cancel();
+            scheduledUpdate = Schedule(() =>
+            {
+                beatmapProcessor?.PreProcess();
+                hitObject?.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
+                beatmapProcessor?.PostProcess();
+            });
         }
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
