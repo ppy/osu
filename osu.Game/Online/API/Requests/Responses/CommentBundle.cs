@@ -4,6 +4,7 @@
 using Newtonsoft.Json;
 using osu.Game.Users;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -44,8 +45,40 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user_follow")]
         public bool UserFollow { get; set; }
 
+        private List<Comment> includedComments;
+
         [JsonProperty(@"included_comments")]
-        public List<Comment> IncludedComments { get; set; }
+        public List<Comment> IncludedComments
+        {
+            get => includedComments;
+            set
+            {
+                includedComments = value;
+
+                if (value.Any())
+                {
+                    Comment main = Comments.Single();
+
+                    value.ForEach(child =>
+                    {
+                        if (child.ParentId == main.Id)
+                        {
+                            main.ChildComments.Add(child);
+                            child.ParentComment = main;
+                        }
+                        else
+                            value.ForEach(parent =>
+                            {
+                                if (parent.Id == child.ParentId)
+                                {
+                                    parent.ChildComments.Add(child);
+                                    child.ParentComment = parent;
+                                }
+                            });
+                    });
+                }
+            }
+        }
 
         [JsonProperty(@"user_votes")]
         private List<long> userVotes
@@ -55,6 +88,12 @@ namespace osu.Game.Online.API.Requests.Responses
                 value.ForEach(v =>
                 {
                     Comments.ForEach(c =>
+                    {
+                        if (v == c.Id)
+                            c.IsVoted = true;
+                    });
+
+                    IncludedComments.ForEach(c =>
                     {
                         if (v == c.Id)
                             c.IsVoted = true;
@@ -76,6 +115,15 @@ namespace osu.Game.Online.API.Requests.Responses
                 value.ForEach(u =>
                 {
                     Comments.ForEach(c =>
+                    {
+                        if (c.UserId == u.Id)
+                            c.User = u;
+
+                        if (c.EditedById == u.Id)
+                            c.EditedUser = u;
+                    });
+
+                    IncludedComments.ForEach(c =>
                     {
                         if (c.UserId == u.Id)
                             c.User = u;

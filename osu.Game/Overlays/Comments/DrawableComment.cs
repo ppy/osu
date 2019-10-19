@@ -28,15 +28,16 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly Bindable<List<Comment>> childComments = new Bindable<List<Comment>>();
+        private readonly List<Comment> loadedChildren = new List<Comment>();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly FillFlowContainer childCommentsContainer;
+        private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
         {
             LinkFlowContainer username;
-            DeletedChildrenPlaceholder deletedChildrenPlaceholder;
             FillFlowContainer info;
             LinkFlowContainer message;
             GridContainer content;
@@ -205,15 +206,16 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            deletedChildrenPlaceholder.DeletedCount.Value = comment.DeletedChildrenCount;
-
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
             else
                 username.AddText(comment.LegacyName);
 
-            if (childComments.Value.Count == 0 && comment.RepliesCount > 0)
-                info.Add(new LoadRepliesButton(comment));
+            if (!childComments.Value.Any() && comment.RepliesCount > 0)
+                info.Add(new LoadRepliesButton(comment)
+                {
+                    ChildComments = { BindTarget = childComments },
+                });
 
             if (comment.EditedAt.HasValue)
             {
@@ -266,10 +268,19 @@ namespace osu.Game.Overlays.Comments
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             childComments.BindValueChanged(children =>
             {
-                children.NewValue.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
+                children.NewValue.ForEach(c =>
                 {
-                    ShowDeleted = { BindTarget = ShowDeleted }
-                }));
+                    if (!loadedChildren.Contains(c))
+                    {
+                        childCommentsContainer.Add(new DrawableComment(c)
+                        {
+                            ShowDeleted = { BindTarget = ShowDeleted }
+                        });
+                        loadedChildren.Add(c);
+                    }
+                });
+
+                deletedChildrenPlaceholder.DeletedCount.Value = loadedChildren.Count(c => c.IsDeleted);
             }, true);
             base.LoadComplete();
         }
