@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Comments
             var children = ChildComments.Value.ToList();
             response.Comments.ForEach(c =>
             {
-                if (c.ParentId == Comment.Id && !children.Any(u => u.Id == c.Id))
+                if (!children.Any(child => child.Id == c.Id))
                     children.Add(c);
             });
             ChildComments.Value = children;
