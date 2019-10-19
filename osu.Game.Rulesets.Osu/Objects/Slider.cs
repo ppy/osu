@@ -19,11 +19,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Slider : OsuHitObject, IHasCurve
     {
-        /// <summary>
-        /// Scoring distance with a speed-adjusted beat length of 1 second.
-        /// </summary>
-        private const float base_scoring_distance = 100;
-
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
@@ -54,13 +49,13 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 base.Position = value;
 
+                endPositionCache.Invalidate();
+
                 if (HeadCircle != null)
                     HeadCircle.Position = value;
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
-
-                endPositionCache.Invalidate();
             }
         }
 
@@ -123,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
 
-            double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
+            double scoringDistance = BASE_SCORING_DISTANCE * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
             TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
@@ -205,6 +200,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public override Judgement CreateJudgement() => new OsuJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

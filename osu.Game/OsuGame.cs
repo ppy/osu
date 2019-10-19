@@ -102,7 +102,7 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        private readonly List<OverlayContainer> toolbarElements = new List<OverlayContainer>();
+        private readonly List<VisibilityContainer> toolbarElements = new List<VisibilityContainer>();
 
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
@@ -488,7 +488,8 @@ namespace osu.Game
                 toolbarElements.Add(d);
             });
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
+
             loadComponentSingleFile(new OnScreenDisplay(), Add, true);
 
             loadComponentSingleFile(musicController = new MusicController(), Add, true);

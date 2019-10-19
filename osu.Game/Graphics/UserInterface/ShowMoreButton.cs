@@ -1,30 +1,36 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osuTK;
+using osuTK.Graphics;
 using System.Collections.Generic;
 
-namespace osu.Game.Overlays.Profile.Sections
+namespace osu.Game.Graphics.UserInterface
 {
     public class ShowMoreButton : OsuHoverContainer
     {
         private const float fade_duration = 200;
 
-        private readonly Box background;
-        private readonly LoadingAnimation loading;
-        private readonly FillFlowContainer content;
+        private Color4 chevronIconColour;
 
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+        protected Color4 ChevronIconColour
+        {
+            get => chevronIconColour;
+            set => chevronIconColour = leftChevron.Colour = rightChevron.Colour = value;
+        }
+
+        public string Text
+        {
+            get => text.Text;
+            set => text.Text = value;
+        }
 
         private bool isLoading;
 
@@ -33,25 +39,31 @@ namespace osu.Game.Overlays.Profile.Sections
             get => isLoading;
             set
             {
-                if (isLoading == value)
-                    return;
-
                 isLoading = value;
 
                 Enabled.Value = !isLoading;
 
                 if (value)
                 {
-                    loading.FadeIn(fade_duration, Easing.OutQuint);
+                    loading.Show();
                     content.FadeOut(fade_duration, Easing.OutQuint);
                 }
                 else
                 {
-                    loading.FadeOut(fade_duration, Easing.OutQuint);
+                    loading.Hide();
                     content.FadeIn(fade_duration, Easing.OutQuint);
                 }
             }
         }
+
+        private readonly Box background;
+        private readonly LoadingAnimation loading;
+        private readonly FillFlowContainer content;
+        private readonly ChevronIcon leftChevron;
+        private readonly ChevronIcon rightChevron;
+        private readonly SpriteText text;
+
+        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
         public ShowMoreButton()
         {
@@ -77,15 +89,15 @@ namespace osu.Game.Overlays.Profile.Sections
                             Spacing = new Vector2(7),
                             Children = new Drawable[]
                             {
-                                new ChevronIcon(),
-                                new OsuSpriteText
+                                leftChevron = new ChevronIcon(),
+                                text = new OsuSpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                     Text = "show more".ToUpper(),
                                 },
-                                new ChevronIcon(),
+                                rightChevron = new ChevronIcon(),
                             }
                         },
                         loading = new LoadingAnimation
@@ -97,13 +109,6 @@ namespace osu.Game.Overlays.Profile.Sections
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colors)
-        {
-            IdleColour = colors.GreySeafoamDark;
-            HoverColour = colors.GreySeafoam;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -132,12 +137,6 @@ namespace osu.Game.Overlays.Profile.Sections
                 Origin = Anchor.Centre;
                 Size = new Vector2(icon_size);
                 Icon = FontAwesome.Solid.ChevronDown;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colors)
-            {
-                Colour = colors.Yellow;
             }
         }
     }
