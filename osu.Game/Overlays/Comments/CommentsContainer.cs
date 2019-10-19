@@ -164,7 +164,8 @@ namespace osu.Game.Overlays.Comments
                 if (c.IsTopLevel)
                     page.Add(new DrawableComment(c)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        ShowDeleted = { BindTarget = ShowDeleted },
+                        Sort = { BindTarget = Sort }
                     });
             }
 

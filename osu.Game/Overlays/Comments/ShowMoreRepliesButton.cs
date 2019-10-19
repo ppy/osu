@@ -7,7 +7,6 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Allocation;
-using osuTK.Graphics;
 using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using osuTK;
@@ -18,9 +17,10 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class LoadRepliesButton : LoadingButton
+    public class ShowMoreRepliesButton : LoadingButton
     {
         public readonly Bindable<List<Comment>> ChildComments = new Bindable<List<Comment>>();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
@@ -29,19 +29,34 @@ namespace osu.Game.Overlays.Comments
 
         private readonly Comment comment;
         private SpriteText text;
-        private GetCommentRepliesRequest request;
+        private ShowMoreCommentRepliesRequest request;
+        private int currentPage;
 
-        public LoadRepliesButton(Comment comment)
+        public ShowMoreRepliesButton(Comment comment)
         {
             this.comment = comment;
 
             AutoSizeAxes = Axes.Both;
+            Margin = new MarginPadding { Vertical = 10, Left = 80 };
             LoadingAnimationSize = new Vector2(8);
 
             Action = onAction;
+        }
 
-            IdleColour = OsuColour.Gray(0.7f);
-            HoverColour = Color4.White;
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            IdleColour = colours.Blue;
+            HoverColour = colours.BlueLighter;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ChildComments.BindValueChanged(children =>
+            {
+                Alpha = (!children.NewValue.Any() && comment.RepliesCount > 0) || children.NewValue.Count == comment.RepliesCount ? 0 : 1;
+            }, true);
         }
 
         protected override Container CreateBackground() => new Container
@@ -53,23 +68,33 @@ namespace osu.Game.Overlays.Comments
         {
             AlwaysPresent = true,
             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-            Text = @"[+] load replies"
+            Text = @"Show More"
         };
 
         private void onAction()
         {
-            request = new GetCommentRepliesRequest(comment.Id);
+            request = new ShowMoreCommentRepliesRequest(comment.Id, Sort.Value, ++currentPage);
             request.Success += onSuccess;
             api.Queue(request);
         }
 
         private void onSuccess(CommentBundle response)
         {
-            ChildComments.Value = response.Comments.Single().ChildComments;
+            var children = ChildComments.Value.ToList();
+            List<Comment> receivedReplies = new List<Comment>();
+            response.Comments.ForEach(c =>
+            {
+                if (c.ParentId == comment.Id)
+                    receivedReplies.Add(c);
+            });
+            receivedReplies.ForEach(r =>
+            {
+                if (!children.Contains(r))
+                    children.Add(r);
+            });
+            ChildComments.Value = children;
             IsLoading = false;
         }
-
-        protected override void OnLoadingFinished() => Hide();
 
         protected override void Dispose(bool isDisposing)
         {

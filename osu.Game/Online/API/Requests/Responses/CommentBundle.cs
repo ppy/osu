@@ -4,7 +4,6 @@
 using Newtonsoft.Json;
 using osu.Game.Users;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -54,29 +53,29 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 includedComments = value;
-
-                if (value.Any())
+                value.ForEach(child =>
                 {
-                    Comment main = Comments.Single();
-
-                    value.ForEach(child =>
+                    if (child.ParentId != null)
                     {
-                        if (child.ParentId == main.Id)
+                        value.ForEach(parent =>
                         {
-                            main.ChildComments.Add(child);
-                            child.ParentComment = main;
-                        }
-                        else
-                            value.ForEach(parent =>
+                            if (parent.Id == child.ParentId)
                             {
-                                if (parent.Id == child.ParentId)
-                                {
-                                    parent.ChildComments.Add(child);
-                                    child.ParentComment = parent;
-                                }
-                            });
-                    });
-                }
+                                parent.ChildComments.Add(child);
+                                child.ParentComment = parent;
+                            }
+                        });
+
+                        comments.ForEach(parent =>
+                        {
+                            if (parent.Id == child.ParentId)
+                            {
+                                parent.ChildComments.Add(child);
+                                child.ParentComment = parent;
+                            }
+                        });
+                    }
+                });
             }
         }
 

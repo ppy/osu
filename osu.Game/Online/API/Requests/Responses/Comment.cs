@@ -75,5 +75,15 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsVoted { get; set; }
 
         public string GetMessage => HasMessage ? WebUtility.HtmlDecode(Regex.Replace(MessageHtml, @"<(.|\n)*?>", string.Empty)) : string.Empty;
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

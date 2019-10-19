@@ -25,6 +25,7 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly Bindable<List<Comment>> childComments = new Bindable<List<Comment>>();
@@ -200,6 +201,11 @@ namespace osu.Game.Overlays.Comments
                             deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
+                            },
+                            new ShowMoreRepliesButton(comment)
+                            {
+                                ChildComments = { BindTarget = childComments },
+                                Sort = { BindTarget = Sort }
                             }
                         }
                     }
