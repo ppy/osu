@@ -221,6 +221,7 @@ namespace osu.Game.Overlays.Comments
                 info.Add(new LoadRepliesButton(comment)
                 {
                     ChildComments = { BindTarget = childComments },
+                    Sort = { BindTarget = Sort }
                 });
 
             if (comment.EditedAt.HasValue)
