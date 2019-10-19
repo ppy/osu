@@ -29,8 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
-        public IBindable<float> CursorScale => cursorScale;
-        private Bindable<float> cursorScale;
+        public Bindable<float> CursorScale;
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
@@ -58,8 +57,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
             autoCursorScale.ValueChanged += _ => calculateScale();
 
-            cursorScale = new Bindable<float>();
-            cursorScale.ValueChanged += e => ActiveCursor.Scale = cursorTrail.Scale = new Vector2(e.NewValue);
+            CursorScale = new Bindable<float>();
+            CursorScale.ValueChanged += e => ActiveCursor.Scale = cursorTrail.Scale = new Vector2(e.NewValue);
 
             calculateScale();
         }
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
             }
 
-            cursorScale.Value = scale;
+            CursorScale.Value = scale;
         }
 
         protected override void LoadComplete()
@@ -130,13 +129,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void PopIn()
         {
             fadeContainer.FadeTo(1, 300, Easing.OutQuint);
-            ActiveCursor.ScaleTo(cursorScale.Value, 400, Easing.OutQuint);
+            ActiveCursor.ScaleTo(CursorScale.Value, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
-            ActiveCursor.ScaleTo(cursorScale.Value * 0.8f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(CursorScale.Value * 0.8f, 450, Easing.OutQuint);
         }
 
         private class DefaultCursorTrail : CursorTrail
