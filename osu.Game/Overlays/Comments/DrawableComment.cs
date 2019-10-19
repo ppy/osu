@@ -30,12 +30,12 @@ namespace osu.Game.Overlays.Comments
         private readonly Bindable<List<Comment>> childComments = new Bindable<List<Comment>>();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
+        private readonly FillFlowContainer childCommentsContainer;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
         {
             LinkFlowContainer username;
-            FillFlowContainer childCommentsContainer;
             DeletedChildrenPlaceholder deletedChildrenPlaceholder;
             FillFlowContainer info;
             LinkFlowContainer message;
@@ -254,11 +254,6 @@ namespace osu.Game.Overlays.Comments
                     }
                 });
             }
-
-            childComments.Value.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
-            {
-                ShowDeleted = { BindTarget = ShowDeleted }
-            }));
         }
 
         protected override void LoadComplete()
@@ -269,6 +264,13 @@ namespace osu.Game.Overlays.Comments
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+            childComments.BindValueChanged(children =>
+            {
+                children.NewValue.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
+                {
+                    ShowDeleted = { BindTarget = ShowDeleted }
+                }));
+            }, true);
             base.LoadComplete();
         }
 
