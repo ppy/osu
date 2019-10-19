@@ -76,16 +76,10 @@ namespace osu.Game.Overlays.Comments
         private void onSuccess(CommentBundle response)
         {
             var children = ChildComments.Value.ToList();
-            List<Comment> receivedReplies = new List<Comment>();
             response.Comments.ForEach(c =>
             {
-                if (c.ParentId == Comment.Id)
-                    receivedReplies.Add(c);
-            });
-            receivedReplies.ForEach(r =>
-            {
-                if (!children.Contains(r))
-                    children.Add(r);
+                if (c.ParentId == Comment.Id && !children.Contains(c))
+                    children.Add(c);
             });
             ChildComments.Value = children;
             IsLoading = false;
