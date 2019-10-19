@@ -3,8 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Input.Events;
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -15,6 +16,10 @@ namespace osu.Game.Overlays.Comments
         protected ShowChildrenButton()
         {
             AutoSizeAxes = Axes.Both;
+            Action = () => Expanded.Value = !Expanded.Value;
+
+            IdleColour = OsuColour.Gray(0.7f);
+            HoverColour = Color4.White;
         }
 
         protected override void LoadComplete()
@@ -24,11 +29,5 @@ namespace osu.Game.Overlays.Comments
         }
 
         protected abstract void OnExpandedChanged(ValueChangedEvent<bool> expanded);
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Expanded.Value = !Expanded.Value;
-            return true;
-        }
     }
 }

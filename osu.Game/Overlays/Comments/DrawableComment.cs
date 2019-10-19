@@ -15,6 +15,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Online.Chat;
+using System.Collections.Generic;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -141,7 +143,6 @@ namespace osu.Game.Overlays.Comments
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
                                                 Spacing = new Vector2(10, 0),
-                                                Colour = OsuColour.Gray(0.7f),
                                                 Children = new Drawable[]
                                                 {
                                                     new SpriteText
@@ -149,9 +150,10 @@ namespace osu.Game.Overlays.Comments
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
                                                         Font = OsuFont.GetFont(size: 12),
-                                                        Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                                        Text = HumanizerUtils.Humanize(comment.CreatedAt),
+                                                        Colour = OsuColour.Gray(0.7f),
                                                     },
-                                                    new RepliesButton(comment.RepliesCount)
+                                                    new RepliesButton(comment)
                                                     {
                                                         Expanded = { BindTarget = childrenExpanded }
                                                     },
@@ -193,12 +195,16 @@ namespace osu.Game.Overlays.Comments
             else
                 username.AddText(comment.LegacyName);
 
+            if (comment.ChildComments.Count == 0 && comment.RepliesCount > 0)
+                info.Add(new LoadRepliesButton(comment));
+
             if (comment.EditedAt.HasValue)
             {
                 info.Add(new SpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
+                    Colour = OsuColour.Gray(0.7f),
                     Font = OsuFont.GetFont(size: 12),
                     Text = $@"edited {HumanizerUtils.Humanize(comment.EditedAt.Value)} by {comment.EditedUser.Username}"
                 });
@@ -270,7 +276,6 @@ namespace osu.Game.Overlays.Comments
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
-                    Colour = OsuColour.Gray(0.7f)
                 };
             }
 
@@ -285,11 +290,11 @@ namespace osu.Game.Overlays.Comments
             private readonly SpriteText text;
             private readonly int count;
 
-            public RepliesButton(int count)
+            public RepliesButton(Comment comment)
             {
-                this.count = count;
+                count = comment.RepliesCount;
 
-                Alpha = count == 0 ? 0 : 1;
+                Alpha = (comment.ChildComments.Count == 0 && count > 0) || count == 0 ? 0 : 1;
                 Child = text = new SpriteText
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
