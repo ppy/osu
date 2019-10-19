@@ -340,7 +340,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnChildrenChanged(ValueChangedEvent<List<Comment>> children)
             {
-                Alpha = children.NewValue.Count == 0 || repliesCount == 0 ? 0 : 1;
+                Alpha = !children.NewValue.Any() || repliesCount == 0 ? 0 : 1;
             }
         }
 
