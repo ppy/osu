@@ -16,7 +16,6 @@ using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Online.Chat;
 using System.Collections.Generic;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -28,6 +27,7 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
+        private readonly Bindable<List<Comment>> childComments = new Bindable<List<Comment>>();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Comments
             VotePill votePill;
 
             this.comment = comment;
+            childComments.Value = comment.ChildComments;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -112,23 +113,38 @@ namespace osu.Game.Overlays.Comments
                                         Spacing = new Vector2(0, 3),
                                         Children = new Drawable[]
                                         {
-                                            new FillFlowContainer
+                                            new Container
                                             {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(7, 0),
+                                                AutoSizeAxes = Axes.Y,
+                                                RelativeSizeAxes = Axes.X,
                                                 Children = new Drawable[]
                                                 {
-                                                    username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                    new FillFlowContainer
                                                     {
                                                         AutoSizeAxes = Axes.Both,
+                                                        Direction = FillDirection.Horizontal,
+                                                        Spacing = new Vector2(7, 0),
+                                                        Children = new Drawable[]
+                                                        {
+                                                            username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                            {
+                                                                AutoSizeAxes = Axes.Both,
+                                                            },
+                                                            new ParentUsername(comment),
+                                                            new SpriteText
+                                                            {
+                                                                Alpha = comment.IsDeleted ? 1 : 0,
+                                                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                                                                Text = @"deleted",
+                                                            }
+                                                        }
                                                     },
-                                                    new ParentUsername(comment),
-                                                    new SpriteText
+                                                    new ChevronButton(comment)
                                                     {
-                                                        Alpha = comment.IsDeleted ? 1 : 0,
-                                                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                                        Text = @"deleted",
+                                                        Anchor = Anchor.TopRight,
+                                                        Origin = Anchor.TopRight,
+                                                        Expanded = { BindTarget = childrenExpanded },
+                                                        ChildComments = { BindTarget = childComments }
                                                     }
                                                 }
                                             },
@@ -155,7 +171,8 @@ namespace osu.Game.Overlays.Comments
                                                     },
                                                     new RepliesButton(comment)
                                                     {
-                                                        Expanded = { BindTarget = childrenExpanded }
+                                                        Expanded = { BindTarget = childrenExpanded },
+                                                        ChildComments = { BindTarget = childComments },
                                                     },
                                                 }
                                             }
@@ -195,7 +212,7 @@ namespace osu.Game.Overlays.Comments
             else
                 username.AddText(comment.LegacyName);
 
-            if (comment.ChildComments.Count == 0 && comment.RepliesCount > 0)
+            if (childComments.Value.Count == 0 && comment.RepliesCount > 0)
                 info.Add(new LoadRepliesButton(comment));
 
             if (comment.EditedAt.HasValue)
@@ -236,20 +253,9 @@ namespace osu.Game.Overlays.Comments
                         Colour = OsuColour.Gray(0.1f)
                     }
                 });
-
-                if (comment.ChildComments.Any())
-                {
-                    AddInternal(new ChevronButton(comment)
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Margin = new MarginPadding { Right = 30, Top = margin },
-                        Expanded = { BindTarget = childrenExpanded }
-                    });
-                }
             }
 
-            comment.ChildComments.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
+            childComments.Value.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
             {
                 ShowDeleted = { BindTarget = ShowDeleted }
             }));
@@ -269,10 +275,12 @@ namespace osu.Game.Overlays.Comments
         private class ChevronButton : ShowChildrenButton
         {
             private readonly SpriteIcon icon;
+            private readonly Comment comment;
 
             public ChevronButton(Comment comment)
             {
-                Alpha = comment.IsTopLevel && comment.ChildComments.Any() ? 1 : 0;
+                this.comment = comment;
+
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
@@ -283,18 +291,22 @@ namespace osu.Game.Overlays.Comments
             {
                 icon.Icon = expanded.NewValue ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
             }
+
+            protected override void OnChildrenChanged(ValueChangedEvent<List<Comment>> children)
+            {
+                Alpha = comment.IsTopLevel && children.NewValue.Any() ? 1 : 0;
+            }
         }
 
         private class RepliesButton : ShowChildrenButton
         {
             private readonly SpriteText text;
-            private readonly int count;
+            private readonly int repliesCount;
 
             public RepliesButton(Comment comment)
             {
-                count = comment.RepliesCount;
+                repliesCount = comment.RepliesCount;
 
-                Alpha = (comment.ChildComments.Count == 0 && count > 0) || count == 0 ? 0 : 1;
                 Child = text = new SpriteText
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
@@ -303,7 +315,12 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
-                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
+                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({repliesCount})";
+            }
+
+            protected override void OnChildrenChanged(ValueChangedEvent<List<Comment>> children)
+            {
+                Alpha = (children.NewValue.Count == 0 && repliesCount > 0) || repliesCount == 0 ? 0 : 1;
             }
         }
 
