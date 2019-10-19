@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Osu.UI
         public override void Show()
         {
             base.Show();
+            GameplayCursor.ActiveCursor.Hide();
             cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
             clickToResumeCursor.Appear();
 
@@ -54,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             localCursorContainer?.Expire();
             localCursorContainer = null;
+            GameplayCursor.ActiveCursor.Show();
 
             base.Hide();
         }
