@@ -1,8 +1,9 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -21,6 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI
         private OsuClickToResumeCursor clickToResumeCursor;
 
         private OsuCursorContainer localCursorContainer;
+        private Bindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
@@ -47,7 +49,9 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Add(localCursorContainer = new OsuCursorContainer());
 
-                localCursorContainer.CursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
+                localCursorScale = new Bindable<float>();
+                localCursorScale.BindTo(localCursorContainer.CursorScale);
+                localCursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
             }
         }
 
