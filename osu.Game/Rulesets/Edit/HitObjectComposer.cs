@@ -57,7 +57,8 @@ namespace osu.Game.Rulesets.Edit
             {
                 drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap, Array.Empty<Mod>()))
                 {
-                    Clock = framedClock
+                    Clock = framedClock,
+                    ProcessCustomClock = false
                 };
             }
             catch (Exception e)
@@ -132,6 +133,7 @@ namespace osu.Game.Rulesets.Edit
             editorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
             editorBeatmap.HitObjectAdded += addHitObject;
             editorBeatmap.HitObjectRemoved += removeHitObject;
+            editorBeatmap.StartTimeChanged += updateHitObject;
 
             var dependencies = new DependencyContainer(parent);
             dependencies.CacheAs<IEditorBeatmap>(editorBeatmap);
@@ -162,16 +164,18 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void addHitObject(HitObject hitObject)
-        {
-            beatmapProcessor?.PreProcess();
-            hitObject.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
-            beatmapProcessor?.PostProcess();
-        }
+        private void addHitObject(HitObject hitObject) => updateHitObject(hitObject);
 
         private void removeHitObject(HitObject hitObject)
         {
             beatmapProcessor?.PreProcess();
+            beatmapProcessor?.PostProcess();
+        }
+
+        private void updateHitObject(HitObject hitObject)
+        {
+            beatmapProcessor?.PreProcess();
+            hitObject.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
             beatmapProcessor?.PostProcess();
         }
 

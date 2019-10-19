@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
-        private static readonly Vector2 wedged_container_size = new Vector2(0.5f, 245);
+        public static readonly Vector2 WEDGED_CONTAINER_SIZE = new Vector2(0.5f, 245);
 
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
@@ -66,11 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Container FooterPanels;
 
-        protected override BackgroundScreen CreateBackground()
-        {
-            var background = new BackgroundScreenBeatmap();
-            return background;
-        }
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
@@ -109,7 +105,7 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Right = -150 },
-                            Size = new Vector2(wedged_container_size.X, 1),
+                            Size = new Vector2(WEDGED_CONTAINER_SIZE.X, 1),
                         }
                     }
                 },
@@ -118,11 +114,11 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(wedged_container_size.X, 1),
+                    Size = new Vector2(WEDGED_CONTAINER_SIZE.X, 1),
                     Padding = new MarginPadding
                     {
                         Bottom = Footer.HEIGHT,
-                        Top = wedged_container_size.Y + left_area_padding,
+                        Top = WEDGED_CONTAINER_SIZE.Y + left_area_padding,
                         Left = left_area_padding,
                         Right = left_area_padding * 2,
                     },
@@ -158,7 +154,7 @@ namespace osu.Game.Screens.Select
                                 Child = Carousel = new BeatmapCarousel
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1 - wedged_container_size.X, 1),
+                                    Size = new Vector2(1 - WEDGED_CONTAINER_SIZE.X, 1),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     SelectionChanged = updateSelectedBeatmap,
@@ -177,7 +173,7 @@ namespace osu.Game.Screens.Select
                 },
                 beatmapInfoWedge = new BeatmapInfoWedge
                 {
-                    Size = wedged_container_size,
+                    Size = WEDGED_CONTAINER_SIZE,
                     RelativeSizeAxes = Axes.X,
                     Margin = new MarginPadding
                     {
@@ -230,9 +226,9 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
-                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number3);
             }
 
             if (this.beatmaps == null)
@@ -412,9 +408,6 @@ namespace osu.Game.Screens.Select
                     WorkingBeatmap previous = Beatmap.Value;
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
 
-                    if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
-                        ensurePlayingSelected();
-
                     if (beatmap != null)
                     {
                         if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
@@ -423,6 +416,9 @@ namespace osu.Game.Screens.Select
                             sampleChangeBeatmap.Play();
                     }
                 }
+
+                if (this.IsCurrentScreen())
+                    ensurePlayingSelected();
 
                 UpdateBeatmap(Beatmap.Value);
             }
@@ -490,7 +486,9 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected();
+
+                // restart playback on returning to song select, regardless.
+                music?.Play();
             }
 
             base.OnResuming(last);
@@ -581,23 +579,24 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
-        private void ensurePlayingSelected(bool restart = false)
+        private readonly WeakReference<Track> lastTrack = new WeakReference<Track>(null);
+
+        /// <summary>
+        /// Ensures some music is playing for the current track.
+        /// Will resume playback from a manual user pause if the track has changed.
+        /// </summary>
+        private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning || restart)
-            {
-                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
 
-                if (music != null)
-                {
-                    // use the global music controller (when available) to cancel a potential local user paused state.
-                    music.SeekTo(track.RestartPoint);
-                    music.Play();
-                }
-                else
-                    track.Restart();
-            }
+            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+
+            if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
+                music?.Play(true);
+
+            lastTrack.SetTarget(track);
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);

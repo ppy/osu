@@ -19,13 +19,15 @@ using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Setup;
+using osu.Game.Screens.Edit.Timing;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
@@ -171,6 +173,12 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            clock.ProcessFrame();
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             switch (e.Key)
@@ -258,6 +266,10 @@ namespace osu.Game.Screens.Edit
 
             switch (e.NewValue)
             {
+                case EditorScreenMode.SongSetup:
+                    currentScreen = new SetupScreen();
+                    break;
+
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
                     break;
@@ -266,8 +278,8 @@ namespace osu.Game.Screens.Edit
                     currentScreen = new DesignScreen();
                     break;
 
-                default:
-                    currentScreen = new EditorScreen();
+                case EditorScreenMode.Timing:
+                    currentScreen = new TimingScreen();
                     break;
             }
 
