@@ -275,7 +275,7 @@ namespace osu.Game.Overlays.Comments
             {
                 children.NewValue.ForEach(c =>
                 {
-                    if (!children.OldValue?.Any(child => child.Id == c.Id) ?? true)
+                    if (children.OldValue?.All(child => child.Id != c.Id) ?? true)
                     {
                         childCommentsContainer.Add(new DrawableComment(c)
                         {
