@@ -234,7 +234,7 @@ namespace osu.Game.Overlays.Comments
 
             if (comment.HasMessage)
             {
-                var formattedSource = MessageFormatter.FormatText(comment.GetMessage);
+                var formattedSource = MessageFormatter.FormatText(comment.Message);
                 message.AddLinks(formattedSource.Text, formattedSource.Links);
             }
 
@@ -377,7 +377,7 @@ namespace osu.Game.Overlays.Comments
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
         }
     }
