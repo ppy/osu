@@ -48,9 +48,7 @@ namespace osu.Game.Overlays.Comments
             ChildComments.BindValueChanged(OnChildrenChanged, true);
         }
 
-        protected virtual void OnChildrenChanged(ValueChangedEvent<List<Comment>> children)
-        {
-        }
+        protected abstract void OnChildrenChanged(ValueChangedEvent<List<Comment>> children);
 
         protected override Container CreateBackground() => new Container
         {
@@ -78,7 +76,7 @@ namespace osu.Game.Overlays.Comments
             var children = ChildComments.Value.ToList();
             response.Comments.ForEach(c =>
             {
-                if (children.Any(child => child.Id != c.Id))
+                if (!children.Any(child => child.Id == c.Id))
                     children.Add(c);
             });
             ChildComments.Value = children;

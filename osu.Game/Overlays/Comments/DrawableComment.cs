@@ -29,7 +29,6 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly Bindable<List<Comment>> childComments = new Bindable<List<Comment>>();
-        private readonly List<Comment> loadedChildren = new List<Comment>();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly FillFlowContainer childCommentsContainer;
@@ -45,7 +44,6 @@ namespace osu.Game.Overlays.Comments
             VotePill votePill;
 
             this.comment = comment;
-            childComments.Value = comment.ChildComments;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -176,6 +174,11 @@ namespace osu.Game.Overlays.Comments
                                                         Expanded = { BindTarget = childrenExpanded },
                                                         ChildComments = { BindTarget = childComments },
                                                     },
+                                                    new LoadRepliesButton(comment)
+                                                    {
+                                                        ChildComments = { BindTarget = childComments },
+                                                        Sort = { BindTarget = Sort }
+                                                    }
                                                 }
                                             }
                                         }
@@ -216,13 +219,6 @@ namespace osu.Game.Overlays.Comments
                 username.AddUserLink(comment.User);
             else
                 username.AddText(comment.LegacyName);
-
-            if (!childComments.Value.Any() && comment.RepliesCount > 0)
-                info.Add(new LoadRepliesButton(comment)
-                {
-                    ChildComments = { BindTarget = childComments },
-                    Sort = { BindTarget = Sort }
-                });
 
             if (comment.EditedAt.HasValue)
             {
@@ -272,23 +268,26 @@ namespace osu.Game.Overlays.Comments
                 if (comment.IsDeleted)
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
+
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+
             childComments.BindValueChanged(children =>
             {
                 children.NewValue.ForEach(c =>
                 {
-                    if (!loadedChildren.Contains(c))
+                    if (!children.OldValue?.Any(child => child.Id == c.Id) ?? true)
                     {
                         childCommentsContainer.Add(new DrawableComment(c)
                         {
                             ShowDeleted = { BindTarget = ShowDeleted }
                         });
-                        loadedChildren.Add(c);
                     }
                 });
 
-                deletedChildrenPlaceholder.DeletedCount.Value = loadedChildren.Count(c => c.IsDeleted);
-            }, true);
+                deletedChildrenPlaceholder.DeletedCount.Value = children.NewValue.Count(c => c.IsDeleted);
+            });
+            childComments.Value = comment.ChildComments;
+
             base.LoadComplete();
         }
 
