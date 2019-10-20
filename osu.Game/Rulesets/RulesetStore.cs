@@ -16,11 +16,17 @@ namespace osu.Game.Rulesets
     /// </summary>
     public class RulesetStore : DatabaseBackedStore
     {
-        private static readonly Lazy<Dictionary<Assembly, Type>> loaded_assemblies = new Lazy<Dictionary<Assembly, Type>>(() => loadRulesets());
+        private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
 
         static RulesetStore()
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
+
+            // On android in release configuration assemblies are loaded from the apk directly into memory.
+            // We cannot read assemblies from cwd, so should check loaded assemblies instead.
+            loadFromAppDomain();
+
+            loadFromDisk();
         }
 
         public RulesetStore(IDatabaseContextFactory factory)
@@ -48,7 +54,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
-        private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Value.Keys.FirstOrDefault(a => a.FullName == args.Name);
+        private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
         private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
@@ -58,7 +64,7 @@ namespace osu.Game.Rulesets
             {
                 var context = usage.Context;
 
-                var instances = loaded_assemblies.Value.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
+                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
                 //add all legacy modes in correct order
                 foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
@@ -107,39 +113,8 @@ namespace osu.Game.Rulesets
             }
         }
 
-        /// <summary>
-        /// Loads the rulesets that are in the current appdomain an in the current directory.
-        /// </summary>
-        /// <returns>The rulesets that were loaded.</returns>
-        private static Dictionary<Assembly, Type> loadRulesets()
+        private static void loadFromAppDomain()
         {
-            var rulesets = new Dictionary<Assembly, Type>();
-
-            foreach (var rulesetAssembly in getRulesetAssemblies())
-            {
-                try
-                {
-                    rulesets[rulesetAssembly] = rulesetAssembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e, $"Failed to add ruleset {rulesetAssembly}");
-                }
-            }
-
-            return rulesets;
-        }
-
-        /// <summary>
-        /// Scans the current appdomain and current directory for ruleset assemblies.
-        /// Rulesets that were found in the current directory are automaticly loaded.
-        /// </summary>
-        /// <returns>The ruleset assemblies that were found in the current appdomain or in the current directory.</returns>
-        private static IEnumerable<Assembly> getRulesetAssemblies()
-        {
-            var rulesetAssemblies = new HashSet<Assembly>();
-
-            // load from appdomain
             foreach (var ruleset in AppDomain.CurrentDomain.GetAssemblies())
             {
                 string rulesetName = ruleset.GetName().Name;
@@ -147,33 +122,55 @@ namespace osu.Game.Rulesets
                 if (!rulesetName.StartsWith(ruleset_library_prefix, StringComparison.InvariantCultureIgnoreCase) || ruleset.GetName().Name.Contains("Tests"))
                     continue;
 
-                rulesetAssemblies.Add(ruleset);
+                addRuleset(ruleset);
             }
+        }
 
-            // load from current directory
+        private static void loadFromDisk()
+        {
             try
             {
                 string[] files = Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll");
 
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
-                {
-                    try
-                    {
-                        rulesetAssemblies.Add(Assembly.LoadFrom(file));
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $"Failed to load ruleset assembly {Path.GetFileNameWithoutExtension(file)}");
-                        return null;
-                    }
-                }
+                    loadRulesetFromFile(file);
             }
             catch (Exception e)
             {
                 Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
+        }
 
-            return rulesetAssemblies;
+        private static void loadRulesetFromFile(string file)
+        {
+            var filename = Path.GetFileNameWithoutExtension(file);
+
+            if (loaded_assemblies.Values.Any(t => t.Namespace == filename))
+                return;
+
+            try
+            {
+                addRuleset(Assembly.LoadFrom(file));
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to load ruleset {filename}");
+            }
+        }
+
+        private static void addRuleset(Assembly assembly)
+        {
+            if (loaded_assemblies.ContainsKey(assembly))
+                return;
+
+            try
+            {
+                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Failed to add ruleset {assembly}");
+            }
         }
     }
 }
