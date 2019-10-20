@@ -173,6 +173,12 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            clock.ProcessFrame();
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             switch (e.Key)

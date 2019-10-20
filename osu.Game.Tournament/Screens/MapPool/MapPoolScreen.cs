@@ -196,7 +196,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             setNextMode();
 
-            if (pickType == ChoiceType.Pick)
+            if (pickType == ChoiceType.Pick && currentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
             {
                 scheduledChange?.Cancel();
                 scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
