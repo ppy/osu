@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        private readonly ShowMoreButton moreButton;
+        private readonly ProfileShowMoreButton moreButton;
         private readonly OsuSpriteText missingText;
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
                 },
-                moreButton = new ShowMoreButton
+                moreButton = new ProfileShowMoreButton
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

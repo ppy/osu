@@ -349,5 +349,11 @@ namespace osu.Game.Tests.Visual.SongSelect
                 DateAdded = DateTimeOffset.UtcNow,
             };
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            rulesets?.Dispose();
+        }
     }
 }
