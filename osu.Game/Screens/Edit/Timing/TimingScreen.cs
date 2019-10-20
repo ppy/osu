@@ -64,20 +64,5 @@ namespace osu.Game.Screens.Edit.Timing
                 };
             }
         }
-
-        public class ControlPointSettings : CompositeDrawable
-        {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                InternalChild = new Box
-                {
-                    Colour = colours.Gray3,
-                    RelativeSizeAxes = Axes.Both,
-                };
-            }
-        }
     }
 }
