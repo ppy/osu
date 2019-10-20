@@ -16,6 +16,7 @@ namespace osu.Game.Tests.Visual.Editor
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ControlPointTable),
+            typeof(ControlPointSettings),
             typeof(RowAttribute)
         };
 
