@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Timing
         private readonly FillFlowContainer backgroundFlow;
 
         [Resolved]
-        private Bindable<ControlPoint> controlPoint { get; set; }
+        private Bindable<IEnumerable<ControlPoint>> selectedPoints { get; set; }
 
         public ControlPointTable()
         {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 foreach (var group in grouped)
                 {
-                    backgroundFlow.Add(new RowBackground { Action = () => controlPoint.Value = group.First() });
+                    backgroundFlow.Add(new RowBackground { Action = () => selectedPoints.Value = group });
                 }
 
                 Columns = createHeaders();
