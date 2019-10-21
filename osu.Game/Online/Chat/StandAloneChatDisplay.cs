@@ -124,6 +124,14 @@ namespace osu.Game.Online.Chat
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
+            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+            {
+                Colour = Color4.White,
+                TextSize = 14,
+                LineHeight = 1,
+                Margin = new MarginPadding { Horizontal = 10 }
+            };
+
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
