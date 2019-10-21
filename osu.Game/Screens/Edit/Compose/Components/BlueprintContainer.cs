@@ -191,7 +191,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private void updatePlacementPosition(Vector2 screenSpacePosition) => currentPlacement.UpdatePosition(ToScreenSpace(composer.GetSnappedPosition(ToLocalSpace(screenSpacePosition))));
+        private void updatePlacementPosition(Vector2 screenSpacePosition)
+        {
+            Vector2 snappedGridPosition = composer.GetSnappedPosition(ToLocalSpace(screenSpacePosition));
+            Vector2 snappedScreenSpacePosition = ToScreenSpace(snappedGridPosition);
+
+            currentPlacement.UpdatePosition(snappedScreenSpacePosition);
+        }
 
         /// <summary>
         /// Select all masks in a given rectangle selection area.
