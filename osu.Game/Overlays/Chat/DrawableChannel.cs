@@ -155,6 +155,7 @@ namespace osu.Game.Overlays.Chat
 
                     return xC.Message.CompareTo(yC.Message);
                 }
+
                 return base.Compare(x, y);
             }
         }
@@ -171,7 +172,7 @@ namespace osu.Game.Overlays.Chat
 
             public float LineHeight
             {
-                get => LineHeight;
+                get => lineHeight;
                 set { lineHeight = leftBox.Height = rightBox.Height = value; }
             }
 
@@ -193,11 +194,8 @@ namespace osu.Game.Overlays.Chat
                         new Dimension(GridSizeMode.AutoSize),
                         new Dimension(),
                     },
-                        RowDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                        Content = new[]
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), },
+                    Content = new[]
                     {
                         new Drawable[]
                         {
