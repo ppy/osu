@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Chat
 
             displayMessages.ForEach(m =>
             {
-                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Day != m.Timestamp.ToLocalTime().Day)
+                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != m.Timestamp.ToLocalTime().Date)
                     ChatLineFlow.Add(CreateDaySeparator(m.Timestamp));
 
                 ChatLineFlow.Add(CreateChatLine(m));
