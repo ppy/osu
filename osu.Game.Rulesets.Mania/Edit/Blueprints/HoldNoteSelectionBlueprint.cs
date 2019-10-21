@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint
     {
-        public new DrawableHoldNote HitObject => (DrawableHoldNote)base.HitObject;
+        public new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionBlueprint(HitObject.Head),
-                new HoldNoteNoteSelectionBlueprint(HitObject.Tail),
+                new HoldNoteNoteSelectionBlueprint(DrawableObject.Head),
+                new HoldNoteNoteSelectionBlueprint(DrawableObject.Tail),
                 new BodyPiece
                 {
                     AccentColour = Color4.Transparent,
@@ -54,13 +54,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Size = HitObject.DrawSize + new Vector2(0, HitObject.Tail.DrawHeight);
+            Size = DrawableObject.DrawSize + new Vector2(0, DrawableObject.Tail.DrawHeight);
 
             // This is a side-effect of not matching the hitobject's anchors/origins, which is kinda hard to do
             // When scrolling upwards our origin is already at the top of the head note (which is the intended location),
             // but when scrolling downwards our origin is at the _bottom_ of the tail note (where we need to be at the _top_ of the tail note)
             if (direction.Value == ScrollingDirection.Down)
-                Y -= HitObject.Tail.DrawHeight;
+                Y -= DrawableObject.Tail.DrawHeight;
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
@@ -77,10 +77,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             {
                 base.Update();
 
-                Anchor = HitObject.Anchor;
-                Origin = HitObject.Origin;
+                Anchor = DrawableObject.Anchor;
+                Origin = DrawableObject.Origin;
 
-                Position = HitObject.DrawPosition;
+                Position = DrawableObject.DrawPosition;
             }
 
             // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
