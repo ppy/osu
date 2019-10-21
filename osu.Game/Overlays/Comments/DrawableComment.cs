@@ -264,6 +264,10 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
+            childComments.AddRange(comment.ChildComments);
+            repliesContainer.Add(createRepliesPage(childComments));
+            updateButtonsState();
+
             loadRepliesButton.ChildComments.BindTo(childComments);
             showMoreRepliesButton.ChildComments.BindTo(childComments);
         }
@@ -281,29 +285,17 @@ namespace osu.Game.Overlays.Comments
             childComments.ItemsAdded += onChildrenAdded;
             loadRepliesButton.OnCommentsReceived += childComments.AddRange;
             showMoreRepliesButton.OnCommentsReceived += childComments.AddRange;
-            childComments.AddRange(comment.ChildComments);
 
             base.LoadComplete();
         }
 
-        private bool initial = true;
-
         private void onChildrenAdded(IEnumerable<Comment> children)
         {
-            if (initial)
+            LoadComponentAsync(createRepliesPage(children), loaded =>
             {
-                repliesContainer.Add(createRepliesPage(children));
+                repliesContainer.Add(loaded);
                 updateButtonsState();
-                initial = false;
-            }
-            else
-            {
-                LoadComponentAsync(createRepliesPage(children), loaded =>
-                {
-                    repliesContainer.Add(loaded);
-                    updateButtonsState();
-                });
-            }
+            });
         }
 
         private FillFlowContainer<DrawableComment> createRepliesPage(IEnumerable<Comment> replies)
