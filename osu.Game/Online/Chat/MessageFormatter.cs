@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -95,11 +95,17 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 var index = m.Index;
-                var link = m.Groups["link"].Value;
-                var indexLength = link.Length;
+                var linkText = m.Groups["link"].Value;
+                var indexLength = linkText.Length;
 
-                var details = getLinkDetails(link);
-                result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
+                var details = getLinkDetails(linkText);
+                var link = new Link(linkText, index, indexLength, details.Action, details.Argument);
+
+                // sometimes an already-processed formatted link can reduce to a simple URL, too
+                // (example: [mean example - https://osu.ppy.sh](https://osu.ppy.sh))
+                // therefore we need to check if any of the pre-existing links contains the raw one we found
+                if (result.Links.All(existingLink => !existingLink.Contains(link)))
+                    result.Links.Add(link);
             }
         }
 
@@ -291,6 +297,8 @@ namespace osu.Game.Online.Chat
             Action = action;
             Argument = argument;
         }
+
+        public bool Contains(Link otherLink) => otherLink.Index >= Index && otherLink.Index + otherLink.Length <= Index + Length;
 
         public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
     }
