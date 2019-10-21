@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
@@ -90,9 +91,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public IBindable<ArmedState> State => state;
 
-        protected DrawableHitObject(HitObject hitObject)
+        protected DrawableHitObject([NotNull] HitObject hitObject)
         {
-            HitObject = hitObject;
+            HitObject = hitObject ?? throw new ArgumentNullException(nameof(hitObject));
         }
 
         [BackgroundDependencyLoader]

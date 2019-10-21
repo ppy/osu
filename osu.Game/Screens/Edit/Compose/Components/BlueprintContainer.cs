@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removeBlueprintFor(HitObject hitObject)
         {
-            var blueprint = selectionBlueprints.Single(m => m.HitObject.HitObject == hitObject);
+            var blueprint = selectionBlueprints.Single(m => m.DrawableObject.HitObject == hitObject);
             if (blueprint == null)
                 return;
 
@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return d;
 
                 // Put earlier hitobjects towards the end of the list, so they handle input first
-                int i = y.HitObject.HitObject.StartTime.CompareTo(x.HitObject.HitObject.StartTime);
+                int i = y.DrawableObject.HitObject.StartTime.CompareTo(x.DrawableObject.HitObject.StartTime);
                 return i == 0 ? CompareReverseChildID(x, y) : i;
             }
         }
