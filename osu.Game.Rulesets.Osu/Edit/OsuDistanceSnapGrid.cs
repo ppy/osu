@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         public OsuDistanceSnapGrid(OsuHitObject hitObject)
             : base(hitObject, hitObject.StackedEndPosition)
         {
+            Masking = true;
         }
 
         protected override float GetVelocity(double time, ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
