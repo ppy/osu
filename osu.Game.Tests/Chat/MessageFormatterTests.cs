@@ -310,6 +310,18 @@ namespace osu.Game.Tests.Chat
         }
 
         [Test]
+        public void TestMarkdownFormatLinkWithUrlAndTextInTitle()
+        {
+            Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [oh no, text here! https://osu.ppy.sh](https://osu.ppy.sh) before..." });
+
+            Assert.AreEqual("I haven't seen oh no, text here! https://osu.ppy.sh before...", result.DisplayContent);
+            Assert.AreEqual(1, result.Links.Count);
+            Assert.AreEqual("https://osu.ppy.sh", result.Links[0].Url);
+            Assert.AreEqual(15, result.Links[0].Index);
+            Assert.AreEqual(36, result.Links[0].Length);
+        }
+
+        [Test]
         public void TestMarkdownFormatLinkWithMisleadingUrlInText()
         {
             Message result = MessageFormatter.FormatMessage(new Message { Content = "I haven't seen [https://google.com](https://osu.ppy.sh) before..." });
