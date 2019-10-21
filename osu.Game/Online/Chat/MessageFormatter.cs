@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -20,7 +20,7 @@ namespace osu.Game.Online.Chat
         private static readonly Regex new_link_regex = new Regex(@"\[(?<url>[a-z]+://[^ ]+) (?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]");
 
         // [test](https://osu.ppy.sh/b/1234) -> test (https://osu.ppy.sh/b/1234) aka correct markdown format
-        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)\)");
+        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)(\s+(?<title>""([^""]|(?<=\\)"")*""))?\)");
 
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
