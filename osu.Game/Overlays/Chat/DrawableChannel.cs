@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -74,17 +76,40 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual ChatLine CreateChatLine(Message m) => new ChatLine(m);
 
+        protected virtual Drawable CreateDaySeparator(DateTimeOffset time) => new Container
+        {
+            Margin = new MarginPadding { Vertical = 5 },
+            RelativeSizeAxes = Axes.X,
+            Height = 2,
+            Child = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Colour = Color4.Black,
+            }
+        };
+
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
-            ChatLineFlow.AddRange(displayMessages.Select(CreateChatLine));
+            var existingChatLines = getChatLines();
 
-            if (scroll.IsScrolledToEnd(10) || !ChatLineFlow.Children.Any() || newMessages.Any(m => m is LocalMessage))
+            Message lastMessage = existingChatLines.Any() ? existingChatLines.First().Message : null;
+
+            displayMessages.ForEach(m =>
+            {
+                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != m.Timestamp.ToLocalTime().Date)
+                    ChatLineFlow.Add(CreateDaySeparator(m.Timestamp));
+
+                ChatLineFlow.Add(CreateChatLine(m));
+                lastMessage = m;
+            });
+
+            if (scroll.IsScrolledToEnd(10) || !existingChatLines.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
 
-            var staleMessages = ChatLineFlow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+            var staleMessages = existingChatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MaxHistory;
 
             for (int i = 0; i < count; i++)
@@ -98,7 +123,7 @@ namespace osu.Game.Overlays.Chat
 
         private void pendingMessageResolved(Message existing, Message updated)
         {
-            var found = ChatLineFlow.Children.LastOrDefault(c => c.Message == existing);
+            var found = getChatLines().LastOrDefault(c => c.Message == existing);
 
             if (found != null)
             {
@@ -112,19 +137,25 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed)
         {
-            ChatLineFlow.Children.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            getChatLines().FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
+
+        private IEnumerable<ChatLine> getChatLines() => ChatLineFlow.Children.OfType<ChatLine>();
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-        protected class ChatLineContainer : FillFlowContainer<ChatLine>
+        protected class ChatLineContainer : FillFlowContainer
         {
             protected override int Compare(Drawable x, Drawable y)
             {
-                var xC = (ChatLine)x;
-                var yC = (ChatLine)y;
+                if (x is ChatLine && y is ChatLine)
+                {
+                    var xC = (ChatLine)x;
+                    var yC = (ChatLine)y;
 
-                return xC.Message.CompareTo(yC.Message);
+                    return xC.Message.CompareTo(yC.Message);
+                }
+                return base.Compare(x, y);
             }
         }
     }
