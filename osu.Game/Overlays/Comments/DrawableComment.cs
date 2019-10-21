@@ -102,14 +102,26 @@ namespace osu.Game.Overlays.Comments
                                                     Origin = Anchor.CentreRight,
                                                 }
                                             },
-                                            new UpdateableAvatar(comment.User)
+                                            new Container
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Size = new Vector2(avatar_size),
                                                 Masking = true,
                                                 CornerRadius = avatar_size / 2f,
-                                            },
+                                                Children = new Drawable[]
+                                                {
+                                                    new Box
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Colour = OsuColour.Gray(0.2f)
+                                                    },
+                                                    new UpdateableAvatar(comment.User)
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
+                                                }
+                                            }
                                         }
                                     },
                                     new FillFlowContainer
