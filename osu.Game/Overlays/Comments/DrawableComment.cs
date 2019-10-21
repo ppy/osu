@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly BindableList<Comment> childComments = new BindableList<Comment>();
+        private readonly BindableInt currentPage = new BindableInt(1);
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly FillFlowContainer childCommentsContainer;
@@ -179,7 +180,8 @@ namespace osu.Game.Overlays.Comments
                                                     },
                                                     loadRepliesButton = new LoadRepliesButton(comment)
                                                     {
-                                                        Sort = { BindTarget = Sort }
+                                                        Sort = { BindTarget = Sort },
+                                                        CurrentPage = { BindTarget = currentPage }
                                                     }
                                                 }
                                             }
@@ -209,7 +211,8 @@ namespace osu.Game.Overlays.Comments
                             },
                             showMoreRepliesButton = new ShowMoreRepliesButton(comment)
                             {
-                                Sort = { BindTarget = Sort }
+                                Sort = { BindTarget = Sort },
+                                CurrentPage = { BindTarget = currentPage }
                             }
                         }
                     }

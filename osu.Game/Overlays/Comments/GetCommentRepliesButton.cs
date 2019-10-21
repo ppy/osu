@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly BindableList<Comment> ChildComments = new BindableList<Comment>();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        public readonly BindableInt CurrentPage = new BindableInt();
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
@@ -32,7 +33,6 @@ namespace osu.Game.Overlays.Comments
 
         private SpriteText text;
         private GetCommentRepliesRequest request;
-        private int currentPage;
 
         protected GetCommentRepliesButton(Comment comment)
         {
@@ -59,20 +59,27 @@ namespace osu.Game.Overlays.Comments
 
         private void onAction()
         {
-            request = new GetCommentRepliesRequest(Comment.Id, Sort.Value, ++currentPage);
+            request = new GetCommentRepliesRequest(Comment.Id, Sort.Value, CurrentPage.Value);
             request.Success += onSuccess;
             api.Queue(request);
         }
 
         private void onSuccess(CommentBundle response)
         {
-            List<Comment> uniqueChildren = new List<Comment>();
-            response.Comments.ForEach(c =>
+            if (CurrentPage.Value == 1)
             {
-                if (ChildComments.All(child => child.Id != c.Id))
-                    uniqueChildren.Add(c);
-            });
-            OnCommentsReceived?.Invoke(uniqueChildren);
+                List<Comment> uniqueChildren = new List<Comment>();
+                response.Comments.ForEach(c =>
+                {
+                    if (ChildComments.All(child => child.Id != c.Id))
+                        uniqueChildren.Add(c);
+                });
+                OnCommentsReceived?.Invoke(uniqueChildren);
+            }
+            else
+                OnCommentsReceived?.Invoke(response.Comments);
+
+            CurrentPage.Value = CurrentPage.Value++;
             IsLoading = false;
         }
 
