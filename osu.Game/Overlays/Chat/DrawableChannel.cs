@@ -84,7 +84,8 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
         {
-            Colour = colours.ChatBlue.Lighten(0.7f)
+            Margin = new MarginPadding { Vertical = 10 },
+            Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
@@ -158,7 +159,7 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        protected class DaySeparator : GridContainer
+        protected class DaySeparator : Container
         {
             public float TextSize
             {
@@ -180,42 +181,46 @@ namespace osu.Game.Overlays.Chat
 
             public DaySeparator(DateTimeOffset time)
             {
-                Margin = new MarginPadding { Vertical = 10 };
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                ColumnDimensions = new[]
+                Child = new GridContainer
                 {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.AutoSize),
-                    new Dimension(),
-                };
-                RowDimensions = new[]
-                {
-                    new Dimension(GridSizeMode.AutoSize),
-                };
-                Content = new[]
-                {
-                    new Drawable[]
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    ColumnDimensions = new[]
                     {
-                        leftBox = new Box
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                    },
+                        RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                        Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = lineHeight,
-                        },
-                        text = new SpriteText
-                        {
-                            Margin = new MarginPadding { Horizontal = 10 },
-                            Text = time.ToLocalTime().ToString("dd MMM yyyy"),
-                        },
-                        rightBox = new Box
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.X,
-                            Height = lineHeight,
-                        },
+                            leftBox = new Box
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = lineHeight,
+                            },
+                            text = new SpriteText
+                            {
+                                Margin = new MarginPadding { Horizontal = 10 },
+                                Text = time.ToLocalTime().ToString("dd MMM yyyy"),
+                            },
+                            rightBox = new Box
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = lineHeight,
+                            },
+                        }
                     }
                 };
             }

@@ -129,7 +129,8 @@ namespace osu.Game.Online.Chat
                 Colour = Color4.White,
                 TextSize = 14,
                 LineHeight = 1,
-                Margin = new MarginPadding { Horizontal = 10 }
+                Padding = new MarginPadding { Horizontal = 10 },
+                Margin = new MarginPadding { Vertical = 5 },
             };
 
             public StandAloneDrawableChannel(Channel channel)
