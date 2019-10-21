@@ -154,11 +154,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 var drawableNested = CreateNestedHitObject(h) ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
 
-                drawableNested.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-                drawableNested.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
-                drawableNested.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
-
-                nestedHitObjects.Value.Add(drawableNested);
+                addNested(drawableNested);
                 AddNestedHitObject(drawableNested);
             }
         }
@@ -176,14 +172,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="h"></param>
         [Obsolete("Use AddNestedHitObject() / ClearNestedHitObjects() / CreateNestedHitObject() instead.")] // can be removed 20200417
-        protected virtual void AddNested(DrawableHitObject h)
-        {
-            h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-            h.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
-            h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
-
-            nestedHitObjects.Value.Add(h);
-        }
+        protected virtual void AddNested(DrawableHitObject h) => addNested(h);
 
         /// <summary>
         /// Invoked by the base <see cref="DrawableHitObject"/> to remove all previously-added nested <see cref="DrawableHitObject"/>s.
@@ -198,6 +187,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="hitObject">The <see cref="HitObject"/>.</param>
         /// <returns>The drawable representation for <paramref name="hitObject"/>.</returns>
         protected virtual DrawableHitObject CreateNestedHitObject(HitObject hitObject) => null;
+
+        private void addNested(DrawableHitObject hitObject)
+        {
+            // Todo: Exists for legacy purposes, can be removed 20200417
+
+            hitObject.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
+            hitObject.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
+            hitObject.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
+            nestedHitObjects.Value.Add(hitObject);
+        }
 
         #region State / Transform Management
 
