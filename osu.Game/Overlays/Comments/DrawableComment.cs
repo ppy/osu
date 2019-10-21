@@ -378,7 +378,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
-                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({repliesCount})";
+                text.Text = $@"{(expanded.NewValue ? "[-]" : "[+]")} replies ({repliesCount})";
             }
         }
 
