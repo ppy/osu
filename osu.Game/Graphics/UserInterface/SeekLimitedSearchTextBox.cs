@@ -3,7 +3,7 @@
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class FixedSearchTextBox : SearchTextBox
+    public class SeekLimitedSearchTextBox : SearchTextBox
     {
         public override bool HandleLeftRightArrows => false;
     }
