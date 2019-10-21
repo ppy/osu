@@ -57,20 +57,14 @@ namespace osu.Game.Rulesets.Osu.UI
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += onNewResult;
-
-            if (h is IDrawableHitObjectWithProxiedApproach c)
+            h.OnLoadComplete += d =>
             {
-                var original = c.ProxiedLayer;
-
-                // Hitobjects only have lifetimes set on LoadComplete. For nested hitobjects (e.g. SliderHeads), this only happens when the parenting slider becomes visible.
-                // This delegation is required to make sure that the approach circles for those not-yet-loaded objects aren't added prematurely.
-                original.OnLoadComplete += addApproachCircleProxy;
-            }
+                if (d is IDrawableHitObjectWithProxiedApproach c)
+                    approachCircles.Add(c.ProxiedLayer.CreateProxy());
+            };
 
             base.Add(h);
         }
-
-        private void addApproachCircleProxy(Drawable d) => approachCircles.Add(d.CreateProxy());
 
         public override void PostProcess()
         {
