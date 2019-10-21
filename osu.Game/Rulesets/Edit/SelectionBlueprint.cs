@@ -43,20 +43,20 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
         /// </summary>
-        public readonly DrawableHitObject HitObject;
+        public readonly DrawableHitObject DrawableObject;
 
         /// <summary>
-        /// The screen-space position of <see cref="HitObject"/> prior to handling a movement event.
+        /// The screen-space position of <see cref="DrawableObject"/> prior to handling a movement event.
         /// </summary>
         internal Vector2 ScreenSpaceMovementStartPosition { get; private set; }
 
-        protected override bool ShouldBeAlive => (HitObject.IsAlive && HitObject.IsPresent) || State == SelectionState.Selected;
+        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        protected SelectionBlueprint(DrawableHitObject hitObject)
+        protected SelectionBlueprint(DrawableHitObject drawableObject)
         {
-            HitObject = hitObject;
+            DrawableObject = drawableObject;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Edit
 
         public bool IsSelected => State == SelectionState.Selected;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObject.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
 
         private bool selectionRequested;
 
@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnDragStart(DragStartEvent e)
         {
-            ScreenSpaceMovementStartPosition = HitObject.ToScreenSpace(HitObject.OriginPosition);
+            ScreenSpaceMovementStartPosition = DrawableObject.ToScreenSpace(DrawableObject.OriginPosition);
             return true;
         }
 
@@ -151,11 +151,11 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
         /// </summary>
-        public virtual Vector2 SelectionPoint => HitObject.ScreenSpaceDrawQuad.Centre;
+        public virtual Vector2 SelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="SelectionBlueprint"/> for selections.
         /// </summary>
-        public virtual Quad SelectionQuad => HitObject.ScreenSpaceDrawQuad;
+        public virtual Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
     }
 }
