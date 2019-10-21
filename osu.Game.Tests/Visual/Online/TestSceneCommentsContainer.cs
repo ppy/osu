@@ -31,36 +31,18 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneCommentsContainer()
         {
-            BasicScrollContainer scrollFlow;
+            CommentsContainer commentsContainer;
 
-            Add(scrollFlow = new BasicScrollContainer
+            Add(new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Child = commentsContainer = new CommentsContainer()
             });
 
-            AddStep("Big Black comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
-            });
-
-            AddStep("Airman comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
-            });
-
-            AddStep("lazer build comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
-            });
-
-            AddStep("beatmap with no comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 1293));
-            });
+            AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
+            AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
+            AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
+            AddStep("beatmap with no comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 1293));
         }
     }
 }

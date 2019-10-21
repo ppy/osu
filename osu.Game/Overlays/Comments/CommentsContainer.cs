@@ -19,11 +19,18 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private readonly CommentableType type;
-        private readonly long id;
+        private CommentableType type;
+        private long id;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+
+        public void ShowComments(CommentableType type, long id)
+        {
+            this.type = type;
+            this.id = id;
+            Sort.TriggerChange();
+        }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -42,11 +49,8 @@ namespace osu.Game.Overlays.Comments
         private readonly CommentsShowMoreButton moreButton;
         private readonly Container placeholder;
 
-        public CommentsContainer(CommentableType type, long id)
+        public CommentsContainer()
         {
-            this.type = type;
-            this.id = id;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
@@ -144,7 +148,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(onSortChanged, true);
+            Sort.BindValueChanged(onSortChanged);
             base.LoadComplete();
         }
 
