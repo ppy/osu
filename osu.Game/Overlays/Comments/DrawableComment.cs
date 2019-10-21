@@ -28,13 +28,13 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
-        private readonly BindableBool childrenExpanded = new BindableBool(true);
-        private readonly BindableList<Comment> childComments = new BindableList<Comment>();
+        private readonly BindableBool showReplies = new BindableBool(true);
+        private readonly BindableList<Comment> replies = new BindableList<Comment>();
         private readonly BindableInt currentPage = new BindableInt();
 
         private readonly FillFlowContainer repliesVisibilityContainer;
         private readonly FillFlowContainer repliesContainer;
-        private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly ChevronButton chevronButton;
         private readonly RepliesButton repliesButton;
         private readonly LoadRepliesButton loadRepliesButton;
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
-                                                        Expanded = { BindTarget = childrenExpanded },
+                                                        Expanded = { BindTarget = showReplies },
                                                     }
                                                 }
                                             },
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Comments
                                                     },
                                                     repliesButton = new RepliesButton(comment)
                                                     {
-                                                        Expanded = { BindTarget = childrenExpanded },
+                                                        Expanded = { BindTarget = showReplies },
                                                     },
                                                     loadRepliesButton = new LoadRepliesButton(comment)
                                                     {
@@ -205,7 +205,7 @@ namespace osu.Game.Overlays.Comments
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical
                             },
-                            deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
+                            deletedCommentsPlaceholder = new DeletedCommentsPlaceholder
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
                             },
@@ -264,12 +264,12 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
-            childComments.AddRange(comment.ChildComments);
-            repliesContainer.Add(createRepliesPage(childComments));
+            replies.AddRange(comment.Replies);
+            repliesContainer.Add(createRepliesPage(replies));
             updateButtonsState();
 
-            loadRepliesButton.ChildComments.BindTo(childComments);
-            showMoreRepliesButton.ChildComments.BindTo(childComments);
+            loadRepliesButton.Replies.BindTo(replies);
+            showMoreRepliesButton.Replies.BindTo(replies);
         }
 
         protected override void LoadComplete()
@@ -280,11 +280,11 @@ namespace osu.Game.Overlays.Comments
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
 
-            childrenExpanded.BindValueChanged(expanded => repliesVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+            showReplies.BindValueChanged(show => repliesVisibilityContainer.FadeTo(show.NewValue ? 1 : 0), true);
 
-            childComments.ItemsAdded += onChildrenAdded;
-            loadRepliesButton.OnCommentsReceived += childComments.AddRange;
-            showMoreRepliesButton.OnCommentsReceived += childComments.AddRange;
+            replies.ItemsAdded += onChildrenAdded;
+            loadRepliesButton.OnCommentsReceived += replies.AddRange;
+            showMoreRepliesButton.OnCommentsReceived += replies.AddRange;
 
             base.LoadComplete();
         }
@@ -320,17 +320,17 @@ namespace osu.Game.Overlays.Comments
 
         private void updateButtonsState()
         {
-            deletedChildrenPlaceholder.DeletedCount.Value = childComments.Count(c => c.IsDeleted);
+            deletedCommentsPlaceholder.DeletedCount.Value = replies.Count(c => c.IsDeleted);
 
-            chevronButton.FadeTo(comment.IsTopLevel && childComments.Any() ? 1 : 0);
-            repliesButton.FadeTo(childComments.Any() ? 1 : 0);
-            loadRepliesButton.FadeTo(childComments.Any() || comment.RepliesCount == 0 ? 0 : 1);
-            showMoreRepliesButton.FadeTo((!childComments.Any() && comment.RepliesCount > 0) || childComments.Count == comment.RepliesCount ? 0 : 1);
+            chevronButton.FadeTo(comment.IsTopLevel && replies.Any() ? 1 : 0);
+            repliesButton.FadeTo(replies.Any() ? 1 : 0);
+            loadRepliesButton.FadeTo(replies.Any() || comment.RepliesCount == 0 ? 0 : 1);
+            showMoreRepliesButton.FadeTo((!replies.Any() && comment.RepliesCount > 0) || replies.Count == comment.RepliesCount ? 0 : 1);
 
             loadRepliesButton.IsLoading = showMoreRepliesButton.IsLoading = false;
         }
 
-        private class ChevronButton : ShowChildrenButton
+        private class ChevronButton : ShowRepliesButton
         {
             private readonly SpriteIcon icon;
 
@@ -348,7 +348,7 @@ namespace osu.Game.Overlays.Comments
             }
         }
 
-        private class RepliesButton : ShowChildrenButton
+        private class RepliesButton : ShowRepliesButton
         {
             private readonly SpriteText text;
             private readonly int repliesCount;

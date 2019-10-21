@@ -18,10 +18,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 comments = value;
-                comments.ForEach(child =>
+                comments.ForEach(comment =>
                 {
-                    if (child.ParentId != null)
-                        comments.ForEach(parent => checkParentChildDependency(parent, child));
+                    if (comment.IsReply)
+                        comments.ForEach(parent => checkRepliesDependency(parent, comment));
                 });
             }
         }
@@ -44,12 +44,12 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 includedComments = value;
-                value.ForEach(child =>
+                value.ForEach(comment =>
                 {
-                    if (child.ParentId != null)
+                    if (comment.IsReply)
                     {
-                        value.ForEach(parent => checkParentChildDependency(parent, child));
-                        comments.ForEach(parent => checkParentChildDependency(parent, child));
+                        value.ForEach(parent => checkRepliesDependency(parent, comment));
+                        comments.ForEach(parent => checkRepliesDependency(parent, comment));
                     }
                 });
             }
@@ -92,12 +92,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"top_level_count")]
         public int TopLevelCount { get; set; }
 
-        private void checkParentChildDependency(Comment parent, Comment child)
+        private void checkRepliesDependency(Comment parent, Comment reply)
         {
-            if (parent.Id == child.ParentId)
+            if (parent.Id == reply.ParentId)
             {
-                parent.ChildComments.Add(child);
-                child.ParentComment = parent;
+                parent.Replies.Add(reply);
+                reply.ParentComment = parent;
             }
         }
 

@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Comments
 {
     public abstract class GetCommentRepliesButton : LoadingButton
     {
-        public readonly BindableList<Comment> ChildComments = new BindableList<Comment>();
+        public readonly BindableList<Comment> Replies = new BindableList<Comment>();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableInt CurrentPage = new BindableInt();
 
@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Comments
                 List<Comment> uniqueChildren = new List<Comment>();
                 response.Comments.ForEach(c =>
                 {
-                    if (ChildComments.All(child => child.Id != c.Id))
+                    if (Replies.All(child => child.Id != c.Id))
                         uniqueChildren.Add(c);
                 });
                 OnCommentsReceived?.Invoke(uniqueChildren);

@@ -16,7 +16,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"parent_id")]
         public long? ParentId { get; set; }
 
-        public readonly List<Comment> ChildComments = new List<Comment>();
+        public readonly List<Comment> Replies = new List<Comment>();
 
         public Comment ParentComment { get; set; }
 
@@ -66,6 +66,8 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsTopLevel => !ParentId.HasValue;
 
         public bool IsDeleted => DeletedAt.HasValue;
+
+        public bool IsReply => ParentId.HasValue;
 
         public bool HasMessage => !string.IsNullOrEmpty(Message);
 

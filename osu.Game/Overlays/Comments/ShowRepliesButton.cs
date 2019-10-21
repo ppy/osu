@@ -9,11 +9,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
-    public abstract class ShowChildrenButton : OsuHoverContainer
+    public abstract class ShowRepliesButton : OsuHoverContainer
     {
         public readonly BindableBool Expanded = new BindableBool(true);
 
-        protected ShowChildrenButton()
+        protected ShowRepliesButton()
         {
             AutoSizeAxes = Axes.Both;
             Action = () => Expanded.Value = !Expanded.Value;

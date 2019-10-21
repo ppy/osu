@@ -11,14 +11,14 @@ using Humanizer;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class DeletedChildrenPlaceholder : FillFlowContainer
+    public class DeletedCommentsPlaceholder : FillFlowContainer
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly BindableInt DeletedCount = new BindableInt();
 
         private readonly SpriteText countText;
 
-        public DeletedChildrenPlaceholder()
+        public DeletedCommentsPlaceholder()
         {
             AutoSizeAxes = Axes.Both;
             Direction = FillDirection.Horizontal;
