@@ -15,6 +15,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Online.Chat;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Comments
@@ -28,11 +29,15 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
-        private readonly Bindable<List<Comment>> childComments = new Bindable<List<Comment>>();
+        private readonly BindableList<Comment> childComments = new BindableList<Comment>();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly FillFlowContainer childCommentsContainer;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private readonly ChevronButton chevronButton;
+        private readonly RepliesButton repliesButton;
+        private readonly LoadRepliesButton loadRepliesButton;
+        private readonly ShowMoreRepliesButton showMoreRepliesButton;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
@@ -139,12 +144,11 @@ namespace osu.Game.Overlays.Comments
                                                             }
                                                         }
                                                     },
-                                                    new ChevronButton(comment)
+                                                    chevronButton = new ChevronButton
                                                     {
                                                         Anchor = Anchor.TopRight,
                                                         Origin = Anchor.TopRight,
                                                         Expanded = { BindTarget = childrenExpanded },
-                                                        ChildComments = { BindTarget = childComments }
                                                     }
                                                 }
                                             },
@@ -169,14 +173,12 @@ namespace osu.Game.Overlays.Comments
                                                         Text = HumanizerUtils.Humanize(comment.CreatedAt),
                                                         Colour = OsuColour.Gray(0.7f),
                                                     },
-                                                    new RepliesButton(comment)
+                                                    repliesButton = new RepliesButton(comment)
                                                     {
                                                         Expanded = { BindTarget = childrenExpanded },
-                                                        ChildComments = { BindTarget = childComments },
                                                     },
-                                                    new LoadRepliesButton(comment)
+                                                    loadRepliesButton = new LoadRepliesButton(comment)
                                                     {
-                                                        ChildComments = { BindTarget = childComments },
                                                         Sort = { BindTarget = Sort }
                                                     }
                                                 }
@@ -205,9 +207,8 @@ namespace osu.Game.Overlays.Comments
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
                             },
-                            new ShowMoreRepliesButton(comment)
+                            showMoreRepliesButton = new ShowMoreRepliesButton(comment)
                             {
-                                ChildComments = { BindTarget = childComments },
                                 Sort = { BindTarget = Sort }
                             }
                         }
@@ -259,6 +260,9 @@ namespace osu.Game.Overlays.Comments
                     }
                 });
             }
+
+            loadRepliesButton.ChildComments.BindTo(childComments);
+            showMoreRepliesButton.ChildComments.BindTo(childComments);
         }
 
         protected override void LoadComplete()
@@ -271,35 +275,38 @@ namespace osu.Game.Overlays.Comments
 
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
 
-            childComments.BindValueChanged(children =>
-            {
-                children.NewValue.ForEach(c =>
-                {
-                    if (children.OldValue?.All(child => child.Id != c.Id) ?? true)
-                    {
-                        childCommentsContainer.Add(new DrawableComment(c)
-                        {
-                            ShowDeleted = { BindTarget = ShowDeleted }
-                        });
-                    }
-                });
-
-                deletedChildrenPlaceholder.DeletedCount.Value = children.NewValue.Count(c => c.IsDeleted);
-            });
-            childComments.Value = comment.ChildComments;
+            childComments.ItemsAdded += onChildrenAdded;
+            loadRepliesButton.OnCommentsReceived += childComments.AddRange;
+            showMoreRepliesButton.OnCommentsReceived += childComments.AddRange;
+            childComments.AddRange(comment.ChildComments);
 
             base.LoadComplete();
+        }
+
+        private void onChildrenAdded(IEnumerable<Comment> children)
+        {
+            children.ForEach(c =>
+            {
+                childCommentsContainer.Add(new DrawableComment(c)
+                {
+                    ShowDeleted = { BindTarget = ShowDeleted }
+                });
+            });
+
+            deletedChildrenPlaceholder.DeletedCount.Value = childComments.Count(c => c.IsDeleted);
+
+            chevronButton.FadeTo(comment.IsTopLevel && childComments.Any() ? 1 : 0);
+            repliesButton.FadeTo(childComments.Any() ? 1 : 0);
+            loadRepliesButton.FadeTo(childComments.Any() || comment.RepliesCount == 0 ? 0 : 1);
+            showMoreRepliesButton.FadeTo((!childComments.Any() && comment.RepliesCount > 0) || childComments.Count == comment.RepliesCount ? 0 : 1);
         }
 
         private class ChevronButton : ShowChildrenButton
         {
             private readonly SpriteIcon icon;
-            private readonly Comment comment;
 
-            public ChevronButton(Comment comment)
+            public ChevronButton()
             {
-                this.comment = comment;
-
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
@@ -309,11 +316,6 @@ namespace osu.Game.Overlays.Comments
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
                 icon.Icon = expanded.NewValue ? FontAwesome.Solid.ChevronUp : FontAwesome.Solid.ChevronDown;
-            }
-
-            protected override void OnChildrenChanged(ValueChangedEvent<List<Comment>> children)
-            {
-                Alpha = comment.IsTopLevel && children.NewValue.Any() ? 1 : 0;
             }
         }
 
@@ -335,11 +337,6 @@ namespace osu.Game.Overlays.Comments
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
                 text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({repliesCount})";
-            }
-
-            protected override void OnChildrenChanged(ValueChangedEvent<List<Comment>> children)
-            {
-                Alpha = !children.NewValue.Any() || repliesCount == 0 ? 0 : 1;
             }
         }
 

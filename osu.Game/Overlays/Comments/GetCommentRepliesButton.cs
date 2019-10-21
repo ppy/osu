@@ -14,12 +14,13 @@ using osu.Game.Online.API;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests;
 using System.Linq;
+using System;
 
 namespace osu.Game.Overlays.Comments
 {
     public abstract class GetCommentRepliesButton : LoadingButton
     {
-        public readonly Bindable<List<Comment>> ChildComments = new Bindable<List<Comment>>();
+        public readonly BindableList<Comment> ChildComments = new BindableList<Comment>();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
@@ -41,14 +42,6 @@ namespace osu.Game.Overlays.Comments
             LoadingAnimationSize = new Vector2(8);
             Action = onAction;
         }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            ChildComments.BindValueChanged(OnChildrenChanged, true);
-        }
-
-        protected abstract void OnChildrenChanged(ValueChangedEvent<List<Comment>> children);
 
         protected override Container CreateBackground() => new Container
         {
@@ -73,15 +66,17 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(CommentBundle response)
         {
-            var children = ChildComments.Value.ToList();
+            List<Comment> uniqueChildren = new List<Comment>();
             response.Comments.ForEach(c =>
             {
-                if (children.All(child => child.Id != c.Id))
-                    children.Add(c);
+                if (ChildComments.All(child => child.Id != c.Id))
+                    uniqueChildren.Add(c);
             });
-            ChildComments.Value = children;
+            OnCommentsReceived?.Invoke(uniqueChildren);
             IsLoading = false;
         }
+
+        public Action<IEnumerable<Comment>> OnCommentsReceived;
 
         protected override void Dispose(bool isDisposing)
         {
