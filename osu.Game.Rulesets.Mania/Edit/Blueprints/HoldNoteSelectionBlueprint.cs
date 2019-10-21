@@ -20,28 +20,34 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private readonly BodyPiece body;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public HoldNoteSelectionBlueprint(DrawableHoldNote hold)
             : base(hold)
         {
-            InternalChildren = new Drawable[]
-            {
-                new HoldNoteNoteSelectionBlueprint(hold.Head),
-                new HoldNoteNoteSelectionBlueprint(hold.Tail),
-                body = new BodyPiece
-                {
-                    AccentColour = Color4.Transparent
-                },
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IScrollingInfo scrollingInfo)
+        private void load(IScrollingInfo scrollingInfo)
         {
-            body.BorderColour = colours.Yellow;
-
             direction.BindTo(scrollingInfo.Direction);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            InternalChildren = new Drawable[]
+            {
+                new HoldNoteNoteSelectionBlueprint(HitObject.Head),
+                new HoldNoteNoteSelectionBlueprint(HitObject.Tail),
+                new BodyPiece
+                {
+                    AccentColour = Color4.Transparent,
+                    BorderColour = colours.Yellow
+                },
+            };
         }
 
         protected override void Update()
