@@ -63,8 +63,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
-            public TestBlueprint(DrawableHitCircle hitCircle)
-                : base(hitCircle)
+            public TestBlueprint(DrawableHitCircle drawableCircle)
+                : base(drawableCircle)
             {
             }
         }
