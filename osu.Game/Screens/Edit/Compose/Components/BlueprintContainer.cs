@@ -123,20 +123,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (blueprint == null)
                 return;
 
-            if (hitObject.IsLoaded)
-                addBlueprint();
-            else
-                hitObject.OnLoadComplete += _ => addBlueprint();
+            blueprint.Selected += onBlueprintSelected;
+            blueprint.Deselected += onBlueprintDeselected;
+            blueprint.SelectionRequested += onSelectionRequested;
+            blueprint.DragRequested += onDragRequested;
 
-            void addBlueprint()
-            {
-                blueprint.Selected += onBlueprintSelected;
-                blueprint.Deselected += onBlueprintDeselected;
-                blueprint.SelectionRequested += onSelectionRequested;
-                blueprint.DragRequested += onDragRequested;
-
-                selectionBlueprints.Add(blueprint);
-            }
+            selectionBlueprints.Add(blueprint);
         }
 
         private void removeBlueprintFor(DrawableHitObject hitObject) => removeBlueprintFor(hitObject.HitObject);
