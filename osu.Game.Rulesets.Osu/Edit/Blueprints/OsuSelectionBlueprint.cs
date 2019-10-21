@@ -10,10 +10,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     public abstract class OsuSelectionBlueprint<T> : SelectionBlueprint
         where T : OsuHitObject
     {
-        protected new T HitObject => (T)base.HitObject.HitObject;
+        protected T HitObject => (T)DrawableObject.HitObject;
 
-        protected OsuSelectionBlueprint(DrawableHitObject hitObject)
-            : base(hitObject)
+        protected OsuSelectionBlueprint(DrawableHitObject drawableObject)
+            : base(drawableObject)
         {
         }
     }
