@@ -13,6 +13,7 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -35,9 +36,11 @@ namespace osu.Game.Overlays.Comments
         private int currentPage;
 
         private readonly Box background;
+        private readonly Box placeholderBackground;
         private readonly FillFlowContainer content;
         private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
+        private readonly Container placeholder;
 
         public CommentsContainer(CommentableType type, long id)
         {
@@ -63,6 +66,25 @@ namespace osu.Game.Overlays.Comments
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
+                        },
+                        placeholder = new Container
+                        {
+                            Height = 80,
+                            RelativeSizeAxes = Axes.X,
+                            Children = new Drawable[]
+                            {
+                                placeholderBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new SpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding { Left = 50 },
+                                    Text = @"No comments yet."
+                                }
+                            }
                         },
                         content = new FillFlowContainer
                         {
@@ -117,6 +139,7 @@ namespace osu.Game.Overlays.Comments
         private void load()
         {
             background.Colour = colours.Gray2;
+            placeholderBackground.Colour = colours.Gray3;
         }
 
         protected override void LoadComplete()
@@ -133,6 +156,8 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
+            moreButton.IsLoading = true;
+            moreButton.Show();
             request?.Cancel();
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
@@ -144,12 +169,20 @@ namespace osu.Game.Overlays.Comments
         {
             currentPage = 1;
             deletedCommentsPlaceholder.DeletedCount.Value = 0;
-            moreButton.IsLoading = true;
+            placeholder.Hide();
             content.Clear();
         }
 
         private void onSuccess(CommentBundle response)
         {
+            if (!response.Comments.Any())
+            {
+                placeholder.Show();
+                moreButton.IsLoading = false;
+                moreButton.Hide();
+                return;
+            }
+
             loadCancellation = new CancellationTokenSource();
 
             FillFlowContainer page = new FillFlowContainer
@@ -183,8 +216,10 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
-
-                moreButton.FadeTo(response.HasMore ? 1 : 0);
+                else
+                {
+                    moreButton.Hide();
+                }
             }, loadCancellation.Token);
         }
 

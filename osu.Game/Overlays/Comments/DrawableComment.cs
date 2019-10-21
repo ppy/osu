@@ -323,7 +323,8 @@ namespace osu.Game.Overlays.Comments
             {
                 page.Add(new DrawableComment(c)
                 {
-                    ShowDeleted = { BindTarget = ShowDeleted }
+                    ShowDeleted = { BindTarget = ShowDeleted },
+                    Sort = { BindTarget = Sort }
                 });
             });
 

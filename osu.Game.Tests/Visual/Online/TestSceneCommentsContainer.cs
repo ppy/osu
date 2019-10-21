@@ -55,6 +55,12 @@ namespace osu.Game.Tests.Visual.Online
                 scrollFlow.Clear();
                 scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
             });
+
+            AddStep("beatmap with no comments", () =>
+            {
+                scrollFlow.Clear();
+                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 1293));
+            });
         }
     }
 }
