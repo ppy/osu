@@ -59,6 +59,7 @@ namespace osu.Game.Overlays.Comments
 
         private void onAction()
         {
+            CurrentPage.Value += 1;
             request = new GetCommentRepliesRequest(Comment.Id, Sort.Value, CurrentPage.Value);
             request.Success += onSuccess;
             api.Queue(request);
@@ -78,9 +79,6 @@ namespace osu.Game.Overlays.Comments
             }
             else
                 OnCommentsReceived?.Invoke(response.Comments);
-
-            CurrentPage.Value = CurrentPage.Value++;
-            IsLoading = false;
         }
 
         public Action<IEnumerable<Comment>> OnCommentsReceived;

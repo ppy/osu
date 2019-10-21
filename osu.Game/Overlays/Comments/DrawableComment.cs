@@ -30,10 +30,10 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly BindableList<Comment> childComments = new BindableList<Comment>();
-        private readonly BindableInt currentPage = new BindableInt(1);
+        private readonly BindableInt currentPage = new BindableInt();
 
-        private readonly FillFlowContainer childCommentsVisibilityContainer;
-        private readonly FillFlowContainer childCommentsContainer;
+        private readonly FillFlowContainer repliesVisibilityContainer;
+        private readonly FillFlowContainer repliesContainer;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly ChevronButton chevronButton;
         private readonly RepliesButton repliesButton;
@@ -191,14 +191,14 @@ namespace osu.Game.Overlays.Comments
                             }
                         }
                     },
-                    childCommentsVisibilityContainer = new FillFlowContainer
+                    repliesVisibilityContainer = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            childCommentsContainer = new FillFlowContainer
+                            repliesContainer = new FillFlowContainer
                             {
                                 Padding = new MarginPadding { Left = 20 },
                                 RelativeSizeAxes = Axes.X,
@@ -276,7 +276,7 @@ namespace osu.Game.Overlays.Comments
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
 
-            childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+            childrenExpanded.BindValueChanged(expanded => repliesVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
 
             childComments.ItemsAdded += onChildrenAdded;
             loadRepliesButton.OnCommentsReceived += childComments.AddRange;
@@ -286,22 +286,56 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
+        private bool initial = true;
+
         private void onChildrenAdded(IEnumerable<Comment> children)
         {
-            children.ForEach(c =>
+            if (initial)
             {
-                childCommentsContainer.Add(new DrawableComment(c)
+                repliesContainer.Add(createRepliesPage(children));
+                updateButtonsState();
+                initial = false;
+            }
+            else
+            {
+                LoadComponentAsync(createRepliesPage(children), loaded =>
+                {
+                    repliesContainer.Add(loaded);
+                    updateButtonsState();
+                });
+            }
+        }
+
+        private FillFlowContainer<DrawableComment> createRepliesPage(IEnumerable<Comment> replies)
+        {
+            var page = new FillFlowContainer<DrawableComment>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+            };
+
+            replies.ForEach(c =>
+            {
+                page.Add(new DrawableComment(c)
                 {
                     ShowDeleted = { BindTarget = ShowDeleted }
                 });
             });
 
+            return page;
+        }
+
+        private void updateButtonsState()
+        {
             deletedChildrenPlaceholder.DeletedCount.Value = childComments.Count(c => c.IsDeleted);
 
             chevronButton.FadeTo(comment.IsTopLevel && childComments.Any() ? 1 : 0);
             repliesButton.FadeTo(childComments.Any() ? 1 : 0);
             loadRepliesButton.FadeTo(childComments.Any() || comment.RepliesCount == 0 ? 0 : 1);
             showMoreRepliesButton.FadeTo((!childComments.Any() && comment.RepliesCount > 0) || childComments.Count == comment.RepliesCount ? 0 : 1);
+
+            loadRepliesButton.IsLoading = showMoreRepliesButton.IsLoading = false;
         }
 
         private class ChevronButton : ShowChildrenButton
