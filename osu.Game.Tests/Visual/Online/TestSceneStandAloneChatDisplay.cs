@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osuTK;
+using System;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -110,6 +111,13 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Sender = longUsernameUser,
                 Content = "Hi guys, my new username is lit!"
+            }));
+
+            AddStep("message with new date", () => testChannel.AddNewMessages(new Message(sequence++)
+            {
+                Sender = longUsernameUser,
+                Content = "Message from the future!",
+                Timestamp = DateTimeOffset.Now
             }));
         }
     }
