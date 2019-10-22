@@ -140,7 +140,8 @@ namespace osu.Game.Online.Chat
 
             private class CustomDaySeparator : DaySeparator
             {
-                public CustomDaySeparator(DateTimeOffset time) : base(time)
+                public CustomDaySeparator(DateTimeOffset time)
+                    : base(time)
                 {
                 }
 
