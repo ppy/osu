@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         /// <param name="hitObject">The <see cref="OsuHitObject"/> to reference properties from.</param>
         public virtual void UpdateFrom(T hitObject)
         {
-            Position = hitObject.Position;
+            Position = hitObject.StackedPosition;
         }
     }
 }
