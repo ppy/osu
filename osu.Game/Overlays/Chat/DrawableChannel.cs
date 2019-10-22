@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Chat
     public class DrawableChannel : Container
     {
         public readonly Channel Channel;
-        protected ChatLineContainer ChatLineFlow;
+        protected FillFlowContainer ChatLineFlow;
         private OsuScrollContainer scroll;
 
         [Resolved]
@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Chat
                     // Some chat lines have effects that slightly protrude to the bottom,
                     // which we do not want to mask away, hence the padding.
                     Padding = new MarginPadding { Bottom = 5 },
-                    Child = ChatLineFlow = new ChatLineContainer
+                    Child = ChatLineFlow = new FillFlowContainer
                     {
                         Padding = new MarginPadding { Left = 20, Right = 20 },
                         RelativeSizeAxes = Axes.X,
@@ -93,9 +93,9 @@ namespace osu.Game.Overlays.Chat
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
-            var existingChatLines = getChatLines();
+            var existingChatLines = getChatLines;
 
-            Message lastMessage = existingChatLines.Any() ? existingChatLines.Last().Message : null;
+            Message lastMessage = existingChatLines.LastOrDefault()?.Message;
 
             displayMessages.ForEach(m =>
             {
@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Chat
 
         private void pendingMessageResolved(Message existing, Message updated)
         {
-            var found = getChatLines().LastOrDefault(c => c.Message == existing);
+            var found = getChatLines.LastOrDefault(c => c.Message == existing);
 
             if (found != null)
             {
@@ -137,28 +137,12 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed)
         {
-            getChatLines().FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            getChatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
 
-        private IEnumerable<ChatLine> getChatLines() => ChatLineFlow.Children.OfType<ChatLine>();
+        private IEnumerable<ChatLine> getChatLines => ChatLineFlow.Children.OfType<ChatLine>();
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
-
-        protected class ChatLineContainer : FillFlowContainer
-        {
-            protected override int Compare(Drawable x, Drawable y)
-            {
-                if (x is ChatLine && y is ChatLine)
-                {
-                    var xC = (ChatLine)x;
-                    var yC = (ChatLine)y;
-
-                    return xC.Message.CompareTo(yC.Message);
-                }
-
-                return base.Compare(x, y);
-            }
-        }
 
         protected class DaySeparator : Container
         {
@@ -173,7 +157,7 @@ namespace osu.Game.Overlays.Chat
             public float LineHeight
             {
                 get => lineHeight;
-                set { lineHeight = leftBox.Height = rightBox.Height = value; }
+                set => lineHeight = leftBox.Height = rightBox.Height = value;
             }
 
             private readonly SpriteText text;
