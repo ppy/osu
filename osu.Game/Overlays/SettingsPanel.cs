@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
 
         protected SettingsSectionsContainer SectionsContainer;
 
-        private SearchTextBox searchTextBox;
+        private SeekLimitedSearchTextBox searchTextBox;
 
         /// <summary>
         /// Provide a source for the toolbar height.
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
                         Masking = true,
                         RelativeSizeAxes = Axes.Both,
                         ExpandableHeader = CreateHeader(),
-                        FixedHeader = searchTextBox = new SearchTextBox
+                        FixedHeader = searchTextBox = new SeekLimitedSearchTextBox
                         {
                             RelativeSizeAxes = Axes.X,
                             Origin = Anchor.TopCentre,
