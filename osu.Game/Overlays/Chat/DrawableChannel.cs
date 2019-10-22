@@ -93,9 +93,7 @@ namespace osu.Game.Overlays.Chat
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
-            var existingChatLines = getChatLines;
-
-            Message lastMessage = existingChatLines.LastOrDefault()?.Message;
+            Message lastMessage = getChatLines.LastOrDefault()?.Message;
 
             displayMessages.ForEach(m =>
             {
@@ -106,10 +104,10 @@ namespace osu.Game.Overlays.Chat
                 lastMessage = m;
             });
 
-            if (scroll.IsScrolledToEnd(10) || !existingChatLines.Any() || newMessages.Any(m => m is LocalMessage))
+            if (scroll.IsScrolledToEnd(10) || !getChatLines.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
 
-            var staleMessages = existingChatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+            var staleMessages = getChatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MaxHistory;
 
             for (int i = 0; i < count; i++)
