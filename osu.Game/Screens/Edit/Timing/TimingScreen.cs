@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -13,6 +14,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -51,8 +54,13 @@ namespace osu.Game.Screens.Edit.Timing
 
         public class ControlPointList : CompositeDrawable
         {
+            private OsuButton deleteButton;
+
             [Resolved]
             protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+
+            [Resolved]
+            private Bindable<IEnumerable<ControlPoint>> selectedPoints { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -73,8 +81,51 @@ namespace osu.Game.Screens.Edit.Timing
                         {
                             ControlPoints = Beatmap.Value.Beatmap.ControlPointInfo.AllControlPoints
                         }
-                    }
+                    },
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Direction = FillDirection.Horizontal,
+                        Margin = new MarginPadding(10),
+                        Spacing = new Vector2(5),
+                        Children = new Drawable[]
+                        {
+                            deleteButton = new OsuButton
+                            {
+                                Text = "-",
+                                Size = new Vector2(30, 30),
+                                Action = delete,
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                            },
+                            new OsuButton
+                            {
+                                Text = "+",
+                                Action = addNew,
+                                Size = new Vector2(30, 30),
+                                Anchor = Anchor.BottomRight,
+                                Origin = Anchor.BottomRight,
+                            },
+                        }
+                    },
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                selectedPoints.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
+            }
+
+            private void delete()
+            {
+            }
+
+            private void addNew()
+            {
             }
         }
     }
