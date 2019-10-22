@@ -240,7 +240,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
             double deviationOnCircles = (greatWindow + 8) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 22000;
+            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 19000;
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
             accuracyValue *= lengthFactor;
