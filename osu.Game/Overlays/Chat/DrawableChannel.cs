@@ -93,7 +93,7 @@ namespace osu.Game.Overlays.Chat
             // Add up to last Channel.MAX_HISTORY messages
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
-            Message lastMessage = getChatLines.LastOrDefault()?.Message;
+            Message lastMessage = chatLines.LastOrDefault()?.Message;
 
             displayMessages.ForEach(m =>
             {
@@ -104,10 +104,10 @@ namespace osu.Game.Overlays.Chat
                 lastMessage = m;
             });
 
-            if (scroll.IsScrolledToEnd(10) || !getChatLines.Any() || newMessages.Any(m => m is LocalMessage))
+            if (scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
 
-            var staleMessages = getChatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+            var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MaxHistory;
 
             for (int i = 0; i < count; i++)
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Chat
 
         private void pendingMessageResolved(Message existing, Message updated)
         {
-            var found = getChatLines.LastOrDefault(c => c.Message == existing);
+            var found = chatLines.LastOrDefault(c => c.Message == existing);
 
             if (found != null)
             {
@@ -135,10 +135,10 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed)
         {
-            getChatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
 
-        private IEnumerable<ChatLine> getChatLines => ChatLineFlow.Children.OfType<ChatLine>();
+        private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
