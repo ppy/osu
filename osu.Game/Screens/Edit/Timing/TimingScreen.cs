@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -18,6 +20,9 @@ namespace osu.Game.Screens.Edit.Timing
     {
         [Cached]
         private Bindable<IEnumerable<ControlPoint>> selectedPoints = new Bindable<IEnumerable<ControlPoint>>();
+
+        [Resolved]
+        private IAdjustableClock clock { get; set; }
 
         protected override Drawable CreateMainContent() => new GridContainer
         {
@@ -36,6 +41,13 @@ namespace osu.Game.Screens.Edit.Timing
                 },
             }
         };
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            selectedPoints.BindValueChanged(selected => { clock.Seek(selected.NewValue.First().Time); });
+        }
 
         public class ControlPointList : CompositeDrawable
         {
