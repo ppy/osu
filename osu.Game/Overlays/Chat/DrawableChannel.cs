@@ -13,7 +13,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Sprites;
