@@ -20,6 +20,7 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -264,7 +265,7 @@ namespace osu.Game.Beatmaps
             }
 
             Beatmap beatmap;
-            using (var stream = new StreamReader(reader.GetStream(mapName)))
+            using (var stream = new LineBufferedReader(reader.GetStream(mapName)))
                 beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
             return new BeatmapSetInfo
@@ -287,7 +288,7 @@ namespace osu.Game.Beatmaps
             {
                 using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
                 using (var ms = new MemoryStream()) //we need a memory stream so we can seek
-                using (var sr = new StreamReader(ms))
+                using (var sr = new LineBufferedReader(ms))
                 {
                     raw.CopyTo(ms);
                     ms.Position = 0;

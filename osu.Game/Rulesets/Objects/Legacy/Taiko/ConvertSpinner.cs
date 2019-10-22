@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 
         public double Duration => EndTime - StartTime;
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

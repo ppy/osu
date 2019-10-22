@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -11,7 +9,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuSelectionHandler : SelectionHandler
     {
-        public override void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
+        public override void HandleMovement(MoveSelectionEvent moveEvent)
         {
             foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
             {
@@ -21,10 +19,10 @@ namespace osu.Game.Rulesets.Osu.Edit
                     continue;
                 }
 
-                h.Position += dragEvent.Delta;
+                h.Position += moveEvent.InstantDelta;
             }
 
-            base.HandleDrag(blueprint, dragEvent);
+            base.HandleMovement(moveEvent);
         }
     }
 }
