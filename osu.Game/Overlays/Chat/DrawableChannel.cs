@@ -95,14 +95,14 @@ namespace osu.Game.Overlays.Chat
 
             Message lastMessage = chatLines.LastOrDefault()?.Message;
 
-            displayMessages.ForEach(m =>
+            foreach (var message in displayMessages)
             {
-                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != m.Timestamp.ToLocalTime().Date)
-                    ChatLineFlow.Add(CreateDaySeparator(m.Timestamp));
+                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != message.Timestamp.ToLocalTime().Date)
+                    ChatLineFlow.Add(CreateDaySeparator(message.Timestamp));
 
-                ChatLineFlow.Add(CreateChatLine(m));
-                lastMessage = m;
-            });
+                ChatLineFlow.Add(CreateChatLine(message));
+                lastMessage = message;
+            }
 
             if (scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
