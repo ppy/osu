@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Select
             return criteria;
         }
 
-        private readonly SearchTextBox searchTextBox;
+        private readonly SeekLimitedSearchTextBox searchTextBox;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox { RelativeSizeAxes = Axes.X },
+                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
                         new Box
                         {
                             RelativeSizeAxes = Axes.X,
