@@ -13,7 +13,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -39,7 +38,6 @@ namespace osu.Game.Screens.Edit.Timing
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(2),
                         Children = createSections()
                     },
                 }
