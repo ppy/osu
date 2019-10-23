@@ -78,6 +78,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPositions();
         }
 
+        [Test]
+        public void TestStackedHitObject()
+        {
+            AddStep("set stacking", () => slider.StackHeight = 5);
+            checkPositions();
+        }
+
         private void moveHitObject()
         {
             AddStep("move hitobject", () =>
@@ -88,7 +95,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void checkPositions()
         {
-            AddAssert("body positioned correctly", () => blueprint.BodyPiece.Position == slider.Position);
+            AddAssert("body positioned correctly", () => blueprint.BodyPiece.Position == slider.StackedPosition);
 
             AddAssert("head positioned correctly",
                 () => Precision.AlmostEquals(blueprint.HeadBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.HeadCircle.ScreenSpaceDrawQuad.Centre));
