@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -109,7 +110,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected -= onBlueprintSelected;
             blueprint.Deselected -= onBlueprintDeselected;
             blueprint.SelectionRequested -= onSelectionRequested;
-            blueprint.DragRequested -= onDragRequested;
 
             selectionBlueprints.Remove(blueprint);
         }
@@ -125,7 +125,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
             blueprint.SelectionRequested += onSelectionRequested;
-            blueprint.DragRequested += onDragRequested;
 
             selectionBlueprints.Add(blueprint);
         }
@@ -227,9 +226,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
+        private Vector2? screenSpaceMovementStartPosition;
+        private SelectionBlueprint movementBlueprint;
+
         protected override bool OnDragStart(DragStartEvent e)
         {
-            if (!selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            if (selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            {
+                // The earliest hitobject is used for drag-movement/snapping
+                movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.DrawableObject.HitObject.StartTime).First();
+                screenSpaceMovementStartPosition = movementBlueprint.DrawableObject.ToScreenSpace(movementBlueprint.DrawableObject.OriginPosition);
+            }
+            else
                 dragBox.FadeIn(250, Easing.OutQuint);
 
             return true;
@@ -237,32 +245,44 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            dragBox.UpdateDrag(e);
+            if (movementBlueprint != null)
+            {
+                Debug.Assert(screenSpaceMovementStartPosition != null);
+
+                Vector2 startPosition = screenSpaceMovementStartPosition.Value;
+                HitObject draggedObject = movementBlueprint.DrawableObject.HitObject;
+
+                Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+                Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
+
+                // Move the hitobjects
+                selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition)));
+
+                // Apply the start time at the newly snapped-to position
+                double offset = composer.GetSnappedTime(draggedObject.StartTime, snappedPosition) - draggedObject.StartTime;
+                foreach (HitObject obj in selectionHandler.SelectedHitObjects)
+                    obj.StartTime += offset;
+            }
+            else
+                dragBox.UpdateDrag(e);
+
             return true;
         }
 
         protected override bool OnDragEnd(DragEndEvent e)
         {
-            dragBox.FadeOut(250, Easing.OutQuint);
-            selectionHandler.UpdateVisibility();
+            if (movementBlueprint != null)
+            {
+                screenSpaceMovementStartPosition = null;
+                movementBlueprint = null;
+            }
+            else
+            {
+                dragBox.FadeOut(250, Easing.OutQuint);
+                selectionHandler.UpdateVisibility();
+            }
 
             return true;
-        }
-
-        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent)
-        {
-            HitObject draggedObject = blueprint.DrawableObject.HitObject;
-
-            Vector2 movePosition = blueprint.ScreenSpaceMovementStartPosition + dragEvent.ScreenSpaceMousePosition - dragEvent.ScreenSpaceMouseDownPosition;
-            Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
-
-            // Move the hitobjects
-            selectionHandler.HandleMovement(new MoveSelectionEvent(blueprint, blueprint.ScreenSpaceMovementStartPosition, ToScreenSpace(snappedPosition)));
-
-            // Apply the start time at the newly snapped-to position
-            double offset = composer.GetSnappedTime(draggedObject.StartTime, snappedPosition) - draggedObject.StartTime;
-            foreach (HitObject obj in selectionHandler.SelectedHitObjects)
-                obj.StartTime += offset;
         }
 
         protected override void Dispose(bool isDisposing)

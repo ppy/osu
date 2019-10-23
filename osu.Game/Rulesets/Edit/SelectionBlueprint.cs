@@ -36,19 +36,9 @@ namespace osu.Game.Rulesets.Edit
         public event Action<SelectionBlueprint, InputState> SelectionRequested;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
-        /// </summary>
-        public event Action<SelectionBlueprint, DragEvent> DragRequested;
-
-        /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
         /// </summary>
         public readonly DrawableHitObject DrawableObject;
-
-        /// <summary>
-        /// The screen-space position of <see cref="DrawableObject"/> prior to handling a movement event.
-        /// </summary>
-        internal Vector2 ScreenSpaceMovementStartPosition { get; private set; }
 
         protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
@@ -134,18 +124,6 @@ namespace osu.Game.Rulesets.Edit
             }
 
             return base.OnClick(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            ScreenSpaceMovementStartPosition = DrawableObject.ToScreenSpace(DrawableObject.OriginPosition);
-            return true;
-        }
-
-        protected override bool OnDrag(DragEvent e)
-        {
-            DragRequested?.Invoke(this, e);
-            return true;
         }
 
         /// <summary>
