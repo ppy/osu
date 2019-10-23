@@ -19,20 +19,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void CreateContent(Vector2 centrePosition)
         {
-            AddInternal(new Box
-            {
-                Origin = Anchor.Centre,
-                Position = centrePosition,
-                Width = 2,
-                Height = Math.Min(10, DistanceSpacing * 2),
-            });
+            const float crosshair_thickness = 1;
+            const float crosshair_max_size = 10;
 
-            AddInternal(new Box
+            AddRangeInternal(new[]
             {
-                Origin = Anchor.Centre,
-                Position = centrePosition,
-                Width = Math.Min(10, DistanceSpacing * 2),
-                Height = 2,
+                new Box
+                {
+                    Origin = Anchor.Centre,
+                    Position = centrePosition,
+                    Width = crosshair_thickness,
+                    EdgeSmoothness = new Vector2(1),
+                    Height = Math.Min(crosshair_max_size, DistanceSpacing * 2),
+                },
+                new Box
+                {
+                    Origin = Anchor.Centre,
+                    Position = centrePosition,
+                    EdgeSmoothness = new Vector2(1),
+                    Width = Math.Min(crosshair_max_size, DistanceSpacing * 2),
+                    Height = crosshair_thickness,
+                }
             });
 
             float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
