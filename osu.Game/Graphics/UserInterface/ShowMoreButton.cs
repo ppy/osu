@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Both;
         }
 
-        protected override Container CreateBackground() => new CircularContainer
+        protected override Container CreateContent() => new CircularContainer
         {
             Masking = true,
             Size = new Vector2(140, 30),
@@ -50,7 +50,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         };
 
-        protected override Drawable CreateContent() => new FillFlowContainer
+        protected override Drawable CreateText() => new FillFlowContainer
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,

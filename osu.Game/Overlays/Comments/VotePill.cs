@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Comments
             IsLoading = false;
         }
 
-        protected override Container CreateBackground() => new Container
+        protected override Container CreateContent() => new Container
         {
             RelativeSizeAxes = Axes.Y,
             AutoSizeAxes = Axes.X,
@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Comments
             },
         };
 
-        protected override Drawable CreateContent() => votesCounter = new OsuSpriteText
+        protected override Drawable CreateText() => votesCounter = new OsuSpriteText
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
