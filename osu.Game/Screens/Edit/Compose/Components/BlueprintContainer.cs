@@ -23,6 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         public event Action<IEnumerable<HitObject>> SelectionChanged;
 
+        private DragBox dragBox;
         private SelectionBlueprintContainer selectionBlueprints;
         private Container<PlacementBlueprint> placementBlueprintContainer;
         private PlacementBlueprint currentPlacement;
@@ -46,12 +47,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionHandler = composer.CreateSelectionHandler();
             selectionHandler.DeselectAll = deselectAll;
 
-            var dragBox = new DragBox(select);
-            dragBox.DragEnd += () => selectionHandler.UpdateVisibility();
-
             InternalChildren = new[]
             {
-                dragBox,
+                dragBox = new DragBox(select),
                 selectionHandler,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
                 placementBlueprintContainer = new Container<PlacementBlueprint> { RelativeSizeAxes = Axes.Both },
@@ -228,6 +226,28 @@ namespace osu.Game.Screens.Edit.Compose.Components
         }
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
+
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (!selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+                dragBox.FadeIn(250, Easing.OutQuint);
+
+            return true;
+        }
+
+        protected override bool OnDrag(DragEvent e)
+        {
+            dragBox.UpdateDrag(e);
+            return true;
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            dragBox.FadeOut(250, Easing.OutQuint);
+            selectionHandler.UpdateVisibility();
+
+            return true;
+        }
 
         private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
