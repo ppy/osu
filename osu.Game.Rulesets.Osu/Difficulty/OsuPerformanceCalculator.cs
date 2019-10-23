@@ -238,8 +238,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnCircles is close to 1
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
-            double deviationOnCircles = (greatWindow + 8) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 19000;
+            double deviationOnCircles = (greatWindow + 20) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
+            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 43000;
 
             double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
             accuracyValue *= lengthFactor;
