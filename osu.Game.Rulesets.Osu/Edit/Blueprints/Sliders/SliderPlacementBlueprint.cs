@@ -69,6 +69,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
+                    // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
+                    // is used instead since snapping control points doesn't make much sense
                     cursor = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
