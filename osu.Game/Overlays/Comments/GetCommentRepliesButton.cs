@@ -43,12 +43,12 @@ namespace osu.Game.Overlays.Comments
             Action = onAction;
         }
 
-        protected override Container CreateBackground() => new Container
+        protected override Container CreateContent() => new Container
         {
             AutoSizeAxes = Axes.Both
         };
 
-        protected override Drawable CreateContent() => text = new SpriteText
+        protected override Drawable CreateText() => text = new SpriteText
         {
             AlwaysPresent = true,
             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
