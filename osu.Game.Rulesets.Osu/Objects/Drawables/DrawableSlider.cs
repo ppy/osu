@@ -34,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly Slider slider;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
         private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
@@ -72,6 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             config?.BindWith(OsuRulesetSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(scale =>
             {
                 updatePathRadius();
@@ -79,6 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             });
 
             positionBindable.BindTo(HitObject.PositionBindable);
+            stackHeightBindable.BindTo(HitObject.StackHeightBindable);
             scaleBindable.BindTo(HitObject.ScaleBindable);
             pathBindable.BindTo(slider.PathBindable);
 
