@@ -217,9 +217,9 @@ namespace osu.Game.Rulesets.Edit
             {
                 distanceSnapGridContainer.Child = distanceSnapGrid;
                 distanceSnapGridContainer.Show();
-
-                lastGridUpdateTime = EditorClock.CurrentTime;
             }
+
+            lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
         private ScheduledDelegate scheduledUpdate;
