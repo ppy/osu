@@ -37,13 +37,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected readonly Vector2 CentrePosition;
 
         [Resolved]
+        protected OsuColour Colours { get; private set; }
+
+        [Resolved]
         private IEditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
 
         private readonly Cached gridCache = new Cached();
         private readonly HitObject hitObject;
@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected ColourInfo GetColourForBeatIndex(int index)
         {
             int beat = (index + 1) % beatDivisor.Value;
-            ColourInfo colour = colours.Gray5;
+            ColourInfo colour = Colours.Gray5;
 
             for (int i = 0; i < BindableBeatDivisor.VALID_DIVISORS.Length; i++)
             {
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 if ((beat * divisor) % beatDivisor.Value == 0)
                 {
-                    colour = BindableBeatDivisor.GetColourFor(divisor, colours);
+                    colour = BindableBeatDivisor.GetColourFor(divisor, Colours);
                     break;
                 }
             }

@@ -111,6 +111,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Distance Overflow 1 Repeat", () => SetContents(() => testDistanceOverflow(1)));
         }
 
+        [Test]
+        public void TestChangeStackHeight()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+                Add(slider);
+            });
+
+            AddStep("change stack height", () => slider.HitObject.StackHeight = 10);
+            AddAssert("body positioned correctly", () => slider.Position == slider.HitObject.StackedPosition);
+        }
+
         private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
 
         private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
