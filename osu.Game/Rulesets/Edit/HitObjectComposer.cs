@@ -169,10 +169,7 @@ namespace osu.Game.Rulesets.Edit
             base.Update();
 
             if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
-            {
                 showGridFor(Enumerable.Empty<HitObject>());
-                lastGridUpdateTime = EditorClock.CurrentTime;
-            }
         }
 
         protected override void UpdateAfterChildren()
