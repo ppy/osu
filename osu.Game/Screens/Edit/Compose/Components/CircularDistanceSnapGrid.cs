@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -18,6 +19,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void CreateContent(Vector2 centrePosition)
         {
+            AddInternal(new Box
+            {
+                Origin = Anchor.Centre,
+                Position = centrePosition,
+                Width = 2,
+                Height = Math.Min(10, DistanceSpacing * 2),
+            });
+
+            AddInternal(new Box
+            {
+                Origin = Anchor.Centre,
+                Position = centrePosition,
+                Width = Math.Min(10, DistanceSpacing * 2),
+                Height = 2,
+            });
+
             float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
             float dy = Math.Max(centrePosition.Y, DrawHeight - centrePosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
