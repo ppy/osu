@@ -256,13 +256,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             // Treat 300 as 300, 100 as 200, 50 as 100
             // add 2 to countHitCircles in the denominator so that later erfinv gives resonable result for ss scores
-            double modifiedAcc;
-            if (countHitCircles > 0)
-                modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
-                              ((countHitCircles + 2) * 3);
-            else
-                modifiedAcc = 0;
-
+            double modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
+                                 ((countHitCircles + 2) * 3);
             return modifiedAcc;
         }
 
