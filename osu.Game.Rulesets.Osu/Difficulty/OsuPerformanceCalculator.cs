@@ -130,11 +130,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double modifiedAcc = getModifiedAcc();
 
-            // Assume SS for non-stream parts
-            double accOnCheeseNotes = 1 - (1 - modifiedAcc) * Math.Sqrt(countHitCircles / Attributes.CheeseNoteCount);
+            double accOnCheeseNotes = 1 - (1 - modifiedAcc) * Math.Sqrt(totalHits / Attributes.CheeseNoteCount);
 
-            // accOnStreams can be negative. The formula below ensures a positive acc while
-            // preserving the value when accOnStreams is close to 1
+            // accOnCheeseNotes can be negative. The formula below ensures a positive acc while
+            // preserving the value when accOnCheeseNotes is close to 1
             double accOnCheeseNotesPositive = Math.Exp(accOnCheeseNotes - 1);
 
             double urOnCheeseNotes = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
@@ -193,7 +192,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double modifiedAcc = getModifiedAcc();
 
             // Assume SS for non-stream parts
-            double accOnStreams = 1 - (1 - modifiedAcc) * countHitCircles / Attributes.StreamNoteCount;
+            double accOnStreams = 1 - (1 - modifiedAcc) * totalHits / Attributes.StreamNoteCount;
 
             // accOnStreams can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnStreams is close to 1
