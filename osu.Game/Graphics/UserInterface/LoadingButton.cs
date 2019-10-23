@@ -27,13 +27,13 @@ namespace osu.Game.Graphics.UserInterface
                 if (value)
                 {
                     loading.Show();
-                    content.FadeOut(fade_duration, Easing.OutQuint);
+                    text.FadeOut(fade_duration, Easing.OutQuint);
                     OnLoadingStart();
                 }
                 else
                 {
                     loading.Hide();
-                    content.FadeIn(fade_duration, Easing.OutQuint);
+                    text.FadeIn(fade_duration, Easing.OutQuint);
                     OnLoadingFinished();
                 }
             }
@@ -46,17 +46,17 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private readonly LoadingAnimation loading;
-        private readonly Drawable content;
+        private readonly Drawable text;
 
         protected LoadingButton()
         {
-            Container background;
+            Container content;
 
-            Child = background = CreateBackground();
+            Child = content = CreateContent();
 
-            background.AddRange(new[]
+            content.AddRange(new[]
             {
-                content = CreateContent(),
+                text = CreateText(),
                 loading = new LoadingAnimation
                 {
                     Anchor = Anchor.Centre,
@@ -90,8 +90,8 @@ namespace osu.Game.Graphics.UserInterface
         {
         }
 
-        protected abstract Container CreateBackground();
+        protected abstract Container CreateContent();
 
-        protected abstract Drawable CreateContent();
+        protected abstract Drawable CreateText();
     }
 }
