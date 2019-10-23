@@ -38,7 +38,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
             float dy = Math.Max(centrePosition.Y, DrawHeight - centrePosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
-
             int requiredCircles = (int)(maxDistance / DistanceSpacing);
 
             for (int i = 0; i < requiredCircles; i++)
