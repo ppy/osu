@@ -208,10 +208,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapValue = tapSkillToPP(tapSkill);
 
             // Buff high acc
-            double accBuff1 = Math.Pow(urOnStreams / 10, -skillToPPExponent) * 5000;
-            double accBuff2 = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.1f;
+            double accBuff = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2f;
 
-            tapValue += accBuff1 + accBuff2;
+            tapValue += accBuff;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             tapValue *= Math.Pow(0.97f, countMiss);
