@@ -143,7 +143,8 @@ namespace osu.Game.Overlays.AccountCreation
             base.OnEntering(last);
             processingOverlay.Hide();
 
-            focusNextTextbox();
+            if (host?.OnScreenKeyboardOverlapsGameWindow != true)
+                focusNextTextbox();
         }
 
         private void performRegistration()
