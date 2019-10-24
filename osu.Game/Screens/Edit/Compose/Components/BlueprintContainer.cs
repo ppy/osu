@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -14,19 +15,19 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public class BlueprintContainer : CompositeDrawable
     {
-        private SelectionBlueprintContainer selectionBlueprints;
+        public event Action<IEnumerable<HitObject>> SelectionChanged;
 
+        private SelectionBlueprintContainer selectionBlueprints;
         private Container<PlacementBlueprint> placementBlueprintContainer;
         private PlacementBlueprint currentPlacement;
         private SelectionHandler selectionHandler;
         private InputManager inputManager;
-
-        private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removeBlueprintFor(HitObject hitObject)
         {
-            var blueprint = selectionBlueprints.Single(m => m.HitObject.HitObject == hitObject);
+            var blueprint = selectionBlueprints.Single(m => m.DrawableObject.HitObject == hitObject);
             if (blueprint == null)
                 return;
 
@@ -143,7 +144,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (currentPlacement != null)
             {
-                currentPlacement.UpdatePosition(e.ScreenSpaceMousePosition);
+                updatePlacementPosition(e.ScreenSpaceMousePosition);
                 return true;
             }
 
@@ -178,8 +179,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
 
                 // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                blueprint.UpdatePosition(inputManager.CurrentState.Mouse.Position);
+                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
             }
+        }
+
+        private void updatePlacementPosition(Vector2 screenSpacePosition)
+        {
+            Vector2 snappedGridPosition = composer.GetSnappedPosition(ToLocalSpace(screenSpacePosition));
+            Vector2 snappedScreenSpacePosition = ToScreenSpace(snappedGridPosition);
+
+            currentPlacement.UpdatePosition(snappedScreenSpacePosition);
         }
 
         /// <summary>
@@ -188,9 +197,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         private void select(RectangleF rect)
         {
-            foreach (var blueprint in selections.ToList())
+            foreach (var blueprint in selectionBlueprints)
             {
-                if (blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
+                if (blueprint.IsAlive && blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
                     blueprint.Select();
                 else
                     blueprint.Deselect();
@@ -200,23 +209,41 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Deselects all selected <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void deselectAll() => selections.ToList().ForEach(m => m.Deselect());
+        private void deselectAll() => selectionHandler.SelectedBlueprints.ToList().ForEach(m => m.Deselect());
 
         private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleSelected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 1);
+
+            SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
             selectionHandler.HandleDeselected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 0);
+
+            SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent) => selectionHandler.HandleDrag(blueprint, dragEvent);
+        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent)
+        {
+            HitObject draggedObject = blueprint.DrawableObject.HitObject;
+
+            Vector2 movePosition = blueprint.ScreenSpaceMovementStartPosition + dragEvent.ScreenSpaceMousePosition - dragEvent.ScreenSpaceMouseDownPosition;
+            Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
+
+            // Move the hitobjects
+            selectionHandler.HandleMovement(new MoveSelectionEvent(blueprint, blueprint.ScreenSpaceMovementStartPosition, ToScreenSpace(snappedPosition)));
+
+            // Apply the start time at the newly snapped-to position
+            double offset = composer.GetSnappedTime(draggedObject.StartTime, snappedPosition) - draggedObject.StartTime;
+            foreach (HitObject obj in selectionHandler.SelectedHitObjects)
+                obj.StartTime += offset;
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -247,7 +274,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     return d;
 
                 // Put earlier hitobjects towards the end of the list, so they handle input first
-                int i = y.HitObject.HitObject.StartTime.CompareTo(x.HitObject.HitObject.StartTime);
+                int i = y.DrawableObject.HitObject.StartTime.CompareTo(x.DrawableObject.HitObject.StartTime);
                 return i == 0 ? CompareReverseChildID(x, y) : i;
             }
         }

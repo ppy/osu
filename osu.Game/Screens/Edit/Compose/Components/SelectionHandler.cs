@@ -26,10 +26,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         public const float BORDER_RADIUS = 2;
 
-        protected IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
+        public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
-        protected IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject.HitObject);
+        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.DrawableObject.HitObject);
 
         private Drawable outline;
 
@@ -65,11 +65,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region User Input Handling
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being dragged.
+        /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
-        /// <param name="blueprint">The <see cref="SelectionBlueprint"/> that received the drag event.</param>
-        /// <param name="dragEvent">The drag event.</param>
-        public virtual void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
+        /// <param name="moveEvent">The move event.</param>
+        public virtual void HandleMovement(MoveSelectionEvent moveEvent)
         {
         }
 
@@ -82,7 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 case Key.Delete:
                     foreach (var h in selectedBlueprints.ToList())
-                        placementHandler.Delete(h.HitObject.HitObject);
+                        placementHandler.Delete(h.DrawableObject.HitObject);
                     return true;
             }
 

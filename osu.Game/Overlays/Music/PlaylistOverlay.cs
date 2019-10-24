@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistOverlay : OverlayContainer
+    public class PlaylistOverlay : VisibilityContainer
     {
         private const float transition_duration = 600;
         private const float playlist_height = 510;
