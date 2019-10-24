@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Online
                 Child = commentsContainer
             });
 
-            AddStep("Initial creation", () =>
+            AddStep("Idle state", () =>
             {
                 scroll.Clear();
                 scroll.Add(commentsContainer = new CommentsContainer());
