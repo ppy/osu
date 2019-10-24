@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -128,24 +129,24 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
-            {
-                if (blueprint.IsHovered)
-                {
-                    selectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
-                    break;
-                }
-            }
-
+            beginClickSelection(e);
             return true;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (selectionBlueprints.AliveBlueprints.Any(b => b.IsHovered))
+            // clickSelectionBegan will be true if a mouse down occurred on the blueprint but the click event was received outside of the blueprint
+            // otherwise, deselection should only occur if the click event did not occur on top of a selected blueprint
+            if (clickSelectionBegan || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
                 return true;
 
             deselectAll();
+            return true;
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            endClickSelection();
             return true;
         }
 
@@ -227,6 +228,40 @@ namespace osu.Game.Screens.Edit.Compose.Components
             currentPlacement.UpdatePosition(snappedScreenSpacePosition);
         }
 
+        #region Selection
+
+        /// <summary>
+        /// Whether a blueprint was selected by a previous click event.
+        /// </summary>
+        private bool clickSelectionBegan;
+
+        /// <summary>
+        /// Attempts to select any hovered blueprints.
+        /// </summary>
+        /// <param name="e">The input event that triggered this selection.</param>
+        private void beginClickSelection(UIEvent e)
+        {
+            Debug.Assert(!clickSelectionBegan);
+
+            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
+            {
+                if (blueprint.IsHovered)
+                {
+                    selectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
+                    clickSelectionBegan = true;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Finishes the current blueprint selection.
+        /// </summary>
+        private void endClickSelection()
+        {
+            clickSelectionBegan = false;
+        }
+
         /// <summary>
         /// Select all masks in a given rectangle selection area.
         /// </summary>
@@ -262,6 +297,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
+
+        #endregion
+
+        #region Selection Movement
 
         private Vector2? screenSpaceMovementStartPosition;
         private SelectionBlueprint movementBlueprint;
@@ -329,6 +368,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             return true;
         }
+
+        #endregion
 
         protected override void Dispose(bool isDisposing)
         {
