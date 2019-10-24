@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Snaps a distance by the snap distance of this grid.
         /// </summary>
-        /// <param name="distance">The distance to snap.</param>
+        /// <param name="distance">The distance to snap in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
         /// <returns>The snapped distance.</returns>
         public float GetSnappedDistance(float distance) => (int)(distance / DistanceSpacing) * DistanceSpacing;
 
