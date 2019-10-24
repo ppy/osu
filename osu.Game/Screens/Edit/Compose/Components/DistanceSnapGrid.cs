@@ -129,6 +129,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public double GetSnapTime(Vector2 position) => startTime + (position - CentrePosition).Length / Velocity;
 
         /// <summary>
+        /// Snaps a distance by the snap distance of this grid.
+        /// </summary>
+        /// <param name="distance">The distance to snap.</param>
+        /// <returns>The snapped distance.</returns>
+        public float GetSnapDistance(float distance) => (int)(distance / DistanceSpacing) * DistanceSpacing;
+
+        /// <summary>
         /// Retrieves the applicable colour for a beat index.
         /// </summary>
         /// <param name="index">The 0-based beat index.</param>
