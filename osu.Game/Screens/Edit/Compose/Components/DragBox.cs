@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        public void UpdateDrag(DragEvent e)
+        public void UpdateDrag(MouseButtonEvent e)
         {
             var dragPosition = e.ScreenSpaceMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
