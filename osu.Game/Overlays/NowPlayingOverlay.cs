@@ -137,7 +137,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => musicController.PrevTrack(),
+                                                    Action = () => musicController.PreviousTrack(),
                                                     Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
