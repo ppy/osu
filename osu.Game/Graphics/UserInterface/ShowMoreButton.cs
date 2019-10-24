@@ -14,6 +14,8 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class ShowMoreButton : LoadingButton
     {
+        private const int duration = 200;
+
         private Color4 chevronIconColour;
 
         protected Color4 ChevronIconColour
@@ -34,42 +36,49 @@ namespace osu.Game.Graphics.UserInterface
         private ChevronIcon rightChevron;
         private SpriteText text;
         private Box background;
+        private FillFlowContainer textContainer;
 
         public ShowMoreButton()
         {
             AutoSizeAxes = Axes.Both;
         }
 
-        protected override Container CreateContent() => new CircularContainer
+        protected override Drawable CreateContent() => new CircularContainer
         {
             Masking = true,
             Size = new Vector2(140, 30),
-            Child = background = new Box
-            {
-                RelativeSizeAxes = Axes.Both,
-            }
-        };
-
-        protected override Drawable CreateText() => new FillFlowContainer
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(7),
             Children = new Drawable[]
             {
-                leftChevron = new ChevronIcon(),
-                text = new OsuSpriteText
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                textContainer = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = "show more".ToUpper(),
-                },
-                rightChevron = new ChevronIcon(),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(7),
+                    Children = new Drawable[]
+                    {
+                        leftChevron = new ChevronIcon(),
+                        text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Text = "show more".ToUpper(),
+                        },
+                        rightChevron = new ChevronIcon(),
+                    }
+                }
             }
         };
+
+        protected override void OnLoadStarted() => textContainer.FadeOut(duration, Easing.OutQuint);
+
+        protected override void OnLoadFinished() => textContainer.FadeIn(duration, Easing.OutQuint);
 
         private class ChevronIcon : SpriteIcon
         {
