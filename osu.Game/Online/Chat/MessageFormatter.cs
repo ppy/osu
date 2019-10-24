@@ -104,7 +104,7 @@ namespace osu.Game.Online.Chat
                 // sometimes an already-processed formatted link can reduce to a simple URL, too
                 // (example: [mean example - https://osu.ppy.sh](https://osu.ppy.sh))
                 // therefore we need to check if any of the pre-existing links contains the raw one we found
-                if (result.Links.All(existingLink => !existingLink.Contains(link)))
+                if (result.Links.All(existingLink => !existingLink.Overlaps(link)))
                     result.Links.Add(link);
             }
         }
@@ -298,7 +298,7 @@ namespace osu.Game.Online.Chat
             Argument = argument;
         }
 
-        public bool Contains(Link otherLink) => otherLink.Index >= Index && otherLink.Index + otherLink.Length <= Index + Length;
+        public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
 
         public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
     }
