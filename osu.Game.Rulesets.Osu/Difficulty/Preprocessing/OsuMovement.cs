@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
     {
         private static readonly CubicSpline correction0MovingSpline = CubicSpline.InterpolateHermiteSorted(
                                                                             new[] { -1, -0.6, 0.3, 0.5, 1 },
-                                                                            new[] { 0.6, 1, 1, 0.6, 0 },
-                                                                            new[] { 0.8, 0.8, -0.8, -2, -0.8 });
+                                                                            new[] { 1, 1, 0.85, 0.6, 0 },
+                                                                            new[] { 0, 0, -0.8, -2, -0.8 });
         // number of coefficients in the formula
         private const int numCoeffs = 4;
 
@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                             double correction0_moving = correction0MovingSpline.Interpolate(cos012);
 
                             double movingness = SpecialFunctions.Logistic(d01 * 2) * 2 - 1;
-                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0Still) * 0.8;
+                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0Still) * 1.5;
                         }
                     }
                     else if (tRatio0 < 1 / tRatioThreshold)
