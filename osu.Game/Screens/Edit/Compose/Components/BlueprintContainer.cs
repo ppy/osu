@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -135,9 +134,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            // clickSelectionBegan will be true if a mouse down occurred on the blueprint but the click event was received outside of the blueprint
-            // otherwise, deselection should only occur if the click event did not occur on top of a selected blueprint
-            if (clickSelectionBegan || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            // Deselection should only occur if no selected blueprints are hovered
+            // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
+            if (endClickSelection() || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
                 return true;
 
             deselectAll();
@@ -146,7 +145,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            endClickSelection();
+            // Special case for when a drag happened instead of a click
+            Schedule(() => endClickSelection());
             return true;
         }
 
@@ -257,9 +257,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Finishes the current blueprint selection.
         /// </summary>
-        private void endClickSelection()
+        /// <returns>Whether a click selection was active.</returns>
+        private bool endClickSelection()
         {
+            if (!clickSelectionBegan)
+                return false;
+
             clickSelectionBegan = false;
+            return true;
         }
 
         /// <summary>
@@ -313,8 +318,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Debug.Assert(movementBlueprint == null);
 
-            // Any selected blueprints can begin the movement of the group, however only the earliest hitobject is used for movement
-            if (!selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+            // Any selected blueprint that is hovered can begin the movement of the group, however only the earliest hitobject is used for movement
+            // A special case is added for when a click selection occurred before the drag
+            if (!clickSelectionBegan && !selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
                 return false;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
