@@ -155,7 +155,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>
         /// </summary>
-        /// <returns>Whether the operation was successful.</returns>
+        /// <returns>The <see cref="PreviousButtonAction"/> that indicate the decided action</returns>
         public PreviousButtonAction PrevTrack()
         {
             var currentTrackPosition = current?.Track.CurrentTime;
