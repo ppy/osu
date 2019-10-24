@@ -194,13 +194,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Assume SS for non-stream parts
             double accOnStreams = 1 - (1 - modifiedAcc) * totalHits / Attributes.StreamNoteCount;
 
-            // accOnStreams can be negative. The formula below ensures a positive acc while
-            // preserving the value when accOnStreams is close to 1
-            double accOnStreamsPositive = Math.Exp(accOnStreams - 1);
-
-            double urOnStreams = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
-
-            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4000) / 1000);
+            double mashLevel = 1 - SpecialFunctions.Logistic((accOnStreams - 0.75) / 0.1) / SpecialFunctions.Logistic(2.5);
             
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
@@ -209,11 +203,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Buff high acc
             double accBuff = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2f;
-
             tapValue += accBuff;
 
-            // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            tapValue *= Math.Pow(0.97f, countMiss);
+            // Penalize misses exponentially
+            tapValue *= Math.Pow(0.93f, countMiss);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
