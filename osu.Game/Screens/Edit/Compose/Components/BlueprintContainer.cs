@@ -160,6 +160,33 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return base.OnMouseMove(e);
         }
 
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (!beginSelectionMovement())
+                dragBox.FadeIn(250, Easing.OutQuint);
+
+            return true;
+        }
+
+        protected override bool OnDrag(DragEvent e)
+        {
+            if (!moveCurrentSelection(e))
+                dragBox.UpdateDrag(e);
+
+            return true;
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            if (!finishSelectionMovement())
+            {
+                dragBox.FadeOut(250, Easing.OutQuint);
+                selectionHandler.UpdateVisibility();
+            }
+
+            return true;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -239,58 +266,66 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Vector2? screenSpaceMovementStartPosition;
         private SelectionBlueprint movementBlueprint;
 
-        protected override bool OnDragStart(DragStartEvent e)
+        /// <summary>
+        /// Attempts to begin the movement of any selected blueprints.
+        /// </summary>
+        /// <returns>Whether movement began.</returns>
+        private bool beginSelectionMovement()
         {
-            if (selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
-            {
-                // The earliest hitobject is used for drag-movement/snapping
-                movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.DrawableObject.HitObject.StartTime).First();
-                screenSpaceMovementStartPosition = movementBlueprint.DrawableObject.ToScreenSpace(movementBlueprint.DrawableObject.OriginPosition);
-            }
-            else
-                dragBox.FadeIn(250, Easing.OutQuint);
+            Debug.Assert(movementBlueprint == null);
+
+            // Any selected blueprints can begin the movement of the group, however only the earliest hitobject is used for movement
+            if (!selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
+                return false;
+
+            // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
+            movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.DrawableObject.HitObject.StartTime).First();
+            screenSpaceMovementStartPosition = movementBlueprint.DrawableObject.ToScreenSpace(movementBlueprint.DrawableObject.OriginPosition);
 
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        /// <summary>
+        /// Moves the current selected blueprints.
+        /// </summary>
+        /// <param name="e">The <see cref="DragEvent"/> defining the movement event.</param>
+        /// <returns>Whether a movement was active.</returns>
+        private bool moveCurrentSelection(DragEvent e)
         {
-            if (movementBlueprint != null)
-            {
-                Debug.Assert(screenSpaceMovementStartPosition != null);
+            if (movementBlueprint == null)
+                return false;
 
-                Vector2 startPosition = screenSpaceMovementStartPosition.Value;
-                HitObject draggedObject = movementBlueprint.DrawableObject.HitObject;
+            Debug.Assert(screenSpaceMovementStartPosition != null);
 
-                Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
-                Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
+            Vector2 startPosition = screenSpaceMovementStartPosition.Value;
+            HitObject draggedObject = movementBlueprint.DrawableObject.HitObject;
 
-                // Move the hitobjects
-                selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition)));
+            // The final movement position, relative to screenSpaceMovementStartPosition
+            Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+            Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
 
-                // Apply the start time at the newly snapped-to position
-                double offset = composer.GetSnappedTime(draggedObject.StartTime, snappedPosition) - draggedObject.StartTime;
-                foreach (HitObject obj in selectionHandler.SelectedHitObjects)
-                    obj.StartTime += offset;
-            }
-            else
-                dragBox.UpdateDrag(e);
+            // Move the hitobjects
+            selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition)));
+
+            // Apply the start time at the newly snapped-to position
+            double offset = composer.GetSnappedTime(draggedObject.StartTime, snappedPosition) - draggedObject.StartTime;
+            foreach (HitObject obj in selectionHandler.SelectedHitObjects)
+                obj.StartTime += offset;
 
             return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        /// <summary>
+        /// Finishes the current movement of selected blueprints.
+        /// </summary>
+        /// <returns>Whether a movement was active.</returns>
+        private bool finishSelectionMovement()
         {
-            if (movementBlueprint != null)
-            {
-                screenSpaceMovementStartPosition = null;
-                movementBlueprint = null;
-            }
-            else
-            {
-                dragBox.FadeOut(250, Easing.OutQuint);
-                selectionHandler.UpdateVisibility();
-            }
+            if (movementBlueprint == null)
+                return false;
+
+            screenSpaceMovementStartPosition = null;
+            movementBlueprint = null;
 
             return true;
         }
