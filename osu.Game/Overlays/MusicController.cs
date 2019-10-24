@@ -27,6 +27,9 @@ namespace osu.Game.Overlays
 
         public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
 
+        /// <summary>
+        /// Point in time after which the current track will be restarted on triggering a "previous track" action.
+        /// </summary>
         private const double restart_cutoff_point = 5000;
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
@@ -155,15 +158,15 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>
         /// </summary>
-        /// <returns>The <see cref="PreviousButtonAction"/> that indicate the decided action</returns>
-        public PreviousButtonAction PrevTrack()
+        /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action</returns>
+        public PreviousTrackResult PreviousTrack()
         {
             var currentTrackPosition = current?.Track.CurrentTime;
 
             if (currentTrackPosition >= restart_cutoff_point)
             {
                 SeekTo(0);
-                return PreviousButtonAction.Restart;
+                return PreviousTrackResult.Restart;
             }
 
             queuedDirection = TrackChangeDirection.Prev;
@@ -176,10 +179,10 @@ namespace osu.Game.Overlays
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
 
-                return PreviousButtonAction.Previous;
+                return PreviousTrackResult.Previous;
             }
 
-            return PreviousButtonAction.None;
+            return PreviousTrackResult.None;
         }
 
         /// <summary>
@@ -285,13 +288,13 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicPrev:
-                    switch (PrevTrack())
+                    switch (PreviousTrack())
                     {
-                        case PreviousButtonAction.Restart:
+                        case PreviousTrackResult.Restart:
                             onScreenDisplay?.Display(new MusicControllerToast("Restart track"));
                             break;
 
-                        case PreviousButtonAction.Previous:
+                        case PreviousTrackResult.Previous:
                             onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
                             break;
                     }
@@ -320,7 +323,7 @@ namespace osu.Game.Overlays
         Prev
     }
 
-    public enum PreviousButtonAction
+    public enum PreviousTrackResult
     {
         None,
         Restart,
