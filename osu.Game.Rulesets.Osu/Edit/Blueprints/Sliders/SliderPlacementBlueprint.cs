@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
             var snappedDistance = composer?.GetSnappedDistance((float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
-            HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints, snappedDistance);
+            HitObject.Path = new SliderPath(unsnappedPath.Type, newControlPoints, snappedDistance);
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
