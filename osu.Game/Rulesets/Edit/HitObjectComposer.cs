@@ -162,11 +162,13 @@ namespace osu.Game.Rulesets.Edit
             inputManager = GetContainingInputManager();
         }
 
+        private double lastGridUpdateTime;
+
         protected override void Update()
         {
             base.Update();
 
-            if (EditorClock.ElapsedFrameTime != 0 && blueprintContainer.CurrentTool != null)
+            if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
                 showGridFor(Enumerable.Empty<HitObject>());
         }
 
@@ -213,6 +215,8 @@ namespace osu.Game.Rulesets.Edit
                 distanceSnapGridContainer.Child = distanceSnapGrid;
                 distanceSnapGridContainer.Show();
             }
+
+            lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
         private ScheduledDelegate scheduledUpdate;
