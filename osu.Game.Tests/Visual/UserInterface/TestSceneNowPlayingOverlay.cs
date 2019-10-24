@@ -56,8 +56,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddUntilStep(@"Wait for current time to update", () => currentBeatmap.Track.CurrentTime > 5000);
             AddAssert(@"Check action is restart track", () => musicController.PreviousTrack() == PreviousTrackResult.Restart);
             AddAssert(@"Check track didn't change", () => currentBeatmap == Beatmap.Value);
-
-            AddStep(@"Seek track to 2 second", () => musicController.SeekTo(2000));
             AddAssert(@"Check action is not restart", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
         }
     }
