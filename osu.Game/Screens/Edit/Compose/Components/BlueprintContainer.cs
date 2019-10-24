@@ -127,7 +127,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (!beginSelectionMovement())
+            {
+                dragBox.UpdateDrag(e);
                 dragBox.FadeIn(250, Easing.OutQuint);
+            }
 
             return true;
         }
