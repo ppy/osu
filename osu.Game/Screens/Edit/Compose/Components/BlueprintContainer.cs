@@ -89,43 +89,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private void addBlueprintFor(HitObject hitObject)
-        {
-            var drawable = composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
-            if (drawable == null)
-                return;
-
-            addBlueprintFor(drawable);
-        }
-
-        private void removeBlueprintFor(HitObject hitObject)
-        {
-            var blueprint = selectionBlueprints.Single(m => m.DrawableObject.HitObject == hitObject);
-            if (blueprint == null)
-                return;
-
-            blueprint.Deselect();
-
-            blueprint.Selected -= onBlueprintSelected;
-            blueprint.Deselected -= onBlueprintDeselected;
-
-            selectionBlueprints.Remove(blueprint);
-        }
-
-        private void addBlueprintFor(DrawableHitObject hitObject)
-        {
-            refreshTool();
-
-            var blueprint = composer.CreateBlueprintFor(hitObject);
-            if (blueprint == null)
-                return;
-
-            blueprint.Selected += onBlueprintSelected;
-            blueprint.Deselected += onBlueprintDeselected;
-
-            selectionBlueprints.Add(blueprint);
-        }
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             beginClickSelection(e);
@@ -201,6 +164,49 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
+        #region Blueprint Addition/Removal
+
+        private void addBlueprintFor(HitObject hitObject)
+        {
+            var drawable = composer.HitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+            if (drawable == null)
+                return;
+
+            addBlueprintFor(drawable);
+        }
+
+        private void removeBlueprintFor(HitObject hitObject)
+        {
+            var blueprint = selectionBlueprints.Single(m => m.DrawableObject.HitObject == hitObject);
+            if (blueprint == null)
+                return;
+
+            blueprint.Deselect();
+
+            blueprint.Selected -= onBlueprintSelected;
+            blueprint.Deselected -= onBlueprintDeselected;
+
+            selectionBlueprints.Remove(blueprint);
+        }
+
+        private void addBlueprintFor(DrawableHitObject hitObject)
+        {
+            refreshTool();
+
+            var blueprint = composer.CreateBlueprintFor(hitObject);
+            if (blueprint == null)
+                return;
+
+            blueprint.Selected += onBlueprintSelected;
+            blueprint.Deselected += onBlueprintDeselected;
+
+            selectionBlueprints.Add(blueprint);
+        }
+
+        #endregion
+
+        #region Placement
+
         /// <summary>
         /// Refreshes the current placement tool.
         /// </summary>
@@ -227,6 +233,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             currentPlacement.UpdatePosition(snappedScreenSpacePosition);
         }
+
+        #endregion
 
         #region Selection
 
