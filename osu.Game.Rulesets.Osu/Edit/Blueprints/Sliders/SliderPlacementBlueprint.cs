@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly List<Segment> segments = new List<Segment>();
         private Vector2 cursor;
+        private InputManager inputManager;
 
         private PlacementState state;
 
@@ -52,6 +54,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             setState(PlacementState.Initial);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            inputManager = GetContainingInputManager();
+        }
+
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
             switch (state)
@@ -61,7 +69,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
-                    cursor = ToLocalSpace(screenSpacePosition) - HitObject.Position;
+                    // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
+                    // is used instead since snapping control points doesn't make much sense
+                    cursor = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
         }
