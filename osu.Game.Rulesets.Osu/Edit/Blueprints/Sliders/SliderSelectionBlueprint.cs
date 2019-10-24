@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected readonly SliderCircleSelectionBlueprint HeadBlueprint;
         protected readonly SliderCircleSelectionBlueprint TailBlueprint;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
 
         public SliderSelectionBlueprint(DrawableSlider slider)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void onNewControlPoints(Vector2[] controlPoints)
         {
             var unsnappedPath = new SliderPath(controlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, controlPoints);
-            var snappedDistance = composer.GetSnappedDistance((float)unsnappedPath.Distance);
+            var snappedDistance = composer?.GetSnappedDistance((float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(unsnappedPath.Type, controlPoints, snappedDistance);
         }

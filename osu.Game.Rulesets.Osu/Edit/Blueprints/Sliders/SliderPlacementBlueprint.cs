@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private PlacementState state;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
 
         public SliderPlacementBlueprint()
@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             Vector2[] newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
 
             var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
-            var snappedDistance = composer.GetSnappedDistance((float)unsnappedPath.Distance);
+            var snappedDistance = composer?.GetSnappedDistance((float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints, snappedDistance);
 
