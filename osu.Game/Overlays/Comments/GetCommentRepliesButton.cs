@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.Comments
 {
     public abstract class GetCommentRepliesButton : LoadingButton
     {
+        private const int duration = 200;
+
         public readonly BindableList<Comment> Replies = new BindableList<Comment>();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableInt CurrentPage = new BindableInt();
@@ -43,17 +45,20 @@ namespace osu.Game.Overlays.Comments
             Action = onAction;
         }
 
-        protected override Container CreateContent() => new Container
+        protected override Drawable CreateContent() => new Container
         {
-            AutoSizeAxes = Axes.Both
+            AutoSizeAxes = Axes.Both,
+            Child = text = new SpriteText
+            {
+                AlwaysPresent = true,
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                Text = ButtonText(),
+            }
         };
 
-        protected override Drawable CreateText() => text = new SpriteText
-        {
-            AlwaysPresent = true,
-            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-            Text = ButtonText(),
-        };
+        protected override void OnLoadStarted() => text.FadeOut(duration, Easing.OutQuint);
+
+        protected override void OnLoadFinished() => text.FadeIn(duration, Easing.OutQuint);
 
         protected abstract string ButtonText();
 

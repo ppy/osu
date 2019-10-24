@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.Comments
 {
     public class VotePill : LoadingButton, IHasAccentColour
     {
+        private const int duration = 200;
+
         public Color4 AccentColour { get; set; }
 
         protected override IEnumerable<Drawable> EffectTargets => null;
@@ -84,7 +86,7 @@ namespace osu.Game.Overlays.Comments
             IsLoading = false;
         }
 
-        protected override Container CreateContent() => new Container
+        protected override Drawable CreateContent() => new Container
         {
             RelativeSizeAxes = Axes.Y,
             AutoSizeAxes = Axes.X,
@@ -116,22 +118,27 @@ namespace osu.Game.Overlays.Comments
                     Margin = new MarginPadding { Right = 3 },
                     Alpha = 0,
                 },
+                votesCounter = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Margin = new MarginPadding { Horizontal = 10 },
+                    Font = OsuFont.GetFont(size: 14),
+                    AlwaysPresent = true,
+                }
             },
         };
 
-        protected override Drawable CreateText() => votesCounter = new OsuSpriteText
+        protected override void OnLoadStarted()
         {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            Margin = new MarginPadding { Horizontal = 10 },
-            Font = OsuFont.GetFont(size: 14),
-            AlwaysPresent = true,
-        };
+            votesCounter.FadeOut(duration, Easing.OutQuint);
+            updateDisplay();
+        }
 
-        protected override void OnLoadingStart() => updateDisplay();
-
-        protected override void OnLoadingFinished()
+        protected override void OnLoadFinished()
         {
+            votesCounter.FadeIn(duration, Easing.OutQuint);
+
             if (IsHovered)
                 onHoverAction();
         }

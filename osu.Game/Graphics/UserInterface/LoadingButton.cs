@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -11,8 +10,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public abstract class LoadingButton : OsuHoverContainer
     {
-        private const float fade_duration = 200;
-
         private bool isLoading;
 
         public bool IsLoading
@@ -27,14 +24,12 @@ namespace osu.Game.Graphics.UserInterface
                 if (value)
                 {
                     loading.Show();
-                    text.FadeOut(fade_duration, Easing.OutQuint);
-                    OnLoadingStart();
+                    OnLoadStarted();
                 }
                 else
                 {
                     loading.Hide();
-                    text.FadeIn(fade_duration, Easing.OutQuint);
-                    OnLoadingFinished();
+                    OnLoadFinished();
                 }
             }
         }
@@ -46,17 +41,12 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private readonly LoadingAnimation loading;
-        private readonly Drawable text;
 
         protected LoadingButton()
         {
-            Container content;
-
-            Child = content = CreateContent();
-
-            content.AddRange(new[]
+            AddRange(new[]
             {
-                text = CreateText(),
+                CreateContent(),
                 loading = new LoadingAnimation
                 {
                     Anchor = Anchor.Centre,
@@ -82,16 +72,14 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected virtual void OnLoadingStart()
+        protected virtual void OnLoadStarted()
         {
         }
 
-        protected virtual void OnLoadingFinished()
+        protected virtual void OnLoadFinished()
         {
         }
 
-        protected abstract Container CreateContent();
-
-        protected abstract Drawable CreateText();
+        protected abstract Drawable CreateContent();
     }
 }
