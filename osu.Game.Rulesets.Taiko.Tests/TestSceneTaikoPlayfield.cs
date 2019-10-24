@@ -239,7 +239,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private class TestStrongNestedHit : DrawableStrongNestedHit
         {
             public TestStrongNestedHit(DrawableHitObject mainObject)
-                : base(null, mainObject)
+                : base(new StrongHitObject { StartTime = mainObject.HitObject.StartTime }, mainObject)
             {
             }
 
