@@ -75,6 +75,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Height = 80,
                             RelativeSizeAxes = Axes.X,
+                            Alpha = 0,
                             Children = new Drawable[]
                             {
                                 placeholderBackground = new Box
@@ -127,7 +128,8 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = getComments
+                                                Action = getComments,
+                                                IsLoading = true,
                                             }
                                         }
                                     }

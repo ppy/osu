@@ -31,14 +31,20 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneCommentsContainer()
         {
-            CommentsContainer commentsContainer;
+            CommentsContainer commentsContainer = new CommentsContainer();
+            BasicScrollContainer scroll;
 
-            Add(new BasicScrollContainer
+            Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer = new CommentsContainer()
+                Child = commentsContainer
             });
 
+            AddStep("Initial creation", () =>
+            {
+                scroll.Clear();
+                scroll.Add(commentsContainer = new CommentsContainer());
+            });
             AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
             AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
             AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
