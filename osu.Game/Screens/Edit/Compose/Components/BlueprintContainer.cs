@@ -109,7 +109,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             blueprint.Selected -= onBlueprintSelected;
             blueprint.Deselected -= onBlueprintDeselected;
-            blueprint.SelectionRequested -= onSelectionRequested;
 
             selectionBlueprints.Remove(blueprint);
         }
@@ -124,15 +123,31 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             blueprint.Selected += onBlueprintSelected;
             blueprint.Deselected += onBlueprintDeselected;
-            blueprint.SelectionRequested += onSelectionRequested;
 
             selectionBlueprints.Add(blueprint);
         }
 
         private void removeBlueprintFor(DrawableHitObject hitObject) => removeBlueprintFor(hitObject.HitObject);
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
+            {
+                if (blueprint.IsHovered)
+                {
+                    selectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
+                    break;
+                }
+            }
+
+            return true;
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
+            if (selectionBlueprints.AliveBlueprints.Any(b => b.IsHovered))
+                return true;
+
             deselectAll();
             return true;
         }
@@ -298,6 +313,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {
+            public IEnumerable<SelectionBlueprint> AliveBlueprints => AliveInternalChildren.Cast<SelectionBlueprint>();
+
             protected override int Compare(Drawable x, Drawable y)
             {
                 if (!(x is SelectionBlueprint xBlueprint) || !(y is SelectionBlueprint yBlueprint))
