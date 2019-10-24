@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -127,8 +126,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionBlueprints.Add(blueprint);
         }
 
-        private void removeBlueprintFor(DrawableHitObject hitObject) => removeBlueprintFor(hitObject.HitObject);
-
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
@@ -238,8 +235,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
-
-        private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
         private Vector2? screenSpaceMovementStartPosition;
         private SelectionBlueprint movementBlueprint;
