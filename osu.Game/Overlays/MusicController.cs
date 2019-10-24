@@ -289,15 +289,14 @@ namespace osu.Game.Overlays
                     {
                         case PreviousButtonAction.Restart:
                             onScreenDisplay?.Display(new MusicControllerToast("Restart track"));
-                            return true;
+                            break;
 
                         case PreviousButtonAction.Previous:
                             onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
-                            return true;
-
-                        default:
-                            return false;
+                            break;
                     }
+
+                    return true;
             }
 
             return false;
