@@ -119,21 +119,21 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="position">The original position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
         /// <returns>The snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</returns>
-        public abstract Vector2 GetSnapPosition(Vector2 position);
+        public abstract Vector2 GetSnappedPosition(Vector2 position);
 
         /// <summary>
         /// Retrieves the time at a snapped position.
         /// </summary>
         /// <param name="position">The snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
         /// <returns>The time at the snapped position.</returns>
-        public double GetSnapTime(Vector2 position) => startTime + (position - CentrePosition).Length / Velocity;
+        public double GetSnappedTime(Vector2 position) => startTime + (position - CentrePosition).Length / Velocity;
 
         /// <summary>
         /// Snaps a distance by the snap distance of this grid.
         /// </summary>
         /// <param name="distance">The distance to snap.</param>
         /// <returns>The snapped distance.</returns>
-        public float GetSnapDistance(float distance) => (int)(distance / DistanceSpacing) * DistanceSpacing;
+        public float GetSnappedDistance(float distance) => (int)(distance / DistanceSpacing) * DistanceSpacing;
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.

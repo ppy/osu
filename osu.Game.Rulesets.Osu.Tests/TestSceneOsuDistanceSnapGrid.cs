@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertSnappedDistance(float expectedDistance) => AddAssert($"snap distance = {expectedDistance}", () =>
         {
-            Vector2 snappedPosition = grid.GetSnapPosition(grid.ToLocalSpace(InputManager.CurrentState.Mouse.Position));
+            Vector2 snappedPosition = grid.GetSnappedPosition(grid.ToLocalSpace(InputManager.CurrentState.Mouse.Position));
             float distance = Vector2.Distance(snappedPosition, grid_position);
 
             return Precision.AlmostEquals(expectedDistance, distance);
@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                         Colour = Color4.SlateGray
                     },
                     grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
-                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnapPosition(grid.ToLocalSpace(v)) }
+                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)) }
                 };
             });
         }
