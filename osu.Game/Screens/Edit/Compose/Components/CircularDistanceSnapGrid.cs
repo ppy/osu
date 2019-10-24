@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public override Vector2 GetSnapPosition(Vector2 position)
+        public override Vector2 GetSnappedPosition(Vector2 position)
         {
             Vector2 direction = position - CentrePosition;
 

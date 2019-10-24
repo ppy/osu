@@ -106,10 +106,10 @@ namespace osu.Game.Tests.Visual.Editor
 
             Vector2 snapPosition = Vector2.Zero;
             AddStep("get first tick position", () => snapPosition = grid_position + new Vector2((float)beat_length, 0));
-            AddAssert("snap time is 1 beat away", () => Precision.AlmostEquals(beat_length, grid.GetSnapTime(snapPosition), 0.01));
+            AddAssert("snap time is 1 beat away", () => Precision.AlmostEquals(beat_length, grid.GetSnappedTime(snapPosition), 0.01));
 
             createGrid(g => g.Velocity = 2, "with velocity = 2");
-            AddAssert("snap time is now 0.5 beats away", () => Precision.AlmostEquals(beat_length / 2, grid.GetSnapTime(snapPosition), 0.01));
+            AddAssert("snap time is now 0.5 beats away", () => Precision.AlmostEquals(beat_length / 2, grid.GetSnappedTime(snapPosition), 0.01));
         }
 
         private void createGrid(Action<TestDistanceSnapGrid> func = null, string description = null)
@@ -206,7 +206,7 @@ namespace osu.Game.Tests.Visual.Editor
             protected override float GetVelocity(double time, ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
                 => Velocity;
 
-            public override Vector2 GetSnapPosition(Vector2 screenSpacePosition)
+            public override Vector2 GetSnappedPosition(Vector2 screenSpacePosition)
                 => Vector2.Zero;
         }
     }
