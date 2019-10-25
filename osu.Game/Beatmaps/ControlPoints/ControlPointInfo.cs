@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// All control points, of all types.
         /// </summary>
-        public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints);
+        public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints).ToArray();
 
         /// <summary>
         /// Finds the difficulty control point that is active at <paramref name="time"/>.
