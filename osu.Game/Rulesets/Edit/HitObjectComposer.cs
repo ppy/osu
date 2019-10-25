@@ -314,7 +314,8 @@ namespace osu.Game.Rulesets.Edit
     }
 
     [Cached(typeof(HitObjectComposer))]
-    public abstract class HitObjectComposer : CompositeDrawable
+    [Cached(typeof(IDistanceSnapProvider))]
+    public abstract class HitObjectComposer : CompositeDrawable, IDistanceSnapProvider
     {
         internal HitObjectComposer()
         {
@@ -351,44 +352,10 @@ namespace osu.Game.Rulesets.Edit
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
         public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
-
-        /// <summary>
-        /// Retrieves the distance between two points within a timing point that are one beat length apart.
-        /// </summary>
-        /// <param name="referenceTime">The time of the timing point.</param>
-        /// <returns>The distance between two points residing in the timing point that are one beat length apart.</returns>
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
-
-        /// <summary>
-        /// Converts a duration to a distance.
-        /// </summary>
-        /// <param name="referenceTime">The time of the timing point which <paramref name="duration"/> resides in.</param>
-        /// <param name="duration">The duration to convert.</param>
-        /// <returns>A value that represents <paramref name="duration"/> as a distance in the timing point.</returns>
         public abstract float DurationToDistance(double referenceTime, double duration);
-
-        /// <summary>
-        /// Converts a distance to a duration.
-        /// </summary>
-        /// <param name="referenceTime">The time of the timing point which <paramref name="distance"/> resides in.</param>
-        /// <param name="distance">The distance to convert.</param>
-        /// <returns>A value that represents <paramref name="distance"/> as a duration in the timing point.</returns>
         public abstract double DistanceToDuration(double referenceTime, float distance);
-
-        /// <summary>
-        /// Converts a distance to a snapped duration.
-        /// </summary>
-        /// <param name="referenceTime">The time of the timing point which <paramref name="distance"/> resides in.</param>
-        /// <param name="distance">The distance to convert.</param>
-        /// <returns>A value that represents <paramref name="distance"/> as a duration snapped to the closest beat of the timing point.</returns>
         public abstract double GetSnappedDurationFromDistance(double referenceTime, float distance);
-
-        /// <summary>
-        /// Converts an unsnapped distance to a snapped distance.
-        /// </summary>
-        /// <param name="referenceTime">The time of the timing point which <paramref name="distance"/> resides in.</param>
-        /// <param name="distance">The distance to convert.</param>
-        /// <returns>A value that represents <paramref name="distance"/> snapped to the closest beat of the timing point.</returns>
         public abstract float GetSnappedDistanceFromDistance(double referenceTime, float distance);
     }
 }
