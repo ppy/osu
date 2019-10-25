@@ -241,7 +241,7 @@ namespace osu.Game.Rulesets.UI
 
         public override void CancelResume()
         {
-            ResumeOverlay.Hide();
+            ResumeOverlay?.Hide();
         }
 
         /// <summary>
