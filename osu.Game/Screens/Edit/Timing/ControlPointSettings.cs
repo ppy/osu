@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Edit.Timing
             private const float header_height = 20;
 
             [Resolved]
-            private Bindable<IEnumerable<ControlPoint>> selectedPoints { get; set; }
+            private Bindable<ControlPointGroup> selectedPoints { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 selectedPoints.BindValueChanged(points =>
                 {
-                    ControlPoint.Value = points.NewValue?.OfType<T>().FirstOrDefault();
+                    ControlPoint.Value = points.NewValue?.ControlPoints.OfType<T>().FirstOrDefault();
 
                     checkbox.Current.Value = ControlPoint.Value != null;
                 }, true);

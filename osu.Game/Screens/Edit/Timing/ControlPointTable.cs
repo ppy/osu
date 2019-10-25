@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Timing
         private readonly FillFlowContainer backgroundFlow;
 
         [Resolved]
-        private Bindable<IEnumerable<ControlPoint>> selectedPoints { get; set; }
+        private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
         public ControlPointTable()
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
-        public IEnumerable<ControlPoint> ControlPoints
+        public IEnumerable<ControlPointGroup> ControlGroups
         {
             set
             {
@@ -56,15 +56,13 @@ namespace osu.Game.Screens.Edit.Timing
                 if (value?.Any() != true)
                     return;
 
-                var grouped = value.GroupBy(cp => cp.Time, cp => cp);
-
-                foreach (var group in grouped)
+                foreach (var group in value)
                 {
-                    backgroundFlow.Add(new RowBackground { Action = () => selectedPoints.Value = group });
+                    backgroundFlow.Add(new RowBackground { Action = () => selectedGroup.Value = group });
                 }
 
                 Columns = createHeaders();
-                Content = grouped.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
+                Content = value.Select((g, i) => createContent(i, g)).ToArray().ToRectangular();
             }
         }
 
@@ -80,7 +78,7 @@ namespace osu.Game.Screens.Edit.Timing
             return columns.ToArray();
         }
 
-        private Drawable[] createContent(int index, IGrouping<double, ControlPoint> controlPoints) => new Drawable[]
+        private Drawable[] createContent(int index, ControlPointGroup group) => new Drawable[]
         {
             new OsuSpriteText
             {
@@ -90,14 +88,14 @@ namespace osu.Game.Screens.Edit.Timing
             },
             new OsuSpriteText
             {
-                Text = $"{controlPoints.Key:n0}ms",
+                Text = $"{group.Time:n0}ms",
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
             new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                ChildrenEnumerable = controlPoints.Select(createAttribute).Where(c => c != null),
+                ChildrenEnumerable = group.ControlPoints.Select(createAttribute).Where(c => c != null),
                 Padding = new MarginPadding(10),
                 Spacing = new Vector2(10)
             },
