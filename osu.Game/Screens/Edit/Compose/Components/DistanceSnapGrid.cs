@@ -39,13 +39,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected OsuColour Colours { get; private set; }
 
         [Resolved]
+        protected IDistanceSnapProvider SnapProvider { get; private set; }
+
+        [Resolved]
         private IEditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
-
-        [Resolved]
-        private IDistanceSnapProvider snapProvider { get; set; }
 
         private readonly Cached gridCache = new Cached();
         private readonly HitObject hitObject;
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceSpacing = snapProvider.GetBeatSnapDistanceAt(StartTime);
+            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(StartTime);
             gridCache.Invalidate();
         }
 

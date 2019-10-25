@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osuTK;
 
@@ -14,9 +12,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        [Resolved]
-        private HitObjectComposer composer { get; set; }
-
         protected CircularDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
             : base(hitObject, centrePosition)
         {
@@ -83,7 +78,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
             Vector2 snappedPosition = CentrePosition + normalisedDirection * radialCount * radius;
 
-            return (snappedPosition, StartTime + composer.GetSnappedDurationFromDistance(StartTime, (snappedPosition - CentrePosition).Length));
+            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(StartTime, (snappedPosition - CentrePosition).Length));
         }
     }
 }
