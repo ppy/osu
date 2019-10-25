@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = tpToPP(tp * cheeseFactor);
 
             // penalize misses
-            aimValue *= Math.Pow(0.985, effectiveMissCount);
+            aimValue *= Math.Pow(0.96f, effectiveMissCount);
 
             // Buff very high AR and low AR
             double approachRateFactor = 1.0f;
