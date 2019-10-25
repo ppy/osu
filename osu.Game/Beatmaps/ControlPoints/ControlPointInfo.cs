@@ -240,6 +240,13 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
         }
 
-        public void Clear() => groups.Clear();
+        public void Clear()
+        {
+            groups.Clear();
+            timingPoints.Clear();
+            difficultyPoints.Clear();
+            samplePoints.Clear();
+            effectPoints.Clear();
+        }
     }
 }
