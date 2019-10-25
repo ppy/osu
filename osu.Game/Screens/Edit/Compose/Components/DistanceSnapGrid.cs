@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private BindableBeatDivisor beatDivisor { get; set; }
 
         [Resolved]
-        private HitObjectComposer composer { get; set; }
+        private IDistanceSnapProvider snapProvider { get; set; }
 
         private readonly Cached gridCache = new Cached();
         private readonly HitObject hitObject;
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            DistanceSpacing = composer.GetBeatSnapDistanceAt(StartTime);
+            DistanceSpacing = snapProvider.GetBeatSnapDistanceAt(StartTime);
             gridCache.Invalidate();
         }
 
