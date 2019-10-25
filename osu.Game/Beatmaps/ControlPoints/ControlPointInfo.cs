@@ -177,7 +177,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             GroupAt(time, true).Add(newPoint);
         }
 
-        public ControlPointGroup GroupAt(double time, bool createIfNotExisting)
+        public ControlPointGroup GroupAt(double time, bool createIfNotExisting = false)
         {
             var existing = Groups.FirstOrDefault(g => g.Time == time);
 

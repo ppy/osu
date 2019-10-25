@@ -167,9 +167,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var controlPoints = beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
-                Assert.AreEqual(42, controlPoints.DifficultyPoints.Count);
-                Assert.AreEqual(42, controlPoints.SamplePoints.Count);
-                Assert.AreEqual(42, controlPoints.EffectPoints.Count);
+                Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
+                Assert.AreEqual(34, controlPoints.SamplePoints.Count);
+                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
 
                 var timingPoint = controlPoints.TimingPointAt(0);
                 Assert.AreEqual(956, timingPoint.Time);
@@ -191,7 +191,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(48428);
-                Assert.AreEqual(48428, difficultyPoint.Time);
+                Assert.AreEqual(0, difficultyPoint.Time);
                 Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(116999);
@@ -224,7 +224,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(119637);
-                Assert.AreEqual(119637, effectPoint.Time);
+                Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
             }
