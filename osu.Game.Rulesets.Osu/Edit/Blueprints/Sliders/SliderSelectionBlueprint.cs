@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private void onNewControlPoints(Vector2[] controlPoints)
         {
             var unsnappedPath = new SliderPath(controlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, controlPoints);
-            var snappedDistance = composer?.GetSnappedDistance((float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
+            var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(unsnappedPath.Type, controlPoints, snappedDistance);
         }
