@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Editor
         public TestSceneDistanceSnapGrid()
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
-            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
 
             createGrid();
         }
@@ -42,8 +42,8 @@ namespace osu.Game.Tests.Visual.Editor
         {
             Clear();
 
-            editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.ControlPointInfo.Clear();
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
 
             BeatDivisor.Value = 1;
         });
@@ -81,8 +81,8 @@ namespace osu.Game.Tests.Visual.Editor
         {
             AddStep($"set beat length = {beatLength}", () =>
             {
-                editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beatLength });
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beatLength });
             });
 
             createGrid();
