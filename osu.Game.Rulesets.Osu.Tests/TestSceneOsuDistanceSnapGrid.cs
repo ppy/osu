@@ -53,9 +53,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             Clear();
 
             editorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
-            editorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.ControlPointInfo.Clear();
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
 
             beatDivisor.Value = 1;
         });
@@ -80,8 +79,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep($"set beat length = {beatLength}", () =>
             {
-                editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beatLength });
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beatLength });
             });
 
             createGrid();
@@ -95,8 +94,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep($"set speed multiplier = {multiplier}", () =>
             {
-                editorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-                editorBeatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = multiplier });
+                editorBeatmap.ControlPointInfo.Clear();
+                editorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = multiplier });
             });
 
             createGrid();

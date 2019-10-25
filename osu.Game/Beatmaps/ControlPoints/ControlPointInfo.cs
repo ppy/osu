@@ -13,34 +13,49 @@ namespace osu.Game.Beatmaps.ControlPoints
     public class ControlPointInfo
     {
         /// <summary>
+        /// Control point groups.
+        /// </summary>
+        [JsonProperty]
+        public IReadOnlyList<ControlPointGroup> Groups => groups;
+
+        private readonly SortedList<ControlPointGroup> groups = new SortedList<ControlPointGroup>(Comparer<ControlPointGroup>.Default);
+
+        /// <summary>
         /// All timing points.
         /// </summary>
         [JsonProperty]
-        public SortedList<TimingControlPoint> TimingPoints { get; private set; } = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
+        public IReadOnlyList<TimingControlPoint> TimingPoints => timingPoints;
+
+        private readonly SortedList<TimingControlPoint> timingPoints = new SortedList<TimingControlPoint>(Comparer<TimingControlPoint>.Default);
 
         /// <summary>
         /// All difficulty points.
         /// </summary>
         [JsonProperty]
-        public SortedList<DifficultyControlPoint> DifficultyPoints { get; private set; } = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
+        public IReadOnlyList<DifficultyControlPoint> DifficultyPoints => difficultyPoints;
+
+        private readonly SortedList<DifficultyControlPoint> difficultyPoints = new SortedList<DifficultyControlPoint>(Comparer<DifficultyControlPoint>.Default);
 
         /// <summary>
         /// All sound points.
         /// </summary>
         [JsonProperty]
-        public SortedList<SampleControlPoint> SamplePoints { get; private set; } = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
+        public IReadOnlyList<SampleControlPoint> SamplePoints => samplePoints;
+
+        private readonly SortedList<SampleControlPoint> samplePoints = new SortedList<SampleControlPoint>(Comparer<SampleControlPoint>.Default);
 
         /// <summary>
         /// All effect points.
         /// </summary>
         [JsonProperty]
-        public SortedList<EffectControlPoint> EffectPoints { get; private set; } = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
+        public IReadOnlyList<EffectControlPoint> EffectPoints => effectPoints;
 
-        public IReadOnlyList<ControlPoint> AllControlPoints =>
-            TimingPoints
-                .Concat((IEnumerable<ControlPoint>)DifficultyPoints)
-                .Concat(SamplePoints)
-                .Concat(EffectPoints).ToArray();
+        private readonly SortedList<EffectControlPoint> effectPoints = new SortedList<EffectControlPoint>(Comparer<EffectControlPoint>.Default);
+
+        /// <summary>
+        /// All control points, of all types.
+        /// </summary>
+        public IEnumerable<ControlPoint> AllControlPoints => Groups.SelectMany(g => g.ControlPoints);
 
         /// <summary>
         /// Finds the difficulty control point that is active at <paramref name="time"/>.
@@ -71,6 +86,28 @@ namespace osu.Game.Beatmaps.ControlPoints
         public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
+        /// Finds the closest <see cref="ControlPoint"/> of the same type as <see cref="referencePoint"/> that is active at <paramref name="time"/>.
+        /// </summary>
+        /// <param name="time">The time to find the timing control point at.</param>
+        /// <param name="referencePoint">A reference point to infer type.</param>
+        /// <returns>The timing control point.</returns>
+        public ControlPoint SimilarPointAt(double time, ControlPoint referencePoint)
+        {
+            switch (referencePoint)
+            {
+                case TimingControlPoint _: return TimingPointAt(time);
+
+                case EffectControlPoint _: return EffectPointAt(time);
+
+                case SampleControlPoint _: return SamplePointAt(time);
+
+                case DifficultyControlPoint _: return DifficultyPointAt(time);
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
@@ -98,7 +135,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(SortedList<T> list, double time, T prePoint = null)
+        private T binarySearch<T>(IReadOnlyList<T> list, double time, T prePoint = null)
             where T : ControlPoint, new()
         {
             if (list == null)
@@ -131,5 +168,78 @@ namespace osu.Game.Beatmaps.ControlPoints
             // l will be the first control point with Time > time, but we want the one before it
             return list[l - 1];
         }
+
+        public void Add(double time, ControlPoint newPoint, bool force = false)
+        {
+            if (!force && SimilarPointAt(time, newPoint)?.EquivalentTo(newPoint) == true)
+                return;
+
+            GroupAt(time, true).Add(newPoint);
+        }
+
+        public ControlPointGroup GroupAt(double time, bool createIfNotExisting)
+        {
+            var existing = Groups.FirstOrDefault(g => g.Time == time);
+
+            if (existing != null)
+                return existing;
+
+            if (createIfNotExisting)
+            {
+                var newGroup = new ControlPointGroup(time);
+                newGroup.ItemAdded += groupItemAdded;
+                newGroup.ItemRemoved += groupItemRemoved;
+                groups.Add(newGroup);
+                return newGroup;
+            }
+
+            return null;
+        }
+
+        private void groupItemRemoved(ControlPoint obj)
+        {
+            switch (obj)
+            {
+                case TimingControlPoint typed:
+                    timingPoints.Remove(typed);
+                    break;
+
+                case EffectControlPoint typed:
+                    effectPoints.Remove(typed);
+                    break;
+
+                case SampleControlPoint typed:
+                    samplePoints.Remove(typed);
+                    break;
+
+                case DifficultyControlPoint typed:
+                    difficultyPoints.Remove(typed);
+                    break;
+            }
+        }
+
+        private void groupItemAdded(ControlPoint obj)
+        {
+            switch (obj)
+            {
+                case TimingControlPoint typed:
+                    timingPoints.Add(typed);
+                    break;
+
+                case EffectControlPoint typed:
+                    effectPoints.Add(typed);
+                    break;
+
+                case SampleControlPoint typed:
+                    samplePoints.Add(typed);
+                    break;
+
+                case DifficultyControlPoint typed:
+                    difficultyPoints.Add(typed);
+                    break;
+            }
+        }
+
+        public void Clear() => groups.Clear();
     }
 }
