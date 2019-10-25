@@ -274,7 +274,7 @@ namespace osu.Game.Screens.Ranking.Pages
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Horizontal,
                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                        Spacing = new Vector2(5),
+                        Spacing = new Vector2(10),
                         Children = new[]
                         {
                             new OsuSpriteText
