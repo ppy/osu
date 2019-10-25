@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -21,7 +19,7 @@ namespace osu.Game.Screens.Edit.Timing
     public class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
-        private Bindable<IEnumerable<ControlPoint>> selectedPoints = new Bindable<IEnumerable<ControlPoint>>();
+        private Bindable<ControlPointGroup> selectedPoints = new Bindable<ControlPointGroup>();
 
         [Resolved]
         private IAdjustableClock clock { get; set; }
@@ -48,7 +46,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedPoints.BindValueChanged(selected => { clock.Seek(selected.NewValue.First().Time); });
+            selectedPoints.BindValueChanged(selected => { clock.Seek(selected.NewValue.Time); });
         }
 
         public class ControlPointList : CompositeDrawable
@@ -59,7 +57,7 @@ namespace osu.Game.Screens.Edit.Timing
             protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
 
             [Resolved]
-            private Bindable<IEnumerable<ControlPoint>> selectedPoints { get; set; }
+            private Bindable<ControlPointGroup> selectedPoints { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -78,7 +76,7 @@ namespace osu.Game.Screens.Edit.Timing
                         RelativeSizeAxes = Axes.Both,
                         Child = new ControlPointTable
                         {
-                            ControlPoints = Beatmap.Value.Beatmap.ControlPointInfo.AllControlPoints
+                            ControlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups
                         }
                     },
                     new FillFlowContainer
