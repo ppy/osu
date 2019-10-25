@@ -6,8 +6,6 @@ using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
@@ -30,25 +28,9 @@ namespace osu.Game.Rulesets.Edit
         public event Action<SelectionBlueprint> Deselected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has requested selection.
-        /// Will fire even if already selected. Does not actually perform selection.
-        /// </summary>
-        public event Action<SelectionBlueprint, InputState> SelectionRequested;
-
-        /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
-        /// </summary>
-        public event Action<SelectionBlueprint, DragEvent> DragRequested;
-
-        /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
         /// </summary>
         public readonly DrawableHitObject DrawableObject;
-
-        /// <summary>
-        /// The screen-space position of <see cref="DrawableObject"/> prior to handling a movement event.
-        /// </summary>
-        internal Vector2 ScreenSpaceMovementStartPosition { get; private set; }
 
         protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
@@ -108,45 +90,6 @@ namespace osu.Game.Rulesets.Edit
         public bool IsSelected => State == SelectionState.Selected;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
-
-        private bool selectionRequested;
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            selectionRequested = false;
-
-            if (State == SelectionState.NotSelected)
-            {
-                SelectionRequested?.Invoke(this, e.CurrentState);
-                selectionRequested = true;
-            }
-
-            return IsSelected;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (State == SelectionState.Selected && !selectionRequested)
-            {
-                selectionRequested = true;
-                SelectionRequested?.Invoke(this, e.CurrentState);
-                return true;
-            }
-
-            return base.OnClick(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            ScreenSpaceMovementStartPosition = DrawableObject.ToScreenSpace(DrawableObject.OriginPosition);
-            return true;
-        }
-
-        protected override bool OnDrag(DragEvent e)
-        {
-            DragRequested?.Invoke(this, e);
-            return true;
-        }
 
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
