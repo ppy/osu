@@ -72,6 +72,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool HasMessage => !string.IsNullOrEmpty(MessageHtml);
 
+        public bool IsVoted { get; set; }
+
         public string GetMessage => HasMessage ? WebUtility.HtmlDecode(Regex.Replace(MessageHtml, @"<(.|\n)*?>", string.Empty)) : string.Empty;
 
         public int DeletedChildrenCount => ChildComments.Count(c => c.IsDeleted);
