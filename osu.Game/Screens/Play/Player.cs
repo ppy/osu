@@ -443,6 +443,11 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause) return;
 
+            if (IsResuming)
+            {
+                DrawableRuleset.CancelResume();
+            }
+
             IsResuming = false;
             GameplayClockContainer.Stop();
             PauseOverlay.Show();

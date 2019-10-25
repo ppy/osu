@@ -239,6 +239,11 @@ namespace osu.Game.Rulesets.UI
                 continueResume();
         }
 
+        public override void CancelResume()
+        {
+            ResumeOverlay.Hide();
+        }
+
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
@@ -452,6 +457,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="continueResume">The action to run when resuming is to be completed.</param>
         public abstract void RequestResume(Action continueResume);
+
+        public abstract void CancelResume();
 
         /// <summary>
         /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
