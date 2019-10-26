@@ -184,9 +184,6 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public void Add(double time, ControlPoint newPoint, bool force = false)
         {
-            if (!force && SimilarPointAt(time, newPoint)?.EquivalentTo(newPoint) == true)
-                return;
-
             GroupAt(time, true).Add(newPoint);
         }
 
