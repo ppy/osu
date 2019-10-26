@@ -189,7 +189,8 @@ namespace osu.Game.Overlays.Comments
                                                     },
                                                     new ReplyButton
                                                     {
-                                                        Expanded = { BindTarget = showResponseContainer }
+                                                        Expanded = { BindTarget = showResponseContainer },
+                                                        Alpha = comment.IsDeleted ? 0 : 1
                                                     },
                                                     repliesButton = new RepliesButton(comment)
                                                     {
