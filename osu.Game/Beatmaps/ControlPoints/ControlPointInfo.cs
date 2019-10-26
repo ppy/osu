@@ -86,28 +86,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         public TimingControlPoint TimingPointAt(double time) => binarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
-        /// Finds the closest <see cref="ControlPoint"/> of the same type as <see cref="referencePoint"/> that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the timing control point at.</param>
-        /// <param name="referencePoint">A reference point to infer type.</param>
-        /// <returns>The timing control point.</returns>
-        public ControlPoint SimilarPointAt(double time, ControlPoint referencePoint)
-        {
-            switch (referencePoint)
-            {
-                case TimingControlPoint _: return TimingPointAt(time);
-
-                case EffectControlPoint _: return EffectPointAt(time);
-
-                case SampleControlPoint _: return SamplePointAt(time);
-
-                case DifficultyControlPoint _: return DifficultyPointAt(time);
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
@@ -184,7 +162,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public void Add(double time, ControlPoint newPoint, bool force = false)
         {
-            if (!force && SimilarPointAt(time, newPoint)?.EquivalentTo(newPoint) == true)
+            if (!force && checkAlreadyExisting(time, newPoint))
                 return;
 
             GroupAt(time, true).Add(newPoint);
@@ -207,6 +185,39 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Check whether <see cref="newPoint"/> should be added.
+        /// </summary>
+        /// <param name="time">The time to find the timing control point at.</param>
+        /// <param name="newPoint">A point to be added.</param>
+        /// <returns>Whether the new point should be added.</returns>
+        private bool checkAlreadyExisting(double time, ControlPoint newPoint)
+        {
+            ControlPoint existing = null;
+
+            switch (newPoint)
+            {
+                case TimingControlPoint _:
+                    // Timing points are a special case and need to be added regardless of fallback availability.
+                    existing = binarySearch(TimingPoints, time);
+                    break;
+
+                case EffectControlPoint _:
+                    existing = EffectPointAt(time);
+                    break;
+
+                case SampleControlPoint _:
+                    existing = SamplePointAt(time);
+                    break;
+
+                case DifficultyControlPoint _:
+                    existing = DifficultyPointAt(time);
+                    break;
+            }
+
+            return existing?.EquivalentTo(newPoint) == true;
         }
 
         private void groupItemRemoved(ControlPoint obj)
