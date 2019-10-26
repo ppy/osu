@@ -30,10 +30,12 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public void Add(ControlPoint point)
         {
-            point.AttachGroup(this);
+            var existing = controlPoints.FirstOrDefault(p => p.GetType() == point.GetType());
 
-            foreach (var existing in controlPoints.Where(p => p.GetType() == point.GetType()).ToArray())
+            if (existing != null)
                 Remove(existing);
+
+            point.AttachGroup(this);
 
             controlPoints.Add(point);
             ItemAdded?.Invoke(point);
