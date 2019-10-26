@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using osu.Game.Users;
 using System;
 using System.Collections.Generic;
+using Humanizer;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -37,11 +38,16 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"votes_count")]
         public int VotesCount { get; set; }
 
+        public CommentableType CommentableType;
+
         [JsonProperty(@"commenatble_type")]
-        public string CommentableType { get; set; }
+        private string commentableType
+        {
+            set => Enum.TryParse(value.Pascalize().Replace("_", string.Empty), true, out CommentableType);
+        }
 
         [JsonProperty(@"commentable_id")]
-        public int CommentableId { get; set; }
+        public long CommentableId { get; set; }
 
         [JsonProperty(@"legacy_name")]
         public string LegacyName { get; set; }
