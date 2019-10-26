@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Play.HUD
         public readonly PlaybackSettings PlaybackSettings;
 
         public readonly VisualSettings VisualSettings;
+        public readonly AudioSettings AudioSettings ; 
 
         //public readonly CollectionSettings CollectionSettings;
 
@@ -42,7 +43,9 @@ namespace osu.Game.Screens.Play.HUD
                     //CollectionSettings = new CollectionSettings(),
                     //DiscussionSettings = new DiscussionSettings(),
                     PlaybackSettings = new PlaybackSettings(),
-                    VisualSettings = new VisualSettings { Expanded = false }
+                    VisualSettings = new VisualSettings { Expanded = false },
+                    AudioSettings = new AudioSettings{ Expanded = false }
+
                 }
             };
 
