@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double deviationOnCircles = (greatWindow + 20) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 46000;
 
-            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
+            double lengthFactor = 0.2f + 0.8f * SpecialFunctions.Logistic(Attributes.Length / 90.0f);
             accuracyValue *= lengthFactor;
 
             if (mods.Any(m => m is OsuModHidden))
