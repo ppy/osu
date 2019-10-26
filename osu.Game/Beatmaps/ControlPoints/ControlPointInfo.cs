@@ -62,28 +62,28 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time);
+        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearchWithFallback(DifficultyPoints, time);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time);
+        public EffectControlPoint EffectPointAt(double time) => binarySearchWithFallback(EffectPoints, time);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.Count > 0 ? SamplePoints[0] : null);
+        public SampleControlPoint SamplePointAt(double time) => binarySearchWithFallback(SamplePoints, time, SamplePoints.Count > 0 ? SamplePoints[0] : null);
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : null);
+        public TimingControlPoint TimingPointAt(double time) => binarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
         /// Finds the closest <see cref="ControlPoint"/> of the same type as <see cref="referencePoint"/> that is active at <paramref name="time"/>.
@@ -130,22 +130,35 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         /// <summary>
         /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
+        /// Includes logic for returning a specific point when no matching point is found.
         /// </summary>
         /// <param name="list">The list to search.</param>
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
-        /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(IReadOnlyList<T> list, double time, T prePoint = null)
+        /// <returns>The active control point at <paramref name="time"/>, or a fallback <see cref="ControlPoint"/> if none found.</returns>
+        private T binarySearchWithFallback<T>(IReadOnlyList<T> list, double time, T prePoint = null)
             where T : ControlPoint, new()
+        {
+            return binarySearch(list, time) ?? prePoint ?? new T();
+        }
+
+        /// <summary>
+        /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
+        /// </summary>
+        /// <param name="list">The list to search.</param>
+        /// <param name="time">The time to find the control point at.</param>
+        /// <returns>The active control point at <paramref name="time"/>.</returns>
+        private T binarySearch<T>(IReadOnlyList<T> list, double time)
+            where T : ControlPoint
         {
             if (list == null)
                 throw new ArgumentNullException(nameof(list));
 
             if (list.Count == 0)
-                return new T();
+                return null;
 
             if (time < list[0].Time)
-                return prePoint ?? new T();
+                return null;
 
             if (time >= list[list.Count - 1].Time)
                 return list[list.Count - 1];
