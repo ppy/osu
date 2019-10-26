@@ -95,13 +95,13 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             switch (referencePoint)
             {
-                case TimingControlPoint _: return TimingPointAt(time);
+                case TimingControlPoint _: return binarySearch(TimingPoints, time);
 
-                case EffectControlPoint _: return EffectPointAt(time);
+                case EffectControlPoint _: return binarySearch(EffectPoints, time);
 
-                case SampleControlPoint _: return SamplePointAt(time);
+                case SampleControlPoint _: return binarySearch(SamplePoints, time);
 
-                case DifficultyControlPoint _: return DifficultyPointAt(time);
+                case DifficultyControlPoint _: return binarySearch(DifficultyPoints, time);
             }
 
             return null;
