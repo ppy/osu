@@ -25,6 +25,8 @@ namespace osu.Desktop
     {
         private readonly bool noVersionOverlay;
         private VersionManager versionManager;
+        public AudioSource nightMod;
+        public bool Night;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
@@ -108,6 +110,13 @@ namespace osu.Desktop
         /// <summary>
         /// A method of accessing an osu-stable install in a controlled fashion.
         /// </summary>
+        
+        public class NightMod()
+        {
+        
+        Night = true;
+        nightMod = this.GetComponent<AudioSource>()
+        }
         private class StableStorage : WindowsStorage
         {
             protected override string LocateBasePath()
