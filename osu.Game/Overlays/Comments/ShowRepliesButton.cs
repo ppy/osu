@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        protected abstract void OnExpandedChanged(ValueChangedEvent<bool> expanded);
+        protected virtual void OnExpandedChanged(ValueChangedEvent<bool> expanded)
+        {
+        }
     }
 }
