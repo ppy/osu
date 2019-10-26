@@ -19,8 +19,7 @@ namespace osu.Game.Screens.Play.HUD
         public readonly AudioSettings AudioSettings; 
         //public readonly CollectionSettings CollectionSettings;
         //public readonly DiscussionSettings DiscussionSettings;
-
-        public PlayerSettingsOverlay()
+         public PlayerSettingsOverlay()
         {
             AlwaysPresent = true;
             RelativeSizeAxes = Axes.Both;
