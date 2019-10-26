@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updatePlacementPosition(Vector2 screenSpacePosition)
         {
-            Vector2 snappedGridPosition = composer.GetSnappedPosition(ToLocalSpace(screenSpacePosition));
+            Vector2 snappedGridPosition = composer.GetSnappedPosition(ToLocalSpace(screenSpacePosition), 0).position;
             Vector2 snappedScreenSpacePosition = ToScreenSpace(snappedGridPosition);
 
             currentPlacement.UpdatePosition(snappedScreenSpacePosition);
@@ -358,13 +358,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // The final movement position, relative to screenSpaceMovementStartPosition
             Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
-            Vector2 snappedPosition = composer.GetSnappedPosition(ToLocalSpace(movePosition));
+            (Vector2 snappedPosition, double snappedTime) = composer.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
             // Move the hitobjects
             selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition)));
 
             // Apply the start time at the newly snapped-to position
-            double offset = composer.GetSnappedTime(draggedObject.StartTime, snappedPosition) - draggedObject.StartTime;
+            double offset = snappedTime - draggedObject.StartTime;
             foreach (HitObject obj in selectionHandler.SelectedHitObjects)
                 obj.StartTime += offset;
 
