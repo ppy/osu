@@ -113,13 +113,7 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Expanded.BindValueChanged(expanded =>
-            {
-                if (expanded.NewValue)
-                    Show();
-                else
-                    Hide();
-            }, true);
+            Expanded.BindValueChanged(expanded => this.FadeTo(expanded.NewValue ? 1 : 0), true);
         }
 
         private void onAction()
