@@ -18,8 +18,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             Children = new Drawable[]
             {
-               
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" },
+               beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" },
             };
         }
 
