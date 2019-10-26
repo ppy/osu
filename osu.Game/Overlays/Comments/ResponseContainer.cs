@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -25,6 +27,13 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableBool Expanded = new BindableBool();
 
         private readonly Comment comment;
+        private readonly ReplyButton replyButton;
+        private readonly ResponseTextBox textBox;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private PostCommentRequest request;
 
         public ResponseContainer(Comment comment)
         {
@@ -41,7 +50,7 @@ namespace osu.Game.Overlays.Comments
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                new ResponseTextBox
+                textBox = new ResponseTextBox
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = height / 2f,
@@ -76,7 +85,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     Expanded = { BindTarget = Expanded }
                                 },
-                                new ReplyButton
+                                replyButton = new ReplyButton
                                 {
                                     Action = onAction,
                                     Expanded = { BindTarget = Expanded }
@@ -115,7 +124,20 @@ namespace osu.Game.Overlays.Comments
 
         private void onAction()
         {
+            request = new PostCommentRequest(comment.CommentableId, comment.CommentableType, textBox.Text, comment.Id);
+            request.Success += onSuccess;
+            api.Queue(request);
+        }
 
+        private void onSuccess(CommentBundle response)
+        {
+            replyButton.IsLoading = false;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            request?.Cancel();
+            base.Dispose(isDisposing);
         }
 
         private class ResponseTextBox : TextBox
