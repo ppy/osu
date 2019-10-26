@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
         private readonly BindableBool showReplies = new BindableBool(true);
+        private readonly BindableBool showResponseContainer = new BindableBool();
         private readonly BindableList<Comment> replies = new BindableList<Comment>();
         private readonly BindableInt currentPage = new BindableInt();
 
@@ -186,7 +187,10 @@ namespace osu.Game.Overlays.Comments
                                                         Text = HumanizerUtils.Humanize(comment.CreatedAt),
                                                         Colour = OsuColour.Gray(0.7f),
                                                     },
-                                                    new ReplyButton(),
+                                                    new ReplyButton
+                                                    {
+                                                        Expanded = { BindTarget = showResponseContainer }
+                                                    },
                                                     repliesButton = new RepliesButton(comment)
                                                     {
                                                         Expanded = { BindTarget = showReplies },
@@ -197,6 +201,10 @@ namespace osu.Game.Overlays.Comments
                                                         CurrentPage = { BindTarget = currentPage }
                                                     }
                                                 }
+                                            },
+                                            new ResponseContainer
+                                            {
+                                                Expanded = { BindTarget = showResponseContainer }
                                             }
                                         }
                                     }

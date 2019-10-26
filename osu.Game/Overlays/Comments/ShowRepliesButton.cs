@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Comments
 {
     public abstract class ShowRepliesButton : OsuHoverContainer
     {
-        public readonly BindableBool Expanded = new BindableBool(true);
+        public readonly BindableBool Expanded = new BindableBool();
 
         protected ShowRepliesButton()
         {
