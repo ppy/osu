@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -23,8 +24,12 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool Expanded = new BindableBool();
 
-        public ResponseContainer()
+        private readonly Comment comment;
+
+        public ResponseContainer(Comment comment)
         {
+            this.comment = comment;
+
             Height = height;
             RelativeSizeAxes = Axes.X;
             Masking = true;
@@ -65,13 +70,17 @@ namespace osu.Game.Overlays.Comments
                             Direction = FillDirection.Horizontal,
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(3, 0),
-                            Children = new[]
+                            Children = new Drawable[]
                             {
                                 new CancelButton
                                 {
                                     Expanded = { BindTarget = Expanded }
                                 },
-                                new Button(@"Reply"),
+                                new ReplyButton
+                                {
+                                    Action = onAction,
+                                    Expanded = { BindTarget = Expanded }
+                                }
                             }
                         }
                     }
@@ -104,6 +113,11 @@ namespace osu.Game.Overlays.Comments
             }, true);
         }
 
+        private void onAction()
+        {
+
+        }
+
         private class ResponseTextBox : TextBox
         {
             protected override float LeftRightPadding => 10;
@@ -134,14 +148,17 @@ namespace osu.Game.Overlays.Comments
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
+            public readonly BindableBool Expanded = new BindableBool();
+
             private Box background;
-            private SpriteText text;
+            protected SpriteText Text;
 
             public Button(string buttonText)
             {
-                text.Text = buttonText;
+                Text.Text = buttonText;
 
                 AutoSizeAxes = Axes.Both;
+                LoadingAnimationSize = new Vector2(10);
             }
 
             [BackgroundDependencyLoader]
@@ -162,8 +179,9 @@ namespace osu.Game.Overlays.Comments
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    text = new SpriteText
+                    Text = new SpriteText
                     {
+                        AlwaysPresent = true,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Margin = new MarginPadding { Horizontal = 10 },
@@ -175,8 +193,6 @@ namespace osu.Game.Overlays.Comments
 
         private class CancelButton : Button
         {
-            public readonly BindableBool Expanded = new BindableBool();
-
             public CancelButton()
                 : base(@"Cancel")
             {
@@ -184,6 +200,24 @@ namespace osu.Game.Overlays.Comments
             }
 
             protected override void OnLoadStarted() => IsLoading = false;
+        }
+
+        private class ReplyButton : Button
+        {
+            private const int duration = 200;
+
+            public ReplyButton()
+                : base(@"Reply")
+            {
+            }
+
+            protected override void OnLoadStarted() => Text.FadeOut(duration, Easing.OutQuint);
+
+            protected override void OnLoadFinished()
+            {
+                Text.FadeIn(duration, Easing.OutQuint);
+                Expanded.Value = false;
+            }
         }
     }
 }

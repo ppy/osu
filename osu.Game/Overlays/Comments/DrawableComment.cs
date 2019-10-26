@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Comments
                                                     }
                                                 }
                                             },
-                                            new ResponseContainer
+                                            new ResponseContainer(comment)
                                             {
                                                 Expanded = { BindTarget = showResponseContainer }
                                             }
