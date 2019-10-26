@@ -38,6 +38,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override Vector2 SelectionPoint => HeadBlueprint.SelectionPoint;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BodyPiece.ReceivePositionalInputAt(screenSpacePos);
+
         protected virtual SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new SliderCircleSelectionBlueprint(slider, position);
     }
 }
