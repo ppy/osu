@@ -18,19 +18,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 comments = value;
-                comments.ForEach(child =>
+                comments.ForEach(comment =>
                 {
-                    if (child.ParentId != null)
-                    {
-                        comments.ForEach(parent =>
-                        {
-                            if (parent.Id == child.ParentId)
-                            {
-                                parent.ChildComments.Add(child);
-                                child.ParentComment = parent;
-                            }
-                        });
-                    }
+                    if (comment.IsReply)
+                        comments.ForEach(parent => checkRepliesDependency(parent, comment));
                 });
             }
         }
@@ -44,8 +35,25 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user_follow")]
         public bool UserFollow { get; set; }
 
+        private List<Comment> includedComments;
+
         [JsonProperty(@"included_comments")]
-        public List<Comment> IncludedComments { get; set; }
+        public List<Comment> IncludedComments
+        {
+            get => includedComments;
+            set
+            {
+                includedComments = value;
+                value.ForEach(comment =>
+                {
+                    if (comment.IsReply)
+                    {
+                        value.ForEach(parent => checkRepliesDependency(parent, comment));
+                        comments.ForEach(parent => checkRepliesDependency(parent, comment));
+                    }
+                });
+            }
+        }
 
         [JsonProperty(@"user_votes")]
         private List<long> userVotes
@@ -54,11 +62,8 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 value.ForEach(v =>
                 {
-                    Comments.ForEach(c =>
-                    {
-                        if (v == c.Id)
-                            c.IsVoted = true;
-                    });
+                    Comments.ForEach(c => checkVotesDependency(v, c));
+                    IncludedComments.ForEach(c => checkVotesDependency(v, c));
                 });
             }
         }
@@ -75,14 +80,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
                 value.ForEach(u =>
                 {
-                    Comments.ForEach(c =>
-                    {
-                        if (c.UserId == u.Id)
-                            c.User = u;
-
-                        if (c.EditedById == u.Id)
-                            c.EditedUser = u;
-                    });
+                    Comments.ForEach(c => checkUserCommentDependency(u, c));
+                    IncludedComments.ForEach(c => checkUserCommentDependency(u, c));
                 });
             }
         }
@@ -92,5 +91,29 @@ namespace osu.Game.Online.API.Requests.Responses
 
         [JsonProperty(@"top_level_count")]
         public int TopLevelCount { get; set; }
+
+        private void checkRepliesDependency(Comment parent, Comment reply)
+        {
+            if (parent.Id == reply.ParentId)
+            {
+                parent.Replies.Add(reply);
+                reply.ParentComment = parent;
+            }
+        }
+
+        private void checkVotesDependency(long votedCommentId, Comment comment)
+        {
+            if (votedCommentId == comment.Id)
+                comment.IsVoted = true;
+        }
+
+        private void checkUserCommentDependency(User user, Comment comment)
+        {
+            if (comment.UserId == user.Id)
+                comment.User = user;
+
+            if (comment.EditedById == user.Id)
+                comment.EditedUser = user;
+        }
     }
 }

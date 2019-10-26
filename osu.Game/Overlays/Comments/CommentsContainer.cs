@@ -13,16 +13,24 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private readonly CommentableType type;
-        private readonly long id;
+        private CommentableType type;
+        private long id;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+
+        public void ShowComments(CommentableType type, long id)
+        {
+            this.type = type;
+            this.id = id;
+            Sort.TriggerChange();
+        }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -35,15 +43,14 @@ namespace osu.Game.Overlays.Comments
         private int currentPage;
 
         private readonly Box background;
+        private readonly Box placeholderBackground;
         private readonly FillFlowContainer content;
-        private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
+        private readonly Container placeholder;
 
-        public CommentsContainer(CommentableType type, long id)
+        public CommentsContainer()
         {
-            this.type = type;
-            this.id = id;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
@@ -63,6 +70,26 @@ namespace osu.Game.Overlays.Comments
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
+                        },
+                        placeholder = new Container
+                        {
+                            Height = 80,
+                            RelativeSizeAxes = Axes.X,
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                placeholderBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new SpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding { Left = 50 },
+                                    Text = @"No comments yet."
+                                }
+                            }
                         },
                         content = new FillFlowContainer
                         {
@@ -88,7 +115,7 @@ namespace osu.Game.Overlays.Comments
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
+                                        deletedCommentsPlaceholder = new DeletedCommentsPlaceholder
                                         {
                                             ShowDeleted = { BindTarget = ShowDeleted }
                                         },
@@ -101,7 +128,8 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = getComments
+                                                Action = getComments,
+                                                IsLoading = true,
                                             }
                                         }
                                     }
@@ -117,11 +145,12 @@ namespace osu.Game.Overlays.Comments
         private void load()
         {
             background.Colour = colours.Gray2;
+            placeholderBackground.Colour = colours.Gray3;
         }
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(onSortChanged, true);
+            Sort.BindValueChanged(onSortChanged);
             base.LoadComplete();
         }
 
@@ -133,6 +162,8 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
+            moreButton.IsLoading = true;
+            moreButton.Show();
             request?.Cancel();
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
@@ -143,13 +174,21 @@ namespace osu.Game.Overlays.Comments
         private void clearComments()
         {
             currentPage = 1;
-            deletedChildrenPlaceholder.DeletedCount.Value = 0;
-            moreButton.IsLoading = true;
+            deletedCommentsPlaceholder.DeletedCount.Value = 0;
+            placeholder.Hide();
             content.Clear();
         }
 
         private void onSuccess(CommentBundle response)
         {
+            if (!response.Comments.Any())
+            {
+                placeholder.Show();
+                moreButton.IsLoading = false;
+                moreButton.Hide();
+                return;
+            }
+
             loadCancellation = new CancellationTokenSource();
 
             FillFlowContainer page = new FillFlowContainer
@@ -164,7 +203,8 @@ namespace osu.Game.Overlays.Comments
                 if (c.IsTopLevel)
                     page.Add(new DrawableComment(c)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        ShowDeleted = { BindTarget = ShowDeleted },
+                        Sort = { BindTarget = Sort }
                     });
             }
 
@@ -172,7 +212,7 @@ namespace osu.Game.Overlays.Comments
             {
                 content.Add(loaded);
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                deletedCommentsPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
                 if (response.HasMore)
                 {
@@ -182,8 +222,10 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
-
-                moreButton.FadeTo(response.HasMore ? 1 : 0);
+                else
+                {
+                    moreButton.Hide();
+                }
             }, loadCancellation.Token);
         }
 

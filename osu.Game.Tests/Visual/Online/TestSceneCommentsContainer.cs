@@ -21,39 +21,34 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DrawableComment),
             typeof(HeaderButton),
             typeof(SortTabControl),
-            typeof(ShowChildrenButton),
-            typeof(DeletedChildrenPlaceholder),
-            typeof(VotePill)
+            typeof(ShowRepliesButton),
+            typeof(DeletedCommentsPlaceholder),
+            typeof(VotePill),
+            typeof(GetCommentRepliesButton)
         };
 
         protected override bool UseOnlineAPI => true;
 
         public TestSceneCommentsContainer()
         {
-            BasicScrollContainer scrollFlow;
+            CommentsContainer commentsContainer = new CommentsContainer();
+            BasicScrollContainer scroll;
 
-            Add(scrollFlow = new BasicScrollContainer
+            Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Child = commentsContainer
             });
 
-            AddStep("Big Black comments", () =>
+            AddStep("Idle state", () =>
             {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
+                scroll.Clear();
+                scroll.Add(commentsContainer = new CommentsContainer());
             });
-
-            AddStep("Airman comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
-            });
-
-            AddStep("lazer build comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
-            });
+            AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
+            AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
+            AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
+            AddStep("beatmap with no comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 1293));
         }
     }
 }
