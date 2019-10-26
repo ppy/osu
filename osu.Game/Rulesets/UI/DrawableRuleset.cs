@@ -239,7 +239,6 @@ namespace osu.Game.Rulesets.UI
                 continueResume();
         }
 
-
         public override void CancelResume()
         {
             // called if the user pauses while the resume overlay is open
