@@ -19,18 +19,11 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private CommentableType type;
-        private long id;
+        private CommentableType? type;
+        private long? id;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
-
-        public void ShowComments(CommentableType type, long id)
-        {
-            this.type = type;
-            this.id = id;
-            Sort.TriggerChange();
-        }
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -47,7 +40,7 @@ namespace osu.Game.Overlays.Comments
         private readonly FillFlowContainer content;
         private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
-        private readonly Container placeholder;
+        private readonly Container noCommentsPlaceholder;
 
         public CommentsContainer()
         {
@@ -71,7 +64,7 @@ namespace osu.Game.Overlays.Comments
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
                         },
-                        placeholder = new Container
+                        noCommentsPlaceholder = new Container
                         {
                             Height = 80,
                             RelativeSizeAxes = Axes.X,
@@ -150,12 +143,20 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(onSortChanged);
+            Sort.BindValueChanged(_ =>
+            {
+                if (!type.HasValue || !id.HasValue)
+                    return;
+
+                ShowComments(type.Value, id.Value);
+            });
             base.LoadComplete();
         }
 
-        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
+        public void ShowComments(CommentableType type, long id)
         {
+            this.type = type;
+            this.id = id;
             clearComments();
             getComments();
         }
@@ -166,7 +167,7 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
             request?.Cancel();
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(type.Value, id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }
@@ -175,7 +176,7 @@ namespace osu.Game.Overlays.Comments
         {
             currentPage = 1;
             deletedCommentsPlaceholder.DeletedCount.Value = 0;
-            placeholder.Hide();
+            noCommentsPlaceholder.Hide();
             content.Clear();
         }
 
@@ -183,7 +184,7 @@ namespace osu.Game.Overlays.Comments
         {
             if (!response.Comments.Any())
             {
-                placeholder.Show();
+                noCommentsPlaceholder.Show();
                 moreButton.IsLoading = false;
                 moreButton.Hide();
                 return;
