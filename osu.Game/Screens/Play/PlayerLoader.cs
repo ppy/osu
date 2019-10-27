@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Play
                     Children = new PlayerSettingsGroup[]
                     {
                         VisualSettings = new VisualSettings(),
-                        new InputSettings()
+                        new InputSettings(),new AudioSettings()
                     }
                 },
                 idleTracker = new IdleTracker(750)

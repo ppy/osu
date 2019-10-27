@@ -11,9 +11,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     public class AudioSettings : PlayerSettingsGroup
     {
         protected override string Title => "Audio settings";
-
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
-
         public AudioSettings()
         {
             Children = new Drawable[]
