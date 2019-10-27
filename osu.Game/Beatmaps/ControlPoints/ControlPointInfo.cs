@@ -279,9 +279,11 @@ namespace osu.Game.Beatmaps.ControlPoints
             var newGroup = new ControlPointGroup(time);
 
             int i = groups.BinarySearch(newGroup);
-            if (i < 0) i = ~i;
 
-            groups.Insert(i, newGroup);
+            if (i > 0)
+                return groups[i];
+
+            groups.Insert(~i, newGroup);
 
             return newGroup;
         }
