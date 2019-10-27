@@ -130,7 +130,9 @@ namespace osu.Game.Overlays.Comments
         private void onSuccess(CommentBundle response)
         {
             replyButton.IsLoading = false;
-            OnResponseReceived?.Invoke(response.Comments.First());
+            Comment newReply = response.Comments.First();
+            newReply.ParentComment = comment;
+            OnResponseReceived?.Invoke(newReply);
         }
 
         protected override void Dispose(bool isDisposing)

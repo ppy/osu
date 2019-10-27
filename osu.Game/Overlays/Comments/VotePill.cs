@@ -40,6 +40,7 @@ namespace osu.Game.Overlays.Comments
         private SpriteText sideNumber;
         private OsuSpriteText votesCounter;
         private CommentVoteRequest request;
+        private bool isDisabled;
 
         private readonly BindableBool isVoted = new BindableBool();
         private readonly BindableInt votesCount = new BindableInt();
@@ -47,8 +48,6 @@ namespace osu.Game.Overlays.Comments
         public VotePill(Comment comment)
         {
             this.comment = comment;
-
-            Action = onAction;
 
             AutoSizeAxes = Axes.X;
             Height = 20;
@@ -65,6 +64,13 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            if (comment.User.Id == api.LocalUser.Value.Id)
+                isDisabled = true;
+
+            if (!isDisabled)
+                Action = onAction;
+
             isVoted.Value = comment.IsVoted;
             votesCount.Value = comment.VotesCount;
             isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
@@ -145,13 +151,17 @@ namespace osu.Game.Overlays.Comments
 
         protected override bool OnHover(HoverEvent e)
         {
-            onHoverAction();
+            if (!isDisabled)
+                onHoverAction();
+
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            updateDisplay();
+            if (!isDisabled)
+                updateDisplay();
+
             base.OnHoverLost(e);
         }
 
