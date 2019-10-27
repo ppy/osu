@@ -52,12 +52,18 @@ namespace osu.Game.Screens.Edit.Timing
         public class ControlPointList : CompositeDrawable
         {
             private OsuButton deleteButton;
+            private ControlPointTable table;
+
+            private IBindableList<ControlPointGroup> controlGroups;
+
+            [Resolved]
+            protected IFrameBasedClock EditorClock { get; private set; }
 
             [Resolved]
             protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
 
             [Resolved]
-            private Bindable<ControlPointGroup> selectedPoints { get; set; }
+            private Bindable<ControlPointGroup> selectedGroup { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -74,10 +80,7 @@ namespace osu.Game.Screens.Edit.Timing
                     new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = new ControlPointTable
-                        {
-                            ControlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups
-                        }
+                        Child = table = new ControlPointTable(),
                     },
                     new FillFlowContainer
                     {
@@ -114,15 +117,27 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.LoadComplete();
 
-                selectedPoints.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
+                selectedGroup.BindValueChanged(selected => { deleteButton.Enabled.Value = selected.NewValue != null; }, true);
+
+                controlGroups = Beatmap.Value.Beatmap.ControlPointInfo.Groups.GetBoundCopy();
+                controlGroups.ItemsAdded += _ => createContent();
+                controlGroups.ItemsRemoved += _ => createContent();
+                createContent();
             }
+
+            private void createContent() => table.ControlGroups = controlGroups;
 
             private void delete()
             {
+                if (selectedGroup.Value == null)
+                    return;
+
+                Beatmap.Value.Beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
             }
 
             private void addNew()
             {
+                selectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.CreateGroup(EditorClock.CurrentTime);
             }
         }
     }
