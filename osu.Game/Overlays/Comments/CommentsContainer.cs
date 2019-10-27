@@ -167,6 +167,10 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
             request?.Cancel();
             loadCancellation?.Cancel();
+
+            if (!type.HasValue || !id.HasValue)
+                return;
+
             request = new GetCommentsRequest(type.Value, id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
