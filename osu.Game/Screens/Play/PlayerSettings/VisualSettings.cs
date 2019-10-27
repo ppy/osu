@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
                 showVideoToggle = new PlayerCheckbox { LabelText = "Video" },
-                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins"}
+                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" }
             };
         }
 
