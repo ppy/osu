@@ -18,6 +18,7 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 comments = value;
+
                 foreach (var comment in comments)
                 {
                     if (comment.IsReply)
