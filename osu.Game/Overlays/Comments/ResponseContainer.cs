@@ -114,6 +114,8 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             };
+
+            textBox.OnCommit += (u, v) => replyButton.Click();
         }
 
         protected override void LoadComplete()
