@@ -189,7 +189,7 @@ namespace osu.Game.Beatmaps.Formats
             Foreground = 3
         }
 
-        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
+        internal class LegacySampleControlPoint : SampleControlPoint
         {
             public int CustomSampleBank;
 
@@ -203,9 +203,9 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public bool Equals(LegacySampleControlPoint other)
-                => base.Equals(other)
-                   && CustomSampleBank == other?.CustomSampleBank;
+            public override bool EquivalentTo(ControlPoint other) =>
+                base.EquivalentTo(other) && other is LegacySampleControlPoint otherTyped &&
+                CustomSampleBank == otherTyped.CustomSampleBank;
         }
     }
 }
