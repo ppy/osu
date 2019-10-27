@@ -41,6 +41,7 @@ namespace osu.Game.Overlays.Comments
         private readonly LoadRepliesButton loadRepliesButton;
         private readonly ShowMoreRepliesButton showMoreRepliesButton;
         private readonly Comment comment;
+        private readonly ResponseContainer responseContainer;
 
         public DrawableComment(Comment comment)
         {
@@ -203,7 +204,7 @@ namespace osu.Game.Overlays.Comments
                                                     }
                                                 }
                                             },
-                                            new ResponseContainer(comment)
+                                            responseContainer = new ResponseContainer(comment)
                                             {
                                                 Expanded = { BindTarget = showResponseContainer }
                                             }
@@ -307,6 +308,7 @@ namespace osu.Game.Overlays.Comments
             replies.ItemsAdded += onChildrenAdded;
             loadRepliesButton.OnCommentsReceived += replies.AddRange;
             showMoreRepliesButton.OnCommentsReceived += replies.AddRange;
+            responseContainer.OnResponseReceived += replies.Add;
 
             base.LoadComplete();
         }

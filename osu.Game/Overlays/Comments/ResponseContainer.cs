@@ -16,6 +16,8 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API;
+using System;
+using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -123,9 +125,12 @@ namespace osu.Game.Overlays.Comments
             api.Queue(request);
         }
 
+        public Action<Comment> OnResponseReceived;
+
         private void onSuccess(CommentBundle response)
         {
             replyButton.IsLoading = false;
+            OnResponseReceived?.Invoke(response.Comments.First());
         }
 
         protected override void Dispose(bool isDisposing)

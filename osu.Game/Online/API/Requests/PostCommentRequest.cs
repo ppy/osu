@@ -29,12 +29,12 @@ namespace osu.Game.Online.API.Requests
 
             req.Method = HttpMethod.Post;
 
-            req.AddParameter("comment.commentable_id", commentableId.ToString());
-            req.AddParameter("comment.commentable_type", type.ToString().Underscore().ToLowerInvariant());
-            req.AddParameter("comment.message", message);
+            req.AddParameter("comment[commentable_id]", commentableId.ToString());
+            req.AddParameter("comment[commentable_type]", type.ToString().Underscore().ToLowerInvariant());
+            req.AddParameter("comment[message]", message);
 
             if (parentId.HasValue)
-                req.AddParameter("comment.parent_id", parentId.Value.ToString());
+                req.AddParameter("comment[parent_id]", parentId.Value.ToString());
 
             return req;
         }
