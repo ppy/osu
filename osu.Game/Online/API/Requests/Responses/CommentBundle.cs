@@ -18,11 +18,18 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 comments = value;
-                comments.ForEach(comment =>
+                foreach (var comment in comments)
                 {
                     if (comment.IsReply)
-                        comments.ForEach(parent => checkRepliesDependency(parent, comment));
-                });
+                        foreach (var parent in comments)
+                        {
+                            if (comment.Id != parent.Id)
+                                checkParentDependency(parent, comment);
+
+                            if (comment.ParentComment != null)
+                                break;
+                        }
+                }
             }
         }
 
@@ -44,14 +51,37 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 includedComments = value;
-                value.ForEach(comment =>
+
+                foreach (var comment in includedComments)
                 {
                     if (comment.IsReply)
                     {
-                        value.ForEach(parent => checkRepliesDependency(parent, comment));
-                        comments.ForEach(parent => checkRepliesDependency(parent, comment));
+                        foreach (var parent in includedComments)
+                        {
+                            if (comment.Id != parent.Id)
+                                checkParentDependency(parent, comment);
+
+                            if (comment.ParentComment != null)
+                                break;
+                        }
+
+                        if (comment.ParentComment != null)
+                        {
+                            foreach (var parent in comments)
+                            {
+                                if (comment.Id != parent.Id)
+                                    checkParentDependency(parent, comment);
+
+                                if (comment.ParentComment != null)
+                                    break;
+                            }
+                        }
                     }
-                });
+
+                    // The comment can be a parent for comments in Comments
+                    foreach (var reply in comments)
+                        checkParentDependency(comment, reply);
+                }
             }
         }
 
@@ -60,11 +90,29 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             set
             {
-                value.ForEach(v =>
+                foreach (var votedCommentId in value)
                 {
-                    Comments.ForEach(c => checkVotesDependency(v, c));
-                    IncludedComments.ForEach(c => checkVotesDependency(v, c));
-                });
+                    bool voteFinded = false;
+
+                    foreach (var comment in comments)
+                    {
+                        voteFinded = checkVotesDependency(votedCommentId, comment);
+
+                        if (voteFinded)
+                            break;
+                    }
+
+                    if (!voteFinded)
+                    {
+                        foreach (var comment in includedComments)
+                        {
+                            voteFinded = checkVotesDependency(votedCommentId, comment);
+
+                            if (voteFinded)
+                                break;
+                        }
+                    }
+                }
             }
         }
 
@@ -92,7 +140,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"top_level_count")]
         public int TopLevelCount { get; set; }
 
-        private void checkRepliesDependency(Comment parent, Comment reply)
+        private void checkParentDependency(Comment parent, Comment reply)
         {
             if (parent.Id == reply.ParentId)
             {
@@ -101,10 +149,15 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
-        private void checkVotesDependency(long votedCommentId, Comment comment)
+        private bool checkVotesDependency(long votedCommentId, Comment comment)
         {
             if (votedCommentId == comment.Id)
+            {
                 comment.IsVoted = true;
+                return true;
+            }
+
+            return false;
         }
 
         private void checkUserCommentDependency(User user, Comment comment)
