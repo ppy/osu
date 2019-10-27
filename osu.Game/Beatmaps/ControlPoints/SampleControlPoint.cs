@@ -1,12 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Game.Audio;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
+    public class SampleControlPoint : ControlPoint
     {
         public const string DEFAULT_BANK = "normal";
 
@@ -45,8 +44,8 @@ namespace osu.Game.Beatmaps.ControlPoints
             return newSampleInfo;
         }
 
-        public bool Equals(SampleControlPoint other)
-            => base.Equals(other)
-               && string.Equals(SampleBank, other?.SampleBank) && SampleVolume == other?.SampleVolume;
+        public override bool EquivalentTo(ControlPoint other) =>
+            other is SampleControlPoint otherTyped &&
+            string.Equals(SampleBank, otherTyped.SampleBank) && SampleVolume == otherTyped.SampleVolume;
     }
 }
