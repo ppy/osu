@@ -15,6 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Timing
 {
@@ -58,7 +59,7 @@ namespace osu.Game.Screens.Edit.Timing
 
                 foreach (var group in value)
                 {
-                    backgroundFlow.Add(new RowBackground { Action = () => selectedGroup.Value = group });
+                    backgroundFlow.Add(new RowBackground(group));
                 }
 
                 Columns = createHeaders();
@@ -135,12 +136,17 @@ namespace osu.Game.Screens.Edit.Timing
 
         public class RowBackground : OsuClickableContainer
         {
+            private readonly ControlPointGroup controlGroup;
             private const int fade_duration = 100;
 
             private readonly Box hoveredBackground;
 
-            public RowBackground()
+            [Resolved]
+            private Bindable<ControlPointGroup> selectedGroup { get; set; }
+
+            public RowBackground(ControlPointGroup controlGroup)
             {
+                this.controlGroup = controlGroup;
                 RelativeSizeAxes = Axes.X;
                 Height = 25;
 
@@ -157,24 +163,62 @@ namespace osu.Game.Screens.Edit.Timing
                         Alpha = 0,
                     },
                 };
+
+                Action = () => selectedGroup.Value = controlGroup;
             }
+
+            private Color4 colourHover;
+            private Color4 colourSelected;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                hoveredBackground.Colour = colours.Blue;
+                hoveredBackground.Colour = colourHover = colours.BlueDarker;
+                colourSelected = colours.YellowDarker;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                selectedGroup.BindValueChanged(group => { Selected = controlGroup == group.NewValue; });
+            }
+
+            private bool selected;
+
+            protected bool Selected
+            {
+                get => selected;
+                set
+                {
+                    if (value == selected)
+                        return;
+
+                    selected = value;
+                    updateState();
+                }
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
+                updateState();
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
+                updateState();
                 base.OnHoverLost(e);
+            }
+
+            private void updateState()
+            {
+                hoveredBackground.FadeColour(selected ? colourSelected : colourHover, 450, Easing.OutQuint);
+
+                if (selected || IsHovered)
+                    hoveredBackground.FadeIn(fade_duration, Easing.OutQuint);
+                else
+                    hoveredBackground.FadeOut(fade_duration, Easing.OutQuint);
             }
         }
     }
