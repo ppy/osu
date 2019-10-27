@@ -17,33 +17,27 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API;
 using System;
-using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class ResponseContainer : Container
+    public abstract class ResponseContainer : Container
     {
-        private const int height = 60;
         private const int corner_radius = 5;
 
-        public readonly BindableBool Expanded = new BindableBool();
+        protected readonly ResponseTextBox TextBox;
 
-        private readonly Bindable<string> text = new Bindable<string>();
-
-        private readonly Comment comment;
-        private readonly ReplyButton replyButton;
-        private readonly ResponseTextBox textBox;
+        protected readonly Bindable<string> Text = new Bindable<string>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
         private PostCommentRequest request;
+        private readonly PostButton postButton;
+        private readonly FillFlowContainer<Button> additionalButtonsPlaceholder;
 
-        public ResponseContainer(Comment comment)
+        public ResponseContainer()
         {
-            this.comment = comment;
-
-            Height = height;
+            Height = 60;
             RelativeSizeAxes = Axes.X;
             Masking = true;
             CornerRadius = corner_radius;
@@ -54,19 +48,19 @@ namespace osu.Game.Overlays.Comments
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.2f)
                 },
-                textBox = new ResponseTextBox
+                TextBox = new ResponseTextBox
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = height / 2f,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
                     PlaceholderText = @"Type your response here",
-                    Current = text,
+                    Current = Text,
                 },
                 new Container
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = height / 2f,
+                    RelativeSizeAxes = Axes.Both,
+                    Height = 0.5f,
                     Padding = new MarginPadding { Horizontal = 10 },
                     Children = new Drawable[]
                     {
@@ -86,16 +80,13 @@ namespace osu.Game.Overlays.Comments
                             Spacing = new Vector2(3, 0),
                             Children = new Drawable[]
                             {
-                                new CancelButton
+                                additionalButtonsPlaceholder = new FillFlowContainer<Button>
                                 {
-                                    Expanded = { BindTarget = Expanded }
+                                    Direction = FillDirection.Horizontal,
+                                    AutoSizeAxes = Axes.Both,
+                                    Spacing = new Vector2(3, 0),
                                 },
-                                replyButton = new ReplyButton
-                                {
-                                    ClickAction = onAction,
-                                    Expanded = { BindTarget = Expanded },
-                                    Text = { BindTarget = text }
-                                }
+                                postButton = CreatePostButton(),
                             }
                         }
                     }
@@ -115,27 +106,28 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            textBox.OnCommit += (u, v) => replyButton.Click();
+            var additionalButtons = AddButtons();
+            if (additionalButtons != null)
+                additionalButtonsPlaceholder.AddRange(additionalButtons);
+
+            TextBox.OnCommit += (u, v) => postButton.Click();
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Expanded.BindValueChanged(expanded =>
-            {
-                if (expanded.NewValue)
-                    Show();
-                else
-                {
-                    Hide();
-                    textBox.Current.Value = string.Empty;
-                }
-            }, true);
-        }
+        protected virtual Button[] AddButtons() => null;
 
-        private void onAction()
+        protected virtual PostButton CreatePostButton() => new PostButton
         {
-            request = new PostCommentRequest(comment.CommentableId, comment.CommentableType, textBox.Current.Value, comment.Id);
+            ClickAction = OnAction,
+            Text = { BindTarget = Text }
+        };
+
+        protected abstract PostCommentRequest CreateRequest();
+
+        protected abstract Comment OnSuccess(CommentBundle response);
+
+        protected void OnAction()
+        {
+            request = CreateRequest();
             request.Success += onSuccess;
             api.Queue(request);
         }
@@ -144,10 +136,8 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(CommentBundle response)
         {
-            replyButton.IsLoading = false;
-            Comment newReply = response.Comments.First();
-            newReply.ParentComment = comment;
-            OnResponseReceived?.Invoke(newReply);
+            postButton.IsLoading = false;
+            OnResponseReceived?.Invoke(OnSuccess(response));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -156,7 +146,7 @@ namespace osu.Game.Overlays.Comments
             base.Dispose(isDisposing);
         }
 
-        private class ResponseTextBox : TextBox
+        protected class ResponseTextBox : TextBox
         {
             protected override float LeftRightPadding => 10;
 
@@ -182,11 +172,9 @@ namespace osu.Game.Overlays.Comments
             protected override Drawable GetDrawableCharacter(char c) => new SpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
         }
 
-        private class Button : LoadingButton
+        protected class Button : LoadingButton
         {
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
-
-            public readonly BindableBool Expanded = new BindableBool();
 
             private Box background;
             protected SpriteText DrawableText;
@@ -229,26 +217,15 @@ namespace osu.Game.Overlays.Comments
             };
         }
 
-        private class CancelButton : Button
-        {
-            public CancelButton()
-                : base(@"Cancel")
-            {
-                Action = () => Expanded.Value = false;
-            }
-
-            protected override void OnLoadStarted() => IsLoading = false;
-        }
-
-        private class ReplyButton : Button
+        protected class PostButton : Button
         {
             private const int duration = 200;
 
             public readonly Bindable<string> Text = new Bindable<string>();
             public Action ClickAction;
 
-            public ReplyButton()
-                : base(@"Reply")
+            public PostButton(string name = @"Post")
+                : base(name)
             {
             }
 
@@ -266,11 +243,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnLoadStarted() => DrawableText.FadeOut(duration, Easing.OutQuint);
 
-            protected override void OnLoadFinished()
-            {
-                DrawableText.FadeIn(duration, Easing.OutQuint);
-                Expanded.Value = false;
-            }
+            protected override void OnLoadFinished() => DrawableText.FadeIn(duration, Easing.OutQuint);
         }
     }
 }
