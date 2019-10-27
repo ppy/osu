@@ -14,11 +14,15 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
+        private const int avatar_size = 50;
+
         private CommentableType? type;
         private long? id;
 
@@ -41,6 +45,9 @@ namespace osu.Game.Overlays.Comments
         private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
         private readonly Container noCommentsPlaceholder;
+        private readonly GlobalResponseContainer responseContainer;
+        private readonly Container header;
+        private readonly UpdateableAvatar avatar;
 
         public CommentsContainer()
         {
@@ -59,6 +66,61 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        header = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Padding = new MarginPadding { Horizontal = 50, Vertical = 10 },
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                new GridContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    ColumnDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize),
+                                        new Dimension(),
+                                    },
+                                    RowDimensions = new[]
+                                    {
+                                        new Dimension(GridSizeMode.AutoSize)
+                                    },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                Size = new Vector2(avatar_size),
+                                                Masking = true,
+                                                CornerRadius = avatar_size / 2f,
+                                                Children = new Drawable[]
+                                                {
+                                                    new Box
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                        Colour = OsuColour.Gray(0.2f)
+                                                    },
+                                                    avatar = new UpdateableAvatar
+                                                    {
+                                                        RelativeSizeAxes = Axes.Both,
+                                                    },
+                                                }
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Padding = new MarginPadding { Left = 10 },
+                                                Child = responseContainer = new GlobalResponseContainer(),
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -139,6 +201,8 @@ namespace osu.Game.Overlays.Comments
         {
             background.Colour = colours.Gray2;
             placeholderBackground.Colour = colours.Gray3;
+
+            avatar.User = api.LocalUser.Value;
         }
 
         protected override void LoadComplete()
@@ -148,16 +212,16 @@ namespace osu.Game.Overlays.Comments
                 if (!type.HasValue || !id.HasValue)
                     return;
 
-                ShowComments(type.Value, id.Value);
+                ShowComments(type.Value, id.Value, false);
             });
             base.LoadComplete();
         }
 
-        public void ShowComments(CommentableType type, long id)
+        public void ShowComments(CommentableType type, long id, bool hideHeader = true)
         {
             this.type = type;
             this.id = id;
-            clearComments();
+            clearComments(hideHeader);
             getComments();
         }
 
@@ -176,8 +240,11 @@ namespace osu.Game.Overlays.Comments
             api.Queue(request);
         }
 
-        private void clearComments()
+        private void clearComments(bool hideHeader)
         {
+            if (hideHeader)
+                header.Hide();
+
             currentPage = 1;
             deletedCommentsPlaceholder.DeletedCount.Value = 0;
             noCommentsPlaceholder.Hide();
@@ -231,6 +298,10 @@ namespace osu.Game.Overlays.Comments
                 {
                     moreButton.Hide();
                 }
+
+                responseContainer.SetParameters(type.Value, id.Value);
+                header.Show();
+
             }, loadCancellation.Token);
         }
 
