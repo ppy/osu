@@ -1,0 +1,44 @@
+using osu.Framework.Allocation;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Sprites;
+
+namespace osu.Game.Screens.Edit.Timing
+{
+    internal class EffectSection : Section<EffectControlPoint>
+    {
+        private OsuSpriteText kiai;
+        private OsuSpriteText omitBarLine;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Flow.AddRange(new[]
+            {
+                kiai = new OsuSpriteText(),
+                omitBarLine = new OsuSpriteText(),
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ControlPoint.BindValueChanged(point =>
+            {
+                kiai.Text = $"Kiai: {point.NewValue?.KiaiMode}";
+                omitBarLine.Text = $"Skip Bar Line: {point.NewValue?.OmitFirstBarLine}";
+            });
+        }
+
+        protected override EffectControlPoint CreatePoint()
+        {
+            var reference = Beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(SelectedGroup.Value.Time);
+
+            return new EffectControlPoint
+            {
+                KiaiMode = reference.KiaiMode,
+                OmitFirstBarLine = reference.OmitFirstBarLine
+            };
+        }
+    }
+}

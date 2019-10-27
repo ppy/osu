@@ -1,0 +1,37 @@
+using osu.Framework.Allocation;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Sprites;
+
+namespace osu.Game.Screens.Edit.Timing
+{
+    internal class DifficultySection : Section<DifficultyControlPoint>
+    {
+        private OsuSpriteText multiplier;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Flow.AddRange(new[]
+            {
+                multiplier = new OsuSpriteText(),
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ControlPoint.BindValueChanged(point => { multiplier.Text = $"Multiplier: {point.NewValue?.SpeedMultiplier}"; });
+        }
+
+        protected override DifficultyControlPoint CreatePoint()
+        {
+            var reference = Beatmap.Value.Beatmap.ControlPointInfo.DifficultyPointAt(SelectedGroup.Value.Time);
+
+            return new DifficultyControlPoint
+            {
+                SpeedMultiplier = reference.SpeedMultiplier,
+            };
+        }
+    }
+}

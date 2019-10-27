@@ -92,35 +92,57 @@ namespace osu.Game.Screens.Edit.Timing
                 Text = $"{group.Time:n0}ms",
                 Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold)
             },
-            new FillFlowContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                ChildrenEnumerable = group.ControlPoints.Select(createAttribute).Where(c => c != null),
-                Padding = new MarginPadding(10),
-                Spacing = new Vector2(2)
-            },
+            new ControlGroupAttributes(group),
         };
 
-        private Drawable createAttribute(ControlPoint controlPoint)
+        private class ControlGroupAttributes : CompositeDrawable
         {
-            switch (controlPoint)
+            private readonly IBindableList<ControlPoint> controlPoints;
+
+            private readonly FillFlowContainer fill;
+
+            public ControlGroupAttributes(ControlPointGroup group)
             {
-                case TimingControlPoint timing:
-                    return new RowAttribute("timing", $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
+                InternalChild = fill = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Padding = new MarginPadding(10),
+                    Spacing = new Vector2(2)
+                };
 
-                case DifficultyControlPoint difficulty:
+                controlPoints = group.ControlPoints.GetBoundCopy();
+                controlPoints.ItemsAdded += _ => createChildren();
+                controlPoints.ItemsRemoved += _ => createChildren();
 
-                    return new RowAttribute("difficulty", $"{difficulty.SpeedMultiplier:n2}x");
-
-                case EffectControlPoint effect:
-                    return new RowAttribute("effect", $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
-
-                case SampleControlPoint sample:
-                    return new RowAttribute("sample", $"{sample.SampleBank} {sample.SampleVolume}%");
+                createChildren();
             }
 
-            return null;
+            private void createChildren()
+            {
+                fill.ChildrenEnumerable = controlPoints.Select(createAttribute).Where(c => c != null);
+            }
+
+            private Drawable createAttribute(ControlPoint controlPoint)
+            {
+                switch (controlPoint)
+                {
+                    case TimingControlPoint timing:
+                        return new RowAttribute("timing", $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
+
+                    case DifficultyControlPoint difficulty:
+
+                        return new RowAttribute("difficulty", $"{difficulty.SpeedMultiplier:n2}x");
+
+                    case EffectControlPoint effect:
+                        return new RowAttribute("effect", $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
+
+                    case SampleControlPoint sample:
+                        return new RowAttribute("sample", $"{sample.SampleBank} {sample.SampleVolume}%");
+                }
+
+                return null;
+            }
         }
 
         protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty);
