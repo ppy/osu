@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 base.LoadComplete();
 
-                selectedGroup.BindValueChanged(group => { Selected = controlGroup == group.NewValue; });
+                selectedGroup.BindValueChanged(group => { Selected = controlGroup == group.NewValue; }, true);
             }
 
             private bool selected;
