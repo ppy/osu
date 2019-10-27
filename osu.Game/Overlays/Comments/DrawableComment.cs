@@ -15,7 +15,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Online.Chat;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Comments
@@ -31,10 +30,12 @@ namespace osu.Game.Overlays.Comments
         private readonly BindableBool showReplies = new BindableBool(true);
         private readonly BindableBool showResponseContainer = new BindableBool();
         private readonly BindableList<Comment> replies = new BindableList<Comment>();
+        private readonly BindableList<Comment> responses = new BindableList<Comment>();
         private readonly BindableInt currentPage = new BindableInt();
 
         private readonly FillFlowContainer repliesVisibilityContainer;
         private readonly FillFlowContainer repliesContainer;
+        private readonly FillFlowContainer responsesContainer;
         private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly ChevronButton chevronButton;
         private readonly RepliesButton repliesButton;
@@ -150,7 +151,10 @@ namespace osu.Game.Overlays.Comments
                                                             {
                                                                 AutoSizeAxes = Axes.Both,
                                                             },
-                                                            new ParentUsername(comment),
+                                                            new ParentUsername(comment)
+                                                            {
+                                                                Alpha = comment.IsReply ? 1 : 0
+                                                            },
                                                             new SpriteText
                                                             {
                                                                 Alpha = comment.IsDeleted ? 1 : 0,
@@ -221,12 +225,27 @@ namespace osu.Game.Overlays.Comments
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            repliesContainer = new FillFlowContainer
+                            new FillFlowContainer
                             {
-                                Padding = new MarginPadding { Left = 20 },
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical
+                                Padding = new MarginPadding { Left = 20 },
+                                Direction = FillDirection.Vertical,
+                                Children = new Drawable[]
+                                {
+                                    responsesContainer = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical
+                                    },
+                                    repliesContainer = new FillFlowContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical
+                                    },
+                                }
                             },
                             deletedCommentsPlaceholder = new DeletedCommentsPlaceholder
                             {
@@ -305,19 +324,39 @@ namespace osu.Game.Overlays.Comments
 
             showReplies.BindValueChanged(show => repliesVisibilityContainer.FadeTo(show.NewValue ? 1 : 0), true);
 
-            replies.ItemsAdded += onChildrenAdded;
+            replies.ItemsAdded += onRepliesAdded;
             loadRepliesButton.OnCommentsReceived += replies.AddRange;
             showMoreRepliesButton.OnCommentsReceived += replies.AddRange;
-            responseContainer.OnResponseReceived += replies.Add;
+
+            responses.ItemsAdded += onResponseAdded;
+            responseContainer.OnResponseReceived += responses.Add;
 
             base.LoadComplete();
         }
 
-        private void onChildrenAdded(IEnumerable<Comment> children)
+        private void onRepliesAdded(IEnumerable<Comment> children)
         {
             LoadComponentAsync(createRepliesPage(children), loaded =>
             {
                 repliesContainer.Add(loaded);
+                updateButtonsState();
+            });
+        }
+
+        private void onResponseAdded(IEnumerable<Comment> children)
+        {
+            var response = new DrawableComment(children.Single())
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort }
+            };
+
+            LoadComponentAsync(response, loaded =>
+            {
+                responsesContainer.Add(loaded);
+                repliesButton.IncreaseCount();
                 updateButtonsState();
             });
         }
@@ -331,14 +370,28 @@ namespace osu.Game.Overlays.Comments
                 Direction = FillDirection.Vertical,
             };
 
-            replies.ForEach(c =>
+            foreach (var comment in replies)
             {
-                page.Add(new DrawableComment(c)
+                bool exists = false;
+
+                foreach (var response in responses)
                 {
-                    ShowDeleted = { BindTarget = ShowDeleted },
-                    Sort = { BindTarget = Sort }
-                });
-            });
+                    if (comment.Id == response.Id)
+                    {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if (!exists)
+                {
+                    page.Add(new DrawableComment(comment)
+                    {
+                        ShowDeleted = { BindTarget = ShowDeleted },
+                        Sort = { BindTarget = Sort }
+                    });
+                }
+            }
 
             return page;
         }
@@ -347,10 +400,10 @@ namespace osu.Game.Overlays.Comments
         {
             deletedCommentsPlaceholder.DeletedCount.Value = replies.Count(c => c.IsDeleted);
 
-            chevronButton.FadeTo(comment.IsTopLevel && replies.Any() ? 1 : 0);
-            repliesButton.FadeTo(replies.Any() ? 1 : 0);
-            loadRepliesButton.FadeTo(replies.Any() || comment.RepliesCount == 0 ? 0 : 1);
-            showMoreRepliesButton.FadeTo((!replies.Any() && comment.RepliesCount > 0) || replies.Count == comment.RepliesCount ? 0 : 1);
+            chevronButton.FadeTo(comment.IsTopLevel && (replies.Any() || responses.Any())? 1 : 0);
+            repliesButton.FadeTo(replies.Any() || responses.Any() ? 1 : 0);
+            loadRepliesButton.FadeTo(replies.Any() || responses.Any() || comment.RepliesCount == 0 ? 0 : 1);
+            showMoreRepliesButton.FadeTo((!replies.Any() && !responses.Any() && comment.RepliesCount > 0) || replies.Count == comment.RepliesCount || replies.Count - responses.Count == comment.RepliesCount || comment.RepliesCount == 0 ? 0 : 1);
 
             loadRepliesButton.IsLoading = showMoreRepliesButton.IsLoading = false;
         }
@@ -376,7 +429,7 @@ namespace osu.Game.Overlays.Comments
         private class RepliesButton : ShowRepliesButton
         {
             private readonly SpriteText text;
-            private readonly int repliesCount;
+            private int repliesCount;
 
             public RepliesButton(Comment comment)
             {
@@ -386,6 +439,12 @@ namespace osu.Game.Overlays.Comments
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 };
+            }
+
+            public void IncreaseCount()
+            {
+                repliesCount++;
+                Expanded.TriggerChange();
             }
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
@@ -419,7 +478,6 @@ namespace osu.Game.Overlays.Comments
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
                 Spacing = new Vector2(3, 0);
-                Alpha = comment.ParentId == null ? 0 : 1;
                 Children = new Drawable[]
                 {
                     new SpriteIcon

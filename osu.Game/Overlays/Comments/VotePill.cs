@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
 
-            if (comment.User.Id == api.LocalUser.Value.Id)
+            if (comment.User?.Id == api.LocalUser.Value.Id)
                 isDisabled = true;
 
             if (!isDisabled)
