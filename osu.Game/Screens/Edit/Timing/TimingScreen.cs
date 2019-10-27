@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Edit.Timing
             private IBindableList<ControlPointGroup> controlGroups;
 
             [Resolved]
-            protected IFrameBasedClock EditorClock { get; private set; }
+            private IFrameBasedClock clock { get; set; }
 
             [Resolved]
             protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
@@ -133,11 +134,13 @@ namespace osu.Game.Screens.Edit.Timing
                     return;
 
                 Beatmap.Value.Beatmap.ControlPointInfo.RemoveGroup(selectedGroup.Value);
+
+                selectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.Groups.FirstOrDefault(g => g.Time >= clock.CurrentTime);
             }
 
             private void addNew()
             {
-                selectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.CreateGroup(EditorClock.CurrentTime);
+                selectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.CreateGroup(clock.CurrentTime);
             }
         }
     }
