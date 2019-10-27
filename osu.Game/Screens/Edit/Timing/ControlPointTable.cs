@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Timing
                 Direction = FillDirection.Horizontal,
                 ChildrenEnumerable = group.ControlPoints.Select(createAttribute).Where(c => c != null),
                 Padding = new MarginPadding(10),
-                Spacing = new Vector2(10)
+                Spacing = new Vector2(2)
             },
         };
 
