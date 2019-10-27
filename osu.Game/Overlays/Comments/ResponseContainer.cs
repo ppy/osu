@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool Expanded = new BindableBool();
 
+        private readonly Bindable<string> text = new Bindable<string>();
+
         private readonly Comment comment;
         private readonly ReplyButton replyButton;
         private readonly ResponseTextBox textBox;
@@ -57,6 +59,7 @@ namespace osu.Game.Overlays.Comments
                     RelativeSizeAxes = Axes.X,
                     Height = height / 2f,
                     PlaceholderText = @"Type your response here",
+                    Current = text,
                 },
                 new Container
                 {
@@ -89,8 +92,9 @@ namespace osu.Game.Overlays.Comments
                                 },
                                 replyButton = new ReplyButton
                                 {
-                                    Action = onAction,
-                                    Expanded = { BindTarget = Expanded }
+                                    ClickAction = onAction,
+                                    Expanded = { BindTarget = Expanded },
+                                    Text = { BindTarget = text }
                                 }
                             }
                         }
@@ -120,7 +124,7 @@ namespace osu.Game.Overlays.Comments
 
         private void onAction()
         {
-            request = new PostCommentRequest(comment.CommentableId, comment.CommentableType, textBox.Text, comment.Id);
+            request = new PostCommentRequest(comment.CommentableId, comment.CommentableType, textBox.Current.Value, comment.Id);
             request.Success += onSuccess;
             api.Queue(request);
         }
@@ -174,11 +178,11 @@ namespace osu.Game.Overlays.Comments
             public readonly BindableBool Expanded = new BindableBool();
 
             private Box background;
-            protected SpriteText Text;
+            protected SpriteText DrawableText;
 
             public Button(string buttonText)
             {
-                Text.Text = buttonText;
+                DrawableText.Text = buttonText;
 
                 AutoSizeAxes = Axes.Both;
                 LoadingAnimationSize = new Vector2(10);
@@ -202,12 +206,12 @@ namespace osu.Game.Overlays.Comments
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    Text = new SpriteText
+                    DrawableText = new SpriteText
                     {
                         AlwaysPresent = true,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Horizontal = 10 },
+                        Margin = new MarginPadding { Horizontal = 15 },
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold),
                     }
                 }
@@ -229,16 +233,31 @@ namespace osu.Game.Overlays.Comments
         {
             private const int duration = 200;
 
+            public readonly Bindable<string> Text = new Bindable<string>();
+            public Action ClickAction;
+
             public ReplyButton()
                 : base(@"Reply")
             {
             }
 
-            protected override void OnLoadStarted() => Text.FadeOut(duration, Easing.OutQuint);
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Text.BindValueChanged(onTextChanged, true);
+            }
+
+            private void onTextChanged(ValueChangedEvent<string> text)
+            {
+                Action = string.IsNullOrEmpty(text.NewValue) ? null : ClickAction;
+                this.FadeColour(string.IsNullOrEmpty(text.NewValue) ? OsuColour.Gray(0.5f) : Color4.White, 200, Easing.OutQuint);
+            }
+
+            protected override void OnLoadStarted() => DrawableText.FadeOut(duration, Easing.OutQuint);
 
             protected override void OnLoadFinished()
             {
-                Text.FadeIn(duration, Easing.OutQuint);
+                DrawableText.FadeIn(duration, Easing.OutQuint);
                 Expanded.Value = false;
             }
         }
