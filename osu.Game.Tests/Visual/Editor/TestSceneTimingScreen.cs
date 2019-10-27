@@ -17,6 +17,11 @@ namespace osu.Game.Tests.Visual.Editor
         {
             typeof(ControlPointTable),
             typeof(ControlPointSettings),
+            typeof(Section<>),
+            typeof(TimingSection),
+            typeof(EffectSection),
+            typeof(SampleSection),
+            typeof(DifficultySection),
             typeof(RowAttribute)
         };
 
