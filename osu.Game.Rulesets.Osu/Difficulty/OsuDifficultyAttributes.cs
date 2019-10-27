@@ -8,7 +8,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     public class OsuDifficultyAttributes : DifficultyAttributes
     {
         public double TapSR;
-        internal double TapDiff;
+        public double TapDiff;
+        public double BurstStrain;
         public double StreamNoteCount;
         public double[] MashLevels;
         public double[] TapSkills;

@@ -194,8 +194,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Assume SS for non-stream parts
             double accOnStreams = 1 - (1 - modifiedAcc) * totalHits / Attributes.StreamNoteCount;
 
-            double mashLevel = 1 - SpecialFunctions.Logistic((accOnStreams - 0.75) / 0.1) / SpecialFunctions.Logistic(2.5);
-            
+            // accOnStreams can be negative. The formula below ensures a positive acc while
+            // preserving the value when accOnStreams is close to 1
+            double accOnStreamsPositive = Math.Exp(accOnStreams - 1);
+
+            double urOnStreams = 10 * (greatWindow) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
+
+            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.BurstStrain) - 4000) / 1000);
+
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
 

@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
 
             // Tap
-            (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
+            (var tapDiff, var burstStrain, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
 
             // Finger Control
@@ -85,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 TapSR = tapSR,
                 TapDiff = tapDiff,
+                BurstStrain = burstStrain,
                 StreamNoteCount = streamNoteCount,
                 MashLevels = mashLevels,
                 TapSkills = tapSkills,

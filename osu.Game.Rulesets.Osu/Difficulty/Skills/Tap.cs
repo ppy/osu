@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                                                  .PointwiseExp();
 
 
-        public static (double, double, double[], double[], List<Vector<double>>) CalculateTapAttributes
+        public static (double, double, double, double[], double[], List<Vector<double>>) CalculateTapAttributes
             (List<OsuHitObject> hitObjects, double clockRate)
         {
             (var strainHistory, var tapDiff) = calculateTapStrain(hitObjects, 0, clockRate);
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             (var mashLevels, var tapSkills) = calculateMashLevelsVSTapSkills(hitObjects, clockRate);
 
-            return (tapDiff, streamNoteCount, mashLevels, tapSkills, strainHistory);
+            return (tapDiff, burstStrain, streamNoteCount, mashLevels, tapSkills, strainHistory);
         }
 
         /// <summary>
