@@ -119,7 +119,16 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Expanded.BindValueChanged(expanded => this.FadeTo(expanded.NewValue ? 1 : 0), true);
+            Expanded.BindValueChanged(expanded =>
+            {
+                if (expanded.NewValue)
+                    Show();
+                else
+                {
+                    Hide();
+                    textBox.Current.Value = string.Empty;
+                }
+            }, true);
         }
 
         private void onAction()
