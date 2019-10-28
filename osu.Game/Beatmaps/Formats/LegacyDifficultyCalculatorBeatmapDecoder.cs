@@ -28,11 +28,11 @@ namespace osu.Game.Beatmaps.Formats
         }
 
         protected override TimingControlPoint CreateTimingControlPoint()
-            => new LegacyDifficultyCalculatorControlPoint();
+            => new LegacyDifficultyCalculatorTimingControlPoint();
 
-        private class LegacyDifficultyCalculatorControlPoint : TimingControlPoint
+        private class LegacyDifficultyCalculatorTimingControlPoint : TimingControlPoint
         {
-            public LegacyDifficultyCalculatorControlPoint()
+            public LegacyDifficultyCalculatorTimingControlPoint()
             {
                 BeatLengthBindable.MinValue = double.MinValue;
                 BeatLengthBindable.MaxValue = double.MaxValue;
