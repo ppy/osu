@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -85,7 +84,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             InternalChildren.ForEach(c => c.Filter(criteria));
             // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
-            InternalChildren = InternalChildren.OrderBy(c => c, new CriteriaComparer(criteria)).ToList();
+            var criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
+            InternalChildren = InternalChildren.OrderBy(c => c, criteriaComparer).ToList();
         }
 
         protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)
@@ -101,24 +101,6 @@ namespace osu.Game.Screens.Select.Carousel
                 }
 
                 State.Value = CarouselItemState.Selected;
-            }
-        }
-
-        private class CriteriaComparer : IComparer<CarouselItem>
-        {
-            private readonly FilterCriteria criteria;
-
-            public CriteriaComparer(FilterCriteria criteria)
-            {
-                this.criteria = criteria;
-            }
-
-            public int Compare(CarouselItem x, CarouselItem y)
-            {
-                if (x != null && y != null)
-                    return x.CompareTo(criteria, y);
-
-                throw new ArgumentNullException();
             }
         }
     }
