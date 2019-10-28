@@ -295,6 +295,7 @@ namespace osu.Game.Overlays.Comments
                 noCommentsPlaceholder.Show();
                 moreButton.IsLoading = false;
                 moreButton.Hide();
+                showHeader();
                 return;
             }
 
@@ -353,10 +354,15 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Hide();
                 }
 
-                responseContainer.SetParameters(type.Value, id.Value);
-                isReadyForReply.Value = true;
-                header.Show();
+                showHeader();
             }, loadCancellation.Token);
+        }
+
+        private void showHeader()
+        {
+            responseContainer.SetParameters(type.Value, id.Value);
+            isReadyForReply.Value = true;
+            header.Show();
         }
 
         protected override void Dispose(bool isDisposing)
