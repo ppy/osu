@@ -321,6 +321,7 @@ namespace osu.Game.Overlays.Comments
 
             replies.ForEach(c =>
             {
+                c.ParentComment = comment;
                 page.Add(new DrawableComment(c)
                 {
                     ShowDeleted = { BindTarget = ShowDeleted },

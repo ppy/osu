@@ -18,19 +18,11 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 comments = value;
-
-                foreach (var comment in comments)
+                comments.ForEach(comment =>
                 {
                     if (comment.IsReply)
-                        foreach (var parent in comments)
-                        {
-                            if (comment.Id != parent.Id)
-                                checkParentDependency(parent, comment);
-
-                            if (comment.ParentComment != null)
-                                break;
-                        }
-                }
+                        comments.ForEach(parent => checkParentDependency(parent, comment));
+                });
             }
         }
 
@@ -52,37 +44,11 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 includedComments = value;
-
-                foreach (var comment in includedComments)
+                value.ForEach(comment =>
                 {
-                    if (comment.IsReply)
-                    {
-                        foreach (var parent in includedComments)
-                        {
-                            if (comment.Id != parent.Id)
-                                checkParentDependency(parent, comment);
-
-                            if (comment.ParentComment != null)
-                                break;
-                        }
-
-                        if (comment.ParentComment != null)
-                        {
-                            foreach (var parent in comments)
-                            {
-                                if (comment.Id != parent.Id)
-                                    checkParentDependency(parent, comment);
-
-                                if (comment.ParentComment != null)
-                                    break;
-                            }
-                        }
-                    }
-
-                    // The comment can be a parent for comments in Comments
-                    foreach (var reply in comments)
-                        checkParentDependency(comment, reply);
-                }
+                    value.ForEach(parent => checkParentDependency(parent, comment));
+                    comments.ForEach(parent => checkParentDependency(parent, comment));
+                });
             }
         }
 
