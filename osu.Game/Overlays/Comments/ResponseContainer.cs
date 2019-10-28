@@ -33,10 +33,11 @@ namespace osu.Game.Overlays.Comments
 
         private PostCommentRequest request;
         private readonly PostButton postButton;
-        private readonly FillFlowContainer<Button> additionalButtonsPlaceholder;
 
-        public ResponseContainer()
+        protected ResponseContainer()
         {
+            FillFlowContainer<Button> additionalButtonsPlaceholder;
+
             Height = 60;
             RelativeSizeAxes = Axes.X;
             Masking = true;

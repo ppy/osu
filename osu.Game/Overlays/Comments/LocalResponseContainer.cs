@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Comments
             }, true);
         }
 
-        protected override Button[] AddButtons() => new[]
+        protected override Button[] AddButtons() => new Button[]
         {
             new CancelButton
             {

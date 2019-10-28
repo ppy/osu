@@ -370,13 +370,13 @@ namespace osu.Game.Overlays.Comments
                 Direction = FillDirection.Vertical,
             };
 
-            foreach (var comment in replies)
+            foreach (var reply in replies)
             {
                 bool exists = false;
 
                 foreach (var response in responses)
                 {
-                    if (comment.Id == response.Id)
+                    if (reply.Id == response.Id)
                     {
                         exists = true;
                         break;
@@ -385,7 +385,7 @@ namespace osu.Game.Overlays.Comments
 
                 if (!exists)
                 {
-                    page.Add(new DrawableComment(comment)
+                    page.Add(new DrawableComment(reply)
                     {
                         ShowDeleted = { BindTarget = ShowDeleted },
                         Sort = { BindTarget = Sort }
@@ -400,7 +400,7 @@ namespace osu.Game.Overlays.Comments
         {
             deletedCommentsPlaceholder.DeletedCount.Value = replies.Count(c => c.IsDeleted);
 
-            chevronButton.FadeTo(comment.IsTopLevel && (replies.Any() || responses.Any())? 1 : 0);
+            chevronButton.FadeTo(comment.IsTopLevel && (replies.Any() || responses.Any()) ? 1 : 0);
             repliesButton.FadeTo(replies.Any() || responses.Any() ? 1 : 0);
             loadRepliesButton.FadeTo(replies.Any() || responses.Any() || comment.RepliesCount == 0 ? 0 : 1);
             showMoreRepliesButton.FadeTo((!replies.Any() && !responses.Any() && comment.RepliesCount > 0) || replies.Count == comment.RepliesCount || replies.Count - responses.Count == comment.RepliesCount || comment.RepliesCount == 0 ? 0 : 1);

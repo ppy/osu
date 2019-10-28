@@ -25,7 +25,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DeletedCommentsPlaceholder),
             typeof(VotePill),
             typeof(GetCommentRepliesButton),
-            typeof(ResponseContainer)
+            typeof(ResponseContainer),
+            typeof(LocalResponseContainer),
+            typeof(GlobalResponseContainer)
         };
 
         protected override bool UseOnlineAPI => true;
