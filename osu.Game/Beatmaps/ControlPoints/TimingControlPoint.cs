@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The time signature at this control point.
         /// </summary>
-        public readonly Bindable<TimeSignatures> TimeSignatureBindable = new Bindable<TimeSignatures>(TimeSignatures.SimpleQuadruple);
+        public readonly Bindable<TimeSignatures> TimeSignatureBindable = new Bindable<TimeSignatures>(TimeSignatures.SimpleQuadruple) { Default = TimeSignatures.SimpleQuadruple };
 
         /// <summary>
         /// The time signature at this control point.
@@ -29,6 +29,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public readonly BindableDouble BeatLengthBindable = new BindableDouble(DEFAULT_BEAT_LENGTH)
         {
+            Default = DEFAULT_BEAT_LENGTH,
             MinValue = 6,
             MaxValue = 60000
         };
