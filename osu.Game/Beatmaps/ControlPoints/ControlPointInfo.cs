@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
     public class ControlPointInfo
     {
         /// <summary>
-        /// Control point groups.
+        /// All control points grouped by time.
         /// </summary>
         [JsonProperty]
         public IBindableList<ControlPointGroup> Groups => groups;
@@ -87,28 +87,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         public TimingControlPoint TimingPointAt(double time) => binarySearchWithFallback(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
-        /// Finds the closest <see cref="ControlPoint"/> of the same type as <see cref="referencePoint"/> that is active at <paramref name="time"/>.
-        /// </summary>
-        /// <param name="time">The time to find the timing control point at.</param>
-        /// <param name="referencePoint">A reference point to infer type.</param>
-        /// <returns>The timing control point.</returns>
-        public ControlPoint SimilarPointAt(double time, ControlPoint referencePoint)
-        {
-            switch (referencePoint)
-            {
-                case TimingControlPoint _: return binarySearch(TimingPoints, time);
-
-                case EffectControlPoint _: return binarySearch(EffectPoints, time);
-
-                case SampleControlPoint _: return binarySearch(SamplePoints, time);
-
-                case DifficultyControlPoint _: return binarySearch(DifficultyPoints, time);
-            }
-
-            return null;
-        }
-
-        /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
         /// </summary>
         [JsonIgnore]
@@ -128,6 +106,62 @@ namespace osu.Game.Beatmaps.ControlPoints
         [JsonIgnore]
         public double BPMMode =>
             60000 / (TimingPoints.GroupBy(c => c.BeatLength).OrderByDescending(grp => grp.Count()).FirstOrDefault()?.FirstOrDefault() ?? new TimingControlPoint()).BeatLength;
+
+        /// <summary>
+        /// Remove all <see cref="ControlPointGroup"/>s and return to a pristine state.
+        /// </summary>
+        public void Clear()
+        {
+            groups.Clear();
+            timingPoints.Clear();
+            difficultyPoints.Clear();
+            samplePoints.Clear();
+            effectPoints.Clear();
+        }
+
+        /// <summary>
+        /// Add a new <see cref="ControlPoint"/>. Note that the provided control point may not be added if the correct state is already present at the provided time.
+        /// </summary>
+        /// <param name="time">The time at which the control point should be added.</param>
+        /// <param name="controlPoint">The control point to add.</param>
+        /// <returns>Whether the control point was added.</returns>
+        public bool Add(double time, ControlPoint controlPoint)
+        {
+            if (checkAlreadyExisting(time, controlPoint))
+                return false;
+
+            GroupAt(time, true).Add(controlPoint);
+            return true;
+        }
+
+        public ControlPointGroup GroupAt(double time, bool addIfNotExisting = false)
+        {
+            var newGroup = new ControlPointGroup(time);
+
+            int i = groups.BinarySearch(newGroup);
+
+            if (i >= 0)
+                return groups[i];
+
+            if (addIfNotExisting)
+            {
+                newGroup.ItemAdded += groupItemAdded;
+                newGroup.ItemRemoved += groupItemRemoved;
+
+                groups.Insert(~i, newGroup);
+                return newGroup;
+            }
+
+            return null;
+        }
+
+        public void RemoveGroup(ControlPointGroup group)
+        {
+            group.ItemAdded -= groupItemAdded;
+            group.ItemRemoved -= groupItemRemoved;
+
+            groups.Remove(group);
+        }
 
         /// <summary>
         /// Binary searches one of the control point lists to find the active control point at <paramref name="time"/>.
@@ -183,33 +217,6 @@ namespace osu.Game.Beatmaps.ControlPoints
             return list[l - 1];
         }
 
-        public void Add(double time, ControlPoint newPoint, bool force = false)
-        {
-            if (!force && checkAlreadyExisting(time, newPoint))
-                return;
-
-            GroupAt(time, true).Add(newPoint);
-        }
-
-        public ControlPointGroup GroupAt(double time, bool createIfNotExisting = false)
-        {
-            var existing = Groups.FirstOrDefault(g => g.Time == time);
-
-            if (existing != null)
-                return existing;
-
-            if (createIfNotExisting)
-            {
-                var newGroup = new ControlPointGroup(time);
-                newGroup.ItemAdded += groupItemAdded;
-                newGroup.ItemRemoved += groupItemRemoved;
-                groups.Add(newGroup);
-                return newGroup;
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Check whether <see cref="newPoint"/> should be added.
         /// </summary>
@@ -243,31 +250,9 @@ namespace osu.Game.Beatmaps.ControlPoints
             return existing?.EquivalentTo(newPoint) == true;
         }
 
-        private void groupItemRemoved(ControlPoint obj)
+        private void groupItemAdded(ControlPoint controlPoint)
         {
-            switch (obj)
-            {
-                case TimingControlPoint typed:
-                    timingPoints.Remove(typed);
-                    break;
-
-                case EffectControlPoint typed:
-                    effectPoints.Remove(typed);
-                    break;
-
-                case SampleControlPoint typed:
-                    samplePoints.Remove(typed);
-                    break;
-
-                case DifficultyControlPoint typed:
-                    difficultyPoints.Remove(typed);
-                    break;
-            }
-        }
-
-        private void groupItemAdded(ControlPoint obj)
-        {
-            switch (obj)
+            switch (controlPoint)
             {
                 case TimingControlPoint typed:
                     timingPoints.Add(typed);
@@ -287,29 +272,26 @@ namespace osu.Game.Beatmaps.ControlPoints
             }
         }
 
-        public void Clear()
+        private void groupItemRemoved(ControlPoint controlPoint)
         {
-            groups.Clear();
-            timingPoints.Clear();
-            difficultyPoints.Clear();
-            samplePoints.Clear();
-            effectPoints.Clear();
+            switch (controlPoint)
+            {
+                case TimingControlPoint typed:
+                    timingPoints.Remove(typed);
+                    break;
+
+                case EffectControlPoint typed:
+                    effectPoints.Remove(typed);
+                    break;
+
+                case SampleControlPoint typed:
+                    samplePoints.Remove(typed);
+                    break;
+
+                case DifficultyControlPoint typed:
+                    difficultyPoints.Remove(typed);
+                    break;
+            }
         }
-
-        public ControlPointGroup CreateGroup(double time)
-        {
-            var newGroup = new ControlPointGroup(time);
-
-            int i = groups.BinarySearch(newGroup);
-
-            if (i > 0)
-                return groups[i];
-
-            groups.Insert(~i, newGroup);
-
-            return newGroup;
-        }
-
-        public void RemoveGroup(ControlPointGroup group) => groups.Remove(group);
     }
 }

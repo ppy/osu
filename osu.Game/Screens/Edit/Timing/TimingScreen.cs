@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             private void addNew()
             {
-                selectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.CreateGroup(clock.CurrentTime);
+                selectedGroup.Value = Beatmap.Value.Beatmap.ControlPointInfo.GroupAt(clock.CurrentTime, true);
             }
         }
     }
