@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Framework.Lists;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -16,9 +17,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// Control point groups.
         /// </summary>
         [JsonProperty]
-        public IReadOnlyList<ControlPointGroup> Groups => groups;
+        public IBindableList<ControlPointGroup> Groups => groups;
 
-        private readonly SortedList<ControlPointGroup> groups = new SortedList<ControlPointGroup>(Comparer<ControlPointGroup>.Default);
+        private readonly BindableList<ControlPointGroup> groups = new BindableList<ControlPointGroup>();
 
         /// <summary>
         /// All timing points.
@@ -272,5 +273,19 @@ namespace osu.Game.Beatmaps.ControlPoints
             samplePoints.Clear();
             effectPoints.Clear();
         }
+
+        public ControlPointGroup CreateGroup(double time)
+        {
+            var newGroup = new ControlPointGroup(time);
+
+            int i = groups.BinarySearch(newGroup);
+            if (i < 0) i = ~i;
+
+            groups.Insert(i, newGroup);
+
+            return newGroup;
+        }
+
+        public void RemoveGroup(ControlPointGroup group) => groups.Remove(group);
     }
 }
