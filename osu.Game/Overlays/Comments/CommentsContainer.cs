@@ -343,6 +343,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     int loadedTopLevelComments = 0;
                     content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
+                    loadedTopLevelComments += responsesContainer.Children.Count;
 
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
