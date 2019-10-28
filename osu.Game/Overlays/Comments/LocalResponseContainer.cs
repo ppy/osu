@@ -51,6 +51,8 @@ namespace osu.Game.Overlays.Comments
             Text = { BindTarget = Text }
         };
 
+        protected override string CreateTextBoxPlaceholder() => @"Type your response here";
+
         protected override PostCommentRequest CreateRequest() =>
             new PostCommentRequest(comment.CommentableId, comment.CommentableType, TextBox.Current.Value, comment.Id);
 

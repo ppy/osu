@@ -43,6 +43,8 @@ namespace osu.Game.Overlays.Comments
             return newReply;
         }
 
+        protected override string CreateTextBoxPlaceholder() => @"Type new comment here";
+
         private class ReadyPostButton : PostButton
         {
             public readonly BindableBool IsReadyForReply = new BindableBool();

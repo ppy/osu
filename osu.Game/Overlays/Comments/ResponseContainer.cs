@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
-                    PlaceholderText = @"Type your response here",
+                    PlaceholderText = CreateTextBoxPlaceholder(),
                     Current = Text,
                 },
                 new Container
@@ -115,6 +115,8 @@ namespace osu.Game.Overlays.Comments
         }
 
         protected virtual Button[] AddButtons() => null;
+
+        protected abstract string CreateTextBoxPlaceholder();
 
         protected abstract PostButton CreatePostButton();
 
