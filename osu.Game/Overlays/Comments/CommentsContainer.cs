@@ -344,7 +344,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     int loadedTopLevelComments = 0;
                     content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
-                    loadedTopLevelComments += responsesContainer.Children.Count;
+                    loadedTopLevelComments += responsesContainer.Children.Count();
 
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
@@ -360,9 +360,12 @@ namespace osu.Game.Overlays.Comments
 
         private void showHeader()
         {
-            responseContainer.SetParameters(type.Value, id.Value);
-            isReadyForReply.Value = true;
-            header.Show();
+            if (type.HasValue && id.HasValue)
+            {
+                responseContainer.SetParameters(type.Value, id.Value);
+                isReadyForReply.Value = true;
+                header.Show();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
