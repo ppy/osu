@@ -385,6 +385,7 @@ namespace osu.Game.Overlays.Comments
 
                 if (!exists)
                 {
+                    reply.ParentComment = comment;
                     page.Add(new DrawableComment(reply)
                     {
                         ShowDeleted = { BindTarget = ShowDeleted },
