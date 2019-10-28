@@ -204,8 +204,8 @@ namespace osu.Game.Beatmaps.Formats
             }
 
             public override bool EquivalentTo(ControlPoint other) =>
-                base.EquivalentTo(other)
-                && CustomSampleBank == ((LegacySampleControlPoint)other).CustomSampleBank;
+                base.EquivalentTo(other) && other is LegacySampleControlPoint otherTyped &&
+                CustomSampleBank == otherTyped.CustomSampleBank;
         }
     }
 }
