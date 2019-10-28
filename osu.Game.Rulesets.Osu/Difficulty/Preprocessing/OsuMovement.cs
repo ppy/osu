@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0f = { 0, 1, 1.7, 2.3 };
-        private static readonly double[] ks0f = { -14.4, -9.1, -7.3, -2 };
+        private static readonly double[] ks0f = { -14.4, -9.5, -7.3, -2 };
         private static readonly double[] scales0f = { 1, 1, 1, 1 };
         private static readonly double[,,] coeffs0f = new double[,,]  {{{ 0   , -1   , -1.7 , -2   },
                                                                         { 0   ,  0   ,  0   ,  0   },
@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
 
         private static readonly double[] ds0s = { 0, 1.5, 2.5, 4, 6, 8 };
-        private static readonly double[] ks0s = { -0.6, -1.4, -6, -5.3, -3.3, -3.3 };
-        private static readonly double[] scales0s = { 1, 0.85, 0.5, 1, 1, 1 };
+        private static readonly double[] ks0s = { -1, -1.8, -5.8, -5.8, -4, -4 };
+        private static readonly double[] scales0s = { 1, 0.85, 0.6, 1, 1, 1 };
         private static readonly double[,,] coeffs0s = new double[,,]  {{{ 0.5 ,  2   ,  2.8 ,  4   ,  6   ,  6   },
                                                                         { 0   ,  0   ,  0   ,  0   ,  0   ,  0   },
                                                                         { 1   ,  1   ,  1   ,  0   ,  0   ,  0   },
@@ -211,7 +211,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                             double correction0_moving = correction0MovingSpline.Interpolate(cos012);
 
                             double movingness = SpecialFunctions.Logistic(d01 * 2) * 2 - 1;
-                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0Still) * 1.6;
+                            correction0 = (movingness * correction0_moving + (1 - movingness) * correction0Still) * 1.5;
                         }
                     }
                     else if (tRatio0 < 1 / tRatioThreshold)
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         else
                         {
                             double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
-                            correction0 = (1 - cos012) * SpecialFunctions.Logistic((d01 * tRatio0 - 1.5) * 4) * 0.33;
+                            correction0 = (1 - cos012) * SpecialFunctions.Logistic((d01 * tRatio0 - 1.5) * 4) * 0.3;
                         }
                     }
                     else
@@ -335,7 +335,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (d12 > 0 && tapStrain != null)
             {
-                tapCorrection = SpecialFunctions.Logistic((Mean.PowerMean(tapStrain, 2) / IP12 - 1.34) / 0.1) * 0.3;
+                tapCorrection = SpecialFunctions.Logistic((Mean.PowerMean(tapStrain, 2) / IP12 - 1.34) / 0.1) * 0.25;
             }
 
             // Correction #5 - Cheesing
@@ -478,7 +478,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private static double calcCorrection0Stop(double d, double x, double y)
         {
-            return SpecialFunctions.Logistic(10 * Math.Sqrt(x * x + y * y + 1) - 11.5);
+            return SpecialFunctions.Logistic(10 * Math.Sqrt(x * x + y * y + 1) - 12);
         }
     }
 }

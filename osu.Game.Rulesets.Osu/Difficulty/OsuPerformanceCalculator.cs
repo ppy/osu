@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                tp = Math.Min(tp, 1.47 * Math.Pow(tp, 0.8));
+                tp = Math.Pow(tp, 0.8);
 
             double aimValue = tpToPP(tp * cheeseFactor);
 
@@ -194,14 +194,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Assume SS for non-stream parts
             double accOnStreams = 1 - (1 - modifiedAcc) * totalHits / Attributes.StreamNoteCount;
 
-            // accOnStreams can be negative. The formula below ensures a positive acc while
-            // preserving the value when accOnStreams is close to 1
-            double accOnStreamsPositive = Math.Exp(accOnStreams - 1);
-
-            double urOnStreams = 10 * (greatWindow) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
-
-            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.BurstStrain) - 4000) / 1000);
-
+            double mashLevel = 1 - SpecialFunctions.Logistic((accOnStreams - 0.75) / 0.1) / SpecialFunctions.Logistic(2.5);
+            
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
 
@@ -239,7 +233,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double deviationOnCircles = (greatWindow + 20) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 46000;
 
-            double lengthFactor = 0.2f + 0.8f * SpecialFunctions.Logistic(Attributes.Length / 90.0f);
+            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
             accuracyValue *= lengthFactor;
 
             if (mods.Any(m => m is OsuModHidden))
@@ -259,7 +253,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return modifiedAcc;
         }
 
-        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.120f;
+        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.126;
 
         private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.115f;
 
