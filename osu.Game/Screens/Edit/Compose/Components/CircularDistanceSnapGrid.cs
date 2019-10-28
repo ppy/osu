@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public override Vector2 GetSnapPosition(Vector2 position)
+        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position)
         {
             Vector2 direction = position - CentrePosition;
 
@@ -76,7 +76,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             int radialCount = Math.Max(1, (int)Math.Round(distance / radius));
 
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
-            return CentrePosition + normalisedDirection * radialCount * radius;
+            Vector2 snappedPosition = CentrePosition + normalisedDirection * radialCount * radius;
+
+            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(StartTime, (snappedPosition - CentrePosition).Length));
         }
     }
 }
