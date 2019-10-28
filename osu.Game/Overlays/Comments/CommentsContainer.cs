@@ -243,7 +243,11 @@ namespace osu.Game.Overlays.Comments
                 Sort = { BindTarget = Sort }
             };
 
-            LoadComponentAsync(response, responsesContainer.Add);
+            LoadComponentAsync(response, loaded =>
+            {
+                noCommentsPlaceholder.Hide();
+                responsesContainer.Add(loaded);
+            });
         }
 
         public void ShowComments(CommentableType type, long id, bool hideHeader = true)
