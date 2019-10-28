@@ -3,22 +3,22 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterfaceV2;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     internal class EffectSection : Section<EffectControlPoint>
     {
-        private OsuSpriteText kiai;
-        private OsuSpriteText omitBarLine;
+        private LabelledSwitchButton kiai;
+        private LabelledSwitchButton omitBarLine;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Flow.AddRange(new[]
             {
-                kiai = new OsuSpriteText(),
-                omitBarLine = new OsuSpriteText(),
+                kiai = new LabelledSwitchButton { Label = "Kiai Time" },
+                omitBarLine = new LabelledSwitchButton { Label = "Skip Bar Line" },
             });
         }
 
@@ -28,8 +28,11 @@ namespace osu.Game.Screens.Edit.Timing
 
             ControlPoint.BindValueChanged(point =>
             {
-                kiai.Text = $"Kiai: {(point.NewValue?.KiaiMode == true ? "on" : "off")}";
-                omitBarLine.Text = $"Skip Bar Line: {(point.NewValue?.OmitFirstBarLine == true ? "on" : "off")}";
+                if (point.NewValue != null)
+                {
+                    kiai.Current = point.NewValue.KiaiModeBindable;
+                    omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
+                }
             });
         }
 

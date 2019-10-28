@@ -2,21 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     internal class DifficultySection : Section<DifficultyControlPoint>
     {
-        private OsuSpriteText multiplier;
+        private SettingsSlider<double> multiplier;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Flow.AddRange(new[]
             {
-                multiplier = new OsuSpriteText(),
+                multiplier = new SettingsSlider<double>
+                {
+                    LabelText = "Speed Multiplier",
+                    Bindable = new DifficultyControlPoint().SpeedMultiplierBindable,
+                    RelativeSizeAxes = Axes.X,
+                }
             });
         }
 
@@ -24,7 +30,13 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            ControlPoint.BindValueChanged(point => { multiplier.Text = $"Multiplier: {point.NewValue?.SpeedMultiplier::0.##}x"; });
+            ControlPoint.BindValueChanged(point =>
+            {
+                if (point.NewValue != null)
+                {
+                    multiplier.Bindable = point.NewValue.SpeedMultiplierBindable;
+                }
+            }, true);
         }
 
         protected override DifficultyControlPoint CreatePoint()
