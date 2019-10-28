@@ -33,6 +33,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private PlacementState state;
 
+        [Resolved(CanBeNull = true)]
+        private HitObjectComposer composer { get; set; }
+
         public SliderPlacementBlueprint()
             : base(new Objects.Slider())
         {
@@ -48,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                new PathControlPointVisualiser(HitObject),
+                new PathControlPointVisualiser(HitObject) { ControlPointsChanged = _ => updateSlider() },
             };
 
             setState(PlacementState.Initial);
@@ -131,8 +134,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            var newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+            Vector2[] newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
+
+            var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+            var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
+
+            HitObject.Path = new SliderPath(unsnappedPath.Type, newControlPoints, snappedDistance);
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
