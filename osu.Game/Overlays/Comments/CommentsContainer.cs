@@ -16,6 +16,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -29,6 +30,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
         private readonly BindableBool isReadyForReply = new BindableBool();
+        private readonly BindableList<Comment> responses = new BindableList<Comment>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -49,6 +51,7 @@ namespace osu.Game.Overlays.Comments
         private readonly GlobalResponseContainer responseContainer;
         private readonly Container header;
         private readonly UpdateableAvatar avatar;
+        private readonly FillFlowContainer<DrawableComment> responsesContainer;
 
         public CommentsContainer()
         {
@@ -150,6 +153,12 @@ namespace osu.Game.Overlays.Comments
                                 }
                             }
                         },
+                        responsesContainer = new FillFlowContainer<DrawableComment>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical
+                        },
                         content = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -218,7 +227,27 @@ namespace osu.Game.Overlays.Comments
 
                 ShowComments(type.Value, id.Value, false);
             });
+
+            responses.ItemsAdded += onResponseAdded;
+            responseContainer.OnResponseReceived += responses.Add;
             base.LoadComplete();
+        }
+
+        private void onResponseAdded(IEnumerable<Comment> children)
+        {
+            var response = new DrawableComment(children.Single())
+            {
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre,
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort }
+            };
+
+            LoadComponentAsync(response, loaded =>
+            {
+                responsesContainer.Add(loaded);
+
+            });
         }
 
         public void ShowComments(CommentableType type, long id, bool hideHeader = true)
@@ -255,6 +284,8 @@ namespace osu.Game.Overlays.Comments
             deletedCommentsPlaceholder.DeletedCount.Value = 0;
             noCommentsPlaceholder.Hide();
             content.Clear();
+            responsesContainer.Clear();
+            responses.Clear();
         }
 
         private void onSuccess(CommentBundle response)
@@ -276,14 +307,30 @@ namespace osu.Game.Overlays.Comments
                 Direction = FillDirection.Vertical,
             };
 
-            foreach (var c in response.Comments)
+            foreach (var comment in response.Comments)
             {
-                if (c.IsTopLevel)
-                    page.Add(new DrawableComment(c)
+                if (comment.IsTopLevel)
+                {
+                    bool exists = false;
+
+                    foreach (var newComment in responses)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted },
-                        Sort = { BindTarget = Sort }
-                    });
+                        if (comment.Id == newComment.Id)
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists)
+                    {
+                        page.Add(new DrawableComment(comment)
+                        {
+                            ShowDeleted = { BindTarget = ShowDeleted },
+                            Sort = { BindTarget = Sort }
+                        });
+                    }
+                }
             }
 
             LoadComponentAsync(page, loaded =>

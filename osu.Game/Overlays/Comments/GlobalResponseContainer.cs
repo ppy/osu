@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override Comment OnSuccess(CommentBundle response)
         {
+            TextBox.Current.Value = string.Empty;
             Comment newReply = response.Comments.First();
             return newReply;
         }
