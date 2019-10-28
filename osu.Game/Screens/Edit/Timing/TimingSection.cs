@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Timing
 
             ControlPoint.BindValueChanged(point =>
             {
-                bpm.Text = $"BPM: {point.NewValue?.BeatLength}";
+                bpm.Text = $"BPM: {point.NewValue?.BPM:0.##}";
                 timeSignature.Text = $"Signature: {point.NewValue?.TimeSignature}";
             });
         }

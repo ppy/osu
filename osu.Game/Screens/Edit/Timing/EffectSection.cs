@@ -25,8 +25,8 @@ namespace osu.Game.Screens.Edit.Timing
 
             ControlPoint.BindValueChanged(point =>
             {
-                kiai.Text = $"Kiai: {point.NewValue?.KiaiMode}";
-                omitBarLine.Text = $"Skip Bar Line: {point.NewValue?.OmitFirstBarLine}";
+                kiai.Text = $"Kiai: {(point.NewValue?.KiaiMode == true ? "on" : "off")}";
+                omitBarLine.Text = $"Skip Bar Line: {(point.NewValue?.OmitFirstBarLine == true ? "on" : "off")}";
             });
         }
 

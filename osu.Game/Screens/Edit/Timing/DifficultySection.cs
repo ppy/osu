@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            ControlPoint.BindValueChanged(point => { multiplier.Text = $"Multiplier: {point.NewValue?.SpeedMultiplier}"; });
+            ControlPoint.BindValueChanged(point => { multiplier.Text = $"Multiplier: {point.NewValue?.SpeedMultiplier::0.##}x"; });
         }
 
         protected override DifficultyControlPoint CreatePoint()
