@@ -4,6 +4,7 @@
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API.Requests;
 using System.Linq;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -11,6 +12,8 @@ namespace osu.Game.Overlays.Comments
     {
         private CommentableType? type;
         private long? id;
+
+        public readonly BindableBool IsReadyForReply = new BindableBool();
 
         public void SetParameters(CommentableType type, long id)
         {
@@ -23,6 +26,13 @@ namespace osu.Game.Overlays.Comments
             Height = 70;
         }
 
+        protected override PostButton CreatePostButton() => new ReadyPostButton
+        {
+            ClickAction = OnAction,
+            Text = { BindTarget = Text },
+            IsReadyForReply = { BindTarget = IsReadyForReply }
+        };
+
         protected override PostCommentRequest CreateRequest() =>
             !type.HasValue || !id.HasValue ? null : new PostCommentRequest(id.Value, type.Value, TextBox.Current.Value);
 
@@ -30,6 +40,19 @@ namespace osu.Game.Overlays.Comments
         {
             Comment newReply = response.Comments.First();
             return newReply;
+        }
+
+        private class ReadyPostButton : PostButton
+        {
+            public readonly BindableBool IsReadyForReply = new BindableBool();
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                IsReadyForReply.BindValueChanged(_ => IsReady.TriggerChange(), true);
+            }
+
+            protected override bool ReadyCondition => base.ReadyCondition && IsReadyForReply.Value;
         }
     }
 }

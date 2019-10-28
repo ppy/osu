@@ -115,11 +115,7 @@ namespace osu.Game.Overlays.Comments
 
         protected virtual Button[] AddButtons() => null;
 
-        protected virtual PostButton CreatePostButton() => new PostButton
-        {
-            ClickAction = OnAction,
-            Text = { BindTarget = Text }
-        };
+        protected abstract PostButton CreatePostButton();
 
         protected abstract PostCommentRequest CreateRequest();
 
@@ -222,6 +218,8 @@ namespace osu.Game.Overlays.Comments
             private const int duration = 200;
 
             public readonly Bindable<string> Text = new Bindable<string>();
+            protected readonly BindableBool IsReady = new BindableBool();
+
             public Action ClickAction;
 
             public PostButton(string name = @"Post")
@@ -232,14 +230,15 @@ namespace osu.Game.Overlays.Comments
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                Text.BindValueChanged(onTextChanged, true);
+                IsReady.BindValueChanged(_ =>
+                {
+                    Action = ReadyCondition ? ClickAction : null;
+                    this.FadeColour(ReadyCondition ? Color4.White : OsuColour.Gray(0.5f), 200, Easing.OutQuint);
+                }, true);
+                Text.BindValueChanged(_ => IsReady.TriggerChange(), true);
             }
 
-            private void onTextChanged(ValueChangedEvent<string> text)
-            {
-                Action = string.IsNullOrEmpty(text.NewValue) ? null : ClickAction;
-                this.FadeColour(string.IsNullOrEmpty(text.NewValue) ? OsuColour.Gray(0.5f) : Color4.White, 200, Easing.OutQuint);
-            }
+            protected virtual bool ReadyCondition => !string.IsNullOrEmpty(Text.Value);
 
             protected override void OnLoadStarted() => DrawableText.FadeOut(duration, Easing.OutQuint);
 

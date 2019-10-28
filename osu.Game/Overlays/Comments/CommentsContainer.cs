@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Comments
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+        private readonly BindableBool isReadyForReply = new BindableBool();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -114,7 +115,10 @@ namespace osu.Game.Overlays.Comments
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
                                                 Padding = new MarginPadding { Left = 10 },
-                                                Child = responseContainer = new GlobalResponseContainer(),
+                                                Child = responseContainer = new GlobalResponseContainer
+                                                {
+                                                    IsReadyForReply = { BindTarget = isReadyForReply }
+                                                }
                                             }
                                         }
                                     }
@@ -245,6 +249,8 @@ namespace osu.Game.Overlays.Comments
             if (hideHeader)
                 header.Hide();
 
+            isReadyForReply.Value = false;
+
             currentPage = 1;
             deletedCommentsPlaceholder.DeletedCount.Value = 0;
             noCommentsPlaceholder.Hide();
@@ -300,6 +306,7 @@ namespace osu.Game.Overlays.Comments
                 }
 
                 responseContainer.SetParameters(type.Value, id.Value);
+                isReadyForReply.Value = true;
                 header.Show();
 
             }, loadCancellation.Token);
