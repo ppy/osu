@@ -2,23 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Beatmaps.Timing;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Edit.Timing
 {
     internal class TimingSection : Section<TimingControlPoint>
     {
-        private OsuSpriteText bpm;
-        private OsuSpriteText timeSignature;
+        private SettingsSlider<double> bpm;
+        private SettingsEnumDropdown<TimeSignatures> timeSignature;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Flow.AddRange(new[]
+            Flow.AddRange(new Drawable[]
             {
-                bpm = new OsuSpriteText(),
-                timeSignature = new OsuSpriteText(),
+                bpm = new BPMSlider
+                {
+                    Bindable = new TimingControlPoint().BeatLengthBindable,
+                    LabelText = "BPM",
+                },
+                timeSignature = new SettingsEnumDropdown<TimeSignatures>
+                {
+                    LabelText = "Time Signature"
+                },
             });
         }
 
@@ -28,8 +38,11 @@ namespace osu.Game.Screens.Edit.Timing
 
             ControlPoint.BindValueChanged(point =>
             {
-                bpm.Text = $"BPM: {point.NewValue?.BPM:0.##}";
-                timeSignature.Text = $"Signature: {point.NewValue?.TimeSignature}";
+                if (point.NewValue != null)
+                {
+                    bpm.Bindable = point.NewValue.BeatLengthBindable;
+                    timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
+                }
             });
         }
 
@@ -42,6 +55,36 @@ namespace osu.Game.Screens.Edit.Timing
                 BeatLength = reference.BeatLength,
                 TimeSignature = reference.TimeSignature
             };
+        }
+
+        private class BPMSlider : SettingsSlider<double>
+        {
+            private readonly BindableDouble beatLengthBindable = new BindableDouble();
+
+            private BindableDouble bpmBindable;
+
+            public override Bindable<double> Bindable
+            {
+                get => base.Bindable;
+                set
+                {
+                    // incoming will be beatlength
+
+                    beatLengthBindable.UnbindBindings();
+                    beatLengthBindable.BindTo(value);
+
+                    base.Bindable = bpmBindable = new BindableDouble(beatLengthToBpm(beatLengthBindable.Value))
+                    {
+                        MinValue = beatLengthToBpm(beatLengthBindable.MaxValue),
+                        MaxValue = beatLengthToBpm(beatLengthBindable.MinValue),
+                        Default = beatLengthToBpm(beatLengthBindable.Default),
+                    };
+
+                    bpmBindable.BindValueChanged(bpm => beatLengthBindable.Value = beatLengthToBpm(bpm.NewValue));
+                }
+            }
+
+            private double beatLengthToBpm(double beatLength) => 60000 / beatLength;
         }
     }
 }
