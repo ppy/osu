@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
@@ -17,9 +17,9 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         public double Time { get; }
 
-        public IReadOnlyList<ControlPoint> ControlPoints => controlPoints;
+        public IBindableList<ControlPoint> ControlPoints => controlPoints;
 
-        private readonly List<ControlPoint> controlPoints = new List<ControlPoint>();
+        private readonly BindableList<ControlPoint> controlPoints = new BindableList<ControlPoint>();
 
         public ControlPointGroup(double time)
         {
