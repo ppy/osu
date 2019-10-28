@@ -128,17 +128,17 @@ namespace osu.Game.Screens.Edit.Timing
                 switch (controlPoint)
                 {
                     case TimingControlPoint timing:
-                        return new RowAttribute("timing", $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
+                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
 
                     case DifficultyControlPoint difficulty:
 
-                        return new RowAttribute("difficulty", $"{difficulty.SpeedMultiplier:n2}x");
+                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x");
 
                     case EffectControlPoint effect:
-                        return new RowAttribute("effect", $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
+                        return new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
 
                     case SampleControlPoint sample:
-                        return new RowAttribute("sample", $"{sample.SampleBank} {sample.SampleVolume}%");
+                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%");
                 }
 
                 return null;
