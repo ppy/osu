@@ -24,6 +24,11 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => beatLength = MathHelper.Clamp(value, 6, 60000);
         }
 
+        /// <summary>
+        /// The BPM at this control point.
+        /// </summary>
+        public double BPM => 60000 / BeatLength;
+
         private double beatLength = DEFAULT_BEAT_LENGTH;
 
         public override bool EquivalentTo(ControlPoint other) =>

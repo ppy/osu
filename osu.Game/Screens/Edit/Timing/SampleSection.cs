@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Timing
             ControlPoint.BindValueChanged(point =>
             {
                 bank.Text = $"Bank: {point.NewValue?.SampleBank}";
-                volume.Text = $"Volume: {point.NewValue?.SampleVolume}";
+                volume.Text = $"Volume: {point.NewValue?.SampleVolume}%";
             });
         }
     }
