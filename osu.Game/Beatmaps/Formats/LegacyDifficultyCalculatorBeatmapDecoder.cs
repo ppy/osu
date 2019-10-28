@@ -32,7 +32,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private class LegacyDifficultyCalculatorControlPoint : TimingControlPoint
         {
-            public override double BeatLength { get; set; } = DEFAULT_BEAT_LENGTH;
+            public LegacyDifficultyCalculatorControlPoint()
+            {
+                BeatLengthBindable.MinValue = double.MinValue;
+                BeatLengthBindable.MaxValue = double.MaxValue;
+            }
         }
     }
 }
