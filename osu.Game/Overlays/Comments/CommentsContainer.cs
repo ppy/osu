@@ -243,11 +243,7 @@ namespace osu.Game.Overlays.Comments
                 Sort = { BindTarget = Sort }
             };
 
-            LoadComponentAsync(response, loaded =>
-            {
-                responsesContainer.Add(loaded);
-
-            });
+            LoadComponentAsync(response, responsesContainer.Add);
         }
 
         public void ShowComments(CommentableType type, long id, bool hideHeader = true)
@@ -356,7 +352,6 @@ namespace osu.Game.Overlays.Comments
                 responseContainer.SetParameters(type.Value, id.Value);
                 isReadyForReply.Value = true;
                 header.Show();
-
             }, loadCancellation.Token);
         }
 
