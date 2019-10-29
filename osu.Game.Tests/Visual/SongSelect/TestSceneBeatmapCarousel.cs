@@ -246,6 +246,28 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestSortingStability()
+        {
+            var sets = new List<BeatmapSetInfo>();
+
+            for (int i = 0; i < 20; i++)
+            {
+                var set = createTestBeatmapSet(i);
+                set.Metadata.Artist = "same artist";
+                set.Metadata.Title = "same title";
+                sets.Add(set);
+            }
+
+            loadBeatmaps(sets);
+
+            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.ID == index).All(b => b));
+
+            AddStep("Sort by title", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Title }, false));
+            AddAssert("Items remain in original order", () => carousel.BeatmapSets.Select((set, index) => set.ID == index).All(b => b));
+        }
+
+        [Test]
         public void TestSortingWithFiltered()
         {
             List<BeatmapSetInfo> sets = new List<BeatmapSetInfo>();
