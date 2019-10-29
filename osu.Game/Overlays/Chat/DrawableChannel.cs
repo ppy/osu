@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Chat
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-        protected class DaySeparator : Container
+        public class DaySeparator : Container
         {
             public float TextSize
             {
