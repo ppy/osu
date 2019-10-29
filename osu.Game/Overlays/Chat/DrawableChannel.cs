@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Chat
                 scrollToEnd();
 
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
-            int count = staleMessages.Length - Channel.MaxHistory;
+            int count = staleMessages.Length - Channel.MAX_HISTORY;
 
             for (int i = 0; i < count; i++)
             {
