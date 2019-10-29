@@ -61,6 +61,8 @@ namespace osu.Game.Overlays.Comments
         {
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
+
+            disabled = api.LocalUser.Value.Id == comment.UserId;
         }
 
         protected override void LoadComplete()
@@ -70,8 +72,6 @@ namespace osu.Game.Overlays.Comments
             votesCount.Value = comment.VotesCount;
             isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
             votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
-
-            api.LocalUser.BindValueChanged(user => disabled = user.NewValue?.Id == comment.UserId, true);
         }
 
         private void onAction()
