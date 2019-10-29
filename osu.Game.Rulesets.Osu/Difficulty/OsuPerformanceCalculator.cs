@@ -207,12 +207,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double tapValue = tapSkillToPP(tapSkill);
 
-            // Buff high acc
+            // Buff very high acc on streams
             double accBuff = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2f;
             tapValue += accBuff;
 
-            // Penalize misses exponentially
+            // Scale tap value down with accuracy
+            double accFactor = 0.5 + 0.5 * (SpecialFunctions.Logistic((accuracy - 0.65f) / 0.1f) + SpecialFunctions.Logistic(-3.5f));
+            tapValue *= accFactor;
+
+            // Penalize misses and 50s exponentially
             tapValue *= Math.Pow(0.93f, countMiss);
+            tapValue *= Math.Pow(0.98f, countMeh);
 
             double approachRateFactor = 1.0f;
             if (Attributes.ApproachRate > 10.33f)
@@ -236,6 +241,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // preserving the value when accOnCircles is close to 1
             double accOnCirclesPositive = Math.Exp(accOnCircles - 1);
 
+            // add 20 to greatWindow to nerf high OD
             double deviationOnCircles = (greatWindow + 20) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
             double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 46000;
 
@@ -253,7 +259,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double getModifiedAcc()
         {
             // Treat 300 as 300, 100 as 200, 50 as 100
-            // add 2 to countHitCircles in the denominator so that later erfinv gives resonable result for ss scores
+            // Assume all 300s on sliders/spinners and exclude them from the calculation. In other words we're
+            // estimating the scorev2 acc from scorev1 acc.
+            // Add 2 to countHitCircles in the denominator so that later erfinv gives resonable result for ss scores
             double modifiedAcc = ((countGreat - (totalHits - countHitCircles)) * 3 + countGood * 2 + countMeh) /
                                  ((countHitCircles + 2) * 3);
             return modifiedAcc;
