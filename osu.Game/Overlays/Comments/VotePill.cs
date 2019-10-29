@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Comments
             isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
             votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
 
-            api.LocalUser.BindValueChanged(user => disabled = user.NewValue?.Id == comment.UserId ? true : false, true);
+            api.LocalUser.BindValueChanged(user => disabled = user.NewValue?.Id == comment.UserId, true);
         }
 
         private void onAction()
