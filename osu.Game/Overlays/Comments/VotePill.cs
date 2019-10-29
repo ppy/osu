@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool isVoted = new BindableBool();
         private readonly BindableInt votesCount = new BindableInt();
+        private bool disabled;
 
         public VotePill(Comment comment)
         {
@@ -69,6 +70,8 @@ namespace osu.Game.Overlays.Comments
             votesCount.Value = comment.VotesCount;
             isVoted.BindValueChanged(voted => background.Colour = voted.NewValue ? AccentColour : OsuColour.Gray(0.05f), true);
             votesCount.BindValueChanged(count => votesCounter.Text = $"+{count.NewValue}", true);
+
+            api.LocalUser.BindValueChanged(user => disabled = user.NewValue?.Id == comment.UserId ? true : false, true);
         }
 
         private void onAction()
@@ -145,14 +148,28 @@ namespace osu.Game.Overlays.Comments
 
         protected override bool OnHover(HoverEvent e)
         {
+            if (disabled)
+                return false;
+
             onHoverAction();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            if (disabled)
+                return;
+
             updateDisplay();
             base.OnHoverLost(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            if (disabled)
+                return false;
+
+            return base.OnClick(e);
         }
 
         private void updateDisplay()
