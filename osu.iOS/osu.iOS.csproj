@@ -54,26 +54,66 @@
     <ITunesArtwork Include="iTunesArtwork%402x" />
   </ItemGroup>
   <ItemGroup>
-    <ImageAsset Include="Assets.xcassets\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iOSAppStore.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp1x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification1x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadProApp2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings1x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight1x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp3x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification3x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings3x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight2x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight3x.png" />
+    <ImageAsset Include="Assets.xcassets\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iOSAppStore.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp1x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadApp2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification1x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadNotification2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadProApp2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings1x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSettings2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight1x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPadSpotlight2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneApp3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneNotification3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSettings3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\iPhoneSpotlight3x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
