@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -89,8 +89,10 @@ namespace osu.Game.Overlays.Chat
 
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
+            bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
+
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
             Message lastMessage = chatLines.LastOrDefault()?.Message;
 
@@ -103,19 +105,32 @@ namespace osu.Game.Overlays.Chat
                 lastMessage = message;
             }
 
-            if (scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage))
-                scrollToEnd();
-
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
-            int count = staleMessages.Length - Channel.MaxHistory;
+            int count = staleMessages.Length - Channel.MAX_HISTORY;
 
-            for (int i = 0; i < count; i++)
+            if (count > 0)
             {
-                var d = staleMessages[i];
-                if (!scroll.IsScrolledToEnd(10))
+                void expireAndAdjustScroll(Drawable d)
+                {
                     scroll.OffsetScrollPosition(-d.DrawHeight);
-                d.Expire();
+                    d.Expire();
+                }
+
+                for (int i = 0; i < count; i++)
+                    expireAndAdjustScroll(staleMessages[i]);
+
+                // remove all adjacent day separators after stale message removal
+                for (int i = 0; i < ChatLineFlow.Count - 1; i++)
+                {
+                    if (!(ChatLineFlow[i] is DaySeparator)) break;
+                    if (!(ChatLineFlow[i + 1] is DaySeparator)) break;
+
+                    expireAndAdjustScroll(ChatLineFlow[i]);
+                }
             }
+
+            if (shouldScrollToEnd)
+                scrollToEnd();
         }
 
         private void pendingMessageResolved(Message existing, Message updated)
@@ -141,7 +156,7 @@ namespace osu.Game.Overlays.Chat
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-        protected class DaySeparator : Container
+        public class DaySeparator : Container
         {
             public float TextSize
             {

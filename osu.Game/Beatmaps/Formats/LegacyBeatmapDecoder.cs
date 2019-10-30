@@ -379,7 +379,7 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new DifficultyControlPoint
+            addControlPoint(time, new LegacyDifficultyControlPoint
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);
