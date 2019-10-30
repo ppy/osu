@@ -125,6 +125,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantExplicitParamsArrayCreation/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantImmediateDelegateInvocation/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantLambdaSignatureParentheses/@EntryIndexedValue">WARNING</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantTypeSpecificationInDefaultExpression/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantLinebreak/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantSpace/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RedundantUsingDirective/@EntryIndexedValue">ERROR</s:String>
@@ -201,6 +202,7 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedMethodReturnValue_002ELocal/@EntryIndexedValue">HINT</s:String>
 	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedParameter_002EGlobal/@EntryIndexedValue">HINT</s:String>
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UnusedParameter_002ELocal/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UseCollectionCountProperty/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UseFormatSpecifierInFormatString/@EntryIndexedValue">WARNING</s:String>
 	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=UseFormatSpecifierInInterpolation/@EntryIndexedValue">WARNING</s:String>
@@ -271,10 +273,13 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GC/@EntryIndexedValue">GC</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GL/@EntryIndexedValue">GL</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GLSL/@EntryIndexedValue">GLSL</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=2D/@EntryIndexedValue">2D</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=3D/@EntryIndexedValue">3D</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HID/@EntryIndexedValue">HID</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=HUD/@EntryIndexedValue">HUD</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=ID/@EntryIndexedValue">ID</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=IL/@EntryIndexedValue">IL</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=IOS/@EntryIndexedValue">IOS</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=IP/@EntryIndexedValue">IP</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=IPC/@EntryIndexedValue">IPC</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=JIT/@EntryIndexedValue">JIT</s:String>
@@ -286,399 +291,400 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RGB/@EntryIndexedValue">RGB</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RNG/@EntryIndexedValue">RNG</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SHA/@EntryIndexedValue">SHA</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=RGB/@EntryIndexedValue">RGB</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SRGB/@EntryIndexedValue">SRGB</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=TK/@EntryIndexedValue">TK</s:String>
-  <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SS/@EntryIndexedValue">SS</s:String>
-  <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PP/@EntryIndexedValue">PP</s:String>
-  <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GMT/@EntryIndexedValue">GMT</s:String>
-  <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=QAT/@EntryIndexedValue">QAT</s:String>
-  <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=BNG/@EntryIndexedValue">BNG</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SS/@EntryIndexedValue">SS</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=PP/@EntryIndexedValue">PP</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GMT/@EntryIndexedValue">GMT</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=QAT/@EntryIndexedValue">QAT</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=BNG/@EntryIndexedValue">BNG</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=UI/@EntryIndexedValue">UI</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpNaming/ApplyAutoDetectedRules/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=EnumMember/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&#xD;
 &lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;&#xD;
-  &lt;TypePattern DisplayName="COM interfaces or structs"&gt;&#xD;
-    &lt;TypePattern.Match&gt;&#xD;
-      &lt;Or&gt;&#xD;
-        &lt;And&gt;&#xD;
-          &lt;Kind Is="Interface" /&gt;&#xD;
-          &lt;Or&gt;&#xD;
-            &lt;HasAttribute Name="System.Runtime.InteropServices.InterfaceTypeAttribute" /&gt;&#xD;
-            &lt;HasAttribute Name="System.Runtime.InteropServices.ComImport" /&gt;&#xD;
-          &lt;/Or&gt;&#xD;
-        &lt;/And&gt;&#xD;
-        &lt;Kind Is="Struct" /&gt;&#xD;
-      &lt;/Or&gt;&#xD;
-    &lt;/TypePattern.Match&gt;&#xD;
-  &lt;/TypePattern&gt;&#xD;
-  &lt;TypePattern DisplayName="NUnit Test Fixtures" RemoveRegions="All"&gt;&#xD;
-    &lt;TypePattern.Match&gt;&#xD;
-      &lt;And&gt;&#xD;
-        &lt;Kind Is="Class" /&gt;&#xD;
-        &lt;HasAttribute Name="NUnit.Framework.TestFixtureAttribute" Inherited="True" /&gt;&#xD;
-      &lt;/And&gt;&#xD;
-    &lt;/TypePattern.Match&gt;&#xD;
-    &lt;Entry DisplayName="Setup/Teardown Methods"&gt;&#xD;
-      &lt;Entry.Match&gt;&#xD;
-        &lt;And&gt;&#xD;
-          &lt;Kind Is="Method" /&gt;&#xD;
-          &lt;Or&gt;&#xD;
-            &lt;HasAttribute Name="NUnit.Framework.SetUpAttribute" Inherited="True" /&gt;&#xD;
-            &lt;HasAttribute Name="NUnit.Framework.TearDownAttribute" Inherited="True" /&gt;&#xD;
-            &lt;HasAttribute Name="NUnit.Framework.FixtureSetUpAttribute" Inherited="True" /&gt;&#xD;
-            &lt;HasAttribute Name="NUnit.Framework.FixtureTearDownAttribute" Inherited="True" /&gt;&#xD;
-          &lt;/Or&gt;&#xD;
-        &lt;/And&gt;&#xD;
-      &lt;/Entry.Match&gt;&#xD;
-    &lt;/Entry&gt;&#xD;
-    &lt;Entry DisplayName="All other members" /&gt;&#xD;
-    &lt;Entry Priority="100" DisplayName="Test Methods"&gt;&#xD;
-      &lt;Entry.Match&gt;&#xD;
-        &lt;And&gt;&#xD;
-          &lt;Kind Is="Method" /&gt;&#xD;
-          &lt;HasAttribute Name="NUnit.Framework.TestAttribute" /&gt;&#xD;
-        &lt;/And&gt;&#xD;
-      &lt;/Entry.Match&gt;&#xD;
-      &lt;Entry.SortBy&gt;&#xD;
-        &lt;Name /&gt;&#xD;
-      &lt;/Entry.SortBy&gt;&#xD;
-    &lt;/Entry&gt;&#xD;
-  &lt;/TypePattern&gt;&#xD;
-  &lt;TypePattern DisplayName="Default Pattern"&gt;&#xD;
-    &lt;Group DisplayName="Fields/Properties"&gt;&#xD;
-      &lt;Group DisplayName="Public Fields"&gt;&#xD;
-        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Public" /&gt;&#xD;
-              &lt;Or&gt;&#xD;
-                &lt;Kind Is="Constant" /&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-                &lt;And&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/And&gt;&#xD;
-              &lt;/Or&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Public" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Public" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Or&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/Or&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Entry DisplayName="Public Properties"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Access Is="Public" /&gt;&#xD;
-            &lt;Kind Is="Property" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-      &lt;Group DisplayName="Internal Fields"&gt;&#xD;
-        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Internal" /&gt;&#xD;
-              &lt;Or&gt;&#xD;
-                &lt;Kind Is="Constant" /&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-                &lt;And&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/And&gt;&#xD;
-              &lt;/Or&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Internal" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Internal" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Or&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/Or&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Entry DisplayName="Internal Properties"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Access Is="Internal" /&gt;&#xD;
-            &lt;Kind Is="Property" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-      &lt;Group DisplayName="Protected Fields"&gt;&#xD;
-        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Protected" /&gt;&#xD;
-              &lt;Or&gt;&#xD;
-                &lt;Kind Is="Constant" /&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-                &lt;And&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/And&gt;&#xD;
-              &lt;/Or&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Protected" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Protected" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Or&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/Or&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Entry DisplayName="Protected Properties"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Access Is="Protected" /&gt;&#xD;
-            &lt;Kind Is="Property" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-      &lt;Group DisplayName="Private Fields"&gt;&#xD;
-        &lt;Entry DisplayName="Constant Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Private" /&gt;&#xD;
-              &lt;Or&gt;&#xD;
-                &lt;Kind Is="Constant" /&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-                &lt;And&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/And&gt;&#xD;
-              &lt;/Or&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Static Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Private" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Readonly /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Normal Fields"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Private" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Or&gt;&#xD;
-                  &lt;Static /&gt;&#xD;
-                  &lt;Readonly /&gt;&#xD;
-                &lt;/Or&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Field" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Entry DisplayName="Private Properties"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;And&gt;&#xD;
-            &lt;Access Is="Private" /&gt;&#xD;
-            &lt;Kind Is="Property" /&gt;&#xD;
-          &lt;/And&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-    &lt;/Group&gt;&#xD;
-    &lt;Group DisplayName="Constructor/Destructor"&gt;&#xD;
-      &lt;Entry DisplayName="Ctor"&gt;&#xD;
-        &lt;Entry.Match&gt;&#xD;
-          &lt;Kind Is="Constructor" /&gt;&#xD;
-        &lt;/Entry.Match&gt;&#xD;
-      &lt;/Entry&gt;&#xD;
-      &lt;Region Name="Disposal"&gt;&#xD;
-        &lt;Entry DisplayName="Dtor"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;Kind Is="Destructor" /&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Dispose()"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Public" /&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-              &lt;Name Is="Dispose" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Dispose(true)"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Protected" /&gt;&#xD;
-              &lt;Or&gt;&#xD;
-                &lt;Virtual /&gt;&#xD;
-                &lt;Override /&gt;&#xD;
-              &lt;/Or&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-              &lt;Name Is="Dispose" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Region&gt;&#xD;
-    &lt;/Group&gt;&#xD;
-    &lt;Group DisplayName="Methods"&gt;&#xD;
-      &lt;Group DisplayName="Public"&gt;&#xD;
-        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Public" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Public" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Static /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Group DisplayName="Internal"&gt;&#xD;
-        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Internal" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Internal" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Static /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Group DisplayName="Protected"&gt;&#xD;
-        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Protected" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Protected" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Static /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-      &lt;Group DisplayName="Private"&gt;&#xD;
-        &lt;Entry DisplayName="Static Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Private" /&gt;&#xD;
-              &lt;Static /&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-        &lt;Entry DisplayName="Methods"&gt;&#xD;
-          &lt;Entry.Match&gt;&#xD;
-            &lt;And&gt;&#xD;
-              &lt;Access Is="Private" /&gt;&#xD;
-              &lt;Not&gt;&#xD;
-                &lt;Static /&gt;&#xD;
-              &lt;/Not&gt;&#xD;
-              &lt;Kind Is="Method" /&gt;&#xD;
-            &lt;/And&gt;&#xD;
-          &lt;/Entry.Match&gt;&#xD;
-        &lt;/Entry&gt;&#xD;
-      &lt;/Group&gt;&#xD;
-    &lt;/Group&gt;&#xD;
-  &lt;/TypePattern&gt;&#xD;
+	&lt;TypePattern DisplayName="COM interfaces or structs"&gt;&#xD;
+	&lt;TypePattern.Match&gt;&#xD;
+		&lt;Or&gt;&#xD;
+		&lt;And&gt;&#xD;
+			&lt;Kind Is="Interface" /&gt;&#xD;
+			&lt;Or&gt;&#xD;
+			&lt;HasAttribute Name="System.Runtime.InteropServices.InterfaceTypeAttribute" /&gt;&#xD;
+			&lt;HasAttribute Name="System.Runtime.InteropServices.ComImport" /&gt;&#xD;
+			&lt;/Or&gt;&#xD;
+		&lt;/And&gt;&#xD;
+		&lt;Kind Is="Struct" /&gt;&#xD;
+		&lt;/Or&gt;&#xD;
+	&lt;/TypePattern.Match&gt;&#xD;
+	&lt;/TypePattern&gt;&#xD;
+	&lt;TypePattern DisplayName="NUnit Test Fixtures" RemoveRegions="All"&gt;&#xD;
+	&lt;TypePattern.Match&gt;&#xD;
+		&lt;And&gt;&#xD;
+		&lt;Kind Is="Class" /&gt;&#xD;
+		&lt;HasAttribute Name="NUnit.Framework.TestFixtureAttribute" Inherited="True" /&gt;&#xD;
+		&lt;/And&gt;&#xD;
+	&lt;/TypePattern.Match&gt;&#xD;
+	&lt;Entry DisplayName="Setup/Teardown Methods"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+		&lt;And&gt;&#xD;
+			&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;Or&gt;&#xD;
+			&lt;HasAttribute Name="NUnit.Framework.SetUpAttribute" Inherited="True" /&gt;&#xD;
+			&lt;HasAttribute Name="NUnit.Framework.TearDownAttribute" Inherited="True" /&gt;&#xD;
+			&lt;HasAttribute Name="NUnit.Framework.FixtureSetUpAttribute" Inherited="True" /&gt;&#xD;
+			&lt;HasAttribute Name="NUnit.Framework.FixtureTearDownAttribute" Inherited="True" /&gt;&#xD;
+			&lt;/Or&gt;&#xD;
+		&lt;/And&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+	&lt;/Entry&gt;&#xD;
+	&lt;Entry DisplayName="All other members" /&gt;&#xD;
+	&lt;Entry Priority="100" DisplayName="Test Methods"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+		&lt;And&gt;&#xD;
+			&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;HasAttribute Name="NUnit.Framework.TestAttribute" /&gt;&#xD;
+		&lt;/And&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+		&lt;Entry.SortBy&gt;&#xD;
+		&lt;Name /&gt;&#xD;
+		&lt;/Entry.SortBy&gt;&#xD;
+	&lt;/Entry&gt;&#xD;
+	&lt;/TypePattern&gt;&#xD;
+	&lt;TypePattern DisplayName="Default Pattern"&gt;&#xD;
+	&lt;Group DisplayName="Fields/Properties"&gt;&#xD;
+		&lt;Group DisplayName="Public Fields"&gt;&#xD;
+		&lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Public" /&gt;&#xD;
+				&lt;Or&gt;&#xD;
+				&lt;Kind Is="Constant" /&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;And&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/And&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Static Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Public" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Public" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Or&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Entry DisplayName="Public Properties"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+			&lt;Access Is="Public" /&gt;&#xD;
+			&lt;Kind Is="Property" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Group DisplayName="Internal Fields"&gt;&#xD;
+		&lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Internal" /&gt;&#xD;
+				&lt;Or&gt;&#xD;
+				&lt;Kind Is="Constant" /&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;And&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/And&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Static Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Internal" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Internal" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Or&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Entry DisplayName="Internal Properties"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+			&lt;Access Is="Internal" /&gt;&#xD;
+			&lt;Kind Is="Property" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Group DisplayName="Protected Fields"&gt;&#xD;
+		&lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Protected" /&gt;&#xD;
+				&lt;Or&gt;&#xD;
+				&lt;Kind Is="Constant" /&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;And&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/And&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Static Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Protected" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Protected" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Or&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Entry DisplayName="Protected Properties"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+			&lt;Access Is="Protected" /&gt;&#xD;
+			&lt;Kind Is="Property" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Group DisplayName="Private Fields"&gt;&#xD;
+		&lt;Entry DisplayName="Constant Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Private" /&gt;&#xD;
+				&lt;Or&gt;&#xD;
+				&lt;Kind Is="Constant" /&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;And&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/And&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Static Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Private" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Readonly /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Normal Fields"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Private" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Or&gt;&#xD;
+					&lt;Static /&gt;&#xD;
+					&lt;Readonly /&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Field" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Entry DisplayName="Private Properties"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+			&lt;Access Is="Private" /&gt;&#xD;
+			&lt;Kind Is="Property" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+	&lt;/Group&gt;&#xD;
+	&lt;Group DisplayName="Constructor/Destructor"&gt;&#xD;
+		&lt;Entry DisplayName="Ctor"&gt;&#xD;
+		&lt;Entry.Match&gt;&#xD;
+			&lt;Kind Is="Constructor" /&gt;&#xD;
+		&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Region Name="Disposal"&gt;&#xD;
+		&lt;Entry DisplayName="Dtor"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;Kind Is="Destructor" /&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Dispose()"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Public" /&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+				&lt;Name Is="Dispose" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Dispose(true)"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Protected" /&gt;&#xD;
+				&lt;Or&gt;&#xD;
+				&lt;Virtual /&gt;&#xD;
+				&lt;Override /&gt;&#xD;
+				&lt;/Or&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+				&lt;Name Is="Dispose" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Region&gt;&#xD;
+	&lt;/Group&gt;&#xD;
+	&lt;Group DisplayName="Methods"&gt;&#xD;
+		&lt;Group DisplayName="Public"&gt;&#xD;
+		&lt;Entry DisplayName="Static Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Public" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Public" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Group DisplayName="Internal"&gt;&#xD;
+		&lt;Entry DisplayName="Static Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Internal" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Internal" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Group DisplayName="Protected"&gt;&#xD;
+		&lt;Entry DisplayName="Static Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Protected" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Protected" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+		&lt;Group DisplayName="Private"&gt;&#xD;
+		&lt;Entry DisplayName="Static Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Private" /&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;Entry DisplayName="Methods"&gt;&#xD;
+			&lt;Entry.Match&gt;&#xD;
+			&lt;And&gt;&#xD;
+				&lt;Access Is="Private" /&gt;&#xD;
+				&lt;Not&gt;&#xD;
+				&lt;Static /&gt;&#xD;
+				&lt;/Not&gt;&#xD;
+				&lt;Kind Is="Method" /&gt;&#xD;
+			&lt;/And&gt;&#xD;
+			&lt;/Entry.Match&gt;&#xD;
+		&lt;/Entry&gt;&#xD;
+		&lt;/Group&gt;&#xD;
+	&lt;/Group&gt;&#xD;
+	&lt;/TypePattern&gt;&#xD;
 &lt;/Patterns&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">Copyright (c) ppy Pty Ltd &lt;contact@ppy.sh&gt;. Licensed under the MIT Licence.&#xD;
 See the LICENCE file in the repository root for full licence text.&#xD;
@@ -738,6 +744,7 @@ See the LICENCE file in the repository root for full licence text.&#xD;
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=NAMESPACE_005FALIAS/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=XAML_005FFIELD/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/XamlNaming/UserRules/=XAML_005FRESOURCE/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CustomTools/CustomToolsData/@EntryValue"></s:String>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpAttributeForSingleLineMethodUpgrade/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpKeepExistingMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpPlaceEmbeddedOnSameLineMigration/@EntryIndexedValue">True</s:Boolean>
@@ -773,7 +780,7 @@ Origin = Anchor.$anchor$,</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2A3ECBA387AF6D468F6ABDA35DED325A/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=2A3ECBA387AF6D468F6ABDA35DED325A/Text/@EntryValue">InternalChildren = new Drawable[]
 {
-    $END$
+	$END$
 };</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=62B70E4DCA5E284A9E383E16C13789C1/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=62B70E4DCA5E284A9E383E16C13789C1/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -786,12 +793,12 @@ Origin = Anchor.$anchor$,</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=62B70E4DCA5E284A9E383E16C13789C1/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=62B70E4DCA5E284A9E383E16C13789C1/Text/@EntryValue">new GridContainer
 {
-    RelativeSizeAxes = Axes.Both,
-    Content = new[]
-    {
-        new Drawable[] { $END$ },
-        new Drawable[] { }
-    }
+	RelativeSizeAxes = Axes.Both,
+	Content = new[]
+	{
+		new Drawable[] { $END$ },
+		new Drawable[] { }
+	}
 };</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=72BD3C3DCA42C84DA1E71F1D05A903C4/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=72BD3C3DCA42C84DA1E71F1D05A903C4/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -804,12 +811,12 @@ Origin = Anchor.$anchor$,</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=72BD3C3DCA42C84DA1E71F1D05A903C4/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=72BD3C3DCA42C84DA1E71F1D05A903C4/Text/@EntryValue">new FillFlowContainer
 {
-    RelativeSizeAxes = Axes.Both,
-    Direction = FillDirection.Vertical,
-    Children = new Drawable[]
-    {
-        $END$
-    }
+	RelativeSizeAxes = Axes.Both,
+	Direction = FillDirection.Vertical,
+	Children = new Drawable[]
+	{
+		$END$
+	}
 },</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=750A3C67E083484FAEEA0ED2382181CC/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=750A3C67E083484FAEEA0ED2382181CC/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -822,11 +829,11 @@ Origin = Anchor.$anchor$,</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=750A3C67E083484FAEEA0ED2382181CC/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=750A3C67E083484FAEEA0ED2382181CC/Text/@EntryValue">new Container
 {
-    RelativeSizeAxes = Axes.Both,
-    Children = new Drawable[]
-    {
-        $END$
-    }
+	RelativeSizeAxes = Axes.Both,
+	Children = new Drawable[]
+	{
+		$END$
+	}
 },</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=78D9C2B1742FD449BD69CD18437E0C07/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=78D9C2B1742FD449BD69CD18437E0C07/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -840,7 +847,7 @@ Origin = Anchor.$anchor$,</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=78D9C2B1742FD449BD69CD18437E0C07/Text/@EntryValue">[BackgroundDependencyLoader]
 private void load()
 {
-    $END$
+	$END$
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CC879477D8841A4CBD724C2DCD249435/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CC879477D8841A4CBD724C2DCD249435/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -853,8 +860,8 @@ private void load()
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CC879477D8841A4CBD724C2DCD249435/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=CC879477D8841A4CBD724C2DCD249435/Text/@EntryValue">new Box
 {
-    Colour = Color4.Black,
-    RelativeSizeAxes = Axes.Both,
+	Colour = Color4.Black,
+	RelativeSizeAxes = Axes.Both,
 },</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F5B3CB743153774F99FB9FCA0FC744EE/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F5B3CB743153774F99FB9FCA0FC744EE/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
@@ -867,8 +874,9 @@ private void load()
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F5B3CB743153774F99FB9FCA0FC744EE/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=F5B3CB743153774F99FB9FCA0FC744EE/Text/@EntryValue">Children = new Drawable[]
 {
-    $END$
+	$END$
 };</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Approximator/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Beatmap/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=beatmaps/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=beatmap_0027s/@EntryIndexedValue">True</s:Boolean>
@@ -886,4 +894,8 @@ private void load()
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ruleset/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=rulesets/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Taiko/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unranked/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Unranked/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Bindables/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=filenames/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=localisable/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=shaders/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
