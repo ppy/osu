@@ -379,7 +379,7 @@ namespace osu.Game.Beatmaps.Formats
                 addControlPoint(time, controlPoint, true);
             }
 
-            addControlPoint(time, new DifficultyControlPoint
+            addControlPoint(time, new LegacyDifficultyControlPoint
             {
                 SpeedMultiplier = speedMultiplier,
             }, timingChange);
@@ -411,14 +411,14 @@ namespace osu.Game.Beatmaps.Formats
 
         private void addControlPoint(double time, ControlPoint point, bool timingChange)
         {
+            if (time != pendingControlPointsTime)
+                flushPendingPoints();
+
             if (timingChange)
             {
                 beatmap.ControlPointInfo.Add(time, point);
                 return;
             }
-
-            if (time != pendingControlPointsTime)
-                flushPendingPoints();
 
             pendingControlPoints.Add(point);
             pendingControlPointsTime = time;
