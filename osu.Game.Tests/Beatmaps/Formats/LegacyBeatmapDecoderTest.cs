@@ -263,6 +263,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestTimingPointResetsSpeedMultiplier()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("timingpoint-speedmultiplier-reset.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapColours()
         {
             var decoder = new LegacySkinDecoder();
