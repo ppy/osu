@@ -27,24 +27,27 @@ namespace osu.Game.Tests.Visual.Online
             var userComment = new Comment
             {
                 IsVoted = false,
-                UserId = API.LocalUser.Value?.Id,
+                UserId = API.LocalUser.Value.Id,
                 VotesCount = 10,
             };
 
             var randomComment = new Comment
             {
                 IsVoted = false,
-                UserId = 455454,
+                UserId = 4444,
                 VotesCount = 2,
             };
+
+            AddStep("User comment", () => addVotePill(userComment));
+            AddStep("Click", () => votePill.Click());
+            AddAssert("Not loading", () => votePill.IsLoading == false);
 
             AddStep("Random comment", () => addVotePill(randomComment));
             AddStep("Click", () => votePill.Click());
             AddAssert("Loading", () => votePill.IsLoading == true);
-            AddStep("User comment", () => addVotePill(userComment));
-            AddStep("Click", () => votePill.Click());
-            AddAssert("Not loading", () => votePill.IsLoading == false);
+
             AddStep("Log out", API.Logout);
+            AddStep("Random comment", () => addVotePill(randomComment));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => votePill.IsLoading == false);
         }

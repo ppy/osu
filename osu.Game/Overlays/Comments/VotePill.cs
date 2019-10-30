@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Comments
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
 
-            if ((api.LocalUser.Value?.Id ?? comment.UserId) != comment.UserId)
+            if (api.LocalUser.Value.Id != comment.UserId && api.LocalUser.Value.Id != 1)
                 Action = onAction;
         }
 
