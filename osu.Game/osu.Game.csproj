@@ -17,9 +17,6 @@
     <copyright>Copyright (c) 2019 ppy Pty Ltd</copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
-  <ItemGroup Label="Service">
-    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Humanizer" Version="2.7.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
