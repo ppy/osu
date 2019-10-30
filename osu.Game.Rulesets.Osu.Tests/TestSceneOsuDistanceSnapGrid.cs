@@ -64,9 +64,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Setup() => Schedule(() =>
         {
             editorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
-            editorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.ControlPointInfo.Clear();
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
         });
 
         [TestCase(1)]

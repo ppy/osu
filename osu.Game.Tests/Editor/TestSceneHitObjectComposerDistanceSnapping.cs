@@ -25,11 +25,10 @@ namespace osu.Game.Tests.Editor
             BeatDivisor.Value = 1;
 
             composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
-            composer.EditorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-            composer.EditorBeatmap.ControlPointInfo.TimingPoints.Clear();
+            composer.EditorBeatmap.ControlPointInfo.Clear();
 
-            composer.EditorBeatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = 1 });
-            composer.EditorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = 1000 });
+            composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 1 });
+            composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
         });
 
         [TestCase(1)]
@@ -47,8 +46,8 @@ namespace osu.Game.Tests.Editor
         {
             AddStep($"set multiplier = {multiplier}", () =>
             {
-                composer.EditorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-                composer.EditorBeatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = multiplier });
+                composer.EditorBeatmap.ControlPointInfo.Clear();
+                composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = multiplier });
             });
 
             assertSnapDistance(100 * multiplier);
@@ -76,8 +75,8 @@ namespace osu.Game.Tests.Editor
 
             AddStep("set beat length = 500", () =>
             {
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = 500 });
+                composer.EditorBeatmap.ControlPointInfo.Clear();
+                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
             });
 
             assertDurationToDistance(500, 200);
@@ -97,8 +96,8 @@ namespace osu.Game.Tests.Editor
 
             AddStep("set beat length = 500", () =>
             {
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = 500 });
+                composer.EditorBeatmap.ControlPointInfo.Clear();
+                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
             });
 
             assertDistanceToDuration(200, 500);
@@ -124,8 +123,8 @@ namespace osu.Game.Tests.Editor
 
             AddStep("set beat length = 500", () =>
             {
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = 500 });
+                composer.EditorBeatmap.ControlPointInfo.Clear();
+                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
             });
 
             assertSnappedDuration(50, 0);
@@ -155,8 +154,8 @@ namespace osu.Game.Tests.Editor
 
             AddStep("set beat length = 500", () =>
             {
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                composer.EditorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = 500 });
+                composer.EditorBeatmap.ControlPointInfo.Clear();
+                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
             });
 
             assertSnappedDistance(50, 0);
