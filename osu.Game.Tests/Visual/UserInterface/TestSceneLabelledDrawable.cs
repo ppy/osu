@@ -11,7 +11,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneLabelledComponent : OsuTestScene
+    public class TestSceneLabelledDrawable : OsuTestScene
     {
         [TestCase(false)]
         [TestCase(true)]
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create component", () =>
             {
-                LabelledComponent<Drawable> component;
+                LabelledDrawable<Drawable> component;
 
                 Child = new Container
                 {
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Width = 500,
                     AutoSizeAxes = Axes.Y,
-                    Child = component = padded ? (LabelledComponent<Drawable>)new PaddedLabelledComponent() : new NonPaddedLabelledComponent(),
+                    Child = component = padded ? (LabelledDrawable<Drawable>)new PaddedLabelledDrawable() : new NonPaddedLabelledDrawable(),
                 };
 
                 component.Label = "a sample component";
@@ -41,9 +41,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private class PaddedLabelledComponent : LabelledComponent<Drawable>
+        private class PaddedLabelledDrawable : LabelledDrawable<Drawable>
         {
-            public PaddedLabelledComponent()
+            public PaddedLabelledDrawable()
                 : base(true)
             {
             }
@@ -57,9 +57,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             };
         }
 
-        private class NonPaddedLabelledComponent : LabelledComponent<Drawable>
+        private class NonPaddedLabelledDrawable : LabelledDrawable<Drawable>
         {
-            public NonPaddedLabelledComponent()
+            public NonPaddedLabelledDrawable()
                 : base(false)
             {
             }
