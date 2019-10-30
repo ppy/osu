@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             hover.FadeIn(200);
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
