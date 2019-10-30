@@ -98,7 +98,8 @@ namespace osu.Game.Screens.Multi
 
             currentJoinRoomRequest.Failure += exception =>
             {
-                Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
+                if (!(exception is OperationCanceledException))
+                    Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
                 onError?.Invoke(exception.ToString());
             };
 
