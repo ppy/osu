@@ -44,6 +44,9 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("User comment", () => addVotePill(userComment));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => votePill.IsLoading == false);
+            AddStep("Log out", API.Logout);
+            AddStep("Click", () => votePill.Click());
+            AddAssert("Not loading", () => votePill.IsLoading == false);
         }
 
         private void addVotePill(Comment comment)
