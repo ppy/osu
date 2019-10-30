@@ -50,9 +50,15 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
             AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
             AddStep("local comments", () => commentsContainer.ShowComments(commentBundle));
+            AddStep("local empty comments", () => commentsContainer.ShowComments(emptyCommentsBundle));
         }
 
-        private readonly CommentBundle commentBundle = new CommentBundle
+        private static readonly CommentBundle emptyCommentsBundle = new CommentBundle
+        {
+            Comments = new List<Comment>(),
+        };
+
+        private static readonly CommentBundle commentBundle = new CommentBundle
         {
             Comments = new List<Comment>
             {
