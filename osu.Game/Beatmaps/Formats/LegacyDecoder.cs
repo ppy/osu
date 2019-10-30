@@ -193,7 +193,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             public LegacyDifficultyControlPoint()
             {
-                SpeedMultiplierBindable.Precision = Double.Epsilon;
+                SpeedMultiplierBindable.Precision = double.Epsilon;
             }
         }
 
