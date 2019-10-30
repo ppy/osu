@@ -40,16 +40,16 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("User comment", () => addVotePill(userComment));
             AddStep("Click", () => votePill.Click());
-            AddAssert("Not loading", () => votePill.IsLoading == false);
+            AddAssert("Not loading", () => !votePill.IsLoading);
 
             AddStep("Random comment", () => addVotePill(randomComment));
             AddStep("Click", () => votePill.Click());
-            AddAssert("Loading", () => votePill.IsLoading == true);
+            AddAssert("Loading", () => votePill.IsLoading);
 
             AddStep("Log out", API.Logout);
             AddStep("Random comment", () => addVotePill(randomComment));
             AddStep("Click", () => votePill.Click());
-            AddAssert("Not loading", () => votePill.IsLoading == false);
+            AddAssert("Not loading", () => !votePill.IsLoading);
         }
 
         private void addVotePill(Comment comment)
