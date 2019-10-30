@@ -21,7 +21,7 @@
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
     <Authors>ppy Pty Ltd</Authors>
-    <PackageLicenseUrl>https://github.com/ppy/osu/blob/master/LICENCE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ppy/osu</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>

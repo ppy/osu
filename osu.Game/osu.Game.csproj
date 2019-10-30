@@ -7,7 +7,14 @@
   <PropertyGroup Label="Nuget">
     <Title>osu!</Title>
     <PackageId>ppy.osu.Game</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
+  <ItemGroup Label="Icon">
+    <None Include="..\assets\lazer-nuget.png">
+      <Pack>True</Pack>
+      <PackagePath>icon.png</PackagePath>
+    </None>
+  </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Humanizer" Version="2.7.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
