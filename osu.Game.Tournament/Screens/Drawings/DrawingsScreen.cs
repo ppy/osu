@@ -195,7 +195,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 }
             }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run((Action)writeAction);
+            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
         }
 
         private void reloadTeams()
