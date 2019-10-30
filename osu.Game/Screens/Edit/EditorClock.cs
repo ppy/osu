@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -88,7 +87,17 @@ namespace osu.Game.Screens.Edit
             if (direction < 0 && timingPoint.Time == CurrentTime)
             {
                 // When going backwards and we're at the boundary of two timing points, we compute the seek distance with the timing point which we are seeking into
-                int activeIndex = ControlPointInfo.TimingPoints.IndexOf(timingPoint);
+                int activeIndex = -1;
+
+                for (int i = 0; i < ControlPointInfo.TimingPoints.Count; i++)
+                {
+                    if (ControlPointInfo.TimingPoints[i] == timingPoint)
+                    {
+                        activeIndex = i;
+                        break;
+                    }
+                }
+
                 while (activeIndex > 0 && CurrentTime == timingPoint.Time)
                     timingPoint = ControlPointInfo.TimingPoints[--activeIndex];
             }
