@@ -158,18 +158,18 @@ namespace osu.Game.Overlays.Comments
 
         private void updateDisplay()
         {
-            if (Action != null)
-            {
-                if (isVoted.Value)
-                {
-                    hoverLayer.FadeTo(IsHovered ? 1 : 0);
-                    sideNumber.Hide();
-                }
-                else
-                    sideNumber.FadeTo(IsHovered ? 1 : 0);
+            if (Action == null)
+                return;
 
-                borderContainer.BorderThickness = IsHovered ? 3 : 0;
+            if (isVoted.Value)
+            {
+                hoverLayer.FadeTo(IsHovered ? 1 : 0);
+                sideNumber.Hide();
             }
+            else
+                sideNumber.FadeTo(IsHovered ? 1 : 0);
+
+            borderContainer.BorderThickness = IsHovered ? 3 : 0;
         }
 
         private void onHoverAction()

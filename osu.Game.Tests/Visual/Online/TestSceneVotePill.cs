@@ -8,6 +8,8 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Framework.Allocation;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
+using osu.Framework.MathUtils;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -24,13 +26,6 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load()
         {
-            var userComment = new Comment
-            {
-                IsVoted = false,
-                UserId = API.LocalUser.Value.Id,
-                VotesCount = 10,
-            };
-
             var randomComment = new Comment
             {
                 IsVoted = false,
@@ -38,7 +33,11 @@ namespace osu.Game.Tests.Visual.Online
                 VotesCount = 2,
             };
 
-            AddStep("User comment", () => addVotePill(userComment));
+            AddStep("Log in", () => API.LocalUser.Value = new User
+            {
+                Id = RNG.Next(2, 100000)
+            });
+            AddStep("User comment", () => addVotePill(getUserComment()));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
 
@@ -51,6 +50,13 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
         }
+
+        private Comment getUserComment() => new Comment
+        {
+            IsVoted = false,
+            UserId = API.LocalUser.Value.Id,
+            VotesCount = 10,
+        };
 
         private void addVotePill(Comment comment)
         {
