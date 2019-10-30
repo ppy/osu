@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                tp = Math.Pow(tp, 0.8);
+                tp = Math.Min(tp, 1.47f * Math.Pow(tp, 0.8f));
 
             double aimValue = tpToPP(tp * cheeseFactor);
 
