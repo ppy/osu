@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Reset height", () => changePlayfieldSize(6));
 
             var controlPointInfo = new ControlPointInfo();
-            controlPointInfo.TimingPoints.Add(new TimingControlPoint());
+            controlPointInfo.Add(0, new TimingControlPoint());
 
             WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
@@ -142,7 +142,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
+            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
+            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
