@@ -376,7 +376,7 @@ namespace osu.Game.Beatmaps.Formats
                 handleTimingControlPoint(controlPoint);
             }
 
-            handleDifficultyControlPoint(new DifficultyControlPoint
+            handleDifficultyControlPoint(new LegacyDifficultyControlPoint
             {
                 Time = time,
                 SpeedMultiplier = speedMultiplier,
