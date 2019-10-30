@@ -189,6 +189,14 @@ namespace osu.Game.Beatmaps.Formats
             Foreground = 3
         }
 
+        internal class LegacyDifficultyControlPoint : DifficultyControlPoint
+        {
+            public LegacyDifficultyControlPoint()
+            {
+                SpeedMultiplierBindable.Precision = double.Epsilon;
+            }
+        }
+
         internal class LegacySampleControlPoint : SampleControlPoint
         {
             public int CustomSampleBank;
