@@ -31,7 +31,7 @@ namespace osu.Game.Tests.Visual.Editor
         public TestSceneDistanceSnapGrid()
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
-            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
 
             Children = new Drawable[]
             {

@@ -9,6 +9,7 @@ using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Tests.Visual.Online
@@ -137,6 +138,17 @@ namespace osu.Game.Tests.Visual.Online
                         });
                 }, Channel.MAX_HISTORY / messages_per_call + 5);
 
+            AddAssert("Ensure no adjacent day separators", () =>
+            {
+                var indices = chatDisplay.FillFlow.OfType<DrawableChannel.DaySeparator>().Select(ds => chatDisplay.FillFlow.IndexOf(ds));
+
+                foreach (var i in indices)
+                    if (i < chatDisplay.FillFlow.Count && chatDisplay.FillFlow[i + 1] is DrawableChannel.DaySeparator)
+                        return false;
+
+                return true;
+            });
+
             AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
         }
 
@@ -147,7 +159,13 @@ namespace osu.Game.Tests.Visual.Online
             {
             }
 
-            public bool ScrolledToBottom => ((ScrollContainer<Drawable>)((Container)InternalChildren.OfType<DrawableChannel>().First().Child).Child).IsScrolledToEnd(1);
+            protected DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
+
+            protected OsuScrollContainer ScrollContainer => (OsuScrollContainer)((Container)DrawableChannel.Child).Child;
+
+            public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
+
+            public bool ScrolledToBottom => ScrollContainer.IsScrolledToEnd(1);
         }
     }
 }
