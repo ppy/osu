@@ -15,10 +15,18 @@
     <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
   <PropertyGroup Label="Project">
-    <Company>ppy Pty Ltd</Company>
-    <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
     <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
     This is required due to https://github.com/NuGet/Home/issues/5740 -->
     <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Label="Nuget">
+    <Authors>ppy Pty Ltd</Authors>
+    <PackageLicenseUrl>https://github.com/ppy/osu/blob/master/LICENCE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ppy/osu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
+    <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
+    <Company>ppy Pty Ltd</Company>
+    <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
+    <PackageTags>osu game</PackageTags>
   </PropertyGroup>
 </Project>
