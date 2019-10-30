@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps.ControlPoints
             MaxValue = 60000
         };
 
+        /// <summary>
         /// The beat length at this control point.
         /// </summary>
         public double BeatLength
