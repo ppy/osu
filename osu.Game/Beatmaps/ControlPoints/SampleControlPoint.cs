@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -12,12 +13,35 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The default sample bank at this control point.
         /// </summary>
-        public string SampleBank = DEFAULT_BANK;
+        public readonly Bindable<string> SampleBankBindable = new Bindable<string>(DEFAULT_BANK) { Default = DEFAULT_BANK };
+
+        /// <summary>
+        /// The speed multiplier at this control point.
+        /// </summary>
+        public string SampleBank
+        {
+            get => SampleBankBindable.Value;
+            set => SampleBankBindable.Value = value;
+        }
+
+        /// <summary>
+        /// The default sample bank at this control point.
+        /// </summary>
+        public readonly BindableInt SampleVolumeBindable = new BindableInt(100)
+        {
+            MinValue = 0,
+            MaxValue = 100,
+            Default = 100
+        };
 
         /// <summary>
         /// The default sample volume at this control point.
         /// </summary>
-        public int SampleVolume = 100;
+        public int SampleVolume
+        {
+            get => SampleVolumeBindable.Value;
+            set => SampleVolumeBindable.Value = value;
+        }
 
         /// <summary>
         /// Create a SampleInfo based on the sample settings in this control point.

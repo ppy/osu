@@ -263,6 +263,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestTimingPointResetsSpeedMultiplier()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("timingpoint-speedmultiplier-reset.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapColours()
         {
             var decoder = new LegacySkinDecoder();
@@ -359,6 +374,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(new Vector2(304, 56), positionData.Position);
                 Assert.AreEqual(1285, hitObjects[1].StartTime);
                 Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
+            }
+        }
+
+        [Test]
+        public void TestDecodeControlPointDifficultyChange()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("controlpoint-difficulty-multiplier.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPointInfo = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPointInfo.DifficultyPointAt(5).SpeedMultiplier, Is.EqualTo(1));
+                Assert.That(controlPointInfo.DifficultyPointAt(1000).SpeedMultiplier, Is.EqualTo(10));
+                Assert.That(controlPointInfo.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1.8518518518518519d));
+                Assert.That(controlPointInfo.DifficultyPointAt(3000).SpeedMultiplier, Is.EqualTo(0.5));
             }
         }
 
