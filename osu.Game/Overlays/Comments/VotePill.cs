@@ -43,13 +43,10 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool isVoted = new BindableBool();
         private readonly BindableInt votesCount = new BindableInt();
-        private bool disabled;
 
         public VotePill(Comment comment)
         {
             this.comment = comment;
-
-            Action = onAction;
 
             AutoSizeAxes = Axes.X;
             Height = 20;
@@ -62,7 +59,8 @@ namespace osu.Game.Overlays.Comments
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
 
-            disabled = api.LocalUser.Value.Id == comment.UserId;
+            if (api.LocalUser.Value.Id != comment.UserId)
+                Action = onAction;
         }
 
         protected override void LoadComplete()
@@ -148,41 +146,30 @@ namespace osu.Game.Overlays.Comments
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (disabled)
-                return false;
-
             onHoverAction();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (disabled)
-                return;
-
             updateDisplay();
             base.OnHoverLost(e);
         }
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (disabled)
-                return false;
-
-            return base.OnClick(e);
-        }
-
         private void updateDisplay()
         {
-            if (isVoted.Value)
+            if (Action != null)
             {
-                hoverLayer.FadeTo(IsHovered ? 1 : 0);
-                sideNumber.Hide();
-            }
-            else
-                sideNumber.FadeTo(IsHovered ? 1 : 0);
+                if (isVoted.Value)
+                {
+                    hoverLayer.FadeTo(IsHovered ? 1 : 0);
+                    sideNumber.Hide();
+                }
+                else
+                    sideNumber.FadeTo(IsHovered ? 1 : 0);
 
-            borderContainer.BorderThickness = IsHovered ? 3 : 0;
+                borderContainer.BorderThickness = IsHovered ? 3 : 0;
+            }
         }
 
         private void onHoverAction()
