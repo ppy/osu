@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.Comments
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
+        private bool isLocal;
 
         private readonly Box background;
         private readonly Box placeholderBackground;
@@ -145,7 +146,7 @@ namespace osu.Game.Overlays.Comments
         {
             Sort.BindValueChanged(_ =>
             {
-                if (!type.HasValue || !id.HasValue)
+                if (!type.HasValue || !id.HasValue || isLocal)
                     return;
 
                 ShowComments(type.Value, id.Value);
@@ -155,33 +156,40 @@ namespace osu.Game.Overlays.Comments
 
         public void ShowComments(CommentableType type, long id)
         {
+            isLocal = false;
             this.type = type;
             this.id = id;
             clearComments();
             getComments();
         }
 
-        private void getComments()
+        public void ShowComments(CommentBundle commentBundle)
         {
-            moreButton.IsLoading = true;
-            moreButton.Show();
+            isLocal = true;
+            clearComments();
+            onSuccess(commentBundle);
+        }
+
+        private void clearComments()
+        {
             request?.Cancel();
             loadCancellation?.Cancel();
+            currentPage = 1;
+            deletedCommentsPlaceholder.DeletedCount.Value = 0;
+            noCommentsPlaceholder.Hide();
+            content.Clear();
+            moreButton.IsLoading = true;
+            moreButton.Show();
+        }
 
+        private void getComments()
+        {
             if (!type.HasValue || !id.HasValue)
                 return;
 
             request = new GetCommentsRequest(type.Value, id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
-        }
-
-        private void clearComments()
-        {
-            currentPage = 1;
-            deletedCommentsPlaceholder.DeletedCount.Value = 0;
-            noCommentsPlaceholder.Hide();
-            content.Clear();
         }
 
         private void onSuccess(CommentBundle response)

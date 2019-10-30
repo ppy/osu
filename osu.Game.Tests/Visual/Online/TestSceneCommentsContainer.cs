@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -46,9 +47,25 @@ namespace osu.Game.Tests.Visual.Online
                 scroll.Add(commentsContainer = new CommentsContainer());
             });
             AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
-            AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
             AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
-            AddStep("beatmap with no comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 1293));
+            AddStep("local comments", () => commentsContainer.ShowComments(commentBundle));
         }
+
+        private readonly CommentBundle commentBundle = new CommentBundle
+        {
+            Comments = new List<Comment>
+            {
+                new Comment
+                {
+                    Id = 1,
+                    Message = "Simple test comment",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                    DeletedAt = null,
+                    EditedAt = null,
+                }
+            },
+            TopLevelCount = 1,
+        };
     }
 }
