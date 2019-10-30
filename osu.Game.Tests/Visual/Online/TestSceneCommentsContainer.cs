@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -61,11 +62,96 @@ namespace osu.Game.Tests.Visual.Online
                     Message = "Simple test comment",
                     LegacyName = "TestUser1",
                     CreatedAt = DateTimeOffset.Now,
-                    DeletedAt = null,
-                    EditedAt = null,
+                    VotesCount = 5
+                },
+                new Comment
+                {
+                    Id = 2,
+                    Message = "This comment has been deleted :( but visible for admins",
+                    LegacyName = "TestUser2",
+                    CreatedAt = DateTimeOffset.Now,
+                    DeletedAt = DateTimeOffset.Now,
+                    VotesCount = 5
+                },
+                new Comment
+                {
+                    Id = 3,
+                    Message = "This comment is a top level",
+                    LegacyName = "TestUser3",
+                    CreatedAt = DateTimeOffset.Now,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 4,
+                    ParentId = 3,
+                    Message = "And this is a reply",
+                    RepliesCount = 1,
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                },
+                new Comment
+                {
+                    Id = 15,
+                    ParentId = 4,
+                    Message = "Reply to reply",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                },
+                new Comment
+                {
+                    Id = 6,
+                    ParentId = 3,
+                    LegacyName = "TestUser11515",
+                    CreatedAt = DateTimeOffset.Now,
+                    DeletedAt = DateTimeOffset.Now,
+                },
+                new Comment
+                {
+                    Id = 5,
+                    Message = "This comment is voted and edited",
+                    LegacyName = "BigBrainUser",
+                    CreatedAt = DateTimeOffset.Now,
+                    EditedAt = DateTimeOffset.Now,
+                    IsVoted = true,
+                    VotesCount = 1000,
+                    EditedById = 1,
+                },
+                new Comment
+                {
+                    Id = 100,
+                    Message = "This comment has \"Show more\" button because it thinks that we have unloaded replies, but at least 1 loaded",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 101,
+                    ParentId = 100,
+                    Message = "I'm here to make my parent example work",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                },
+                new Comment
+                {
+                    Id = 200,
+                    Message = "This comment has \"load replies\" button because it thinks that we have unloaded replies and none of them are loaded",
+                    LegacyName = "TestUser1",
+                    CreatedAt = DateTimeOffset.Now,
+                    RepliesCount = 2,
+                },
+            },
+            IncludedComments = new List<Comment>(),
+            Users = new List<User>
+            {
+                new User
+                {
+                    Id = 1,
+                    Username = "Good_Admin"
                 }
             },
-            TopLevelCount = 1,
+            TopLevelCount = 10,
         };
     }
 }
