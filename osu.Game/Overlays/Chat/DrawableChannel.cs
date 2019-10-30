@@ -108,11 +108,25 @@ namespace osu.Game.Overlays.Chat
             var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MAX_HISTORY;
 
-            for (int i = 0; i < count; i++)
+            if (count > 0)
             {
-                var d = staleMessages[i];
-                scroll.OffsetScrollPosition(-d.DrawHeight);
-                d.Expire();
+                void expireAndAdjustScroll(Drawable d)
+                {
+                    scroll.OffsetScrollPosition(-d.DrawHeight);
+                    d.Expire();
+                }
+
+                for (int i = 0; i < count; i++)
+                    expireAndAdjustScroll(staleMessages[i]);
+
+                // remove all adjacent day separators after stale message removal
+                for (int i = 0; i < ChatLineFlow.Count - 1; i++)
+                {
+                    if (!(ChatLineFlow[i] is DaySeparator)) break;
+                    if (!(ChatLineFlow[i + 1] is DaySeparator)) break;
+
+                    expireAndAdjustScroll(ChatLineFlow[i]);
+                }
             }
 
             if (shouldScrollToEnd)
@@ -142,7 +156,7 @@ namespace osu.Game.Overlays.Chat
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-        protected class DaySeparator : Container
+        public class DaySeparator : Container
         {
             public float TextSize
             {
