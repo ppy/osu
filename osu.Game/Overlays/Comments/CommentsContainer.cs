@@ -34,7 +34,6 @@ namespace osu.Game.Overlays.Comments
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
-        private bool isLocal;
 
         private readonly Box background;
         private readonly Box placeholderBackground;
@@ -146,7 +145,7 @@ namespace osu.Game.Overlays.Comments
         {
             Sort.BindValueChanged(_ =>
             {
-                if (!type.HasValue || !id.HasValue || isLocal)
+                if (!type.HasValue || !id.HasValue)
                     return;
 
                 ShowComments(type.Value, id.Value);
@@ -156,7 +155,6 @@ namespace osu.Game.Overlays.Comments
 
         public void ShowComments(CommentableType type, long id)
         {
-            isLocal = false;
             this.type = type;
             this.id = id;
             clearComments();
@@ -165,7 +163,8 @@ namespace osu.Game.Overlays.Comments
 
         public void ShowComments(CommentBundle commentBundle)
         {
-            isLocal = true;
+            type = null;
+            id = null;
             clearComments();
             onSuccess(commentBundle);
         }
