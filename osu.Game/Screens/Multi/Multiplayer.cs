@@ -174,7 +174,10 @@ namespace osu.Game.Screens.Multi
         {
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
-                this.Exit();
+            {
+                while (this.IsCurrentScreen())
+                    this.Exit();
+            }
             else
             {
                 this.MakeCurrent();
