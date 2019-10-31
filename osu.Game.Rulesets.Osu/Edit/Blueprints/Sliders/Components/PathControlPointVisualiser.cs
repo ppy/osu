@@ -32,27 +32,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.Update();
 
             while (slider.Path.ControlPoints.Length > Pieces.Count)
-                Pieces.Add(new PathControlPointPiece(slider, Pieces.Count) { ControlPointsChanged = c => ControlPointsChanged?.Invoke(c) });
+            {
+                Pieces.Add(new PathControlPointPiece(slider, Pieces.Count)
+                {
+                    ControlPointsChanged = c => ControlPointsChanged?.Invoke(c),
+                    RequestSelection = selectPiece
+                });
+            }
+
             while (slider.Path.ControlPoints.Length < Pieces.Count)
                 Pieces.Remove(Pieces[Pieces.Count - 1]);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
-            bool anySelected = false;
-
             foreach (var piece in Pieces)
-            {
-                if (piece.IsHovered)
-                {
-                    piece.IsSelected.Value = true;
-                    anySelected = true;
-                }
-                else
-                    piece.IsSelected.Value = false;
-            }
+                piece.IsSelected.Value = false;
+            return false;
+        }
 
-            return anySelected;
+        private void selectPiece(int index)
+        {
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = piece.Index == index;
         }
     }
 }
