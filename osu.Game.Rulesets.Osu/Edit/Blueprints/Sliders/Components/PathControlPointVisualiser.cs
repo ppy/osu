@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
@@ -14,9 +15,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         public Action<Vector2[]> ControlPointsChanged;
 
-        internal Container<PathControlPointPiece> Pieces { get; }
-
+        internal readonly Container<PathControlPointPiece> Pieces;
         private readonly Slider slider;
+
+        private InputManager inputManager;
 
         public PathControlPointVisualiser(Slider slider)
         {
@@ -25,6 +27,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
         }
 
         protected override void Update()
@@ -53,8 +62,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private void selectPiece(int index)
         {
-            foreach (var piece in Pieces)
-                piece.IsSelected.Value = piece.Index == index;
+            if (inputManager.CurrentState.Keyboard.ControlPressed)
+                Pieces[index].IsSelected.Value = true;
+            else
+            {
+                foreach (var piece in Pieces)
+                    piece.IsSelected.Value = piece.Index == index;
+            }
         }
     }
 }
