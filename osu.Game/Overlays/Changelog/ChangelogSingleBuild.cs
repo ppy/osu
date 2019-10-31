@@ -44,7 +44,17 @@ namespace osu.Game.Overlays.Changelog
             req.Failure += _ => complete = true;
 
             // This is done on a separate thread to support cancellation below
-            Task.Run(() => req.Perform(api));
+            Task.Run(() =>
+            {
+                try
+                {
+                    req.Perform(api);
+                }
+                catch
+                {
+                    complete = true;
+                }
+            });
 
             while (!complete)
             {
