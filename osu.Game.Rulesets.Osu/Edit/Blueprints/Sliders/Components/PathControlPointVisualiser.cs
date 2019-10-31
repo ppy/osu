@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 case Key.Delete:
                     var newControlPoints = new List<Vector2>();
 
-                    foreach (var piece in pieces)
+                    foreach (var piece in Pieces)
                     {
                         if (!piece.IsSelected.Value)
                             newControlPoints.Add(slider.Path.ControlPoints[piece.Index]);
