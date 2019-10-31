@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osuTK;
@@ -18,10 +19,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override void CreateContent(Vector2 centrePosition)
         {
+            const float crosshair_thickness = 1;
+            const float crosshair_max_size = 10;
+
+            AddRangeInternal(new[]
+            {
+                new Box
+                {
+                    Origin = Anchor.Centre,
+                    Position = centrePosition,
+                    Width = crosshair_thickness,
+                    EdgeSmoothness = new Vector2(1),
+                    Height = Math.Min(crosshair_max_size, DistanceSpacing * 2),
+                },
+                new Box
+                {
+                    Origin = Anchor.Centre,
+                    Position = centrePosition,
+                    EdgeSmoothness = new Vector2(1),
+                    Width = Math.Min(crosshair_max_size, DistanceSpacing * 2),
+                    Height = crosshair_thickness,
+                }
+            });
+
             float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
             float dy = Math.Max(centrePosition.Y, DrawHeight - centrePosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
-
             int requiredCircles = (int)(maxDistance / DistanceSpacing);
 
             for (int i = 0; i < requiredCircles; i++)
@@ -40,7 +63,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        public override Vector2 GetSnapPosition(Vector2 position)
+        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position)
         {
             Vector2 direction = position - CentrePosition;
 
@@ -53,7 +76,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             int radialCount = Math.Max(1, (int)Math.Round(distance / radius));
 
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
-            return CentrePosition + normalisedDirection * radialCount * radius;
+            Vector2 snappedPosition = CentrePosition + normalisedDirection * radialCount * radius;
+
+            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(StartTime, (snappedPosition - CentrePosition).Length));
         }
     }
 }

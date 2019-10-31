@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -28,8 +29,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private readonly List<Segment> segments = new List<Segment>();
         private Vector2 cursor;
+        private InputManager inputManager;
 
         private PlacementState state;
+
+        [Resolved(CanBeNull = true)]
+        private HitObjectComposer composer { get; set; }
 
         public SliderPlacementBlueprint()
             : base(new Objects.Slider())
@@ -46,10 +51,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                new PathControlPointVisualiser(HitObject),
+                new PathControlPointVisualiser(HitObject) { ControlPointsChanged = _ => updateSlider() },
             };
 
             setState(PlacementState.Initial);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            inputManager = GetContainingInputManager();
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
@@ -61,7 +72,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
-                    cursor = ToLocalSpace(screenSpacePosition) - HitObject.Position;
+                    // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
+                    // is used instead since snapping control points doesn't make much sense
+                    cursor = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
         }
@@ -121,8 +134,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            var newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+            Vector2[] newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
+
+            var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+            var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
+
+            HitObject.Path = new SliderPath(unsnappedPath.Type, newControlPoints, snappedDistance);
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
