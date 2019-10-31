@@ -93,11 +93,79 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkControlPointSelected(0, true);
             checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestSingleControlPointDeselectionViaOtherControlPoint()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
 
             moveMouseToControlPoint(1);
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkControlPointSelected(0, false);
             checkControlPointSelected(1, true);
+        }
+
+        [Test]
+        public void TestSingleControlPointDeselectionViaClickOutside()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("move mouse outside control point", () => InputManager.MoveMouseTo(drawableObject));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestMultipleControlPointSelection()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            moveMouseToControlPoint(1);
+            AddStep("ctrl + click", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            checkControlPointSelected(0, true);
+            checkControlPointSelected(1, true);
+        }
+
+        [Test]
+        public void TestMultipleControlPointDeselectionViaOtherControlPoint()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            moveMouseToControlPoint(1);
+            AddStep("ctrl + click", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            moveMouseToControlPoint(2);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestMultipleControlPointDeselectionViaClickOutside()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            moveMouseToControlPoint(1);
+            AddStep("ctrl + click", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
 
             AddStep("move mouse outside control point", () => InputManager.MoveMouseTo(drawableObject));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
