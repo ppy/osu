@@ -7,10 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -106,10 +108,10 @@ namespace osu.Game.Database
             return Import(notification, paths);
         }
 
-        protected async Task Import(ProgressNotification notification, params string[] paths)
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = "Import is initialising...";
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -145,7 +147,7 @@ namespace osu.Game.Database
 
             if (imported.Count == 0)
             {
-                notification.Text = "Import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
@@ -166,6 +168,8 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            return imported;
         }
 
         /// <summary>
@@ -398,20 +402,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var b in items)
             {
-                foreach (var b in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
-                    Delete(b);
+                Delete(b);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -437,20 +438,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Restoring ({++i} of {items.Count})";
+                notification.Text = $"Restoring ({++i} of {items.Count})";
 
-                    Undelete(item);
+                Undelete(item);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -481,12 +479,16 @@ namespace osu.Game.Database
         {
             var fileInfos = new List<TFileModel>();
 
+            string prefix = reader.Filenames.GetCommonPrefix();
+            if (!(prefix.EndsWith("/") || prefix.EndsWith("\\")))
+                prefix = string.Empty;
+
             // import files to manager
             foreach (string file in reader.Filenames)
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathStandardise(file),
+                        Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
                         FileInfo = files.Add(s)
                     });
 
@@ -585,7 +587,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
-        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
         protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();

@@ -10,12 +10,13 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class BarLineGenerator
+    public class BarLineGenerator<TBarLine>
+        where TBarLine : class, IBarLine, new()
     {
         /// <summary>
         /// The generated bar lines.
         /// </summary>
-        public readonly List<BarLine> BarLines = new List<BarLine>();
+        public readonly List<TBarLine> BarLines = new List<TBarLine>();
 
         /// <summary>
         /// Constructs and generates bar lines for provided beatmap.
@@ -46,7 +47,7 @@ namespace osu.Game.Rulesets.Objects
 
                 for (double t = currentTimingPoint.Time; Precision.DefinitelyBigger(endTime, t); t += barLength, currentBeat++)
                 {
-                    BarLines.Add(new BarLine
+                    BarLines.Add(new TBarLine
                     {
                         StartTime = t,
                         Major = currentBeat % (int)currentTimingPoint.TimeSignature == 0

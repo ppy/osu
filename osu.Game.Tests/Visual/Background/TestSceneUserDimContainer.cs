@@ -285,6 +285,12 @@ namespace osu.Game.Tests.Visual.Background
             });
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            rulesets?.Dispose();
+        }
+
         private class DummySongSelect : PlaySongSelect
         {
             protected override BackgroundScreen CreateBackground()

@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
-using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -22,8 +21,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        public readonly DrawableNote Head;
-        public readonly DrawableNote Tail;
+        public DrawableNote Head => headContainer.Child;
+        public DrawableNote Tail => tailContainer.Child;
+
+        private readonly Container<DrawableHeadNote> headContainer;
+        private readonly Container<DrawableTailNote> tailContainer;
+        private readonly Container<DrawableHoldNoteTick> tickContainer;
 
         private readonly BodyPiece bodyPiece;
 
@@ -40,48 +43,79 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
         {
-            Container<DrawableHoldNoteTick> tickContainer;
             RelativeSizeAxes = Axes.X;
 
             AddRangeInternal(new Drawable[]
             {
-                bodyPiece = new BodyPiece
-                {
-                    RelativeSizeAxes = Axes.X,
-                },
-                tickContainer = new Container<DrawableHoldNoteTick>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = HitObject.NestedHitObjects.OfType<HoldNoteTick>().Select(tick => new DrawableHoldNoteTick(tick)
-                    {
-                        HoldStartTime = () => holdStartTime
-                    })
-                },
-                Head = new DrawableHeadNote(this)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                },
-                Tail = new DrawableTailNote(this)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
+                bodyPiece = new BodyPiece { RelativeSizeAxes = Axes.X },
+                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
+                headContainer = new Container<DrawableHeadNote> { RelativeSizeAxes = Axes.Both },
+                tailContainer = new Container<DrawableTailNote> { RelativeSizeAxes = Axes.Both },
             });
-
-            foreach (var tick in tickContainer)
-                AddNested(tick);
-
-            AddNested(Head);
-            AddNested(Tail);
 
             AccentColour.BindValueChanged(colour =>
             {
                 bodyPiece.AccentColour = colour.NewValue;
-                Head.AccentColour.Value = colour.NewValue;
-                Tail.AccentColour.Value = colour.NewValue;
-                tickContainer.ForEach(t => t.AccentColour.Value = colour.NewValue);
             }, true);
+        }
+
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableHeadNote head:
+                    headContainer.Child = head;
+                    break;
+
+                case DrawableTailNote tail:
+                    tailContainer.Child = tail;
+                    break;
+
+                case DrawableHoldNoteTick tick:
+                    tickContainer.Add(tick);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            headContainer.Clear();
+            tailContainer.Clear();
+            tickContainer.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case TailNote _:
+                    return new DrawableTailNote(this)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AccentColour = { BindTarget = AccentColour }
+                    };
+
+                case Note _:
+                    return new DrawableHeadNote(this)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AccentColour = { BindTarget = AccentColour }
+                    };
+
+                case HoldNoteTick tick:
+                    return new DrawableHoldNoteTick(tick)
+                    {
+                        HoldStartTime = () => holdStartTime,
+                        AccentColour = { BindTarget = AccentColour }
+                    };
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
