@@ -14,9 +14,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         public Action<Vector2[]> ControlPointsChanged;
 
-        private readonly Slider slider;
+        internal Container<PathControlPointPiece> Pieces { get; }
 
-        private readonly Container<PathControlPointPiece> pieces;
+        private readonly Slider slider;
 
         public PathControlPointVisualiser(Slider slider)
         {
@@ -24,24 +24,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+            InternalChild = Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
         }
 
         protected override void Update()
         {
             base.Update();
 
-            while (slider.Path.ControlPoints.Length > pieces.Count)
-                pieces.Add(new PathControlPointPiece(slider, pieces.Count) { ControlPointsChanged = c => ControlPointsChanged?.Invoke(c) });
-            while (slider.Path.ControlPoints.Length < pieces.Count)
-                pieces.Remove(pieces[pieces.Count - 1]);
+            while (slider.Path.ControlPoints.Length > Pieces.Count)
+                Pieces.Add(new PathControlPointPiece(slider, Pieces.Count) { ControlPointsChanged = c => ControlPointsChanged?.Invoke(c) });
+            while (slider.Path.ControlPoints.Length < Pieces.Count)
+                Pieces.Remove(Pieces[Pieces.Count - 1]);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             bool anySelected = false;
 
-            foreach (var piece in pieces)
+            foreach (var piece in Pieces)
             {
                 if (piece.IsHovered)
                 {
