@@ -109,6 +109,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                     // The slider's position defines the position of the first control point, and all further control points are relative to that point
                     slider.Position = slider.Position + first;
+
+                    // Since pieces are re-used, they will not point to the deleted control points while remaining selected
+                    foreach (var piece in Pieces)
+                        piece.IsSelected.Value = false;
+
                     ControlPointsChanged?.Invoke(newControlPoints.ToArray());
 
                     return true;
