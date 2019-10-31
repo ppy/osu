@@ -50,6 +50,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private readonly LoadingAnimation loading;
 
+        [Cached(typeof(IBindable<RulesetInfo>))]
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
         public Header()
         {
             ExternalLinkButton externalLink;
@@ -80,6 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         },
                         RulesetSelector = new BeatmapRulesetSelector
                         {
+                            Current = ruleset,
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                         }
@@ -220,13 +224,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 Details.Beatmap = b.NewValue;
                 externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IBindable<RulesetInfo>>(RulesetSelector.Current);
-            return dependencies;
         }
 
         [BackgroundDependencyLoader]
