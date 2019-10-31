@@ -33,7 +33,6 @@ namespace osu.Game.Overlays.BeatmapSet
             : base(value)
         {
             AutoSizeAxes = Axes.Both;
-            Masking = true;
 
             FillFlowContainer nameContainer;
 
@@ -87,7 +86,6 @@ namespace osu.Game.Overlays.BeatmapSet
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
-                    Height = 4f,
                 },
                 new HoverClickSounds(),
             };
@@ -95,9 +93,10 @@ namespace osu.Game.Overlays.BeatmapSet
             BeatmapSet.BindValueChanged(setInfo =>
             {
                 var beatmapsCount = setInfo.NewValue?.Beatmaps.Count(b => b.Ruleset.Equals(Value)) ?? 0;
-                count.Text = beatmapsCount.ToString();
 
+                count.Text = beatmapsCount.ToString();
                 count.Alpha = beatmapsCount > 0 ? 1f : 0f;
+
                 Enabled.Value = beatmapsCount > 0;
             }, true);
 
@@ -120,9 +119,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private void updateState()
         {
             var isHoveredOrActive = IsHovered || Active.Value;
-            name.Colour = isHoveredOrActive ? colour.GrayE : colour.GrayC;
-            bar.MoveToY(isHoveredOrActive ? 0f : bar.Height, 120);
 
+            bar.ResizeHeightTo(isHoveredOrActive ? 4 : 1, 200, Easing.OutQuint);
+
+            name.Colour = isHoveredOrActive ? colour.GrayE : colour.GrayC;
             name.Font = name.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
         }
 
