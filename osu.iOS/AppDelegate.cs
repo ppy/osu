@@ -21,7 +21,7 @@ namespace osu.iOS
             if (url.IsFileUrl)
                 Task.Run(() => game.Import(url.Path));
             else
-                Task.Run(() => game.HandleUrl(url.AbsoluteString));
+                Task.Run(() => game.HandleLink(url.AbsoluteString));
             return true;
         }
     }

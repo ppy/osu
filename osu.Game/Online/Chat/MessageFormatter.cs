@@ -255,17 +255,17 @@ namespace osu.Game.Online.Chat
                 OriginalText = Text = text;
             }
         }
+    }
 
-        public class LinkDetails
+    public class LinkDetails
+    {
+        public LinkAction Action;
+        public string Argument;
+
+        public LinkDetails(LinkAction action, string argument)
         {
-            public LinkAction Action;
-            public string Argument;
-
-            public LinkDetails(LinkAction action, string argument)
-            {
-                Action = action;
-                Argument = argument;
-            }
+            Action = action;
+            Argument = argument;
         }
     }
 
@@ -279,6 +279,7 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
+        Custom
     }
 
     public class Link : IComparable<Link>

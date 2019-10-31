@@ -44,46 +44,47 @@ namespace osu.Game.Graphics.Containers
             foreach (var link in links)
             {
                 AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
-                AddLink(text.Substring(link.Index, link.Length), link.Url, link.Action, link.Argument);
+                AddLink(text.Substring(link.Index, link.Length), link.Action, link.Argument ?? link.Url);
                 previousLinkEnd = link.Index + link.Length;
             }
 
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public IEnumerable<Drawable> AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
+        public void AddLink(string text, string url, Action<SpriteText> creationParameters = null) =>
+            createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), text);
 
-        public IEnumerable<Drawable> AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
+        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, null), tooltipText, action);
 
-        public IEnumerable<Drawable> AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(string text, LinkAction action, string argument, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), new LinkDetails(action, argument), null);
+
+        public void AddLink(IEnumerable<SpriteText> text, LinkAction action = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);
 
-            return createLink(text, null, url, linkType, linkArgument, tooltipText);
+            createLink(text, new LinkDetails(action, linkArgument), tooltipText);
         }
 
-        public IEnumerable<Drawable> AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), user.Username, null, LinkAction.OpenUserProfile, user.Id.ToString(), "View profile");
+        public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "View Profile");
 
-        private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
+        private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
                 RelativeSizeAxes = Axes.Both,
-                TooltipText = tooltipText ?? (url != text ? url : string.Empty),
+                TooltipText = tooltipText,
                 Action = () =>
                 {
                     if (action != null)
                         action();
                     else
-                        game.HandleLink(url, linkType, linkArgument);
+                        game.HandleLink(link);
                 },
             });
-
-            return drawables;
         }
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.

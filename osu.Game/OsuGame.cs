@@ -43,7 +43,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
-using static osu.Game.Online.Chat.MessageFormatter;
 
 namespace osu.Game
 {
@@ -216,7 +215,9 @@ namespace osu.Game
 
         private ExternalLinkOpener externalLinkOpener;
 
-        public void HandleLink(string url, LinkAction linkType, string linkArgument)
+        public void HandleLink(string url) => HandleLink(MessageFormatter.GetLinkDetails(url));
+
+        public void HandleLink(LinkDetails link)
         {
             Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -224,27 +225,27 @@ namespace osu.Game
                 Icon = FontAwesome.Solid.LifeRing,
             });
 
-            switch (linkType)
+            switch (link.Action)
             {
                 case LinkAction.OpenBeatmap:
                     // TODO: proper query params handling
-                    if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
+                    if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
                         ShowBeatmap(beatmapId);
                     break;
 
                 case LinkAction.OpenBeatmapSet:
-                    if (int.TryParse(linkArgument, out int setId))
+                    if (int.TryParse(link.Argument, out int setId))
                         ShowBeatmapSet(setId);
                     break;
 
                 case LinkAction.OpenChannel:
                     try
                     {
-                        channelManager.OpenChannel(linkArgument);
+                        channelManager.OpenChannel(link.Argument);
                     }
                     catch (ChannelNotFoundException)
                     {
-                        Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
+                        Logger.Log($"The requested channel \"{link.Argument}\" does not exist");
                     }
 
                     break;
@@ -256,26 +257,17 @@ namespace osu.Game
                     break;
 
                 case LinkAction.External:
-                    OpenUrlExternally(url);
+                    OpenUrlExternally(link.Argument);
                     break;
 
                 case LinkAction.OpenUserProfile:
-                    if (long.TryParse(linkArgument, out long userId))
+                    if (long.TryParse(link.Argument, out long userId))
                         ShowUser(userId);
                     break;
 
                 default:
-                    throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
+                    throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
-        }
-
-        public void HandleUrl(string url)
-        {
-            Logger.Log($"Request to handle url: {url}");
-
-            LinkDetails linkDetails = GetLinkDetails(url);
-
-            Schedule(() => HandleLink(url, linkDetails.Action, linkDetails.Argument));
         }
 
         public void OpenUrlExternally(string url)
