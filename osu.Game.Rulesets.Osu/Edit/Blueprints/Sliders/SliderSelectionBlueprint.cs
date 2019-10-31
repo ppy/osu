@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(unsnappedPath.Type, controlPoints, snappedDistance);
+
+            UpdateHitObject();
         }
 
         public override Vector2 SelectionPoint => HeadBlueprint.SelectionPoint;
