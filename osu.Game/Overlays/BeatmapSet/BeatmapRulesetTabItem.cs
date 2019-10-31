@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             var isHoveredOrActive = IsHovered || Active.Value;
 
-            bar.ResizeHeightTo(isHoveredOrActive ? 4 : 1, 200, Easing.OutQuint);
+            bar.ResizeHeightTo(isHoveredOrActive ? 4 : 0, 200, Easing.OutQuint);
 
             name.Colour = isHoveredOrActive ? colour.GrayE : colour.GrayC;
             name.Font = name.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Regular);
