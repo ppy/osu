@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -27,6 +28,11 @@ namespace osu.Game.Rulesets.Objects
         /// A small adjustment to the start time of control points to account for rounding/precision errors.
         /// </summary>
         private const double control_point_leniency = 1;
+
+        /// <summary>
+        /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
+        /// </summary>
+        public event Action DefaultsApplied;
 
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
 
@@ -113,6 +119,8 @@ namespace osu.Game.Rulesets.Objects
 
             foreach (var h in nestedHitObjects)
                 h.ApplyDefaults(controlPointInfo, difficulty);
+
+            DefaultsApplied?.Invoke();
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)

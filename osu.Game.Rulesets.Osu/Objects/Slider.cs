@@ -163,6 +163,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         {
                             StartTime = e.Time,
                             Position = Position,
+                            StackHeight = StackHeight,
                             Samples = getNodeSamples(0),
                             SampleControlPoint = SampleControlPoint,
                         });
@@ -176,6 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         {
                             StartTime = e.Time,
                             Position = EndPosition,
+                            StackHeight = StackHeight
                         });
                         break;
 

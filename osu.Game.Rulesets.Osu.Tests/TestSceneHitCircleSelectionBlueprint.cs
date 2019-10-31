@@ -52,12 +52,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("blueprint positioned over hitobject", () => blueprint.CirclePiece.Position == hitCircle.Position);
         }
 
+        [Test]
+        public void TestStackedHitObject()
+        {
+            AddStep("set stacking", () => hitCircle.StackHeight = 5);
+            AddAssert("blueprint positioned over hitobject", () => blueprint.CirclePiece.Position == hitCircle.StackedPosition);
+        }
+
         private class TestBlueprint : HitCircleSelectionBlueprint
         {
             public new HitCirclePiece CirclePiece => base.CirclePiece;
 
-            public TestBlueprint(DrawableHitCircle hitCircle)
-                : base(hitCircle)
+            public TestBlueprint(DrawableHitCircle drawableCircle)
+                : base(drawableCircle)
             {
             }
         }
