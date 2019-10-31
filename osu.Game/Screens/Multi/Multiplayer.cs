@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Multi
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
-                forcefullyExit();
+                Schedule(forcefullyExit);
         }
 
         private void forcefullyExit()
