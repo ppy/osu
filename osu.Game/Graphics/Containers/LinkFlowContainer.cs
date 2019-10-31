@@ -74,7 +74,13 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = action ?? (() => game.HandleLink(url, linkType, linkArgument)),
+                Action = () =>
+                {
+                    if (action != null)
+                        action();
+                    else
+                        game.HandleLink(url, linkType, linkArgument);
+                },
             });
 
             return drawables;
