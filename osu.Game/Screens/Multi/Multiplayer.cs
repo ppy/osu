@@ -212,6 +212,8 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnExiting(IScreen next)
         {
+            roomManager.PartRoom();
+
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
             {
                 screenStack.Exit();
