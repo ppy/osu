@@ -18,15 +18,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
+        public Action<int> RequestSelection;
         public Action<Vector2[]> ControlPointsChanged;
-        public readonly Bindable<bool> IsSelected = new Bindable<bool>();
 
+        public readonly Bindable<bool> IsSelected = new Bindable<bool>();
         public readonly int Index;
 
         private readonly Slider slider;
         private readonly Path path;
         private readonly Container marker;
         private readonly Drawable markerRing;
+
+        private bool isClicked;
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -98,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
             Color4 colour = isSegmentSeparator ? colours.Red : colours.Yellow;
-            if (IsHovered || IsSelected.Value)
+            if (IsHovered || isClicked || IsSelected.Value)
                 colour = Color4.White;
             marker.Colour = colour;
         }
@@ -121,6 +124,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         // The connecting path is excluded from positional input
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            isClicked = true;
+            return true;
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            isClicked = false;
+            return true;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            RequestSelection?.Invoke(Index);
+            return true;
+        }
 
         protected override bool OnDragStart(DragStartEvent e) => true;
 
