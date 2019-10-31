@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.IO;
+using osu.Game.IO;
 using osu.Game.IO.Serialization;
 
 namespace osu.Game.Beatmaps.Formats
@@ -13,11 +13,8 @@ namespace osu.Game.Beatmaps.Formats
             AddDecoder<Beatmap>("{", m => new JsonBeatmapDecoder());
         }
 
-        protected override void ParseStreamInto(StreamReader stream, Beatmap output)
+        protected override void ParseStreamInto(LineBufferedReader stream, Beatmap output)
         {
-            stream.BaseStream.Position = 0;
-            stream.DiscardBufferedData();
-
             stream.ReadToEnd().DeserializeInto(output);
 
             foreach (var hitObject in output.HitObjects)
