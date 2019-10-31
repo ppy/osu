@@ -45,36 +45,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
 
                 beatmapSet = value;
-
                 updateDisplay();
             }
-        }
-
-        private void updateDisplay()
-        {
-            Difficulties.Clear();
-
-            if (BeatmapSet != null)
-            {
-                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Where(b => b.Ruleset.Equals(ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
-                {
-                    State = DifficultySelectorState.NotSelected,
-                    OnHovered = beatmap =>
-                    {
-                        showBeatmap(beatmap);
-                        starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
-                        starRating.FadeIn(100);
-                    },
-                    OnClicked = beatmap => { Beatmap.Value = beatmap; },
-                });
-            }
-
-            starRating.FadeOut(100);
-            Beatmap.Value = Difficulties.FirstOrDefault()?.Beatmap;
-            plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
-            favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
-
-            updateDifficultyButtons();
         }
 
         public BeatmapPicker()
@@ -167,6 +139,33 @@ namespace osu.Game.Overlays.BeatmapSet
 
             // done here so everything can bind in intialization and get the first trigger
             Beatmap.TriggerChange();
+        }
+
+        private void updateDisplay()
+        {
+            Difficulties.Clear();
+
+            if (BeatmapSet != null)
+            {
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Where(b => b.Ruleset.Equals(ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
+                {
+                    State = DifficultySelectorState.NotSelected,
+                    OnHovered = beatmap =>
+                    {
+                        showBeatmap(beatmap);
+                        starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
+                        starRating.FadeIn(100);
+                    },
+                    OnClicked = beatmap => { Beatmap.Value = beatmap; },
+                });
+            }
+
+            starRating.FadeOut(100);
+            Beatmap.Value = Difficulties.FirstOrDefault()?.Beatmap;
+            plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
+            favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
+
+            updateDifficultyButtons();
         }
 
         private void showBeatmap(BeatmapInfo beatmap)
