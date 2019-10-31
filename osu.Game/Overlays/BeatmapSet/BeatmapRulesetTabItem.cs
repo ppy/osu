@@ -138,10 +138,7 @@ namespace osu.Game.Overlays.BeatmapSet
             return false;
         }
 
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            updateState();
-        }
+        protected override void OnHoverLost(HoverLostEvent e) => updateState();
 
         #endregion
     }
