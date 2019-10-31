@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -29,11 +31,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(PathControlPointPiece)
         };
 
-        private readonly DrawableSlider drawableObject;
+        private Slider slider;
+        private DrawableSlider drawableObject;
+        private TestSliderBlueprint blueprint;
 
-        public TestSceneSliderSelectionBlueprint()
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
-            var slider = new Slider
+            Clear();
+
+            slider = new Slider
             {
                 Position = new Vector2(256, 192),
                 Path = new SliderPath(PathType.Bezier, new[]
@@ -47,8 +54,78 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
 
             Add(drawableObject = new DrawableSlider(slider));
+            AddBlueprint(blueprint = new TestSliderBlueprint(drawableObject));
+        });
+
+        [Test]
+        public void TestInitialState()
+        {
+            checkPositions();
         }
 
-        protected override SelectionBlueprint CreateBlueprint() => new SliderSelectionBlueprint(drawableObject);
+        [Test]
+        public void TestMoveHitObject()
+        {
+            moveHitObject();
+            checkPositions();
+        }
+
+        [Test]
+        public void TestMoveAfterApplyingDefaults()
+        {
+            AddStep("apply defaults", () => slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 }));
+            moveHitObject();
+            checkPositions();
+        }
+
+        [Test]
+        public void TestStackedHitObject()
+        {
+            AddStep("set stacking", () => slider.StackHeight = 5);
+            checkPositions();
+        }
+
+        private void moveHitObject()
+        {
+            AddStep("move hitobject", () =>
+            {
+                slider.Position = new Vector2(300, 225);
+            });
+        }
+
+        private void checkPositions()
+        {
+            AddAssert("body positioned correctly", () => blueprint.BodyPiece.Position == slider.StackedPosition);
+
+            AddAssert("head positioned correctly",
+                () => Precision.AlmostEquals(blueprint.HeadBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.HeadCircle.ScreenSpaceDrawQuad.Centre));
+
+            AddAssert("tail positioned correctly",
+                () => Precision.AlmostEquals(blueprint.TailBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
+        }
+
+        private class TestSliderBlueprint : SliderSelectionBlueprint
+        {
+            public new SliderBodyPiece BodyPiece => base.BodyPiece;
+            public new TestSliderCircleBlueprint HeadBlueprint => (TestSliderCircleBlueprint)base.HeadBlueprint;
+            public new TestSliderCircleBlueprint TailBlueprint => (TestSliderCircleBlueprint)base.TailBlueprint;
+
+            public TestSliderBlueprint(DrawableSlider slider)
+                : base(slider)
+            {
+            }
+
+            protected override SliderCircleSelectionBlueprint CreateCircleSelectionBlueprint(DrawableSlider slider, SliderPosition position) => new TestSliderCircleBlueprint(slider, position);
+        }
+
+        private class TestSliderCircleBlueprint : SliderCircleSelectionBlueprint
+        {
+            public new HitCirclePiece CirclePiece => base.CirclePiece;
+
+            public TestSliderCircleBlueprint(DrawableSlider slider, SliderPosition position)
+                : base(slider, position)
+            {
+            }
+        }
     }
 }
