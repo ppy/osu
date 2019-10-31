@@ -67,7 +67,7 @@ namespace osu.Game.Database
 
         public virtual string[] HandledExtensions => new[] { ".zip" };
 
-        public virtual bool SupportsImportFromStable => (RuntimeInfo.IsDesktop || RuntimeInfo.OS == RuntimeInfo.Platform.iOS);
+        public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
         protected readonly FileStore Files;
 
