@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -85,6 +86,25 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPositions();
         }
 
+        [Test]
+        public void TestSingleControlPointSelection()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, true);
+            checkControlPointSelected(1, false);
+
+            moveMouseToControlPoint(1);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, true);
+
+            AddStep("move mouse outside control point", () => InputManager.MoveMouseTo(drawableObject));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, false);
+        }
+
         private void moveHitObject()
         {
             AddStep("move hitobject", () =>
@@ -104,11 +124,24 @@ namespace osu.Game.Rulesets.Osu.Tests
                 () => Precision.AlmostEquals(blueprint.TailBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
         }
 
+        private void moveMouseToControlPoint(int index)
+        {
+            AddStep($"move mouse to control point {index}", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[index];
+                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+            });
+        }
+
+        private void checkControlPointSelected(int index, bool selected)
+            => AddAssert($"control point {index} {(selected ? "selected" : "not selected")}", () => blueprint.ControlPointVisualiser.Pieces[index].IsSelected.Value == selected);
+
         private class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleBlueprint HeadBlueprint => (TestSliderCircleBlueprint)base.HeadBlueprint;
             public new TestSliderCircleBlueprint TailBlueprint => (TestSliderCircleBlueprint)base.TailBlueprint;
+            public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(DrawableSlider slider)
                 : base(slider)
