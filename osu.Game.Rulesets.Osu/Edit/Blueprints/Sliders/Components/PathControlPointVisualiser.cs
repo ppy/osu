@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
 
+            RelativeSizeAxes = Axes.Both;
+
             InternalChild = pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
         }
 
@@ -32,6 +35,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 pieces.Add(new PathControlPointPiece(slider, pieces.Count) { ControlPointsChanged = c => ControlPointsChanged?.Invoke(c) });
             while (slider.Path.ControlPoints.Length < pieces.Count)
                 pieces.Remove(pieces[pieces.Count - 1]);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            bool anySelected = false;
+
+            foreach (var piece in pieces)
+            {
+                if (piece.IsHovered)
+                {
+                    piece.IsSelected.Value = true;
+                    anySelected = true;
+                }
+                else
+                    piece.IsSelected.Value = false;
+            }
+
+            return anySelected;
         }
     }
 }
