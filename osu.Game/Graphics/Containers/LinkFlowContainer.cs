@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddLink(string text, string url, Action<SpriteText> creationParameters = null) =>
-            createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), text);
+            createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.External, url), url);
 
         public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), new LinkDetails(LinkAction.Custom, null), tooltipText, action);
