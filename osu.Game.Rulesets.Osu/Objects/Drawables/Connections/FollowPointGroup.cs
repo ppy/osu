@@ -3,6 +3,7 @@
 
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Types;
@@ -16,16 +17,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private const int spacing = 32;
         private const double preempt = 800;
 
+        public readonly Bindable<double> StartTime = new Bindable<double>();
+
         /// <summary>
         /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.
         /// </summary>
         [NotNull]
         public readonly DrawableOsuHitObject Start;
 
-        public FollowPointGroup(DrawableOsuHitObject start)
+        /// <summary>
+        /// Creates a new <see cref="FollowPointGroup"/>.
+        /// </summary>
+        /// <param name="start">The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.</param>
+        public FollowPointGroup([NotNull] DrawableOsuHitObject start)
         {
             Start = start;
+
             RelativeSizeAxes = Axes.Both;
+
+            StartTime.BindTo(Start.HitObject.StartTimeBindable);
         }
 
         protected override void LoadComplete()

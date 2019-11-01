@@ -1,6 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -8,97 +11,87 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointRenderer : CompositeDrawable
     {
+        private readonly List<FollowPointGroup> groups = new List<FollowPointGroup>();
+
         /// <summary>
         /// Adds the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
         public void AddFollowPoints(DrawableOsuHitObject hitObject)
-        {
-            var startGroup = new FollowPointGroup(hitObject);
-            AddInternal(startGroup);
-
-            // Groups are sorted by their start time when added, so the index can be used to post-process other surrounding groups
-            int startIndex = IndexOfInternal(startGroup);
-
-            if (startIndex < InternalChildren.Count - 1)
-            {
-                //     h1 -> -> -> h2
-                //  hitObject   nextGroup
-
-                var nextGroup = (FollowPointGroup)InternalChildren[startIndex + 1];
-                startGroup.End = nextGroup.Start;
-            }
-
-            if (startIndex > 0)
-            {
-                //     h1 -> -> -> h2
-                //  prevGroup   hitObject
-
-                var previousGroup = (FollowPointGroup)InternalChildren[startIndex - 1];
-                previousGroup.End = startGroup.Start;
-            }
-        }
+            => addGroup(new FollowPointGroup(hitObject).With(g => g.StartTime.BindValueChanged(_ => onStartTimeChanged(g))));
 
         /// <summary>
         /// Removes the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
-        public void RemoveFollowPoints(DrawableOsuHitObject hitObject)
+        public void RemoveFollowPoints(DrawableOsuHitObject hitObject) => removeGroup(groups.Single(g => g.Start == hitObject));
+
+        /// <summary>
+        /// Adds a <see cref="FollowPointGroup"/> to this <see cref="FollowPointRenderer"/>.
+        /// </summary>
+        /// <param name="group">The <see cref="FollowPointGroup"/> to add.</param>
+        /// <returns>The index of <paramref name="group"/> in <see cref="groups"/>.</returns>
+        private int addGroup(FollowPointGroup group)
         {
-            var groups = findGroups(hitObject);
+            AddInternal(group);
 
-            // Regardless of the position of the hitobject in the beatmap, there will always be a group leading from the hitobject
-            RemoveInternal(groups.start);
+            // Groups are sorted by their start time when added such that the index can be used to post-process other surrounding groups
+            int index = groups.AddInPlace(group, Comparer<FollowPointGroup>.Create((g1, g2) => g1.StartTime.Value.CompareTo(g2.StartTime.Value)));
 
-            if (groups.end != null)
+            if (index < groups.Count - 1)
             {
-                // When there were two groups referencing the same hitobject,  merge them by updating the end group to point to the new end (the start group was already removed)
-                groups.end.End = groups.start.End;
+                // Update the group's end point to the next hitobject
+                //     h1 -> -> -> h2
+                //  hitObject   nextGroup
+
+                FollowPointGroup nextGroup = groups[index + 1];
+                group.End = nextGroup.Start;
             }
+
+            if (index > 0)
+            {
+                // Previous group's end point to the current group's start point
+                //     h1 -> -> -> h2
+                //  prevGroup   hitObject
+
+                FollowPointGroup previousGroup = groups[index - 1];
+                previousGroup.End = group.Start;
+            }
+
+            return index;
         }
 
         /// <summary>
-        /// Finds the <see cref="FollowPointGroup"/>s with <paramref name="hitObject"/> as the start and end <see cref="DrawableOsuHitObject"/>s.
+        /// Removes a <see cref="FollowPointGroup"/> from this <see cref="FollowPointRenderer"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to find the relevant <see cref="FollowPointGroup"/> of.</param>
-        /// <returns>A tuple containing the end group (the <see cref="FollowPointGroup"/> where <paramref name="hitObject"/> is the end of),
-        /// and the start group (the <see cref="FollowPointGroup"/> where <paramref name="hitObject"/> is the start of).</returns>
-        private (FollowPointGroup start, FollowPointGroup end) findGroups(DrawableOsuHitObject hitObject)
+        /// <param name="group">The <see cref="FollowPointGroup"/> to remove.</param>
+        /// <returns>Whether <paramref name="group"/> was removed.</returns>
+        private bool removeGroup(FollowPointGroup group)
         {
-            //           endGroup         startGroup
-            //     h1 -> -> -> -> -> h2 -> -> -> -> -> h3
-            //                    hitObject
+            RemoveInternal(group);
 
-            FollowPointGroup startGroup = null; // The group which the hitobject is the start in
-            FollowPointGroup endGroup = null; // The group which the hitobject is the end in
+            int index = groups.IndexOf(group);
 
-            int startIndex = 0;
-
-            for (; startIndex < InternalChildren.Count; startIndex++)
+            if (index > 0)
             {
-                var group = (FollowPointGroup)InternalChildren[startIndex];
-
-                if (group.Start == hitObject)
-                {
-                    startGroup = group;
-                    break;
-                }
+                // Update the previous group's end point to the next group's start point
+                //     h1 -> -> -> h2 -> -> -> h3
+                //  prevGroup    group       nextGroup
+                // The current group's end point is used since there may not be a next group
+                FollowPointGroup previousGroup = groups[index - 1];
+                previousGroup.End = group.End;
             }
 
-            if (startIndex > 0)
-                endGroup = (FollowPointGroup)InternalChildren[startIndex - 1];
-
-            return (startGroup, endGroup);
+            return groups.Remove(group);
         }
 
-        protected override int Compare(Drawable x, Drawable y)
+        private void onStartTimeChanged(FollowPointGroup group)
         {
-            var groupX = (FollowPointGroup)x;
-            var groupY = (FollowPointGroup)y;
-
-            return groupX.Start.HitObject.StartTime.CompareTo(groupY.Start.HitObject.StartTime);
+            // Naive but can be improved if performance becomes problematic
+            removeGroup(group);
+            addGroup(group);
         }
     }
 }
