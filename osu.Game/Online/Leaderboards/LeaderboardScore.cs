@@ -21,6 +21,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using Humanizer;
+using osu.Game.Online.API;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -59,7 +60,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = score.User;
 
@@ -100,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
+                                    Colour = user.Id == api.LocalUser.Value.Id ? colour.YellowLight : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
