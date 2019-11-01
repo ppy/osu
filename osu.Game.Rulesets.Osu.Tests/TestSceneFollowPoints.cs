@@ -318,7 +318,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 {
                     end = value;
 
-                    bindHitObject(end);
+                    if (end != null)
+                        bindHitObject(end);
+
                     refreshFollowPoints();
                 }
             }
