@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play;
@@ -49,11 +48,7 @@ namespace osu.Game.Screens.Ranking.Pages
             background.Colour = colours.Green;
 
             if (player != null)
-                Action = () =>
-                {
-                    player.Restart();
-                    player.MakeCurrent();
-                };
+                Action = () => player.Restart();
         }
     }
 }
