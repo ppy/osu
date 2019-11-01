@@ -40,8 +40,6 @@ namespace osu.Game.Screens.Menu
         private readonly Container logoHoverContainer;
         private readonly LogoVisualisation visualizer;
 
-        private readonly IntroSequence intro;
-
         private SampleChannel sampleClick;
         private SampleChannel sampleBeat;
 
@@ -99,10 +97,6 @@ namespace osu.Game.Screens.Menu
 
             Children = new Drawable[]
             {
-                intro = new IntroSequence
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
                 logoHoverContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -314,9 +308,6 @@ namespace osu.Game.Screens.Menu
             const double fade = 200;
 
             logoHoverContainer.FadeOut().Delay(length).FadeIn(fade);
-            intro.Show();
-            intro.Start(length);
-            intro.Delay(length + fade).FadeOut();
         }
 
         protected override void Update()
