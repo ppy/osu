@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
-    public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
+    public class FollowPointRenderer : CompositeDrawable
     {
         private int pointDistance = 32;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private IEnumerable<OsuHitObject> hitObjects;
 
-        public override IEnumerable<OsuHitObject> HitObjects
+        public IEnumerable<OsuHitObject> HitObjects
         {
             get => hitObjects;
             set
