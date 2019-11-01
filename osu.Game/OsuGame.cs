@@ -215,6 +215,61 @@ namespace osu.Game
 
         private ExternalLinkOpener externalLinkOpener;
 
+        public void HandleLink(string url) => HandleLink(MessageFormatter.GetLinkDetails(url));
+
+        public void HandleLink(LinkDetails link)
+        {
+            Action showNotImplementedError = () => notifications?.Post(new SimpleNotification
+            {
+                Text = @"This link type is not yet supported!",
+                Icon = FontAwesome.Solid.LifeRing,
+            });
+
+            switch (link.Action)
+            {
+                case LinkAction.OpenBeatmap:
+                    // TODO: proper query params handling
+                    if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                        ShowBeatmap(beatmapId);
+                    break;
+
+                case LinkAction.OpenBeatmapSet:
+                    if (int.TryParse(link.Argument, out int setId))
+                        ShowBeatmapSet(setId);
+                    break;
+
+                case LinkAction.OpenChannel:
+                    try
+                    {
+                        channelManager.OpenChannel(link.Argument);
+                    }
+                    catch (ChannelNotFoundException)
+                    {
+                        Logger.Log($"The requested channel \"{link.Argument}\" does not exist");
+                    }
+
+                    break;
+
+                case LinkAction.OpenEditorTimestamp:
+                case LinkAction.JoinMultiplayerMatch:
+                case LinkAction.Spectate:
+                    showNotImplementedError.Invoke();
+                    break;
+
+                case LinkAction.External:
+                    OpenUrlExternally(link.Argument);
+                    break;
+
+                case LinkAction.OpenUserProfile:
+                    if (long.TryParse(link.Argument, out long userId))
+                        ShowUser(userId);
+                    break;
+
+                default:
+                    throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
+            }
+        }
+
         public void OpenUrlExternally(string url)
         {
             if (url.StartsWith("/"))
