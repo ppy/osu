@@ -268,20 +268,21 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class FollowPointGroup : CompositeDrawable
         {
+            // Todo: These shouldn't be constants
             private const int spacing = 32;
             private const double preempt = 800;
+
+            /// <summary>
+            /// The <see cref="DrawableHitObject"/> which <see cref="FollowPoint"/>s will exit from.
+            /// </summary>
+            [NotNull]
+            public readonly DrawableHitObject Start;
 
             public FollowPointGroup(DrawableHitObject start)
             {
                 Start = start;
                 RelativeSizeAxes = Axes.Both;
             }
-
-            /// <summary>
-            /// The <see cref="DrawableHitObject"/> which <see cref="FollowPoint"/>s will exit from.
-            /// </summary>
-            [NotNull]
-            public DrawableHitObject Start { get; }
 
             private DrawableHitObject end;
 
