@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Size = HitObject.DrawSize;
+            Size = DrawableObject.DrawSize;
         }
     }
 }

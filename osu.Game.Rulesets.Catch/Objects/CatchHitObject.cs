@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 
     public enum FruitVisualRepresentation
