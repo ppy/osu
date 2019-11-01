@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
-        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly FollowPointRenderer connectionLayer;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
