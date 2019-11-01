@@ -3,11 +3,10 @@
 
 using osu.Framework.IO.Network;
 using osu.Game.Rulesets;
-using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public abstract class GetRankingsRequest<TModel> : APIRequest<List<TModel>>
+    public abstract class GetRankingsRequest<TModel> : APIRequest<TModel>
     {
         private readonly RulesetInfo ruleset;
         private readonly int page;
