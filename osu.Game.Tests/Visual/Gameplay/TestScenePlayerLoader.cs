@@ -69,7 +69,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
+            AddWaitStep("wait a bit", 5);
             AddAssert("loader still active", () => loader.IsCurrentScreen());
+            AddStep("move to center", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
         }
 
@@ -144,9 +146,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
             AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
-            AddUntilStep("wait for player", () => player.IsLoaded);
 
-            AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
+            AddUntilStep("wait for notification post", () => container.NotificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>
             {
                 var scrollContainer = (OsuScrollContainer)container.NotificationOverlay.Children.Last();

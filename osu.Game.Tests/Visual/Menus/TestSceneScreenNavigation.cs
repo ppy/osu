@@ -112,6 +112,12 @@ namespace osu.Game.Tests.Visual.Menus
 
             AddStep("press enter", () => pressAndRelease(Key.Enter));
 
+            // Player loading may be blocked by either the cursor staying at 0,0 (hovering the toolbar), or a focused overlay being opened taking away hover from player loader
+            // therefore all focused overlays should be closed and the mouse position must be in the centre when the player loader is active.
+            AddUntilStep("wait for player loader", () => (game.ScreenStack.CurrentScreen as PlayerLoader)?.IsLoaded ?? false);
+            AddStep("close all overlays", () => game.CloseAllOverlays());
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(game.ScreenSpaceDrawQuad.Centre));
+
             AddUntilStep("wait for player", () => (player = game.ScreenStack.CurrentScreen as Player) != null);
             AddUntilStep("wait for fail", () => player.HasFailed);
 
