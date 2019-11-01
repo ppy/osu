@@ -138,18 +138,13 @@ namespace osu.Game.Overlays.AccountCreation
             passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (host?.OnScreenKeyboardOverlapsGameWindow != true && !textboxes.Any(t => t.HasFocus))
-                focusNextTextbox();
-        }
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             processingOverlay.Hide();
+
+            if (host?.OnScreenKeyboardOverlapsGameWindow != true)
+                focusNextTextbox();
         }
 
         private void performRegistration()

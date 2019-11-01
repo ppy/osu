@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -105,6 +106,8 @@ namespace osu.Game.Screens.Edit.Components
                 TabContainer.Spacing = Vector2.Zero;
 
                 tempo_values.ForEach(AddItem);
+
+                Current.Value = tempo_values.Last();
             }
 
             public class PlaybackTabItem : TabItem<double>

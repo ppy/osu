@@ -108,7 +108,7 @@ namespace osu.Game.Database
             return Import(notification, paths);
         }
 
-        protected async Task Import(ProgressNotification notification, params string[] paths)
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
@@ -168,6 +168,8 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            return imported;
         }
 
         /// <summary>
@@ -400,20 +402,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var b in items)
             {
-                foreach (var b in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
-                    Delete(b);
+                Delete(b);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -439,20 +438,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Restoring ({++i} of {items.Count})";
+                notification.Text = $"Restoring ({++i} of {items.Count})";
 
-                    Undelete(item);
+                Undelete(item);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
