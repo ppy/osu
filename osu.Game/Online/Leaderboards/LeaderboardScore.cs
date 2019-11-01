@@ -38,6 +38,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly ScoreInfo score;
         private readonly int rank;
+        private readonly bool canHighlighted;
 
         private Box background;
         private Container content;
@@ -50,10 +51,11 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        public LeaderboardScore(ScoreInfo score, int rank)
+        public LeaderboardScore(ScoreInfo score, int rank, bool canHighlighted = true)
         {
             this.score = score;
             this.rank = rank;
+            this.canHighlighted = canHighlighted;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -101,7 +103,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id ? colour.YellowLight : Color4.Black,
+                                    Colour = user.Id == api.LocalUser.Value.Id && canHighlighted ? colour.YellowLight : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
