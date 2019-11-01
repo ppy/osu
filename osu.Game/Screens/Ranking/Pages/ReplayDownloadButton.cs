@@ -8,6 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
+using osuTK;
 
 namespace osu.Game.Screens.Ranking.Pages
 {
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.Ranking.Pages
         public ReplayDownloadButton(ScoreInfo score)
             : base(score)
         {
+            Size = new Vector2(50, 30);
         }
 
         [BackgroundDependencyLoader(true)]

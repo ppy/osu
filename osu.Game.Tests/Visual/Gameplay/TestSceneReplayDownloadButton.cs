@@ -8,7 +8,6 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Users;
-using osuTK;
 using System;
 using System.Collections.Generic;
 using osu.Game.Screens.Ranking.Pages;
@@ -42,7 +41,6 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(80, 40),
                 };
             });
         }
