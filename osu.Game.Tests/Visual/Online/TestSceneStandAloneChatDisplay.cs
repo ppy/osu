@@ -7,6 +7,10 @@ using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osuTK;
 using System;
+using System.Linq;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Chat;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -42,14 +46,14 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private ChannelManager channelManager = new ChannelManager();
 
-        private readonly StandAloneChatDisplay chatDisplay;
-        private readonly StandAloneChatDisplay chatDisplay2;
+        private readonly TestStandAloneChatDisplay chatDisplay;
+        private readonly TestStandAloneChatDisplay chatDisplay2;
 
         public TestSceneStandAloneChatDisplay()
         {
             Add(channelManager);
 
-            Add(chatDisplay = new StandAloneChatDisplay
+            Add(chatDisplay = new TestStandAloneChatDisplay
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
@@ -57,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
                 Size = new Vector2(400, 80)
             });
 
-            Add(chatDisplay2 = new StandAloneChatDisplay(true)
+            Add(chatDisplay2 = new TestStandAloneChatDisplay(true)
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
@@ -119,6 +123,49 @@ namespace osu.Game.Tests.Visual.Online
                 Content = "Message from the future!",
                 Timestamp = DateTimeOffset.Now
             }));
+
+            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+
+            const int messages_per_call = 10;
+            AddRepeatStep("add many messages", () =>
+                {
+                    for (int i = 0; i < messages_per_call; i++)
+                        testChannel.AddNewMessages(new Message(sequence++)
+                        {
+                            Sender = longUsernameUser,
+                            Content = "Many messages! " + Guid.NewGuid(),
+                            Timestamp = DateTimeOffset.Now
+                        });
+                }, Channel.MAX_HISTORY / messages_per_call + 5);
+
+            AddAssert("Ensure no adjacent day separators", () =>
+            {
+                var indices = chatDisplay.FillFlow.OfType<DrawableChannel.DaySeparator>().Select(ds => chatDisplay.FillFlow.IndexOf(ds));
+
+                foreach (var i in indices)
+                    if (i < chatDisplay.FillFlow.Count && chatDisplay.FillFlow[i + 1] is DrawableChannel.DaySeparator)
+                        return false;
+
+                return true;
+            });
+
+            AddUntilStep("ensure still scrolled to bottom", () => chatDisplay.ScrolledToBottom);
+        }
+
+        private class TestStandAloneChatDisplay : StandAloneChatDisplay
+        {
+            public TestStandAloneChatDisplay(bool textbox = false)
+                : base(textbox)
+            {
+            }
+
+            protected DrawableChannel DrawableChannel => InternalChildren.OfType<DrawableChannel>().First();
+
+            protected OsuScrollContainer ScrollContainer => (OsuScrollContainer)((Container)DrawableChannel.Child).Child;
+
+            public FillFlowContainer FillFlow => (FillFlowContainer)ScrollContainer.Child;
+
+            public bool ScrolledToBottom => ScrollContainer.IsScrolledToEnd(1);
         }
     }
 }
