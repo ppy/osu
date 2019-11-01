@@ -283,6 +283,12 @@ namespace osu.Game.Rulesets.Osu.Tests
                 RelativeSizeAxes = Axes.Both;
             }
 
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                bindHitObject(Start);
+            }
+
             private DrawableOsuHitObject end;
 
             /// <summary>
@@ -295,8 +301,17 @@ namespace osu.Game.Rulesets.Osu.Tests
                 set
                 {
                     end = value;
+
+                    bindHitObject(end);
                     refreshFollowPoints();
                 }
+            }
+
+            private void bindHitObject(DrawableOsuHitObject drawableObject)
+            {
+                drawableObject.HitObject.StartTimeBindable.BindValueChanged(_ => refreshFollowPoints());
+                drawableObject.HitObject.PositionBindable.BindValueChanged(_ => refreshFollowPoints());
+                drawableObject.HitObject.DefaultsApplied += refreshFollowPoints;
             }
 
             private void refreshFollowPoints()
