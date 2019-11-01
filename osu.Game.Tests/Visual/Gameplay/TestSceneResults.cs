@@ -26,6 +26,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             typeof(Results),
             typeof(ResultsPage),
             typeof(ScoreResultsPage),
+            typeof(ReplayDownloadButton),
             typeof(LocalLeaderboardPage)
         };
 
