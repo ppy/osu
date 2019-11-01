@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -22,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneFollowPoints : OsuTestScene
     {
-        private Container<DrawableHitObject> hitObjectContainer;
+        private Container<DrawableOsuHitObject> hitObjectContainer;
         private FollowPointRenderer followPointRenderer;
 
         [SetUp]
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             Children = new Drawable[]
             {
-                hitObjectContainer = new Container<DrawableHitObject> { RelativeSizeAxes = Axes.Both },
+                hitObjectContainer = new Container<DrawableOsuHitObject> { RelativeSizeAxes = Axes.Both },
                 followPointRenderer = new FollowPointRenderer { RelativeSizeAxes = Axes.Both }
             };
         });
@@ -44,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestRemoveSingleHitObject()
         {
-            DrawableHitObject obj = null;
+            DrawableOsuHitObject obj = null;
 
             addObjects(() => new[] { new HitCircle { Position = new Vector2(100, 100) } }, o => obj = o);
             removeObject(() => obj);
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestRemoveEndObject()
         {
-            var objects = new List<DrawableHitObject>();
+            var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
@@ -85,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestRemoveStartObject()
         {
-            var objects = new List<DrawableHitObject>();
+            var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
@@ -104,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestRemoveMiddleObject()
         {
-            var objects = new List<DrawableHitObject>();
+            var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
@@ -123,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestMoveHitObject()
         {
-            var objects = new List<DrawableHitObject>();
+            var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
@@ -136,10 +135,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new HitCircle { Position = new Vector2(500, 500) },
             }, o => objects.Add(o));
 
-            AddStep("move hitobject", () => ((OsuHitObject)objects[2].HitObject).Position = new Vector2(300, 100));
+            AddStep("move hitobject", () => objects[2].HitObject.Position = new Vector2(300, 100));
         }
 
-        private void addObjects(Func<HitCircle[]> ctorFunc, Action<DrawableHitObject> storeFunc = null)
+        private void addObjects(Func<HitCircle[]> ctorFunc, Action<DrawableOsuHitObject> storeFunc = null)
         {
             AddStep("add hitobjects", () =>
             {
@@ -159,7 +158,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        private void removeObject(Func<DrawableHitObject> getFunc)
+        private void removeObject(Func<DrawableOsuHitObject> getFunc)
         {
             AddStep("remove hitobject", () =>
             {
@@ -173,11 +172,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private class FollowPointRenderer : CompositeDrawable
         {
             /// <summary>
-            /// Adds the <see cref="FollowPoint"/>s around a <see cref="DrawableHitObject"/>.
+            /// Adds the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
             /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
             /// </summary>
-            /// <param name="hitObject">The <see cref="DrawableHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
-            public void AddFollowPoints(DrawableHitObject hitObject)
+            /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
+            public void AddFollowPoints(DrawableOsuHitObject hitObject)
             {
                 var startGroup = new FollowPointGroup(hitObject);
                 AddInternal(startGroup);
@@ -205,11 +204,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
 
             /// <summary>
-            /// Removes the <see cref="FollowPoint"/>s around a <see cref="DrawableHitObject"/>.
+            /// Removes the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
             /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
             /// </summary>
-            /// <param name="hitObject">The <see cref="DrawableHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
-            public void RemoveFollowPoints(DrawableHitObject hitObject)
+            /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
+            public void RemoveFollowPoints(DrawableOsuHitObject hitObject)
             {
                 var groups = findGroups(hitObject);
 
@@ -224,12 +223,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
 
             /// <summary>
-            /// Finds the <see cref="FollowPointGroup"/>s with <paramref name="hitObject"/> as the start and end <see cref="DrawableHitObject"/>s.
+            /// Finds the <see cref="FollowPointGroup"/>s with <paramref name="hitObject"/> as the start and end <see cref="DrawableOsuHitObject"/>s.
             /// </summary>
-            /// <param name="hitObject">The <see cref="DrawableHitObject"/> to find the relevant <see cref="FollowPointGroup"/> of.</param>
+            /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to find the relevant <see cref="FollowPointGroup"/> of.</param>
             /// <returns>A tuple containing the end group (the <see cref="FollowPointGroup"/> where <paramref name="hitObject"/> is the end of),
             /// and the start group (the <see cref="FollowPointGroup"/> where <paramref name="hitObject"/> is the start of).</returns>
-            private (FollowPointGroup start, FollowPointGroup end) findGroups(DrawableHitObject hitObject)
+            private (FollowPointGroup start, FollowPointGroup end) findGroups(DrawableOsuHitObject hitObject)
             {
                 //           endGroup         startGroup
                 //     h1 -> -> -> -> -> h2 -> -> -> -> -> h3
@@ -273,24 +272,24 @@ namespace osu.Game.Rulesets.Osu.Tests
             private const double preempt = 800;
 
             /// <summary>
-            /// The <see cref="DrawableHitObject"/> which <see cref="FollowPoint"/>s will exit from.
+            /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.
             /// </summary>
             [NotNull]
-            public readonly DrawableHitObject Start;
+            public readonly DrawableOsuHitObject Start;
 
-            public FollowPointGroup(DrawableHitObject start)
+            public FollowPointGroup(DrawableOsuHitObject start)
             {
                 Start = start;
                 RelativeSizeAxes = Axes.Both;
             }
 
-            private DrawableHitObject end;
+            private DrawableOsuHitObject end;
 
             /// <summary>
-            /// The <see cref="DrawableHitObject"/> which <see cref="FollowPoint"/>s will enter.
+            /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will enter.
             /// </summary>
             [CanBeNull]
-            public DrawableHitObject End
+            public DrawableOsuHitObject End
             {
                 get => end;
                 set
@@ -307,8 +306,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (End == null)
                     return;
 
-                OsuHitObject osuStart = (OsuHitObject)Start.HitObject;
-                OsuHitObject osuEnd = (OsuHitObject)End.HitObject;
+                OsuHitObject osuStart = Start.HitObject;
+                OsuHitObject osuEnd = End.HitObject;
 
                 if (osuEnd.NewCombo)
                     return;
