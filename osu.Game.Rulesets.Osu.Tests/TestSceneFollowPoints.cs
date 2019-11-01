@@ -198,6 +198,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public FollowPointGroup(DrawableHitObject start)
             {
                 Start = start;
+                RelativeSizeAxes = Axes.Both;
             }
 
             /// <summary>
