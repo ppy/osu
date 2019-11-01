@@ -14,11 +14,21 @@ namespace osu.Game.Screens.Menu
         protected override string BeatmapHash => "3c8b1fcc9434dbb29e2fb613d3b9eada9d7bb6c125ceb32396c3b53437280c83";
 
         protected override string BeatmapFile => "circles.osz";
+        
+        private readonly IntroSequence intro;
 
         private const double delay_step_one = 2300;
         private const double delay_step_two = 600;
 
         private SampleChannel welcome;
+        
+        public IntroCircles()
+        {
+            intro = new IntroSequence
+            {
+                RelativeSizeAxes = Axes.Both,
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -46,7 +56,7 @@ namespace osu.Game.Screens.Menu
 
                 logo.ScaleTo(1);
                 logo.FadeIn();
-                logo.PlayIntro();
+                PlayIntro();
             }
         }
 
@@ -54,6 +64,16 @@ namespace osu.Game.Screens.Menu
         {
             this.FadeOut(300);
             base.OnSuspending(next);
+        }
+        
+        private void PlayIntro()
+        {
+            const double length = 3150;
+            const double fade = 200;
+            
+            intro.Show();
+            intro.Start(length);
+            intro.Delay(length + fade).FadeOut();
         }
     }
 }
