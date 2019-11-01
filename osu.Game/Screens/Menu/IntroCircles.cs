@@ -229,13 +229,6 @@ namespace osu.Game.Screens.Menu
 
                 base.LoadComplete();
 
-                //if (InternalChildren.Any())
-                //{
-                //    // restart if we were already run previously.
-                //    FinishTransforms(true);
-                //    load();
-                //}
-
                 smallRing.ResizeTo(logo_size * 0.086f, 400, Easing.InOutQuint);
 
                 mediumRing.ResizeTo(130, 340, Easing.OutQuad);
