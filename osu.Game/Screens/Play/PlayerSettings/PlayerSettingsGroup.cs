@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override bool OnHover(HoverEvent e)
         {
             this.FadeIn(fade_duration, Easing.OutQuint);
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
