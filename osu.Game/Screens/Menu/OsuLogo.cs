@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public void FadeOut()
+        public void LogoContainerFadeOut()
         {
             const double length = 3150;
             const double fade = 200;
