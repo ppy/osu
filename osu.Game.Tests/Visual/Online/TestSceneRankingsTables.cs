@@ -77,7 +77,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var table = new CountriesTable(page)
                 {
-                    Rankings = rankings,
+                    Rankings = rankings.Countries,
                 };
 
                 LoadComponentAsync(table, t =>
@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var table = new PerformanceTable(page)
                 {
-                    Rankings = rankings,
+                    Rankings = rankings.Users,
                 };
 
                 LoadComponentAsync(table, t =>
@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 var table = new ScoresTable(page)
                 {
-                    Rankings = rankings,
+                    Rankings = rankings.Users,
                 };
 
                 LoadComponentAsync(table, t =>

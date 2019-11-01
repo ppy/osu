@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.IO.Network;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserRankingsRequest : GetRankingsRequest<APIUserRankings>
+    public class GetUserRankingsRequest : GetRankingsRequest<GetUsersResponse>
     {
         private readonly string country;
         private readonly UserRankingsType type;
