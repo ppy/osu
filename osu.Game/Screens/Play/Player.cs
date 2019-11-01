@@ -319,6 +319,8 @@ namespace osu.Game.Screens.Play
 
             if (this.IsCurrentScreen())
                 performImmediateExit();
+            else
+                this.MakeCurrent();
         }
 
         private ScheduledDelegate completionProgressDelegate;
