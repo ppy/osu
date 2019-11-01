@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Extensions.Color4Extensions;
@@ -40,54 +42,132 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestAddSingleHitObject()
         {
-            addObject(new HitCircle { Position = new Vector2(100, 100) });
+            addObjects(() => new[] { new HitCircle { Position = new Vector2(100, 100) } });
         }
 
         [Test]
         public void TestRemoveSingleHitObject()
         {
+            DrawableHitObject obj = null;
+
+            addObjects(() => new[] { new HitCircle { Position = new Vector2(100, 100) } }, o => obj = o);
+            removeObject(() => obj);
         }
 
         [Test]
         public void TestAddMultipleHitObjects()
         {
+            addObjects(() => new[]
+            {
+                new HitCircle { Position = new Vector2(100, 100) },
+                new HitCircle { Position = new Vector2(200, 200) },
+                new HitCircle { Position = new Vector2(300, 300) },
+                new HitCircle { Position = new Vector2(400, 400) },
+                new HitCircle { Position = new Vector2(500, 500) },
+            });
         }
 
         [Test]
         public void TestRemoveEndObject()
         {
+            var objects = new List<DrawableHitObject>();
+
+            AddStep("reset", () => objects.Clear());
+
+            addObjects(() => new[]
+            {
+                new HitCircle { Position = new Vector2(100, 100) },
+                new HitCircle { Position = new Vector2(200, 200) },
+                new HitCircle { Position = new Vector2(300, 300) },
+                new HitCircle { Position = new Vector2(400, 400) },
+                new HitCircle { Position = new Vector2(500, 500) },
+            }, o => objects.Add(o));
+
+            removeObject(() => objects.Last());
         }
 
         [Test]
         public void TestRemoveStartObject()
         {
+            var objects = new List<DrawableHitObject>();
+
+            AddStep("reset", () => objects.Clear());
+
+            addObjects(() => new[]
+            {
+                new HitCircle { Position = new Vector2(100, 100) },
+                new HitCircle { Position = new Vector2(200, 200) },
+                new HitCircle { Position = new Vector2(300, 300) },
+                new HitCircle { Position = new Vector2(400, 400) },
+                new HitCircle { Position = new Vector2(500, 500) },
+            }, o => objects.Add(o));
+
+            removeObject(() => objects.First());
         }
 
         [Test]
         public void TestRemoveMiddleObject()
         {
+            var objects = new List<DrawableHitObject>();
+
+            AddStep("reset", () => objects.Clear());
+
+            addObjects(() => new[]
+            {
+                new HitCircle { Position = new Vector2(100, 100) },
+                new HitCircle { Position = new Vector2(200, 200) },
+                new HitCircle { Position = new Vector2(300, 300) },
+                new HitCircle { Position = new Vector2(400, 400) },
+                new HitCircle { Position = new Vector2(500, 500) },
+            }, o => objects.Add(o));
+
+            removeObject(() => objects[2]);
         }
 
-        private void addObject(HitCircle hitCircle, Action<DrawableHitObject> func = null)
+        [Test]
+        public void TestMoveHitObject()
         {
-            AddStep("add hitobject", () =>
+            var objects = new List<DrawableHitObject>();
+
+            AddStep("reset", () => objects.Clear());
+
+            addObjects(() => new[]
             {
-                hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+                new HitCircle { Position = new Vector2(100, 100) },
+                new HitCircle { Position = new Vector2(200, 200) },
+                new HitCircle { Position = new Vector2(300, 300) },
+                new HitCircle { Position = new Vector2(400, 400) },
+                new HitCircle { Position = new Vector2(500, 500) },
+            }, o => objects.Add(o));
 
-                var drawableCircle = new DrawableHitCircle(hitCircle);
+            AddStep("move hitobject", () => ((OsuHitObject)objects[2].HitObject).Position = new Vector2(300, 100));
+        }
 
-                hitObjectContainer.Add(drawableCircle);
-                followPointRenderer.AddFollowPoints(drawableCircle);
+        private void addObjects(Func<HitCircle[]> ctorFunc, Action<DrawableHitObject> storeFunc = null)
+        {
+            AddStep("add hitobjects", () =>
+            {
+                var circles = ctorFunc();
 
-                func?.Invoke(drawableCircle);
+                for (int i = 0; i < circles.Length; i++)
+                {
+                    circles[i].StartTime = Time.Current + 1000 + 500 * (i + 1);
+                    circles[i].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+
+                    var drawableCircle = new DrawableHitCircle(circles[i]);
+                    hitObjectContainer.Add(drawableCircle);
+                    followPointRenderer.AddFollowPoints(drawableCircle);
+
+                    storeFunc?.Invoke(drawableCircle);
+                }
             });
         }
 
-        private void removeObject(Func<DrawableHitObject> func)
+        private void removeObject(Func<DrawableHitObject> getFunc)
         {
             AddStep("remove hitobject", () =>
             {
-                var drawableObject = func?.Invoke();
+                var drawableObject = getFunc?.Invoke();
 
                 hitObjectContainer.Remove(drawableObject);
                 followPointRenderer.RemoveFollowPoints(drawableObject);
