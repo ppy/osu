@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Menu
 
                 logo.ScaleTo(1);
                 logo.FadeIn();
+                logo.FadeOut();
                 PlayIntro();
             }
         }
