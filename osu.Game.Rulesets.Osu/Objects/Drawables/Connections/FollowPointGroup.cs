@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            bindHitObject(Start);
+            bindEvents(Start);
         }
 
         private DrawableOsuHitObject end;
@@ -48,20 +48,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 end = value;
 
                 if (end != null)
-                    bindHitObject(end);
+                    bindEvents(end);
 
-                refreshFollowPoints();
+                refresh();
             }
         }
 
-        private void bindHitObject(DrawableOsuHitObject drawableObject)
+        private void bindEvents(DrawableOsuHitObject drawableObject)
         {
-            drawableObject.HitObject.StartTimeBindable.BindValueChanged(_ => refreshFollowPoints());
-            drawableObject.HitObject.PositionBindable.BindValueChanged(_ => refreshFollowPoints());
-            drawableObject.HitObject.DefaultsApplied += refreshFollowPoints;
+            drawableObject.HitObject.PositionBindable.BindValueChanged(_ => scheduleRefresh());
+            drawableObject.HitObject.DefaultsApplied += scheduleRefresh;
         }
 
-        private void refreshFollowPoints()
+        private void scheduleRefresh() => Scheduler.AddOnce(refresh);
+
+        private void refresh()
         {
             ClearInternal();
 
