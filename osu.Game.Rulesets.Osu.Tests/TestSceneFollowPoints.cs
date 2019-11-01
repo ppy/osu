@@ -35,24 +35,24 @@ namespace osu.Game.Rulesets.Osu.Tests
         });
 
         [Test]
-        public void TestAddSingleHitObject()
+        public void TestAddSingleHitCircle()
         {
-            addObjects(() => new[] { new HitCircle { Position = new Vector2(100, 100) } });
+            addObjects(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } });
         }
 
         [Test]
-        public void TestRemoveSingleHitObject()
+        public void TestRemoveSingleHitCircle()
         {
             DrawableOsuHitObject obj = null;
 
-            addObjects(() => new[] { new HitCircle { Position = new Vector2(100, 100) } }, o => obj = o);
+            addObjects(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } }, o => obj = o);
             removeObject(() => obj);
         }
 
         [Test]
-        public void TestAddMultipleHitObjects()
+        public void TestAddMultipleHitCircles()
         {
-            addObjects(() => new[]
+            addObjects(() => new OsuHitObject[]
             {
                 new HitCircle { Position = new Vector2(100, 100) },
                 new HitCircle { Position = new Vector2(200, 200) },
@@ -63,13 +63,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveEndObject()
+        public void TestRemoveEndHitCircle()
         {
             var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
-            addObjects(() => new[]
+            addObjects(() => new OsuHitObject[]
             {
                 new HitCircle { Position = new Vector2(100, 100) },
                 new HitCircle { Position = new Vector2(200, 200) },
@@ -82,13 +82,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveStartObject()
+        public void TestRemoveStartHitCircle()
         {
             var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
-            addObjects(() => new[]
+            addObjects(() => new OsuHitObject[]
             {
                 new HitCircle { Position = new Vector2(100, 100) },
                 new HitCircle { Position = new Vector2(200, 200) },
@@ -101,13 +101,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveMiddleObject()
+        public void TestRemoveMiddleHitCircle()
         {
             var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
-            addObjects(() => new[]
+            addObjects(() => new OsuHitObject[]
             {
                 new HitCircle { Position = new Vector2(100, 100) },
                 new HitCircle { Position = new Vector2(200, 200) },
@@ -120,13 +120,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestMoveHitObject()
+        public void TestMoveHitCircle()
         {
             var objects = new List<DrawableOsuHitObject>();
 
             AddStep("reset", () => objects.Clear());
 
-            addObjects(() => new[]
+            addObjects(() => new OsuHitObject[]
             {
                 new HitCircle { Position = new Vector2(100, 100) },
                 new HitCircle { Position = new Vector2(200, 200) },
@@ -138,22 +138,38 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("move hitobject", () => objects[2].HitObject.Position = new Vector2(300, 100));
         }
 
-        private void addObjects(Func<HitCircle[]> ctorFunc, Action<DrawableOsuHitObject> storeFunc = null)
+        private void addObjects(Func<OsuHitObject[]> ctorFunc, Action<DrawableOsuHitObject> storeFunc = null)
         {
             AddStep("add hitobjects", () =>
             {
-                var circles = ctorFunc();
+                var objects = ctorFunc();
 
-                for (int i = 0; i < circles.Length; i++)
+                for (int i = 0; i < objects.Length; i++)
                 {
-                    circles[i].StartTime = Time.Current + 1000 + 500 * (i + 1);
-                    circles[i].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
+                    objects[i].StartTime = Time.Current + 1000 + 500 * (i + 1);
+                    objects[i].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                    var drawableCircle = new DrawableHitCircle(circles[i]);
-                    hitObjectContainer.Add(drawableCircle);
-                    followPointRenderer.AddFollowPoints(drawableCircle);
+                    DrawableOsuHitObject drawableObject = null;
 
-                    storeFunc?.Invoke(drawableCircle);
+                    switch (objects[i])
+                    {
+                        case HitCircle circle:
+                            drawableObject = new DrawableHitCircle(circle);
+                            break;
+
+                        case Slider slider:
+                            drawableObject = new DrawableSlider(slider);
+                            break;
+
+                        case Spinner spinner:
+                            drawableObject = new DrawableSpinner(spinner);
+                            break;
+                    }
+
+                    hitObjectContainer.Add(drawableObject);
+                    followPointRenderer.AddFollowPoints(drawableObject);
+
+                    storeFunc?.Invoke(drawableObject);
                 }
             });
         }
