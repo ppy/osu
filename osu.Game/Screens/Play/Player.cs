@@ -30,6 +30,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
+    [Cached]
     public class Player : ScreenWithBeatmapBackground
     {
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
@@ -311,14 +312,19 @@ namespace osu.Game.Screens.Play
                 this.Exit();
         }
 
+        /// <summary>
+        /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
+        /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
+        /// </summary>
         public void Restart()
         {
-            if (!this.IsCurrentScreen()) return;
-
             sampleRestart?.Play();
-
             RestartRequested?.Invoke();
-            performImmediateExit();
+
+            if (this.IsCurrentScreen())
+                performImmediateExit();
+            else
+                this.MakeCurrent();
         }
 
         private ScheduledDelegate completionProgressDelegate;
