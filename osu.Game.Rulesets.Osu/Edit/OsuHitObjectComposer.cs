@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
@@ -24,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
@@ -51,6 +53,32 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return base.CreateBlueprintFor(hitObject);
+        }
+
+        protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
+        {
+            var objects = selectedHitObjects.ToList();
+
+            if (objects.Count == 0)
+            {
+                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime <= EditorClock.CurrentTime);
+
+                if (lastObject == null)
+                    return null;
+
+                return new OsuDistanceSnapGrid(lastObject);
+            }
+            else
+            {
+                double minTime = objects.Min(h => h.StartTime);
+
+                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime < minTime);
+
+                if (lastObject == null)
+                    return null;
+
+                return new OsuDistanceSnapGrid(lastObject);
+            }
         }
     }
 }

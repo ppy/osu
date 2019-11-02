@@ -70,6 +70,24 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestPauseWithResumeOverlay()
+        {
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+
+            pauseAndConfirm();
+
+            resume();
+            confirmClockRunning(false);
+            confirmPauseOverlayShown(false);
+
+            pauseAndConfirm();
+
+            AddUntilStep("resume overlay is not active", () => Player.DrawableRuleset.ResumeOverlay.State.Value == Visibility.Hidden);
+            confirmPaused();
+        }
+
+        [Test]
         public void TestResumeWithResumeOverlaySkipped()
         {
             AddStep("move cursor to button", () =>
@@ -128,11 +146,60 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestExitFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("exit", () => Player.Exit());
+
+            confirmExited();
+        }
+
+        [Test]
+        public void TestQuickRetryFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("quick retry", () => Player.GameplayClockContainer.OfType<HotkeyRetryOverlay>().First().Action?.Invoke());
+
+            confirmExited();
+        }
+
+        [Test]
+        public void TestQuickExitFromFailedGameplay()
+        {
+            AddUntilStep("wait for fail", () => Player.HasFailed);
+            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+
+            confirmExited();
+        }
+
+        [Test]
         public void TestExitFromGameplay()
         {
             AddStep("exit", () => Player.Exit());
 
+            confirmExited();
+        }
+
+        [Test]
+        public void TestQuickExitFromGameplay()
+        {
+            AddStep("quick exit", () => Player.GameplayClockContainer.OfType<HotkeyExitOverlay>().First().Action?.Invoke());
+
+            confirmExited();
+        }
+
+        [Test]
+        public void TestExitViaHoldToExit()
+        {
+            AddStep("exit", () =>
+            {
+                InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.First(c => c is HoldToConfirmContainer));
+                InputManager.PressButton(MouseButton.Left);
+            });
+
             confirmPaused();
+
+            AddStep("release", () => InputManager.ReleaseButton(MouseButton.Left));
 
             exitAndConfirm();
         }
@@ -142,6 +209,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             pauseAndConfirm();
             exitAndConfirm();
+        }
+
+        [Test]
+        public void TestRestartAfterResume()
+        {
+            pauseAndConfirm();
+            resumeAndConfirm();
+            restart();
+            confirmExited();
         }
 
         private void pauseAndConfirm()
@@ -182,6 +258,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player exited", () => !Player.IsCurrentScreen());
         }
 
+        private void restart() => AddStep("restart", () => Player.Restart());
         private void pause() => AddStep("pause", () => Player.Pause());
         private void resume() => AddStep("resume", () => Player.Resume());
 

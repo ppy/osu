@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.IO;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -30,13 +31,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeBeatmapVersion()
         {
             using (var resStream = TestResources.OpenResource("beatmap-version.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
-
-                stream.BaseStream.Position = 0;
-                stream.DiscardBufferedData();
-
                 var working = new TestWorkingBeatmap(decoder.Decode(stream));
 
                 Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
@@ -51,7 +48,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
                 var beatmapInfo = beatmap.BeatmapInfo;
@@ -75,7 +72,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder();
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmapInfo = decoder.Decode(stream).BeatmapInfo;
 
@@ -101,7 +98,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder();
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
                 var beatmapInfo = beatmap.BeatmapInfo;
@@ -126,7 +123,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder();
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var difficulty = decoder.Decode(stream).BeatmapInfo.BaseDifficulty;
 
@@ -145,7 +142,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
                 var metadata = beatmap.Metadata;
@@ -164,15 +161,15 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
                 var controlPoints = beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
-                Assert.AreEqual(42, controlPoints.DifficultyPoints.Count);
-                Assert.AreEqual(42, controlPoints.SamplePoints.Count);
-                Assert.AreEqual(42, controlPoints.EffectPoints.Count);
+                Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
+                Assert.AreEqual(34, controlPoints.SamplePoints.Count);
+                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
 
                 var timingPoint = controlPoints.TimingPointAt(0);
                 Assert.AreEqual(956, timingPoint.Time);
@@ -194,7 +191,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(48428);
-                Assert.AreEqual(48428, difficultyPoint.Time);
+                Assert.AreEqual(0, difficultyPoint.Time);
                 Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(116999);
@@ -227,7 +224,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(119637);
-                Assert.AreEqual(119637, effectPoint.Time);
+                Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
             }
@@ -239,7 +236,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("overlapping-control-points.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var controlPoints = decoder.Decode(stream).ControlPointInfo;
 
@@ -266,12 +263,27 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestTimingPointResetsSpeedMultiplier()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("timingpoint-speedmultiplier-reset.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapColours()
         {
             var decoder = new LegacySkinDecoder();
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var comboColors = decoder.Decode(stream).ComboColours;
 
@@ -297,7 +309,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder();
 
             using (var resStream = TestResources.OpenResource("hitobject-combo-offset.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
 
@@ -320,7 +332,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder();
 
             using (var resStream = TestResources.OpenResource("hitobject-combo-offset.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var beatmap = decoder.Decode(stream);
 
@@ -343,7 +355,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
@@ -354,14 +366,31 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsNotNull(curveData);
                 Assert.AreEqual(new Vector2(192, 168), positionData.Position);
                 Assert.AreEqual(956, hitObjects[0].StartTime);
-                Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == SampleInfo.HIT_NORMAL));
+                Assert.IsTrue(hitObjects[0].Samples.Any(s => s.Name == HitSampleInfo.HIT_NORMAL));
 
                 positionData = hitObjects[1] as IHasPosition;
 
                 Assert.IsNotNull(positionData);
                 Assert.AreEqual(new Vector2(304, 56), positionData.Position);
                 Assert.AreEqual(1285, hitObjects[1].StartTime);
-                Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
+                Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP));
+            }
+        }
+
+        [Test]
+        public void TestDecodeControlPointDifficultyChange()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("controlpoint-difficulty-multiplier.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPointInfo = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPointInfo.DifficultyPointAt(5).SpeedMultiplier, Is.EqualTo(1));
+                Assert.That(controlPointInfo.DifficultyPointAt(1000).SpeedMultiplier, Is.EqualTo(10));
+                Assert.That(controlPointInfo.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1.8518518518518519d));
+                Assert.That(controlPointInfo.DifficultyPointAt(3000).SpeedMultiplier, Is.EqualTo(0.5));
             }
         }
 
@@ -371,7 +400,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("controlpoint-custom-samplebank.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
@@ -384,7 +413,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -393,7 +422,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("hitobject-custom-samplebank.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
@@ -402,7 +431,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -411,7 +440,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("hitobject-file-samples.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
@@ -422,7 +451,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -431,41 +460,41 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("slider-samples.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
                 var slider1 = (ConvertSlider)hitObjects[0];
 
                 Assert.AreEqual(1, slider1.NodeSamples[0].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
                 Assert.AreEqual(1, slider1.NodeSamples[1].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
                 Assert.AreEqual(1, slider1.NodeSamples[2].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
 
                 var slider2 = (ConvertSlider)hitObjects[1];
 
                 Assert.AreEqual(2, slider2.NodeSamples[0].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
                 Assert.AreEqual(2, slider2.NodeSamples[1].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
                 Assert.AreEqual(2, slider2.NodeSamples[2].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
 
                 var slider3 = (ConvertSlider)hitObjects[2];
 
                 Assert.AreEqual(2, slider3.NodeSamples[0].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
                 Assert.AreEqual(1, slider3.NodeSamples[1].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
                 Assert.AreEqual(2, slider3.NodeSamples[2].Count);
-                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
-                Assert.AreEqual(SampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
+                Assert.AreEqual(HitSampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
             }
         }
 
@@ -475,11 +504,145 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
 
             using (var resStream = TestResources.OpenResource("hitobject-no-addition-bank.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
                 Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
+            }
+        }
+
+        [Test]
+        public void TestInvalidEventStillPasses()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var badResStream = TestResources.OpenResource("invalid-events.osu"))
+            using (var badStream = new LineBufferedReader(badResStream))
+            {
+                Assert.DoesNotThrow(() => decoder.Decode(badStream));
+            }
+        }
+
+        [Test]
+        public void TestFallbackDecoderForCorruptedHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("Beatmap with corrupted header", beatmap.Metadata.Title);
+                Assert.AreEqual("Evil Hacker", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestFallbackDecoderForMissingHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("missing-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("Beatmap with no header", beatmap.Metadata.Title);
+                Assert.AreEqual("Incredibly Evil Hacker", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeFileWithEmptyLinesAtStart()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("empty-lines-at-start.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("Empty lines at start", beatmap.Metadata.Title);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeFileWithEmptyLinesAndNoHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("empty-line-instead-of-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("The dog ate the file header", beatmap.Metadata.Title);
+                Assert.AreEqual("Why does this keep happening", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeFileWithContentImmediatelyAfterHeader()
+        {
+            Decoder<Beatmap> decoder = null;
+            Beatmap beatmap = null;
+
+            using (var resStream = TestResources.OpenResource("no-empty-line-after-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+                Assert.DoesNotThrow(() => beatmap = decoder.Decode(stream));
+                Assert.IsNotNull(beatmap);
+                Assert.AreEqual("No empty line delimiting header from contents", beatmap.Metadata.Title);
+                Assert.AreEqual("Edge Case Hunter", beatmap.Metadata.AuthorString);
+            }
+        }
+
+        [Test]
+        public void TestDecodeEmptyFile()
+        {
+            using (var resStream = new MemoryStream())
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.Throws<IOException>(() => Decoder.GetDecoder<Beatmap>(stream));
+            }
+        }
+
+        [Test]
+        public void TestAllowFallbackDecoderOverwrite()
+        {
+            Decoder<Beatmap> decoder = null;
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyBeatmapDecoder>(decoder);
+            }
+
+            Assert.DoesNotThrow(LegacyDifficultyCalculatorBeatmapDecoder.Register);
+
+            using (var resStream = TestResources.OpenResource("corrupted-header.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                Assert.DoesNotThrow(() => decoder = Decoder.GetDecoder<Beatmap>(stream));
+                Assert.IsInstanceOf<LegacyDifficultyCalculatorBeatmapDecoder>(decoder);
             }
         }
     }

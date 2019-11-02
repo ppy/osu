@@ -14,7 +14,7 @@ namespace osu.Game.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
                 {
@@ -45,6 +45,8 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("AudioLeadIn");
 
+                    b.Property<double>("BPM");
+
                     b.Property<int>("BaseDifficultyID");
 
                     b.Property<int>("BeatDivisor");
@@ -60,6 +62,8 @@ namespace osu.Game.Migrations
                     b.Property<string>("Hash");
 
                     b.Property<bool>("Hidden");
+
+                    b.Property<double>("Length");
 
                     b.Property<bool>("LetterboxInBreaks");
 
@@ -134,6 +138,8 @@ namespace osu.Game.Migrations
                     b.Property<string>("Title");
 
                     b.Property<string>("TitleUnicode");
+
+                    b.Property<string>("VideoFile");
 
                     b.HasKey("ID");
 

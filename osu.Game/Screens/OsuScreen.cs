@@ -8,10 +8,8 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
@@ -21,7 +19,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IOsuScreen, IKeyBindingHandler<GlobalAction>, IHasDescription
+    public abstract class OsuScreen : Screen, IOsuScreen, IHasDescription
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
@@ -36,7 +34,7 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        protected virtual bool AllowBackButton => true;
+        public virtual bool AllowBackButton => true;
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -130,21 +128,6 @@ namespace osu.Game.Screens
         {
             sampleExit = audio.Samples.Get(@"UI/screen-back");
         }
-
-        public virtual bool OnPressed(GlobalAction action)
-        {
-            if (!this.IsCurrentScreen()) return false;
-
-            if (action == GlobalAction.Back && AllowBackButton)
-            {
-                this.Exit();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
 
         public override void OnResuming(IScreen last)
         {

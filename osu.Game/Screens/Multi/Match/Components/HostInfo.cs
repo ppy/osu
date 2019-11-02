@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components

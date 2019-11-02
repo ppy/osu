@@ -24,12 +24,30 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
+            bool match =
+                criteria.Ruleset == null ||
+                Beatmap.RulesetID == criteria.Ruleset.ID ||
+                (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
-            foreach (var criteriaTerm in criteria.SearchTerms)
-                match &=
-                    Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
-                    Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            match &= criteria.StarDifficulty.IsInRange(Beatmap.StarDifficulty);
+            match &= criteria.ApproachRate.IsInRange(Beatmap.BaseDifficulty.ApproachRate);
+            match &= criteria.DrainRate.IsInRange(Beatmap.BaseDifficulty.DrainRate);
+            match &= criteria.CircleSize.IsInRange(Beatmap.BaseDifficulty.CircleSize);
+            match &= criteria.Length.IsInRange(Beatmap.Length);
+            match &= criteria.BPM.IsInRange(Beatmap.BPM);
+
+            match &= criteria.BeatDivisor.IsInRange(Beatmap.BeatDivisor);
+            match &= criteria.OnlineStatus.IsInRange(Beatmap.Status);
+
+            match &= criteria.Creator.Matches(Beatmap.Metadata.AuthorString);
+            match &= criteria.Artist.Matches(Beatmap.Metadata.Artist) ||
+                     criteria.Artist.Matches(Beatmap.Metadata.ArtistUnicode);
+
+            if (match)
+                foreach (var criteriaTerm in criteria.SearchTerms)
+                    match &=
+                        Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
+                        Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
 
             Filtered.Value = !match;
         }

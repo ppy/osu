@@ -36,8 +36,18 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Show health display even when you can't fail",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                },
+                new SettingsEnumDropdown<ScoreMeterType>
+                {
+                    LabelText = "Score meter type",
+                    Bindable = config.GetBindable<ScoreMeterType>(OsuSetting.ScoreMeter)
                 },
                 new SettingsEnumDropdown<ScoringMode>
                 {

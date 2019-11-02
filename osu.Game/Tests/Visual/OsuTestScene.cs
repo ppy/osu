@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -15,6 +15,8 @@ using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Database;
+using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
@@ -26,9 +28,9 @@ namespace osu.Game.Tests.Visual
     {
         [Cached(typeof(Bindable<WorkingBeatmap>))]
         [Cached(typeof(IBindable<WorkingBeatmap>))]
-        private OsuTestBeatmap beatmap;
+        private NonNullableBindable<WorkingBeatmap> beatmap;
 
-        protected BindableBeatmap Beatmap => beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -43,22 +45,65 @@ namespace osu.Game.Tests.Visual
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
+        private readonly Lazy<DatabaseContextFactory> contextFactory;
+
+        protected IAPIProvider API
+        {
+            get
+            {
+                if (UseOnlineAPI)
+                    throw new InvalidOperationException($"Using the {nameof(OsuTestScene)} dummy API is not supported when {nameof(UseOnlineAPI)} is true");
+
+                return dummyAPI;
+            }
+        }
+
+        private DummyAPIAccess dummyAPI;
+
+        protected DatabaseContextFactory ContextFactory => contextFactory.Value;
+
+        /// <summary>
+        /// Whether this test scene requires real-world API access.
+        /// If true, this will bypass the local <see cref="DummyAPIAccess"/> and use the <see cref="OsuGameBase"/> provided one.
+        /// </summary>
+        protected virtual bool UseOnlineAPI => false;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
             var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
 
-            beatmap = new OsuTestBeatmap(working)
+            beatmap = new NonNullableBindable<WorkingBeatmap>(working) { Default = working };
+            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
-                Default = working
-            };
+                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
+                    b.OldValue.RecycleTrack();
+            }));
 
-            return Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            if (!UseOnlineAPI)
+            {
+                dummyAPI = new DummyAPIAccess();
+                Dependencies.CacheAs<IAPIProvider>(dummyAPI);
+                Add(dummyAPI);
+            }
+
+            return Dependencies;
         }
 
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            contextFactory = new Lazy<DatabaseContextFactory>(() =>
+            {
+                var factory = new DatabaseContextFactory(LocalStorage);
+                factory.ResetDatabase();
+                using (var usage = factory.Get())
+                    usage.Migrate();
+                return factory;
+            });
         }
 
         [Resolved]
@@ -84,6 +129,9 @@ namespace osu.Game.Tests.Visual
 
             if (beatmap?.Value.TrackLoaded == true)
                 beatmap.Value.Track.Stop();
+
+            if (contextFactory.IsValueCreated)
+                contextFactory.Value.ResetDatabase();
 
             if (localStorage.IsValueCreated)
             {
@@ -137,9 +185,9 @@ namespace osu.Game.Tests.Visual
                     track = audio?.Tracks.GetVirtual(length);
             }
 
-            public override void Dispose()
+            protected override void Dispose(bool isDisposing)
             {
-                base.Dispose();
+                base.Dispose(isDisposing);
                 store?.Dispose();
             }
 
@@ -271,14 +319,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
-        }
-
-        private class OsuTestBeatmap : BindableBeatmap
-        {
-            public OsuTestBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
-            {
-            }
         }
     }
 }

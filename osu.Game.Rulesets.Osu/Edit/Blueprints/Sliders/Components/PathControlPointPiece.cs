@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,14 +9,15 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointPiece : CompositeDrawable
+    public class PathControlPointPiece : BlueprintPiece<Slider>
     {
+        public Action<Vector2[]> ControlPointsChanged;
+
         private readonly Slider slider;
         private readonly int index;
 
@@ -96,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (isSegmentSeparatorWithPrevious)
                 newControlPoints[index - 1] = newControlPoints[index];
 
-            slider.Path = new SliderPath(slider.Path.Type, newControlPoints);
+            ControlPointsChanged?.Invoke(newControlPoints);
 
             return true;
         }

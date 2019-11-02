@@ -19,18 +19,24 @@ using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
-using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Setup;
+using osu.Game.Screens.Edit.Timing;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : OsuScreen
+    public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
+
+        public override bool AllowBackButton => false;
 
         public override bool HideOverlaysOnEnter => true;
 
@@ -167,6 +173,12 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            clock.ProcessFrame();
+        }
+
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             switch (e.Key)
@@ -204,30 +216,46 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                // as we don't want to display the back button, manual handling of exit action is required.
+                this.Exit();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+
         public override void OnResuming(IScreen last)
         {
-            Beatmap.Value.Track?.Stop();
             base.OnResuming(last);
+            Beatmap.Value.Track?.Stop();
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
             Background.FadeColour(Color4.DarkGray, 500);
-            Beatmap.Value.Track?.Stop();
+            resetTrack();
         }
 
         public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
-
-            if (Beatmap.Value.Track != null)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
-            }
+            resetTrack();
 
             return base.OnExiting(next);
+        }
+
+        private void resetTrack()
+        {
+            Beatmap.Value.Track?.ResetSpeedAdjustments();
+            Beatmap.Value.Track?.Stop();
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
@@ -238,6 +266,10 @@ namespace osu.Game.Screens.Edit
 
             switch (e.NewValue)
             {
+                case EditorScreenMode.SongSetup:
+                    currentScreen = new SetupScreen();
+                    break;
+
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
                     break;
@@ -246,8 +278,8 @@ namespace osu.Game.Screens.Edit
                     currentScreen = new DesignScreen();
                     break;
 
-                default:
-                    currentScreen = new EditorScreen();
+                case EditorScreenMode.Timing:
+                    currentScreen = new TimingScreen();
                     break;
             }
 

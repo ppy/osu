@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>tools for tournaments.</Description>
+  </PropertyGroup>
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
+  </ItemGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.6.0" />
+  </ItemGroup>
+</Project>

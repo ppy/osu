@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class VolumeOverlay : OverlayContainer
+    public class VolumeOverlay : VisibilityContainer
     {
         private const float offset = 10;
 
@@ -28,9 +28,10 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMusic;
         private MuteButton muteButton;
 
-        protected override bool BlockPositionalInput => false;
-
         private readonly BindableDouble muteAdjustment = new BindableDouble();
+
+        private readonly Bindable<bool> isMuted = new Bindable<bool>();
+        public Bindable<bool> IsMuted => isMuted;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -64,7 +65,8 @@ namespace osu.Game.Overlays
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
                         muteButton = new MuteButton
                         {
-                            Margin = new MarginPadding { Top = 100 }
+                            Margin = new MarginPadding { Top = 100 },
+                            Current = { BindTarget = isMuted }
                         }
                     }
                 },
@@ -74,13 +76,13 @@ namespace osu.Game.Overlays
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            muteButton.Current.ValueChanged += muted =>
+            isMuted.BindValueChanged(muted =>
             {
                 if (muted.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
-            };
+            });
         }
 
         protected override void LoadComplete()
@@ -102,6 +104,10 @@ namespace osu.Game.Overlays
                 case GlobalAction.DecreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
+                    else if (volumeMeterMusic.IsHovered)
+                        volumeMeterMusic.Decrease(amount, isPrecise);
+                    else if (volumeMeterEffect.IsHovered)
+                        volumeMeterEffect.Decrease(amount, isPrecise);
                     else
                         volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
@@ -109,6 +115,10 @@ namespace osu.Game.Overlays
                 case GlobalAction.IncreaseVolume:
                     if (State.Value == Visibility.Hidden)
                         Show();
+                    else if (volumeMeterMusic.IsHovered)
+                        volumeMeterMusic.Increase(amount, isPrecise);
+                    else if (volumeMeterEffect.IsHovered)
+                        volumeMeterEffect.Increase(amount, isPrecise);
                     else
                         volumeMeterMaster.Increase(amount, isPrecise);
                     return true;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,10 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -31,11 +33,20 @@ namespace osu.Game.Database
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
-    public abstract class ArchiveModelManager<TModel, TFileModel> : ArchiveModelManager, ICanAcceptFiles
+    public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing);
+        private const int import_queue_request_concurrency = 1;
+
+        /// <summary>
+        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
+        /// It is mainly being used as a queue mechanism for large imports.
+        /// </remarks>
+        private static readonly ThreadedTaskScheduler import_scheduler = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager<TModel, TFileModel>));
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -46,7 +57,7 @@ namespace osu.Game.Database
         /// Fired when a new <see cref="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event ItemAddedDelegate ItemAdded;
+        public event Action<TModel> ItemAdded;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> is removed from the database.
@@ -67,56 +78,12 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly List<Action> queuedEvents = new List<Action>();
-
-        /// <summary>
-        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
-        /// </summary>
-        private bool delayingEvents;
-
-        /// <summary>
-        /// Begin delaying outwards events.
-        /// </summary>
-        private void delayEvents() => delayingEvents = true;
-
-        /// <summary>
-        /// Flush delayed events and disable delaying.
-        /// </summary>
-        /// <param name="perform">Whether the flushed events should be performed.</param>
-        private void flushEvents(bool perform)
-        {
-            Action[] events;
-
-            lock (queuedEvents)
-            {
-                events = queuedEvents.ToArray();
-                queuedEvents.Clear();
-            }
-
-            if (perform)
-            {
-                foreach (var a in events)
-                    a.Invoke();
-            }
-
-            delayingEvents = false;
-        }
-
-        private void handleEvent(Action a)
-        {
-            if (delayingEvents)
-                lock (queuedEvents)
-                    queuedEvents.Add(a);
-            else
-                a.Invoke();
-        }
-
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item, false));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -141,10 +108,10 @@ namespace osu.Game.Database
             return Import(notification, paths);
         }
 
-        protected async Task Import(ProgressNotification notification, params string[] paths)
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = "Import is initialising...";
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -160,7 +127,8 @@ namespace osu.Game.Database
 
                     lock (imported)
                     {
-                        imported.Add(model);
+                        if (model != null)
+                            imported.Add(model);
                         current++;
 
                         notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
@@ -179,14 +147,14 @@ namespace osu.Game.Database
 
             if (imported.Count == 0)
             {
-                notification.Text = "Import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {HumanisedModelName}s!";
+                    : $"Imported {imported.Count} {HumanisedModelName}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -200,6 +168,8 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            return imported;
         }
 
         /// <summary>
@@ -222,7 +192,7 @@ namespace osu.Game.Database
             // TODO: Add a check to prevent files from storage to be deleted.
             try
             {
-                if (import != null && File.Exists(path))
+                if (import != null && File.Exists(path) && ShouldDeleteArchive(path))
                     File.Delete(path);
             }
             catch (Exception e)
@@ -253,7 +223,7 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return null;
+                if (model == null) return Task.FromResult<TModel>(null);
 
                 model.Hash = computeHash(archive);
             }
@@ -298,7 +268,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
 
-            return hashable.ComputeSHA2Hash();
+            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
         }
 
         /// <summary>
@@ -345,8 +315,6 @@ namespace osu.Game.Database
                             {
                                 Undelete(existing);
                                 LogForModel(item, $"Found existing {HumanisedModelName} for {item} (ID {existing.ID}) – skipping import.");
-                                handleEvent(() => ItemAdded?.Invoke(existing, true));
-
                                 // existing item will be used; rollback new import and exit early.
                                 rollback();
                                 flushEvents(true);
@@ -383,7 +351,7 @@ namespace osu.Game.Database
 
             flushEvents(true);
             return item;
-        }, cancellationToken, TaskCreationOptions.HideScheduler, IMPORT_SCHEDULER).Unwrap();
+        }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -434,20 +402,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var b in items)
             {
-                foreach (var b in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
-                    Delete(b);
+                Delete(b);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -473,20 +438,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Restoring ({++i} of {items.Count})";
+                notification.Text = $"Restoring ({++i} of {items.Count})";
 
-                    Undelete(item);
+                Undelete(item);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -517,12 +479,16 @@ namespace osu.Game.Database
         {
             var fileInfos = new List<TFileModel>();
 
+            string prefix = reader.Filenames.GetCommonPrefix();
+            if (!(prefix.EndsWith("/") || prefix.EndsWith("\\")))
+                prefix = string.Empty;
+
             // import files to manager
             foreach (string file in reader.Filenames)
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathStandardise(file),
+                        Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
                         FileInfo = files.Add(s)
                     });
 
@@ -547,6 +513,18 @@ namespace osu.Game.Database
         protected virtual string ImportFromStablePath => null;
 
         /// <summary>
+        /// Select paths to import from stable. Default implementation iterates all directories in <see cref="ImportFromStablePath"/>.
+        /// </summary>
+        protected virtual IEnumerable<string> GetStableImportPaths(Storage stableStoage) => stableStoage.GetDirectories(ImportFromStablePath);
+
+        /// <summary>
+        /// Whether this specified path should be removed after successful import.
+        /// </summary>
+        /// <param name="path">The path for consideration. May be a file or a directory.</param>
+        /// <returns>Whether to perform deletion.</returns>
+        protected virtual bool ShouldDeleteArchive(string path) => false;
+
+        /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
         public Task ImportFromStableAsync()
@@ -566,7 +544,7 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Run(async () => await Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()));
+            return Task.Run(async () => await Import(GetStableImportPaths(GetStableStorage()).Select(f => stable.GetFullPath(f)).ToArray()));
         }
 
         #endregion
@@ -609,7 +587,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
-        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
         protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
@@ -632,19 +610,53 @@ namespace osu.Game.Database
 
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
-    }
 
-    public abstract class ArchiveModelManager
-    {
-        private const int import_queue_request_concurrency = 1;
+        #region Event handling / delaying
+
+        private readonly List<Action> queuedEvents = new List<Action>();
 
         /// <summary>
-        /// A singleton scheduler shared by all <see cref="ArchiveModelManager{TModel,TFileModel}"/>.
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
         /// </summary>
-        /// <remarks>
-        /// This scheduler generally performs IO and CPU intensive work so concurrency is limited harshly.
-        /// It is mainly being used as a queue mechanism for large imports.
-        /// </remarks>
-        protected static readonly ThreadedTaskScheduler IMPORT_SCHEDULER = new ThreadedTaskScheduler(import_queue_request_concurrency, nameof(ArchiveModelManager));
+        private bool delayingEvents;
+
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
+
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
+        private void flushEvents(bool perform)
+        {
+            Action[] events;
+
+            lock (queuedEvents)
+            {
+                events = queuedEvents.ToArray();
+                queuedEvents.Clear();
+            }
+
+            if (perform)
+            {
+                foreach (var a in events)
+                    a.Invoke();
+            }
+
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
+        #endregion
     }
 }
