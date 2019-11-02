@@ -307,10 +307,10 @@ namespace osu.Game.Screens.Menu
                             }
                         }
                     }
-
-                    logo.FadeOut().Delay(intro_length).FadeIn(fade_duration);
-                    this.Delay(intro_length).FadeOut();
                 }
+
+                logo.FadeOut().Delay(intro_length).FadeIn(fade_duration);
+                this.Delay(intro_length + fade_duration).FadeOut();
             }
 
             private class Ring : Container<Circle>
