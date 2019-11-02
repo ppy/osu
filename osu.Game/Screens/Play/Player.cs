@@ -449,7 +449,12 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause) return;
 
-            IsResuming = false;
+            if (IsResuming)
+            {
+                DrawableRuleset.CancelResume();
+                IsResuming = false;
+            }
+
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
