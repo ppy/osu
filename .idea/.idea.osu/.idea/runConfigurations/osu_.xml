@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="osu!" type="DotNetProject" factoryName=".NET Project">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp2.2/osu!.dll" />
+  <configuration default="false" name="osu!" type="DotNetProject" factoryName=".NET Project" folderName="osu!">
+    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp3.0/osu!.dll" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop" />
     <option name="PASS_PARENT_ENVS" value="1" />
@@ -12,7 +12,7 @@
     <option name="PROJECT_ARGUMENTS_TRACKING" value="1" />
     <option name="PROJECT_WORKING_DIRECTORY_TRACKING" value="1" />
     <option name="PROJECT_KIND" value="DotNetCore" />
-    <option name="PROJECT_TFM" value=".NETCoreApp,Version=v2.2" />
+    <option name="PROJECT_TFM" value=".NETCoreApp,Version=v3.0" />
     <method v="2">
       <option name="Build" enabled="true" />
     </method>

@@ -11,20 +11,15 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : SliderPiece
+    public class SliderBodyPiece : BlueprintPiece<Slider>
     {
-        private readonly Slider slider;
         private readonly ManualSliderBody body;
 
-        public SliderBodyPiece(Slider slider)
-            : base(slider)
+        public SliderBodyPiece()
         {
-            this.slider = slider;
-
             InternalChild = body = new ManualSliderBody
             {
-                AccentColour = Color4.Transparent,
-                PathRadius = slider.Scale * 64
+                AccentColour = Color4.Transparent
             };
         }
 
@@ -32,19 +27,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            ScaleBindable.BindValueChanged(scale => body.PathRadius = scale.NewValue * 64, true);
         }
 
-        private void updatePosition() => Position = slider.StackedPosition;
-
-        protected override void Update()
+        public override void UpdateFrom(Slider hitObject)
         {
-            base.Update();
+            base.UpdateFrom(hitObject);
+
+            body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
 
             var vertices = new List<Vector2>();
-            slider.Path.GetPathToProgress(vertices, 0, 1);
+            hitObject.Path.GetPathToProgress(vertices, 0, 1);
 
             body.SetVertices(vertices);
 

@@ -11,7 +11,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.SearchableList
 {
-    public abstract class SearchableListOverlay : WaveOverlayContainer
+    public abstract class SearchableListOverlay : FullscreenOverlay
     {
         public static readonly float WIDTH_PADDING = 80;
     }
@@ -32,8 +32,6 @@ namespace osu.Game.Overlays.SearchableList
 
         protected SearchableListOverlay()
         {
-            RelativeSizeAxes = Axes.Both;
-
             Children = new Drawable[]
             {
                 new Box
@@ -90,8 +88,6 @@ namespace osu.Game.Overlays.SearchableList
                     },
                 },
             };
-
-            Filter.Search.Exit = Hide;
         }
 
         protected override void Update()

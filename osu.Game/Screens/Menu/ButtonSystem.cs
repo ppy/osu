@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -150,7 +151,7 @@ namespace osu.Game.Screens.Menu
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 
-            sampleBack = audio.Sample.Get(@"Menu/button-back-select");
+            sampleBack = audio.Samples.Get(@"Menu/button-back-select");
         }
 
         private void onMulti()
@@ -176,8 +177,22 @@ namespace osu.Game.Screens.Menu
 
         private void updateIdleState(bool isIdle)
         {
-            if (isIdle && State != ButtonSystemState.Exit)
+            if (isIdle && State != ButtonSystemState.Exit && State != ButtonSystemState.EnteringMode)
                 State = ButtonSystemState.Initial;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (State == ButtonSystemState.Initial)
+            {
+                if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
+                {
+                    logo?.Click();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -332,7 +347,7 @@ namespace osu.Game.Screens.Menu
                     break;
 
                 case ButtonSystemState.EnteringMode:
-                    logoTrackingContainer.StartTracking(logo, 0, Easing.In);
+                    logoTrackingContainer.StartTracking(logo, lastState == ButtonSystemState.Initial ? MainMenu.FADE_OUT_DURATION : 0, Easing.InSine);
                     break;
             }
         }

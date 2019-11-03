@@ -11,12 +11,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete
+    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete, IEquatable<ScoreInfo>
     {
         public int ID { get; set; }
 
@@ -182,5 +182,7 @@ namespace osu.Game.Scoring
         }
 
         public override string ToString() => $"{User} playing {Beatmap}";
+
+        public bool Equals(ScoreInfo other) => other?.OnlineScoreID == OnlineScoreID;
     }
 }

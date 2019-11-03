@@ -4,56 +4,42 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuCheckbox : Checkbox
     {
-        private Bindable<bool> bindable;
-
-        public Bindable<bool> Bindable
-        {
-            set
-            {
-                bindable = value;
-                Current.BindTo(bindable);
-            }
-        }
-
         public Color4 CheckedColor { get; set; } = Color4.Cyan;
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }
 
         public string LabelText
         {
-            get => labelSpriteText?.Text;
             set
             {
-                if (labelSpriteText != null)
-                    labelSpriteText.Text = value;
+                if (labelText != null)
+                    labelText.Text = value;
             }
         }
 
         public MarginPadding LabelPadding
         {
-            get => labelSpriteText?.Padding ?? new MarginPadding();
+            get => labelText?.Padding ?? new MarginPadding();
             set
             {
-                if (labelSpriteText != null)
-                    labelSpriteText.Padding = value;
+                if (labelText != null)
+                    labelText.Padding = value;
             }
         }
 
         protected readonly Nub Nub;
 
-        private readonly SpriteText labelSpriteText;
+        private readonly OsuTextFlowContainer labelText;
         private SampleChannel sampleChecked;
         private SampleChannel sampleUnchecked;
 
@@ -62,37 +48,35 @@ namespace osu.Game.Graphics.UserInterface
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
 
+            const float nub_padding = 5;
+
             Children = new Drawable[]
             {
-                labelSpriteText = new OsuSpriteText(),
+                labelText = new OsuTextFlowContainer
+                {
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Padding = new MarginPadding { Right = Nub.EXPANDED_SIZE + nub_padding }
+                },
                 Nub = new Nub
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = 5 },
+                    Margin = new MarginPadding { Right = nub_padding },
                 },
                 new HoverClickSounds()
             };
 
             Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
-            };
+            Current.DisabledChanged += disabled => labelText.Alpha = Nub.Alpha = disabled ? 0.3f : 1;
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
         {
-            base.LoadComplete();
-
-            Current.ValueChanged += enabled =>
-            {
-                if (enabled.NewValue)
-                    sampleChecked?.Play();
-                else
-                    sampleUnchecked?.Play();
-            };
+            sampleChecked = audio.Samples.Get(@"UI/check-on");
+            sampleUnchecked = audio.Samples.Get(@"UI/check-off");
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -109,11 +93,13 @@ namespace osu.Game.Graphics.UserInterface
             base.OnHoverLost(e);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        protected override void OnUserChange(bool value)
         {
-            sampleChecked = audio.Sample.Get(@"UI/check-on");
-            sampleUnchecked = audio.Sample.Get(@"UI/check-off");
+            base.OnUserChange(value);
+            if (value)
+                sampleChecked?.Play();
+            else
+                sampleUnchecked?.Play();
         }
     }
 }

@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.UserInterface
                 hover = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Colour = Color4.White.Opacity(0.1f),
                     Alpha = 0,
                     Depth = -1
@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(HoverEvent e)
         {
             hover.FadeIn(200);
-            return base.OnHover(e);
+            return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)

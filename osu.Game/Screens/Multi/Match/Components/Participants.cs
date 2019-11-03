@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
@@ -25,7 +26,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                 Children = new Drawable[]
                 {
-                    new ScrollContainer
+                    new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = 10 },

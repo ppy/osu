@@ -1,0 +1,67 @@
+<Project>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <SchemaVersion>2.0</SchemaVersion>
+    <BundleAssemblies>false</BundleAssemblies>
+    <AotAssemblies>false</AotAssemblies>
+    <LangVersion>default</LangVersion>
+    <OutputType>Library</OutputType>
+    <FileAlignment>512</FileAlignment>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <AndroidApplication>True</AndroidApplication>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
+    <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>portable</DebugType>
+    <Optimize>False</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <EnableLLVM>false</EnableLLVM>
+    <AndroidManagedSymbols>false</AndroidManagedSymbols>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidUseSharedRuntime>true</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+    <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
+    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+    <Optimize>True</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <EnableLLVM>true</EnableLLVM>
+    <AndroidManagedSymbols>false</AndroidManagedSymbols>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
+    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="Java.Interop" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.1010.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.1029.0" />
+  </ItemGroup>
+</Project>

@@ -46,8 +46,7 @@ namespace osu.Game.Overlays.Settings
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText());
-                    FlowContent.SetLayoutPosition(text, -1);
+                    FlowContent.Insert(-1, text = new OsuSpriteText());
                 }
 
                 text.Text = value;
@@ -63,6 +62,9 @@ namespace osu.Game.Overlays.Settings
 
             set
             {
+                if (bindable != null)
+                    controlWithCurrent?.Current.UnbindFrom(bindable);
+
                 bindable = value;
                 controlWithCurrent?.Current.BindTo(bindable);
 
@@ -87,7 +89,7 @@ namespace osu.Game.Overlays.Settings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Padding = new MarginPadding { Right = SettingsOverlay.CONTENT_MARGINS };
+            Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
 
             InternalChildren = new Drawable[]
             {
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS },
+                    Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS },
                     Child = Control = CreateControl()
                 },
             };
@@ -131,7 +133,7 @@ namespace osu.Game.Overlays.Settings
             public RestoreDefaultValueButton()
             {
                 RelativeSizeAxes = Axes.Y;
-                Width = SettingsOverlay.CONTENT_MARGINS;
+                Width = SettingsPanel.CONTENT_MARGINS;
                 Alpha = 0f;
             }
 

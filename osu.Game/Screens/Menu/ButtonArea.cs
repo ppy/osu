@@ -56,12 +56,12 @@ namespace osu.Game.Screens.Menu
                     case ButtonSystemState.Exit:
                     case ButtonSystemState.Initial:
                     case ButtonSystemState.EnteringMode:
-                        State = Visibility.Hidden;
+                        Hide();
                         break;
 
                     case ButtonSystemState.TopLevel:
                     case ButtonSystemState.Play:
-                        State = Visibility.Visible;
+                        Show();
                         break;
                 }
 
@@ -81,6 +81,10 @@ namespace osu.Game.Screens.Menu
                 StateChanged?.Invoke(state);
             }
         }
+
+        public override void Hide() => State = Visibility.Hidden;
+
+        public override void Show() => State = Visibility.Visible;
 
         public event Action<Visibility> StateChanged;
 

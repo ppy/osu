@@ -14,7 +14,6 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -24,15 +23,19 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableOsuRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableOsuRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
+
+        public const string SHORT_NAME = "osu";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -48,6 +51,11 @@ namespace osu.Game.Rulesets.Osu
                 yield return new OsuModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new OsuModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
@@ -73,17 +81,11 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new OsuModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
             if (mods.HasFlag(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
@@ -134,8 +136,16 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTransform(),
                         new OsuModWiggle(),
-                        new OsuModGrow(),
-                        new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
+                        new OsuModSpinIn(),
+                        new MultiMod(new OsuModGrow(), new OsuModDeflate()),
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new OsuModTraceable(),
+                    };
+
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new OsuModTouchDevice(),
                     };
 
                 default:
@@ -153,9 +163,11 @@ namespace osu.Game.Rulesets.Osu
 
         public override string Description => "osu!";
 
-        public override string ShortName => "osu";
+        public override string ShortName => SHORT_NAME;
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);
 
         public override int? LegacyID => 0;
 

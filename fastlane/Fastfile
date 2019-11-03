@@ -1,22 +1,84 @@
 update_fastlane
 
-default_platform(:ios)
+platform :android do
+desc 'Deploy to play store'
+  lane :beta do |options|
 
-platform :ios do
-  lane :testflight_prune_dry do
-    clean_testflight_testers(days_of_inactivity:45, dry_run: true)
+    update_version(
+      version: options[:version],
+      build: options[:build],
+    )
+
+    build(options)
+
+    supply(
+      apk: './osu.Android/bin/Release/sh.ppy.osulazer-Signed.apk',
+      package_name: 'sh.ppy.osulazer',
+      track: 'alpha', # upload to alpha, we can promote it later
+      json_key: options[:json_key],
+    )
   end
 
-  # Specify a custom number for what's "inactive"
-  lane :testflight_prune do
-    clean_testflight_testers(days_of_inactivity: 45) # 120 days, so about 4 months
+  desc 'Deploy to github release'
+  lane :build_github do |options|
+
+    update_version(
+      version: options[:version],
+      build: options[:build],
+    )
+
+    build(options)
+
+    client = HTTPClient.new
+    changelog = client.get_content 'https://gist.githubusercontent.com/peppy/aaa2ec1a323554b619671cac6dbbb776/raw'
+    changelog.gsub!('$BUILD_ID', options[:build])
+
+    set_github_release(
+      repository_name: "ppy/osu",
+      api_token: ENV["GITHUB_TOKEN"],
+      name: options[:build],
+      tag_name: options[:build],
+      is_draft: true,
+      description: changelog,
+      commitish: "master",
+      upload_assets: ["osu.Android/bin/Release/sh.ppy.osulazer.apk"]
+    )
+
+  end
+
+  desc 'Compile the project'
+  lane :build do |options|
+    nuget_restore(
+      project_path: 'osu.Android.sln'
+    )
+
+    souyuz(
+      build_configuration: 'Release',
+      solution_path: 'osu.Android.sln',
+      platform: "android",
+      output_path: "osu.Android/bin/Release/",
+      keystore_path: options[:keystore_path],
+      keystore_alias: options[:keystore_alias],
+      keystore_password: ENV["KEYSTORE_PASSWORD"]
+    )
   end
 
   lane :update_version do |options|
-    options[:plist_path] = '../osu.iOS/Info.plist'
-    app_version(options)
+
+    split = options[:build].split('.')
+    split[1] = split[1].to_s.rjust(4, '0')
+    android_build = split.join('')
+
+    app_version(
+      solution_path: 'osu.Android.sln',
+      version: options[:version],
+      build: android_build,
+    )
   end
 
+end
+
+platform :ios do
   desc 'Deploy to testflight'
   lane :beta do |options|
     update_version(options)
@@ -35,7 +97,7 @@ platform :ios do
     changelog.gsub!('$BUILD_ID', options[:build])
 
     pilot(
-      wait_processing_interval: 900,
+      wait_processing_interval: 1800,
       changelog: changelog,
       ipa: './osu.iOS/bin/iPhone/Release/osu.iOS.ipa'
     )
@@ -61,5 +123,18 @@ platform :ios do
     end
 
     match(options)
+  end
+
+  lane :update_version do |options|
+    options[:plist_path] = '../osu.iOS/Info.plist'
+    app_version(options)
+  end
+
+  lane :testflight_prune_dry do
+    clean_testflight_testers(days_of_inactivity:45, dry_run: true)
+  end
+
+  lane :testflight_prune do
+    clean_testflight_testers(days_of_inactivity: 45)
   end
 end

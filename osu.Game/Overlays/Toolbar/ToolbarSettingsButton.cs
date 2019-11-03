@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MainSettings settings)
+        private void load(SettingsOverlay settings)
         {
             StateContainer = settings;
         }

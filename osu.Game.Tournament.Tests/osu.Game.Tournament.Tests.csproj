@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.TestProject.props" />
+  <PropertyGroup>
+    <StartupObject>osu.Game.Tournament.Tests.TournamentTestRunner</StartupObject>
+  </PropertyGroup>
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+  </ItemGroup>
+  <PropertyGroup Label="Project">
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
+    <ProjectReference Include="..\osu.Game.Tournament\osu.Game.Tournament.csproj" />
+  </ItemGroup>
+</Project>

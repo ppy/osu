@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public DrawableOsuRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }
@@ -63,8 +63,10 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             get
             {
-                var first = (OsuHitObject)Objects.First();
-                return first.StartTime - Math.Max(2000, first.TimePreempt);
+                if (Objects.FirstOrDefault() is OsuHitObject first)
+                    return first.StartTime - Math.Max(2000, first.TimePreempt);
+
+                return 0;
             }
         }
     }
