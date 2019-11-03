@@ -10,7 +10,8 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         protected override Drawable CreateCursor() => new InvisibleCursor();
 
-        private class InvisibleCursor : Drawable {
+        private class InvisibleCursor : Drawable
+        {
         }
     }
 }
