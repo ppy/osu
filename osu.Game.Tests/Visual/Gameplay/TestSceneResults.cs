@@ -22,10 +22,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ScoreInfo),
             typeof(Results),
             typeof(ResultsPage),
             typeof(ScoreResultsPage),
+            typeof(RetryButton),
+            typeof(ReplayDownloadButton),
             typeof(LocalLeaderboardPage)
         };
 

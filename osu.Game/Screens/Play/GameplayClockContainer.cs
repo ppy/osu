@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
         /// </summary>
-        private readonly IAdjustableClock sourceClock;
+        private IAdjustableClock sourceClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -151,6 +152,18 @@ namespace osu.Game.Screens.Play
             this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => adjustableClock.Stop());
 
             IsPaused.Value = true;
+        }
+
+        /// <summary>
+        /// Changes the backing clock to avoid using the originally provided beatmap's track.
+        /// </summary>
+        public void StopUsingBeatmapClock()
+        {
+            if (sourceClock != beatmap.Track)
+                return;
+
+            sourceClock = new TrackVirtual(beatmap.Track.Length);
+            adjustableClock.ChangeSource(sourceClock);
         }
 
         public void ResetLocalAdjustments()
