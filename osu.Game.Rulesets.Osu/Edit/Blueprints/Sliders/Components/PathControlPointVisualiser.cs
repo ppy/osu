@@ -4,6 +4,8 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -13,25 +15,60 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         public Action<Vector2[]> ControlPointsChanged;
 
+        internal readonly Container<PathControlPointPiece> Pieces;
         private readonly Slider slider;
 
-        private readonly Container<PathControlPointPiece> pieces;
+        private InputManager inputManager;
 
         public PathControlPointVisualiser(Slider slider)
         {
             this.slider = slider;
 
-            InternalChild = pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+            RelativeSizeAxes = Axes.Both;
+
+            InternalChild = Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            while (slider.Path.ControlPoints.Length > pieces.Count)
-                pieces.Add(new PathControlPointPiece(slider, pieces.Count) { ControlPointsChanged = c => ControlPointsChanged?.Invoke(c) });
-            while (slider.Path.ControlPoints.Length < pieces.Count)
-                pieces.Remove(pieces[pieces.Count - 1]);
+            while (slider.Path.ControlPoints.Length > Pieces.Count)
+            {
+                Pieces.Add(new PathControlPointPiece(slider, Pieces.Count)
+                {
+                    ControlPointsChanged = c => ControlPointsChanged?.Invoke(c),
+                    RequestSelection = selectPiece
+                });
+            }
+
+            while (slider.Path.ControlPoints.Length < Pieces.Count)
+                Pieces.Remove(Pieces[Pieces.Count - 1]);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = false;
+            return false;
+        }
+
+        private void selectPiece(int index)
+        {
+            if (inputManager.CurrentState.Keyboard.ControlPressed)
+                Pieces[index].IsSelected.Toggle();
+            else
+            {
+                foreach (var piece in Pieces)
+                    piece.IsSelected.Value = piece.Index == index;
+            }
         }
     }
 }

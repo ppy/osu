@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 PathBindable.Value = value;
                 endPositionCache.Invalidate();
+
+                updateNestedPositions();
             }
         }
 
@@ -48,14 +50,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.Position = value;
-
                 endPositionCache.Invalidate();
 
-                if (HeadCircle != null)
-                    HeadCircle.Position = value;
-
-                if (TailCircle != null)
-                    TailCircle.Position = EndPosition;
+                updateNestedPositions();
             }
         }
 
@@ -195,6 +192,15 @@ namespace osu.Game.Rulesets.Osu.Objects
                         break;
                 }
             }
+        }
+
+        private void updateNestedPositions()
+        {
+            if (HeadCircle != null)
+                HeadCircle.Position = Position;
+
+            if (TailCircle != null)
+                TailCircle.Position = EndPosition;
         }
 
         private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>
