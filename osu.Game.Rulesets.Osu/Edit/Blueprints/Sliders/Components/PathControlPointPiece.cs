@@ -128,19 +128,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             isClicked = true;
-            return true;
+            return false;
         }
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
             isClicked = false;
-            return true;
+            return false;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            RequestSelection?.Invoke(Index);
-            return true;
+            if (RequestSelection != null)
+            {
+                RequestSelection.Invoke(Index);
+                return true;
+            }
+
+            return false;
         }
 
         protected override bool OnDragStart(DragStartEvent e) => true;
