@@ -19,11 +19,10 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private CommentableType? type;
-        private long? id;
-
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+
+        private readonly Bindable<CommentBundleParameters> parameters = new Bindable<CommentBundleParameters>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -145,26 +144,28 @@ namespace osu.Game.Overlays.Comments
         {
             Sort.BindValueChanged(_ =>
             {
-                if (!type.HasValue || !id.HasValue)
+                if (parameters.Value.IsEmpty)
                     return;
 
-                ShowComments(type.Value, id.Value);
+                ShowComments(parameters.Value.Type.Value, parameters.Value.Id.Value);
             });
             base.LoadComplete();
         }
 
         public void ShowComments(CommentableType type, long id)
         {
-            this.type = type;
-            this.id = id;
+            parameters.Value = new CommentBundleParameters
+            {
+                Type = type,
+                Id = id
+            };
             clearComments();
             getComments();
         }
 
         public void ShowComments(CommentBundle commentBundle)
         {
-            type = null;
-            id = null;
+            parameters.Value = new CommentBundleParameters();
             clearComments();
             onSuccess(commentBundle);
         }
@@ -183,10 +184,10 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
-            if (!type.HasValue || !id.HasValue)
+            if (parameters.Value.IsEmpty)
                 return;
 
-            request = new GetCommentsRequest(type.Value, id.Value, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(parameters.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }
