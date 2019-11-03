@@ -23,12 +23,12 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
             new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and country name
-            new TableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 100)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 100)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 100)),
-            new TableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 100)),
-            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 80)),
-            new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)),
+            new TableColumn("Active Users", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Avg. Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Drawable[] CreateContent(int index, APICountryRankings item) => new Drawable[]

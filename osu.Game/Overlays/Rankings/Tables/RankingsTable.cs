@@ -91,6 +91,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             public RowText()
             {
                 Font = OsuFont.GetFont(size: TEXT_SIZE);
+                Margin = new MarginPadding { Horizontal = 10 };
             }
         }
 
