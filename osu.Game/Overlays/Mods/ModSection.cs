@@ -158,7 +158,8 @@ namespace osu.Game.Overlays.Mods
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Spacing = new Vector2(50f, 0f),
