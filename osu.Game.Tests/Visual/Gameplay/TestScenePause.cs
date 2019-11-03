@@ -70,6 +70,24 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestPauseWithResumeOverlay()
+        {
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+
+            pauseAndConfirm();
+
+            resume();
+            confirmClockRunning(false);
+            confirmPauseOverlayShown(false);
+
+            pauseAndConfirm();
+
+            AddUntilStep("resume overlay is not active", () => Player.DrawableRuleset.ResumeOverlay.State.Value == Visibility.Hidden);
+            confirmPaused();
+        }
+
+        [Test]
         public void TestResumeWithResumeOverlaySkipped()
         {
             AddStep("move cursor to button", () =>
