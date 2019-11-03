@@ -220,14 +220,14 @@ namespace osu.Game
         /// This can be called from a non-thread-safe non-game-loaded state.
         /// </summary>
         /// <param name="url">The URL to load.</param>
-        public void HandleLink(string url) => Schedule(() => HandleLink(MessageFormatter.GetLinkDetails(url)));
+        public void HandleLink(string url) => HandleLink(MessageFormatter.GetLinkDetails(url));
 
         /// <summary>
         /// Handle a specific <see cref="LinkDetails"/>.
         /// This can be called from a non-thread-safe non-game-loaded state.
         /// </summary>
         /// <param name="link">The link to load.</param>
-        public void HandleLink(LinkDetails link)
+        public void HandleLink(LinkDetails link) => Schedule(() =>
         {
             switch (link.Action)
             {
@@ -268,7 +268,7 @@ namespace osu.Game
                 default:
                     throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
             }
-        }
+        });
 
         public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
