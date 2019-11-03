@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Comments
         {
             Sort.BindValueChanged(_ =>
             {
-                if (parameters.Value.IsEmpty)
+                if (!parameters.Value.Type.HasValue || !parameters.Value.Id.HasValue)
                     return;
 
                 ShowComments(parameters.Value.Type.Value, parameters.Value.Id.Value);
@@ -184,10 +184,10 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
-            if (parameters.Value.IsEmpty)
+            if (!parameters.Value.Type.HasValue || !parameters.Value.Id.HasValue)
                 return;
 
-            request = new GetCommentsRequest(parameters.Value, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(parameters.Value.Type.Value, parameters.Value.Id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }

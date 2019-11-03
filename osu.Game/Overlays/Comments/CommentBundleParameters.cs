@@ -10,7 +10,5 @@ namespace osu.Game.Overlays.Comments
         public CommentableType? Type { get; set; }
 
         public long? Id { get; set; }
-
-        public bool IsEmpty => !Type.HasValue || !Id.HasValue;
     }
 }
