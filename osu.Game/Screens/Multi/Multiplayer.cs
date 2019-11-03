@@ -167,14 +167,17 @@ namespace osu.Game.Screens.Multi
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
-                forcefullyExit();
+                Schedule(forcefullyExit);
         }
 
         private void forcefullyExit()
         {
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
-                this.Exit();
+            {
+                while (this.IsCurrentScreen())
+                    this.Exit();
+            }
             else
             {
                 this.MakeCurrent();
