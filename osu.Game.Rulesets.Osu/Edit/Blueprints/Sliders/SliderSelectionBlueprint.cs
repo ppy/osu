@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected readonly SliderBodyPiece BodyPiece;
         protected readonly SliderCircleSelectionBlueprint HeadBlueprint;
         protected readonly SliderCircleSelectionBlueprint TailBlueprint;
+        protected readonly PathControlPointVisualiser ControlPointVisualiser;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 BodyPiece = new SliderBodyPiece(),
                 HeadBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.Start),
                 TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
-                new PathControlPointVisualiser(sliderObject) { ControlPointsChanged = onNewControlPoints },
+                ControlPointVisualiser = new PathControlPointVisualiser(sliderObject) { ControlPointsChanged = onNewControlPoints },
             };
         }
 
