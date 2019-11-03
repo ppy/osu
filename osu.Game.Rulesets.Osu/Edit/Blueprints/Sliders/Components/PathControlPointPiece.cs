@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public Action<int> RequestSelection;
         public Action<Vector2[]> ControlPointsChanged;
 
-        public readonly Bindable<bool> IsSelected = new Bindable<bool>();
+        public readonly BindableBool IsSelected = new BindableBool();
         public readonly int Index;
 
         private readonly Slider slider;

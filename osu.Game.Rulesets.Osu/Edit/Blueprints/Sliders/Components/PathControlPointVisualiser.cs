@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void selectPiece(int index)
         {
             if (inputManager.CurrentState.Keyboard.ControlPressed)
-                Pieces[index].IsSelected.Value = true;
+                Pieces[index].IsSelected.Toggle();
             else
             {
                 foreach (var piece in Pieces)

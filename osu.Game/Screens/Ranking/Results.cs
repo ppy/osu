@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -33,6 +34,9 @@ namespace osu.Game.Screens.Ranking
         private ParallaxContainer backgroundParallax;
 
         private ResultModeTabControl modeChangeButtons;
+
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -100,10 +104,7 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            allCircles.ForEach(c =>
-            {
-                c.ScaleTo(0, transition_time, Easing.OutSine);
-            });
+            allCircles.ForEach(c => c.ScaleTo(0, transition_time, Easing.OutSine));
 
             Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
@@ -253,7 +254,16 @@ namespace osu.Game.Screens.Ranking
                             }
                         }
                     }
-                }
+                },
+                new HotkeyRetryOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        player?.Restart();
+                    },
+                },
             };
 
             var pages = CreateResultPages();
