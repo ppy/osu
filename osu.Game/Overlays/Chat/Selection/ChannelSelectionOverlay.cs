@@ -32,6 +32,8 @@ namespace osu.Game.Overlays.Chat.Selection
         private readonly SearchTextBox search;
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
+        protected override bool DimMainContent => false;
+
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
@@ -117,7 +119,6 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     PlaceholderText = @"Search",
-                                    Exit = Hide,
                                 },
                             },
                         },

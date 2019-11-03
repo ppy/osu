@@ -23,7 +23,7 @@ namespace osu.Game.Online.Leaderboards
     {
         private const double fade_duration = 300;
 
-        private readonly ScrollContainer scrollContainer;
+        private readonly OsuScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
 
         private FillFlowContainer<LeaderboardScore> scrollFlow;
@@ -34,6 +34,10 @@ namespace osu.Game.Online.Leaderboards
         private CancellationTokenSource showScoresCancellationSource;
 
         private bool scoresLoadedOnce;
+
+        private readonly Container content;
+
+        protected override Container<Drawable> Content => content;
 
         private IEnumerable<ScoreInfo> scores;
 
@@ -51,7 +55,6 @@ namespace osu.Game.Online.Leaderboards
 
                 loading.Hide();
 
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 showScoresDelegate?.Cancel();
                 showScoresCancellationSource?.Cancel();
 
@@ -61,28 +64,22 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                scrollFlow = CreateScoreFlow();
-                scrollFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
+                var scoreFlow = CreateScoreFlow();
+                scoreFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
-                if (!IsLoaded)
-                    showScoresDelegate = Schedule(showScores);
-                else
-                    showScores();
-
-                void showScores() => LoadComponentAsync(scrollFlow, _ =>
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                showScoresDelegate = Schedule(() => LoadComponentAsync(scoreFlow, _ =>
                 {
-                    scrollContainer.Add(scrollFlow);
+                    scrollContainer.Add(scrollFlow = scoreFlow);
 
                     int i = 0;
 
                     foreach (var s in scrollFlow.Children)
-                    {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
-                    }
 
                     scrollContainer.ScrollTo(0f, false);
-                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
+                }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
             }
         }
 
@@ -123,9 +120,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 if (value != PlaceholderState.Successful)
                 {
-                    getScoresRequest?.Cancel();
-                    getScoresRequest = null;
-                    Scores = null;
+                    Reset();
                 }
 
                 if (value == placeholderState)
@@ -138,6 +133,10 @@ namespace osu.Game.Online.Leaderboards
                         {
                             OnRetry = UpdateScores,
                         });
+                        break;
+
+                    case PlaceholderState.NoneSelected:
+                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
                         break;
 
                     case PlaceholderState.Unavailable:
@@ -165,12 +164,35 @@ namespace osu.Game.Online.Leaderboards
 
         protected Leaderboard()
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                scrollContainer = new OsuScrollContainer
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            scrollContainer = new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ScrollbarVisible = false,
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            content = new Container
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        }
+                    },
                 },
                 loading = new LoadingAnimation(),
                 placeholderContainer = new Container
@@ -178,6 +200,13 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Both
                 },
             };
+        }
+
+        protected virtual void Reset()
+        {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+            Scores = null;
         }
 
         private IAPIProvider api;
@@ -201,10 +230,19 @@ namespace osu.Game.Online.Leaderboards
 
         private APIRequest getScoresRequest;
 
+        protected abstract bool IsOnlineScope { get; }
+
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
-            if (state == APIState.Online)
-                UpdateScores();
+            switch (state)
+            {
+                case APIState.Online:
+                case APIState.Offline:
+                    if (IsOnlineScope)
+                        UpdateScores();
+
+                    break;
+            }
         }
 
         protected void UpdateScores()
@@ -230,12 +268,6 @@ namespace osu.Game.Online.Leaderboards
 
                 if (getScoresRequest == null)
                     return;
-
-                if (api?.IsLoggedIn != true)
-                {
-                    PlaceholderState = PlaceholderState.NotLoggedIn;
-                    return;
-                }
 
                 getScoresRequest.Failure += e => Schedule(() =>
                 {

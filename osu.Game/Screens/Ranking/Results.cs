@@ -16,10 +16,10 @@ using osu.Game.Screens.Backgrounds;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Ranking
         private ParallaxContainer backgroundParallax;
 
         private ResultModeTabControl modeChangeButtons;
+
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -101,10 +104,7 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            allCircles.ForEach(c =>
-            {
-                c.ScaleTo(0, transition_time, Easing.OutSine);
-            });
+            allCircles.ForEach(c => c.ScaleTo(0, transition_time, Easing.OutSine));
 
             Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
@@ -255,17 +255,23 @@ namespace osu.Game.Screens.Ranking
                         }
                     }
                 },
-                new BackButton
+                new HotkeyRetryOverlay
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Action = this.Exit
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        player?.Restart();
+                    },
                 },
             };
 
-            foreach (var t in CreateResultPages())
-                modeChangeButtons.AddItem(t);
-            modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
+            var pages = CreateResultPages();
+
+            foreach (var p in pages)
+                modeChangeButtons.AddItem(p);
+
+            modeChangeButtons.Current.Value = pages.FirstOrDefault();
 
             modeChangeButtons.Current.BindValueChanged(page =>
             {
@@ -275,7 +281,7 @@ namespace osu.Game.Screens.Ranking
                 currentPage = page.NewValue?.CreatePage();
 
                 if (currentPage != null)
-                    circleInner.Add(currentPage);
+                    LoadComponentAsync(currentPage, circleInner.Add);
             }, true);
         }
 

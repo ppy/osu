@@ -15,22 +15,31 @@ Install _fastlane_ using
 or alternatively using `brew cask install fastlane`
 
 # Available Actions
+## Android
+### android beta
+```
+fastlane android beta
+```
+Deploy to play store
+### android build_github
+```
+fastlane android build_github
+```
+Deploy to github release
+### android build
+```
+fastlane android build
+```
+Compile the project
+### android update_version
+```
+fastlane android update_version
+```
+
+
+----
+
 ## iOS
-### ios testflight_prune_dry
-```
-fastlane ios testflight_prune_dry
-```
-
-### ios testflight_prune
-```
-fastlane ios testflight_prune
-```
-
-### ios update_version
-```
-fastlane ios update_version
-```
-
 ### ios beta
 ```
 fastlane ios beta
@@ -46,6 +55,21 @@ Compile the project
 fastlane ios provision
 ```
 Install provisioning profiles using match
+### ios update_version
+```
+fastlane ios update_version
+```
+
+### ios testflight_prune_dry
+```
+fastlane ios testflight_prune_dry
+```
+
+### ios testflight_prune
+```
+fastlane ios testflight_prune
+```
+
 
 ----
 

@@ -15,6 +15,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
         private readonly PlayerCheckbox showStoryboardToggle;
+        private readonly PlayerCheckbox showVideoToggle;
         private readonly PlayerCheckbox beatmapSkinsToggle;
         private readonly PlayerCheckbox beatmapHitsoundsToggle;
 
@@ -37,6 +38,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     Text = "Toggles:"
                 },
                 showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
+                showVideoToggle = new PlayerCheckbox { LabelText = "Video" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
                 beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
             };
@@ -47,9 +49,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
         {
             dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
             blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
-            showStoryboardToggle.Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            beatmapSkinsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
-            beatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
+            showStoryboardToggle.Current = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            showVideoToggle.Current = config.GetBindable<bool>(OsuSetting.ShowVideoBackground);
+            beatmapSkinsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapHitsoundsToggle.Current = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
         }
     }
 }

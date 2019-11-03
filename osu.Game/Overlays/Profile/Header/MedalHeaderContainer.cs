@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarkest,
+                    Colour = colours.GreySeafoamDarker,
                 },
                 new Container //artificial shadow
                 {
@@ -78,10 +78,8 @@ namespace osu.Game.Overlays.Profile.Header
                     int displayIndex = index;
                     LoadComponentAsync(new DrawableBadge(badges[index]), asyncBadge =>
                     {
-                        badgeFlowContainer.Add(asyncBadge);
-
                         // load in stable order regardless of async load order.
-                        badgeFlowContainer.SetLayoutPosition(asyncBadge, displayIndex);
+                        badgeFlowContainer.Insert(displayIndex, asyncBadge);
                     });
                 }
             }

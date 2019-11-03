@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.55f,
                             Children = new Drawable[]
                             {
-                                new ScrollContainer
+                                new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
@@ -68,8 +69,6 @@ namespace osu.Game.Screens.Multi.Lounge
                     },
                 },
             };
-
-            Filter.Search.Exit += this.Exit;
         }
 
         protected override void UpdateAfterChildren()

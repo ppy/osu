@@ -2,8 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.IO;
 using NUnit.Framework;
+using osu.Game.IO;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osuTK.Graphics;
@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Skins
             var decoder = new LegacySkinDecoder();
 
             using (var resStream = TestResources.OpenResource(hasColours ? "skin.ini" : "skin-empty.ini"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var comboColors = decoder.Decode(stream).ComboColours;
 
@@ -39,6 +39,21 @@ namespace osu.Game.Tests.Skins
                 Assert.AreEqual(expectedColors.Count, comboColors.Count);
                 for (int i = 0; i < expectedColors.Count; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestDecodeGeneral()
+        {
+            var decoder = new LegacySkinDecoder();
+
+            using (var resStream = TestResources.OpenResource("skin.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var config = decoder.Decode(stream);
+
+                Assert.AreEqual("test skin", config.SkinInfo.Name);
+                Assert.AreEqual("TestValue", config.ConfigDictionary["TestLookup"]);
             }
         }
     }

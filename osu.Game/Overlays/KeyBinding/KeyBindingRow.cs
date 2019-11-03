@@ -13,9 +13,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
@@ -47,7 +48,7 @@ namespace osu.Game.Overlays.KeyBinding
         public bool FilteringActive { get; set; }
 
         private OsuSpriteText text;
-        private OsuTextFlowContainer pressAKey;
+        private Drawable pressAKey;
 
         private FillFlowContainer<KeyButton> buttons;
 
@@ -80,7 +81,7 @@ namespace osu.Game.Overlays.KeyBinding
                 Hollow = true,
             };
 
-            Children = new Drawable[]
+            Children = new[]
             {
                 new Box
                 {
@@ -99,15 +100,19 @@ namespace osu.Game.Overlays.KeyBinding
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
-                pressAKey = new OsuTextFlowContainer
+                pressAKey = new FillFlowContainer
                 {
-                    Text = "Press a key to change binding, Shift+Delete to delete, Escape to cancel.",
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Margin = new MarginPadding(padding),
-                    Padding = new MarginPadding { Top = height },
+                    AutoSizeAxes = Axes.Both,
+                    Padding = new MarginPadding(padding) { Top = height + padding * 2 },
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
                     Alpha = 0,
-                    Colour = colours.YellowDark
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new CancelButton { Action = finalise },
+                        new ClearButton { Action = clear },
+                    },
                 }
             };
 
@@ -205,21 +210,6 @@ namespace osu.Game.Overlays.KeyBinding
             if (!HasFocus)
                 return false;
 
-            switch (e.Key)
-            {
-                case Key.Delete:
-                {
-                    if (e.ShiftPressed)
-                    {
-                        bindTarget.UpdateKeyCombination(InputKey.None);
-                        finalise();
-                        return true;
-                    }
-
-                    break;
-                }
-            }
-
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             if (!isModifier(e.Key)) finalise();
 
@@ -252,6 +242,12 @@ namespace osu.Game.Overlays.KeyBinding
 
             finalise();
             return true;
+        }
+
+        private void clear()
+        {
+            bindTarget.UpdateKeyCombination(InputKey.None);
+            finalise();
         }
 
         private void finalise()
@@ -298,6 +294,41 @@ namespace osu.Game.Overlays.KeyBinding
             if (bindTarget != null) bindTarget.IsBinding = false;
             bindTarget = buttons.FirstOrDefault(b => b.IsHovered) ?? buttons.FirstOrDefault();
             if (bindTarget != null) bindTarget.IsBinding = true;
+        }
+
+        private class CancelButton : TriangleButton
+        {
+            public CancelButton()
+            {
+                Text = "Cancel";
+                Size = new Vector2(80, 20);
+            }
+        }
+
+        private class ClearButton : TriangleButton
+        {
+            public ClearButton()
+            {
+                Text = "Clear";
+                Size = new Vector2(80, 20);
+            }
+
+            protected override bool OnMouseUp(MouseUpEvent e)
+            {
+                base.OnMouseUp(e);
+
+                // without this, the mouse up triggers a finalise (and deselection) of the current binding target.
+                return true;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                BackgroundColour = colours.Pink;
+
+                Triangles.ColourDark = colours.PinkDark;
+                Triangles.ColourLight = colours.PinkLight;
+            }
         }
 
         private class KeyButton : Container

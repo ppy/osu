@@ -35,14 +35,14 @@ namespace osu.Game.Overlays.Profile.Header
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            iconColour = colours.CommunityUserGrayGreenLighter;
+            iconColour = colours.GreySeafoamLighter;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarker,
+                    Colour = colours.GreySeafoamDark,
                 },
                 new FillFlowContainer
                 {
@@ -87,18 +87,23 @@ namespace osu.Game.Overlays.Profile.Header
 
             addSpacer(topLinkContainer);
 
-            if (user.PlayStyles?.Length > 0)
+            if (user.IsOnline)
             {
-                topLinkContainer.AddText("Plays with ");
-                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
+                topLinkContainer.AddText("Currently online");
+                addSpacer(topLinkContainer);
+            }
+            else if (user.LastVisit.HasValue)
+            {
+                topLinkContainer.AddText("Last seen ");
+                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
 
                 addSpacer(topLinkContainer);
             }
 
-            if (user.LastVisit.HasValue)
+            if (user.PlayStyles?.Length > 0)
             {
-                topLinkContainer.AddText("Last seen ");
-                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
+                topLinkContainer.AddText("Plays with ");
+                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
 
                 addSpacer(topLinkContainer);
             }
@@ -134,6 +139,9 @@ namespace osu.Game.Overlays.Profile.Header
         private void tryAddInfo(IconUsage icon, string content, string link = null)
         {
             if (string.IsNullOrEmpty(content)) return;
+
+            // newlines could be contained in API returned user content.
+            content = content.Replace("\n", " ");
 
             bottomLinkContainer.AddIcon(icon, text =>
             {

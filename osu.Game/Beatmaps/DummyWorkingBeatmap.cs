@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -16,9 +18,9 @@ namespace osu.Game.Beatmaps
 {
     public class DummyWorkingBeatmap : WorkingBeatmap
     {
-        private readonly OsuGameBase game;
+        private readonly TextureStore textures;
 
-        public DummyWorkingBeatmap(OsuGameBase game = null)
+        public DummyWorkingBeatmap(AudioManager audio, TextureStore textures)
             : base(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
@@ -34,16 +36,18 @@ namespace osu.Game.Beatmaps
                     OverallDifficulty = 0,
                 },
                 Ruleset = new DummyRulesetInfo()
-            })
+            }, audio)
         {
-            this.game = game;
+            this.textures = textures;
         }
 
         protected override IBeatmap GetBeatmap() => new Beatmap();
 
-        protected override Texture GetBackground() => game?.Textures.Get(@"Backgrounds/bg4");
+        protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => new TrackVirtual { Length = 1000 };
+        protected override VideoSprite GetVideo() => null;
+
+        protected override Track GetTrack() => GetVirtualTrack();
 
         private class DummyRulesetInfo : RulesetInfo
         {
@@ -53,7 +57,7 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+                public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
                 {
                     throw new NotImplementedException();
                 }

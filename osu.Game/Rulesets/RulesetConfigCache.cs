@@ -32,9 +32,18 @@ namespace osu.Game.Rulesets
         public IRulesetConfigManager GetConfigFor(Ruleset ruleset)
         {
             if (ruleset.RulesetInfo.ID == null)
-                throw new InvalidOperationException("The provided ruleset doesn't have a valid id.");
+                return null;
 
             return configCache.GetOrAdd(ruleset.RulesetInfo.ID.Value, _ => ruleset.CreateConfig(settingsStore));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // ensures any potential database operations are finalised before game destruction.
+            foreach (var c in configCache.Values)
+                (c as IDisposable)?.Dispose();
         }
     }
 }

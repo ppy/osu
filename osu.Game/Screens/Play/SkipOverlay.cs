@@ -23,7 +23,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
@@ -36,7 +36,6 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-        protected override bool BlockPositionalInput => false;
 
         /// <summary>
         /// Displays a skip overlay, giving the user the ability to skip forward.
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Play
         {
             this.startTime = startTime;
 
-            State = Visibility.Visible;
+            Show();
 
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.X;
@@ -136,7 +135,7 @@ namespace osu.Game.Screens.Play
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (!e.HasAnyButtonPressed)
-                fadeContainer.State = Visibility.Visible;
+                fadeContainer.Show();
             return base.OnMouseMove(e);
         }
 
@@ -161,6 +160,8 @@ namespace osu.Game.Screens.Play
             private Visibility state;
             private ScheduledDelegate scheduledHide;
 
+            public override bool IsPresent => true;
+
             public Visibility State
             {
                 get => state;
@@ -181,7 +182,7 @@ namespace osu.Game.Screens.Play
 
                             if (!IsHovered && !IsDragged)
                                 using (BeginDelayedSequence(1000))
-                                    scheduledHide = Schedule(() => State = Visibility.Hidden);
+                                    scheduledHide = Schedule(Hide);
                             break;
 
                         case Visibility.Hidden:
@@ -196,20 +197,25 @@ namespace osu.Game.Screens.Play
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                State = Visibility.Visible;
+                Show();
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
+                Show();
                 scheduledHide?.Cancel();
-                return base.OnMouseDown(e);
+                return true;
             }
 
             protected override bool OnMouseUp(MouseUpEvent e)
             {
-                State = Visibility.Visible;
-                return base.OnMouseUp(e);
+                Show();
+                return true;
             }
+
+            public override void Hide() => State = Visibility.Hidden;
+
+            public override void Show() => State = Visibility.Visible;
         }
 
         private class Button : OsuClickableContainer
@@ -234,7 +240,7 @@ namespace osu.Game.Screens.Play
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
-                sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
+                sampleConfirm = audio.Samples.Get(@"SongSelect/confirm-selection");
 
                 Children = new Drawable[]
                 {

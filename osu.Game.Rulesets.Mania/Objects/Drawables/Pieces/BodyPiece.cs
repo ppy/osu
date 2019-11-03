@@ -26,14 +26,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public BodyPiece()
         {
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
 
             Children = new[]
             {
                 Background = new Box { RelativeSizeAxes = Axes.Both },
                 Foreground = new BufferedContainer
                 {
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     RelativeSizeAxes = Axes.Both,
                     CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             }
         }
 
-        private Cached subtractionCache = new Cached();
+        private readonly Cached subtractionCache = new Cached();
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {

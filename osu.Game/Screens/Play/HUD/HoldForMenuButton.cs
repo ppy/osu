@@ -13,6 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Play.HUD
     public class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
         private readonly Button button;
 
@@ -43,7 +46,6 @@ namespace osu.Game.Screens.Play.HUD
             {
                 text = new OsuSpriteText
                 {
-                    Text = "hold for menu",
                     Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
@@ -51,15 +53,30 @@ namespace osu.Game.Screens.Play.HUD
                 button = new Button
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
-                    HoverLost = () => text.FadeOut(500, Easing.OutQuint)
+                    HoverLost = () => text.FadeOut(500, Easing.OutQuint),
+                    IsPaused = { BindTarget = IsPaused }
                 }
             };
             AutoSizeAxes = Axes.Both;
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private Bindable<float> activationDelay;
+
         protected override void LoadComplete()
         {
+            activationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            activationDelay.BindValueChanged(v =>
+            {
+                text.Text = v.NewValue > 0
+                    ? "hold for menu"
+                    : "press for menu";
+            }, true);
+
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+
             base.LoadComplete();
         }
 
@@ -93,6 +110,8 @@ namespace osu.Game.Screens.Play.HUD
             private SpriteIcon icon;
             private CircularProgress circularProgress;
             private Circle overlayCircle;
+
+            public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
             protected override bool AllowMultipleFires => true;
 
@@ -217,7 +236,7 @@ namespace osu.Game.Screens.Play.HUD
 
             private void updateActive()
             {
-                if (!pauseOnFocusLost) return;
+                if (!pauseOnFocusLost || IsPaused.Value) return;
 
                 if (gameActive.Value)
                     AbortConfirm();

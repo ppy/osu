@@ -13,6 +13,8 @@ using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -28,14 +30,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new OsuDifficultyAttributes { Mods = mods };
+                return new OsuDifficultyAttributes { Mods = mods, Skills = skills };
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
+
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
+            double hitWindowGreat = (int)(hitWindows.WindowFor(HitResult.Great)) / clockRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             int maxCombo = beatmap.HitObjects.Count;
@@ -50,7 +55,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 SpeedStrain = speedRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
-                MaxCombo = maxCombo
+                MaxCombo = maxCombo,
+                Skills = skills
             };
         }
 
