@@ -142,32 +142,30 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(_ =>
-            {
-                if (!parameters.Value.Type.HasValue || !parameters.Value.Id.HasValue)
-                    return;
-
-                ShowComments(parameters.Value.Type.Value, parameters.Value.Id.Value);
-            });
+            Sort.BindValueChanged(_ => updateComments());
             base.LoadComplete();
         }
 
         public void ShowComments(CommentableType type, long id)
         {
-            parameters.Value = new CommentBundleParameters
-            {
-                Type = type,
-                Id = id
-            };
-            clearComments();
-            getComments();
+            parameters.Value = new CommentBundleParameters(type, id);
+            updateComments();
         }
 
         public void ShowComments(CommentBundle commentBundle)
         {
-            parameters.Value = new CommentBundleParameters();
+            parameters.Value = null;
             clearComments();
             onSuccess(commentBundle);
+        }
+
+        private void updateComments()
+        {
+            if (parameters.Value == null)
+                return;
+
+            clearComments();
+            getComments();
         }
 
         private void clearComments()
@@ -184,10 +182,10 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
-            if (!parameters.Value.Type.HasValue || !parameters.Value.Id.HasValue)
+            if (parameters.Value == null)
                 return;
 
-            request = new GetCommentsRequest(parameters.Value.Type.Value, parameters.Value.Id.Value, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(parameters.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }

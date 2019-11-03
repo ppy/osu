@@ -10,16 +10,14 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetCommentsRequest : APIRequest<CommentBundle>
     {
-        private readonly long id;
+        private readonly CommentBundleParameters parameters;
         private readonly int page;
-        private readonly CommentableType type;
         private readonly CommentsSortCriteria sort;
 
-        public GetCommentsRequest(CommentableType type, long id, CommentsSortCriteria sort = CommentsSortCriteria.New, int page = 1)
+        public GetCommentsRequest(CommentBundleParameters parameters, CommentsSortCriteria sort = CommentsSortCriteria.New, int page = 1)
         {
-            this.type = type;
+            this.parameters = parameters;
             this.sort = sort;
-            this.id = id;
             this.page = page;
         }
 
@@ -27,8 +25,8 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            req.AddParameter("commentable_type", type.ToString().Underscore().ToLowerInvariant());
-            req.AddParameter("commentable_id", id.ToString());
+            req.AddParameter("commentable_type", parameters.Type.ToString().Underscore().ToLowerInvariant());
+            req.AddParameter("commentable_id", parameters.Id.ToString());
             req.AddParameter("sort", sort.ToString().ToLowerInvariant());
             req.AddParameter("page", page.ToString());
 
