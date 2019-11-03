@@ -24,13 +24,13 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
             new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username
-            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 80)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 80)),
-            new TableColumn("Total Score", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 100)),
-            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 100)),
-            new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)),
-            new TableColumn("S", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)),
-            new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)),
+            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Total Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Ranked Score", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("S", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Drawable[] CreateContent(int index, APIUserRankings item)

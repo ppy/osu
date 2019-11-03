@@ -24,12 +24,12 @@ namespace osu.Game.Overlays.Rankings.Tables
         {
             new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
             new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username
-            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 80)),
-            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 80)),
-            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 80)),
-            new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)),
-            new TableColumn("S", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)),
-            new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)),
+            new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("SS", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("S", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+            new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
         protected override Drawable[] CreateContent(int index, APIUserRankings item)
