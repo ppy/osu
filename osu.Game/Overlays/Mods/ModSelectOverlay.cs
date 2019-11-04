@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Mods
     public class ModSelectOverlay : WaveOverlayContainer
     {
         protected readonly TriangleButton DeselectAllButton;
+        protected readonly TriangleButton CustomizeButton;
         protected readonly TriangleButton CloseButton;
 
         protected readonly OsuSpriteText MultiplierLabel;
@@ -41,6 +42,10 @@ namespace osu.Game.Overlays.Mods
         protected override bool DimMainContent => false;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
+
+        protected readonly FillFlowContainer<ModControlSection> ModSettingsContent;
+
+        protected readonly Container ModSettingsContainer;
 
         protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -226,6 +231,16 @@ namespace osu.Game.Overlays.Mods
                                                     Right = 20
                                                 }
                                             },
+                                            CustomizeButton = new TriangleButton
+                                            {
+                                                Width = 180,
+                                                Text = "Customization",
+                                                Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Right = 20
+                                                }
+                                            },
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
@@ -271,6 +286,36 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
+                ModSettingsContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Width = 0.25f,
+                    Alpha = 0,
+                    X = -100,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = new Color4(0, 0, 0, 192)
+                        },
+                        new OsuScrollContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = ModSettingsContent = new FillFlowContainer<ModControlSection>
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Spacing = new Vector2(0f, 10f),
+                                Padding = new MarginPadding(20),
+                            }
+                        }
+                    }
+                }
             };
         }
 
@@ -284,8 +329,22 @@ namespace osu.Game.Overlays.Mods
             Ruleset.BindTo(ruleset);
             if (mods != null) SelectedMods.BindTo(mods);
 
+            SelectedMods.ValueChanged += updateModSettings;
+            Ruleset.ValueChanged += _ => ModSettingsContent.Clear();
+
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
+        }
+
+        private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
+        {
+            var added = selectedMods.NewValue.Except(selectedMods.OldValue).FirstOrDefault();
+            var removed = selectedMods.OldValue.Except(selectedMods.NewValue).FirstOrDefault();
+
+            if (added is IModHasSettings)
+                ModSettingsContent.Add(new ModControlSection(added));
+            else if (removed is IModHasSettings)
+                ModSettingsContent.Remove(ModSettingsContent.Children.Where(section => section.Mod == removed).FirstOrDefault());
         }
 
         public void DeselectAll()
