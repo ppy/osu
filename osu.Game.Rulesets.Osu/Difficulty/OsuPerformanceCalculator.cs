@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double modifiedAcc = getModifiedAcc();
 
             // Assume SS for non-stream parts
-            double accOnStreams = 1 - (1 - modifiedAcc) * totalHits / Attributes.StreamNoteCount;
+            double accOnStreams = 1 - (1 - modifiedAcc) * Math.Sqrt(totalHits / Attributes.StreamNoteCount);
 
             // accOnStreams can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnStreams is close to 1
@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double urOnStreams = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnStreamsPositive));
 
-            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4600) / 1000);
+            double mashLevel = SpecialFunctions.Logistic(((urOnStreams * Attributes.TapDiff) - 4000) / 1000);
             
             double tapSkill = LinearSpline.InterpolateSorted(Attributes.MashLevels, Attributes.TapSkills)
                               .Interpolate(mashLevel);
