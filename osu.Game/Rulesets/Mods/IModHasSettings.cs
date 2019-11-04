@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// An interface for mods that allows user control over it's properties.
     /// </summary>
-    public interface IModHasSettings
+    public interface IModHasSettings : IApplicableMod
     {
         Drawable[] CreateControls();
     }
