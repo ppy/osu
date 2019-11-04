@@ -331,6 +331,7 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.ValueChanged += updateModSettings;
             Ruleset.ValueChanged += _ => ModSettingsContent.Clear();
+            CustomizeButton.Enabled.Value = false;
 
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
@@ -344,7 +345,12 @@ namespace osu.Game.Overlays.Mods
             if (added is IModHasSettings)
                 ModSettingsContent.Add(new ModControlSection(added));
             else if (removed is IModHasSettings)
-                ModSettingsContent.Remove(ModSettingsContent.Children.Where(section => section.Mod == removed).FirstOrDefault());
+                ModSettingsContent.Remove(ModSettingsContent.Children.Where(section => section.Mod == removed).Single());
+
+            CustomizeButton.Enabled.Value = ModSettingsContent.Children.Count > 0;
+
+            if (ModSettingsContainer.Alpha == 1 && ModSettingsContent.Children.Count == 0)
+                ModSettingsContainer.Alpha = 0;
         }
 
         public void DeselectAll()
