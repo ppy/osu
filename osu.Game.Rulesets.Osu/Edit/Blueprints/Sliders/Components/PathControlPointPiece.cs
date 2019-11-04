@@ -29,8 +29,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly Container marker;
         private readonly Drawable markerRing;
 
-        private bool isClicked;
-
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -101,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
             Color4 colour = isSegmentSeparator ? colours.Red : colours.Yellow;
-            if (IsHovered || isClicked || IsSelected.Value)
+            if (IsHovered || IsSelected.Value)
                 colour = Color4.White;
             marker.Colour = colour;
         }
@@ -127,18 +125,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            isClicked = true;
-            return false;
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            isClicked = false;
-            return false;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
             if (RequestSelection != null)
             {
                 RequestSelection.Invoke(Index);
@@ -147,6 +133,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             return false;
         }
+
+        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
+
+        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         protected override bool OnDragStart(DragStartEvent e) => true;
 
