@@ -119,12 +119,15 @@ namespace osu.Game.Tests.Visual.Online
                     LegacyName = "BigBrainUser",
                     CreatedAt = DateTimeOffset.Now,
                     EditedAt = DateTimeOffset.Now,
-                    IsVoted = true,
                     VotesCount = 1000,
                     EditedById = 1,
                 }
             },
             IncludedComments = new List<Comment>(),
+            UserVotes = new List<long>
+            {
+                5
+            },
             Users = new List<User>
             {
                 new User
