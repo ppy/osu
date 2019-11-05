@@ -17,12 +17,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         internal readonly Container<PathControlPointPiece> Pieces;
         private readonly Slider slider;
+        private readonly bool allowSelection;
 
         private InputManager inputManager;
 
-        public PathControlPointVisualiser(Slider slider)
+        public PathControlPointVisualiser(Slider slider, bool allowSelection)
         {
             this.slider = slider;
+            this.allowSelection = allowSelection;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -42,11 +44,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             while (slider.Path.ControlPoints.Length > Pieces.Count)
             {
-                Pieces.Add(new PathControlPointPiece(slider, Pieces.Count)
+                var piece = new PathControlPointPiece(slider, Pieces.Count)
                 {
                     ControlPointsChanged = c => ControlPointsChanged?.Invoke(c),
-                    RequestSelection = selectPiece
-                });
+                };
+
+                if (allowSelection)
+                    piece.RequestSelection = selectPiece;
+
+                Pieces.Add(piece);
             }
 
             while (slider.Path.ControlPoints.Length < Pieces.Count)
