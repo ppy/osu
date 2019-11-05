@@ -137,6 +137,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             },
             TopLevelCount = 4,
+            Total = 7,
         };
     }
 }
