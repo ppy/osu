@@ -60,7 +60,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 if (end != null)
                     bindEvents(end);
 
-                refresh();
+                if (IsLoaded)
+                    scheduleRefresh();
+                else
+                    refresh();
             }
         }
 
