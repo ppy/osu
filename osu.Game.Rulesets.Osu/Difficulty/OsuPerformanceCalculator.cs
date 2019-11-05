@@ -154,8 +154,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Buff very high AR and low AR
             double approachRateFactor = 1.0f;
+            double ar11lengthBuff = 0.8f * (SpecialFunctions.Logistic(totalHits / 500f) - 0.5f);
             if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += 0.2f * (Attributes.ApproachRate - 10.33f);
+                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33f) / 0.67f;
             else if (Attributes.ApproachRate < 8.0f)
                 approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
 
@@ -216,9 +217,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             tapValue *= Math.Pow(0.93f, countMiss);
             tapValue *= Math.Pow(0.98f, countMeh);
 
+            // Buff very high AR
             double approachRateFactor = 1.0f;
+            double ar11lengthBuff = 0.8f * (SpecialFunctions.Logistic(totalHits / 500f) - 0.5f);
             if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += 0.2f * (Attributes.ApproachRate - 10.33f);
+                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33f) / 0.67f;
+
             tapValue *= approachRateFactor;
 
             return tapValue;
