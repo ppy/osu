@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         public override bool RemoveWhenNotAlive => false;
 
-        public override bool RemoveCompletedTransforms => false;
-
         public FollowPoint()
         {
             Origin = Anchor.Centre;
