@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         });
 
         [Test]
-        public void TestAddSingleHitCircle()
+        public void TestAddObject()
         {
             addObjectsStep(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } });
 
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveSingleHitCircle()
+        public void TestRemoveObject()
         {
             addObjectsStep(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } });
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestAddMultipleHitCircles()
+        public void TestAddMultipleObjects()
         {
             addMultipleObjectsStep();
 
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveEndHitCircle()
+        public void TestRemoveEndObject()
         {
             addMultipleObjectsStep();
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveStartHitCircle()
+        public void TestRemoveStartObject()
         {
             addMultipleObjectsStep();
 
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestRemoveMiddleHitCircle()
+        public void TestRemoveMiddleObject()
         {
             addMultipleObjectsStep();
 
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestMoveHitCircle()
+        public void TestMoveObject()
         {
             addMultipleObjectsStep();
 
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [TestCase(4, 0)] // End -> Start
         [TestCase(4, 2)] // End -> Middle
         [TestCase(4, 4)] // End -> End
-        public void TestReorderHitObjects(int startIndex, int endIndex)
+        public void TestReorderObjects(int startIndex, int endIndex)
         {
             addMultipleObjectsStep();
 
