@@ -52,12 +52,17 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
+        private List<long> userVotes;
+
         [JsonProperty(@"user_votes")]
-        private List<long> userVotes
+        public List<long> UserVotes
         {
+            get => userVotes;
             set
             {
-                foreach (var votedCommentId in value)
+                userVotes = value;
+
+                foreach (var votedCommentId in userVotes)
                 {
                     bool voteFinded = false;
 

@@ -48,6 +48,7 @@ namespace osu.Game.Tests.Visual.Online
                 scroll.Add(commentsContainer = new CommentsContainer());
             });
             AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
+            AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
             AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
             AddStep("local comments", () => commentsContainer.ShowComments(comment_bundle));
             AddStep("local empty comments", () => commentsContainer.ShowComments(empty_comment_bundle));
@@ -119,7 +120,6 @@ namespace osu.Game.Tests.Visual.Online
                     LegacyName = "BigBrainUser",
                     CreatedAt = DateTimeOffset.Now,
                     EditedAt = DateTimeOffset.Now,
-                    IsVoted = true,
                     VotesCount = 1000,
                     EditedById = 1,
                 },
@@ -149,6 +149,10 @@ namespace osu.Game.Tests.Visual.Online
                 },
             },
             IncludedComments = new List<Comment>(),
+            UserVotes = new List<long>
+            {
+                5
+            },
             Users = new List<User>
             {
                 new User
@@ -157,7 +161,8 @@ namespace osu.Game.Tests.Visual.Online
                     Username = "Good_Admin"
                 }
             },
-            TopLevelCount = 10,
+            TopLevelCount = 6,
+            Total = 10
         };
     }
 }

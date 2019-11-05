@@ -14,6 +14,7 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -21,8 +22,6 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
-
-        private readonly Bindable<CommentBundleParameters> parameters = new Bindable<CommentBundleParameters>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -33,13 +32,16 @@ namespace osu.Game.Overlays.Comments
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
+        private CommentBundleParameters parameters;
 
         private readonly Box background;
+        private readonly Container noCommentsPlaceholder;
         private readonly Box placeholderBackground;
         private readonly FillFlowContainer content;
         private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
-        private readonly Container noCommentsPlaceholder;
+        private readonly SpriteText totalCounter;
+        private readonly Container totalCounterContainer;
 
         public CommentsContainer()
         {
@@ -58,6 +60,53 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        totalCounterContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 50,
+                            Alpha = 0,
+                            Child = new FillFlowContainer
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreLeft,
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Margin = new MarginPadding { Left = 50 },
+                                Spacing = new Vector2(5, 0),
+                                Children = new Drawable[]
+                                {
+                                    new SpriteText
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        Font = OsuFont.GetFont(size: 20, italics: true),
+                                        Text = @"Comments"
+                                    },
+                                    new CircularContainer
+                                    {
+                                        Anchor = Anchor.CentreLeft,
+                                        Origin = Anchor.CentreLeft,
+                                        AutoSizeAxes = Axes.Both,
+                                        Masking = true,
+                                        Children = new Drawable[]
+                                        {
+                                            new Box
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Colour = OsuColour.Gray(0.05f)
+                                            },
+                                            totalCounter = new SpriteText
+                                            {
+                                                Anchor = Anchor.Centre,
+                                                Origin = Anchor.Centre,
+                                                Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                                            }
+                                        },
+                                    }
+                                }
+                            },
+                        },
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -138,38 +187,42 @@ namespace osu.Game.Overlays.Comments
         {
             background.Colour = colours.Gray2;
             placeholderBackground.Colour = colours.Gray3;
+            totalCounter.Colour = colours.BlueLighter;
         }
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(_ => updateComments());
+            Sort.BindValueChanged(_ => updateComments(false));
             base.LoadComplete();
         }
 
         public void ShowComments(CommentableType type, long id)
         {
-            parameters.Value = new CommentBundleParameters(type, id);
+            parameters = new CommentBundleParameters(type, id);
             updateComments();
         }
 
         public void ShowComments(CommentBundle commentBundle)
         {
-            parameters.Value = null;
-            clearComments();
+            parameters = null;
+            clearComments(true);
             onSuccess(commentBundle);
         }
 
-        private void updateComments()
+        private void updateComments(bool hideTotalCounter = true)
         {
-            if (parameters.Value == null)
+            if (parameters == null)
                 return;
 
-            clearComments();
+            clearComments(hideTotalCounter);
             getComments();
         }
 
-        private void clearComments()
+        private void clearComments(bool hideTotalCounter)
         {
+            if (hideTotalCounter)
+                totalCounterContainer.Hide();
+
             request?.Cancel();
             loadCancellation?.Cancel();
             currentPage = 1;
@@ -182,16 +235,18 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
-            if (parameters.Value == null)
+            if (parameters == null)
                 return;
 
-            request = new GetCommentsRequest(parameters.Value, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }
 
         private void onSuccess(CommentBundle response)
         {
+            setTotalCounterAmount(response.Total);
+
             if (!response.Comments.Any())
             {
                 noCommentsPlaceholder.Show();
@@ -238,6 +293,12 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Hide();
                 }
             }, loadCancellation.Token);
+        }
+
+        private void setTotalCounterAmount(int amount)
+        {
+            totalCounter.Text = amount.ToString("N0");
+            totalCounterContainer.Show();
         }
 
         protected override void Dispose(bool isDisposing)
