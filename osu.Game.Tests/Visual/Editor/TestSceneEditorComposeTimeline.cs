@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Editor
             }
         }
 
-        private class StartStopButton : Button
+        private class StartStopButton : BasicButton
         {
             private IAdjustableClock adjustableClock;
             private bool started;
