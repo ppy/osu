@@ -11,6 +11,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointRenderer : CompositeDrawable
     {
+        internal IReadOnlyList<FollowPointGroup> Groups => groups;
+
         private readonly List<FollowPointGroup> groups = new List<FollowPointGroup>();
 
         /// <summary>
