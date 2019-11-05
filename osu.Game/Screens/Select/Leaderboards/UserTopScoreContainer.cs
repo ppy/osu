@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (newScore == null)
                 return;
 
-            LoadComponentAsync(new LeaderboardScore(newScore.Score, newScore.Position)
+            LoadComponentAsync(new LeaderboardScore(newScore.Score, newScore.Position, false)
             {
                 Action = () => ScoreSelected?.Invoke(newScore.Score)
             }, drawableScore =>
