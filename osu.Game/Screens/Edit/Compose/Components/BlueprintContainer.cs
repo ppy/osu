@@ -254,29 +254,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             Debug.Assert(!clickSelectionBegan);
 
-            bool hoveringSelected = false;
+            // If a select blueprint is already hovered, disallow changes in selection.
+            if (selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
+                return;
 
-            // Make sure any already-selected blueprints aren't being hovered over
-            foreach (SelectionBlueprint selected in selectionHandler.SelectedBlueprints)
+            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
             {
-                if (selected.IsHovered)
+                if (blueprint.IsHovered)
                 {
-                    hoveringSelected = true;
+                    selectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
+                    clickSelectionBegan = true;
                     break;
-                }
-            }
-
-            // Attempt a new selection at the mouse position
-            if (!hoveringSelected)
-            {
-                foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
-                {
-                    if (blueprint.IsHovered)
-                    {
-                        selectionHandler.HandleSelectionRequested(blueprint, e.CurrentState);
-                        clickSelectionBegan = true;
-                        break;
-                    }
                 }
             }
         }
