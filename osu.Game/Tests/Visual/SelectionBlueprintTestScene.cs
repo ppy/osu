@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class SelectionBlueprintTestScene : OsuTestScene
+    public abstract class SelectionBlueprintTestScene : ManualInputManagerTestScene
     {
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
