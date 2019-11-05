@@ -164,5 +164,9 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = FromHex(@"223034");
+
+        public readonly Color4 CommentsGray = FromHex(@"22282a");
+        public readonly Color4 CommentsGrayLight = FromHex(@"2e3538");
+        public readonly Color4 CommentsGrayLighter = FromHex(@"394246");
     }
 }
