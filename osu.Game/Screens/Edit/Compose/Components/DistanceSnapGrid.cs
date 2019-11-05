@@ -6,26 +6,28 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public abstract class BeatSnapGrid : CompositeDrawable
+    /// <summary>
+    /// A grid which takes user input and returns a quantized ("snapped") position and time.
+    /// </summary>
+    public abstract class DistanceSnapGrid : CompositeDrawable
     {
-        /// <summary>
-        /// The velocity of the beatmap at the point of placement in pixels per millisecond.
-        /// </summary>
-        protected double Velocity { get; private set; }
-
         /// <summary>
         /// The spacing between each tick of the beat snapping grid.
         /// </summary>
         protected float DistanceSpacing { get; private set; }
+
+        /// <summary>
+        /// The snapping time at <see cref="CentrePosition"/>.
+        /// </summary>
+        protected double StartTime { get; private set; }
 
         /// <summary>
         /// The position which the grid is centred on.
@@ -34,33 +36,32 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected readonly Vector2 CentrePosition;
 
         [Resolved]
+        protected OsuColour Colours { get; private set; }
+
+        [Resolved]
+        protected IDistanceSnapProvider SnapProvider { get; private set; }
+
+        [Resolved]
         private IEditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private readonly Cached gridCache = new Cached();
         private readonly HitObject hitObject;
 
-        private double startTime;
-        private double beatLength;
-
-        protected BeatSnapGrid(HitObject hitObject, Vector2 centrePosition)
+        protected DistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
         {
             this.hitObject = hitObject;
-            this.CentrePosition = centrePosition;
 
+            CentrePosition = centrePosition;
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            startTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
-            beatLength = beatmap.ControlPointInfo.TimingPointAt(startTime).BeatLength;
+            StartTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
         }
 
         protected override void LoadComplete()
@@ -72,8 +73,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void updateSpacing()
         {
-            Velocity = GetVelocity(startTime, beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
-            DistanceSpacing = (float)(beatLength / beatDivisor.Value * Velocity);
+            DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(StartTime);
             gridCache.Invalidate();
         }
 
@@ -103,27 +103,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected abstract void CreateContent(Vector2 centrePosition);
 
         /// <summary>
-        /// Retrieves the velocity of gameplay at a point in time in pixels per millisecond.
-        /// </summary>
-        /// <param name="time">The time to retrieve the velocity at.</param>
-        /// <param name="controlPointInfo">The beatmap's <see cref="ControlPointInfo"/> at the point in time.</param>
-        /// <param name="difficulty">The beatmap's <see cref="BeatmapDifficulty"/> at the point in time.</param>
-        /// <returns>The velocity.</returns>
-        protected abstract float GetVelocity(double time, ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty);
-
-        /// <summary>
         /// Snaps a position to this grid.
         /// </summary>
-        /// <param name="position">The original position in coordinate space local to this <see cref="BeatSnapGrid"/>.</param>
-        /// <returns>The snapped position in coordinate space local to this <see cref="BeatSnapGrid"/>.</returns>
-        public abstract Vector2 GetSnapPosition(Vector2 position);
-
-        /// <summary>
-        /// Retrieves the time at a snapped position.
-        /// </summary>
-        /// <param name="position">The snapped position in coordinate space local to this <see cref="BeatSnapGrid"/>.</param>
-        /// <returns>The time at the snapped position.</returns>
-        public double GetSnapTime(Vector2 position) => startTime + (position - CentrePosition).Length / Velocity;
+        /// <param name="position">The original position in coordinate space local to this <see cref="DistanceSnapGrid"/>.</param>
+        /// <returns>A tuple containing the snapped position in coordinate space local to this <see cref="DistanceSnapGrid"/> and the respective time value.</returns>
+        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position);
 
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
@@ -133,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected ColourInfo GetColourForBeatIndex(int index)
         {
             int beat = (index + 1) % beatDivisor.Value;
-            ColourInfo colour = colours.Gray5;
+            ColourInfo colour = Colours.Gray5;
 
             for (int i = 0; i < BindableBeatDivisor.VALID_DIVISORS.Length; i++)
             {
@@ -141,7 +125,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 if ((beat * divisor) % beatDivisor.Value == 0)
                 {
-                    colour = BindableBeatDivisor.GetColourFor(divisor, colours);
+                    colour = BindableBeatDivisor.GetColourFor(divisor, Colours);
                     break;
                 }
             }

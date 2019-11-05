@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             ScreenSpaceStartPosition = screenSpaceStartPosition;
             ScreenSpacePosition = screenSpacePosition;
 
-            InstantDelta = Blueprint.HitObject.Parent.ToLocalSpace(ScreenSpacePosition) - Blueprint.HitObject.Position;
+            InstantDelta = Blueprint.DrawableObject.Parent.ToLocalSpace(ScreenSpacePosition) - Blueprint.DrawableObject.Position;
         }
     }
 }

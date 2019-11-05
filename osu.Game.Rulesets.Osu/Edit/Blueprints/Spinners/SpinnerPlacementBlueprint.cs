@@ -41,8 +41,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             }
             else
             {
-                HitObject.StartTime = EditorClock.CurrentTime;
-
                 isPlacingEnd = true;
                 piece.FadeTo(1f, 150, Easing.OutQuint);
 

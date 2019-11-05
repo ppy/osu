@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Changelog
                             t.Font = fontLarge;
                             t.Colour = entryColour;
                         });
-                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
+                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl,
                             creationParameters: t =>
                             {
                                 t.Font = fontLarge;
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Changelog
                             t.Colour = entryColour;
                         });
                     else if (entry.GithubUser.GithubUrl != null)
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t =>
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
                         {
                             t.Font = fontMedium;
                             t.Colour = entryColour;
