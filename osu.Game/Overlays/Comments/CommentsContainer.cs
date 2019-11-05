@@ -13,14 +13,12 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private readonly CommentableType type;
-        private readonly long id;
-
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
@@ -33,17 +31,17 @@ namespace osu.Game.Overlays.Comments
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
+        private CommentBundleParameters parameters;
 
         private readonly Box background;
+        private readonly Container noCommentsPlaceholder;
+        private readonly Box placeholderBackground;
         private readonly FillFlowContainer content;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
 
-        public CommentsContainer(CommentableType type, long id)
+        public CommentsContainer()
         {
-            this.type = type;
-            this.id = id;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
@@ -63,6 +61,26 @@ namespace osu.Game.Overlays.Comments
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
+                        },
+                        noCommentsPlaceholder = new Container
+                        {
+                            Height = 80,
+                            RelativeSizeAxes = Axes.X,
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                placeholderBackground = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new SpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding { Left = 50 },
+                                    Text = @"No comments yet."
+                                }
+                            }
                         },
                         content = new FillFlowContainer
                         {
@@ -101,7 +119,8 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = getComments
+                                                Action = getComments,
+                                                IsLoading = true,
                                             }
                                         }
                                     }
@@ -117,39 +136,69 @@ namespace osu.Game.Overlays.Comments
         private void load()
         {
             background.Colour = colours.Gray2;
+            placeholderBackground.Colour = colours.Gray3;
         }
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(onSortChanged, true);
+            Sort.BindValueChanged(_ => updateComments());
             base.LoadComplete();
         }
 
-        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
+        public void ShowComments(CommentableType type, long id)
         {
+            parameters = new CommentBundleParameters(type, id);
+            updateComments();
+        }
+
+        public void ShowComments(CommentBundle commentBundle)
+        {
+            parameters = null;
+            clearComments();
+            onSuccess(commentBundle);
+        }
+
+        private void updateComments()
+        {
+            if (parameters == null)
+                return;
+
             clearComments();
             getComments();
         }
 
-        private void getComments()
+        private void clearComments()
         {
             request?.Cancel();
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
+            currentPage = 1;
+            deletedChildrenPlaceholder.DeletedCount.Value = 0;
+            noCommentsPlaceholder.Hide();
+            content.Clear();
+            moreButton.IsLoading = true;
+            moreButton.Show();
+        }
+
+        private void getComments()
+        {
+            if (parameters == null)
+                return;
+
+            request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }
 
-        private void clearComments()
-        {
-            currentPage = 1;
-            deletedChildrenPlaceholder.DeletedCount.Value = 0;
-            moreButton.IsLoading = true;
-            content.Clear();
-        }
-
         private void onSuccess(CommentBundle response)
         {
+            if (!response.Comments.Any())
+            {
+                noCommentsPlaceholder.Show();
+                moreButton.IsLoading = false;
+                moreButton.Hide();
+                return;
+            }
+
             loadCancellation = new CancellationTokenSource();
 
             FillFlowContainer page = new FillFlowContainer
@@ -182,8 +231,10 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
-
-                moreButton.FadeTo(response.HasMore ? 1 : 0);
+                else
+                {
+                    moreButton.Hide();
+                }
             }, loadCancellation.Token);
         }
 

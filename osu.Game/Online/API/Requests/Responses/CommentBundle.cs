@@ -26,7 +26,7 @@ namespace osu.Game.Online.API.Requests.Responses
                         {
                             if (parent.Id == child.ParentId)
                             {
-                                parent.ChildComments.Add(child);
+                                parent.Replies.Add(child);
                                 child.ParentComment = parent;
                             }
                         });
