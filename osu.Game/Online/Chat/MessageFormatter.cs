@@ -81,7 +81,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    var details = getLinkDetails(linkText);
+                    var details = GetLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
                     //adjust the offset for processing the current matches group.
@@ -98,7 +98,7 @@ namespace osu.Game.Online.Chat
                 var linkText = m.Groups["link"].Value;
                 var indexLength = linkText.Length;
 
-                var details = getLinkDetails(linkText);
+                var details = GetLinkDetails(linkText);
                 var link = new Link(linkText, index, indexLength, details.Action, details.Argument);
 
                 // sometimes an already-processed formatted link can reduce to a simple URL, too
@@ -109,7 +109,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private static LinkDetails getLinkDetails(string url)
+        public static LinkDetails GetLinkDetails(string url)
         {
             var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
@@ -255,17 +255,17 @@ namespace osu.Game.Online.Chat
                 OriginalText = Text = text;
             }
         }
+    }
 
-        public class LinkDetails
+    public class LinkDetails
+    {
+        public LinkAction Action;
+        public string Argument;
+
+        public LinkDetails(LinkAction action, string argument)
         {
-            public LinkAction Action;
-            public string Argument;
-
-            public LinkDetails(LinkAction action, string argument)
-            {
-                Action = action;
-                Argument = argument;
-            }
+            Action = action;
+            Argument = argument;
         }
     }
 
@@ -279,6 +279,7 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
+        Custom
     }
 
     public class Link : IComparable<Link>
