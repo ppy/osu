@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private readonly List<FollowPointGroup> groups = new List<FollowPointGroup>();
 
+        public override bool RemoveCompletedTransforms => false;
+
         /// <summary>
         /// Adds the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
