@@ -49,6 +49,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 FollowPointGroup nextGroup = groups[index + 1];
                 group.End = nextGroup.Start;
             }
+            else
+                group.End = null;
 
             if (index > 0)
             {
