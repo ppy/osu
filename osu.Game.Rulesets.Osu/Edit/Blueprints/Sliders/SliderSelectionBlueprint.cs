@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected readonly SliderBodyPiece BodyPiece;
         protected readonly SliderCircleSelectionBlueprint HeadBlueprint;
         protected readonly SliderCircleSelectionBlueprint TailBlueprint;
+        protected readonly PathControlPointVisualiser ControlPointVisualiser;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
@@ -32,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 BodyPiece = new SliderBodyPiece(),
                 HeadBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.Start),
                 TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
-                new PathControlPointVisualiser(sliderObject) { ControlPointsChanged = onNewControlPoints },
+                ControlPointVisualiser = new PathControlPointVisualiser(sliderObject, true) { ControlPointsChanged = onNewControlPoints },
             };
         }
 
@@ -49,6 +50,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(unsnappedPath.Type, controlPoints, snappedDistance);
+
+            UpdateHitObject();
         }
 
         public override Vector2 SelectionPoint => HeadBlueprint.SelectionPoint;

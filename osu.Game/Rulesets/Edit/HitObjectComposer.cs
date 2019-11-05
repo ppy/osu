@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Edit
             EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
-            EditorBeatmap.StartTimeChanged += updateHitObject;
+            EditorBeatmap.StartTimeChanged += UpdateHitObject;
 
             var dependencies = new DependencyContainer(parent);
             dependencies.CacheAs<IEditorBeatmap>(EditorBeatmap);
@@ -225,11 +225,7 @@ namespace osu.Game.Rulesets.Edit
 
         private ScheduledDelegate scheduledUpdate;
 
-        private void addHitObject(HitObject hitObject) => updateHitObject(hitObject);
-
-        private void removeHitObject(HitObject hitObject) => updateHitObject(null);
-
-        private void updateHitObject([CanBeNull] HitObject hitObject)
+        public override void UpdateHitObject(HitObject hitObject)
         {
             scheduledUpdate?.Cancel();
             scheduledUpdate = Schedule(() =>
@@ -239,6 +235,10 @@ namespace osu.Game.Rulesets.Edit
                 beatmapProcessor?.PostProcess();
             });
         }
+
+        private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
+
+        private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
 
         public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
         public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
@@ -351,11 +351,22 @@ namespace osu.Game.Rulesets.Edit
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
+        /// <summary>
+        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
+        public abstract void UpdateHitObject([CanBeNull] HitObject hitObject);
+
         public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
+
         public abstract float GetBeatSnapDistanceAt(double referenceTime);
+
         public abstract float DurationToDistance(double referenceTime, double duration);
+
         public abstract double DistanceToDuration(double referenceTime, float distance);
+
         public abstract double GetSnappedDurationFromDistance(double referenceTime, float distance);
+
         public abstract float GetSnappedDistanceFromDistance(double referenceTime, float distance);
     }
 }
