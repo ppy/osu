@@ -26,7 +26,7 @@ namespace osu.Game.Online.API.Requests.Responses
                         {
                             if (parent.Id == child.ParentId)
                             {
-                                parent.ChildComments.Add(child);
+                                parent.Replies.Add(child);
                                 child.ParentComment = parent;
                             }
                         });
@@ -47,12 +47,16 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"included_comments")]
         public List<Comment> IncludedComments { get; set; }
 
+        private List<long> userVotes;
+
         [JsonProperty(@"user_votes")]
-        private List<long> userVotes
+        public List<long> UserVotes
         {
+            get => userVotes;
             set
             {
-                value.ForEach(v =>
+                userVotes = value;
+                userVotes.ForEach(v =>
                 {
                     Comments.ForEach(c =>
                     {
