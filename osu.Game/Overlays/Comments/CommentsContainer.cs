@@ -26,32 +26,28 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
         private CommentBundleParameters parameters;
+        private Container totalCounterContainer;
+        private Container noCommentsPlaceholder;
+        private FillFlowContainer content;
+        private DeletedCommentsPlaceholder deletedCommentsPlaceholder;
+        private CommentsShowMoreButton moreButton;
+        private SpriteText totalCounter;
 
-        private readonly Box background;
-        private readonly Container noCommentsPlaceholder;
-        private readonly Box placeholderBackground;
-        private readonly FillFlowContainer content;
-        private readonly DeletedCommentsPlaceholder deletedCommentsPlaceholder;
-        private readonly CommentsShowMoreButton moreButton;
-        private readonly SpriteText totalCounter;
-        private readonly Container totalCounterContainer;
-
-        public CommentsContainer()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colours.CommentsGray,
                 },
                 new FillFlowContainer
                 {
@@ -80,7 +76,8 @@ namespace osu.Game.Overlays.Comments
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
                                         Font = OsuFont.GetFont(size: 20, italics: true),
-                                        Text = @"Comments"
+                                        Text = @"Comments",
+                                        Colour = colours.BlueLighter
                                     },
                                     new CircularContainer
                                     {
@@ -100,7 +97,8 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                                                Colour = colours.BlueLighter
                                             }
                                         },
                                     }
@@ -119,9 +117,10 @@ namespace osu.Game.Overlays.Comments
                             Alpha = 0,
                             Children = new Drawable[]
                             {
-                                placeholderBackground = new Box
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Colour = colours.CommentsGrayLight
                                 },
                                 new SpriteText
                                 {
@@ -147,7 +146,7 @@ namespace osu.Game.Overlays.Comments
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.2f)
+                                    Colour = colours.CommentsGrayLight
                                 },
                                 new FillFlowContainer
                                 {
@@ -180,14 +179,6 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            background.Colour = colours.Gray2;
-            placeholderBackground.Colour = colours.Gray3;
-            totalCounter.Colour = colours.BlueLighter;
         }
 
         protected override void LoadComplete()
