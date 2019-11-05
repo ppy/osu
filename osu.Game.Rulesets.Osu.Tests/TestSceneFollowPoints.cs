@@ -2,8 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             Children = new Drawable[]
             {
-                hitObjectContainer = new Container<DrawableOsuHitObject> { RelativeSizeAxes = Axes.Both },
+                hitObjectContainer = new TestHitObjectContainer { RelativeSizeAxes = Axes.Both },
                 followPointRenderer = new FollowPointRenderer { RelativeSizeAxes = Axes.Both }
             };
         });
@@ -35,108 +33,97 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestAddSingleHitCircle()
         {
-            addObjects(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } });
+            addObjectsStep(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } });
+
+            assertGroups();
         }
 
         [Test]
         public void TestRemoveSingleHitCircle()
         {
-            DrawableOsuHitObject obj = null;
+            addObjectsStep(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } });
 
-            addObjects(() => new OsuHitObject[] { new HitCircle { Position = new Vector2(100, 100) } }, o => obj = o);
-            removeObject(() => obj);
+            removeObjectStep(() => getObject(0));
+
+            assertGroups();
         }
 
         [Test]
         public void TestAddMultipleHitCircles()
         {
-            addObjects(() => new OsuHitObject[]
-            {
-                new HitCircle { Position = new Vector2(100, 100) },
-                new HitCircle { Position = new Vector2(200, 200) },
-                new HitCircle { Position = new Vector2(300, 300) },
-                new HitCircle { Position = new Vector2(400, 400) },
-                new HitCircle { Position = new Vector2(500, 500) },
-            });
+            addMultipleObjectsStep();
+
+            assertGroups();
         }
 
         [Test]
         public void TestRemoveEndHitCircle()
         {
-            var objects = new List<DrawableOsuHitObject>();
+            addMultipleObjectsStep();
 
-            AddStep("reset", () => objects.Clear());
+            removeObjectStep(() => getObject(4));
 
-            addObjects(() => new OsuHitObject[]
-            {
-                new HitCircle { Position = new Vector2(100, 100) },
-                new HitCircle { Position = new Vector2(200, 200) },
-                new HitCircle { Position = new Vector2(300, 300) },
-                new HitCircle { Position = new Vector2(400, 400) },
-                new HitCircle { Position = new Vector2(500, 500) },
-            }, o => objects.Add(o));
-
-            removeObject(() => objects.Last());
+            assertGroups();
         }
 
         [Test]
         public void TestRemoveStartHitCircle()
         {
-            var objects = new List<DrawableOsuHitObject>();
+            addMultipleObjectsStep();
 
-            AddStep("reset", () => objects.Clear());
+            removeObjectStep(() => getObject(0));
 
-            addObjects(() => new OsuHitObject[]
-            {
-                new HitCircle { Position = new Vector2(100, 100) },
-                new HitCircle { Position = new Vector2(200, 200) },
-                new HitCircle { Position = new Vector2(300, 300) },
-                new HitCircle { Position = new Vector2(400, 400) },
-                new HitCircle { Position = new Vector2(500, 500) },
-            }, o => objects.Add(o));
-
-            removeObject(() => objects.First());
+            assertGroups();
         }
 
         [Test]
         public void TestRemoveMiddleHitCircle()
         {
-            var objects = new List<DrawableOsuHitObject>();
+            addMultipleObjectsStep();
 
-            AddStep("reset", () => objects.Clear());
+            removeObjectStep(() => getObject(2));
 
-            addObjects(() => new OsuHitObject[]
-            {
-                new HitCircle { Position = new Vector2(100, 100) },
-                new HitCircle { Position = new Vector2(200, 200) },
-                new HitCircle { Position = new Vector2(300, 300) },
-                new HitCircle { Position = new Vector2(400, 400) },
-                new HitCircle { Position = new Vector2(500, 500) },
-            }, o => objects.Add(o));
-
-            removeObject(() => objects[2]);
+            assertGroups();
         }
 
         [Test]
         public void TestMoveHitCircle()
         {
-            var objects = new List<DrawableOsuHitObject>();
+            addMultipleObjectsStep();
 
-            AddStep("reset", () => objects.Clear());
+            AddStep("move hitobject", () => getObject(2).HitObject.Position = new Vector2(300, 100));
 
-            addObjects(() => new OsuHitObject[]
-            {
-                new HitCircle { Position = new Vector2(100, 100) },
-                new HitCircle { Position = new Vector2(200, 200) },
-                new HitCircle { Position = new Vector2(300, 300) },
-                new HitCircle { Position = new Vector2(400, 400) },
-                new HitCircle { Position = new Vector2(500, 500) },
-            }, o => objects.Add(o));
-
-            AddStep("move hitobject", () => objects[2].HitObject.Position = new Vector2(300, 100));
+            assertGroups();
         }
 
-        private void addObjects(Func<OsuHitObject[]> ctorFunc, Action<DrawableOsuHitObject> storeFunc = null)
+        [TestCase(0, 0)] // Start -> Start
+        [TestCase(0, 2)] // Start -> Middle
+        [TestCase(0, 5)] // Start -> End
+        [TestCase(2, 0)] // Middle -> Start
+        [TestCase(1, 3)] // Middle -> Middle (forwards)
+        [TestCase(3, 1)] // Middle -> Middle (backwards)
+        [TestCase(4, 0)] // End -> Start
+        [TestCase(4, 2)] // End -> Middle
+        [TestCase(4, 4)] // End -> End
+        public void TestReorderHitObjects(int startIndex, int endIndex)
+        {
+            addMultipleObjectsStep();
+
+            reorderObjectStep(startIndex, endIndex);
+
+            assertGroups();
+        }
+
+        private void addMultipleObjectsStep() => addObjectsStep(() => new OsuHitObject[]
+        {
+            new HitCircle { Position = new Vector2(100, 100) },
+            new HitCircle { Position = new Vector2(200, 200) },
+            new HitCircle { Position = new Vector2(300, 300) },
+            new HitCircle { Position = new Vector2(400, 400) },
+            new HitCircle { Position = new Vector2(500, 500) },
+        });
+
+        private void addObjectsStep(Func<OsuHitObject[]> ctorFunc)
         {
             AddStep("add hitobjects", () =>
             {
@@ -166,13 +153,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                     hitObjectContainer.Add(drawableObject);
                     followPointRenderer.AddFollowPoints(drawableObject);
-
-                    storeFunc?.Invoke(drawableObject);
                 }
             });
         }
 
-        private void removeObject(Func<DrawableOsuHitObject> getFunc)
+        private void removeObjectStep(Func<DrawableOsuHitObject> getFunc)
         {
             AddStep("remove hitobject", () =>
             {
@@ -181,6 +166,65 @@ namespace osu.Game.Rulesets.Osu.Tests
                 hitObjectContainer.Remove(drawableObject);
                 followPointRenderer.RemoveFollowPoints(drawableObject);
             });
+        }
+
+        private void reorderObjectStep(int startIndex, int endIndex)
+        {
+            AddStep($"move object {startIndex} to {endIndex}", () =>
+            {
+                DrawableOsuHitObject toReorder = getObject(startIndex);
+
+                double targetTime;
+                if (endIndex < hitObjectContainer.Count)
+                    targetTime = getObject(endIndex).HitObject.StartTime - 1;
+                else
+                    targetTime = getObject(hitObjectContainer.Count - 1).HitObject.StartTime + 1;
+
+                hitObjectContainer.Remove(toReorder);
+                toReorder.HitObject.StartTime = targetTime;
+                hitObjectContainer.Add(toReorder);
+            });
+        }
+
+        private void assertGroups()
+        {
+            AddAssert("has correct group count", () => followPointRenderer.Groups.Count == hitObjectContainer.Count);
+            AddAssert("group endpoints are correct", () =>
+            {
+                for (int i = 0; i < hitObjectContainer.Count; i++)
+                {
+                    DrawableOsuHitObject expectedStart = getObject(i);
+                    DrawableOsuHitObject expectedEnd = i < hitObjectContainer.Count - 1 ? getObject(i + 1) : null;
+
+                    if (getGroup(i).Start != expectedStart)
+                        throw new AssertionException($"Object {i} expected to be the start of group {i}.");
+
+                    if (getGroup(i).End != expectedEnd)
+                        throw new AssertionException($"Object {(expectedEnd == null ? "null" : i.ToString())} expected to be the end of group {i}.");
+                }
+
+                return true;
+            });
+        }
+
+        private DrawableOsuHitObject getObject(int index) => hitObjectContainer[index];
+
+        private FollowPointGroup getGroup(int index) => followPointRenderer.Groups[index];
+
+        private class TestHitObjectContainer : Container<DrawableOsuHitObject>
+        {
+            protected override int Compare(Drawable x, Drawable y)
+            {
+                var osuX = (DrawableOsuHitObject)x;
+                var osuY = (DrawableOsuHitObject)y;
+
+                int compare = osuX.HitObject.StartTime.CompareTo(osuY.HitObject.StartTime);
+
+                if (compare == 0)
+                    return base.Compare(x, y);
+
+                return compare;
+            }
         }
     }
 }
