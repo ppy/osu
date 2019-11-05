@@ -255,7 +255,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Debug.Assert(!clickSelectionBegan);
 
             // If a select blueprint is already hovered, disallow changes in selection.
-            if (selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
+            // Exception is made when holding control, as deselection should still be allowed.
+            if (!e.CurrentState.Keyboard.ControlPressed &&
+                selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
                 return;
 
             foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
