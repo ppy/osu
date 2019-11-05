@@ -2,31 +2,29 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.IO.Network;
-using Humanizer;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetCommentsRequest : APIRequest<CommentBundle>
+    public class GetCommentRepliesRequest : APIRequest<CommentBundle>
     {
-        private readonly CommentBundleParameters parameters;
+        private readonly long id;
         private readonly int page;
         private readonly CommentsSortCriteria sort;
 
-        public GetCommentsRequest(CommentBundleParameters parameters, CommentsSortCriteria sort = CommentsSortCriteria.New, int page = 1)
+        public GetCommentRepliesRequest(long id, CommentsSortCriteria sort, int page = 1)
         {
-            this.parameters = parameters;
-            this.sort = sort;
+            this.id = id;
             this.page = page;
+            this.sort = sort;
         }
 
         protected override WebRequest CreateWebRequest()
         {
             var req = base.CreateWebRequest();
 
-            req.AddParameter("commentable_type", parameters.Type.ToString().Underscore().ToLowerInvariant());
-            req.AddParameter("commentable_id", parameters.Id.ToString());
+            req.AddParameter("parent_id", id.ToString());
             req.AddParameter("sort", sort.ToString().ToLowerInvariant());
             req.AddParameter("page", page.ToString());
 
@@ -34,12 +32,5 @@ namespace osu.Game.Online.API.Requests
         }
 
         protected override string Target => "comments";
-    }
-
-    public enum CommentableType
-    {
-        Build,
-        Beatmapset,
-        NewsPost
     }
 }
