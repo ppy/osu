@@ -169,12 +169,19 @@ namespace osu.Game.Screens.Ranking.Pages
                         },
                     },
                 },
-                new ReplayDownloadButton(score)
+                new FillFlowContainer
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Margin = new MarginPadding { Bottom = 10 },
-                    Size = new Vector2(50, 30),
+                    Spacing = new Vector2(5),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        new ReplayDownloadButton(score),
+                        new RetryButton()
+                    }
                 },
             };
 

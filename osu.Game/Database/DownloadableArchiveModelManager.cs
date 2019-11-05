@@ -86,16 +86,7 @@ namespace osu.Game.Database
                 }, TaskCreationOptions.LongRunning);
             };
 
-            request.Failure += error =>
-            {
-                DownloadFailed?.Invoke(request);
-
-                if (error is OperationCanceledException) return;
-
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
-                currentDownloads.Remove(request);
-            };
+            request.Failure += triggerFailure;
 
             notification.CancelRequested += () =>
             {
@@ -108,11 +99,31 @@ namespace osu.Game.Database
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    request.Perform(api);
+                }
+                catch (Exception error)
+                {
+                    triggerFailure(error);
+                }
+            }, TaskCreationOptions.LongRunning);
 
             DownloadBegan?.Invoke(request);
-
             return true;
+
+            void triggerFailure(Exception error)
+            {
+                DownloadFailed?.Invoke(request);
+
+                if (error is OperationCanceledException) return;
+
+                notification.State = ProgressNotificationState.Cancelled;
+                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
+                currentDownloads.Remove(request);
+            }
         }
 
         public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, modelStore.ConsumableItems.Where(m => !m.DeletePending));
