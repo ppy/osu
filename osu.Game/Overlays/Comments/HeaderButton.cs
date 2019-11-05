@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray4;
+            background.Colour = colours.CommentsGrayLighter;
         }
 
         protected override bool OnHover(HoverEvent e)
