@@ -17,7 +17,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarButton : Button
+    public class SidebarButton : BasicButton
     {
         private readonly SpriteIcon drawableIcon;
         private readonly SpriteText headerText;
