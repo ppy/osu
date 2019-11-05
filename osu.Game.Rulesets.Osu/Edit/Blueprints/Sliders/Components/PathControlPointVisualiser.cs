@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
@@ -15,7 +16,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointVisualiser : CompositeDrawable
+    public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         public Action<Vector2[]> ControlPointsChanged;
 
@@ -84,11 +85,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(PlatformAction action)
         {
-            switch (e.Key)
+            switch (action.ActionMethod)
             {
-                case Key.Delete:
+                case PlatformActionMethod.Delete:
                     var newControlPoints = new List<Vector2>();
 
                     foreach (var piece in Pieces)
@@ -127,5 +128,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             return false;
         }
+
+        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
     }
 }
