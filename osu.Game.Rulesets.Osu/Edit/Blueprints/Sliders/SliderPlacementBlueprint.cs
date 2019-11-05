@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                new PathControlPointVisualiser(HitObject) { ControlPointsChanged = _ => updateSlider() },
+                new PathControlPointVisualiser(HitObject, false) { ControlPointsChanged = _ => updateSlider() },
             };
 
             setState(PlacementState.Initial);
