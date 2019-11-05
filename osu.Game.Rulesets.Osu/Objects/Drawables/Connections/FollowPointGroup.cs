@@ -11,12 +11,18 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
+    /// <summary>
+    /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
+    /// </summary>
     public class FollowPointGroup : CompositeDrawable
     {
         // Todo: These shouldn't be constants
         private const int spacing = 32;
         private const double preempt = 800;
 
+        /// <summary>
+        /// The start time of <see cref="Start"/>.
+        /// </summary>
         public readonly Bindable<double> StartTime = new Bindable<double>();
 
         /// <summary>

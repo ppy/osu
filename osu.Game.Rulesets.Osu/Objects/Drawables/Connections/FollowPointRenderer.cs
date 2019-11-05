@@ -9,8 +9,14 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
+    /// <summary>
+    /// Visualises groups of <see cref="FollowPoint"/>s.
+    /// </summary>
     public class FollowPointRenderer : CompositeDrawable
     {
+        /// <summary>
+        /// All the <see cref="FollowPointGroup"/>s contained by this <see cref="FollowPointRenderer"/>.
+        /// </summary>
         internal IReadOnlyList<FollowPointGroup> Groups => groups;
 
         private readonly List<FollowPointGroup> groups = new List<FollowPointGroup>();
@@ -46,21 +52,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             if (index < groups.Count - 1)
             {
-                // Update the group's end point to the next hitobject
+                // Update the group's end point to the next group's start point
                 //     h1 -> -> -> h2
-                //  hitObject   nextGroup
+                //    group    nextGroup
 
                 FollowPointGroup nextGroup = groups[index + 1];
                 group.End = nextGroup.Start;
             }
             else
+            {
+                // The end point may be non-null during re-ordering
                 group.End = null;
+            }
 
             if (index > 0)
             {
-                // Previous group's end point to the current group's start point
+                // Update the previous group's end point to the current group's start point
                 //     h1 -> -> -> h2
-                //  prevGroup   hitObject
+                //  prevGroup    group
 
                 FollowPointGroup previousGroup = groups[index - 1];
                 previousGroup.End = group.Start;
@@ -95,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private void onStartTimeChanged(FollowPointGroup group)
         {
-            // Naive but can be improved if performance becomes problematic
+            // Naive but can be improved if performance becomes an issue
             removeGroup(group);
             addGroup(group);
         }
