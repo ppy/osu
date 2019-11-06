@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void assertGroups()
         {
-            AddAssert("has correct group count", () => followPointRenderer.Groups.Count == hitObjectContainer.Count);
+            AddAssert("has correct group count", () => followPointRenderer.Connections.Count == hitObjectContainer.Count);
             AddAssert("group endpoints are correct", () =>
             {
                 for (int i = 0; i < hitObjectContainer.Count; i++)
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private DrawableOsuHitObject getObject(int index) => hitObjectContainer[index];
 
-        private FollowPointGroup getGroup(int index) => followPointRenderer.Groups[index];
+        private FollowPointConnection getGroup(int index) => followPointRenderer.Connections[index];
 
         private class TestHitObjectContainer : Container<DrawableOsuHitObject>
         {

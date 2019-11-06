@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Visualises the <see cref="FollowPoint"/>s between two <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
-    public class FollowPointGroup : CompositeDrawable
+    public class FollowPointConnection : CompositeDrawable
     {
         // Todo: These shouldn't be constants
         private const int spacing = 32;
@@ -32,10 +32,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         public readonly DrawableOsuHitObject Start;
 
         /// <summary>
-        /// Creates a new <see cref="FollowPointGroup"/>.
+        /// Creates a new <see cref="FollowPointConnection"/>.
         /// </summary>
         /// <param name="start">The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.</param>
-        public FollowPointGroup([NotNull] DrawableOsuHitObject start)
+        public FollowPointConnection([NotNull] DrawableOsuHitObject start)
         {
             Start = start;
 
