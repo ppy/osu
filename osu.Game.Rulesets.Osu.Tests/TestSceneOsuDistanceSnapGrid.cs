@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public new float DistanceSpacing => base.DistanceSpacing;
 
             public TestOsuDistanceSnapGrid(OsuHitObject hitObject)
-                : base(hitObject)
+                : base(hitObject, null)
             {
             }
         }
