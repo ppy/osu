@@ -8,7 +8,7 @@ namespace osu.Game.Skinning
         public const decimal LATEST_VERSION = 2.7m;
 
         /// <summary>
-        /// Legacy version of this skin.
+        /// Legacy version of this skin. Null if no version was set to allow fallback to a parent skin version.
         /// </summary>
         public decimal? LegacyVersion { get; internal set; }
     }
