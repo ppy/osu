@@ -46,6 +46,8 @@ namespace osu.Game.Skinning
             else
                 Configuration = new SkinConfiguration();
 
+            Configuration.AllowDefaultColoursFallback = AllowDefaultColoursFallback;
+
             if (storage != null)
             {
                 Samples = audioManager?.GetSampleStore(storage);
@@ -68,10 +70,9 @@ namespace osu.Game.Skinning
                     switch (global)
                     {
                         case GlobalSkinConfiguration.ComboColours:
-                            if (Configuration.ComboColours.Any())
-                                return SkinUtils.As<TValue>(new Bindable<List<Color4>>(Configuration.ComboColours));
-                            else if (AllowDefaultColoursFallback)
-                                return SkinUtils.As<TValue>(new Bindable<List<Color4>>(new DefaultSkinConfiguration().ComboColours));
+                            var comboColours = Configuration.ComboColours;
+                            if (comboColours != null)
+                                return SkinUtils.As<TValue>(new Bindable<List<Color4>>(comboColours));
 
                             break;
                     }
