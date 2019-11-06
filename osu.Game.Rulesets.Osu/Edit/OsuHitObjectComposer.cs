@@ -64,30 +64,37 @@ namespace osu.Game.Rulesets.Osu.Edit
                 return createGrid(h => h.StartTime <= EditorClock.CurrentTime);
 
             double minTime = objects.Min(h => h.StartTime);
-            return createGrid(h => h.StartTime < minTime);
+            return createGrid(h => h.StartTime < minTime, objects.Count + 1);
         }
 
-        private OsuDistanceSnapGrid createGrid(Func<HitObject, bool> hitObjectSelector)
+        /// <summary>
+        /// Creates a grid from the last <see cref="HitObject"/> matching a predicate to a target <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="sourceSelector">A predicate that matches <see cref="HitObject"/>s where the grid can start from.
+        /// Only the last <see cref="HitObject"/> matching the predicate is used.</param>
+        /// <param name="targetOffset">An offset from the <see cref="HitObject"/> selected via <paramref name="sourceSelector"/> at which the grid should stop.</param>
+        /// <returns>The <see cref="OsuDistanceSnapGrid"/> from a selected <see cref="HitObject"/> to a target <see cref="HitObject"/>.</returns>
+        private OsuDistanceSnapGrid createGrid(Func<HitObject, bool> sourceSelector, int targetOffset = 1)
         {
-            int lastIndex = -1;
+            if (targetOffset < 1) throw new ArgumentOutOfRangeException(nameof(targetOffset));
+
+            int sourceIndex = -1;
 
             for (int i = 0; i < EditorBeatmap.HitObjects.Count; i++)
             {
-                HitObject hitObject = EditorBeatmap.HitObjects[i];
-
-                if (!hitObjectSelector(hitObject))
+                if (!sourceSelector(EditorBeatmap.HitObjects[i]))
                     break;
 
-                lastIndex = i;
+                sourceIndex = i;
             }
 
-            if (lastIndex == -1)
+            if (sourceIndex == -1)
                 return null;
 
-            OsuHitObject lastObject = EditorBeatmap.HitObjects[lastIndex];
-            OsuHitObject nextObject = lastIndex == EditorBeatmap.HitObjects.Count - 1 ? null : EditorBeatmap.HitObjects[lastIndex + 1];
+            OsuHitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
+            OsuHitObject targetObject = sourceIndex + targetOffset < EditorBeatmap.HitObjects.Count ? EditorBeatmap.HitObjects[sourceIndex + targetOffset] : null;
 
-            return new OsuDistanceSnapGrid(lastObject, nextObject);
+            return new OsuDistanceSnapGrid(sourceObject, targetObject);
         }
     }
 }
