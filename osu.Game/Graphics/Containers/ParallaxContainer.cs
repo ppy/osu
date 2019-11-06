@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.Containers
 
                 double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000);
 
-                content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, 1000, Easing.OutQuint);
+                content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, 100, Easing.OutQuint);
                 content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + System.Math.Abs(ParallaxAmount)), 0, 1000, Easing.OutQuint);
             }
 
