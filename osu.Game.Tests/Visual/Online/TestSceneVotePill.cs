@@ -10,6 +10,7 @@ using osu.Framework.Allocation;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using osu.Framework.MathUtils;
+using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -20,6 +21,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(VotePill)
         };
+
+        protected override bool UseOnlineAPI => true;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private VotePill votePill;
 
@@ -33,7 +39,7 @@ namespace osu.Game.Tests.Visual.Online
                 VotesCount = 2,
             };
 
-            AddStep("Log in", () => API.LocalUser.Value = new User
+            AddStep("Log in", () => api.LocalUser.Value = new User
             {
                 Id = RNG.Next(2, 100000)
             });
@@ -45,7 +51,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Click", () => votePill.Click());
             AddAssert("Loading", () => votePill.IsLoading);
 
-            AddStep("Log out", API.Logout);
+            AddStep("Log out", api.Logout);
             AddStep("Random comment", () => addVotePill(randomComment));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
@@ -54,7 +60,7 @@ namespace osu.Game.Tests.Visual.Online
         private Comment getUserComment() => new Comment
         {
             IsVoted = false,
-            UserId = API.LocalUser.Value.Id,
+            UserId = api.LocalUser.Value.Id,
             VotesCount = 10,
         };
 
