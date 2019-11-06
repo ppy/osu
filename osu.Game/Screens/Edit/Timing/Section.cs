@@ -119,7 +119,11 @@ namespace osu.Game.Screens.Edit.Timing
                 ControlPoint.Value = points.NewValue?.ControlPoints.OfType<T>().FirstOrDefault();
                 checkbox.Current.Value = ControlPoint.Value != null;
             }, true);
+
+            ControlPoint.BindValueChanged(OnControlPointChanged, true);
         }
+
+        protected abstract void OnControlPointChanged(ValueChangedEvent<T> point);
 
         protected abstract T CreatePoint();
     }

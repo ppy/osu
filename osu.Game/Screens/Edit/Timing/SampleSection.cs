@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Sprites;
 
@@ -22,15 +23,10 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
-        protected override void LoadComplete()
+        protected override void OnControlPointChanged(ValueChangedEvent<SampleControlPoint> point)
         {
-            base.LoadComplete();
-
-            ControlPoint.BindValueChanged(point =>
-            {
-                bank.Text = $"Bank: {point.NewValue?.SampleBank}";
-                volume.Text = $"Volume: {point.NewValue?.SampleVolume}%";
-            });
+            bank.Text = $"Bank: {point.NewValue?.SampleBank}";
+            volume.Text = $"Volume: {point.NewValue?.SampleVolume}%";
         }
 
         protected override SampleControlPoint CreatePoint()
