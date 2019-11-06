@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,9 +15,9 @@ namespace osu.Game.Screens.Edit.Timing
     public class RowAttribute : CompositeDrawable, IHasTooltip
     {
         private readonly string header;
-        private readonly string content;
+        private readonly Func<string> content;
 
-        public RowAttribute(string header, string content)
+        public RowAttribute(string header, Func<string> content)
         {
             this.header = header;
             this.content = content;
@@ -54,6 +55,6 @@ namespace osu.Game.Screens.Edit.Timing
             };
         }
 
-        public string TooltipText => content;
+        public string TooltipText => content();
     }
 }
