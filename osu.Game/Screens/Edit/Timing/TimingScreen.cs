@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Timing
     public class TimingScreen : EditorScreenWithTimeline
     {
         [Cached]
-        private Bindable<ControlPointGroup> selectedPoints = new Bindable<ControlPointGroup>();
+        private Bindable<ControlPointGroup> selectedGroup = new Bindable<ControlPointGroup>();
 
         [Resolved]
         private IAdjustableClock clock { get; set; }
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedPoints.BindValueChanged(selected => { clock.Seek(selected.NewValue.Time); });
+            selectedGroup.BindValueChanged(selected => { clock.Seek(selected.NewValue.Time); });
         }
 
         public class ControlPointList : CompositeDrawable
