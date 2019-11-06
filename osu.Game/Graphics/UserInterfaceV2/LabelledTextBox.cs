@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledTextBox : LabelledComponent<OsuTextBox>
+    public class LabelledTextBox : LabelledComponent<OsuTextBox, string>
     {
         public event TextBox.OnCommitHandler OnCommit;
 

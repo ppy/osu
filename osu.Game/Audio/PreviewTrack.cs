@@ -9,15 +9,18 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Audio
 {
+    [LongRunningLoad]
     public abstract class PreviewTrack : Component
     {
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has stopped playing.
+        /// Not invoked in a thread-safe context.
         /// </summary>
         public event Action Stopped;
 
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has started playing.
+        /// Not invoked in a thread-safe context.
         /// </summary>
         public event Action Started;
 
@@ -29,7 +32,7 @@ namespace osu.Game.Audio
         {
             track = GetTrack();
             if (track != null)
-                track.Completed += () => Schedule(Stop);
+                track.Completed += Stop;
         }
 
         /// <summary>
@@ -93,6 +96,7 @@ namespace osu.Game.Audio
             hasStarted = false;
 
             track.Stop();
+
             Stopped?.Invoke();
         }
 

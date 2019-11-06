@@ -22,7 +22,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Editor
 {
     [TestFixture]
-    public class TestSceneHitObjectComposer : OsuTestScene
+    public class TestSceneHitObjectComposer : EditorClockTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

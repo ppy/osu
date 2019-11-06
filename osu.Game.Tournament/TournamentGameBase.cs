@@ -215,7 +215,7 @@ namespace osu.Game.Tournament
 
             foreach (var r in ladder.Rounds)
             foreach (var b in r.Beatmaps)
-                if (b.BeatmapInfo == null)
+                if (b.BeatmapInfo == null && b.ID > 0)
                 {
                     var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                     req.Perform(API);
