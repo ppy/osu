@@ -5,7 +5,7 @@ namespace osu.Game.Skinning
 {
     public class LegacySkinConfiguration : DefaultSkinConfiguration
     {
-        public const decimal LATEST_VERSION = 2.5m;
+        public const decimal LATEST_VERSION = 2.7m;
 
         /// <summary>
         /// Legacy version of this skin.
