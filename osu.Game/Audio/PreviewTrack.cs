@@ -9,6 +9,7 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Audio
 {
+    [LongRunningLoad]
     public abstract class PreviewTrack : Component
     {
         /// <summary>
