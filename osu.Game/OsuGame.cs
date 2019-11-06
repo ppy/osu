@@ -215,31 +215,102 @@ namespace osu.Game
 
         private ExternalLinkOpener externalLinkOpener;
 
-        public void OpenUrlExternally(string url)
+        /// <summary>
+        /// Handle an arbitrary URL. Displays via in-game overlays where possible.
+        /// This can be called from a non-thread-safe non-game-loaded state.
+        /// </summary>
+        /// <param name="url">The URL to load.</param>
+        public void HandleLink(string url) => HandleLink(MessageFormatter.GetLinkDetails(url));
+
+        /// <summary>
+        /// Handle a specific <see cref="LinkDetails"/>.
+        /// This can be called from a non-thread-safe non-game-loaded state.
+        /// </summary>
+        /// <param name="link">The link to load.</param>
+        public void HandleLink(LinkDetails link) => Schedule(() =>
+        {
+            switch (link.Action)
+            {
+                case LinkAction.OpenBeatmap:
+                    // TODO: proper query params handling
+                    if (link.Argument != null && int.TryParse(link.Argument.Contains('?') ? link.Argument.Split('?')[0] : link.Argument, out int beatmapId))
+                        ShowBeatmap(beatmapId);
+                    break;
+
+                case LinkAction.OpenBeatmapSet:
+                    if (int.TryParse(link.Argument, out int setId))
+                        ShowBeatmapSet(setId);
+                    break;
+
+                case LinkAction.OpenChannel:
+                    ShowChannel(link.Argument);
+                    break;
+
+                case LinkAction.OpenEditorTimestamp:
+                case LinkAction.JoinMultiplayerMatch:
+                case LinkAction.Spectate:
+                    waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
+                    {
+                        Text = @"This link type is not yet supported!",
+                        Icon = FontAwesome.Solid.LifeRing,
+                    }));
+                    break;
+
+                case LinkAction.External:
+                    OpenUrlExternally(link.Argument);
+                    break;
+
+                case LinkAction.OpenUserProfile:
+                    if (long.TryParse(link.Argument, out long userId))
+                        ShowUser(userId);
+                    break;
+
+                default:
+                    throw new NotImplementedException($"This {nameof(LinkAction)} ({link.Action.ToString()}) is missing an associated action.");
+            }
+        });
+
+        public void OpenUrlExternally(string url) => waitForReady(() => externalLinkOpener, _ =>
         {
             if (url.StartsWith("/"))
                 url = $"{API.Endpoint}{url}";
 
             externalLinkOpener.OpenUrlExternally(url);
-        }
+        });
+
+        /// <summary>
+        /// Open a specific channel in chat.
+        /// </summary>
+        /// <param name="channel">The channel to display.</param>
+        public void ShowChannel(string channel) => waitForReady(() => channelManager, _ =>
+        {
+            try
+            {
+                channelManager.OpenChannel(channel);
+            }
+            catch (ChannelNotFoundException)
+            {
+                Logger.Log($"The requested channel \"{channel}\" does not exist");
+            }
+        });
 
         /// <summary>
         /// Show a beatmap set as an overlay.
         /// </summary>
         /// <param name="setId">The set to display.</param>
-        public void ShowBeatmapSet(int setId) => beatmapSetOverlay.FetchAndShowBeatmapSet(setId);
+        public void ShowBeatmapSet(int setId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmapSet(setId));
 
         /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
-        public void ShowUser(long userId) => userProfile.ShowUser(userId);
+        public void ShowUser(long userId) => waitForReady(() => userProfile, _ => userProfile.ShowUser(userId));
 
         /// <summary>
         /// Show a beatmap's set as an overlay, displaying the given beatmap.
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
-        public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
+        public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
@@ -395,6 +466,23 @@ namespace osu.Game
             menuScreen?.MakeCurrent();
 
             performFromMainMenuTask = Schedule(() => performFromMainMenu(action, taskName));
+        }
+
+        /// <summary>
+        /// Wait for the game (and target component) to become loaded and then run an action.
+        /// </summary>
+        /// <param name="retrieveInstance">A function to retrieve a (potentially not-yet-constructed) target instance.</param>
+        /// <param name="action">The action to perform on the instance when load is confirmed.</param>
+        /// <typeparam name="T">The type of the target instance.</typeparam>
+        private void waitForReady<T>(Func<T> retrieveInstance, Action<T> action)
+            where T : Drawable
+        {
+            var instance = retrieveInstance();
+
+            if (ScreenStack == null || ScreenStack.CurrentScreen is StartupScreen || instance?.IsLoaded != true)
+                Schedule(() => waitForReady(retrieveInstance, action));
+            else
+                action(instance);
         }
 
         protected override void Dispose(bool isDisposing)

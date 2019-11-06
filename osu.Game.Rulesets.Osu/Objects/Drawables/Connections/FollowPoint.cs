@@ -12,6 +12,9 @@ using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
+    /// <summary>
+    /// A single follow point positioned between two adjacent <see cref="DrawableOsuHitObject"/>s.
+    /// </summary>
     public class FollowPoint : Container
     {
         private const float width = 8;
