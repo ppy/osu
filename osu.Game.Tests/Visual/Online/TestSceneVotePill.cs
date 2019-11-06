@@ -7,8 +7,6 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Users;
-using osu.Framework.MathUtils;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -25,10 +23,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestUserCommentPill()
         {
-            AddStep("Log in", () => API.LocalUser.Value = new User
-            {
-                Id = RNG.Next(2, 100000)
-            });
+            AddStep("Log in", logIn);
             AddStep("User comment", () => addVotePill(getUserComment()));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
@@ -37,10 +32,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestRandomCommentPill()
         {
-            AddStep("Log in", () => API.LocalUser.Value = new User
-            {
-                Id = RNG.Next(2, 100000)
-            });
+            AddStep("Log in", logIn);
             AddStep("Random comment", () => addVotePill(getRandomComment()));
             AddStep("Click", () => votePill.Click());
             AddAssert("Loading", () => votePill.IsLoading);
@@ -54,6 +46,8 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
         }
+
+        private void logIn() => API.Login("localUser", "password");
 
         private Comment getUserComment() => new Comment
         {
