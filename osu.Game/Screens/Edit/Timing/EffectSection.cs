@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterfaceV2;
 
@@ -22,18 +23,13 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
-        protected override void LoadComplete()
+        protected override void OnControlPointChanged(ValueChangedEvent<EffectControlPoint> point)
         {
-            base.LoadComplete();
-
-            ControlPoint.BindValueChanged(point =>
+            if (point.NewValue != null)
             {
-                if (point.NewValue != null)
-                {
-                    kiai.Current = point.NewValue.KiaiModeBindable;
-                    omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
-                }
-            });
+                kiai.Current = point.NewValue.KiaiModeBindable;
+                omitBarLine.Current = point.NewValue.OmitFirstBarLineBindable;
+            }
         }
 
         protected override EffectControlPoint CreatePoint()

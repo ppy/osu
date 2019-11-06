@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings;
@@ -31,6 +32,15 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
+        protected override void OnControlPointChanged(ValueChangedEvent<SampleControlPoint> point)
+        {
+            if (point.NewValue != null)
+            {
+                bank.Current = point.NewValue.SampleBankBindable;
+                volume.Bindable = point.NewValue.SampleVolumeBindable;
+            }
+        }
+
         protected override SampleControlPoint CreatePoint()
         {
             var reference = Beatmap.Value.Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
@@ -40,20 +50,6 @@ namespace osu.Game.Screens.Edit.Timing
                 SampleBank = reference.SampleBank,
                 SampleVolume = reference.SampleVolume,
             };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            ControlPoint.BindValueChanged(point =>
-            {
-                if (point.NewValue != null)
-                {
-                    bank.Current = point.NewValue.SampleBankBindable;
-                    volume.Bindable = point.NewValue.SampleVolumeBindable;
-                }
-            });
         }
     }
 }

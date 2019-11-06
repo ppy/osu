@@ -32,18 +32,13 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
-        protected override void LoadComplete()
+        protected override void OnControlPointChanged(ValueChangedEvent<TimingControlPoint> point)
         {
-            base.LoadComplete();
-
-            ControlPoint.BindValueChanged(point =>
+            if (point.NewValue != null)
             {
-                if (point.NewValue != null)
-                {
-                    bpm.Bindable = point.NewValue.BeatLengthBindable;
-                    timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
-                }
-            });
+                bpm.Bindable = point.NewValue.BeatLengthBindable;
+                timeSignature.Bindable = point.NewValue.TimeSignatureBindable;
+            }
         }
 
         protected override TimingControlPoint CreatePoint()
