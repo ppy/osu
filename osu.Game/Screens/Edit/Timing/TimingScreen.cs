@@ -47,7 +47,11 @@ namespace osu.Game.Screens.Edit.Timing
         {
             base.LoadComplete();
 
-            selectedGroup.BindValueChanged(selected => { clock.Seek(selected.NewValue.Time); });
+            selectedGroup.BindValueChanged(selected =>
+            {
+                if (selected.NewValue != null)
+                    clock.Seek(selected.NewValue.Time);
+            });
         }
 
         public class ControlPointList : CompositeDrawable
