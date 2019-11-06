@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// </summary>
         /// <param name="connection">The <see cref="FollowPointConnection"/> to add.</param>
         /// <returns>The index of <paramref name="connection"/> in <see cref="connections"/>.</returns>
-        private int addConnection(FollowPointConnection connection)
+        private void addConnection(FollowPointConnection connection)
         {
             AddInternal(connection);
 
@@ -74,8 +74,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 FollowPointConnection previousConnection = connections[index - 1];
                 previousConnection.End = connection.Start;
             }
-
-            return index;
         }
 
         /// <summary>
@@ -83,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// </summary>
         /// <param name="connection">The <see cref="FollowPointConnection"/> to remove.</param>
         /// <returns>Whether <paramref name="connection"/> was removed.</returns>
-        private bool removeGroup(FollowPointConnection connection)
+        private void removeGroup(FollowPointConnection connection)
         {
             RemoveInternal(connection);
 
@@ -99,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 previousConnection.End = connection.End;
             }
 
-            return connections.Remove(connection);
+            connections.Remove(connection);
         }
 
         private void onStartTimeChanged(FollowPointConnection connection)
