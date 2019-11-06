@@ -174,6 +174,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     FillColour = colours.Yellow,
+                                    BackgroundColour = colours.YellowDarker.Opacity(0.5f),
                                     OnSeek = musicController.SeekTo
                                 }
                             },
