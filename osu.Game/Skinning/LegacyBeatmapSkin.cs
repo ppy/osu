@@ -9,7 +9,7 @@ namespace osu.Game.Skinning
 {
     public class LegacyBeatmapSkin : LegacySkin
     {
-        // Null should be returned in the case of no colours provided to fallback into current skin's colours.
+        // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
         protected override bool AllowDefaultColoursFallback => false;
 
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, AudioManager audioManager)
