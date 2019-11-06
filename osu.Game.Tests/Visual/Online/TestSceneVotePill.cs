@@ -29,16 +29,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private VotePill votePill;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        [Test]
+        public void TestUserCommentPill()
         {
-            var randomComment = new Comment
-            {
-                IsVoted = false,
-                UserId = 4444,
-                VotesCount = 2,
-            };
-
             AddStep("Log in", () => api.LocalUser.Value = new User
             {
                 Id = RNG.Next(2, 100000)
@@ -46,13 +39,25 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("User comment", () => addVotePill(getUserComment()));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
+        }
 
-            AddStep("Random comment", () => addVotePill(randomComment));
+        [Test]
+        public void TestRandomCommentPill()
+        {
+            AddStep("Log in", () => api.LocalUser.Value = new User
+            {
+                Id = RNG.Next(2, 100000)
+            });
+            AddStep("Random comment", () => addVotePill(getRandomComment()));
             AddStep("Click", () => votePill.Click());
             AddAssert("Loading", () => votePill.IsLoading);
+        }
 
+        [Test]
+        public void TestOfflineRandomCommentPill()
+        {
             AddStep("Log out", api.Logout);
-            AddStep("Random comment", () => addVotePill(randomComment));
+            AddStep("Random comment", () => addVotePill(getRandomComment()));
             AddStep("Click", () => votePill.Click());
             AddAssert("Not loading", () => !votePill.IsLoading);
         }
@@ -62,6 +67,13 @@ namespace osu.Game.Tests.Visual.Online
             IsVoted = false,
             UserId = api.LocalUser.Value.Id,
             VotesCount = 10,
+        };
+
+        private Comment getRandomComment() => new Comment
+        {
+            IsVoted = false,
+            UserId = 4444,
+            VotesCount = 2,
         };
 
         private void addVotePill(Comment comment)
