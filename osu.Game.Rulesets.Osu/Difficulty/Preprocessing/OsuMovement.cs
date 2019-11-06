@@ -172,6 +172,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             movement.IP12 = IP12;
 
+            var pos0 = Vector<double>.Build.Dense(2);
+            var pos3 = Vector<double>.Build.Dense(2);
             var s01 = Vector<double>.Build.Dense(2);
             var s23 = Vector<double>.Build.Dense(2);
             double d01 = 0;
@@ -190,7 +192,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double correction0 = 0;
             if (obj0 != null)
             {
-                var pos0 = Vector<double>.Build.Dense(new[] {(double)obj0.Position.X, (double)obj0.Position.Y});
+                pos0 = Vector<double>.Build.Dense(new[] {(double)obj0.Position.X, (double)obj0.Position.Y});
                 s01 = (pos1 - pos0) / (2 * obj2.Radius);
                 d01 = s01.L2Norm();
                 t01 = (obj1.StartTime - obj0.StartTime) / clockRate / 1000.0;
@@ -241,13 +243,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                         flowiness012 = SpecialFunctions.Logistic((correction0Snap - correction0Flow - 0.05) * 20);
 
                         correction0 = Mean.PowerMean(new double[] { correction0Flow, correction0Snap, correction0Stop }, -10) * 1.3;
-
-                        //Console.Write(obj2.StartTime + " ");
-                        //Console.Write(correction0Flow.ToString("N3") + " ");
-                        //Console.Write(correction0Snap.ToString("N3") + " ");
-                        //Console.Write(correction0Stop.ToString("N3") + " ");
-                        //Console.Write(correction0.ToString("N3") + " ");
-                        //Console.WriteLine();
                     }
                 }
             }
@@ -258,7 +253,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (obj3 != null)
             {
-                var pos3 = Vector<double>.Build.Dense(new[] { (double)obj3.Position.X, (double)obj3.Position.Y });
+                pos3 = Vector<double>.Build.Dense(new[] { (double)obj3.Position.X, (double)obj3.Position.Y });
                 s23 = (pos3 - pos2) / (2 * obj2.Radius);
                 d23 = s23.L2Norm();
                 t23 = (obj3.StartTime - obj2.StartTime) / clockRate / 1000.0;
@@ -391,6 +386,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 d12StackedNerf = Math.Max(1.4 * (d12 - stackedThreshold) + stackedThreshold, 0);
             else
                 d12StackedNerf = d12;
+
+            // Correction #8 - Stacked wiggle fix
+            if (obj0 != null && obj3 != null)
+            {
+                var d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
+                var d13 = ((pos3 - pos1) / (2 * obj2.Radius)).L2Norm();
+                var d03 = ((pos3 - pos0) / (2 * obj2.Radius)).L2Norm();
+
+                if (d01 < 1 && d02 < 1 && d03 < 1 && d12 < 1 && d13 < 1 && d23 < 1)
+                {
+                    correction0 = 0;
+                    correction3 = 0;
+                    patternCorrection = 0;
+                    tapCorrection = 0;
+                }
+            }
 
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
