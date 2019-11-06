@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
@@ -153,7 +153,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 };
             }
 
-            private IReadOnlyList<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+            private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
 
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
