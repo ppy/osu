@@ -34,6 +34,7 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
 
             AddStep("get track", () => track = getOwnedTrack());
+            AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start", () => track.Start());
             AddAssert("started", () => track.IsRunning);
             AddStep("stop", () => track.Stop());
@@ -52,6 +53,8 @@ namespace osu.Game.Tests.Visual.Components
                 track2 = getOwnedTrack();
             });
 
+            AddUntilStep("wait loaded", () => track1.IsLoaded && track2.IsLoaded);
+
             AddStep("start track 1", () => track1.Start());
             AddStep("start track 2", () => track2.Start());
             AddAssert("track 1 stopped", () => !track1.IsRunning);
@@ -64,6 +67,7 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
 
             AddStep("get track", () => track = getOwnedTrack());
+            AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start", () => track.Start());
             AddStep("stop by owner", () => trackManager.StopAnyPlaying(this));
             AddAssert("stopped", () => !track.IsRunning);
@@ -76,6 +80,7 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
 
             AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
+            AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start", () => track.Start());
             AddStep("attempt stop", () => trackManager.StopAnyPlaying(this));
             AddAssert("not stopped", () => track.IsRunning);
@@ -89,16 +94,24 @@ namespace osu.Game.Tests.Visual.Components
         {
             var track = getTrack();
 
-            Add(track);
+            LoadComponentAsync(track, Add);
 
             return track;
         }
 
         private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
+            private readonly PreviewTrack track;
+
             public TestTrackOwner(PreviewTrack track)
             {
-                AddInternal(track);
+                this.track = track;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                LoadComponentAsync(track, AddInternal);
             }
 
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
