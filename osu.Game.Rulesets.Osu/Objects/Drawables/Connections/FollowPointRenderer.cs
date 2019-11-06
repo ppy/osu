@@ -10,16 +10,16 @@ using osu.Framework.Graphics.Containers;
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     /// <summary>
-    /// Visualises groups of <see cref="FollowPoint"/>s.
+    /// Visualises connections between <see cref="DrawableOsuHitObject"/>s.
     /// </summary>
     public class FollowPointRenderer : CompositeDrawable
     {
         /// <summary>
-        /// All the <see cref="FollowPointGroup"/>s contained by this <see cref="FollowPointRenderer"/>.
+        /// All the <see cref="FollowPointConnection"/>s contained by this <see cref="FollowPointRenderer"/>.
         /// </summary>
-        internal IReadOnlyList<FollowPointGroup> Groups => groups;
+        internal IReadOnlyList<FollowPointConnection> Connections => connections;
 
-        private readonly List<FollowPointGroup> groups = new List<FollowPointGroup>();
+        private readonly List<FollowPointConnection> connections = new List<FollowPointConnection>();
 
         public override bool RemoveCompletedTransforms => false;
 
@@ -29,84 +29,84 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to add <see cref="FollowPoint"/>s for.</param>
         public void AddFollowPoints(DrawableOsuHitObject hitObject)
-            => addGroup(new FollowPointGroup(hitObject).With(g => g.StartTime.BindValueChanged(_ => onStartTimeChanged(g))));
+            => addConnection(new FollowPointConnection(hitObject).With(g => g.StartTime.BindValueChanged(_ => onStartTimeChanged(g))));
 
         /// <summary>
         /// Removes the <see cref="FollowPoint"/>s around a <see cref="DrawableOsuHitObject"/>.
         /// This includes <see cref="FollowPoint"/>s leading into <paramref name="hitObject"/>, and <see cref="FollowPoint"/>s exiting <paramref name="hitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableOsuHitObject"/> to remove <see cref="FollowPoint"/>s for.</param>
-        public void RemoveFollowPoints(DrawableOsuHitObject hitObject) => removeGroup(groups.Single(g => g.Start == hitObject));
+        public void RemoveFollowPoints(DrawableOsuHitObject hitObject) => removeGroup(connections.Single(g => g.Start == hitObject));
 
         /// <summary>
-        /// Adds a <see cref="FollowPointGroup"/> to this <see cref="FollowPointRenderer"/>.
+        /// Adds a <see cref="FollowPointConnection"/> to this <see cref="FollowPointRenderer"/>.
         /// </summary>
-        /// <param name="group">The <see cref="FollowPointGroup"/> to add.</param>
-        /// <returns>The index of <paramref name="group"/> in <see cref="groups"/>.</returns>
-        private int addGroup(FollowPointGroup group)
+        /// <param name="connection">The <see cref="FollowPointConnection"/> to add.</param>
+        /// <returns>The index of <paramref name="connection"/> in <see cref="connections"/>.</returns>
+        private int addConnection(FollowPointConnection connection)
         {
-            AddInternal(group);
+            AddInternal(connection);
 
-            // Groups are sorted by their start time when added such that the index can be used to post-process other surrounding groups
-            int index = groups.AddInPlace(group, Comparer<FollowPointGroup>.Create((g1, g2) => g1.StartTime.Value.CompareTo(g2.StartTime.Value)));
+            // Groups are sorted by their start time when added such that the index can be used to post-process other surrounding connections
+            int index = connections.AddInPlace(connection, Comparer<FollowPointConnection>.Create((g1, g2) => g1.StartTime.Value.CompareTo(g2.StartTime.Value)));
 
-            if (index < groups.Count - 1)
+            if (index < connections.Count - 1)
             {
-                // Update the group's end point to the next group's start point
+                // Update the connection's end point to the next connection's start point
                 //     h1 -> -> -> h2
-                //    group    nextGroup
+                //    connection    nextGroup
 
-                FollowPointGroup nextGroup = groups[index + 1];
-                group.End = nextGroup.Start;
+                FollowPointConnection nextConnection = connections[index + 1];
+                connection.End = nextConnection.Start;
             }
             else
             {
                 // The end point may be non-null during re-ordering
-                group.End = null;
+                connection.End = null;
             }
 
             if (index > 0)
             {
-                // Update the previous group's end point to the current group's start point
+                // Update the previous connection's end point to the current connection's start point
                 //     h1 -> -> -> h2
-                //  prevGroup    group
+                //  prevGroup    connection
 
-                FollowPointGroup previousGroup = groups[index - 1];
-                previousGroup.End = group.Start;
+                FollowPointConnection previousConnection = connections[index - 1];
+                previousConnection.End = connection.Start;
             }
 
             return index;
         }
 
         /// <summary>
-        /// Removes a <see cref="FollowPointGroup"/> from this <see cref="FollowPointRenderer"/>.
+        /// Removes a <see cref="FollowPointConnection"/> from this <see cref="FollowPointRenderer"/>.
         /// </summary>
-        /// <param name="group">The <see cref="FollowPointGroup"/> to remove.</param>
-        /// <returns>Whether <paramref name="group"/> was removed.</returns>
-        private bool removeGroup(FollowPointGroup group)
+        /// <param name="connection">The <see cref="FollowPointConnection"/> to remove.</param>
+        /// <returns>Whether <paramref name="connection"/> was removed.</returns>
+        private bool removeGroup(FollowPointConnection connection)
         {
-            RemoveInternal(group);
+            RemoveInternal(connection);
 
-            int index = groups.IndexOf(group);
+            int index = connections.IndexOf(connection);
 
             if (index > 0)
             {
-                // Update the previous group's end point to the next group's start point
+                // Update the previous connection's end point to the next connection's start point
                 //     h1 -> -> -> h2 -> -> -> h3
-                //  prevGroup    group       nextGroup
-                // The current group's end point is used since there may not be a next group
-                FollowPointGroup previousGroup = groups[index - 1];
-                previousGroup.End = group.End;
+                //  prevGroup    connection       nextGroup
+                // The current connection's end point is used since there may not be a next connection
+                FollowPointConnection previousConnection = connections[index - 1];
+                previousConnection.End = connection.End;
             }
 
-            return groups.Remove(group);
+            return connections.Remove(connection);
         }
 
-        private void onStartTimeChanged(FollowPointGroup group)
+        private void onStartTimeChanged(FollowPointConnection connection)
         {
             // Naive but can be improved if performance becomes an issue
-            removeGroup(group);
-            addGroup(group);
+            removeGroup(connection);
+            addConnection(connection);
         }
     }
 }
