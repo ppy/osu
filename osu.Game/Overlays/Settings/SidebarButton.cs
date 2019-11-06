@@ -61,6 +61,8 @@ namespace osu.Game.Overlays.Settings
             Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
 
+            BackgroundColour = Color4.Black;
+
             AddRange(new Drawable[]
             {
                 text = new Container
