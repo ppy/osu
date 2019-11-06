@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.MathUtil
             if (mt * tp > 100)
                 return 1.0;
 
-            if (mt <= 0)
-                return 0.0;
+            if (mt <= 0.03)
+                mt = 0.03;
 
             return SpecialFunctions.Erf(2.066 / d * (Math.Pow(2, (mt * tp)) - 1) / Math.Sqrt(2));
         }
