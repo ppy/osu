@@ -7,8 +7,12 @@ namespace osu.Game.Skinning
     {
         protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
         {
+            line = StripComments(line);
+
+            var pair = SplitKeyVal(line);
+
             // Early return on "Version" key to disallow conflicting between .osu file beatmap difficulty version and skin configuration legacy version.
-            if (SplitKeyVal(line).Key == "Version")
+            if (pair.Key == @"Version")
                 return;
 
             base.ParseLine(skin, section, line);
