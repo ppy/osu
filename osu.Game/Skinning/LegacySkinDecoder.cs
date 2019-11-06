@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
@@ -36,7 +37,7 @@ namespace osu.Game.Skinning
                             case @"Version":
                                 if (pair.Value == "latest")
                                     skin.LegacyVersion = LegacySkinConfiguration.LATEST_VERSION;
-                                else if (decimal.TryParse(pair.Value, out var version))
+                                else if (decimal.TryParse(pair.Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var version))
                                     skin.LegacyVersion = version;
 
                                 return;
