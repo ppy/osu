@@ -162,14 +162,10 @@ namespace osu.Game.Screens.Play
             if (sourceClock != beatmap.Track)
                 return;
 
+            removeSourceClockAdjustments();
+
             sourceClock = new TrackVirtual(beatmap.Track.Length);
             adjustableClock.ChangeSource(sourceClock);
-        }
-
-        public void ResetLocalAdjustments()
-        {
-            // In the case of replays, we may have changed the playback rate.
-            UserPlaybackRate.Value = 1;
         }
 
         protected override void Update()
@@ -198,6 +194,14 @@ namespace osu.Game.Screens.Play
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
+            removeSourceClockAdjustments();
+            sourceClock = null;
+        }
+
+        private void removeSourceClockAdjustments()
+        {
+            sourceClock.ResetSpeedAdjustments();
             (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
         }
     }
