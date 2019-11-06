@@ -22,17 +22,6 @@ namespace osu.Game.Screens.Edit.Timing
             });
         }
 
-        protected override SampleControlPoint CreatePoint()
-        {
-            var reference = Beatmap.Value.Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
-
-            return new SampleControlPoint
-            {
-                SampleBank = reference.SampleBank,
-                SampleVolume = reference.SampleVolume,
-            };
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -42,6 +31,17 @@ namespace osu.Game.Screens.Edit.Timing
                 bank.Text = $"Bank: {point.NewValue?.SampleBank}";
                 volume.Text = $"Volume: {point.NewValue?.SampleVolume}%";
             });
+        }
+
+        protected override SampleControlPoint CreatePoint()
+        {
+            var reference = Beatmap.Value.Beatmap.ControlPointInfo.SamplePointAt(SelectedGroup.Value.Time);
+
+            return new SampleControlPoint
+            {
+                SampleBank = reference.SampleBank,
+                SampleVolume = reference.SampleVolume,
+            };
         }
     }
 }
