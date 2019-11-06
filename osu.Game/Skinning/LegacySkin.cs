@@ -18,7 +18,12 @@ using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkin : Skin
+    /// <summary>
+    /// Represents a skin with legacy features.
+    /// </summary>
+    /// <typeparam name="TSkinDecoder">Legacy decoder to be used for decoding the skin configuration file.</typeparam>
+    public class LegacySkin<TSkinDecoder> : Skin
+        where TSkinDecoder : LegacySkinDecoder, new()
     {
         [CanBeNull]
         protected TextureStore Textures;
@@ -26,18 +31,13 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
-        public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
-            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
-        {
-        }
-
         protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
             : base(skin)
         {
             Stream stream = storage?.GetStream(filename);
             if (stream != null)
                 using (LineBufferedReader reader = new LineBufferedReader(stream))
-                    Configuration = new LegacySkinDecoder().Decode(reader);
+                    Configuration = new TSkinDecoder().Decode(reader);
             else
                 Configuration = new DefaultSkinConfiguration();
 
@@ -167,6 +167,19 @@ namespace osu.Game.Skinning
         {
             string lastPiece = componentName.Split('/').Last();
             return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
+        }
+    }
+
+    public class LegacySkin : LegacySkin<LegacySkinDecoder>
+    {
+        public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+            : base(skin, storage, audioManager, filename)
+        {
+        }
+
+        public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
+            : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
+        {
         }
     }
 }
