@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -60,25 +61,33 @@ namespace osu.Game.Rulesets.Osu.Edit
             var objects = selectedHitObjects.ToList();
 
             if (objects.Count == 0)
+                return createGrid(h => h.StartTime <= EditorClock.CurrentTime);
+
+            double minTime = objects.Min(h => h.StartTime);
+            return createGrid(h => h.StartTime < minTime);
+        }
+
+        private OsuDistanceSnapGrid createGrid(Func<HitObject, bool> hitObjectSelector)
+        {
+            int lastIndex = -1;
+
+            for (int i = 0; i < EditorBeatmap.HitObjects.Count; i++)
             {
-                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime <= EditorClock.CurrentTime);
+                HitObject hitObject = EditorBeatmap.HitObjects[i];
 
-                if (lastObject == null)
-                    return null;
+                if (!hitObjectSelector(hitObject))
+                    break;
 
-                return new OsuDistanceSnapGrid(lastObject);
+                lastIndex = i;
             }
-            else
-            {
-                double minTime = objects.Min(h => h.StartTime);
 
-                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime < minTime);
+            if (lastIndex == -1)
+                return null;
 
-                if (lastObject == null)
-                    return null;
+            OsuHitObject lastObject = EditorBeatmap.HitObjects[lastIndex];
+            OsuHitObject nextObject = lastIndex == EditorBeatmap.HitObjects.Count - 1 ? null : EditorBeatmap.HitObjects[lastIndex + 1];
 
-                return new OsuDistanceSnapGrid(lastObject);
-            }
+            return new OsuDistanceSnapGrid(lastObject, nextObject);
         }
     }
 }

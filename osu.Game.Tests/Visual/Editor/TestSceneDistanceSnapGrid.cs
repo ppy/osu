@@ -62,7 +62,7 @@ namespace osu.Game.Tests.Visual.Editor
             public new float DistanceSpacing => base.DistanceSpacing;
 
             public TestDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
-                : base(hitObject, centrePosition)
+                : base(hitObject, null, centrePosition)
             {
             }
 
