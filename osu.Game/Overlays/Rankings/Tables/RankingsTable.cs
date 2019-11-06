@@ -76,6 +76,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
                 Text = text;
                 Font = OsuFont.GetFont(size: 12);
+                Margin = new MarginPadding { Horizontal = 10 };
             }
 
             [BackgroundDependencyLoader]
