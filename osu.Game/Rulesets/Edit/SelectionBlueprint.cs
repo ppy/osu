@@ -82,6 +82,9 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
+        // When not selected, input is only required for the blueprint itself to receive IsHovering
+        protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;
+
         /// <summary>
         /// Selects this <see cref="SelectionBlueprint"/>, causing it to become visible.
         /// </summary>
