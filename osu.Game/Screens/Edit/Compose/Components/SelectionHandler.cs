@@ -68,9 +68,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
         /// <param name="moveEvent">The move event.</param>
-        public virtual void HandleMovement(MoveSelectionEvent moveEvent)
-        {
-        }
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s were moved.</returns>
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
 
         public bool OnPressed(PlatformAction action)
         {
