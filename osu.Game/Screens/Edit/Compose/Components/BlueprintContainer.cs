@@ -367,7 +367,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             (Vector2 snappedPosition, double snappedTime) = composer.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
             // Move the hitobjects
-            selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition)));
+            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition))))
+                return true;
 
             // Apply the start time at the newly snapped-to position
             double offset = snappedTime - draggedObject.StartTime;
