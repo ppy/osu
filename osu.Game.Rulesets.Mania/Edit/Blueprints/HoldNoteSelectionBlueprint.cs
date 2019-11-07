@@ -64,27 +64,5 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         }
 
         public override Quad SelectionQuad => ScreenSpaceDrawQuad;
-
-        private class HoldNoteNoteSelectionBlueprint : NoteSelectionBlueprint
-        {
-            public HoldNoteNoteSelectionBlueprint(DrawableNote note)
-                : base(note)
-            {
-                Select();
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                Anchor = DrawableObject.Anchor;
-                Origin = DrawableObject.Origin;
-
-                Position = DrawableObject.DrawPosition;
-            }
-
-            // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
-            public override bool HandlePositionalInput => false;
-        }
     }
 }
