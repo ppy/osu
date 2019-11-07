@@ -32,7 +32,11 @@ namespace osu.Game.Tests.Visual.Editor
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
+        }
 
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
             Children = new Drawable[]
             {
                 new Box
@@ -42,7 +46,7 @@ namespace osu.Game.Tests.Visual.Editor
                 },
                 new TestDistanceSnapGrid(new HitObject(), grid_position)
             };
-        }
+        });
 
         [TestCase(1)]
         [TestCase(2)]
@@ -57,12 +61,29 @@ namespace osu.Game.Tests.Visual.Editor
             AddStep($"set beat divisor = {divisor}", () => BeatDivisor.Value = divisor);
         }
 
+        [Test]
+        public void TestLimitedDistance()
+        {
+            AddStep("create limited grid", () =>
+            {
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.SlateGray
+                    },
+                    new TestDistanceSnapGrid(new HitObject(), grid_position, new HitObject { StartTime = 100 })
+                };
+            });
+        }
+
         private class TestDistanceSnapGrid : DistanceSnapGrid
         {
             public new float DistanceSpacing => base.DistanceSpacing;
 
-            public TestDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
-                : base(hitObject, centrePosition)
+            public TestDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition, HitObject nextHitObject = null)
+                : base(hitObject, nextHitObject, centrePosition)
             {
             }
 
@@ -77,7 +98,7 @@ namespace osu.Game.Tests.Visual.Editor
 
                 int beatIndex = 0;
 
-                for (float s = centrePosition.X + DistanceSpacing; s <= DrawWidth; s += DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.X + DistanceSpacing; s <= DrawWidth && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
@@ -90,7 +111,7 @@ namespace osu.Game.Tests.Visual.Editor
 
                 beatIndex = 0;
 
-                for (float s = centrePosition.X - DistanceSpacing; s >= 0; s -= DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.X - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
@@ -103,7 +124,7 @@ namespace osu.Game.Tests.Visual.Editor
 
                 beatIndex = 0;
 
-                for (float s = centrePosition.Y + DistanceSpacing; s <= DrawHeight; s += DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.Y + DistanceSpacing; s <= DrawHeight && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
@@ -116,7 +137,7 @@ namespace osu.Game.Tests.Visual.Editor
 
                 beatIndex = 0;
 
-                for (float s = centrePosition.Y - DistanceSpacing; s >= 0; s -= DistanceSpacing, beatIndex++)
+                for (float s = centrePosition.Y - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
@@ -138,9 +159,9 @@ namespace osu.Game.Tests.Visual.Editor
 
             public float GetBeatSnapDistanceAt(double referenceTime) => 10;
 
-            public float DurationToDistance(double referenceTime, double duration) => 0;
+            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
 
-            public double DistanceToDuration(double referenceTime, float distance) => 0;
+            public double DistanceToDuration(double referenceTime, float distance) => distance;
 
             public double GetSnappedDurationFromDistance(double referenceTime, float distance) => 0;
 
