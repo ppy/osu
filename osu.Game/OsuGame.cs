@@ -601,14 +601,14 @@ namespace osu.Game
             loadComponentSingleFile(userProfile = new UserProfileOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
 
-            loadComponentSingleFile(new LoginOverlay
+            var login = loadComponentSingleFile(new LoginOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new NowPlayingOverlay
+            var nowPlaying = loadComponentSingleFile(new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -670,6 +670,8 @@ namespace osu.Game
                     singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
+
+            overlays.AddRange(new OverlayContainer[] { login, nowPlaying });
 
             OverlayActivationMode.ValueChanged += mode =>
             {
