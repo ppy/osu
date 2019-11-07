@@ -1,15 +1,24 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
+using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteNoteSelectionBlueprint : NoteSelectionBlueprint
+    public class HoldNoteNoteSelectionBlueprint : ManiaSelectionBlueprint
     {
-        public HoldNoteNoteSelectionBlueprint(DrawableNote note)
-            : base(note)
+        protected new DrawableHoldNote DrawableObject => (DrawableHoldNote)base.DrawableObject;
+
+        private readonly HoldNotePosition position;
+
+        public HoldNoteNoteSelectionBlueprint(DrawableHoldNote holdNote, HoldNotePosition position)
+            : base(holdNote)
         {
+            this.position = position;
+            InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
+
             Select();
         }
 
@@ -17,10 +26,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Anchor = DrawableObject.Anchor;
-            Origin = DrawableObject.Origin;
+            DrawableNote note = position == HoldNotePosition.Start ? DrawableObject.Head : DrawableObject.Tail;
 
-            Position = DrawableObject.DrawPosition;
+            Anchor = note.Anchor;
+            Origin = note.Origin;
+
+            Size = note.DrawSize;
+            Position = note.DrawPosition;
         }
 
         // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
