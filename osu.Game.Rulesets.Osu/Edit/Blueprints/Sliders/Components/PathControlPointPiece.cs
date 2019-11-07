@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Graphics;
@@ -28,6 +29,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly Path path;
         private readonly Container marker;
         private readonly Drawable markerRing;
+
+        [Resolved(CanBeNull = true)]
+        private IDistanceSnapProvider snapProvider { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -146,12 +150,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (Index == 0)
             {
-                // Special handling for the head - only the position of the slider changes
-                slider.Position += e.Delta;
+                // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
+                (Vector2 snappedPosition, double snappedTime) = snapProvider?.GetSnappedPosition(e.MousePosition, slider.StartTime) ?? (e.MousePosition, slider.StartTime);
+                Vector2 movementDelta = snappedPosition - slider.Position;
+
+                slider.Position += movementDelta;
+                slider.StartTime = snappedTime;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
                 for (int i = 1; i < newControlPoints.Length; i++)
-                    newControlPoints[i] -= e.Delta;
+                    newControlPoints[i] -= movementDelta;
             }
             else
                 newControlPoints[Index] += e.Delta;
