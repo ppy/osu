@@ -39,7 +39,16 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuMenuItem(item);
+        protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
+        {
+            switch (item)
+            {
+                case ToggleMenuItem toggle:
+                    return new DrawableToggleMenuItem(toggle);
+            }
+
+            return new DrawableOsuMenuItem(item);
+        }
 
         protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 
