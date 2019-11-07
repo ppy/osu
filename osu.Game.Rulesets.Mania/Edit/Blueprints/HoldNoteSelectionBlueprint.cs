@@ -40,8 +40,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionBlueprint(DrawableObject.Head),
-                new HoldNoteNoteSelectionBlueprint(DrawableObject.Tail),
+                new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.Start),
+                new HoldNoteNoteSelectionBlueprint(DrawableObject, HoldNotePosition.End),
                 new BodyPiece
                 {
                     AccentColour = Color4.Transparent,
