@@ -26,11 +26,6 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
-        /// <summary>
-        /// Whether to allow default combo colours as fallback if none provided in this skin.
-        /// </summary>
-        protected virtual bool AllowDefaultColoursFallback => true;
-
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
@@ -45,8 +40,6 @@ namespace osu.Game.Skinning
                     Configuration = new LegacySkinDecoder().Decode(reader);
             else
                 Configuration = new SkinConfiguration();
-
-            Configuration.AllowDefaultColoursFallback = AllowDefaultColoursFallback;
 
             if (storage != null)
             {

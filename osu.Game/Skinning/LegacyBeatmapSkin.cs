@@ -9,12 +9,11 @@ namespace osu.Game.Skinning
 {
     public class LegacyBeatmapSkin : LegacySkin
     {
-        // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
-        protected override bool AllowDefaultColoursFallback => false;
-
         public LegacyBeatmapSkin(BeatmapInfo beatmap, IResourceStore<byte[]> storage, AudioManager audioManager)
             : base(createSkinInfo(beatmap), new LegacySkinResourceStore<BeatmapSetFileInfo>(beatmap.BeatmapSet, storage), audioManager, beatmap.Path)
         {
+            // Disallow default colours fallback on beatmap skins to allow using parent skin combo colours. (via SkinProvidingContainer)
+            Configuration.AllowDefaultComboColoursFallback = false;
         }
 
         private static SkinInfo createSkinInfo(BeatmapInfo beatmap) =>

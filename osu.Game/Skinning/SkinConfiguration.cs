@@ -16,7 +16,10 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
-        internal bool AllowDefaultColoursFallback;
+        /// <summary>
+        /// Whether to allow <see cref="DefaultComboColours"/> as a fallback list for when no combo colours are provided.
+        /// </summary>
+        internal bool AllowDefaultComboColoursFallback = true;
 
         public static List<Color4> DefaultComboColours = new List<Color4>
         {
@@ -35,7 +38,7 @@ namespace osu.Game.Skinning
                 if (comboColours.Count > 0)
                     return comboColours;
 
-                if (AllowDefaultColoursFallback)
+                if (AllowDefaultComboColoursFallback)
                     return DefaultComboColours;
 
                 return null;
