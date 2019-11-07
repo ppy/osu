@@ -26,13 +26,17 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            DrawableNote note = position == HoldNotePosition.Start ? DrawableObject.Head : DrawableObject.Tail;
+            // Todo: This shouldn't exist, mania should not reference the drawable hitobject directly.
+            if (DrawableObject.IsLoaded)
+            {
+                DrawableNote note = position == HoldNotePosition.Start ? DrawableObject.Head : DrawableObject.Tail;
 
-            Anchor = note.Anchor;
-            Origin = note.Origin;
+                Anchor = note.Anchor;
+                Origin = note.Origin;
 
-            Size = note.DrawSize;
-            Position = note.DrawPosition;
+                Size = note.DrawSize;
+                Position = note.DrawPosition;
+            }
         }
 
         // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
