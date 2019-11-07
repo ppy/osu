@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
@@ -29,6 +30,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private PlacementBlueprint currentPlacement;
         private SelectionHandler selectionHandler;
         private InputManager inputManager;
+
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
@@ -103,6 +107,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return true;
 
             deselectAll();
+            return true;
+        }
+
+        protected override bool OnDoubleClick(DoubleClickEvent e)
+        {
+            SelectionBlueprint clickedBlueprint = selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
+
+            if (clickedBlueprint == null)
+                return false;
+
+            adjustableClock?.Seek(clickedBlueprint.DrawableObject.HitObject.StartTime);
             return true;
         }
 
@@ -367,7 +382,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             (Vector2 snappedPosition, double snappedTime) = composer.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
             // Move the hitobjects
-            selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition)));
+            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition))))
+                return true;
 
             // Apply the start time at the newly snapped-to position
             double offset = snappedTime - draggedObject.StartTime;

@@ -8,8 +8,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuDistanceSnapGrid : CircularDistanceSnapGrid
     {
-        public OsuDistanceSnapGrid(OsuHitObject hitObject)
-            : base(hitObject, hitObject.StackedEndPosition)
+        public OsuDistanceSnapGrid(OsuHitObject hitObject, OsuHitObject nextHitObject)
+            : base(hitObject, nextHitObject, hitObject.StackedEndPosition)
         {
             Masking = true;
         }
