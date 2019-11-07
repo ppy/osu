@@ -7,11 +7,16 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
+using osu.Game.Audio;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -22,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
     /// </summary>
-    public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         public const float BORDER_RADIUS = 2;
 
@@ -142,6 +147,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
+        #region Outline Display
+
         /// <summary>
         /// Updates whether this <see cref="SelectionHandler"/> is visible.
         /// </summary>
@@ -176,5 +183,63 @@ namespace osu.Game.Screens.Edit.Compose.Components
             outline.Size = bottomRight - topLeft;
             outline.Position = topLeft;
         }
+
+        #endregion
+
+        #region Context Menu
+
+        public virtual MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                if (!SelectedBlueprints.Any())
+                    return Array.Empty<MenuItem>();
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem("hit sound")
+                    {
+                        Items = new[]
+                        {
+                            createHitSampleMenuItem(HitSampleInfo.HIT_WHISTLE),
+                            createHitSampleMenuItem(HitSampleInfo.HIT_CLAP),
+                            createHitSampleMenuItem(HitSampleInfo.HIT_FINISH)
+                        }
+                    }
+                };
+            }
+        }
+
+        private MenuItem createHitSampleMenuItem(string sampleName)
+        {
+            return new ToggleMenuItem(sampleName, MenuItemType.Standard, setHitSampleState)
+            {
+                State = { Value = getHitSampleState() }
+            };
+
+            void setHitSampleState(bool enabled)
+            {
+                if (enabled)
+                {
+                    foreach (var h in SelectedHitObjects)
+                    {
+                        // Make sure there isn't already an existing sample
+                        if (h.Samples.Any(s => s.Name == sampleName))
+                            continue;
+
+                        h.Samples.Add(new HitSampleInfo { Name = sampleName });
+                    }
+                }
+                else
+                {
+                    foreach (var h in SelectedHitObjects)
+                        h.Samples.RemoveAll(s => s.Name == sampleName);
+                }
+            }
+
+            bool getHitSampleState() => SelectedHitObjects.All(h => h.Samples.Any(s => s.Name == sampleName));
+        }
+
+        #endregion
     }
 }
