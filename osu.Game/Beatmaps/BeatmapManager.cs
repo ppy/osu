@@ -392,8 +392,15 @@ namespace osu.Game.Beatmaps
 
                 req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
 
-                // intentionally blocking to limit web request concurrency
-                req.Perform(api);
+                try
+                {
+                    // intentionally blocking to limit web request concurrency
+                    req.Perform(api);
+                }
+                catch (Exception e)
+                {
+                    LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})");
+                }
             }
         }
     }

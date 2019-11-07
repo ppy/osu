@@ -298,6 +298,12 @@ namespace osu.Game
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            RulesetStore?.Dispose();
+        }
+
         private class OsuUserInputManager : UserInputManager
         {
             protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)

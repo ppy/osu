@@ -19,11 +19,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         private readonly Action<RectangleF> performSelection;
 
-        /// <summary>
-        /// Invoked when the drag selection has finished.
-        /// </summary>
-        public event Action DragEnd;
-
         private Drawable box;
 
         /// <summary>
@@ -55,13 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            this.FadeIn(250, Easing.OutQuint);
-            return true;
-        }
-
-        protected override bool OnDrag(DragEvent e)
+        public void UpdateDrag(MouseButtonEvent e)
         {
             var dragPosition = e.ScreenSpaceMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
@@ -78,14 +67,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             box.Size = bottomRight - topLeft;
 
             performSelection?.Invoke(dragRectangle);
-            return true;
-        }
-
-        protected override bool OnDragEnd(DragEndEvent e)
-        {
-            this.FadeOut(250, Easing.OutQuint);
-            DragEnd?.Invoke();
-            return true;
         }
     }
 }

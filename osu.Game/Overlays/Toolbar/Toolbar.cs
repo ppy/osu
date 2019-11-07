@@ -16,7 +16,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : OverlayContainer
+    public class Toolbar : VisibilityContainer
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -25,8 +25,6 @@ namespace osu.Game.Overlays.Toolbar
 
         private ToolbarUserButton userButton;
         private ToolbarRulesetSelector rulesetSelector;
-
-        protected override bool BlockPositionalInput => false;
 
         private const double transition_time = 500;
 
