@@ -16,10 +16,10 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class DrawableOsuMenuItem : Menu.DrawableMenuItem
     {
-        private const int margin_horizontal = 17;
+        public const int MARGIN_HORIZONTAL = 17;
+        public const int MARGIN_VERTICAL = 4;
         private const int text_size = 17;
         private const int transition_length = 80;
-        public const int MARGIN_VERTICAL = 4;
 
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
@@ -115,7 +115,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: text_size),
-                        Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
+                        Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL, Vertical = MARGIN_VERTICAL },
                     },
                     BoldText = new OsuSpriteText
                     {
@@ -124,7 +124,7 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Horizontal = margin_horizontal, Vertical = MARGIN_VERTICAL },
+                        Margin = new MarginPadding { Horizontal = MARGIN_HORIZONTAL, Vertical = MARGIN_VERTICAL },
                     }
                 };
             }
