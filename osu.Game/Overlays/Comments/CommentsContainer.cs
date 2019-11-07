@@ -192,7 +192,11 @@ namespace osu.Game.Overlays.Comments
 
                 request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
 
-                request.Success += onSuccess;
+                request.Success += response => Schedule(() => 
+                {
+                    onSuccess(response);
+                    tcs.SetResult(true);
+                });
 
                 request.Failure += _ => tcs.SetResult(false);
 
