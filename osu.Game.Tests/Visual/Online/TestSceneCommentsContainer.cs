@@ -10,6 +10,8 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
+using osu.Game.Online.API;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -51,6 +53,12 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
             AddStep("local comments", () => commentsContainer.ShowComments(comment_bundle));
             AddStep("local empty comments", () => commentsContainer.ShowComments(empty_comment_bundle));
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
+            AddStep("trigger logout", api.Logout);
         }
 
         private static readonly CommentBundle empty_comment_bundle = new CommentBundle
