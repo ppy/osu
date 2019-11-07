@@ -14,7 +14,6 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -30,12 +29,11 @@ namespace osu.Game.Overlays.Comments
         private CancellationTokenSource loadCancellation;
         private int currentPage;
         private CommentBundleParameters parameters;
-        private Container totalCounterContainer;
+        private TotalCommentsCounter totalCommentsCounter;
         private Container noCommentsPlaceholder;
         private FillFlowContainer content;
         private DeletedCommentsPlaceholder deletedCommentsPlaceholder;
         private CommentsShowMoreButton moreButton;
-        private SpriteText totalCounter;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -56,55 +54,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        totalCounterContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 50,
-                            Alpha = 0,
-                            Child = new FillFlowContainer
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreLeft,
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Margin = new MarginPadding { Left = 50 },
-                                Spacing = new Vector2(5, 0),
-                                Children = new Drawable[]
-                                {
-                                    new SpriteText
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        Font = OsuFont.GetFont(size: 20, italics: true),
-                                        Text = @"Comments",
-                                        Colour = colours.BlueLighter
-                                    },
-                                    new CircularContainer
-                                    {
-                                        Anchor = Anchor.CentreLeft,
-                                        Origin = Anchor.CentreLeft,
-                                        AutoSizeAxes = Axes.Both,
-                                        Masking = true,
-                                        Children = new Drawable[]
-                                        {
-                                            new Box
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Colour = OsuColour.Gray(0.05f)
-                                            },
-                                            totalCounter = new SpriteText
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                                Colour = colours.BlueLighter
-                                            }
-                                        },
-                                    }
-                                }
-                            },
-                        },
+                        totalCommentsCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -200,19 +150,19 @@ namespace osu.Game.Overlays.Comments
             onSuccess(commentBundle);
         }
 
-        private void updateComments(bool hideTotalCounter = true)
+        private void updateComments(bool resetCommentsCounter = true)
         {
             if (parameters == null)
                 return;
 
-            clearComments(hideTotalCounter);
+            clearComments(resetCommentsCounter);
             getComments();
         }
 
-        private void clearComments(bool hideTotalCounter)
+        private void clearComments(bool resetCommentsCounter)
         {
-            if (hideTotalCounter)
-                totalCounterContainer.Hide();
+            if (resetCommentsCounter)
+                totalCommentsCounter.SetValue(0);
 
             request?.Cancel();
             loadCancellation?.Cancel();
@@ -236,8 +186,6 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(CommentBundle response)
         {
-            setTotalCounterAmount(response.Total);
-
             if (!response.Comments.Any())
             {
                 noCommentsPlaceholder.Show();
@@ -248,6 +196,22 @@ namespace osu.Game.Overlays.Comments
 
             loadCancellation = new CancellationTokenSource();
 
+            var page = createCommentsPage(response);
+
+            LoadComponentAsync(page, loaded =>
+            {
+                content.Add(loaded);
+
+                deletedCommentsPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+
+                updateMoreButtonState(response);
+
+                totalCommentsCounter.SetValue(response.Total);
+            }, loadCancellation.Token);
+        }
+
+        private FillFlowContainer createCommentsPage(CommentBundle response)
+        {
             FillFlowContainer page = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -265,31 +229,23 @@ namespace osu.Game.Overlays.Comments
                     });
             }
 
-            LoadComponentAsync(page, loaded =>
-            {
-                content.Add(loaded);
-
-                deletedCommentsPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-
-                if (response.HasMore)
-                {
-                    int loadedTopLevelComments = 0;
-                    content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
-
-                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                    moreButton.IsLoading = false;
-                }
-                else
-                {
-                    moreButton.Hide();
-                }
-            }, loadCancellation.Token);
+            return page;
         }
 
-        private void setTotalCounterAmount(int amount)
+        private void updateMoreButtonState(CommentBundle response)
         {
-            totalCounter.Text = amount.ToString("N0");
-            totalCounterContainer.Show();
+            if (response.HasMore)
+            {
+                int loadedTopLevelComments = 0;
+                content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
+
+                moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
+                moreButton.IsLoading = false;
+            }
+            else
+            {
+                moreButton.Hide();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
