@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Comments
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.Gray(0.05f)
+                                Colour = colours.CommentsGrayDarker
                             },
                             counter = new SpriteText
                             {

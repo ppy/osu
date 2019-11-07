@@ -17,6 +17,7 @@ using System.Linq;
 using osu.Game.Online.Chat;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -39,6 +40,7 @@ namespace osu.Game.Overlays.Comments
         private readonly RepliesButton repliesButton;
         private readonly LoadRepliesButton loadRepliesButton;
         private readonly ShowMoreRepliesButton showMoreRepliesButton;
+        private readonly Box avatarBackground;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
@@ -111,10 +113,9 @@ namespace osu.Game.Overlays.Comments
                                                 CornerRadius = avatar_size / 2f,
                                                 Children = new Drawable[]
                                                 {
-                                                    new Box
+                                                    avatarBackground = new Box
                                                     {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Colour = OsuColour.Gray(0.2f)
+                                                        RelativeSizeAxes = Axes.Both
                                                     },
                                                     new UpdateableAvatar(comment.User)
                                                     {
@@ -260,6 +261,17 @@ namespace osu.Game.Overlays.Comments
                 votePill.Hide();
             }
 
+            replies.AddRange(comment.Replies);
+            repliesContainer.Add(createRepliesPage(replies));
+            updateButtonsState();
+
+            loadRepliesButton.Replies.BindTo(replies);
+            showMoreRepliesButton.Replies.BindTo(replies);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             if (comment.IsTopLevel)
             {
                 AddInternal(new Container
@@ -271,17 +283,12 @@ namespace osu.Game.Overlays.Comments
                     Child = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.1f)
+                        Colour = colours.CommentsGrayDarker
                     }
                 });
             }
 
-            replies.AddRange(comment.Replies);
-            repliesContainer.Add(createRepliesPage(replies));
-            updateButtonsState();
-
-            loadRepliesButton.Replies.BindTo(replies);
-            showMoreRepliesButton.Replies.BindTo(replies);
+            avatarBackground.Colour = colours.CommentsGrayLighter;
         }
 
         protected override void LoadComplete()

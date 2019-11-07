@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.CommentsGrayLight;
+            background.Colour = colours.CommentsGray;
         }
 
         private class ShowDeletedButton : HeaderButton

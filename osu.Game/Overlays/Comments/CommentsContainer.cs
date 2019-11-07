@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Comments
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommentsGray,
+                    Colour = colours.CommentsGrayDark,
                 },
                 new FillFlowContainer
                 {
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Comments
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.CommentsGrayLight
+                                    Colour = colours.CommentsGray
                                 },
                                 new SpriteText
                                 {
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Comments
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.CommentsGrayLight
+                                    Colour = colours.CommentsGray
                                 },
                                 new FillFlowContainer
                                 {
