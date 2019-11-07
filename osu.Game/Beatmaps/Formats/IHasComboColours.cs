@@ -8,6 +8,19 @@ namespace osu.Game.Beatmaps.Formats
 {
     public interface IHasComboColours
     {
-        List<Color4> ComboColours { get; set; }
+        /// <summary>
+        /// Retrieves the list of combo colours for presentation only.
+        /// </summary>
+        IReadOnlyList<Color4> ComboColours { get; set; }
+
+        /// <summary>
+        /// Adds combo colours to the list.
+        /// </summary>
+        void AddComboColours(params Color4[] colours);
+
+        /// <summary>
+        /// Clear current combo colours from the list.
+        /// </summary>
+        void ClearComboColours();
     }
 }

@@ -72,7 +72,7 @@ namespace osu.Game.Skinning
                         case GlobalSkinConfiguration.ComboColours:
                             var comboColours = Configuration.ComboColours;
                             if (comboColours != null)
-                                return SkinUtils.As<TValue>(new Bindable<List<Color4>>(comboColours));
+                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
 
                             break;
                     }
