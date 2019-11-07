@@ -39,12 +39,12 @@ namespace osu.Game.Tests.Skins
                 if (hasColours)
                 {
                     expectedColors = new List<Color4>
-                {
-                    new Color4(142, 199, 255, 255),
-                    new Color4(255, 128, 128, 255),
-                    new Color4(128, 255, 255, 255),
-                    new Color4(100, 100, 100, 100),
-                };
+                    {
+                        new Color4(142, 199, 255, 255),
+                        new Color4(255, 128, 128, 255),
+                        new Color4(128, 255, 255, 255),
+                        new Color4(100, 100, 100, 100),
+                    };
                 }
                 else
                 {
