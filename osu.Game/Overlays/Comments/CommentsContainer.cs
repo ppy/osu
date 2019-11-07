@@ -240,6 +240,7 @@ namespace osu.Game.Overlays.Comments
 
             return page;
         }
+
         private void updateMoreButtonState(CommentBundle response)
         {
             if (response.HasMore)
