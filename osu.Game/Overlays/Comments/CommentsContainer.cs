@@ -201,6 +201,20 @@ namespace osu.Game.Overlays.Comments
 
             loadCancellation = new CancellationTokenSource();
 
+            var page = createCommentsPage(response);
+
+            LoadComponentAsync(page, loaded =>
+            {
+                content.Add(loaded);
+
+                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+
+                updateMoreButtonState(response);
+            }, loadCancellation.Token);
+        }
+
+        private FillFlowContainer createCommentsPage(CommentBundle response)
+        {
             FillFlowContainer page = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -217,25 +231,23 @@ namespace osu.Game.Overlays.Comments
                     });
             }
 
-            LoadComponentAsync(page, loaded =>
+            return page;
+        }
+
+        private void updateMoreButtonState(CommentBundle response)
+        {
+            if (response.HasMore)
             {
-                content.Add(loaded);
+                int loadedTopLevelComments = 0;
+                content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-
-                if (response.HasMore)
-                {
-                    int loadedTopLevelComments = 0;
-                    content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
-
-                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                    moreButton.IsLoading = false;
-                }
-                else
-                {
-                    moreButton.Hide();
-                }
-            }, loadCancellation.Token);
+                moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
+                moreButton.IsLoading = false;
+            }
+            else
+            {
+                moreButton.Hide();
+            }
         }
 
         protected override void Dispose(bool isDisposing)
