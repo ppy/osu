@@ -95,7 +95,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (netcoreapp2.2)",
+            "label": "Restore (netcoreapp3.0)",
             "type": "shell",
             "command": "dotnet",
             "args": [

@@ -10,9 +10,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Graphics;
@@ -101,7 +101,7 @@ namespace osu.Game.Tests.Visual.Editor
             }
         }
 
-        private class StartStopButton : Button
+        private class StartStopButton : OsuButton
         {
             private IAdjustableClock adjustableClock;
             private bool started;
