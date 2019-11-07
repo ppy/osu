@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestGlobalLookup()
         {
-            AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.Count > 0);
+            AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.Count > 0);
         }
 
         [Test]
@@ -121,19 +121,19 @@ namespace osu.Game.Tests.Skins
         [TestCase(true)]
         public void TestEmptyComboColours(bool allowFallback)
         {
-            AddStep("Add custom combo colours to fallback source", () => source1.Configuration.ComboColours = new List<Color4>
+            AddStep("Add custom combo colours to source1", () => source1.Configuration.ComboColours = new List<Color4>
             {
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255),
             });
-            AddStep("Clear combo colours from source", () => source2.Configuration.ComboColours.Clear());
-            AddStep("Disable default fallback in source", () => source2.AllowColoursFallback = allowFallback);
+            AddStep("Clear combo colours from source2", () => source2.Configuration.ClearComboColours());
+            AddStep("Disallow default colours fallback in source2", () => source2.Configuration.AllowDefaultComboColoursFallback = allowFallback);
 
-            AddAssert($"Check retrieved combo colours from {(allowFallback ? "default skin" : "fallback source")}", () =>
+            AddAssert($"Check retrieved combo colours from {(allowFallback ? "source1" : "fallback source")}", () =>
             {
-                var expectedColours = allowFallback ? new DefaultSkinConfiguration().ComboColours : source1.Configuration.ComboColours;
-                return requester.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(expectedColours) ?? false;
+                var expectedColours = allowFallback ? SkinConfiguration.DefaultComboColours : source1.Configuration.ComboColours;
+                return requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(expectedColours) ?? false;
             });
         }
 
@@ -151,9 +151,6 @@ namespace osu.Game.Tests.Skins
 
         public class SkinSource : LegacySkin
         {
-            public bool AllowColoursFallback = true;
-            protected override bool AllowDefaultColoursFallback => AllowColoursFallback;
-
             public SkinSource()
                 : base(new SkinInfo(), null, null, string.Empty)
             {

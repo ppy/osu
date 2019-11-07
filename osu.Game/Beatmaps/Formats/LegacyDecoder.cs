@@ -103,7 +103,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
-                tHasComboColours.ComboColours.Add(colour);
+                tHasComboColours.AddComboColours(colour);
             }
             else
             {
