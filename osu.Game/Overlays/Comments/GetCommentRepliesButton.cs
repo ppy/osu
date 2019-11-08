@@ -15,6 +15,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests;
 using System.Linq;
 using System;
+using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -65,9 +66,32 @@ namespace osu.Game.Overlays.Comments
         private void onAction()
         {
             CurrentPage.Value += 1;
-            request = new GetCommentRepliesRequest(Comment.Id, Sort.Value, CurrentPage.Value);
-            request.Success += onSuccess;
-            api.Queue(request);
+
+            Task.Run(async () =>
+            {
+                var tcs = new TaskCompletionSource<bool>();
+
+                request = new GetCommentRepliesRequest(Comment.Id, Sort.Value, CurrentPage.Value);
+
+                request.Success += response => Schedule(() =>
+                {
+                    onSuccess(response);
+                    tcs.SetResult(true);
+                });
+
+                request.Failure += _ => tcs.SetResult(false);
+
+                try
+                {
+                    request.Perform(api);
+                }
+                catch
+                {
+                    tcs.SetResult(false);
+                }
+
+                await tcs.Task;
+            });
         }
 
         private void onSuccess(CommentBundle response)

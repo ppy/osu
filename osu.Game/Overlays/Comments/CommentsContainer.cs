@@ -14,6 +14,7 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
+using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -37,6 +38,7 @@ namespace osu.Game.Overlays.Comments
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
+
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -134,6 +136,7 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             Sort.BindValueChanged(_ => updateComments(false));
+            api.LocalUser.BindValueChanged(_ => updateComments(false));
             base.LoadComplete();
         }
 
@@ -179,9 +182,31 @@ namespace osu.Game.Overlays.Comments
             if (parameters == null)
                 return;
 
-            request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
-            request.Success += onSuccess;
-            api.Queue(request);
+            Task.Run(async () =>
+            {
+                var tcs = new TaskCompletionSource<bool>();
+
+                request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
+
+                request.Success += response => Schedule(() =>
+                {
+                    onSuccess(response);
+                    tcs.SetResult(true);
+                });
+
+                request.Failure += _ => tcs.SetResult(false);
+
+                try
+                {
+                    request.Perform(api);
+                }
+                catch
+                {
+                    tcs.SetResult(false);
+                }
+
+                await tcs.Task;
+            });
         }
 
         private void onSuccess(CommentBundle response)
