@@ -78,6 +78,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
+        private BindableList<HitSampleInfo> samplesBindable;
         private Bindable<double> startTimeBindable;
         private Bindable<int> comboIndexBindable;
 
@@ -108,20 +109,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
             }
 
-            var samples = GetSamples().ToArray();
-
-            if (samples.Length > 0)
-            {
-                if (HitObject.SampleControlPoint == null)
-                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                                                          + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-
-                samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
-                foreach (var s in samples)
-                    s.Namespace = SampleNamespace;
-
-                AddInternal(Samples = new SkinnableSound(samples));
-            }
+            loadSamples();
         }
 
         protected override void LoadComplete()
@@ -139,8 +127,32 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 comboIndexBindable.BindValueChanged(_ => updateAccentColour(), true);
             }
 
+            samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
+            samplesBindable.ItemsAdded += _ => scheduleLoadSamples();
+            samplesBindable.ItemsRemoved += _ => scheduleLoadSamples();
+
             updateState(ArmedState.Idle, true);
             onDefaultsApplied();
+        }
+
+        private void scheduleLoadSamples() => Scheduler.AddOnce(loadSamples);
+
+        private void loadSamples()
+        {
+            var samples = GetSamples().ToArray();
+
+            if (samples.Length <= 0)
+                return;
+
+            if (HitObject.SampleControlPoint == null)
+                throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                                                      + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+
+            samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
+            foreach (var s in samples)
+                s.Namespace = SampleNamespace;
+
+            AddInternal(Samples = new SkinnableSound(samples));
         }
 
         private void onDefaultsApplied() => apply(HitObject);
