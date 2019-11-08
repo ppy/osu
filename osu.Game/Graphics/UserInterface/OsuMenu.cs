@@ -43,8 +43,8 @@ namespace osu.Game.Graphics.UserInterface
         {
             switch (item)
             {
-                case ToggleMenuItem toggle:
-                    return new DrawableToggleMenuItem(toggle);
+                case StatefulMenuItem stateful:
+                    return new DrawableStatefulMenuItem(stateful);
             }
 
             return new DrawableOsuMenuItem(item);

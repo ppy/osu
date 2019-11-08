@@ -2,24 +2,23 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Bindables;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class ToggleMenuItem : OsuMenuItem
+    public class ToggleMenuItem : StatefulMenuItem<bool>
     {
-        public readonly BindableBool State = new BindableBool();
-
         public ToggleMenuItem(string text, MenuItemType type = MenuItemType.Standard)
             : this(text, type, null)
         {
         }
 
         public ToggleMenuItem(string text, MenuItemType type, Action<bool> action)
-            : base(text, type)
+            : base(text, type, value => !value)
         {
-            Action.Value = () => State.Toggle();
             State.BindValueChanged(state => action?.Invoke(state.NewValue));
         }
+
+        public override IconUsage? GetIconForState(bool state) => state ? (IconUsage?)FontAwesome.Solid.Check : null;
     }
 }
