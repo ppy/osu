@@ -69,6 +69,14 @@ namespace osu.Game.Screens.Edit
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
+            if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+            {
+                double targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
+                double beatLength = Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(targetTime).BeatLength;
+
+                clock.Seek(Math.Max(0, targetTime - beatLength));
+            }
+
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.Cache(beatDivisor);
