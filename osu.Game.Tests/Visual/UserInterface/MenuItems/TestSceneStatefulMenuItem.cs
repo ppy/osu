@@ -7,14 +7,14 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Tests.Visual.UserInterface
+namespace osu.Game.Tests.Visual.UserInterface.MenuItems
 {
     public class TestSceneStatefulMenuItem : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OsuMenu),
-            typeof(ToggleMenuItem),
+            typeof(StatefulMenuItem),
             typeof(DrawableStatefulMenuItem)
         };
 
