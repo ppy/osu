@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -134,37 +135,58 @@ namespace osu.Game.Tournament
                 },
             };
 
+            foreach (var drawable in screens)
+                drawable.Hide();
+
             SetScreen(typeof(SetupScreen));
         }
 
+        private float depth;
+
+        private Drawable currentScreen;
+        private ScheduledDelegate scheduledHide;
+
         public void SetScreen(Type screenType)
         {
-            var screen = screens.FirstOrDefault(s => s.GetType() == screenType);
-            if (screen == null) return;
+            var target = screens.FirstOrDefault(s => s.GetType() == screenType);
 
-            foreach (var s in screens.Children)
+            if (target == null || currentScreen == target) return;
+
+            if (scheduledHide?.Completed == false)
             {
-                if (s == screen)
-                {
-                    s.Show();
-                    if (s is IProvideVideo)
-                        video.FadeOut(200);
-                    else
-                        video.Show();
-                }
-                else
-                    s.Hide();
+                scheduledHide.RunTask();
+                scheduledHide.Cancel(); // see https://github.com/ppy/osu-framework/issues/2967
+                scheduledHide = null;
             }
 
-            switch (screen)
+            var lastScreen = currentScreen;
+            currentScreen = target;
+
+            if (currentScreen is IProvideVideo)
+            {
+                video.FadeOut(200);
+
+                // delay the hide to avoid a double-fade transition.
+                scheduledHide = Scheduler.AddDelayed(() => lastScreen?.Hide(), TournamentScreen.FADE_DELAY);
+            }
+            else
+            {
+                lastScreen?.Hide();
+                video.Show();
+            }
+
+            screens.ChangeChildDepth(currentScreen, depth--);
+            currentScreen.Show();
+
+            switch (currentScreen)
             {
                 case GameplayScreen _:
                 case MapPoolScreen _:
-                    chatContainer.FadeIn(100);
+                    chatContainer.FadeIn(TournamentScreen.FADE_DELAY);
                     break;
 
                 default:
-                    chatContainer.FadeOut(100);
+                    chatContainer.FadeOut(TournamentScreen.FADE_DELAY);
                     break;
             }
 
