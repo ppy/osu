@@ -244,7 +244,8 @@ namespace osu.Game.Screens.Edit
             base.OnEntering(last);
 
             Background.FadeColour(Color4.DarkGray, 500);
-            resetTrack();
+
+            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -255,10 +256,24 @@ namespace osu.Game.Screens.Edit
             return base.OnExiting(next);
         }
 
-        private void resetTrack()
+        private void resetTrack(bool seekToStart = false)
         {
             Beatmap.Value.Track?.ResetSpeedAdjustments();
             Beatmap.Value.Track?.Stop();
+
+            if (seekToStart)
+            {
+                double targetTime = 0;
+
+                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+                {
+                    // seek to one beat length before the first hitobject
+                    targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
+                    targetTime -= Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(targetTime).BeatLength;
+                }
+
+                clock.Seek(Math.Max(0, targetTime));
+            }
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
