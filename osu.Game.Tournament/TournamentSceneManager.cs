@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens;
@@ -37,6 +37,7 @@ namespace osu.Game.Tournament
         private TournamentMatchChatDisplay chat = new TournamentMatchChatDisplay();
 
         private Container chatContainer;
+        private FillFlowContainer buttons;
 
         public TournamentSceneManager()
         {
@@ -102,29 +103,32 @@ namespace osu.Game.Tournament
                             Colour = Color4.Black,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new FillFlowContainer
+                        buttons = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(2),
+                            Padding = new MarginPadding(2),
                             Children = new Drawable[]
                             {
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Setup", Action = () => SetScreen(typeof(SetupScreen)) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Team Editor", Action = () => SetScreen(typeof(TeamEditorScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Rounds Editor", Action = () => SetScreen(typeof(RoundEditorScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => SetScreen(typeof(DrawingsScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => SetScreen(typeof(ShowcaseScreen)) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Schedule", Action = () => SetScreen(typeof(ScheduleScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => SetScreen(typeof(LadderScreen)) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => SetScreen(typeof(TeamIntroScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => SetScreen(typeof(MapPoolScreen)) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => SetScreen(typeof(GameplayScreen)) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Win", Action = () => SetScreen(typeof(TeamWinScreen)) },
+                                new ScreenButton(typeof(SetupScreen)) { Text = "Setup", RequestSelection = SetScreen },
+                                new Separator(),
+                                new ScreenButton(typeof(TeamEditorScreen)) { Text = "Team Editor", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(RoundEditorScreen)) { Text = "Rounds Editor", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(LadderEditorScreen)) { Text = "Bracket Editor", RequestSelection = SetScreen },
+                                new Separator(),
+                                new ScreenButton(typeof(ScheduleScreen)) { Text = "Schedule", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(LadderScreen)) { Text = "Bracket", RequestSelection = SetScreen },
+                                new Separator(),
+                                new ScreenButton(typeof(TeamIntroScreen)) { Text = "TeamIntro", RequestSelection = SetScreen },
+                                new Separator(),
+                                new ScreenButton(typeof(MapPoolScreen)) { Text = "MapPool", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(GameplayScreen)) { Text = "Gameplay", RequestSelection = SetScreen },
+                                new Separator(),
+                                new ScreenButton(typeof(TeamWinScreen)) { Text = "Win", RequestSelection = SetScreen },
+                                new Separator(),
+                                new ScreenButton(typeof(DrawingsScreen)) { Text = "Drawings", RequestSelection = SetScreen },
+                                new ScreenButton(typeof(ShowcaseScreen)) { Text = "Showcase", RequestSelection = SetScreen },
                             }
                         },
                     },
@@ -184,6 +188,50 @@ namespace osu.Game.Tournament
                 default:
                     chatContainer.FadeOut(TournamentScreen.FADE_DELAY);
                     break;
+            }
+
+            foreach (var s in buttons.OfType<ScreenButton>())
+                s.IsSelected = screenType == s.Type;
+        }
+
+        private class Separator : CompositeDrawable
+        {
+            public Separator()
+            {
+                RelativeSizeAxes = Axes.X;
+                Height = 20;
+            }
+        }
+
+        private class ScreenButton : TourneyButton
+        {
+            public readonly Type Type;
+
+            public ScreenButton(Type type)
+            {
+                Type = type;
+                BackgroundColour = OsuColour.Gray(0.2f);
+                Action = () => RequestSelection(type);
+
+                RelativeSizeAxes = Axes.X;
+            }
+
+            private bool isSelected;
+
+            public Action<Type> RequestSelection;
+
+            public bool IsSelected
+            {
+                get => isSelected;
+                set
+                {
+                    if (value == isSelected)
+                        return;
+
+                    isSelected = value;
+                    BackgroundColour = isSelected ? Color4.SkyBlue : OsuColour.Gray(0.2f);
+                    SpriteText.Colour = isSelected ? Color4.Black : Color4.White;
+                }
             }
         }
     }
