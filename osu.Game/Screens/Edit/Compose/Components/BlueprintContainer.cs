@@ -96,11 +96,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                return false;
-
             beginClickSelection(e);
-            return true;
+            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -133,12 +130,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                return false;
-
             // Special case for when a drag happened instead of a click
             Schedule(() => endClickSelection());
-            return true;
+            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
