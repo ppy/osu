@@ -76,23 +76,4 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
     }
-
-    public enum ThreeStates
-    {
-        /// <summary>
-        /// The current state is disabled.
-        /// </summary>
-        Disabled,
-
-        /// <summary>
-        /// The current state is a combination of <see cref="Disabled"/> and <see cref="Enabled"/>.
-        /// The state becomes <see cref="Enabled"/> if the <see cref="ThreeStateMenuItem"/> is pressed.
-        /// </summary>
-        Indeterminate,
-
-        /// <summary>
-        /// The current state is enabled.
-        /// </summary>
-        Enabled
-    }
 }
