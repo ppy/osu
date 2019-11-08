@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
+        public override float BackgroundParallaxAmount => 0.1f;
+
         public override bool AllowBackButton => false;
 
         public override bool HideOverlaysOnEnter => true;
