@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
@@ -32,7 +31,7 @@ namespace osu.Game.Tournament.Screens.Editors
         [BackgroundDependencyLoader]
         private void load()
         {
-            ControlPanel.Add(new OsuButton
+            ControlPanel.Add(new TourneyButton
             {
                 RelativeSizeAxes = Axes.X,
                 Text = "Add all countries",
