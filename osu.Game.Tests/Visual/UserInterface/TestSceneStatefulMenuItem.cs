@@ -74,9 +74,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                     case TestStates.State3:
                         return FontAwesome.Solid.DiceThree;
-                }
 
-                return null;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(state), state, null);
+                }
             }
         }
 

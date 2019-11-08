@@ -6,15 +6,41 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// An <see cref="OsuMenuItem"/> with three possible states.
+    /// </summary>
     public class ThreeStateMenuItem : StatefulMenuItem<ThreeStates>
     {
+        /// <summary>
+        /// Creates a new <see cref="ThreeStateMenuItem"/>.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
         public ThreeStateMenuItem(string text, MenuItemType type = MenuItemType.Standard)
             : this(text, type, null)
         {
         }
 
+        /// <summary>
+        /// Creates a new <see cref="ThreeStateMenuItem"/>.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
+        /// <param name="action">A delegate to be invoked when this <see cref="ThreeStateMenuItem"/> is pressed.</param>
         public ThreeStateMenuItem(string text, MenuItemType type, Action<ThreeStates> action)
-            : base(text, getNextState, type, action)
+            : this(text, getNextState, type, action)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="ThreeStateMenuItem"/>.
+        /// </summary>
+        /// <param name="text">The text to display.</param>
+        /// <param name="changeStateFunc">A function that mutates a state to another state after this <see cref="ThreeStateMenuItem"/> is pressed.</param>
+        /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
+        /// <param name="action">A delegate to be invoked when this <see cref="ThreeStateMenuItem"/> is pressed.</param>
+        protected ThreeStateMenuItem(string text, Func<ThreeStates, ThreeStates> changeStateFunc, MenuItemType type, Action<ThreeStates> action)
+            : base(text, changeStateFunc, type, action)
         {
         }
 
@@ -44,16 +70,29 @@ namespace osu.Game.Graphics.UserInterface
 
                 case ThreeStates.Enabled:
                     return ThreeStates.Disabled;
-            }
 
-            return ThreeStates.Disabled;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
+            }
         }
     }
 
     public enum ThreeStates
     {
+        /// <summary>
+        /// The current state is disabled.
+        /// </summary>
         Disabled,
+
+        /// <summary>
+        /// The current state is a combination of <see cref="Disabled"/> and <see cref="Enabled"/>.
+        /// The state becomes <see cref="Enabled"/> if the <see cref="ThreeStateMenuItem"/> is pressed.
+        /// </summary>
         Indeterminate,
+
+        /// <summary>
+        /// The current state is enabled.
+        /// </summary>
         Enabled
     }
 }
