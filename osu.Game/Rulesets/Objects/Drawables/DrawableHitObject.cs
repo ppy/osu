@@ -128,14 +128,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
-            samplesBindable.ItemsAdded += _ => scheduleLoadSamples();
-            samplesBindable.ItemsRemoved += _ => scheduleLoadSamples();
+            samplesBindable.ItemsAdded += _ => loadSamples();
+            samplesBindable.ItemsRemoved += _ => loadSamples();
 
             updateState(ArmedState.Idle, true);
             onDefaultsApplied();
         }
-
-        private void scheduleLoadSamples() => Scheduler.AddOnce(loadSamples);
 
         private void loadSamples()
         {
