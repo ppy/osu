@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+    - name: osu!stable issues
+      url: https://github.com/ppy/osu-stable-issues
+      about: For issues regarding osu!stable (not osu!lazer), open them here.

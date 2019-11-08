@@ -8,21 +8,21 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
-using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
     /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
     /// </summary>
-    public class SelectionHandler : CompositeDrawable
+    public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         public const float BORDER_RADIUS = 2;
 
@@ -68,25 +68,23 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
         /// </summary>
         /// <param name="moveEvent">The move event.</param>
-        public virtual void HandleMovement(MoveSelectionEvent moveEvent)
-        {
-        }
+        /// <returns>Whether any <see cref="DrawableHitObject"/>s were moved.</returns>
+        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(PlatformAction action)
         {
-            if (e.Repeat)
-                return base.OnKeyDown(e);
-
-            switch (e.Key)
+            switch (action.ActionMethod)
             {
-                case Key.Delete:
+                case PlatformActionMethod.Delete:
                     foreach (var h in selectedBlueprints.ToList())
                         placementHandler.Delete(h.DrawableObject.HitObject);
                     return true;
             }
 
-            return base.OnKeyDown(e);
+            return false;
         }
+
+        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
 
         #endregion
 

@@ -2,36 +2,132 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Compose;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointVisualiser : CompositeDrawable
+    public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         public Action<Vector2[]> ControlPointsChanged;
 
+        internal readonly Container<PathControlPointPiece> Pieces;
         private readonly Slider slider;
+        private readonly bool allowSelection;
 
-        private readonly Container<PathControlPointPiece> pieces;
+        private InputManager inputManager;
 
-        public PathControlPointVisualiser(Slider slider)
+        [Resolved(CanBeNull = true)]
+        private IPlacementHandler placementHandler { get; set; }
+
+        public PathControlPointVisualiser(Slider slider, bool allowSelection)
         {
             this.slider = slider;
+            this.allowSelection = allowSelection;
 
-            InternalChild = pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+            RelativeSizeAxes = Axes.Both;
+
+            InternalChild = Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
         }
 
         protected override void Update()
         {
             base.Update();
 
-            while (slider.Path.ControlPoints.Length > pieces.Count)
-                pieces.Add(new PathControlPointPiece(slider, pieces.Count) { ControlPointsChanged = c => ControlPointsChanged?.Invoke(c) });
-            while (slider.Path.ControlPoints.Length < pieces.Count)
-                pieces.Remove(pieces[pieces.Count - 1]);
+            while (slider.Path.ControlPoints.Length > Pieces.Count)
+            {
+                var piece = new PathControlPointPiece(slider, Pieces.Count)
+                {
+                    ControlPointsChanged = c => ControlPointsChanged?.Invoke(c),
+                };
+
+                if (allowSelection)
+                    piece.RequestSelection = selectPiece;
+
+                Pieces.Add(piece);
+            }
+
+            while (slider.Path.ControlPoints.Length < Pieces.Count)
+                Pieces.Remove(Pieces[Pieces.Count - 1]);
         }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            foreach (var piece in Pieces)
+                piece.IsSelected.Value = false;
+            return false;
+        }
+
+        private void selectPiece(int index)
+        {
+            if (inputManager.CurrentState.Keyboard.ControlPressed)
+                Pieces[index].IsSelected.Toggle();
+            else
+            {
+                foreach (var piece in Pieces)
+                    piece.IsSelected.Value = piece.Index == index;
+            }
+        }
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionMethod)
+            {
+                case PlatformActionMethod.Delete:
+                    var newControlPoints = new List<Vector2>();
+
+                    foreach (var piece in Pieces)
+                    {
+                        if (!piece.IsSelected.Value)
+                            newControlPoints.Add(slider.Path.ControlPoints[piece.Index]);
+                    }
+
+                    // Ensure that there are any points to be deleted
+                    if (newControlPoints.Count == slider.Path.ControlPoints.Length)
+                        return false;
+
+                    // If there are 0 remaining control points, treat the slider as being deleted
+                    if (newControlPoints.Count == 0)
+                    {
+                        placementHandler?.Delete(slider);
+                        return true;
+                    }
+
+                    // Make control points relative
+                    Vector2 first = newControlPoints[0];
+                    for (int i = 0; i < newControlPoints.Count; i++)
+                        newControlPoints[i] = newControlPoints[i] - first;
+
+                    // The slider's position defines the position of the first control point, and all further control points are relative to that point
+                    slider.Position = slider.Position + first;
+
+                    // Since pieces are re-used, they will not point to the deleted control points while remaining selected
+                    foreach (var piece in Pieces)
+                        piece.IsSelected.Value = false;
+
+                    ControlPointsChanged?.Invoke(newControlPoints.ToArray());
+
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
     }
 }

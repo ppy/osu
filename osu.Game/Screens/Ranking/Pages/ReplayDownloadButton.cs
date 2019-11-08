@@ -4,12 +4,13 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online;
-using osu.Game.Scoring;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Scoring;
+using osuTK;
 
-namespace osu.Game.Screens.Play
+namespace osu.Game.Screens.Ranking.Pages
 {
     public class ReplayDownloadButton : DownloadTrackingComposite<ScoreInfo, ScoreManager>
     {
@@ -33,6 +34,7 @@ namespace osu.Game.Screens.Play
         public ReplayDownloadButton(ScoreInfo score)
             : base(score)
         {
+            Size = new Vector2(50, 30);
         }
 
         [BackgroundDependencyLoader(true)]
