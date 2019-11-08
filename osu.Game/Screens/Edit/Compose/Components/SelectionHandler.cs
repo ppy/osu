@@ -196,47 +196,61 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("hit sound")
+                    new OsuMenuItem("Sound")
                     {
                         Items = new[]
                         {
-                            createHitSampleMenuItem(HitSampleInfo.HIT_WHISTLE),
-                            createHitSampleMenuItem(HitSampleInfo.HIT_CLAP),
-                            createHitSampleMenuItem(HitSampleInfo.HIT_FINISH)
+                            createHitSampleMenuItem("Whistle", HitSampleInfo.HIT_WHISTLE),
+                            createHitSampleMenuItem("Clap", HitSampleInfo.HIT_CLAP),
+                            createHitSampleMenuItem("Finish", HitSampleInfo.HIT_FINISH)
                         }
                     }
                 };
             }
         }
 
-        private MenuItem createHitSampleMenuItem(string sampleName)
+        private MenuItem createHitSampleMenuItem(string name, string sampleName)
         {
-            return new ToggleMenuItem(sampleName, MenuItemType.Standard, setHitSampleState)
+            return new ThreeStateMenuItem(name, MenuItemType.Standard, setHitSampleState)
             {
                 State = { Value = getHitSampleState() }
             };
 
-            void setHitSampleState(bool enabled)
+            void setHitSampleState(ThreeStates state)
             {
-                if (enabled)
+                switch (state)
                 {
-                    foreach (var h in SelectedHitObjects)
-                    {
-                        // Make sure there isn't already an existing sample
-                        if (h.Samples.Any(s => s.Name == sampleName))
-                            continue;
+                    case ThreeStates.Disabled:
+                        foreach (var h in SelectedHitObjects)
+                            h.Samples.RemoveAll(s => s.Name == sampleName);
+                        break;
 
-                        h.Samples.Add(new HitSampleInfo { Name = sampleName });
-                    }
-                }
-                else
-                {
-                    foreach (var h in SelectedHitObjects)
-                        h.Samples.RemoveAll(s => s.Name == sampleName);
+                    case ThreeStates.Enabled:
+                        foreach (var h in SelectedHitObjects)
+                        {
+                            // Make sure there isn't already an existing sample
+                            if (h.Samples.Any(s => s.Name == sampleName))
+                                continue;
+
+                            h.Samples.Add(new HitSampleInfo { Name = sampleName });
+                        }
+
+                        break;
                 }
             }
 
-            bool getHitSampleState() => SelectedHitObjects.All(h => h.Samples.Any(s => s.Name == sampleName));
+            ThreeStates getHitSampleState()
+            {
+                int countExisting = SelectedHitObjects.Count(h => h.Samples.Any(s => s.Name == sampleName));
+
+                if (countExisting == 0)
+                    return ThreeStates.Disabled;
+
+                if (countExisting < SelectedHitObjects.Count())
+                    return ThreeStates.Indeterminate;
+
+                return ThreeStates.Enabled;
+            }
         }
 
         #endregion
