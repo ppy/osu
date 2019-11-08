@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable createCatmull(int repeats = 0)
         {
-            var repeatSamples = new List<List<HitSampleInfo>>();
+            var repeatSamples = new List<IList<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
                 repeatSamples.Add(new List<HitSampleInfo>());
 
@@ -297,9 +297,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             return createDrawable(slider, 3, 1);
         }
 
-        private List<List<HitSampleInfo>> createEmptySamples(int repeats)
+        private List<IList<HitSampleInfo>> createEmptySamples(int repeats)
         {
-            var repeatSamples = new List<List<HitSampleInfo>>();
+            var repeatSamples = new List<IList<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
                 repeatSamples.Add(new List<HitSampleInfo>());
             return repeatSamples;
