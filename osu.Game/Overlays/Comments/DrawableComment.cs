@@ -288,7 +288,7 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
-            avatarBackground.Colour = colours.CommentsGrayLighter;
+            avatarBackground.Colour = colours.CommentsGrayDarker;
         }
 
         protected override void LoadComplete()
