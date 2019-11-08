@@ -59,6 +59,9 @@ namespace osu.Game.Tests.Visual.Components
             AddStep("start track 2", () => track2.Start());
             AddAssert("track 1 stopped", () => !track1.IsRunning);
             AddAssert("track 2 started", () => track2.IsRunning);
+            AddStep("start track 1", () => track1.Start());
+            AddAssert("track 2 stopped", () => !track2.IsRunning);
+            AddAssert("track 1 started", () => track1.IsRunning);
         }
 
         [Test]
