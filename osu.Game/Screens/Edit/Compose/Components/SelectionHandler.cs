@@ -222,7 +222,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case ThreeStates.Disabled:
                         foreach (var h in SelectedHitObjects)
-                            h.Samples.RemoveAll(s => s.Name == sampleName);
+                            h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+
                         break;
 
                     case ThreeStates.Enabled:
