@@ -18,7 +18,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -76,7 +75,7 @@ namespace osu.Game.Tournament
 
             AddRange(new[]
             {
-                new OsuButton
+                new TourneyButton
                 {
                     Text = "Save Changes",
                     Width = 140,
