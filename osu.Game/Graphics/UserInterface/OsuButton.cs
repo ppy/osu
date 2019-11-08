@@ -48,7 +48,7 @@ namespace osu.Game.Graphics.UserInterface
         protected Box Background;
         protected SpriteText SpriteText;
 
-        public OsuButton()
+        public OsuButton(HoverSampleSet? hoverSounds = HoverSampleSet.Loud)
         {
             Height = 40;
 
@@ -78,9 +78,11 @@ namespace osu.Game.Graphics.UserInterface
                         Depth = float.MinValue
                     },
                     SpriteText = CreateText(),
-                    new HoverClickSounds(HoverSampleSet.Loud),
                 }
             });
+
+            if (hoverSounds.HasValue)
+                AddInternal(new HoverClickSounds(hoverSounds.Value));
 
             Enabled.BindValueChanged(enabledChanged, true);
         }
