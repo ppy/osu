@@ -16,8 +16,7 @@ namespace osu.Game.Tournament.Components
     {
         private readonly VideoSprite video;
 
-        private ManualClock manualClock;
-        private IFrameBasedClock sourceClock;
+        private readonly ManualClock manualClock;
 
         public TourneyVideo(Stream stream)
         {
@@ -34,6 +33,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
+                    Clock = new FramedClock(manualClock = new ManualClock())
                 };
         }
 
@@ -46,21 +46,16 @@ namespace osu.Game.Tournament.Components
             }
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            sourceClock = Clock;
-            Clock = new FramedClock(manualClock = new ManualClock());
-        }
-
         protected override void Update()
         {
             base.Update();
 
-            // we want to avoid seeking as much as possible, because we care about performance, not sync.
-            // to avoid seeking completely, we only increment out local clock when in an updating state.
-            manualClock.CurrentTime += sourceClock.ElapsedFrameTime;
+            if (manualClock != null && Clock.ElapsedFrameTime < 100)
+            {
+                // we want to avoid seeking as much as possible, because we care about performance, not sync.
+                // to avoid seeking completely, we only increment out local clock when in an updating state.
+                manualClock.CurrentTime += Clock.ElapsedFrameTime;
+            }
         }
     }
 }
