@@ -14,9 +14,8 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         public ToggleMenuItem(string text, MenuItemType type, Action<bool> action)
-            : base(text, type, value => !value)
+            : base(text, value => !value, type, action)
         {
-            State.BindValueChanged(state => action?.Invoke(state.NewValue));
         }
 
         public override IconUsage? GetIconForState(bool state) => state ? (IconUsage?)FontAwesome.Solid.Check : null;

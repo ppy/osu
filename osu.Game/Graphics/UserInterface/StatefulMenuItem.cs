@@ -11,15 +11,19 @@ namespace osu.Game.Graphics.UserInterface
     {
         public readonly Bindable<object> State = new Bindable<object>();
 
-        protected StatefulMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-            : this(text, type, null)
+        protected StatefulMenuItem(string text, Func<object, object> changeStateFunc, MenuItemType type = MenuItemType.Standard)
+            : this(text, changeStateFunc, type, null)
         {
         }
 
-        protected StatefulMenuItem(string text, MenuItemType type, Func<object, object> changeStateFunc)
+        protected StatefulMenuItem(string text, Func<object, object> changeStateFunc, MenuItemType type, Action<object> action)
             : base(text, type)
         {
-            Action.Value = () => State.Value = changeStateFunc?.Invoke(State.Value) ?? State.Value;
+            Action.Value = () =>
+            {
+                State.Value = changeStateFunc?.Invoke(State.Value) ?? State.Value;
+                action?.Invoke(State.Value);
+            };
         }
 
         public abstract IconUsage? GetIconForState(object state);
@@ -30,13 +34,13 @@ namespace osu.Game.Graphics.UserInterface
     {
         public new readonly Bindable<T> State = new Bindable<T>();
 
-        protected StatefulMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-            : this(text, type, null)
+        protected StatefulMenuItem(string text, Func<T, T> changeStateFunc, MenuItemType type = MenuItemType.Standard)
+            : this(text, changeStateFunc, type, null)
         {
         }
 
-        protected StatefulMenuItem(string text, MenuItemType type, Func<T, T> changeStateFunc)
-            : base(text, type, o => changeStateFunc?.Invoke((T)o) ?? o)
+        protected StatefulMenuItem(string text, Func<T, T> changeStateFunc, MenuItemType type, Action<T> action)
+            : base(text, o => changeStateFunc?.Invoke((T)o) ?? o, type, o => action?.Invoke((T)o))
         {
             base.State.BindValueChanged(state =>
             {

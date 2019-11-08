@@ -53,12 +53,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestMenuItem : StatefulMenuItem<TestStates>
         {
             public TestMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-                : base(text, type)
+                : this(text, type, null)
             {
             }
 
             public TestMenuItem(string text, MenuItemType type, Func<TestStates, TestStates> changeStateFunc)
-                : base(text, type, changeStateFunc)
+                : base(text, changeStateFunc, type)
             {
             }
 
