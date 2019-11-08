@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
         protected virtual string SampleNamespace => null;
 
-        protected SkinnableSound Samples;
+        protected SkinnableSound Samples { get; private set; }
 
         protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
@@ -137,6 +137,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         private void loadSamples()
         {
+            if (Samples != null)
+            {
+                RemoveInternal(Samples);
+                Samples = null;
+            }
+
             var samples = GetSamples().ToArray();
 
             if (samples.Length <= 0)
