@@ -186,31 +186,9 @@ namespace osu.Game.Overlays.Comments
             if (parameters == null)
                 return;
 
-            Task.Run(async () =>
-            {
-                var tcs = new TaskCompletionSource<bool>();
-
-                request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
-
-                request.Success += response => Schedule(() =>
-                {
-                    onSuccess(response);
-                    tcs.SetResult(true);
-                });
-
-                request.Failure += _ => tcs.SetResult(false);
-
-                try
-                {
-                    request.Perform(api);
-                }
-                catch
-                {
-                    tcs.SetResult(false);
-                }
-
-                await tcs.Task;
-            });
+            request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
+            request.Success += onSuccess;
+            Task.Run(() => request.Perform(api));
         }
 
         private void onSuccess(CommentBundle response)
