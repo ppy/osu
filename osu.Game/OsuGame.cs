@@ -102,8 +102,6 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        private readonly List<VisibilityContainer> toolbarElements = new List<VisibilityContainer>();
-
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
         public OsuGame(string[] args = null)
@@ -134,17 +132,13 @@ namespace osu.Game
         /// <summary>
         /// Close all game-wide overlays.
         /// </summary>
-        /// <param name="hideToolbarElements">Whether the toolbar (and accompanying controls) should also be hidden.</param>
-        public void CloseAllOverlays(bool hideToolbarElements = true)
+        /// <param name="hideToolbar">Whether the toolbar should also be hidden.</param>
+        public void CloseAllOverlays(bool hideToolbar = true)
         {
             foreach (var overlay in overlays)
                 overlay.Hide();
 
-            if (hideToolbarElements)
-            {
-                foreach (var overlay in toolbarElements)
-                    overlay.Hide();
-            }
+            if (hideToolbar) Toolbar.Hide();
         }
 
         private DependencyContainer dependencies;
@@ -570,11 +564,7 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
                 },
-            }, d =>
-            {
-                topMostOverlayContent.Add(d);
-                toolbarElements.Add(d);
-            });
+            }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
@@ -613,11 +603,7 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, d =>
-            {
-                rightFloatingOverlayContent.Add(d);
-                toolbarElements.Add(d);
-            }, true);
+            }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
