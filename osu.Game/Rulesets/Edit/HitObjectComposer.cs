@@ -41,6 +41,9 @@ namespace osu.Game.Rulesets.Edit
         protected IFrameBasedClock EditorClock { get; private set; }
 
         [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
+
+        [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
         private IWorkingBeatmap workingBeatmap;
@@ -256,6 +259,9 @@ namespace osu.Game.Rulesets.Edit
         public void EndPlacement(HitObject hitObject)
         {
             EditorBeatmap.Add(hitObject);
+
+            adjustableClock.Seek(hitObject.StartTime);
+
             showGridFor(Enumerable.Empty<HitObject>());
         }
 
