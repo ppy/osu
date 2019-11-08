@@ -185,6 +185,36 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
+        #region Sample Changes
+
+        /// <summary>
+        /// Adds a hit sample to all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="sampleName">The name of the hit sample.</param>
+        public void AddHitSample(string sampleName)
+        {
+            foreach (var h in SelectedHitObjects)
+            {
+                // Make sure there isn't already an existing sample
+                if (h.Samples.Any(s => s.Name == sampleName))
+                    continue;
+
+                h.Samples.Add(new HitSampleInfo { Name = sampleName });
+            }
+        }
+
+        /// <summary>
+        /// Removes a hit sample from all selected <see cref="HitObject"/>s.
+        /// </summary>
+        /// <param name="sampleName">The name of the hit sample.</param>
+        public void RemoveHitSample(string sampleName)
+        {
+            foreach (var h in SelectedHitObjects)
+                h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
+        }
+
+        #endregion
+
         #region Context Menu
 
         public virtual MenuItem[] ContextMenuItems
@@ -221,21 +251,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 switch (state)
                 {
                     case ThreeStates.Disabled:
-                        foreach (var h in SelectedHitObjects)
-                            h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
-
+                        RemoveHitSample(sampleName);
                         break;
 
                     case ThreeStates.Enabled:
-                        foreach (var h in SelectedHitObjects)
-                        {
-                            // Make sure there isn't already an existing sample
-                            if (h.Samples.Any(s => s.Name == sampleName))
-                                continue;
-
-                            h.Samples.Add(new HitSampleInfo { Name = sampleName });
-                        }
-
+                        AddHitSample(sampleName);
                         break;
                 }
             }
