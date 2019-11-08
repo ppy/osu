@@ -46,12 +46,18 @@ namespace osu.Game.Audio
         {
             var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
-            track.Started += () => Schedule(() =>
+            track.Started += () =>
             {
+                // Stopping track should not be within the below schedule since its stop event schedules a null assign to current.
+                // Due to that, assigning the new track to current must be scheduled after the null assign to avoid current track loss.
                 current?.Stop();
-                current = track;
-                audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            });
+
+                Schedule(() =>
+                {
+                    current = track;
+                    audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
+                });
+            };
 
             track.Stopped += () => Schedule(() =>
             {
