@@ -20,6 +20,9 @@ namespace osu.Game.Users
         [JsonProperty(@"username")]
         public string Username;
 
+        [JsonProperty(@"previous_usernames")]
+        public string[] PreviousUsernames;
+
         [JsonProperty(@"country")]
         public Country Country;
 
@@ -74,6 +77,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"is_bng")]
         public bool IsBNG;
+
+        [JsonProperty(@"is_bot")]
+        public bool IsBot;
 
         [JsonProperty(@"is_active")]
         public bool Active;

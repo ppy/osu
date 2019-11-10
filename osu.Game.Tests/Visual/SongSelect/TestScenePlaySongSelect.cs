@@ -15,6 +15,8 @@ using osu.Framework.MathUtils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -32,6 +34,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapManager manager;
 
         private RulesetStore rulesets;
+
+        private MusicController music;
 
         private WorkingBeatmap defaultBeatmap;
 
@@ -78,8 +82,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, defaultBeatmap = Beatmap.Default));
 
+            Dependencies.Cache(music = new MusicController());
+
+            // required to get bindables attached
+            Add(music);
+
             Beatmap.SetDefault();
+
+            Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
+
+        private OsuConfigManager config;
 
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
@@ -87,6 +100,57 @@ namespace osu.Game.Tests.Visual.SongSelect
             Ruleset.Value = new OsuRuleset().RulesetInfo;
             manager?.Delete(manager.GetAllUsableBeatmapSets());
         });
+
+        [Test]
+        public void TestAudioResuming()
+        {
+            createSongSelect();
+
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            checkMusicPlaying(true);
+            AddStep("select first", () => songSelect.Carousel.SelectBeatmap(songSelect.Carousel.BeatmapSets.First().Beatmaps.First()));
+            checkMusicPlaying(true);
+
+            AddStep("manual pause", () => music.TogglePause());
+            checkMusicPlaying(false);
+            AddStep("select next difficulty", () => songSelect.Carousel.SelectNext(skipDifficulties: false));
+            checkMusicPlaying(false);
+
+            AddStep("select next set", () => songSelect.Carousel.SelectNext());
+            checkMusicPlaying(true);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestAudioRemainsCorrectOnRulesetChange(bool rulesetsInSameBeatmap)
+        {
+            createSongSelect();
+
+            // start with non-osu! to avoid convert confusion
+            changeRuleset(1);
+
+            if (rulesetsInSameBeatmap)
+                AddStep("import multi-ruleset map", () =>
+                {
+                    var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+                    manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
+                });
+            else
+            {
+                addRulesetImportStep(1);
+                addRulesetImportStep(0);
+            }
+
+            checkMusicPlaying(true);
+
+            AddStep("manual pause", () => music.TogglePause());
+            checkMusicPlaying(false);
+
+            changeRuleset(0);
+            checkMusicPlaying(!rulesetsInSameBeatmap);
+        }
 
         [Test]
         public void TestDummy()
@@ -111,22 +175,22 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
-            AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
-            AddStep(@"Sort by Title", delegate { songSelect.FilterControl.Sort = SortMode.Title; });
-            AddStep(@"Sort by Author", delegate { songSelect.FilterControl.Sort = SortMode.Author; });
-            AddStep(@"Sort by DateAdded", delegate { songSelect.FilterControl.Sort = SortMode.DateAdded; });
-            AddStep(@"Sort by BPM", delegate { songSelect.FilterControl.Sort = SortMode.BPM; });
-            AddStep(@"Sort by Length", delegate { songSelect.FilterControl.Sort = SortMode.Length; });
-            AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
+            var sortMode = config.GetBindable<SortMode>(OsuSetting.SongSelectSortingMode);
+
+            AddStep(@"Sort by Artist", delegate { sortMode.Value = SortMode.Artist; });
+            AddStep(@"Sort by Title", delegate { sortMode.Value = SortMode.Title; });
+            AddStep(@"Sort by Author", delegate { sortMode.Value = SortMode.Author; });
+            AddStep(@"Sort by DateAdded", delegate { sortMode.Value = SortMode.DateAdded; });
+            AddStep(@"Sort by BPM", delegate { sortMode.Value = SortMode.BPM; });
+            AddStep(@"Sort by Length", delegate { sortMode.Value = SortMode.Length; });
+            AddStep(@"Sort by Difficulty", delegate { sortMode.Value = SortMode.Difficulty; });
         }
 
         [Test]
-        [Ignore("needs fixing")]
         public void TestImportUnderDifferentRuleset()
         {
             createSongSelect();
-            changeRuleset(2);
-            addRulesetImportStep(0);
+            addRulesetImportStep(2);
             AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
         }
 
@@ -217,6 +281,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         private static int importId;
         private int getImportId() => ++importId;
 
+        private void checkMusicPlaying(bool playing) =>
+            AddUntilStep($"music {(playing ? "" : "not ")}playing", () => music.IsPlaying == playing);
+
         private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => Mods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
@@ -281,6 +348,12 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmaps = beatmaps,
                 DateAdded = DateTimeOffset.UtcNow,
             };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            rulesets?.Dispose();
         }
     }
 }

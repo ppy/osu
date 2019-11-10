@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
+        protected override bool Autoplay => true;
+
         [Test]
         public void TestHyperDash()
         {

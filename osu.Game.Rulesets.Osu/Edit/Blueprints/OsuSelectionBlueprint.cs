@@ -7,12 +7,13 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {
-    public class OsuSelectionBlueprint : SelectionBlueprint
+    public abstract class OsuSelectionBlueprint<T> : SelectionBlueprint
+        where T : OsuHitObject
     {
-        protected OsuHitObject OsuObject => (OsuHitObject)HitObject.HitObject;
+        protected T HitObject => (T)DrawableObject.HitObject;
 
-        public OsuSelectionBlueprint(DrawableHitObject hitObject)
-            : base(hitObject)
+        protected OsuSelectionBlueprint(DrawableHitObject drawableObject)
+            : base(drawableObject)
         {
         }
     }
