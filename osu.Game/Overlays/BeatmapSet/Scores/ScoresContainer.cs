@@ -145,8 +145,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             base.LoadComplete();
 
-            scopeSelector.Current.BindValueChanged(scope => getScores(scope.NewValue, modSelector.SelectedMods.Value), true);
-            modSelector.SelectedMods.BindValueChanged(mods => getScores(scopeSelector.Current.Value, mods.NewValue), true);
+            modSelector.SelectedMods.ItemsAdded += modsChanged;
+            modSelector.SelectedMods.ItemsRemoved += modsChanged;
+
+            scopeSelector.Current.BindValueChanged(scope => getScores(scope.NewValue, modSelector.SelectedMods));
+
             Beatmap.BindValueChanged(beatmap =>
             {
                 scopeSelector.Current.Value = BeatmapLeaderboardScope.Global;
@@ -161,6 +164,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 getScores();
             }, true);
         }
+
+        private void modsChanged(IEnumerable<Mod> mods) => getScores(scopeSelector.Current.Value, modSelector.SelectedMods);
 
         private void getScores(BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global, IEnumerable<Mod> mods = null)
         {

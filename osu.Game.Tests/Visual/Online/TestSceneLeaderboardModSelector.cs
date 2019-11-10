@@ -11,6 +11,9 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Bindables;
+using osu.Game.Rulesets;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -24,9 +27,10 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;
-            FillFlowContainer selectedMods;
+            FillFlowContainer<SpriteText> selectedMods;
+            Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-            Add(selectedMods = new FillFlowContainer
+            Add(selectedMods = new FillFlowContainer<SpriteText>
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -36,24 +40,38 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Ruleset = { BindTarget = ruleset }
             });
 
-            modSelector.SelectedMods.BindValueChanged(mods =>
+            modSelector.SelectedMods.ItemsAdded += mods =>
             {
-                selectedMods.Clear();
+                mods.ForEach(mod => selectedMods.Add(new SpriteText
+                {
+                    Text = mod.Acronym,
+                }));
+            };
 
-                foreach (var mod in mods.NewValue)
-                    selectedMods.Add(new SpriteText
+            modSelector.SelectedMods.ItemsRemoved += mods =>
+            {
+                mods.ForEach(mod =>
+                {
+                    foreach (var selected in selectedMods)
                     {
-                        Text = mod.Acronym,
-                    });
-            });
+                        if (selected.Text == mod.Acronym)
+                        {
+                            selectedMods.Remove(selected);
+                            break;
+                        }
+                    }
+                });
+            };
 
-            AddStep("osu mods", () => modSelector.Ruleset.Value = new OsuRuleset().RulesetInfo);
-            AddStep("mania mods", () => modSelector.Ruleset.Value = new ManiaRuleset().RulesetInfo);
-            AddStep("taiko mods", () => modSelector.Ruleset.Value = new TaikoRuleset().RulesetInfo);
-            AddStep("catch mods", () => modSelector.Ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("osu ruleset", () => ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddStep("mania ruleset", () => ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddStep("taiko ruleset", () => ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddStep("catch ruleset", () => ruleset.Value = new CatchRuleset().RulesetInfo);
             AddStep("Deselect all", () => modSelector.DeselectAll());
+            AddStep("null ruleset", () => ruleset.Value = null);
         }
     }
 }
