@@ -40,7 +40,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public CommentableType CommentableType;
 
-        [JsonProperty(@"commenatble_type")]
+        [JsonProperty(@"commentable_type")]
         private string commentableType
         {
             set => Enum.TryParse(value.Pascalize(), true, out CommentableType);
