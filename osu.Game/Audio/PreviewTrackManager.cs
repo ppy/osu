@@ -48,6 +48,7 @@ namespace osu.Game.Audio
 
             track.Started += () => Schedule(() =>
             {
+                // Assign the new track to current before stopping last track to avoid assigning null to current.
                 var last = current;
                 current = track;
                 last?.Stop();
