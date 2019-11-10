@@ -88,13 +88,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        scopeSelector = new LeaderboardScopeSelector(),
+                        scopeSelector = new LeaderboardScopeSelector
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
                         modSelector = new LeaderboardModSelector
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             Ruleset = { BindTarget = ruleset }
                         },
                         new Container
                         {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Children = new Drawable[]

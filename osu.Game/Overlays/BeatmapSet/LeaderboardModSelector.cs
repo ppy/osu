@@ -27,8 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public LeaderboardModSelector()
         {
-            AutoSizeAxes = Axes.Y;
-            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Both;
             InternalChild = modsContainer = new FillFlowContainer<ModButton>
             {
                 Anchor = Anchor.Centre,
