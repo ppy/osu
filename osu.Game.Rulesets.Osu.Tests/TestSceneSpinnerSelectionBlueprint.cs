@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -25,8 +24,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(SpinnerPiece)
         };
 
-        private readonly DrawableSpinner drawableSpinner;
-
         public TestSceneSpinnerSelectionBlueprint()
         {
             var spinner = new Spinner
@@ -35,7 +32,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StartTime = -1000,
                 EndTime = 2000
             };
+
             spinner.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
+
+            DrawableSpinner drawableSpinner;
 
             Add(new Container
             {
@@ -43,8 +43,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Size = new Vector2(0.5f),
                 Child = drawableSpinner = new DrawableSpinner(spinner)
             });
-        }
 
-        protected override SelectionBlueprint CreateBlueprint() => new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) };
+            AddBlueprint(new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) });
+        }
     }
 }
