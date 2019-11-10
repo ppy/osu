@@ -39,6 +39,10 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.BeatDivisor.IsInRange(Beatmap.BeatDivisor);
             match &= criteria.OnlineStatus.IsInRange(Beatmap.Status);
 
+            match &= criteria.Creator.Matches(Beatmap.Metadata.AuthorString);
+            match &= criteria.Artist.Matches(Beatmap.Metadata.Artist) ||
+                     criteria.Artist.Matches(Beatmap.Metadata.ArtistUnicode);
+
             if (match)
                 foreach (var criteriaTerm in criteria.SearchTerms)
                     match &=

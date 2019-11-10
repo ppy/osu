@@ -19,7 +19,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Size = HitObject.DrawSize;
+            // Todo: This shouldn't exist, mania should not reference the drawable hitobject directly.
+            if (DrawableObject.IsLoaded)
+                Size = DrawableObject.DrawSize;
         }
     }
 }

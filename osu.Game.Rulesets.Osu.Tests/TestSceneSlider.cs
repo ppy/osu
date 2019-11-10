@@ -111,6 +111,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Distance Overflow 1 Repeat", () => SetContents(() => testDistanceOverflow(1)));
         }
 
+        [Test]
+        public void TestChangeStackHeight()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+                Add(slider);
+            });
+
+            AddStep("change stack height", () => slider.HitObject.StackHeight = 10);
+            AddAssert("body positioned correctly", () => slider.Position == slider.HitObject.StackedPosition);
+        }
+
         private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
 
         private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
@@ -293,15 +308,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
         {
             var cpi = new ControlPointInfo();
-            cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
+            cpi.Add(0, new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
             slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
-            var drawable = new DrawableSlider(slider)
-            {
-                Anchor = Anchor.Centre,
-                Depth = depthIndex++
-            };
+            var drawable = CreateDrawableSlider(slider);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
@@ -310,6 +321,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             return drawable;
         }
+
+        protected virtual DrawableSlider CreateDrawableSlider(Slider slider) => new DrawableSlider(slider)
+        {
+            Anchor = Anchor.Centre,
+            Depth = depthIndex++
+        };
 
         private float judgementOffsetDirection = 1;
 
