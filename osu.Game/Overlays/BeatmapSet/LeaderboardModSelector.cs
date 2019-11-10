@@ -5,7 +5,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Framework.Bindables;
-using System.Collections.Generic;
 using osu.Game.Rulesets;
 using osuTK;
 using osu.Game.Rulesets.UI;
@@ -21,7 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class LeaderboardModSelector : CompositeDrawable
     {
-        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
+        public readonly BindableList<Mod> SelectedMods = new BindableList<Mod>();
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
@@ -47,8 +46,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
         {
-            SelectedMods.Value = new List<Mod>();
-
+            SelectedMods.Clear();
             modsContainer.Clear();
 
             if (ruleset.NewValue == null)
@@ -67,22 +65,18 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void selectionChanged(Mod mod, bool selected)
         {
-            var mods = SelectedMods.Value.ToList();
-
             if (selected)
-                mods.Add(mod);
+                SelectedMods.Add(mod);
             else
-                mods.Remove(mod);
+                SelectedMods.Remove(mod);
 
-            SelectedMods.Value = mods;
-
-            if (!mods.Any() && !IsHovered)
+            if (!SelectedMods.Any() && !IsHovered)
                 highlightAll();
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!SelectedMods.Value.Any())
+            if (!SelectedMods.Any())
                 modsContainer.ForEach(button =>
                 {
                     if (!button.IsHovered)
@@ -96,7 +90,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.OnHoverLost(e);
 
-            if (!SelectedMods.Value.Any())
+            if (!SelectedMods.Any())
                 highlightAll();
         }
 

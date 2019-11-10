@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -26,10 +27,10 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneLeaderboardModSelector()
         {
             LeaderboardModSelector modSelector;
-            FillFlowContainer selectedMods;
+            FillFlowContainer<SpriteText> selectedMods;
             Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-            Add(selectedMods = new FillFlowContainer
+            Add(selectedMods = new FillFlowContainer<SpriteText>
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -42,16 +43,28 @@ namespace osu.Game.Tests.Visual.Online
                 Ruleset = { BindTarget = ruleset }
             });
 
-            modSelector.SelectedMods.BindValueChanged(mods =>
+            modSelector.SelectedMods.ItemsAdded += mods =>
             {
-                selectedMods.Clear();
+                mods.ForEach(mod => selectedMods.Add(new SpriteText
+                {
+                    Text = mod.Acronym,
+                }));
+            };
 
-                foreach (var mod in mods.NewValue)
-                    selectedMods.Add(new SpriteText
+            modSelector.SelectedMods.ItemsRemoved += mods =>
+            {
+                mods.ForEach(mod =>
+                {
+                    foreach (var selected in selectedMods)
                     {
-                        Text = mod.Acronym,
-                    });
-            });
+                        if (selected.Text == mod.Acronym)
+                        {
+                            selectedMods.Remove(selected);
+                            break;
+                        }
+                    }
+                });
+            };
 
             AddStep("osu ruleset", () => ruleset.Value = new OsuRuleset().RulesetInfo);
             AddStep("mania ruleset", () => ruleset.Value = new ManiaRuleset().RulesetInfo);
