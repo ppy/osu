@@ -106,8 +106,11 @@ namespace osu.Game.Storyboards
             foreach (var loop in loops)
                 commands = commands.Concat(loop.GetCommands(timelineSelector));
             if (triggeredGroups != null)
+            {
                 foreach (var pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
+            }
+
             return commands;
         }
 
