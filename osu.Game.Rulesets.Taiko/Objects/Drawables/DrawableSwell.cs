@@ -146,15 +146,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case SwellTick tick:
-                    return new DrawableSwellTick(tick);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
+                SwellTick tick => new DrawableSwellTick(tick),
+                _ => base.CreateNestedHitObject(hitObject),
+            };
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {

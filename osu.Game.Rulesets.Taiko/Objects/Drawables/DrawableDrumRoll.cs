@@ -74,15 +74,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case DrumRollTick tick:
-                    return new DrawableDrumRollTick(tick);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
+                DrumRollTick tick => new DrawableDrumRollTick(tick),
+                _ => base.CreateNestedHitObject(hitObject),
+            };
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
 

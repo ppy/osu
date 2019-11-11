@@ -11,36 +11,20 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         public override HitResult MaxResult => HitResult.Great;
 
         protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Good:
-                    return 100;
-
-                case HitResult.Great:
-                    return 300;
-
-                default:
-                    return 0;
-            }
-        }
+                HitResult.Good => 100,
+                HitResult.Great => 300,
+                _ => 0,
+            };
 
         protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Miss:
-                    return -1.0;
-
-                case HitResult.Good:
-                    return 1.1;
-
-                case HitResult.Great:
-                    return 3.0;
-
-                default:
-                    return 0;
-            }
-        }
+                HitResult.Miss => -1.0,
+                HitResult.Good => 1.1,
+                HitResult.Great => 3.0,
+                _ => 0,
+            };
     }
 }

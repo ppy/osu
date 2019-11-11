@@ -153,15 +153,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case StrongHitObject strong:
-                    return CreateStrongHit(strong);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
+                StrongHitObject strong => CreateStrongHit(strong),
+                _ => base.CreateNestedHitObject(hitObject),
+            };
 
         // Normal and clap samples are handled by the drum
         protected override IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples.Where(s => s.Name != HitSampleInfo.HIT_NORMAL && s.Name != HitSampleInfo.HIT_CLAP);

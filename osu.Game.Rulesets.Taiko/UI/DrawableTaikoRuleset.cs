@@ -45,24 +45,14 @@ namespace osu.Game.Rulesets.Taiko.UI
         protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 
         public override DrawableHitObject<TaikoHitObject> CreateDrawableRepresentation(TaikoHitObject h)
-        {
-            switch (h)
+            => h switch
             {
-                case CentreHit centreHit:
-                    return new DrawableCentreHit(centreHit);
-
-                case RimHit rimHit:
-                    return new DrawableRimHit(rimHit);
-
-                case DrumRoll drumRoll:
-                    return new DrawableDrumRoll(drumRoll);
-
-                case Swell swell:
-                    return new DrawableSwell(swell);
-            }
-
-            return null;
-        }
+                CentreHit centreHit => new DrawableCentreHit(centreHit),
+                RimHit rimHit => new DrawableRimHit(rimHit),
+                DrumRoll drumRoll => new DrawableDrumRoll(drumRoll),
+                Swell swell => new DrawableSwell(swell),
+                _ => null,
+            };
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new TaikoFramedReplayInputHandler(replay);
     }

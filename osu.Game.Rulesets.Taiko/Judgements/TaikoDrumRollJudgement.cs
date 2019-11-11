@@ -9,17 +9,12 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     {
         public override bool AffectsCombo => false;
 
-        protected override double HealthIncreaseFor(HitResult result)
-        {
+        protected override double HealthIncreaseFor(HitResult result) =>
             // Drum rolls can be ignored with no health penalty
-            switch (result)
+            result switch
             {
-                case HitResult.Miss:
-                    return 0;
-
-                default:
-                    return base.HealthIncreaseFor(result);
-            }
-        }
+                HitResult.Miss => 0,
+                _ => base.HealthIncreaseFor(result),
+            };
     }
 }

@@ -15,17 +15,13 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         };
 
         public override bool IsHitResultAllowed(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Great:
-                case HitResult.Good:
-                case HitResult.Miss:
-                    return true;
-            }
-
-            return false;
-        }
+                HitResult.Great => true,
+                HitResult.Good => true,
+                HitResult.Miss => true,
+                _ => false,
+            };
 
         protected override DifficultyRange[] GetRanges() => taiko_ranges;
     }

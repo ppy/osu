@@ -51,27 +51,13 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
                         for (double j = h.StartTime; j < endTime; j += hitRate)
                         {
-                            TaikoAction action;
-
-                            switch (d)
+                            var action = d switch
                             {
-                                default:
-                                case 0:
-                                    action = TaikoAction.LeftCentre;
-                                    break;
-
-                                case 1:
-                                    action = TaikoAction.LeftRim;
-                                    break;
-
-                                case 2:
-                                    action = TaikoAction.RightCentre;
-                                    break;
-
-                                case 3:
-                                    action = TaikoAction.RightRim;
-                                    break;
-                            }
+                                1 => TaikoAction.LeftRim,
+                                2 => TaikoAction.RightCentre,
+                                3 => TaikoAction.RightRim,
+                                _ => TaikoAction.LeftCentre,
+                            };
 
                             Frames.Add(new TaikoReplayFrame(j, action));
                             d = (d + 1) % 4;

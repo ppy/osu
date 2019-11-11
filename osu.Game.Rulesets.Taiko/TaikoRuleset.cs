@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -20,7 +21,6 @@ using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
-using System;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -84,44 +84,33 @@ namespace osu.Game.Rulesets.Taiko
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
-        {
-            switch (type)
+            => type switch
             {
-                case ModType.DifficultyReduction:
-                    return new Mod[]
-                    {
-                        new TaikoModEasy(),
-                        new TaikoModNoFail(),
-                        new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
-                    };
-
-                case ModType.DifficultyIncrease:
-                    return new Mod[]
-                    {
-                        new TaikoModHardRock(),
-                        new MultiMod(new TaikoModSuddenDeath(), new TaikoModPerfect()),
-                        new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
-                        new TaikoModHidden(),
-                        new TaikoModFlashlight(),
-                    };
-
-                case ModType.Automation:
-                    return new Mod[]
-                    {
-                        new MultiMod(new TaikoModAutoplay(), new TaikoModCinema()),
-                        new TaikoModRelax(),
-                    };
-
-                case ModType.Fun:
-                    return new Mod[]
-                    {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
-                    };
-
-                default:
-                    return Array.Empty<Mod>();
-            }
-        }
+                ModType.DifficultyReduction => new Mod[]
+                {
+                    new TaikoModEasy(),
+                    new TaikoModNoFail(),
+                    new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
+                },
+                ModType.DifficultyIncrease => new Mod[]
+                {
+                    new TaikoModHardRock(),
+                    new MultiMod(new TaikoModSuddenDeath(), new TaikoModPerfect()),
+                    new MultiMod(new TaikoModDoubleTime(), new TaikoModNightcore()),
+                    new TaikoModHidden(),
+                    new TaikoModFlashlight(),
+                },
+                ModType.Automation => new Mod[]
+                {
+                    new MultiMod(new TaikoModAutoplay(), new TaikoModCinema()),
+                    new TaikoModRelax(),
+                },
+                ModType.Fun => new Mod[]
+                {
+                    new MultiMod(new ModWindUp(), new ModWindDown())
+                },
+                _ => Array.Empty<Mod>(),
+            };
 
         public override string Description => "osu!taiko";
 
