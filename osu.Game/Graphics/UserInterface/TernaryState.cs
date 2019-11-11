@@ -6,22 +6,22 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An on/off state with an extra indeterminate state.
     /// </summary>
-    public enum ThreeStates
+    public enum TernaryState
     {
         /// <summary>
-        /// The current state is disabled.
+        /// The current state is false.
         /// </summary>
-        Disabled,
+        False,
 
         /// <summary>
-        /// The current state is a combination of <see cref="Disabled"/> and <see cref="Enabled"/>.
-        /// The state becomes <see cref="Enabled"/> if the <see cref="ThreeStateMenuItem"/> is pressed.
+        /// The current state is a combination of <see cref="False"/> and <see cref="True"/>.
+        /// The state becomes <see cref="True"/> if the <see cref="ThreeStateMenuItem"/> is pressed.
         /// </summary>
         Indeterminate,
 
         /// <summary>
-        /// The current state is enabled.
+        /// The current state is true.
         /// </summary>
-        Enabled
+        True
     }
 }

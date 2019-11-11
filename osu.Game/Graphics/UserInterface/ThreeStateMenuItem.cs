@@ -9,7 +9,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An <see cref="OsuMenuItem"/> with three possible states.
     /// </summary>
-    public class ThreeStateMenuItem : StatefulMenuItem<ThreeStates>
+    public class ThreeStateMenuItem : StatefulMenuItem<TernaryState>
     {
         /// <summary>
         /// Creates a new <see cref="ThreeStateMenuItem"/>.
@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="text">The text to display.</param>
         /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
         /// <param name="action">A delegate to be invoked when this <see cref="ThreeStateMenuItem"/> is pressed.</param>
-        public ThreeStateMenuItem(string text, MenuItemType type, Action<ThreeStates> action)
+        public ThreeStateMenuItem(string text, MenuItemType type, Action<TernaryState> action)
             : this(text, getNextState, type, action)
         {
         }
@@ -39,37 +39,37 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="changeStateFunc">A function that mutates a state to another state after this <see cref="ThreeStateMenuItem"/> is pressed.</param>
         /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
         /// <param name="action">A delegate to be invoked when this <see cref="ThreeStateMenuItem"/> is pressed.</param>
-        protected ThreeStateMenuItem(string text, Func<ThreeStates, ThreeStates> changeStateFunc, MenuItemType type, Action<ThreeStates> action)
+        protected ThreeStateMenuItem(string text, Func<TernaryState, TernaryState> changeStateFunc, MenuItemType type, Action<TernaryState> action)
             : base(text, changeStateFunc, type, action)
         {
         }
 
-        public override IconUsage? GetIconForState(ThreeStates state)
+        public override IconUsage? GetIconForState(TernaryState state)
         {
             switch (state)
             {
-                case ThreeStates.Indeterminate:
-                    return FontAwesome.Regular.Circle;
+                case TernaryState.Indeterminate:
+                    return FontAwesome.Solid.DotCircle;
 
-                case ThreeStates.Enabled:
+                case TernaryState.True:
                     return FontAwesome.Solid.Check;
             }
 
             return null;
         }
 
-        private static ThreeStates getNextState(ThreeStates state)
+        private static TernaryState getNextState(TernaryState state)
         {
             switch (state)
             {
-                case ThreeStates.Disabled:
-                    return ThreeStates.Enabled;
+                case TernaryState.False:
+                    return TernaryState.True;
 
-                case ThreeStates.Indeterminate:
-                    return ThreeStates.Enabled;
+                case TernaryState.Indeterminate:
+                    return TernaryState.True;
 
-                case ThreeStates.Enabled:
-                    return ThreeStates.Disabled;
+                case TernaryState.True:
+                    return TernaryState.False;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);
