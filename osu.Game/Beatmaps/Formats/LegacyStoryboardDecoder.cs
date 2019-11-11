@@ -171,16 +171,16 @@ namespace osu.Game.Beatmaps.Formats
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
+                                break;
                             }
-                            break;
 
                             case "S":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
+                                break;
                             }
-                            break;
 
                             case "V":
                             {
@@ -189,16 +189,16 @@ namespace osu.Game.Beatmaps.Formats
                                 var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                                break;
                             }
-                            break;
 
                             case "R":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
+                                break;
                             }
-                            break;
 
                             case "M":
                             {
@@ -208,24 +208,24 @@ namespace osu.Game.Beatmaps.Formats
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
+                                break;
                             }
-                            break;
 
                             case "MX":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
+                                break;
                             }
-                            break;
 
                             case "MY":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
+                                break;
                             }
-                            break;
 
                             case "C":
                             {
@@ -238,8 +238,8 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Colour.Add(easing, startTime, endTime,
                                     new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
+                                break;
                             }
-                            break;
 
                             case "P":
                             {
@@ -259,14 +259,16 @@ namespace osu.Game.Beatmaps.Formats
                                         timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
                                         break;
                                 }
+
+                                break;
                             }
-                            break;
 
                             default:
                                 throw new InvalidDataException($@"Unknown command type: {commandType}");
                         }
+
+                        break;
                     }
-                    break;
                 }
             }
         }

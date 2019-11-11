@@ -43,6 +43,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override string FormatCount(double count)
         {
             string format = new string('0', (int)LeadingZeroes);
+
             if (UseCommaSeparator)
             {
                 for (int i = format.Length - 3; i > 0; i -= 3)

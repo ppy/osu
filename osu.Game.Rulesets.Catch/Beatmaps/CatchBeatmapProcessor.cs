@@ -195,6 +195,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 if (currentObject is Fruit)
                     objectWithDroplets.Add(currentObject);
+
                 if (currentObject is JuiceStream)
                 {
                     foreach (var currentJuiceElement in currentObject.NestedHitObjects)
