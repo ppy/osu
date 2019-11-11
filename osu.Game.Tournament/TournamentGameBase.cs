@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -21,11 +22,13 @@ using osu.Game.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
 {
+    [Cached(typeof(TournamentGameBase))]
     public abstract class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
@@ -197,10 +200,7 @@ namespace osu.Game.Tournament
             foreach (var p in t.Players)
                 if (string.IsNullOrEmpty(p.Username))
                 {
-                    var req = new GetUserRequest(p.Id);
-                    req.Perform(API);
-                    p.Username = req.Result.Username;
-
+                    PopulateUser(p);
                     addedInfo = true;
                 }
 
@@ -226,6 +226,30 @@ namespace osu.Game.Tournament
                 }
 
             return addedInfo;
+        }
+
+        public void PopulateUser(User user, Action success = null, Action failure = null)
+        {
+            var req = new GetUserRequest(user.Id, Ruleset.Value);
+
+            req.Success += res =>
+            {
+                user.Username = res.Username;
+                user.Statistics = res.Statistics;
+                user.Username = res.Username;
+                user.Country = res.Country;
+                user.Cover = res.Cover;
+
+                success?.Invoke();
+            };
+
+            req.Failure += _ =>
+            {
+                user.Id = 1;
+                failure?.Invoke();
+            };
+
+            API.Queue(req);
         }
 
         protected override void LoadComplete()
