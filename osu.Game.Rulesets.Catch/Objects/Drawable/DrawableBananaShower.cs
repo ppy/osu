@@ -38,14 +38,10 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case Banana banana:
-                    return createDrawableRepresentation?.Invoke(banana)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
+                Banana banana => createDrawableRepresentation?.Invoke(banana)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false),
+                _ => base.CreateNestedHitObject(hitObject),
+            };
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Catch.Mods;
@@ -20,7 +21,6 @@ using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
-using System;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -85,44 +85,33 @@ namespace osu.Game.Rulesets.Catch
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
-        {
-            switch (type)
+            => type switch
             {
-                case ModType.DifficultyReduction:
-                    return new Mod[]
-                    {
-                        new CatchModEasy(),
-                        new CatchModNoFail(),
-                        new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
-                    };
-
-                case ModType.DifficultyIncrease:
-                    return new Mod[]
-                    {
-                        new CatchModHardRock(),
-                        new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect()),
-                        new MultiMod(new CatchModDoubleTime(), new CatchModNightcore()),
-                        new CatchModHidden(),
-                        new CatchModFlashlight(),
-                    };
-
-                case ModType.Automation:
-                    return new Mod[]
-                    {
-                        new MultiMod(new CatchModAutoplay(), new CatchModCinema()),
-                        new CatchModRelax(),
-                    };
-
-                case ModType.Fun:
-                    return new Mod[]
-                    {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
-                    };
-
-                default:
-                    return Array.Empty<Mod>();
-            }
-        }
+                ModType.DifficultyReduction => new Mod[]
+                {
+                    new CatchModEasy(),
+                    new CatchModNoFail(),
+                    new MultiMod(new CatchModHalfTime(), new CatchModDaycore())
+                },
+                ModType.DifficultyIncrease => new Mod[]
+                {
+                    new CatchModHardRock(),
+                    new MultiMod(new CatchModSuddenDeath(), new CatchModPerfect()),
+                    new MultiMod(new CatchModDoubleTime(), new CatchModNightcore()),
+                    new CatchModHidden(),
+                    new CatchModFlashlight(),
+                },
+                ModType.Automation => new Mod[]
+                {
+                    new MultiMod(new CatchModAutoplay(), new CatchModCinema()),
+                    new CatchModRelax(),
+                },
+                ModType.Fun => new Mod[]
+                {
+                    new MultiMod(new ModWindUp(), new ModWindDown())
+                },
+                _ => Array.Empty<Mod>(),
+            };
 
         public override string Description => "osu!catch";
 

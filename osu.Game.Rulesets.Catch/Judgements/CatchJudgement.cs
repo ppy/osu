@@ -12,28 +12,18 @@ namespace osu.Game.Rulesets.Catch.Judgements
         public override HitResult MaxResult => HitResult.Perfect;
 
         protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 300;
-            }
-        }
+                HitResult.Perfect => 300,
+                _ => 0,
+            };
 
         protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                default:
-                    return -0.02;
-
-                case HitResult.Perfect:
-                    return 0.01;
-            }
-        }
+                HitResult.Perfect => 0.01,
+                _ => -0.02,
+            };
 
         /// <summary>
         /// Whether fruit on the platter should explode or drop.

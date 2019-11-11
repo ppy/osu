@@ -11,28 +11,18 @@ namespace osu.Game.Rulesets.Catch.Judgements
         public override bool AffectsCombo => false;
 
         protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 1100;
-            }
-        }
+                HitResult.Perfect => 1100,
+                _ => 0,
+            };
 
         protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                default:
-                    return 0;
-
-                case HitResult.Perfect:
-                    return 0.008;
-            }
-        }
+                HitResult.Perfect => 0.008,
+                _ => 0,
+            };
 
         public override bool ShouldExplodeFor(JudgementResult result) => true;
     }

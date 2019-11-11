@@ -102,176 +102,169 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 distance * MathF.Sin(angle * MathF.PI / 180),
                 distance * MathF.Cos(angle * MathF.PI / 180));
 
-            switch (representation)
+            return representation switch
             {
-                default:
-                    return new Container();
-
-                case FruitVisualRepresentation.Raspberry:
-                    return new Container
+                FruitVisualRepresentation.Raspberry => new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Framework.Graphics.Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        new Pulp
                         {
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(small_pulp),
-                                Y = -0.34f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(0, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(90, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(180, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_4),
-                                AccentColour = AccentColour.Value,
-                                Position = positionAt(270, distance_from_centre_4),
-                            },
-                        }
-                    };
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(small_pulp),
+                            Y = -0.34f,
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4),
+                            Position = positionAt(0, distance_from_centre_4),
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4),
+                            Position = positionAt(90, distance_from_centre_4),
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4),
+                            Position = positionAt(180, distance_from_centre_4),
+                        },
+                        new Pulp
+                        {
+                            Size = new Vector2(large_pulp_4),
+                            AccentColour = AccentColour.Value,
+                            Position = positionAt(270, distance_from_centre_4),
+                        },
+                    }
+                },
 
-                case FruitVisualRepresentation.Pineapple:
-                    return new Container
+                FruitVisualRepresentation.Pineapple => new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Framework.Graphics.Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        new Pulp
                         {
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(small_pulp),
-                                Y = -0.3f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(45, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(135, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4),
-                                Position = positionAt(225, distance_from_centre_4),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_4),
-                                AccentColour = AccentColour.Value,
-                                Position = positionAt(315, distance_from_centre_4),
-                            },
-                        }
-                    };
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(small_pulp),
+                            Y = -0.3f,
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4),
+                            Position = positionAt(45, distance_from_centre_4),
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4),
+                            Position = positionAt(135, distance_from_centre_4),
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4),
+                            Position = positionAt(225, distance_from_centre_4),
+                        },
+                        new Pulp
+                        {
+                            Size = new Vector2(large_pulp_4),
+                            AccentColour = AccentColour.Value,
+                            Position = positionAt(315, distance_from_centre_4),
+                        },
+                    }
+                },
 
-                case FruitVisualRepresentation.Pear:
-                    return new Container
+                FruitVisualRepresentation.Pear => new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Framework.Graphics.Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        new Pulp
                         {
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(small_pulp),
-                                Y = -0.33f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(60, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(180, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_3),
-                                AccentColour = AccentColour.Value,
-                                Position = positionAt(300, distance_from_centre_3),
-                            },
-                        }
-                    };
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(small_pulp),
+                            Y = -0.33f,
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_3),
+                            Position = positionAt(60, distance_from_centre_3),
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_3),
+                            Position = positionAt(180, distance_from_centre_3),
+                        },
+                        new Pulp
+                        {
+                            Size = new Vector2(large_pulp_3),
+                            AccentColour = AccentColour.Value,
+                            Position = positionAt(300, distance_from_centre_3),
+                        },
+                    }
+                },
 
-                case FruitVisualRepresentation.Grape:
-                    return new Container
+                FruitVisualRepresentation.Grape => new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Framework.Graphics.Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        new Pulp
                         {
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(small_pulp),
-                                Y = -0.25f,
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(0, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_3),
-                                Position = positionAt(120, distance_from_centre_3),
-                            },
-                            new Pulp
-                            {
-                                Size = new Vector2(large_pulp_3),
-                                AccentColour = AccentColour.Value,
-                                Position = positionAt(240, distance_from_centre_3),
-                            },
-                        }
-                    };
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(small_pulp),
+                            Y = -0.25f,
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_3),
+                            Position = positionAt(0, distance_from_centre_3),
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_3),
+                            Position = positionAt(120, distance_from_centre_3),
+                        },
+                        new Pulp
+                        {
+                            Size = new Vector2(large_pulp_3),
+                            AccentColour = AccentColour.Value,
+                            Position = positionAt(240, distance_from_centre_3),
+                        },
+                    }
+                },
 
-                case FruitVisualRepresentation.Banana:
-                    return new Container
+                FruitVisualRepresentation.Banana => new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Framework.Graphics.Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Framework.Graphics.Drawable[]
+                        new Pulp
                         {
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(small_pulp),
-                                Y = -0.3f
-                            },
-                            new Pulp
-                            {
-                                AccentColour = AccentColour.Value,
-                                Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
-                                Y = 0.05f,
-                            },
-                        }
-                    };
-            }
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(small_pulp),
+                            Y = -0.3f
+                        },
+                        new Pulp
+                        {
+                            AccentColour = AccentColour.Value,
+                            Size = new Vector2(large_pulp_4 * 0.8f, large_pulp_4 * 2.5f),
+                            Y = 0.05f,
+                        },
+                    }
+                },
+                _ => new Container(),
+            };
         }
 
         protected override void Update()
@@ -282,35 +275,19 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         }
 
         private Color4 colourForRepresentation(FruitVisualRepresentation representation)
-        {
-            switch (representation)
+            => representation switch
             {
-                default:
-                case FruitVisualRepresentation.Pear:
-                    return new Color4(17, 136, 170, 255);
-
-                case FruitVisualRepresentation.Grape:
-                    return new Color4(204, 102, 0, 255);
-
-                case FruitVisualRepresentation.Raspberry:
-                    return new Color4(121, 9, 13, 255);
-
-                case FruitVisualRepresentation.Pineapple:
-                    return new Color4(102, 136, 0, 255);
-
-                case FruitVisualRepresentation.Banana:
-                    switch (RNG.Next(0, 3))
-                    {
-                        default:
-                            return new Color4(255, 240, 0, 255);
-
-                        case 1:
-                            return new Color4(255, 192, 0, 255);
-
-                        case 2:
-                            return new Color4(214, 221, 28, 255);
-                    }
-            }
-        }
+                FruitVisualRepresentation.Grape => new Color4(204, 102, 0, 255),
+                FruitVisualRepresentation.Raspberry => new Color4(121, 9, 13, 255),
+                FruitVisualRepresentation.Pineapple => new Color4(102, 136, 0, 255),
+                FruitVisualRepresentation.Banana => (RNG.Next(0, 3)) switch
+                {
+                    1 => new Color4(255, 192, 0, 255),
+                    2 => new Color4(214, 221, 28, 255),
+                    _ => new Color4(255, 240, 0, 255),
+                },
+                // defaults to Pear
+                _ => new Color4(17, 136, 170, 255),
+            };
     }
 }

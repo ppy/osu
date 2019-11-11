@@ -8,15 +8,11 @@ namespace osu.Game.Rulesets.Catch.Scoring
     public class CatchHitWindows : HitWindows
     {
         public override bool IsHitResultAllowed(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Perfect:
-                case HitResult.Miss:
-                    return true;
-            }
-
-            return false;
-        }
+                HitResult.Perfect => true,
+                HitResult.Miss => true,
+                _ => false,
+            };
     }
 }

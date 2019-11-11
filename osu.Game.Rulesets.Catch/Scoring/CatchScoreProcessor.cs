@@ -24,16 +24,11 @@ namespace osu.Game.Rulesets.Catch.Scoring
         }
 
         protected override double HealthAdjustmentFactorFor(JudgementResult result)
-        {
-            switch (result.Type)
+            => result.Type switch
             {
-                case HitResult.Miss:
-                    return hpDrainRate;
-
-                default:
-                    return 10.2 - hpDrainRate; // Award less HP as drain rate is increased
-            }
-        }
+                HitResult.Miss => hpDrainRate,
+                _ => 10.2 - hpDrainRate, // Award less HP as drain rate is increased
+            };
 
         public override HitWindows CreateHitWindows() => new CatchHitWindows();
     }

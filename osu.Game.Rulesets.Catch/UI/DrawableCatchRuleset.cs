@@ -39,29 +39,15 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
         public override DrawableHitObject<CatchHitObject> CreateDrawableRepresentation(CatchHitObject h)
-        {
-            switch (h)
+            => h switch
             {
-                case Banana banana:
-                    return new DrawableBanana(banana);
-
-                case Fruit fruit:
-                    return new DrawableFruit(fruit);
-
-                case JuiceStream stream:
-                    return new DrawableJuiceStream(stream, CreateDrawableRepresentation);
-
-                case BananaShower shower:
-                    return new DrawableBananaShower(shower, CreateDrawableRepresentation);
-
-                case TinyDroplet tiny:
-                    return new DrawableTinyDroplet(tiny);
-
-                case Droplet droplet:
-                    return new DrawableDroplet(droplet);
-            }
-
-            return null;
-        }
+                Banana banana => new DrawableBanana(banana),
+                Fruit fruit => new DrawableFruit(fruit),
+                JuiceStream stream => new DrawableJuiceStream(stream, CreateDrawableRepresentation),
+                BananaShower shower => new DrawableBananaShower(shower, CreateDrawableRepresentation),
+                TinyDroplet tiny => new DrawableTinyDroplet(tiny),
+                Droplet droplet => new DrawableDroplet(droplet),
+                _ => null,
+            };
     }
 }
