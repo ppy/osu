@@ -59,7 +59,10 @@ namespace osu.Game.Overlays
                         {
                             Header = new Header(),
                             info = new Info(),
-                            scoreContainer = new ScoresContainer(),
+                            scoreContainer = new ScoresContainer
+                            {
+                                Beatmap = { BindTarget = Header.Picker.Beatmap }
+                            }
                         },
                     },
                 },
@@ -71,7 +74,6 @@ namespace osu.Game.Overlays
             Header.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
-                scoreContainer.Beatmap = b.NewValue;
 
                 scroll.ScrollToStart();
             };
