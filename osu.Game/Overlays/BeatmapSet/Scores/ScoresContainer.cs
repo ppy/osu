@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly LoadingAnimation loadingAnimation;
         private readonly LeaderboardScopeSelector scopeSelector;
         private readonly LeaderboardModSelector modSelector;
+        private readonly FillFlowContainer modFilter;
 
         private GetScoresRequest getScoresRequest;
 
@@ -88,16 +89,26 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        scopeSelector = new LeaderboardScopeSelector
+                        modFilter = new FillFlowContainer
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                        },
-                        modSelector = new LeaderboardModSelector
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Ruleset = { BindTarget = ruleset }
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, spacing),
+                            Children = new Drawable[]
+                            {
+                                scopeSelector = new LeaderboardScopeSelector
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                },
+                                modSelector = new LeaderboardModSelector
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Ruleset = { BindTarget = ruleset }
+                                },
+                            }
                         },
                         new Container
                         {
@@ -153,6 +164,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             base.LoadComplete();
 
+            api.LocalUser.BindValueChanged(_ => updateModFilterVisibility());
+
             modSelector.SelectedMods.ItemsAdded += modsChanged;
             modSelector.SelectedMods.ItemsRemoved += modsChanged;
 
@@ -182,21 +195,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Scores = null;
 
-            if (Beatmap.Value == null)
-                return;
+            updateModFilterVisibility();
 
-            if (!Beatmap.Value.OnlineBeatmapID.HasValue || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
-            {
-                scopeSelector.Hide();
-                modSelector.Hide();
+            if (!hasLeaderboard)
                 return;
-            }
-
-            if (api.LocalUser.Value.IsSupporter)
-            {
-                scopeSelector.Show();
-                modSelector.Show();
-            }
 
             loadingAnimation.Show();
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope, mods);
@@ -206,6 +208,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Scores = scores;
             };
             api.Queue(getScoresRequest);
+        }
+
+        private bool hasLeaderboard => !(Beatmap.Value == null || !Beatmap.Value.OnlineBeatmapID.HasValue || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending);
+
+        private void updateModFilterVisibility()
+        {
+            modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter && hasLeaderboard ? 1 : 0);
         }
     }
 }
