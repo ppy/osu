@@ -161,6 +161,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             base.LoadComplete();
             scope.BindValueChanged(_ => getScores());
+            ruleset.BindValueChanged(_ => getScores());
 
             modSelector.SelectedMods.ItemsAdded += _ => getScores();
             modSelector.SelectedMods.ItemsRemoved += _ => getScores();
@@ -173,12 +174,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             var beatmapRuleset = beatmap.NewValue?.Ruleset;
 
-            if (modSelector.Ruleset.Value?.Equals(beatmapRuleset) ?? false)
+            if (ruleset.Value?.Equals(beatmapRuleset) ?? false)
                 modSelector.DeselectAll();
             else
                 ruleset.Value = beatmapRuleset;
 
-            getScores();
+            scope.Value = BeatmapLeaderboardScope.Global;
         }
 
         private void onUserChanged(ValueChangedEvent<User> user)
