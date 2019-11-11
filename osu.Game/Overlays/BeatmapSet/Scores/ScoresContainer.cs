@@ -210,11 +210,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             api.Queue(getScoresRequest);
         }
 
-        private bool hasLeaderboard => !(Beatmap.Value == null || !Beatmap.Value.OnlineBeatmapID.HasValue || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending);
+        private void updateModFilterVisibility() => modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter && hasLeaderboard ? 1 : 0);
 
-        private void updateModFilterVisibility()
-        {
-            modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter && hasLeaderboard ? 1 : 0);
-        }
+        private bool hasLeaderboard => Beatmap.Value?.Status > BeatmapSetOnlineStatus.Pending;
     }
 }
