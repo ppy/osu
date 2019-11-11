@@ -3,33 +3,92 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneStatefulMenuItem : OsuTestScene
+    public class TestSceneStatefulMenuItem : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OsuMenu),
             typeof(StatefulMenuItem),
-            typeof(DrawableStatefulMenuItem)
+            typeof(ThreeStateMenuItem),
+            typeof(DrawableStatefulMenuItem),
         };
 
-        public TestSceneStatefulMenuItem()
+        [Test]
+        public void TestTernaryMenuItem()
         {
-            Add(new OsuMenu(Direction.Vertical, true)
+            OsuMenu menu = null;
+
+            Bindable<TernaryState> state = new Bindable<TernaryState>(TernaryState.Indeterminate);
+
+            AddStep("create menu", () =>
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Items = new[]
+                state.Value = TernaryState.Indeterminate;
+
+                Child = menu = new OsuMenu(Direction.Vertical, true)
                 {
-                    new TestMenuItem("First", MenuItemType.Standard, getNextState),
-                    new TestMenuItem("Second", MenuItemType.Standard, getNextState) { State = { Value = TestStates.State2 } },
-                    new TestMenuItem("Third", MenuItemType.Standard, getNextState) { State = { Value = TestStates.State3 } },
-                }
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Items = new[]
+                    {
+                        new ThreeStateMenuItem("First"),
+                        new ThreeStateMenuItem("Second") { State = { BindTarget = state } },
+                        new ThreeStateMenuItem("Third") { State = { Value = TernaryState.True } },
+                    }
+                };
+            });
+
+            checkState(TernaryState.Indeterminate);
+
+            click();
+            checkState(TernaryState.True);
+
+            click();
+            checkState(TernaryState.False);
+
+            click();
+            checkState(TernaryState.True);
+
+            click();
+            checkState(TernaryState.False);
+
+            AddStep("change state via bindable", () => state.Value = TernaryState.True);
+
+            void click() =>
+                AddStep("click", () =>
+                {
+                    InputManager.MoveMouseTo(menu.ScreenSpaceDrawQuad.Centre);
+                    InputManager.Click(MouseButton.Left);
+                });
+
+            void checkState(TernaryState expected)
+                => AddAssert($"state is {expected}", () => state.Value == expected);
+        }
+
+        [Test]
+        public void TestCustomState()
+        {
+            AddStep("create menu", () =>
+            {
+                Child = new OsuMenu(Direction.Vertical, true)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Items = new[]
+                    {
+                        new TestMenuItem("First", MenuItemType.Standard, getNextState),
+                        new TestMenuItem("Second", MenuItemType.Standard, getNextState) { State = { Value = TestStates.State2 } },
+                        new TestMenuItem("Third", MenuItemType.Standard, getNextState) { State = { Value = TestStates.State3 } },
+                    }
+                };
             });
         }
 
