@@ -109,8 +109,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     // Generate a new pattern by copying the last hit objects in reverse-column order
                     for (int i = RandomStart; i < TotalColumns; i++)
+                    {
                         if (PreviousPattern.ColumnHasObject(i))
                             addToPattern(pattern, RandomStart + TotalColumns - i - 1);
+                    }
 
                     return pattern;
                 }
@@ -132,8 +134,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     // Generate a new pattern by placing on the already filled columns
                     for (int i = RandomStart; i < TotalColumns; i++)
+                    {
                         if (PreviousPattern.ColumnHasObject(i))
                             addToPattern(pattern, i);
+                    }
 
                     return pattern;
                 }

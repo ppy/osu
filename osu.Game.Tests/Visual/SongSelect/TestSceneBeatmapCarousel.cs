@@ -467,8 +467,10 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void advanceSelection(bool diff, int direction = 1, int count = 1)
         {
             if (count == 1)
+            {
                 AddStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>
                     carousel.SelectNext(direction, !diff));
+            }
             else
             {
                 AddRepeatStep($"select {(direction > 0 ? "next" : "prev")} {(diff ? "diff" : "set")}", () =>

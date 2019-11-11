@@ -103,20 +103,20 @@ namespace osu.Game.Tournament.Tests.Components
             }));
 
             AddStep("multiple messages", () => testChannel.AddNewMessages(new Message(nextMessageId())
-                {
-                    Sender = admin,
-                    Content = "I spam you!"
-                },
-                new Message(nextMessageId())
-                {
-                    Sender = admin,
-                    Content = "I spam you!!!1"
-                },
-                new Message(nextMessageId())
-                {
-                    Sender = admin,
-                    Content = "I spam you!1!1"
-                }));
+            {
+                Sender = admin,
+                Content = "I spam you!"
+            },
+            new Message(nextMessageId())
+            {
+                Sender = admin,
+                Content = "I spam you!!!1"
+            },
+            new Message(nextMessageId())
+            {
+                Sender = admin,
+                Content = "I spam you!1!1"
+            }));
 
             AddStep("change channel to 2", () => chatDisplay.Channel.Value = testChannel2);
 

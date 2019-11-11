@@ -75,8 +75,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 int pointCount = 1;
                 foreach (var t in pointSplit)
+                {
                     if (t.Length > 1)
                         pointCount++;
+                }
 
                 var points = new Vector2[pointCount];
 
