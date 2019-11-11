@@ -264,6 +264,7 @@ namespace osu.Game.Database
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
+
             foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
             {
                 using (Stream s = reader.GetStream(file))

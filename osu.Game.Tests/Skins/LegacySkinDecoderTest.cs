@@ -25,6 +25,7 @@ namespace osu.Game.Tests.Skins
                 var comboColors = decoder.Decode(stream).ComboColours;
 
                 List<Color4> expectedColors;
+
                 if (hasColours)
                 {
                     expectedColors = new List<Color4>
