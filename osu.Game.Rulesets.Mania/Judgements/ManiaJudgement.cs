@@ -9,52 +9,26 @@ namespace osu.Game.Rulesets.Mania.Judgements
     public class ManiaJudgement : Judgement
     {
         protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                default:
-                    return 0;
-
-                case HitResult.Meh:
-                    return 50;
-
-                case HitResult.Ok:
-                    return 100;
-
-                case HitResult.Good:
-                    return 200;
-
-                case HitResult.Great:
-                case HitResult.Perfect:
-                    return 300;
-            }
-        }
+                HitResult.Meh => 50,
+                HitResult.Ok => 100,
+                HitResult.Good => 200,
+                HitResult.Great => 300,
+                HitResult.Perfect => 300,
+                _ => 0,
+            };
 
         protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Miss:
-                    return -0.125;
-
-                case HitResult.Meh:
-                    return 0.005;
-
-                case HitResult.Ok:
-                    return 0.010;
-
-                case HitResult.Good:
-                    return 0.035;
-
-                case HitResult.Great:
-                    return 0.055;
-
-                case HitResult.Perfect:
-                    return 0.065;
-
-                default:
-                    return 0;
-            }
-        }
+                HitResult.Miss => -0.125,
+                HitResult.Meh => 0.005,
+                HitResult.Ok => 0.010,
+                HitResult.Good => 0.035,
+                HitResult.Great => 0.055,
+                HitResult.Perfect => 0.065,
+                _ => 0,
+            };
     }
 }

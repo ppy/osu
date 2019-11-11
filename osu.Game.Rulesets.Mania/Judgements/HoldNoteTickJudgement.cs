@@ -12,15 +12,10 @@ namespace osu.Game.Rulesets.Mania.Judgements
         protected override int NumericResultFor(HitResult result) => 20;
 
         protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Miss:
-                    return 0;
-
-                default:
-                    return 0.040;
-            }
-        }
+                HitResult.Miss => 0,
+                _ => 0.040,
+            };
     }
 }

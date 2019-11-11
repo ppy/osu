@@ -70,19 +70,12 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
         public override DrawableHitObject<ManiaHitObject> CreateDrawableRepresentation(ManiaHitObject h)
-        {
-            switch (h)
+            => h switch
             {
-                case HoldNote holdNote:
-                    return new DrawableHoldNote(holdNote);
-
-                case Note note:
-                    return new DrawableNote(note);
-
-                default:
-                    return null;
-            }
-        }
+                HoldNote holdNote => new DrawableHoldNote(holdNote),
+                Note note => new DrawableNote(note),
+                _ => null,
+            };
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
     }

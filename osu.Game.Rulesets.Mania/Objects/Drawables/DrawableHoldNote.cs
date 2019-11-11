@@ -88,35 +88,27 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case TailNote _:
-                    return new DrawableTailNote(this)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        AccentColour = { BindTarget = AccentColour }
-                    };
-
-                case Note _:
-                    return new DrawableHeadNote(this)
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        AccentColour = { BindTarget = AccentColour }
-                    };
-
-                case HoldNoteTick tick:
-                    return new DrawableHoldNoteTick(tick)
-                    {
-                        HoldStartTime = () => holdStartTime,
-                        AccentColour = { BindTarget = AccentColour }
-                    };
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
+                TailNote _ => new DrawableTailNote(this)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    AccentColour = { BindTarget = AccentColour }
+                },
+                Note _ => new DrawableHeadNote(this)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    AccentColour = { BindTarget = AccentColour }
+                },
+                HoldNoteTick tick => new DrawableHoldNoteTick(tick)
+                {
+                    HoldStartTime = () => holdStartTime,
+                    AccentColour = { BindTarget = AccentColour }
+                },
+                _ => base.CreateNestedHitObject(hitObject),
+            };
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {

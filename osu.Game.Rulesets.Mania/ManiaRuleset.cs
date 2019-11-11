@@ -115,60 +115,47 @@ namespace osu.Game.Rulesets.Mania
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
-        {
-            switch (type)
+            => type switch
             {
-                case ModType.DifficultyReduction:
-                    return new Mod[]
-                    {
-                        new ManiaModEasy(),
-                        new ManiaModNoFail(),
-                        new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
-                    };
-
-                case ModType.DifficultyIncrease:
-                    return new Mod[]
-                    {
-                        new ManiaModHardRock(),
-                        new MultiMod(new ManiaModSuddenDeath(), new ManiaModPerfect()),
-                        new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
-                        new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
-                        new ManiaModFlashlight(),
-                    };
-
-                case ModType.Conversion:
-                    return new Mod[]
-                    {
-                        new MultiMod(new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3()),
-                        new ManiaModRandom(),
-                        new ManiaModDualStages(),
-                        new ManiaModMirror(),
-                    };
-
-                case ModType.Automation:
-                    return new Mod[]
-                    {
-                        new MultiMod(new ManiaModAutoplay(), new ManiaModCinema()),
-                    };
-
-                case ModType.Fun:
-                    return new Mod[]
-                    {
-                        new MultiMod(new ModWindUp(), new ModWindDown())
-                    };
-
-                default:
-                    return Array.Empty<Mod>();
-            }
-        }
+                ModType.DifficultyReduction => new Mod[]
+                {
+                    new ManiaModEasy(),
+                    new ManiaModNoFail(),
+                    new MultiMod(new ManiaModHalfTime(), new ManiaModDaycore()),
+                },
+                ModType.DifficultyIncrease => new Mod[]
+                {
+                    new ManiaModHardRock(),
+                    new MultiMod(new ManiaModSuddenDeath(), new ManiaModPerfect()),
+                    new MultiMod(new ManiaModDoubleTime(), new ManiaModNightcore()),
+                    new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
+                    new ManiaModFlashlight(),
+                },
+                ModType.Conversion => new Mod[]
+                {
+                    new MultiMod(new ManiaModKey4(),
+                        new ManiaModKey5(),
+                        new ManiaModKey6(),
+                        new ManiaModKey7(),
+                        new ManiaModKey8(),
+                        new ManiaModKey9(),
+                        new ManiaModKey1(),
+                        new ManiaModKey2(),
+                        new ManiaModKey3()),
+                    new ManiaModRandom(),
+                    new ManiaModDualStages(),
+                    new ManiaModMirror(),
+                },
+                ModType.Automation => new Mod[]
+                {
+                    new MultiMod(new ManiaModAutoplay(), new ModCinema()),
+                },
+                ModType.Fun => new Mod[]
+                {
+                    new MultiMod(new ModWindUp(), new ModWindDown())
+                },
+                _ => Array.Empty<Mod>(),
+            };
 
         public override string Description => "osu!mania";
 

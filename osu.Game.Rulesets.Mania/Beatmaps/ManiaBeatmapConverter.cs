@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
 using osuTK;
 using osu.Game.Audio;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
 {
@@ -92,19 +93,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         protected override IEnumerable<ManiaHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
             if (original is ManiaHitObject maniaOriginal)
-            {
-                yield return maniaOriginal;
-
-                yield break;
-            }
+                return maniaOriginal.Yield();
 
             var objects = IsForCurrentRuleset ? generateSpecific(original, beatmap) : generateConverted(original, beatmap);
-
-            if (objects == null)
-                yield break;
-
-            foreach (ManiaHitObject obj in objects)
-                yield return obj;
+            return objects ?? Enumerable.Empty<ManiaHitObject>();
         }
 
         private readonly List<double> prevNoteTimes = new List<double>(max_notes_for_density);
@@ -219,10 +211,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             {
             }
 
-            public override IEnumerable<Pattern> Generate()
-            {
-                yield return generate();
-            }
+            public override IEnumerable<Pattern> Generate() => generate().Yield();
 
             private Pattern generate()
             {

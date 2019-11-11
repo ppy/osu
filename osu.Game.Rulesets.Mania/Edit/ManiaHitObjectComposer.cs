@@ -61,17 +61,11 @@ namespace osu.Game.Rulesets.Mania.Edit
         public override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case DrawableNote note:
-                    return new NoteSelectionBlueprint(note);
-
-                case DrawableHoldNote holdNote:
-                    return new HoldNoteSelectionBlueprint(holdNote);
-            }
-
-            return base.CreateBlueprintFor(hitObject);
-        }
+                DrawableNote note => new NoteSelectionBlueprint(note),
+                DrawableHoldNote holdNote => new HoldNoteSelectionBlueprint(holdNote),
+                _ => base.CreateBlueprintFor(hitObject),
+            };
     }
 }
