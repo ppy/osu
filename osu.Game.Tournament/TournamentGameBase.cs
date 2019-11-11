@@ -126,6 +126,8 @@ namespace osu.Game.Tournament
                 ladder = new LadderInfo();
             }
 
+            Ruleset.BindTo(ladder.Ruleset);
+
             dependencies.Cache(ladder);
 
             bool addedInfo = false;
