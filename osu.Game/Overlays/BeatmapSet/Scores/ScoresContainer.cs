@@ -13,12 +13,15 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
+
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -29,22 +32,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private IAPIProvider api { get; set; }
 
         private GetScoresRequest getScoresRequest;
-
-        private BeatmapInfo beatmap;
-
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                if (beatmap == value)
-                    return;
-
-                beatmap = value;
-
-                getScores(beatmap);
-            }
-        }
 
         protected APILegacyScores Scores
         {
@@ -125,18 +112,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             background.Colour = colours.Gray2;
         }
 
-        private void getScores(BeatmapInfo beatmap)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Beatmap.BindValueChanged(getScores, true);
+        }
+
+        private void getScores(ValueChangedEvent<BeatmapInfo> beatmap)
         {
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
             Scores = null;
 
-            if (beatmap?.OnlineBeatmapID.HasValue != true || beatmap.Status <= BeatmapSetOnlineStatus.Pending)
+            if (beatmap.NewValue?.OnlineBeatmapID.HasValue != true || beatmap.NewValue.Status <= BeatmapSetOnlineStatus.Pending)
                 return;
 
             loadingAnimation.Show();
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest = new GetScoresRequest(beatmap.NewValue, beatmap.NewValue.Ruleset);
             getScoresRequest.Success += scores =>
             {
                 loadingAnimation.Hide();
