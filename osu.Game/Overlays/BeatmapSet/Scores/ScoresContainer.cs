@@ -16,6 +16,7 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -145,7 +146,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             modSelector.SelectedMods.ItemsAdded += _ => getScores();
             modSelector.SelectedMods.ItemsRemoved += _ => getScores();
 
-            Beatmap.BindValueChanged(onBeatmapChanged, true);
+            Beatmap.BindValueChanged(onBeatmapChanged);
+            api.LocalUser.BindValueChanged(onUserChanged, true);
         }
 
         private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
@@ -160,6 +162,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScores();
         }
 
+        private void onUserChanged(ValueChangedEvent<User> user)
+        {
+            scope.Value = BeatmapLeaderboardScope.Global;
+            modSelector.DeselectAll();
+            updateModFilterVisibility();
+        }
+
+        private void updateModFilterVisibility()
+        {
+            modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter && !hasNoLeaderboard ? 1 : 0);
+        }
+
         private void getScores()
         {
             getScoresRequest?.Cancel();
@@ -167,7 +181,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Scores = null;
 
-            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
+            updateModFilterVisibility();
+
+            if (hasNoLeaderboard)
                 return;
 
             loadingAnimation.Show();
@@ -179,5 +195,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
             api.Queue(getScoresRequest);
         }
+
+        private bool hasNoLeaderboard => Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending;
     }
 }
