@@ -57,7 +57,8 @@ git pull
 
 Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this provided [below](#contributing).
 
-> Visual Studio Code users must run the `Restore` task before any build attempt.
+- Visual Studio / Rider users should load the project via one of the platform-specific .slnf files, rather than the main .sln. This will allow access to template run configurations.
+- Visual Studio Code users must run the `Restore` task before any build attempt.
 
 You can also build and run osu! from the command-line with a single command:
 
@@ -68,18 +69,6 @@ dotnet run --project osu.Desktop
 If you are not interested in debugging osu!, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in any commands mentioned in this document.
 
 If the build fails, try to restore nuget packages with `dotnet restore`.
-
-#### A note for Linux users
-
-On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory, located at `osu.Desktop/bin/Debug/$NETCORE_VERSION`.
-
-`$NETCORE_VERSION` is the version of the targeted .NET Core SDK. You can check it by running `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
-
-For example, you can run osu! with the following command:
-
-```shell
-LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Debug/netcoreapp3.0" dotnet run --project osu.Desktop
-```
 
 ### Testing with resource/framework modifications
 
