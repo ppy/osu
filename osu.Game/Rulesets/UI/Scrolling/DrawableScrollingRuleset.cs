@@ -88,24 +88,18 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected DrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
-            scrollingInfo = new LocalScrollingInfo();
+            scrollingInfo = new LocalScrollingInfo
+            {
+                Algorithm = VisualisationMethod switch
+                {
+                    ScrollVisualisationMethod.Sequential => new SequentialScrollAlgorithm(controlPoints),
+                    ScrollVisualisationMethod.Overlapping => new OverlappingScrollAlgorithm(controlPoints),
+                    ScrollVisualisationMethod.Constant => new ConstantScrollAlgorithm(),
+                    _ => throw new NotSupportedException($"Unknown enum member {nameof(ScrollVisualisationMethod)} {VisualisationMethod}."),
+                }
+            };
             scrollingInfo.Direction.BindTo(Direction);
             scrollingInfo.TimeRange.BindTo(TimeRange);
-
-            switch (VisualisationMethod)
-            {
-                case ScrollVisualisationMethod.Sequential:
-                    scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
-                    break;
-
-                case ScrollVisualisationMethod.Overlapping:
-                    scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
-                    break;
-
-                case ScrollVisualisationMethod.Constant:
-                    scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
-                    break;
-            }
         }
 
         [BackgroundDependencyLoader]

@@ -39,15 +39,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         };
 
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
-        {
-            switch (type)
+            => type switch
             {
-                default:
-                    return new DrawablePerformanceScore(model.CreateScoreInfo(Rulesets), includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
-
-                case ScoreType.Recent:
-                    return new DrawableTotalScore(model.CreateScoreInfo(Rulesets));
-            }
-        }
+                ScoreType.Recent => new DrawableTotalScore(model.CreateScoreInfo(Rulesets)),
+                _ => new DrawablePerformanceScore(model.CreateScoreInfo(Rulesets), includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null),
+            };
     }
 }

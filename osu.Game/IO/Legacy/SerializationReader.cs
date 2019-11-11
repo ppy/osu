@@ -128,69 +128,28 @@ namespace osu.Game.IO.Legacy
 
         /// <summary> Reads an object which was added to the buffer by WriteObject. </summary>
         public object ReadObject()
-        {
-            ObjType t = (ObjType)ReadByte();
-
-            switch (t)
+            => ((ObjType)base.ReadByte()) switch
             {
-                case ObjType.boolType:
-                    return ReadBoolean();
-
-                case ObjType.byteType:
-                    return ReadByte();
-
-                case ObjType.uint16Type:
-                    return ReadUInt16();
-
-                case ObjType.uint32Type:
-                    return ReadUInt32();
-
-                case ObjType.uint64Type:
-                    return ReadUInt64();
-
-                case ObjType.sbyteType:
-                    return ReadSByte();
-
-                case ObjType.int16Type:
-                    return ReadInt16();
-
-                case ObjType.int32Type:
-                    return ReadInt32();
-
-                case ObjType.int64Type:
-                    return ReadInt64();
-
-                case ObjType.charType:
-                    return ReadChar();
-
-                case ObjType.stringType:
-                    return base.ReadString();
-
-                case ObjType.singleType:
-                    return ReadSingle();
-
-                case ObjType.doubleType:
-                    return ReadDouble();
-
-                case ObjType.decimalType:
-                    return ReadDecimal();
-
-                case ObjType.dateTimeType:
-                    return ReadDateTime();
-
-                case ObjType.byteArrayType:
-                    return ReadByteArray();
-
-                case ObjType.charArrayType:
-                    return ReadCharArray();
-
-                case ObjType.otherType:
-                    return DynamicDeserializer.Deserialize(BaseStream);
-
-                default:
-                    return null;
-            }
-        }
+                ObjType.boolType => base.ReadBoolean(),
+                ObjType.byteType => base.ReadByte(),
+                ObjType.uint16Type => base.ReadUInt16(),
+                ObjType.uint32Type => base.ReadUInt32(),
+                ObjType.uint64Type => base.ReadUInt64(),
+                ObjType.sbyteType => base.ReadSByte(),
+                ObjType.int16Type => base.ReadInt16(),
+                ObjType.int32Type => base.ReadInt32(),
+                ObjType.int64Type => base.ReadInt64(),
+                ObjType.charType => base.ReadChar(),
+                ObjType.stringType => base.ReadString(),
+                ObjType.singleType => base.ReadSingle(),
+                ObjType.doubleType => base.ReadDouble(),
+                ObjType.decimalType => base.ReadDecimal(),
+                ObjType.dateTimeType => ReadDateTime(),
+                ObjType.byteArrayType => ReadByteArray(),
+                ObjType.charArrayType => ReadCharArray(),
+                ObjType.otherType => DynamicDeserializer.Deserialize(base.BaseStream),
+                _ => null,
+            };
 
         public static class DynamicDeserializer
         {

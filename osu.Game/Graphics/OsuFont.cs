@@ -37,18 +37,12 @@ namespace osu.Game.Graphics
         /// <param name="typeface">The <see cref="Typeface"/>.</param>
         /// <returns>The string representation.</returns>
         public static string GetFamilyString(Typeface typeface)
-        {
-            switch (typeface)
+            => typeface switch
             {
-                case Typeface.Exo:
-                    return "Exo2.0";
-
-                case Typeface.Venera:
-                    return "Venera";
-            }
-
-            return null;
-        }
+                Typeface.Exo => "Exo2.0",
+                Typeface.Venera => "Venera",
+                _ => null,
+            };
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.

@@ -317,18 +317,12 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         private double getScore(ScoringMode mode)
-        {
-            switch (mode)
+            => mode switch
             {
-                default:
-                case ScoringMode.Standardised:
-                    return (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier;
-
-                case ScoringMode.Classic:
-                    // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * ((1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier) / 25);
-            }
-        }
+                ScoringMode.Classic => bonusScore + baseScore * ((1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier) / 25), // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
+                // default is Standardised
+                _ => (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier,
+            };
 
         /// <summary>
         /// Checks if the score is in a failed state and notifies subscribers.

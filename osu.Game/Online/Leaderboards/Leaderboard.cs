@@ -128,39 +128,20 @@ namespace osu.Game.Online.Leaderboards
                 if (value == placeholderState)
                     return;
 
-                switch (placeholderState = value)
+                placeholderState = value;
+                replacePlaceholder(value switch
                 {
-                    case PlaceholderState.NetworkFailure:
-                        replacePlaceholder(new RetrievalFailurePlaceholder
-                        {
-                            OnRetry = UpdateScores,
-                        });
-                        break;
-
-                    case PlaceholderState.NoneSelected:
-                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
-                        break;
-
-                    case PlaceholderState.Unavailable:
-                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
-                        break;
-
-                    case PlaceholderState.NoScores:
-                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
-                        break;
-
-                    case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
-                        break;
-
-                    case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
-                        break;
-
-                    default:
-                        replacePlaceholder(null);
-                        break;
-                }
+                    PlaceholderState.NetworkFailure => new RetrievalFailurePlaceholder
+                    {
+                        OnRetry = UpdateScores,
+                    },
+                    PlaceholderState.NoneSelected => new MessagePlaceholder(@"Please select a beatmap!"),
+                    PlaceholderState.Unavailable => new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"),
+                    PlaceholderState.NoScores => new MessagePlaceholder(@"No records yet!"),
+                    PlaceholderState.NotLoggedIn => new MessagePlaceholder(@"Please sign in to view online leaderboards!"),
+                    PlaceholderState.NotSupporter => new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"),
+                    _ => null,
+                });
             }
         }
 

@@ -120,28 +120,15 @@ namespace osu.Game.Screens.Edit.Timing
 
             private void createChildren()
             {
-                fill.ChildrenEnumerable = controlPoints.Select(createAttribute).Where(c => c != null);
-            }
-
-            private Drawable createAttribute(ControlPoint controlPoint)
-            {
-                switch (controlPoint)
-                {
-                    case TimingControlPoint timing:
-                        return new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}");
-
-                    case DifficultyControlPoint difficulty:
-
-                        return new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x");
-
-                    case EffectControlPoint effect:
-                        return new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}");
-
-                    case SampleControlPoint sample:
-                        return new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%");
-                }
-
-                return null;
+                fill.ChildrenEnumerable = controlPoints.Select(controlPoint =>
+                    controlPoint switch
+                    {
+                        TimingControlPoint timing => new RowAttribute("timing", () => $"{60000 / timing.BeatLength:n1}bpm {timing.TimeSignature}"),
+                        DifficultyControlPoint difficulty => new RowAttribute("difficulty", () => $"{difficulty.SpeedMultiplier:n2}x"),
+                        EffectControlPoint effect => new RowAttribute("effect", () => $"{(effect.KiaiMode ? "Kiai " : "")}{(effect.OmitFirstBarLine ? "NoBarLine " : "")}"),
+                        SampleControlPoint sample => new RowAttribute("sample", () => $"{sample.SampleBank} {sample.SampleVolume}%"),
+                        _ => null,
+                    }).Where(c => c != null);
             }
         }
 

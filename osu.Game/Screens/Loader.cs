@@ -63,14 +63,11 @@ namespace osu.Game.Screens
             if (introSequence == IntroSequence.Random)
                 introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
 
-            switch (introSequence)
+            return introSequence switch
             {
-                case IntroSequence.Circles:
-                    return new IntroCircles();
-
-                default:
-                    return new IntroTriangles();
-            }
+                IntroSequence.Circles => new IntroCircles(),
+                _ => new IntroTriangles(),
+            };
         }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();

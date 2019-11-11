@@ -33,30 +33,17 @@ namespace osu.Game.Screens.Select.Carousel
             if (!(other is CarouselBeatmapSet otherSet))
                 return base.CompareTo(criteria, other);
 
-            switch (criteria.Sort)
+            return criteria.Sort switch
             {
-                default:
-                case SortMode.Artist:
-                    return string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase);
-
-                case SortMode.Title:
-                    return string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase);
-
-                case SortMode.Author:
-                    return string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase);
-
-                case SortMode.DateAdded:
-                    return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
-
-                case SortMode.BPM:
-                    return compareUsingAggregateMax(otherSet, b => b.BPM);
-
-                case SortMode.Length:
-                    return compareUsingAggregateMax(otherSet, b => b.Length);
-
-                case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
-            }
+                SortMode.Title => string.Compare(BeatmapSet.Metadata.Title, otherSet.BeatmapSet.Metadata.Title, StringComparison.OrdinalIgnoreCase),
+                SortMode.Author => string.Compare(BeatmapSet.Metadata.Author.Username, otherSet.BeatmapSet.Metadata.Author.Username, StringComparison.OrdinalIgnoreCase),
+                SortMode.DateAdded => otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded),
+                SortMode.BPM => compareUsingAggregateMax(otherSet, b => b.BPM),
+                SortMode.Length => compareUsingAggregateMax(otherSet, b => b.Length),
+                SortMode.Difficulty => compareUsingAggregateMax(otherSet, b => b.StarDifficulty),
+                // defaults to Artist
+                _ => string.Compare(BeatmapSet.Metadata.Artist, otherSet.BeatmapSet.Metadata.Artist, StringComparison.OrdinalIgnoreCase),
+            };
         }
 
         /// <summary>

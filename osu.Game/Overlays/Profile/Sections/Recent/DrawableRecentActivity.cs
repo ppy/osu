@@ -54,37 +54,32 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         }
 
         protected override Drawable CreateLeftVisual()
-        {
-            switch (activity.Type)
+            => activity.Type switch
             {
-                case RecentActivityType.Rank:
-                    return new UpdateableRank(activity.ScoreRank)
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 60,
-                        FillMode = FillMode.Fit,
-                    };
+                RecentActivityType.Rank => new UpdateableRank(activity.ScoreRank)
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 60,
+                    FillMode = FillMode.Fit,
+                },
 
-                case RecentActivityType.Achievement:
-                    return new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        FillMode = FillMode.Fit,
-                    })
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 60,
-                    };
+                RecentActivityType.Achievement => new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                })
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 60,
+                },
 
-                default:
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 60,
-                        FillMode = FillMode.Fit,
-                    };
-            }
-        }
+                _ => new Container
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 60,
+                    FillMode = FillMode.Fit,
+                },
+            };
 
         private string toAbsoluteUrl(string url) => $"{api.Endpoint}{url}";
 
@@ -94,72 +89,24 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             string beatmapLinkTemplate() => $"[{toAbsoluteUrl(activity.Beatmap?.Url)} {activity.Beatmap?.Title}]";
             string beatmapsetLinkTemplate() => $"[{toAbsoluteUrl(activity.Beatmapset?.Url)} {activity.Beatmapset?.Title}]";
 
-            string message;
-
-            switch (activity.Type)
+            var message = activity.Type switch
             {
-                case RecentActivityType.Achievement:
-                    message = $"{userLinkTemplate()} unlocked the {activity.Achievement.Name} medal!";
-                    break;
-
-                case RecentActivityType.BeatmapPlaycount:
-                    message = $"{beatmapLinkTemplate()} has been played {activity.Count} times!";
-                    break;
-
-                case RecentActivityType.BeatmapsetApprove:
-                    message = $"{beatmapsetLinkTemplate()} has been {activity.Approval.ToString().ToLowerInvariant()}!";
-                    break;
-
-                case RecentActivityType.BeatmapsetDelete:
-                    message = $"{beatmapsetLinkTemplate()} has been deleted.";
-                    break;
-
-                case RecentActivityType.BeatmapsetRevive:
-                    message = $"{beatmapsetLinkTemplate()} has been revived from eternal slumber by {userLinkTemplate()}.";
-                    break;
-
-                case RecentActivityType.BeatmapsetUpdate:
-                    message = $"{userLinkTemplate()} has updated the beatmap {beatmapsetLinkTemplate()}!";
-                    break;
-
-                case RecentActivityType.BeatmapsetUpload:
-                    message = $"{userLinkTemplate()} has submitted a new beatmap {beatmapsetLinkTemplate()}!";
-                    break;
-
-                case RecentActivityType.Medal:
-                    // apparently this shouldn't exist look at achievement instead (https://github.com/ppy/osu-web/blob/master/resources/assets/coffee/react/profile-page/recent-activity.coffee#L111)
-                    message = string.Empty;
-                    break;
-
-                case RecentActivityType.Rank:
-                    message = $"{userLinkTemplate()} achieved rank #{activity.Rank} on {beatmapLinkTemplate()} ({activity.Mode}!)";
-                    break;
-
-                case RecentActivityType.RankLost:
-                    message = $"{userLinkTemplate()} has lost first place on {beatmapLinkTemplate()} ({activity.Mode}!)";
-                    break;
-
-                case RecentActivityType.UserSupportAgain:
-                    message = $"{userLinkTemplate()} has once again chosen to support osu! - thanks for your generosity!";
-                    break;
-
-                case RecentActivityType.UserSupportFirst:
-                    message = $"{userLinkTemplate()} has become an osu!supporter - thanks for your generosity!";
-                    break;
-
-                case RecentActivityType.UserSupportGift:
-                    message = $"{userLinkTemplate()} has received the gift of osu!supporter!";
-                    break;
-
-                case RecentActivityType.UsernameChange:
-                    message = $"{activity.User?.PreviousUsername} has changed their username to {userLinkTemplate()}!";
-                    break;
-
-                default:
-                    message = string.Empty;
-                    break;
-            }
-
+                RecentActivityType.Achievement => $"{userLinkTemplate()} unlocked the {activity.Achievement.Name} medal!",
+                RecentActivityType.BeatmapPlaycount => $"{beatmapLinkTemplate()} has been played {activity.Count} times!",
+                RecentActivityType.BeatmapsetApprove => $"{beatmapsetLinkTemplate()} has been {activity.Approval.ToString().ToLowerInvariant()}!",
+                RecentActivityType.BeatmapsetDelete => $"{beatmapsetLinkTemplate()} has been deleted.",
+                RecentActivityType.BeatmapsetRevive => $"{beatmapsetLinkTemplate()} has been revived from eternal slumber by {userLinkTemplate()}.",
+                RecentActivityType.BeatmapsetUpdate => $"{userLinkTemplate()} has updated the beatmap {beatmapsetLinkTemplate()}!",
+                RecentActivityType.BeatmapsetUpload => $"{userLinkTemplate()} has submitted a new beatmap {beatmapsetLinkTemplate()}!",
+                RecentActivityType.Medal => string.Empty,
+                RecentActivityType.Rank => $"{userLinkTemplate()} achieved rank #{activity.Rank} on {beatmapLinkTemplate()} ({activity.Mode}!)",
+                RecentActivityType.RankLost => $"{userLinkTemplate()} has lost first place on {beatmapLinkTemplate()} ({activity.Mode}!)",
+                RecentActivityType.UserSupportAgain => $"{userLinkTemplate()} has once again chosen to support osu! - thanks for your generosity!",
+                RecentActivityType.UserSupportFirst => $"{userLinkTemplate()} has become an osu!supporter - thanks for your generosity!",
+                RecentActivityType.UserSupportGift => $"{userLinkTemplate()} has received the gift of osu!supporter!",
+                RecentActivityType.UsernameChange => $"{activity.User?.PreviousUsername} has changed their username to {userLinkTemplate()}!",
+                _ => string.Empty,
+            };
             return MessageFormatter.FormatText(message);
         }
     }

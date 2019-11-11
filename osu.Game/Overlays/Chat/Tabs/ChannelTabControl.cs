@@ -46,16 +46,11 @@ namespace osu.Game.Overlays.Chat.Tabs
         }
 
         protected override TabItem<Channel> CreateTabItem(Channel value)
-        {
-            switch (value.Type)
+            => value.Type switch
             {
-                default:
-                    return new ChannelTabItem(value);
-
-                case ChannelType.PM:
-                    return new PrivateChannelTabItem(value);
-            }
-        }
+                ChannelType.PM => new PrivateChannelTabItem(value),
+                _ => new ChannelTabItem(value),
+            };
 
         /// <summary>
         /// Adds a channel to the ChannelTabControl.

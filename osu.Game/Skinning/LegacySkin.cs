@@ -123,30 +123,18 @@ namespace osu.Game.Skinning
         private IBindable<Color4> getCustomColour(string lookup) => Configuration.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
         public override Drawable GetDrawableComponent(ISkinComponent component)
-        {
-            switch (component)
+            => component switch
             {
-                case GameplaySkinComponent<HitResult> resultComponent:
-                    switch (resultComponent.Component)
-                    {
-                        case HitResult.Miss:
-                            return this.GetAnimation("hit0", true, false);
-
-                        case HitResult.Meh:
-                            return this.GetAnimation("hit50", true, false);
-
-                        case HitResult.Good:
-                            return this.GetAnimation("hit100", true, false);
-
-                        case HitResult.Great:
-                            return this.GetAnimation("hit300", true, false);
-                    }
-
-                    break;
-            }
-
-            return this.GetAnimation(component.LookupName, false, false);
-        }
+                GameplaySkinComponent<HitResult> resultComponent => resultComponent.Component switch
+                {
+                    HitResult.Miss => this.GetAnimation("hit0", true, false),
+                    HitResult.Meh => this.GetAnimation("hit50", true, false),
+                    HitResult.Good => this.GetAnimation("hit100", true, false),
+                    HitResult.Great => this.GetAnimation("hit300", true, false),
+                    _ => this.GetAnimation(component.LookupName, false, false),
+                },
+                _ => this.GetAnimation(component.LookupName, false, false),
+            };
 
         public override Texture GetTexture(string componentName)
         {

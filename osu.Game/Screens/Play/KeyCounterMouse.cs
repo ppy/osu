@@ -12,27 +12,17 @@ namespace osu.Game.Screens.Play
         public MouseButton Button { get; }
 
         public KeyCounterMouse(MouseButton button)
-            : base(getStringRepresentation(button))
+            : base(button switch
+            {
+                MouseButton.Left => @"M1",
+                MouseButton.Right => @"M2",
+                _ => button.ToString(),
+            })
         {
             Button = button;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
-        private static string getStringRepresentation(MouseButton button)
-        {
-            switch (button)
-            {
-                default:
-                    return button.ToString();
-
-                case MouseButton.Left:
-                    return @"M1";
-
-                case MouseButton.Right:
-                    return @"M2";
-            }
-        }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {

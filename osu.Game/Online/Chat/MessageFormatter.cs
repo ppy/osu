@@ -145,40 +145,17 @@ namespace osu.Game.Online.Chat
                     if (args.Length < 3)
                         return new LinkDetails(LinkAction.External, null);
 
-                    LinkAction linkType;
-
-                    switch (args[1])
+                    var linkType = args[1] switch
                     {
-                        case "chan":
-                            linkType = LinkAction.OpenChannel;
-                            break;
-
-                        case "edit":
-                            linkType = LinkAction.OpenEditorTimestamp;
-                            break;
-
-                        case "b":
-                            linkType = LinkAction.OpenBeatmap;
-                            break;
-
-                        case "s":
-                        case "dl":
-                            linkType = LinkAction.OpenBeatmapSet;
-                            break;
-
-                        case "spectate":
-                            linkType = LinkAction.Spectate;
-                            break;
-
-                        case "u":
-                            linkType = LinkAction.OpenUserProfile;
-                            break;
-
-                        default:
-                            linkType = LinkAction.External;
-                            break;
-                    }
-
+                        "chan" => LinkAction.OpenChannel,
+                        "edit" => LinkAction.OpenEditorTimestamp,
+                        "b" => LinkAction.OpenBeatmap,
+                        "s" => LinkAction.OpenBeatmapSet,
+                        "dl" => LinkAction.OpenBeatmapSet,
+                        "spectate" => LinkAction.Spectate,
+                        "u" => LinkAction.OpenUserProfile,
+                        _ => LinkAction.External,
+                    };
                     return new LinkDetails(linkType, args[2]);
 
                 case "osump":

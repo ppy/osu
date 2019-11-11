@@ -99,16 +99,12 @@ namespace osu.Game.Overlays.Settings
 
                 state = value;
 
-                switch (state)
+                var width = value switch
                 {
-                    default:
-                        this.ResizeTo(new Vector2(DEFAULT_WIDTH, Height), 500, Easing.OutQuint);
-                        break;
-
-                    case ExpandedState.Expanded:
-                        this.ResizeTo(new Vector2(EXPANDED_WIDTH, Height), 500, Easing.OutQuint);
-                        break;
-                }
+                    ExpandedState.Expanded => EXPANDED_WIDTH,
+                    _ => DEFAULT_WIDTH,
+                };
+                this.ResizeTo(new Vector2(width, Height), 500, Easing.OutQuint);
 
                 StateChanged?.Invoke(State);
             }

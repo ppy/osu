@@ -82,31 +82,15 @@ namespace osu.Game.Users
             public int A;
 
             public int this[ScoreRank rank]
-            {
-                get
+                => rank switch
                 {
-                    switch (rank)
-                    {
-                        case ScoreRank.XH:
-                            return SSPlus;
-
-                        case ScoreRank.X:
-                            return SS;
-
-                        case ScoreRank.SH:
-                            return SPlus;
-
-                        case ScoreRank.S:
-                            return S;
-
-                        case ScoreRank.A:
-                            return A;
-
-                        default:
-                            throw new ArgumentException($"API does not return {rank.ToString()}");
-                    }
-                }
-            }
+                    ScoreRank.XH => SSPlus,
+                    ScoreRank.X => SS,
+                    ScoreRank.SH => SPlus,
+                    ScoreRank.S => S,
+                    ScoreRank.A => A,
+                    _ => throw new ArgumentException($"API does not return {rank.ToString()}"),
+                };
         }
 
         public struct UserRanks

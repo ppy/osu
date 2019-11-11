@@ -59,89 +59,23 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         {
             string amount = $"{Math.Abs(item.Amount)} kudosu";
             string post = $"[{item.Post.Title}]({item.Post.Url})";
+            string giver = $"[{item.Giver?.Username}]({item.Giver?.Url})";
 
-            switch (item.Source)
+            return (item.Source, item.Action) switch
             {
-                case KudosuSource.AllowKudosu:
-                    switch (item.Action)
-                    {
-                        case KudosuAction.Give:
-                            return $"Received {amount} from kudosu deny repeal of modding post {post}";
-                    }
-
-                    break;
-
-                case KudosuSource.DenyKudosu:
-                    switch (item.Action)
-                    {
-                        case KudosuAction.Reset:
-                            return $"Denied {amount} from modding post {post}";
-                    }
-
-                    break;
-
-                case KudosuSource.Delete:
-                    switch (item.Action)
-                    {
-                        case KudosuAction.Reset:
-                            return $"Lost {amount} from modding post deletion of {post}";
-                    }
-
-                    break;
-
-                case KudosuSource.Restore:
-                    switch (item.Action)
-                    {
-                        case KudosuAction.Give:
-                            return $"Received {amount} from modding post restoration of {post}";
-                    }
-
-                    break;
-
-                case KudosuSource.Vote:
-                    switch (item.Action)
-                    {
-                        case KudosuAction.Give:
-                            return $"Received {amount} from obtaining votes in modding post of {post}";
-
-                        case KudosuAction.Reset:
-                            return $"Lost {amount} from losing votes in modding post of {post}";
-                    }
-
-                    break;
-
-                case KudosuSource.Recalculate:
-                    switch (item.Action)
-                    {
-                        case KudosuAction.Give:
-                            return $"Received {amount} from votes recalculation in modding post of {post}";
-
-                        case KudosuAction.Reset:
-                            return $"Lost {amount} from votes recalculation in modding post of {post}";
-                    }
-
-                    break;
-
-                case KudosuSource.Forum:
-
-                    string giver = $"[{item.Giver?.Username}]({item.Giver?.Url})";
-
-                    switch (historyItem.Action)
-                    {
-                        case KudosuAction.Give:
-                            return $"Received {amount} from {giver} for a post at {post}";
-
-                        case KudosuAction.Reset:
-                            return $"Kudosu reset by {giver} for the post {post}";
-
-                        case KudosuAction.Revoke:
-                            return $"Denied kudosu by {giver} for the post {post}";
-                    }
-
-                    break;
-            }
-
-            return $"Unknown event ({amount} change)";
+                (KudosuSource.AllowKudosu, KudosuAction.Give) => $"Received {amount} from kudosu deny repeal of modding post {post}",
+                (KudosuSource.DenyKudosu, KudosuAction.Reset) => $"Denied {amount} from modding post {post}",
+                (KudosuSource.Delete, KudosuAction.Reset) => $"Lost {amount} from modding post deletion of {post}",
+                (KudosuSource.Restore, KudosuAction.Give) => $"Received {amount} from modding post restoration of {post}",
+                (KudosuSource.Vote, KudosuAction.Give) => $"Received {amount} from obtaining votes in modding post of {post}",
+                (KudosuSource.Vote, KudosuAction.Reset) => $"Lost {amount} from losing votes in modding post of {post}",
+                (KudosuSource.Recalculate, KudosuAction.Give) => $"Received {amount} from votes recalculation in modding post of {post}",
+                (KudosuSource.Recalculate, KudosuAction.Reset) => $"Lost {amount} from votes recalculation in modding post of {post}",
+                (KudosuSource.Forum, KudosuAction.Give) => $"Received {amount} from {giver} for a post at {post}",
+                (KudosuSource.Forum, KudosuAction.Reset) => $"Kudosu reset by {giver} for the post {post}",
+                (KudosuSource.Forum, KudosuAction.Revoke) => $"Denied kudosu by {giver} for the post {post}",
+                _ => $"Unknown event ({amount} change)",
+            };
         }
     }
 }

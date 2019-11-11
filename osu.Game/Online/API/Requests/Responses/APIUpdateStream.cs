@@ -27,34 +27,15 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool Equals(APIUpdateStream other) => Id == other?.Id;
 
-        public ColourInfo Colour
+        public ColourInfo Colour => Name switch
         {
-            get
-            {
-                switch (Name)
-                {
-                    case "stable40":
-                        return new Color4(102, 204, 255, 255);
-
-                    case "stable":
-                        return new Color4(34, 153, 187, 255);
-
-                    case "beta40":
-                        return new Color4(255, 221, 85, 255);
-
-                    case "cuttingedge":
-                        return new Color4(238, 170, 0, 255);
-
-                    case OsuGameBase.CLIENT_STREAM_NAME:
-                        return new Color4(237, 18, 33, 255);
-
-                    case "web":
-                        return new Color4(136, 102, 238, 255);
-
-                    default:
-                        return new Color4(0, 0, 0, 255);
-                }
-            }
-        }
+            "stable40" => new Color4(102, 204, 255, 255),
+            "stable" => new Color4(34, 153, 187, 255),
+            "beta40" => new Color4(255, 221, 85, 255),
+            "cuttingedge" => new Color4(238, 170, 0, 255),
+            OsuGameBase.CLIENT_STREAM_NAME => new Color4(237, 18, 33, 255),
+            "web" => new Color4(136, 102, 238, 255),
+            _ => new Color4(0, 0, 0, 255),
+        };
     }
 }

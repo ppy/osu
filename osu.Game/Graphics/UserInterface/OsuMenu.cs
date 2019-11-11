@@ -40,15 +40,11 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item)
-        {
-            switch (item)
+            => item switch
             {
-                case StatefulMenuItem stateful:
-                    return new DrawableStatefulMenuItem(stateful);
-            }
-
-            return new DrawableOsuMenuItem(item);
-        }
+                StatefulMenuItem stateful => new DrawableStatefulMenuItem(stateful),
+                _ => new DrawableOsuMenuItem(item),
+            };
 
         protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 

@@ -142,26 +142,14 @@ namespace osu.Game.Beatmaps.Formats
 
                 case @"Mode":
                     beatmap.BeatmapInfo.RulesetID = Parsing.ParseInt(pair.Value);
-
-                    switch (beatmap.BeatmapInfo.RulesetID)
+                    parser = beatmap.BeatmapInfo.RulesetID switch
                     {
-                        case 0:
-                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
-                            break;
-
-                        case 1:
-                            parser = new Rulesets.Objects.Legacy.Taiko.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
-                            break;
-
-                        case 2:
-                            parser = new Rulesets.Objects.Legacy.Catch.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
-                            break;
-
-                        case 3:
-                            parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
-                            break;
-                    }
-
+                        0 => new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
+                        1 => new Rulesets.Objects.Legacy.Taiko.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
+                        2 => new Rulesets.Objects.Legacy.Catch.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
+                        3 => new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
+                        _ => parser,
+                    };
                     break;
 
                 case @"LetterboxInBreaks":

@@ -225,27 +225,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <returns>Whether the new point should be added.</returns>
         private bool checkAlreadyExisting(double time, ControlPoint newPoint)
         {
-            ControlPoint existing = null;
-
-            switch (newPoint)
+            ControlPoint existing = newPoint switch
             {
-                case TimingControlPoint _:
-                    // Timing points are a special case and need to be added regardless of fallback availability.
-                    existing = binarySearch(TimingPoints, time);
-                    break;
-
-                case EffectControlPoint _:
-                    existing = EffectPointAt(time);
-                    break;
-
-                case SampleControlPoint _:
-                    existing = binarySearch(SamplePoints, time);
-                    break;
-
-                case DifficultyControlPoint _:
-                    existing = DifficultyPointAt(time);
-                    break;
-            }
+                TimingControlPoint _ => binarySearch(TimingPoints, time), // Timing points are a special case and need to be added regardless of fallback availability.
+                EffectControlPoint _ => EffectPointAt(time),
+                SampleControlPoint _ => binarySearch(SamplePoints, time),
+                DifficultyControlPoint _ => DifficultyPointAt(time),
+                _ => null,
+            };
 
             return existing?.EquivalentTo(newPoint) == true;
         }

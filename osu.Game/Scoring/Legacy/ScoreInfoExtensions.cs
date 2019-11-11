@@ -1,138 +1,86 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
 {
     public static class ScoreInfoExtensions
     {
-        public static int? GetCountGeki(this ScoreInfo scoreInfo)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 3:
-                    return scoreInfo.Statistics[HitResult.Perfect];
-            }
+        private static int? tryGetCount(Dictionary<HitResult, int> statistics, HitResult? hitResult)
+            => hitResult is HitResult h
+                ? statistics[h]
+                : (int?)null;
 
-            return null;
+        private static void trySetCount(Dictionary<HitResult, int> statistics, HitResult? hitResult, int value)
+        {
+            if (hitResult is HitResult hr)
+                statistics[hr] = value;
         }
 
-        public static void SetCountGeki(this ScoreInfo scoreInfo, int value)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+        private static int getId(this ScoreInfo scoreInfo) => scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID;
+
+        private static HitResult? mapGeki(int rulesetId)
+            => rulesetId switch
             {
-                case 3:
-                    scoreInfo.Statistics[HitResult.Perfect] = value;
-                    break;
-            }
-        }
+                3 => HitResult.Perfect,
+                _ => null,
+            };
 
-        public static int? GetCount300(this ScoreInfo scoreInfo)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+        public static int? GetCountGeki(this ScoreInfo scoreInfo) => tryGetCount(scoreInfo.Statistics, mapGeki(scoreInfo.getId()));
+
+        public static void SetCountGeki(this ScoreInfo scoreInfo, int value) => trySetCount(scoreInfo.Statistics, mapGeki(scoreInfo.getId()), value);
+
+        private static HitResult? map300(int rulesetId)
+            => rulesetId switch
             {
-                case 0:
-                case 1:
-                case 3:
-                    return scoreInfo.Statistics[HitResult.Great];
+                0 => HitResult.Great,
+                1 => HitResult.Great,
+                2 => HitResult.Perfect,
+                3 => HitResult.Great,
+                _ => null,
+            };
 
-                case 2:
-                    return scoreInfo.Statistics[HitResult.Perfect];
-            }
+        public static int? GetCount300(this ScoreInfo scoreInfo) => tryGetCount(scoreInfo.Statistics, map300(scoreInfo.getId()));
 
-            return null;
-        }
+        public static void SetCount300(this ScoreInfo scoreInfo, int value) => trySetCount(scoreInfo.Statistics, map300(scoreInfo.getId()), value);
 
-        public static void SetCount300(this ScoreInfo scoreInfo, int value)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+        private static HitResult? mapKatu(int rulesetId)
+            => rulesetId switch
             {
-                case 0:
-                case 1:
-                case 3:
-                    scoreInfo.Statistics[HitResult.Great] = value;
-                    break;
+                3 => HitResult.Good,
+                _ => null,
+            };
 
-                case 2:
-                    scoreInfo.Statistics[HitResult.Perfect] = value;
-                    break;
-            }
-        }
+        public static int? GetCountKatu(this ScoreInfo scoreInfo) => tryGetCount(scoreInfo.Statistics, mapKatu(scoreInfo.getId()));
 
-        public static int? GetCountKatu(this ScoreInfo scoreInfo)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+        public static void SetCountKatu(this ScoreInfo scoreInfo, int value) => trySetCount(scoreInfo.Statistics, mapKatu(scoreInfo.getId()), value);
+
+        private static HitResult? map100(int rulesetId)
+            => rulesetId switch
             {
-                case 3:
-                    return scoreInfo.Statistics[HitResult.Good];
-            }
+                0 => HitResult.Good,
+                1 => HitResult.Good,
+                3 => HitResult.Ok,
+                _ => null,
+            };
 
-            return null;
-        }
+        public static int? GetCount100(this ScoreInfo scoreInfo) => tryGetCount(scoreInfo.Statistics, map100(scoreInfo.getId()));
 
-        public static void SetCountKatu(this ScoreInfo scoreInfo, int value)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+        public static void SetCount100(this ScoreInfo scoreInfo, int value) => trySetCount(scoreInfo.Statistics, map100(scoreInfo.getId()), value);
+
+        private static HitResult? map50(int rulesetId)
+            => rulesetId switch
             {
-                case 3:
-                    scoreInfo.Statistics[HitResult.Good] = value;
-                    break;
-            }
-        }
+                0 => HitResult.Meh,
+                3 => HitResult.Meh,
+                _ => null,
+            };
 
-        public static int? GetCount100(this ScoreInfo scoreInfo)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 0:
-                case 1:
-                    return scoreInfo.Statistics[HitResult.Good];
+        public static int? GetCount50(this ScoreInfo scoreInfo) => tryGetCount(scoreInfo.Statistics, map50(scoreInfo.getId()));
 
-                case 3:
-                    return scoreInfo.Statistics[HitResult.Ok];
-            }
-
-            return null;
-        }
-
-        public static void SetCount100(this ScoreInfo scoreInfo, int value)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 0:
-                case 1:
-                    scoreInfo.Statistics[HitResult.Good] = value;
-                    break;
-
-                case 3:
-                    scoreInfo.Statistics[HitResult.Ok] = value;
-                    break;
-            }
-        }
-
-        public static int? GetCount50(this ScoreInfo scoreInfo)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 0:
-                case 3:
-                    return scoreInfo.Statistics[HitResult.Meh];
-            }
-
-            return null;
-        }
-
-        public static void SetCount50(this ScoreInfo scoreInfo, int value)
-        {
-            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
-            {
-                case 0:
-                case 3:
-                    scoreInfo.Statistics[HitResult.Meh] = value;
-                    break;
-            }
-        }
+        public static void SetCount50(this ScoreInfo scoreInfo, int value) => trySetCount(scoreInfo.Statistics, map50(scoreInfo.getId()), value);
 
         public static int? GetCountMiss(this ScoreInfo scoreInfo) =>
             scoreInfo.Statistics[HitResult.Miss];

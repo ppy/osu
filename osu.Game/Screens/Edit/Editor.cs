@@ -291,25 +291,14 @@ namespace osu.Game.Screens.Edit
         {
             currentScreen?.Exit();
 
-            switch (e.NewValue)
+            currentScreen = e.NewValue switch
             {
-                case EditorScreenMode.SongSetup:
-                    currentScreen = new SetupScreen();
-                    break;
-
-                case EditorScreenMode.Compose:
-                    currentScreen = new ComposeScreen();
-                    break;
-
-                case EditorScreenMode.Design:
-                    currentScreen = new DesignScreen();
-                    break;
-
-                case EditorScreenMode.Timing:
-                    currentScreen = new TimingScreen();
-                    break;
-            }
-
+                EditorScreenMode.SongSetup => new SetupScreen(),
+                EditorScreenMode.Compose => new ComposeScreen(),
+                EditorScreenMode.Design => new DesignScreen(),
+                EditorScreenMode.Timing => new TimingScreen(),
+                _ => throw new ArgumentException($"Unknown enum member {nameof(EditorScreenMode)} {e.NewValue}", nameof(e)),
+            };
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 

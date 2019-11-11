@@ -275,42 +275,19 @@ namespace osu.Game.Beatmaps.Formats
         private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
 
         private Anchor parseOrigin(string value)
-        {
-            var origin = (LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value);
-
-            switch (origin)
+            => ((LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value)) switch
             {
-                case LegacyOrigins.TopLeft:
-                    return Anchor.TopLeft;
-
-                case LegacyOrigins.TopCentre:
-                    return Anchor.TopCentre;
-
-                case LegacyOrigins.TopRight:
-                    return Anchor.TopRight;
-
-                case LegacyOrigins.CentreLeft:
-                    return Anchor.CentreLeft;
-
-                case LegacyOrigins.Centre:
-                    return Anchor.Centre;
-
-                case LegacyOrigins.CentreRight:
-                    return Anchor.CentreRight;
-
-                case LegacyOrigins.BottomLeft:
-                    return Anchor.BottomLeft;
-
-                case LegacyOrigins.BottomCentre:
-                    return Anchor.BottomCentre;
-
-                case LegacyOrigins.BottomRight:
-                    return Anchor.BottomRight;
-
-                default:
-                    return Anchor.TopLeft;
-            }
-        }
+                LegacyOrigins.TopLeft => Anchor.TopLeft,
+                LegacyOrigins.TopCentre => Anchor.TopCentre,
+                LegacyOrigins.TopRight => Anchor.TopRight,
+                LegacyOrigins.CentreLeft => Anchor.CentreLeft,
+                LegacyOrigins.Centre => Anchor.Centre,
+                LegacyOrigins.CentreRight => Anchor.CentreRight,
+                LegacyOrigins.BottomLeft => Anchor.BottomLeft,
+                LegacyOrigins.BottomCentre => Anchor.BottomCentre,
+                LegacyOrigins.BottomRight => Anchor.BottomRight,
+                _ => Anchor.TopLeft,
+            };
 
         private void handleVariables(string line)
         {

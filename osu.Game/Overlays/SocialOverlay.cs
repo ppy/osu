@@ -141,23 +141,15 @@ namespace osu.Game.Overlays
                 Margin = new MarginPadding { Top = 10 },
                 ChildrenEnumerable = Users.Select(u =>
                 {
-                    SocialPanel panel;
-
-                    switch (displayStyle)
+                    SocialPanel panel = displayStyle switch
                     {
-                        case PanelDisplayStyle.Grid:
-                            panel = new SocialGridPanel(u)
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre
-                            };
-                            break;
-
-                        default:
-                            panel = new SocialListPanel(u);
-                            break;
-                    }
-
+                        PanelDisplayStyle.Grid => new SocialGridPanel(u)
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre
+                        },
+                        _ => new SocialListPanel(u),
+                    };
                     panel.Status.BindTo(u.Status);
                     panel.Activity.BindTo(u.Activity);
                     return panel;

@@ -90,25 +90,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     if (t.Length == 1)
                     {
-                        switch (t)
+                        pathType = t switch
                         {
-                            case @"C":
-                                pathType = PathType.Catmull;
-                                break;
-
-                            case @"B":
-                                pathType = PathType.Bezier;
-                                break;
-
-                            case @"L":
-                                pathType = PathType.Linear;
-                                break;
-
-                            case @"P":
-                                pathType = PathType.PerfectCurve;
-                                break;
-                        }
-
+                            @"C" => PathType.Catmull,
+                            @"B" => PathType.Bezier,
+                            @"L" => PathType.Linear,
+                            @"P" => PathType.PerfectCurve,
+                            _ => pathType,
+                        };
                         continue;
                     }
 

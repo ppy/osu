@@ -412,29 +412,14 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            int direction = 0;
-            bool skipDifficulties = false;
-
-            switch (e.Key)
+            (int direction, bool skipDifficulties) = e.Key switch
             {
-                case Key.Up:
-                    direction = -1;
-                    break;
-
-                case Key.Down:
-                    direction = 1;
-                    break;
-
-                case Key.Left:
-                    direction = -1;
-                    skipDifficulties = true;
-                    break;
-
-                case Key.Right:
-                    direction = 1;
-                    skipDifficulties = true;
-                    break;
-            }
+                Key.Up => (-1, false),
+                Key.Down => (1, false),
+                Key.Left => (-1, true),
+                Key.Right => (1, true),
+                _ => (0, false),
+            };
 
             if (direction == 0)
                 return base.OnKeyDown(e);

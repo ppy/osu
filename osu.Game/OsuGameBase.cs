@@ -330,15 +330,11 @@ namespace osu.Game
         private class OsuUserInputManager : UserInputManager
         {
             protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
-            {
-                switch (button)
+                => button switch
                 {
-                    case MouseButton.Right:
-                        return new RightMouseManager(button);
-                }
-
-                return base.CreateButtonManagerFor(button);
-            }
+                    MouseButton.Right => new RightMouseManager(button),
+                    _ => base.CreateButtonManagerFor(button),
+                };
 
             private class RightMouseManager : MouseButtonEventManager
             {

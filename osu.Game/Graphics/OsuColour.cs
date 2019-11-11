@@ -17,51 +17,33 @@ namespace osu.Game.Graphics
             if (hex[0] == '#')
                 hex = hex.Substring(1);
 
-            switch (hex.Length)
+            return hex.Length switch
             {
-                default:
-                    throw new ArgumentException(@"Invalid hex string length!");
-
-                case 3:
-                    return new Color4(
-                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
-                        255);
-
-                case 6:
-                    return new Color4(
-                        Convert.ToByte(hex.Substring(0, 2), 16),
-                        Convert.ToByte(hex.Substring(2, 2), 16),
-                        Convert.ToByte(hex.Substring(4, 2), 16),
-                        255);
-            }
+                3 => new Color4(
+                    (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                    (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                    (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                    255),
+                6 => new Color4(
+                    Convert.ToByte(hex.Substring(0, 2), 16),
+                    Convert.ToByte(hex.Substring(2, 2), 16),
+                    Convert.ToByte(hex.Substring(4, 2), 16),
+                    255),
+                _ => throw new ArgumentException(@"Invalid hex string length!"),
+            };
         }
 
         public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
-        {
-            switch (difficulty)
+            => difficulty switch
             {
-                case DifficultyRating.Easy:
-                    return Green;
-
-                default:
-                case DifficultyRating.Normal:
-                    return Blue;
-
-                case DifficultyRating.Hard:
-                    return Yellow;
-
-                case DifficultyRating.Insane:
-                    return Pink;
-
-                case DifficultyRating.Expert:
-                    return useLighterColour ? PurpleLight : Purple;
-
-                case DifficultyRating.ExpertPlus:
-                    return useLighterColour ? Gray9 : Gray0;
-            }
-        }
+                DifficultyRating.Easy => Green,
+                DifficultyRating.Normal => Blue,
+                DifficultyRating.Hard => Yellow,
+                DifficultyRating.Insane => Pink,
+                DifficultyRating.Expert => useLighterColour ? PurpleLight : Purple,
+                DifficultyRating.ExpertPlus => useLighterColour ? Gray9 : Gray0,
+                _ => Blue,
+            };
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
         public readonly Color4 PurpleLighter = FromHex(@"eeeeff");

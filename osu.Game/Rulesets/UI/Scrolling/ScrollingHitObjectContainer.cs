@@ -155,22 +155,24 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)
         {
+            var scrollAmount = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+
             switch (direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.Y = scrollAmount;
                     break;
 
                 case ScrollingDirection.Down:
-                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.Y = -scrollAmount;
                     break;
 
                 case ScrollingDirection.Left:
-                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.X = scrollAmount;
                     break;
 
                 case ScrollingDirection.Right:
-                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
+                    hitObject.X = -scrollAmount;
                     break;
             }
         }

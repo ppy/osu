@@ -56,23 +56,12 @@ namespace osu.Game.Beatmaps
 
             var lastObject = Beatmap.HitObjects.LastOrDefault();
 
-            double length;
-
-            switch (lastObject)
+            var length = lastObject switch
             {
-                case null:
-                    length = excess_length;
-                    break;
-
-                case IHasEndTime endTime:
-                    length = endTime.EndTime + excess_length;
-                    break;
-
-                default:
-                    length = lastObject.StartTime + excess_length;
-                    break;
-            }
-
+                null => excess_length,
+                IHasEndTime endTime => endTime.EndTime + excess_length,
+                _ => lastObject.StartTime + excess_length,
+            };
             return AudioManager.Tracks.GetVirtual(length);
         }
 

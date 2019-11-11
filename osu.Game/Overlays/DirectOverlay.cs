@@ -197,20 +197,15 @@ namespace osu.Game.Overlays
                 Spacing = new Vector2(panel_padding),
                 Margin = new MarginPadding { Top = 10 },
                 ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
-                {
-                    switch (displayStyle)
+                    displayStyle switch
                     {
-                        case PanelDisplayStyle.Grid:
-                            return new DirectGridPanel(b)
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                            };
-
-                        default:
-                            return new DirectListPanel(b);
-                    }
-                })
+                        PanelDisplayStyle.Grid => new DirectGridPanel(b)
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        _ => new DirectListPanel(b),
+                    })
             };
 
             LoadComponentAsync(newPanels, p =>

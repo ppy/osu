@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -67,23 +68,13 @@ namespace osu.Game.Tests.Visual
 
             public ScrollVisualisationMethod Algorithm
             {
-                set
+                set => implementation = value switch
                 {
-                    switch (value)
-                    {
-                        case ScrollVisualisationMethod.Constant:
-                            implementation = new ConstantScrollAlgorithm();
-                            break;
-
-                        case ScrollVisualisationMethod.Overlapping:
-                            implementation = new OverlappingScrollAlgorithm(ControlPoints);
-                            break;
-
-                        case ScrollVisualisationMethod.Sequential:
-                            implementation = new SequentialScrollAlgorithm(ControlPoints);
-                            break;
-                    }
-                }
+                    ScrollVisualisationMethod.Constant => new ConstantScrollAlgorithm(),
+                    ScrollVisualisationMethod.Overlapping => new OverlappingScrollAlgorithm(ControlPoints),
+                    ScrollVisualisationMethod.Sequential => new SequentialScrollAlgorithm(ControlPoints),
+                    _ => throw new ArgumentException($"Unknown enum member {nameof(ScrollVisualisationMethod)} {value}", nameof(value)),
+                };
             }
 
             public double GetDisplayStartTime(double time, double timeRange)

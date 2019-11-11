@@ -109,24 +109,12 @@ namespace osu.Game.Rulesets.Difficulty
 
             IEnumerable<Mod> createDifficultyAdjustmentModCombinations(IEnumerable<Mod> currentSet, Mod[] adjustmentSet, int currentSetCount = 0, int adjustmentSetStart = 0)
             {
-                switch (currentSetCount)
+                yield return currentSetCount switch
                 {
-                    case 0:
-                        // Initial-case: Empty current set
-                        yield return new ModNoMod();
-
-                        break;
-
-                    case 1:
-                        yield return currentSet.Single();
-
-                        break;
-
-                    default:
-                        yield return new MultiMod(currentSet.ToArray());
-
-                        break;
-                }
+                    0 => new ModNoMod(), // Initial-case: Empty current set
+                    1 => currentSet.Single(),
+                    _ => new MultiMod(currentSet.ToArray()),
+                };
 
                 // Apply mods in the adjustment set recursively. Using the entire adjustment set would result in duplicate multi-mod mod
                 // combinations in further recursions, so a moving subset is used to eliminate this effect

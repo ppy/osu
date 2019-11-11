@@ -49,33 +49,18 @@ namespace osu.Game.Screens.Edit
         /// <param name="colours">The set of colours.</param>
         /// <returns>The applicable colour from <paramref name="colours"/> for <paramref name="beatDivisor"/>.</returns>
         public static ColourInfo GetColourFor(int beatDivisor, OsuColour colours)
-        {
-            switch (beatDivisor)
+            => beatDivisor switch
             {
-                case 2:
-                    return colours.BlueLight;
+                2 => colours.BlueLight,
+                4 => colours.Blue,
+                8 => colours.BlueDarker,
+                16 => colours.PurpleDark,
 
-                case 4:
-                    return colours.Blue;
+                3 => colours.YellowLight,
+                6 => colours.Yellow,
+                12 => colours.YellowDarker,
 
-                case 8:
-                    return colours.BlueDarker;
-
-                case 16:
-                    return colours.PurpleDark;
-
-                case 3:
-                    return colours.YellowLight;
-
-                case 6:
-                    return colours.Yellow;
-
-                case 12:
-                    return colours.YellowDarker;
-
-                default:
-                    return Color4.White;
-            }
-        }
+                _ => Color4.White,
+            };
     }
 }

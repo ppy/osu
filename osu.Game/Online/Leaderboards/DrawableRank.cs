@@ -75,58 +75,32 @@ namespace osu.Game.Online.Leaderboards
         ///  Retrieves the grade background colour.
         /// </summary>
         private Color4 getRankColour()
-        {
-            switch (rank)
+            => rank switch
             {
-                case ScoreRank.XH:
-                case ScoreRank.X:
-                    return OsuColour.FromHex(@"ce1c9d");
-
-                case ScoreRank.SH:
-                case ScoreRank.S:
-                    return OsuColour.FromHex(@"00a8b5");
-
-                case ScoreRank.A:
-                    return OsuColour.FromHex(@"7cce14");
-
-                case ScoreRank.B:
-                    return OsuColour.FromHex(@"e3b130");
-
-                case ScoreRank.C:
-                    return OsuColour.FromHex(@"f18252");
-
-                default:
-                    return OsuColour.FromHex(@"e95353");
-            }
-        }
+                ScoreRank.XH => OsuColour.FromHex(@"ce1c9d"),
+                ScoreRank.X => OsuColour.FromHex(@"ce1c9d"),
+                ScoreRank.SH => OsuColour.FromHex(@"00a8b5"),
+                ScoreRank.S => OsuColour.FromHex(@"00a8b5"),
+                ScoreRank.A => OsuColour.FromHex(@"7cce14"),
+                ScoreRank.B => OsuColour.FromHex(@"e3b130"),
+                ScoreRank.C => OsuColour.FromHex(@"f18252"),
+                _ => OsuColour.FromHex(@"e95353"),
+            };
 
         /// <summary>
         ///  Retrieves the grade text colour.
         /// </summary>
         private ColourInfo getRankNameColour()
-        {
-            switch (rank)
+            => rank switch
             {
-                case ScoreRank.XH:
-                case ScoreRank.SH:
-                    return ColourInfo.GradientVertical(Color4.White, OsuColour.FromHex("afdff0"));
-
-                case ScoreRank.X:
-                case ScoreRank.S:
-                    return ColourInfo.GradientVertical(OsuColour.FromHex(@"ffe7a8"), OsuColour.FromHex(@"ffb800"));
-
-                case ScoreRank.A:
-                    return OsuColour.FromHex(@"275227");
-
-                case ScoreRank.B:
-                    return OsuColour.FromHex(@"553a2b");
-
-                case ScoreRank.C:
-                    return OsuColour.FromHex(@"473625");
-
-                default:
-                    return OsuColour.FromHex(@"512525");
-            }
-        }
+                ScoreRank.XH => ColourInfo.GradientVertical(Color4.White, OsuColour.FromHex("afdff0")),
+                ScoreRank.SH => ColourInfo.GradientVertical(Color4.White, OsuColour.FromHex("afdff0")),
+                ScoreRank.X => ColourInfo.GradientVertical(OsuColour.FromHex(@"ffe7a8"), OsuColour.FromHex(@"ffb800")),
+                ScoreRank.S => ColourInfo.GradientVertical(OsuColour.FromHex(@"ffe7a8"), OsuColour.FromHex(@"ffb800")),
+                ScoreRank.A => OsuColour.FromHex(@"275227"),
+                ScoreRank.B => OsuColour.FromHex(@"553a2b"),
+                ScoreRank.C => OsuColour.FromHex(@"473625"),
+                _ => OsuColour.FromHex(@"512525"),
+            };
     }
 }

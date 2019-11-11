@@ -73,40 +73,19 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (type)
+            (backgroundColour, highlightedColour) = type switch
             {
-                default:
-                case ModType.DifficultyIncrease:
-                    backgroundColour = colours.Yellow;
-                    highlightedColour = colours.YellowLight;
-                    break;
+                ModType.DifficultyIncrease => (colours.Yellow, colours.YellowLight),
+                ModType.DifficultyReduction => (colours.Green, colours.GreenLight),
+                ModType.Automation => (colours.Blue, colours.BlueLight),
+                ModType.Conversion => (colours.Purple, colours.PurpleLight),
+                ModType.Fun => (colours.Pink, colours.PinkLight),
+                ModType.System => (colours.Gray6, colours.Gray7),
+                _ => (colours.Yellow, colours.YellowLight),
+            };
 
-                case ModType.DifficultyReduction:
-                    backgroundColour = colours.Green;
-                    highlightedColour = colours.GreenLight;
-                    break;
-
-                case ModType.Automation:
-                    backgroundColour = colours.Blue;
-                    highlightedColour = colours.BlueLight;
-                    break;
-
-                case ModType.Conversion:
-                    backgroundColour = colours.Purple;
-                    highlightedColour = colours.PurpleLight;
-                    break;
-
-                case ModType.Fun:
-                    backgroundColour = colours.Pink;
-                    highlightedColour = colours.PinkLight;
-                    break;
-
-                case ModType.System:
-                    backgroundColour = colours.Gray6;
-                    highlightedColour = colours.Gray7;
-                    modIcon.Colour = colours.Yellow;
-                    break;
-            }
+            if (type == ModType.System)
+                modIcon.Colour = colours.Yellow;
         }
 
         protected override void LoadComplete()

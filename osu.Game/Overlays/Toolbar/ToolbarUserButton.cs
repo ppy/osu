@@ -53,18 +53,11 @@ namespace osu.Game.Overlays.Toolbar
 
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
-            switch (state)
+            (Text, avatar.User) = state switch
             {
-                default:
-                    Text = @"Guest";
-                    avatar.User = new User();
-                    break;
-
-                case APIState.Online:
-                    Text = api.LocalUser.Value.Username;
-                    avatar.User = api.LocalUser.Value;
-                    break;
-            }
+                APIState.Online => (api.LocalUser.Value.Username, api.LocalUser.Value),
+                _ => ("Guest", new User()),
+            };
         }
     }
 }

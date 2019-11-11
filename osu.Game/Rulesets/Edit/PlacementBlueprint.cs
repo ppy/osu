@@ -128,17 +128,12 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Handle(e);
 
-            switch (e)
+            return e switch
             {
-                case ScrollEvent _:
-                    return false;
-
-                case MouseButtonEvent _:
-                    return true;
-
-                default:
-                    return false;
-            }
+                ScrollEvent _ => false,
+                MouseButtonEvent _ => true,
+                _ => false,
+            };
         }
     }
 

@@ -26,22 +26,13 @@ namespace osu.Game.Beatmaps.Drawables
         [BackgroundDependencyLoader]
         private void load(LargeTextureStore textures)
         {
-            string resource = null;
-
-            switch (type)
+            string resource = type switch
             {
-                case BeatmapSetCoverType.Cover:
-                    resource = set.OnlineInfo.Covers.Cover;
-                    break;
-
-                case BeatmapSetCoverType.Card:
-                    resource = set.OnlineInfo.Covers.Card;
-                    break;
-
-                case BeatmapSetCoverType.List:
-                    resource = set.OnlineInfo.Covers.List;
-                    break;
-            }
+                BeatmapSetCoverType.Cover => set.OnlineInfo.Covers.Cover,
+                BeatmapSetCoverType.Card => set.OnlineInfo.Covers.Card,
+                BeatmapSetCoverType.List => set.OnlineInfo.Covers.List,
+                _ => null,
+            };
 
             if (resource != null)
                 Texture = textures.Get(resource);

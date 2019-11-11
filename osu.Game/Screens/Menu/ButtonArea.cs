@@ -127,21 +127,13 @@ namespace osu.Game.Screens.Menu
 
             public ButtonSystemState ButtonSystemState
             {
-                set
+                set => State = value switch
                 {
-                    switch (value)
-                    {
-                        default:
-                            State = ButtonAreaBackgroundState.Normal;
-                            break;
-
-                        case ButtonSystemState.Initial:
-                        case ButtonSystemState.Exit:
-                        case ButtonSystemState.EnteringMode:
-                            State = ButtonAreaBackgroundState.Flat;
-                            break;
-                    }
-                }
+                    ButtonSystemState.Initial => ButtonAreaBackgroundState.Flat,
+                    ButtonSystemState.Exit => ButtonAreaBackgroundState.Flat,
+                    ButtonSystemState.EnteringMode => ButtonAreaBackgroundState.Flat,
+                    _ => ButtonAreaBackgroundState.Normal,
+                };
             }
 
             public event Action<ButtonAreaBackgroundState> StateChanged;

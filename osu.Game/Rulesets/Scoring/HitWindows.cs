@@ -143,31 +143,16 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="result">The expected <see cref="HitResult"/>.</param>
         /// <returns>One half of the hit window for <paramref name="result"/>.</returns>
         public double WindowFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Perfect:
-                    return perfect;
-
-                case HitResult.Great:
-                    return great;
-
-                case HitResult.Good:
-                    return good;
-
-                case HitResult.Ok:
-                    return ok;
-
-                case HitResult.Meh:
-                    return meh;
-
-                case HitResult.Miss:
-                    return miss;
-
-                default:
-                    throw new ArgumentException("Unknown enum member", nameof(result));
-            }
-        }
+                HitResult.Perfect => perfect,
+                HitResult.Great => great,
+                HitResult.Good => good,
+                HitResult.Ok => ok,
+                HitResult.Meh => meh,
+                HitResult.Miss => miss,
+                _ => throw new ArgumentException("Unknown enum member", nameof(result)),
+            };
 
         /// <summary>
         /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
@@ -192,16 +177,12 @@ namespace osu.Game.Rulesets.Scoring
             };
 
             public override bool IsHitResultAllowed(HitResult result)
-            {
-                switch (result)
+                => result switch
                 {
-                    case HitResult.Perfect:
-                    case HitResult.Miss:
-                        return true;
-                }
-
-                return false;
-            }
+                    HitResult.Perfect => true,
+                    HitResult.Miss => true,
+                    _ => false,
+                };
 
             protected override DifficultyRange[] GetRanges() => ranges;
         }

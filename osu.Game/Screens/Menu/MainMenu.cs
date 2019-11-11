@@ -109,19 +109,12 @@ namespace osu.Game.Screens.Menu
             });
 
             buttons.StateChanged += state =>
-            {
-                switch (state)
+                Background.FadeColour(state switch
                 {
-                    case ButtonSystemState.Initial:
-                    case ButtonSystemState.Exit:
-                        Background.FadeColour(Color4.White, 500, Easing.OutSine);
-                        break;
-
-                    default:
-                        Background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
-                        break;
-                }
-            };
+                    ButtonSystemState.Initial => Color4.White,
+                    ButtonSystemState.Exit => Color4.White,
+                    _ => OsuColour.Gray(0.8f),
+                }, 500, Easing.OutSine);
 
             buttons.OnSettings = () => settings?.ToggleVisibility();
             buttons.OnDirect = () => direct?.ToggleVisibility();

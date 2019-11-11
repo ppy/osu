@@ -65,24 +65,13 @@ namespace osu.Game.Updater
 
         private string getBestUrl(GitHubRelease release)
         {
-            GitHubAsset bestAsset = null;
-
-            switch (RuntimeInfo.OS)
+            var bestAsset = RuntimeInfo.OS switch
             {
-                case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe"));
-                    break;
-
-                case RuntimeInfo.Platform.MacOsx:
-                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
-                    break;
-
-                case RuntimeInfo.Platform.Android:
-                    // on our testing device this causes the download to magically disappear.
-                    //bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".apk"));
-                    break;
-            }
-
+                RuntimeInfo.Platform.Windows => release.Assets?.Find(f => f.Name.EndsWith(".exe")),
+                RuntimeInfo.Platform.MacOsx => release.Assets?.Find(f => f.Name.EndsWith(".app.zip")),
+                //RuntimeInfo.Platform.Android => release.Assets?.Find(f => f.Name.EndsWith(".apk")), // on our testing device this causes the download to magically disappear.
+                _ => null,
+            };
             return bestAsset?.BrowserDownloadUrl ?? release.HtmlUrl;
         }
 
