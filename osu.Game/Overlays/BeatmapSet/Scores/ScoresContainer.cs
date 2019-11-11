@@ -15,6 +15,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Select.Leaderboards;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -24,6 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -97,7 +99,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Spacing = new Vector2(0, spacing),
                             Children = new Drawable[]
                             {
-                                new LeaderboardScopeSelector(),
+                                new LeaderboardScopeSelector
+                                {
+                                    Current = { BindTarget = scope }
+                                },
                                 modSelector = new LeaderboardModSelector
                                 {
                                     Ruleset = { BindTarget = ruleset }
@@ -135,6 +140,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         protected override void LoadComplete()
         {
             base.LoadComplete();
+            scope.BindValueChanged(_ => getScores());
             Beatmap.BindValueChanged(onBeatmapChanged, true);
         }
 
@@ -147,21 +153,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             else
                 ruleset.Value = beatmapRuleset;
 
-            getScores(beatmap.NewValue);
+            getScores();
         }
 
-        private void getScores(BeatmapInfo beatmap)
+        private void getScores()
         {
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
             Scores = null;
 
-            if (beatmap?.OnlineBeatmapID.HasValue != true || beatmap.Status <= BeatmapSetOnlineStatus.Pending)
+            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
                 return;
 
             loadingAnimation.Show();
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value);
             getScoresRequest.Success += scores =>
             {
                 loadingAnimation.Hide();
