@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Tests.Visual.UserInterface.MenuItems
+namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneThreeStateMenuItem : OsuTestScene
     {

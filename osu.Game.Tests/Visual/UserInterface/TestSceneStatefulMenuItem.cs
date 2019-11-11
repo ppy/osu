@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Tests.Visual.UserInterface.MenuItems
+namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneStatefulMenuItem : OsuTestScene
     {
