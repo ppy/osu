@@ -14,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -22,11 +23,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int spacing = 15;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
         private readonly LoadingAnimation loadingAnimation;
+        private readonly FillFlowContainer modFilter;
+        private readonly LeaderboardModSelector modSelector;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -84,6 +88,22 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
+                        modFilter = new FillFlowContainer
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, spacing),
+                            Children = new Drawable[]
+                            {
+                                new LeaderboardScopeSelector(),
+                                modSelector = new LeaderboardModSelector
+                                {
+                                    Ruleset = { BindTarget = ruleset }
+                                }
+                            }
+                        },
                         topScoresContainer = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -115,21 +135,33 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Beatmap.BindValueChanged(getScores, true);
+            Beatmap.BindValueChanged(onBeatmapChanged, true);
         }
 
-        private void getScores(ValueChangedEvent<BeatmapInfo> beatmap)
+        private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
+        {
+            var beatmapRuleset = beatmap.NewValue?.Ruleset;
+
+            if (modSelector.Ruleset.Value?.Equals(beatmapRuleset) ?? false)
+                modSelector.DeselectAll();
+            else
+                ruleset.Value = beatmapRuleset;
+
+            getScores(beatmap.NewValue);
+        }
+
+        private void getScores(BeatmapInfo beatmap)
         {
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
             Scores = null;
 
-            if (beatmap.NewValue?.OnlineBeatmapID.HasValue != true || beatmap.NewValue.Status <= BeatmapSetOnlineStatus.Pending)
+            if (beatmap?.OnlineBeatmapID.HasValue != true || beatmap.Status <= BeatmapSetOnlineStatus.Pending)
                 return;
 
             loadingAnimation.Show();
-            getScoresRequest = new GetScoresRequest(beatmap.NewValue, beatmap.NewValue.Ruleset);
+            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
             getScoresRequest.Success += scores =>
             {
                 loadingAnimation.Hide();
