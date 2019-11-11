@@ -117,24 +117,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case SliderTailCircle tail:
-                    return new DrawableSliderTail(slider, tail);
-
-                case HitCircle head:
-                    return new DrawableSliderHead(slider, head) { OnShake = Shake };
-
-                case SliderTick tick:
-                    return new DrawableSliderTick(tick) { Position = tick.Position - slider.Position };
-
-                case RepeatPoint repeat:
-                    return new DrawableRepeatPoint(repeat, this) { Position = repeat.Position - slider.Position };
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
+                SliderTailCircle tail => new DrawableSliderTail(slider, tail),
+                HitCircle head => new DrawableSliderHead(slider, head) { OnShake = Shake },
+                SliderTick tick => new DrawableSliderTick(tick) { Position = tick.Position - slider.Position },
+                RepeatPoint repeat => new DrawableRepeatPoint(repeat, this) { Position = repeat.Position - slider.Position },
+                _ => base.CreateNestedHitObject(hitObject),
+            };
 
         protected override void UpdateInitialTransforms()
         {

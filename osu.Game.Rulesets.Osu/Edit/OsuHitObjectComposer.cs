@@ -40,21 +40,13 @@ namespace osu.Game.Rulesets.Osu.Edit
         public override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case DrawableHitCircle circle:
-                    return new HitCircleSelectionBlueprint(circle);
-
-                case DrawableSlider slider:
-                    return new SliderSelectionBlueprint(slider);
-
-                case DrawableSpinner spinner:
-                    return new SpinnerSelectionBlueprint(spinner);
-            }
-
-            return base.CreateBlueprintFor(hitObject);
-        }
+                DrawableHitCircle circle => new HitCircleSelectionBlueprint(circle),
+                DrawableSlider slider => new SliderSelectionBlueprint(slider),
+                DrawableSpinner spinner => new SpinnerSelectionBlueprint(spinner),
+                _ => base.CreateBlueprintFor(hitObject),
+            };
 
         protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
         {

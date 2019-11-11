@@ -16,18 +16,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
         };
 
         public override bool IsHitResultAllowed(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Great:
-                case HitResult.Good:
-                case HitResult.Meh:
-                case HitResult.Miss:
-                    return true;
-            }
-
-            return false;
-        }
+                HitResult.Great => true,
+                HitResult.Good => true,
+                HitResult.Meh => true,
+                HitResult.Miss => true,
+                _ => false,
+            };
 
         protected override DifficultyRange[] GetRanges() => osu_ranges;
     }

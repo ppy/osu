@@ -11,38 +11,22 @@ namespace osu.Game.Rulesets.Osu.Judgements
         public override HitResult MaxResult => HitResult.Great;
 
         protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                default:
-                    return 0;
-
-                case HitResult.Meh:
-                    return 50;
-
-                case HitResult.Good:
-                    return 100;
-
-                case HitResult.Great:
-                    return 300;
-            }
-        }
+                HitResult.Meh => 50,
+                HitResult.Good => 100,
+                HitResult.Great => 300,
+                _ => 0,
+            };
 
         protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
+            => result switch
             {
-                case HitResult.Miss:
-                    return -0.02;
-
-                case HitResult.Meh:
-                case HitResult.Good:
-                case HitResult.Great:
-                    return 0.01;
-
-                default:
-                    return 0;
-            }
-        }
+                HitResult.Miss => -0.02,
+                HitResult.Meh => 0.01,
+                HitResult.Good => 0.01,
+                HitResult.Great => 0.01,
+                _ => 0,
+            };
     }
 }

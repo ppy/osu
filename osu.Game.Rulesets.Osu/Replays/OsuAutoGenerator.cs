@@ -6,7 +6,6 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
@@ -98,24 +97,13 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             double endTime = prev.GetEndTime();
 
-            HitWindows hitWindows = null;
-
-            switch (h)
+            var hitWindows = h switch
             {
-                case HitCircle hitCircle:
-                    hitWindows = hitCircle.HitWindows;
-                    break;
-
-                case Slider slider:
-                    hitWindows = slider.TailCircle.HitWindows;
-                    break;
-
-                case Spinner _:
-                    hitWindows = defaultHitWindows;
-                    break;
-            }
-
-            Debug.Assert(hitWindows != null);
+                HitCircle hitCircle => hitCircle.HitWindows,
+                Slider slider => slider.TailCircle.HitWindows,
+                Spinner _ => defaultHitWindows,
+                _ => throw new ArgumentException($"Unknown hit object type {h.GetType()}", nameof(h)),
+            };
 
             // Make the cursor stay at a hitObject as long as possible (mainly for autopilot).
             if (h.StartTime - hitWindows.WindowFor(HitResult.Miss) > endTime + hitWindows.WindowFor(HitResult.Meh) + 50)

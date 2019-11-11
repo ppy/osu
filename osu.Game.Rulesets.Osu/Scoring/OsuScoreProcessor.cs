@@ -26,28 +26,15 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         protected override double HealthAdjustmentFactorFor(JudgementResult result)
-        {
-            switch (result.Type)
+            => result.Type switch
             {
-                case HitResult.Great:
-                    return 10.2 - hpDrainRate;
-
-                case HitResult.Good:
-                    return 8 - hpDrainRate;
-
-                case HitResult.Meh:
-                    return 4 - hpDrainRate;
-
-                // case HitResult.SliderTick:
-                //     return Math.Max(7 - hpDrainRate, 0) * 0.01;
-
-                case HitResult.Miss:
-                    return hpDrainRate;
-
-                default:
-                    return 0;
-            }
-        }
+                HitResult.Great => 10.2 - hpDrainRate,
+                HitResult.Good => 8 - hpDrainRate,
+                HitResult.Meh => 4 - hpDrainRate,
+                //HitResult.SliderTick => Math.Max(7 - hpDrainRate, 0) * 0.01;
+                HitResult.Miss => hpDrainRate,
+                _ => 0,
+            };
 
         protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new OsuJudgementResult(hitObject, judgement);
 

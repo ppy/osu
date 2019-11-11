@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
@@ -28,7 +29,6 @@ using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
-using System;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -104,63 +104,48 @@ namespace osu.Game.Rulesets.Osu
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
-        {
-            switch (type)
+            => type switch
             {
-                case ModType.DifficultyReduction:
-                    return new Mod[]
-                    {
-                        new OsuModEasy(),
-                        new OsuModNoFail(),
-                        new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
-                        new OsuModSpunOut(),
-                    };
-
-                case ModType.DifficultyIncrease:
-                    return new Mod[]
-                    {
-                        new OsuModHardRock(),
-                        new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
-                        new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
-                        new OsuModHidden(),
-                        new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
-                    };
-
-                case ModType.Conversion:
-                    return new Mod[]
-                    {
-                        new OsuModTarget(),
-                    };
-
-                case ModType.Automation:
-                    return new Mod[]
-                    {
-                        new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
-                        new OsuModRelax(),
-                        new OsuModAutopilot(),
-                    };
-
-                case ModType.Fun:
-                    return new Mod[]
-                    {
-                        new OsuModTransform(),
-                        new OsuModWiggle(),
-                        new OsuModSpinIn(),
-                        new MultiMod(new OsuModGrow(), new OsuModDeflate()),
-                        new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new OsuModTraceable(),
-                    };
-
-                case ModType.System:
-                    return new Mod[]
-                    {
-                        new OsuModTouchDevice(),
-                    };
-
-                default:
-                    return Array.Empty<Mod>();
-            }
-        }
+                ModType.DifficultyReduction => new Mod[]
+                {
+                    new OsuModEasy(),
+                    new OsuModNoFail(),
+                    new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
+                    new OsuModSpunOut(),
+                },
+                ModType.DifficultyIncrease => new Mod[]
+                {
+                    new OsuModHardRock(),
+                    new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
+                    new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
+                    new OsuModHidden(),
+                    new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
+                },
+                ModType.Conversion => new Mod[]
+                {
+                    new OsuModTarget(),
+                },
+                ModType.Automation => new Mod[]
+                {
+                    new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
+                    new OsuModRelax(),
+                    new OsuModAutopilot(),
+                },
+                ModType.Fun => new Mod[]
+                {
+                    new OsuModTransform(),
+                    new OsuModWiggle(),
+                    new OsuModSpinIn(),
+                    new MultiMod(new OsuModGrow(), new OsuModDeflate()),
+                    new MultiMod(new ModWindUp(), new ModWindDown()),
+                    new OsuModTraceable(),
+                },
+                ModType.System => new Mod[]
+                {
+                    new OsuModTouchDevice(),
+                },
+                _ => Array.Empty<Mod>(),
+            };
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetOsu };
 

@@ -40,21 +40,13 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
 
         public override DrawableHitObject<OsuHitObject> CreateDrawableRepresentation(OsuHitObject h)
-        {
-            switch (h)
+            => h switch
             {
-                case HitCircle circle:
-                    return new DrawableHitCircle(circle);
-
-                case Slider slider:
-                    return new DrawableSlider(slider);
-
-                case Spinner spinner:
-                    return new DrawableSpinner(spinner);
-            }
-
-            return null;
-        }
+                HitCircle circle => new DrawableHitCircle(circle),
+                Slider slider => new DrawableSlider(slider),
+                Spinner spinner => new DrawableSpinner(spinner),
+                _ => null,
+            };
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuFramedReplayInputHandler(replay);
 
