@@ -75,28 +75,14 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testBeatmapLabels(instance);
 
-                switch (instance)
+                testInfoLabels(instance switch
                 {
-                    case OsuRuleset _:
-                        testInfoLabels(5);
-                        break;
-
-                    case TaikoRuleset _:
-                        testInfoLabels(5);
-                        break;
-
-                    case CatchRuleset _:
-                        testInfoLabels(5);
-                        break;
-
-                    case ManiaRuleset _:
-                        testInfoLabels(4);
-                        break;
-
-                    default:
-                        testInfoLabels(2);
-                        break;
-                }
+                    OsuRuleset _ => 5,
+                    TaikoRuleset _ => 5,
+                    CatchRuleset _ => 5,
+                    ManiaRuleset _ => 4,
+                    _ => 2,
+                });
             }
         }
 

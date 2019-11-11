@@ -171,16 +171,12 @@ namespace osu.Game.Rulesets.Mania.Tests
                     {
                         double finalPosition = (nested.HitObject.StartTime - obj.HitObject.StartTime) / endTime.Duration;
 
-                        switch (direction)
+                        nested.Y = direction switch
                         {
-                            case ScrollingDirection.Up:
-                                nested.Y = (float)(finalPosition * content.DrawHeight);
-                                break;
-
-                            case ScrollingDirection.Down:
-                                nested.Y = (float)(-finalPosition * content.DrawHeight);
-                                break;
-                        }
+                            ScrollingDirection.Up => (float)(finalPosition * content.DrawHeight),
+                            ScrollingDirection.Down => (float)(-finalPosition * content.DrawHeight),
+                            _ => throw new InvalidOperationException($"Unexpected enum member {nameof(ScrollingDirection)} {direction}."),
+                        };
                     }
                 }
             }

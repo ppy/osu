@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Mods;
 using osu.Game.Rulesets.Catch.Objects;
@@ -29,27 +31,12 @@ namespace osu.Game.Rulesets.Catch.Tests
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
-        {
-            switch (hitObject)
+            => hitObject switch
             {
-                case JuiceStream stream:
-                    foreach (var nested in stream.NestedHitObjects)
-                        yield return new ConvertValue((CatchHitObject)nested);
-
-                    break;
-
-                case BananaShower shower:
-                    foreach (var nested in shower.NestedHitObjects)
-                        yield return new ConvertValue((CatchHitObject)nested);
-
-                    break;
-
-                default:
-                    yield return new ConvertValue((CatchHitObject)hitObject);
-
-                    break;
-            }
-        }
+                JuiceStream stream => stream.NestedHitObjects.Select(nested => new ConvertValue((CatchHitObject)nested)),
+                BananaShower shower => shower.NestedHitObjects.Select(nested => new ConvertValue((CatchHitObject)nested)),
+                _ => new ConvertValue((CatchHitObject)hitObject).Yield(),
+            };
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
     }

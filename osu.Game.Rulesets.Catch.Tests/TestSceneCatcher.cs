@@ -84,15 +84,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             }
 
             public Drawable GetDrawableComponent(ISkinComponent component)
-            {
-                switch (component.LookupName)
+                => component.LookupName switch
                 {
-                    case "Gameplay/catch/fruit-catcher-idle":
-                        return new CatcherCustomSkin();
-                }
-
-                return null;
-            }
+                    "Gameplay/catch/fruit-catcher-idle" => new CatcherCustomSkin(),
+                    _ => null,
+                };
 
             public SampleChannel GetSample(ISampleInfo sampleInfo) =>
                 throw new NotImplementedException();

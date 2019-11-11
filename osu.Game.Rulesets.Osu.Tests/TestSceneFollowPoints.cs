@@ -134,23 +134,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                     objects[i].StartTime = Time.Current + 1000 + 500 * (i + 1);
                     objects[i].ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                    DrawableOsuHitObject drawableObject = null;
-
-                    switch (objects[i])
+                    DrawableOsuHitObject drawableObject = (objects[i]) switch
                     {
-                        case HitCircle circle:
-                            drawableObject = new DrawableHitCircle(circle);
-                            break;
-
-                        case Slider slider:
-                            drawableObject = new DrawableSlider(slider);
-                            break;
-
-                        case Spinner spinner:
-                            drawableObject = new DrawableSpinner(spinner);
-                            break;
-                    }
-
+                        HitCircle circle => new DrawableHitCircle(circle),
+                        Slider slider => new DrawableSlider(slider),
+                        Spinner spinner => new DrawableSpinner(spinner),
+                        _ => null,
+                    };
                     hitObjectContainer.Add(drawableObject);
                     followPointRenderer.AddFollowPoints(drawableObject);
                 }

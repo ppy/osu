@@ -123,26 +123,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         private void setAnchor(DrawableHitObject obj, TestPlayfield playfield)
-        {
-            switch (playfield.Direction)
+            => obj.Anchor = playfield.Direction switch
             {
-                case ScrollingDirection.Up:
-                    obj.Anchor = Anchor.TopCentre;
-                    break;
-
-                case ScrollingDirection.Down:
-                    obj.Anchor = Anchor.BottomCentre;
-                    break;
-
-                case ScrollingDirection.Left:
-                    obj.Anchor = Anchor.CentreLeft;
-                    break;
-
-                case ScrollingDirection.Right:
-                    obj.Anchor = Anchor.CentreRight;
-                    break;
-            }
-        }
+                ScrollingDirection.Up => Anchor.TopCentre,
+                ScrollingDirection.Down => Anchor.BottomCentre,
+                ScrollingDirection.Left => Anchor.CentreLeft,
+                ScrollingDirection.Right => Anchor.CentreRight,
+                _ => throw new ArgumentException($"Unknown enum member {nameof(ScrollingDirection)} {playfield.Direction}."),
+            };
 
         private void setScrollAlgorithm(ScrollVisualisationMethod algorithm) => scrollContainers.ForEach(c => c.ScrollAlgorithm = algorithm);
 
