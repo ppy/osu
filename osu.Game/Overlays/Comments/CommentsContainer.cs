@@ -33,6 +33,7 @@ namespace osu.Game.Overlays.Comments
         private CancellationTokenSource loadCancellation;
         private int currentPage;
         private CommentBundleParameters parameters;
+        private CommentBundle commentBundle;
 
         private readonly Box background;
         private readonly Container noCommentsPlaceholder;
@@ -150,22 +151,29 @@ namespace osu.Game.Overlays.Comments
         public void ShowComments(CommentableType type, long id)
         {
             parameters = new CommentBundleParameters(type, id);
+            commentBundle = null;
             updateComments();
         }
 
         public void ShowComments(CommentBundle commentBundle)
         {
             parameters = null;
-            clearComments();
-            onSuccess(commentBundle);
+            this.commentBundle = commentBundle;
+            updateComments();
         }
 
         private void updateComments()
         {
-            if (parameters == null)
-                return;
-
             clearComments();
+
+            if (parameters == null)
+            {
+                if (commentBundle != null)
+                    onSuccess(commentBundle);
+
+                return;
+            }
+
             getComments();
         }
 
