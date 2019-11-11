@@ -171,29 +171,19 @@ namespace osu.Game.Tournament.Components
 
                 BorderThickness = 6;
 
-                switch (found.Team)
+                BorderColour = found.Team switch
                 {
-                    case TeamColour.Red:
-                        BorderColour = Color4.Red;
-                        break;
+                    TeamColour.Red => Color4.Red,
+                    TeamColour.Blue => Color4.Blue,
+                    _ => throw new ArgumentException($"Unknown enum member {nameof(TeamColour)} {found.Team}."),
+                };
 
-                    case TeamColour.Blue:
-                        BorderColour = Color4.Blue;
-                        break;
-                }
-
-                switch (found.Type)
+                (Colour, Alpha) = found.Type switch
                 {
-                    case ChoiceType.Pick:
-                        Colour = Color4.White;
-                        Alpha = 1;
-                        break;
-
-                    case ChoiceType.Ban:
-                        Colour = Color4.Gray;
-                        Alpha = 0.5f;
-                        break;
-                }
+                    ChoiceType.Pick => (Color4.White, 1),
+                    ChoiceType.Ban => (Color4.Gray, 0.5f),
+                    _ => throw new ArgumentException($"Unknown enum member {nameof(ChoiceType)} {found.Type}."),
+                };
             }
             else
             {

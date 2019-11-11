@@ -31,15 +31,11 @@ namespace osu.Game.Tournament
         /// <param name="typeface">The <see cref="TournamentTypeface"/>.</param>
         /// <returns>The string representation.</returns>
         public static string GetFamilyString(TournamentTypeface typeface)
-        {
-            switch (typeface)
+            => typeface switch
             {
-                case TournamentTypeface.Aquatico:
-                    return "Aquatico";
-            }
-
-            return null;
-        }
+                TournamentTypeface.Aquatico => "Aquatico",
+                _ => null,
+            };
 
         /// <summary>
         /// Retrieves the string representation of a <see cref="FontWeight"/>.
