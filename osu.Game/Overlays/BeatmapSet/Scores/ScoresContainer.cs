@@ -110,24 +110,43 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 }
                             }
                         },
-                        topScoresContainer = new FillFlowContainer
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5),
-                        },
-                        scoreTable = new ScoreTable
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                            RelativeSizeAxes = Axes.X,
+                            Children = new Drawable[]
+                            {
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, spacing),
+                                    Children = new Drawable[]
+                                    {
+                                        topScoresContainer = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 5),
+                                        },
+                                        scoreTable = new ScoreTable
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                        }
+                                    }
+                                },
+                                loadingAnimation = new LoadingAnimation
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Alpha = 0,
+                                },
+                            }
                         }
                     }
-                },
-                loadingAnimation = new LoadingAnimation
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(20),
                 },
             };
         }
