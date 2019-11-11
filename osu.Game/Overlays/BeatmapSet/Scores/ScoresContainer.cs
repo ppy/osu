@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
+        private const int duration = 200;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -34,7 +35,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly LoadingAnimation loadingAnimation;
         private readonly LeaderboardScopeSelector scopeSelector;
         private readonly LeaderboardModSelector modSelector;
-        private readonly FillFlowContainer modFilter;
+        private readonly Container modFilter;
+        private readonly FillFlowContainer modFilterContent;
 
         private GetScoresRequest getScoresRequest;
 
@@ -89,26 +91,34 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        modFilter = new FillFlowContainer
+                        modFilter = new Container
                         {
-                            AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, spacing),
-                            Children = new Drawable[]
+                            AutoSizeEasing = Easing.OutQuint,
+                            AutoSizeDuration = duration,
+                            Child = modFilterContent = new FillFlowContainer
                             {
-                                scopeSelector = new LeaderboardScopeSelector
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Direction = FillDirection.Vertical,
+                                Spacing = new Vector2(0, spacing),
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                },
-                                modSelector = new LeaderboardModSelector
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Ruleset = { BindTarget = ruleset }
-                                },
-                            }
+                                    scopeSelector = new LeaderboardScopeSelector
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                    },
+                                    modSelector = new LeaderboardModSelector
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Ruleset = { BindTarget = ruleset }
+                                    },
+                                }
+                            },
                         },
                         new Container
                         {
@@ -210,7 +220,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             api.Queue(getScoresRequest);
         }
 
-        private void updateModFilterVisibility() => modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter && hasLeaderboard ? 1 : 0);
+        private void updateModFilterVisibility()
+        {
+            if (api.IsLoggedIn && api.LocalUser.Value.IsSupporter && hasLeaderboard)
+            {
+                modFilter.AutoSizeAxes = Axes.Y;
+                modFilterContent.FadeIn(duration, Easing.OutQuint);
+            }
+            else
+            {
+                modFilter.AutoSizeAxes = Axes.None;
+                modFilter.ResizeHeightTo(0, duration, Easing.OutQuint);
+                modFilterContent.FadeOut(duration, Easing.OutQuint);
+            }
+        }
 
         private bool hasLeaderboard => Beatmap.Value?.Status > BeatmapSetOnlineStatus.Pending;
     }
