@@ -297,10 +297,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 set
                 {
-                    var h = Header as UserDropdownHeader;
-                    if (h == null) return;
-
-                    h.StatusColour = value;
+                    if (Header is UserDropdownHeader h)
+                        h.StatusColour = value;
                 }
             }
 
