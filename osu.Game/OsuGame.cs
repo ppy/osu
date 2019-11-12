@@ -71,7 +71,7 @@ namespace osu.Game
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
-        protected RavenLogger RavenLogger;
+        protected SentryLogger RavenLogger;
 
         public virtual Storage GetStorageForStableInstall() => null;
 
@@ -110,7 +110,7 @@ namespace osu.Game
 
             forwardLoggedErrorsToNotifications();
 
-            RavenLogger = new RavenLogger(this);
+            RavenLogger = new SentryLogger(this);
         }
 
         private void updateBlockingOverlayFade() =>

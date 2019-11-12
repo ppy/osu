@@ -7,26 +7,26 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
-using SharpRaven;
-using SharpRaven.Data;
+using Sentry;
 
 namespace osu.Game.Utils
 {
     /// <summary>
     /// Report errors to sentry.
     /// </summary>
-    public class RavenLogger : IDisposable
+    public class SentryLogger : IDisposable
     {
-        private readonly RavenClient raven = new RavenClient("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255");
-
         private readonly List<Task> tasks = new List<Task>();
 
-        public RavenLogger(OsuGame game)
+        public SentryLogger(OsuGame game)
         {
-            raven.Release = game.Version;
-
             if (!game.IsDeployedBuild) return;
 
+            SentrySdk.Init(new SentryOptions
+            {
+                Dsn = new Dsn("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255"),
+                Release = game.Version
+            });
             Exception lastException = null;
 
             Logger.NewEntry += entry =>
@@ -46,10 +46,10 @@ namespace osu.Game.Utils
                         return;
 
                     lastException = exception;
-                    queuePendingTask(raven.CaptureAsync(new SentryEvent(exception) { Message = entry.Message }));
+                    SentrySdk.CaptureEvent(new SentryEvent(exception) { Message = entry.Message });
                 }
                 else
-                    raven.AddTrail(new Breadcrumb(entry.Target.ToString(), BreadcrumbType.Navigation) { Message = entry.Message });
+                    SentrySdk.AddBreadcrumb(category: entry.Target.ToString(), type: "navigation", message: entry.Message);
             };
         }
 
@@ -93,7 +93,7 @@ namespace osu.Game.Utils
 
         #region Disposal
 
-        ~RavenLogger()
+        ~SentryLogger()
         {
             Dispose(false);
         }
