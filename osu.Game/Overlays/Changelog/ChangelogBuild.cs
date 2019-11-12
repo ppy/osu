@@ -130,6 +130,7 @@ namespace osu.Game.Overlays.Changelog
                     });
 
                     if (entry.GithubUser.UserId != null)
+                    {
                         title.AddUserLink(new User
                         {
                             Username = entry.GithubUser.OsuUsername,
@@ -139,18 +140,23 @@ namespace osu.Game.Overlays.Changelog
                             t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
+                    }
                     else if (entry.GithubUser.GithubUrl != null)
+                    {
                         title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
                         {
                             t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
+                    }
                     else
+                    {
                         title.AddText(entry.GithubUser.DisplayName, t =>
                         {
                             t.Font = fontSmall;
                             t.Colour = entryColour;
                         });
+                    }
 
                     ChangelogEntries.Add(titleContainer);
 
