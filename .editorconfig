@@ -153,7 +153,7 @@ csharp_style_conditional_delegate_call = true:suggestion
 #Style - unused
 dotnet_code_quality_unused_parameters = non_public:silent
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
-csharp_style_unused_value_assignment_preference = discard_variable:silent
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 
 #Style - variable declaration
 csharp_style_inlined_variable_declaration = true:silent
