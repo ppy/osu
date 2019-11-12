@@ -53,12 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Add(new ModButton(new NoMod()));
-
-            ruleset.NewValue.CreateInstance().GetAllMods().ForEach(mod =>
-            {
-                if (mod.Ranked)
-                    modsContainer.Add(new ModButton(mod));
-            });
+            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
 
             modsContainer.ForEach(button => button.OnSelectionChanged += selectionChanged);
         }
@@ -77,11 +72,7 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override bool OnHover(HoverEvent e)
         {
             if (!SelectedMods.Any())
-                modsContainer.ForEach(button =>
-                {
-                    if (!button.IsHovered)
-                        button.Highlighted.Value = false;
-                });
+                modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = false);
 
             return base.OnHover(e);
         }
