@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 if (TargetColumns >= 10)
                 {
-                    TargetColumns = TargetColumns / 2;
+                    TargetColumns /= 2;
                     Dual = true;
                 }
             }

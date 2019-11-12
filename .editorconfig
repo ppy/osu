@@ -140,7 +140,7 @@ dotnet_style_prefer_inferred_anonymous_type_member_names = true:warning
 dotnet_style_prefer_auto_properties = true:warning
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 dotnet_style_prefer_conditional_expression_over_return = true:silent
-dotnet_style_prefer_compound_assignment = true:silent
+dotnet_style_prefer_compound_assignment = true:warning
 
 #Style - null/type checks
 dotnet_style_coalesce_expression = true:warning
