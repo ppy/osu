@@ -170,7 +170,7 @@ csharp_style_deconstructed_variable_declaration = true:warning
 #Style - other C# 7.x features
 dotnet_style_prefer_inferred_tuple_names = true:warning
 csharp_prefer_simple_default_expression = true:warning
-csharp_style_pattern_local_over_anonymous_function = true:silent
+csharp_style_pattern_local_over_anonymous_function = true:warning
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:silent
 
 #Style - C# 8 features
