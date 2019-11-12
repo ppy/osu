@@ -436,8 +436,10 @@ namespace osu.Game.Rulesets.UI
                         return h.HitWindows;
 
                     foreach (var n in h.NestedHitObjects)
+                    {
                         if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
                             return n.HitWindows;
+                    }
                 }
 
                 return null;
