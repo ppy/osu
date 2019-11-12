@@ -218,7 +218,7 @@ namespace osu.Game.Tests.Visual
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = Double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity)
                 {
                     var track = new TrackVirtualManual(referenceClock) { Length = length };
                     AddItem(track);
