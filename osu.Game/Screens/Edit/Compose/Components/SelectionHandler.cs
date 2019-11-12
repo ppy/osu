@@ -90,6 +90,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => selectedBlueprints.Any(b => b.IsHovered);
+
         #endregion
 
         #region Selection Handling
