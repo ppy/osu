@@ -19,7 +19,7 @@ namespace osu.Game.Online.API.Requests
 
         public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
-            this.query = System.Uri.EscapeDataString(query);
+            this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
             this.searchCategory = searchCategory;
             this.sortCriteria = sortCriteria;
