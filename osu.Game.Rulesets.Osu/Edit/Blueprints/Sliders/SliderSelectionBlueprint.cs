@@ -78,10 +78,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     continue;
 
                 Vector2 dir = p2 - p1;
+
                 float projLength = MathHelper.Clamp(Vector2.Dot(position - p1, dir) / dir.LengthSquared, 0, 1);
                 Vector2 proj = p1 + projLength * dir;
 
-                float dist = Vector2.Distance(position, proj);
+                float dist = Vector2.DistanceSquared(position, proj);
 
                 if (dist < minDistance)
                 {
