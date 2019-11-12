@@ -24,36 +24,37 @@ namespace osu.Game.Audio
         /// </summary>
         public event Action Started;
 
-        private Track track;
+        protected Track Track { get; private set; }
+
         private bool hasStarted;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            track = GetTrack();
-            if (track != null)
-                track.Completed += Stop;
+            Track = GetTrack();
+            if (Track != null)
+                Track.Completed += Stop;
         }
 
         /// <summary>
         /// Length of the track.
         /// </summary>
-        public double Length => track?.Length ?? 0;
+        public double Length => Track?.Length ?? 0;
 
         /// <summary>
         /// The current track time.
         /// </summary>
-        public double CurrentTime => track?.CurrentTime ?? 0;
+        public double CurrentTime => Track?.CurrentTime ?? 0;
 
         /// <summary>
         /// Whether the track is loaded.
         /// </summary>
-        public bool TrackLoaded => track?.IsLoaded ?? false;
+        public bool TrackLoaded => Track?.IsLoaded ?? false;
 
         /// <summary>
         /// Whether the track is playing.
         /// </summary>
-        public bool IsRunning => track?.IsRunning ?? false;
+        public bool IsRunning => Track?.IsRunning ?? false;
 
         private ScheduledDelegate startDelegate;
 
@@ -63,7 +64,7 @@ namespace osu.Game.Audio
         /// <returns>Whether the track is started or already playing.</returns>
         public bool Start()
         {
-            if (track == null)
+            if (Track == null)
                 return false;
 
             startDelegate = Schedule(() =>
@@ -73,7 +74,7 @@ namespace osu.Game.Audio
 
                 hasStarted = true;
 
-                track.Restart();
+                Track.Restart();
                 Started?.Invoke();
             });
 
@@ -87,7 +88,7 @@ namespace osu.Game.Audio
         {
             startDelegate?.Cancel();
 
-            if (track == null)
+            if (Track == null)
                 return;
 
             if (!hasStarted)
@@ -95,7 +96,7 @@ namespace osu.Game.Audio
 
             hasStarted = false;
 
-            track.Stop();
+            Track.Stop();
 
             Stopped?.Invoke();
         }
