@@ -108,7 +108,7 @@ namespace osu.Game.Database
             return Import(notification, paths);
         }
 
-        protected async Task Import(ProgressNotification notification, params string[] paths)
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
@@ -168,6 +168,8 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            return imported;
         }
 
         /// <summary>
@@ -262,9 +264,12 @@ namespace osu.Game.Database
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
+
             foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+            {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
+            }
 
             return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
         }
@@ -483,12 +488,16 @@ namespace osu.Game.Database
 
             // import files to manager
             foreach (string file in reader.Filenames)
+            {
                 using (Stream s = reader.GetStream(file))
+                {
                     fileInfos.Add(new TFileModel
                     {
                         Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
                         FileInfo = files.Add(s)
                     });
+                }
+            }
 
             return fileInfos;
         }
@@ -649,8 +658,10 @@ namespace osu.Game.Database
         private void handleEvent(Action a)
         {
             if (delayingEvents)
+            {
                 lock (queuedEvents)
                     queuedEvents.Add(a);
+            }
             else
                 a.Invoke();
         }
