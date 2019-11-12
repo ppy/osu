@@ -109,16 +109,20 @@ namespace osu.Game.Tests.Visual
             AddAssert("check OsuGame DI members", () =>
             {
                 foreach (var type in requiredGameDependencies)
+                {
                     if (game.Dependencies.Get(type) == null)
                         throw new Exception($"{type} has not been cached");
+                }
 
                 return true;
             });
             AddAssert("check OsuGameBase DI members", () =>
             {
                 foreach (var type in requiredGameBaseDependencies)
+                {
                     if (gameBase.Dependencies.Get(type) == null)
                         throw new Exception($"{type} has not been cached");
+                }
 
                 return true;
             });
