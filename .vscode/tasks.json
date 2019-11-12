@@ -100,7 +100,7 @@
             "command": "dotnet",
             "args": [
                 "restore",
-                "osu.sln"
+                "build/Desktop.proj"
             ],
             "problemMatcher": []
         }

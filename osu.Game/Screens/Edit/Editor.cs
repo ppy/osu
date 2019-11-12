@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
+        public override float BackgroundParallaxAmount => 0.1f;
+
         public override bool AllowBackButton => false;
 
         public override bool HideOverlaysOnEnter => true;
@@ -65,7 +67,10 @@ namespace osu.Game.Screens.Edit
         {
             this.host = host;
 
-            // TODO: should probably be done at a DrawableRuleset level to share logic with Player.
+            beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
+            beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
+
+            // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
@@ -246,7 +251,8 @@ namespace osu.Game.Screens.Edit
             base.OnEntering(last);
 
             Background.FadeColour(Color4.DarkGray, 500);
-            resetTrack();
+
+            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -257,10 +263,24 @@ namespace osu.Game.Screens.Edit
             return base.OnExiting(next);
         }
 
-        private void resetTrack()
+        private void resetTrack(bool seekToStart = false)
         {
             Beatmap.Value.Track?.ResetSpeedAdjustments();
             Beatmap.Value.Track?.Stop();
+
+            if (seekToStart)
+            {
+                double targetTime = 0;
+
+                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+                {
+                    // seek to one beat length before the first hitobject
+                    targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
+                    targetTime -= Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(targetTime).BeatLength;
+                }
+
+                clock.Seek(Math.Max(0, targetTime));
+            }
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
