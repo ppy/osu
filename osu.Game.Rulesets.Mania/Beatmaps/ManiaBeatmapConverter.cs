@@ -255,7 +255,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             /// </summary>
             /// <param name="time">The time to retrieve the sample info list from.</param>
             /// <returns></returns>
-            private List<HitSampleInfo> sampleInfoListAt(double time)
+            private IList<HitSampleInfo> sampleInfoListAt(double time)
             {
                 var curveData = HitObject as IHasCurve;
 

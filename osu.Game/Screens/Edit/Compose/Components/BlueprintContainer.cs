@@ -10,16 +10,19 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class BlueprintContainer : CompositeDrawable
+    public class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         public event Action<IEnumerable<HitObject>> SelectionChanged;
 
@@ -29,6 +32,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private PlacementBlueprint currentPlacement;
         private SelectionHandler selectionHandler;
         private InputManager inputManager;
+
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
@@ -92,11 +98,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             beginClickSelection(e);
-            return true;
+            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             // Deselection should only occur if no selected blueprints are hovered
             // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
             if (endClickSelection() || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
@@ -106,11 +115,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override bool OnDoubleClick(DoubleClickEvent e)
+        {
+            if (e.Button == MouseButton.Right)
+                return false;
+
+            SelectionBlueprint clickedBlueprint = selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
+
+            if (clickedBlueprint == null)
+                return false;
+
+            adjustableClock?.Seek(clickedBlueprint.DrawableObject.HitObject.StartTime);
+            return true;
+        }
+
         protected override bool OnMouseUp(MouseUpEvent e)
         {
             // Special case for when a drag happened instead of a click
             Schedule(() => endClickSelection());
-            return true;
+            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -126,6 +149,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!beginSelectionMovement())
             {
                 dragBox.UpdateDrag(e);
@@ -137,6 +163,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDrag(DragEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!moveCurrentSelection(e))
                 dragBox.UpdateDrag(e);
 
@@ -145,6 +174,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragEnd(DragEndEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!finishSelectionMovement())
             {
                 dragBox.FadeOut(250, Easing.OutQuint);
@@ -153,6 +185,37 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             return true;
         }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    if (!selectionHandler.SelectedBlueprints.Any())
+                        return false;
+
+                    deselectAll();
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected override bool OnKeyUp(KeyUpEvent e) => false;
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.SelectAll:
+                    selectAll();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(PlatformAction action) => false;
 
         protected override void Update()
         {
@@ -297,6 +360,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 else
                     blueprint.Deselect();
             }
+        }
+
+        /// <summary>
+        /// Selects all <see cref="SelectionBlueprint"/>s.
+        /// </summary>
+        private void selectAll()
+        {
+            selectionBlueprints.ToList().ForEach(m => m.Select());
+            selectionHandler.UpdateVisibility();
         }
 
         /// <summary>

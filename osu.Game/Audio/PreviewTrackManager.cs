@@ -55,6 +55,9 @@ namespace osu.Game.Audio
 
             track.Stopped += () => Schedule(() =>
             {
+                if (current != track)
+                    return;
+
                 current = null;
                 audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
             });
@@ -85,7 +88,7 @@ namespace osu.Game.Audio
         /// </summary>
         protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
-        protected class TrackManagerPreviewTrack : PreviewTrack
+        public class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 
