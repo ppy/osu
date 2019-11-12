@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     rightClickPosition = e.MouseDownPosition;
                     return false; // Allow right click to be handled by context menu
 
-                case MouseButton.Left when e.ControlPressed:
+                case MouseButton.Left when e.ControlPressed && IsSelected:
                     placementControlPointIndex = addControlPoint(e.MousePosition);
                     return true; // Stop input from being handled and modifying the selection
             }
