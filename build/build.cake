@@ -11,6 +11,7 @@ var target = Argument("target", "Build");
 var configuration = Argument("configuration", "Release");
 
 var rootDirectory = new DirectoryPath("..");
+var sln = rootDirectory.CombineWithFilePath("osu.sln");
 var desktopBuilds = rootDirectory.CombineWithFilePath("build/Desktop.proj");
 var desktopSlnf = rootDirectory.CombineWithFilePath("osu.Desktop.slnf");
 
@@ -60,8 +61,12 @@ Task("CodeFileSanity")
         });
     });
 
+Task("DotnetFormat")
+    .Does(() => DotNetCoreTool(sln.FullPath, "format", "--dry-run --check"));
+
 Task("Build")
     .IsDependentOn("CodeFileSanity")
+    .IsDependentOn("DotnetFormat")
     .IsDependentOn("InspectCode")
     .IsDependentOn("Test");
 
