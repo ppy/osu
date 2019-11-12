@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
@@ -19,7 +18,7 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
-    public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>, IHasContextMenu
+    public class SliderSelectionBlueprint : OsuSelectionBlueprint<Slider>
     {
         protected readonly SliderBodyPiece BodyPiece;
         protected readonly SliderCircleSelectionBlueprint HeadBlueprint;
@@ -102,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             UpdateHitObject();
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
             new OsuMenuItem("Add control point", MenuItemType.Standard, addControlPoint),
         };
