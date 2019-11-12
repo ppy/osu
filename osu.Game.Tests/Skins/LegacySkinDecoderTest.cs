@@ -25,7 +25,9 @@ namespace osu.Game.Tests.Skins
                 var comboColors = decoder.Decode(stream).ComboColours;
 
                 List<Color4> expectedColors;
+
                 if (hasColours)
+                {
                     expectedColors = new List<Color4>
                     {
                         new Color4(142, 199, 255, 255),
@@ -33,6 +35,7 @@ namespace osu.Game.Tests.Skins
                         new Color4(128, 255, 255, 255),
                         new Color4(100, 100, 100, 100),
                     };
+                }
                 else
                     expectedColors = new DefaultSkin().Configuration.ComboColours;
 

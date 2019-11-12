@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osuTK;
@@ -56,7 +55,7 @@ namespace osu.Game.Tournament.Screens.Editors
                 {
                     Children = new Drawable[]
                     {
-                        new OsuButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Add new",

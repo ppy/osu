@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Tournament.IPC;
 using osuTK;
 using osuTK.Graphics;
@@ -27,6 +29,9 @@ namespace osu.Game.Tournament.Screens
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -85,11 +90,38 @@ namespace osu.Game.Tournament.Screens
                     Value = api?.LocalUser.Value.Username,
                     Failing = api?.IsLoggedIn != true,
                     Description = "In order to access the API and display metadata, a login is required."
-                }
+                },
+                new LabelledDropdown<RulesetInfo>
+                {
+                    Label = "Ruleset",
+                    Description = "Decides what stats are displayed and which ranks are retrieved for players",
+                    Items = rulesets.AvailableRulesets,
+                    Current = LadderInfo.Ruleset,
+                },
             };
         }
 
-        private class ActionableInfo : LabelledComponent<Drawable>
+        public class LabelledDropdown<T> : LabelledComponent<OsuDropdown<T>, T>
+        {
+            public LabelledDropdown()
+                : base(true)
+            {
+            }
+
+            public IEnumerable<T> Items
+            {
+                get => Component.Items;
+                set => Component.Items = value;
+            }
+
+            protected override OsuDropdown<T> CreateComponent() => new OsuDropdown<T>
+            {
+                RelativeSizeAxes = Axes.X,
+                Width = 0.5f,
+            };
+        }
+
+        private class ActionableInfo : LabelledDrawable<Drawable>
         {
             private OsuButton button;
 
