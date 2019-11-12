@@ -87,7 +87,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
             Assert.IsNull(filterCriteria.BPM.Max);
         }
 
-        private static object[] lengthQueryExamples =
+        private static readonly object[] length_query_examples =
         {
             new object[] { "6ms", TimeSpan.FromMilliseconds(6), TimeSpan.FromMilliseconds(1) },
             new object[] { "23s", TimeSpan.FromSeconds(23), TimeSpan.FromSeconds(1) },
@@ -97,7 +97,7 @@ namespace osu.Game.Tests.NonVisual.Filtering
         };
 
         [Test]
-        [TestCaseSource(nameof(lengthQueryExamples))]
+        [TestCaseSource(nameof(length_query_examples))]
         public void TestApplyLengthQueries(string lengthQuery, TimeSpan expectedLength, TimeSpan scale)
         {
             string query = $"length={lengthQuery} time";

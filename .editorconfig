@@ -158,6 +158,7 @@ csharp_style_throw_expression = true:silent
 csharp_style_conditional_delegate_call = true:suggestion
 
 #Style - unused
+dotnet_style_readonly_field = true:silent
 dotnet_code_quality_unused_parameters = non_public:silent
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
@@ -175,8 +176,6 @@ dotnet_style_prefer_is_null_check_over_reference_equality_method = true:silent
 #Supressing roslyn built-in analyzers
 # Suppress: EC112
 
-#Field can be readonly
-dotnet_diagnostic.IDE0044.severity = silent
 #Private method is unused
 dotnet_diagnostic.IDE0051.severity = silent
 #Private member is unused
