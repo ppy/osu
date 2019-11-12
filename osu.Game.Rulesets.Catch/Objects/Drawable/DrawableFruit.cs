@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
             const float small_pulp = large_pulp_3 / 2;
 
-            Vector2 positionAt(float angle, float distance) => new Vector2(
+            static Vector2 positionAt(float angle, float distance) => new Vector2(
                 distance * (float)Math.Sin(angle * Math.PI / 180),
                 distance * (float)Math.Cos(angle * Math.PI / 180));
 

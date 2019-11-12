@@ -222,7 +222,7 @@ namespace osu.Game.Tournament.Components
                 Margin = new MarginPadding { Horizontal = 15, Vertical = 1 };
                 AutoSizeAxes = Axes.Both;
 
-                void cp(SpriteText s, Color4 colour)
+                static void cp(SpriteText s, Color4 colour)
                 {
                     s.Colour = colour;
                     s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);

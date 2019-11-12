@@ -152,7 +152,7 @@ namespace osu.Game.Tournament.IPC
         {
             protected override string LocateBasePath()
             {
-                bool checkExists(string p)
+                static bool checkExists(string p)
                 {
                     return File.Exists(Path.Combine(p, "ipc.txt"));
                 }
