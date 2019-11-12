@@ -168,43 +168,43 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 }
 
                 if (convertType.HasFlag(PatternType.KeepSingle))
-                    return pattern = generateRandomNotes(1);
+                    return generateRandomNotes(1);
 
                 if (convertType.HasFlag(PatternType.Mirror))
                 {
                     if (ConversionDifficulty > 6.5)
-                        return pattern = generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
+                        return generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
                     if (ConversionDifficulty > 4)
-                        return pattern = generateRandomPatternWithMirrored(0.12, 0.17, 0);
+                        return generateRandomPatternWithMirrored(0.12, 0.17, 0);
 
-                    return pattern = generateRandomPatternWithMirrored(0.12, 0, 0);
+                    return generateRandomPatternWithMirrored(0.12, 0, 0);
                 }
 
                 if (ConversionDifficulty > 6.5)
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
-                        return pattern = generateRandomPattern(0.78, 0.42, 0, 0);
+                        return generateRandomPattern(0.78, 0.42, 0, 0);
 
-                    return pattern = generateRandomPattern(1, 0.62, 0, 0);
+                    return generateRandomPattern(1, 0.62, 0, 0);
                 }
 
                 if (ConversionDifficulty > 4)
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
-                        return pattern = generateRandomPattern(0.35, 0.08, 0, 0);
+                        return generateRandomPattern(0.35, 0.08, 0, 0);
 
-                    return pattern = generateRandomPattern(0.52, 0.15, 0, 0);
+                    return generateRandomPattern(0.52, 0.15, 0, 0);
                 }
 
                 if (ConversionDifficulty > 2)
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
-                        return pattern = generateRandomPattern(0.18, 0, 0, 0);
+                        return generateRandomPattern(0.18, 0, 0, 0);
 
-                    return pattern = generateRandomPattern(0.45, 0, 0, 0);
+                    return generateRandomPattern(0.45, 0, 0, 0);
                 }
 
-                return pattern = generateRandomPattern(0, 0, 0, 0);
+                return generateRandomPattern(0, 0, 0, 0);
             }
             finally
             {
@@ -384,8 +384,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>The amount of notes to be generated. The note to be added to the centre column will NOT be part of this count.</returns>
         private int getRandomNoteCountMirrored(double centreProbability, double p2, double p3, out bool addToCentre)
         {
-            addToCentre = false;
-
             switch (TotalColumns)
             {
                 case 2:
