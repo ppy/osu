@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
@@ -129,6 +130,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left)
+                return false;
+
             if (RequestSelection != null)
             {
                 RequestSelection.Invoke(Index);
@@ -138,11 +142,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
+        protected override bool OnMouseUp(MouseUpEvent e) => e.Button == MouseButton.Left && RequestSelection != null;
 
-        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
+        protected override bool OnClick(ClickEvent e) => e.Button == MouseButton.Left && RequestSelection != null;
 
-        protected override bool OnDragStart(DragStartEvent e) => true;
+        protected override bool OnDragStart(DragStartEvent e) => e.Button == MouseButton.Left;
 
         protected override bool OnDrag(DragEvent e)
         {
