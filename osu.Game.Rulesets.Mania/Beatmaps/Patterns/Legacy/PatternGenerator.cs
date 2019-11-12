@@ -148,9 +148,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         protected int FindAvailableColumn(int initialColumn, int? lowerBound = null, int? upperBound = null, Func<int, int> nextColumn = null, [InstantHandle] Func<int, bool> validation = null,
                                           params Pattern[] patterns)
         {
-            lowerBound = lowerBound ?? RandomStart;
-            upperBound = upperBound ?? TotalColumns;
-            nextColumn = nextColumn ?? (_ => GetRandomColumn(lowerBound, upperBound));
+            lowerBound ??= RandomStart;
+            upperBound ??= TotalColumns;
+            nextColumn ??= (_ => GetRandomColumn(lowerBound, upperBound));
 
             // Check for the initial column
             if (isValid(initialColumn))
