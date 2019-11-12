@@ -2,10 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Threading.Tasks;
 using osu.Framework.Logging;
 using Sentry;
 
@@ -102,7 +100,7 @@ namespace osu.Game.Utils
                 return;
 
             isDisposed = true;
-            sentry.Dispose();
+            sentry?.Dispose();
             sentry = null;
         }
 
