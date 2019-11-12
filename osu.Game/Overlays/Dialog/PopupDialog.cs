@@ -241,11 +241,6 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
-            if (!actionInvoked)
-                // In the case a user did not choose an action before a hide was triggered, press the last button.
-                // This is presumed to always be a sane default "cancel" action.
-                buttonsContainer.Last().Click();
-
             content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
 
