@@ -149,8 +149,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 return;
 
             if (HitObject.SampleControlPoint == null)
+            {
                 throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
                                                                                       + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+            }
 
             samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
             foreach (var s in samples)
