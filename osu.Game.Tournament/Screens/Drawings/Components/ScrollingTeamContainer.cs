@@ -125,22 +125,20 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                         foreach (var c in Children)
                         {
-                            var stc = c as ScrollingTeam;
-
-                            if (stc == null)
-                                continue;
-
-                            if (closest == null)
+                            if (c is ScrollingTeam stc)
                             {
-                                closest = stc;
-                                continue;
+                                if (closest == null)
+                                {
+                                    closest = stc;
+                                    continue;
+                                }
+
+                                float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
+                                float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
+
+                                if (o < lastOffset)
+                                    closest = stc;
                             }
-
-                            float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
-                            float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
-
-                            if (o < lastOffset)
-                                closest = stc;
                         }
 
                         Trace.Assert(closest != null, "closest != null");
@@ -203,15 +201,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
             foreach (var c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-
-                if (st == null)
-                    continue;
-
-                if (st.Team == team)
+                if (c is ScrollingTeam st)
                 {
-                    st.FadeOut(200);
-                    st.Expire();
+                    if (st.Team == team)
+                    {
+                        st.FadeOut(200);
+                        st.Expire();
+                    }
                 }
             }
         }
@@ -295,14 +291,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             foreach (var c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-                if (st == null)
-                    continue;
-
-                if (st.Selected)
+                if (c is ScrollingTeam st)
                 {
-                    st.Selected = false;
-                    RemoveTeam(st.Team);
+                    if (st.Selected)
+                    {
+                        st.Selected = false;
+                        RemoveTeam(st.Team);
+                    }
                 }
             }
         }

@@ -145,8 +145,8 @@ dotnet_style_prefer_compound_assignment = true:warning
 #Style - null/type checks
 dotnet_style_coalesce_expression = true:warning
 dotnet_style_null_propagation = true:warning
-csharp_style_pattern_matching_over_is_with_cast_check = true:silent
-csharp_style_pattern_matching_over_as_with_null_check = true:silent
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
 csharp_style_throw_expression = true:silent
 csharp_style_conditional_delegate_call = true:suggestion
 
