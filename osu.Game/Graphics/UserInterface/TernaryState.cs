@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 
         /// <summary>
         /// The current state is a combination of <see cref="False"/> and <see cref="True"/>.
-        /// The state becomes <see cref="True"/> if the <see cref="ThreeStateMenuItem"/> is pressed.
+        /// The state becomes <see cref="True"/> if the <see cref="TernaryStateMenuItem"/> is pressed.
         /// </summary>
         Indeterminate,
 
