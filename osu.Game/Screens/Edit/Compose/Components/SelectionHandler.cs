@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
-                return new MenuItem[]
+                var items = new List<MenuItem>
                 {
                     new OsuMenuItem("Sound")
                     {
@@ -242,6 +242,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                     },
                     new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
                 };
+
+                if (selectedBlueprints.Count == 1)
+                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
+
+                return items.ToArray();
             }
         }
 
