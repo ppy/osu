@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
         private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>();
+        private readonly Bindable<User> user = new Bindable<User>();
 
         private readonly Box background;
         private readonly ScoreTable scoreTable;
@@ -155,6 +156,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray2;
+
+            user.BindTo(api.LocalUser);
         }
 
         protected override void LoadComplete()
@@ -167,7 +170,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             modSelector.SelectedMods.ItemsRemoved += _ => getScores();
 
             Beatmap.BindValueChanged(onBeatmapChanged);
-            api.LocalUser.BindValueChanged(onUserChanged, true);
+            user.BindValueChanged(onUserChanged, true);
         }
 
         private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
