@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+                static bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
 
                 if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
                     pathType = PathType.Linear;

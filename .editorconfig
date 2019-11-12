@@ -173,6 +173,9 @@ csharp_prefer_simple_default_expression = true:warning
 csharp_style_pattern_local_over_anonymous_function = true:silent
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:silent
 
+#Style _ C# 8 features
+csharp_prefer_static_local_function = true:warning
+
 #Supressing roslyn built-in analyzers
 # Suppress: EC112
 
