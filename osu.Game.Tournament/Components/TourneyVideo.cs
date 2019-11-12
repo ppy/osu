@@ -29,12 +29,14 @@ namespace osu.Game.Tournament.Components
                 };
             }
             else
+            {
                 InternalChild = video = new VideoSprite(stream)
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fit,
                     Clock = new FramedClock(manualClock = new ManualClock())
                 };
+            }
         }
 
         public bool Loop

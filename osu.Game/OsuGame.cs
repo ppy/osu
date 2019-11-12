@@ -102,8 +102,6 @@ namespace osu.Game
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
-        private readonly List<VisibilityContainer> toolbarElements = new List<VisibilityContainer>();
-
         private readonly List<OverlayContainer> visibleBlockingOverlays = new List<OverlayContainer>();
 
         public OsuGame(string[] args = null)
@@ -134,17 +132,13 @@ namespace osu.Game
         /// <summary>
         /// Close all game-wide overlays.
         /// </summary>
-        /// <param name="hideToolbarElements">Whether the toolbar (and accompanying controls) should also be hidden.</param>
-        public void CloseAllOverlays(bool hideToolbarElements = true)
+        /// <param name="hideToolbar">Whether the toolbar should also be hidden.</param>
+        public void CloseAllOverlays(bool hideToolbar = true)
         {
             foreach (var overlay in overlays)
                 overlay.Hide();
 
-            if (hideToolbarElements)
-            {
-                foreach (var overlay in toolbarElements)
-                    overlay.Hide();
-            }
+            if (hideToolbar) Toolbar.Hide();
         }
 
         private DependencyContainer dependencies;
@@ -393,6 +387,8 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
+        protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
+
         #region Beatmap progression
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
@@ -402,8 +398,10 @@ namespace osu.Game
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
             using (var oldBeatmap = beatmap.OldValue)
+            {
                 if (oldBeatmap?.Track != null)
                     oldBeatmap.Track.Completed -= currentTrackCompleted;
+            }
 
             nextBeatmap?.LoadBeatmapAsync();
         }
@@ -570,11 +568,7 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     menuScreen?.MakeCurrent();
                 },
-            }, d =>
-            {
-                topMostOverlayContent.Add(d);
-                toolbarElements.Add(d);
-            });
+            }, topMostOverlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), leftFloatingOverlayContent.Add, true);
 
@@ -613,11 +607,7 @@ namespace osu.Game
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, d =>
-            {
-                rightFloatingOverlayContent.Add(d);
-                toolbarElements.Add(d);
-            }, true);
+            }, rightFloatingOverlayContent.Add, true);
 
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new DialogOverlay(), topMostOverlayContent.Add, true);
@@ -627,8 +617,8 @@ namespace osu.Game
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
+            // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
-            overlays.AddRange(singleDisplaySideOverlays);
 
             foreach (var overlay in singleDisplaySideOverlays)
             {
@@ -642,7 +632,6 @@ namespace osu.Game
 
             // eventually informational overlays should be displayed in a stack, but for now let's only allow one to stay open at a time.
             var informationalOverlays = new OverlayContainer[] { beatmapSetOverlay, userProfile };
-            overlays.AddRange(informationalOverlays);
 
             foreach (var overlay in informationalOverlays)
             {
@@ -656,7 +645,6 @@ namespace osu.Game
 
             // ensure only one of these overlays are open at once.
             var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct, changelogOverlay };
-            overlays.AddRange(singleDisplayOverlays);
 
             foreach (var overlay in singleDisplayOverlays)
             {
@@ -756,6 +744,9 @@ namespace osu.Game
         {
             if (cache)
                 dependencies.Cache(d);
+
+            if (d is OverlayContainer overlay)
+                overlays.Add(overlay);
 
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
