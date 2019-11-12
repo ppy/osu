@@ -235,10 +235,12 @@ namespace osu.Game.Overlays.Comments
             foreach (var c in response.Comments)
             {
                 if (c.IsTopLevel)
+                {
                     page.Add(new DrawableComment(c)
                     {
                         ShowDeleted = { BindTarget = ShowDeleted }
                     });
+                }
             }
 
             return page;
