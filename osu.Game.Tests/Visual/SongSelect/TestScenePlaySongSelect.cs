@@ -132,11 +132,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(1);
 
             if (rulesetsInSameBeatmap)
+            {
                 AddStep("import multi-ruleset map", () =>
                 {
                     var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
                     manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
                 });
+            }
             else
             {
                 addRulesetImportStep(1);
