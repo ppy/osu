@@ -387,6 +387,8 @@ namespace osu.Game
 
         protected virtual Loader CreateLoader() => new Loader();
 
+        protected override Container CreateScalingContainer() => new ScalingContainer(ScalingMode.Everything);
+
         #region Beatmap progression
 
         private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
