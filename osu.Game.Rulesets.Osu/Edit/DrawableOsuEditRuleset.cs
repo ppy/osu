@@ -16,6 +16,12 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class DrawableOsuEditRuleset : DrawableOsuRuleset
     {
+        /// <summary>
+        /// Hit objects are intentionally made to fade out at a constant slower rate than in gameplay.
+        /// This allows a mapper to gain better historical context and use recent hitobjects as reference / snap points.
+        /// </summary>
+        private const double editor_hit_object_fade_out_extension = 500;
+
         public DrawableOsuEditRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
@@ -35,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                         return;
 
                     using (hitObject.BeginAbsoluteSequence(existing.StartTime))
-                        hitObject.FadeOut(500).Expire();
+                        hitObject.FadeOut(editor_hit_object_fade_out_extension).Expire();
                     break;
             }
         }
