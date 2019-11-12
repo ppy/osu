@@ -1,6 +1,7 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-        private readonly Bindable<bool> favourited = new Bindable<bool>();
+        private readonly BindableBool favourited = new BindableBool();
 
         private PostBeatmapFavouriteRequest request;
         private DimmedLoadingLayer loading;
@@ -44,40 +45,45 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 loading = new DimmedLoadingLayer(),
             });
 
+            favourited.ValueChanged += favourited => icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
+
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                if (setInfo.NewValue?.OnlineInfo?.HasFavourited == null)
-                    return;
-
-                favourited.Value = setInfo.NewValue.OnlineInfo.HasFavourited;
-            });
-
-            favourited.ValueChanged += favourited =>
-            {
-                loading.Hide();
-
-                icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
-            };
+                Enabled.Value = BeatmapSet.Value?.OnlineBeatmapSetID > 0;
+                favourited.Value = setInfo.NewValue?.OnlineInfo?.HasFavourited ?? false;
+            }, true);
 
             Action = () =>
             {
                 if (loading.State.Value == Visibility.Visible)
                     return;
 
+                // guaranteed by disabled state abvove.
+                Debug.Assert(BeatmapSet.Value.OnlineBeatmapSetID != null);
+
                 loading.Show();
 
                 request?.Cancel();
-                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value?.OnlineBeatmapSetID ?? 0, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
-                request.Success += () => favourited.Value = !favourited.Value;
-                request.Failure += exception =>
+
+                request = new PostBeatmapFavouriteRequest(BeatmapSet.Value.OnlineBeatmapSetID.Value, favourited.Value ? BeatmapFavouriteAction.UnFavourite : BeatmapFavouriteAction.Favourite);
+
+                request.Success += () =>
+                {
+                    favourited.Toggle();
+                    loading.Hide();
+                };
+
+                request.Failure += e =>
                 {
                     notifications.Post(new SimpleNotification
                     {
-                        Text = exception.Message,
+                        Text = e.Message,
                         Icon = FontAwesome.Solid.Times,
                     });
+
                     loading.Hide();
                 };
+
                 api.Queue(request);
             };
         }
