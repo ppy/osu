@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
@@ -54,15 +55,47 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button == MouseButton.Right)
-                rightClickPosition = e.MouseDownPosition;
+            switch (e.Button)
+            {
+                case MouseButton.Right:
+                    rightClickPosition = e.MouseDownPosition;
+                    return false; // Allow right click to be handled by context menu
+
+                case MouseButton.Left when e.ControlPressed:
+                    placementControlPointIndex = addControlPoint(e.MousePosition);
+                    return true; // Stop input from being handled and modifying the selection
+            }
 
             return false;
         }
 
-        private void addControlPoint()
+        private int? placementControlPointIndex;
+
+        protected override bool OnDragStart(DragStartEvent e) => placementControlPointIndex != null;
+
+        protected override bool OnDrag(DragEvent e)
         {
-            Vector2 position = rightClickPosition - HitObject.Position;
+            Debug.Assert(placementControlPointIndex != null);
+
+            Vector2 position = e.MousePosition - HitObject.Position;
+
+            var controlPoints = HitObject.Path.ControlPoints.ToArray();
+            controlPoints[placementControlPointIndex.Value] = position;
+
+            onNewControlPoints(controlPoints);
+
+            return true;
+        }
+
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            placementControlPointIndex = null;
+            return true;
+        }
+
+        private int addControlPoint(Vector2 position)
+        {
+            position -= HitObject.Position;
 
             var controlPoints = new Vector2[HitObject.Path.ControlPoints.Length + 1];
             HitObject.Path.ControlPoints.CopyTo(controlPoints);
@@ -86,6 +119,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             controlPoints[insertionIndex] = position;
 
             onNewControlPoints(controlPoints);
+
+            return insertionIndex;
         }
 
         private void onNewControlPoints(Vector2[] controlPoints)
@@ -100,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Add control point", MenuItemType.Standard, addControlPoint),
+            new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
         };
 
         public override Vector2 SelectionPoint => HeadBlueprint.SelectionPoint;
