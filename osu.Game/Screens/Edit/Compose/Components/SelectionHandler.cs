@@ -80,8 +80,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             switch (action.ActionMethod)
             {
                 case PlatformActionMethod.Delete:
-                    foreach (var h in selectedBlueprints.ToList())
-                        placementHandler.Delete(h.DrawableObject.HitObject);
+                    deleteSelected();
                     return true;
             }
 
@@ -142,6 +141,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
 
             UpdateVisibility();
+        }
+
+        private void deleteSelected()
+        {
+            foreach (var h in selectedBlueprints.ToList())
+                placementHandler.Delete(h.DrawableObject.HitObject);
         }
 
         #endregion
@@ -234,7 +239,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             createHitSampleMenuItem("Clap", HitSampleInfo.HIT_CLAP),
                             createHitSampleMenuItem("Finish", HitSampleInfo.HIT_FINISH)
                         }
-                    }
+                    },
+                    new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
                 };
 
                 if (selectedBlueprints.Count == 1)
