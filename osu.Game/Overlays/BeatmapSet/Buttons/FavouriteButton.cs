@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 if (loading.State.Value == Visibility.Visible)
                     return;
 
-                // guaranteed by disabled state abvove.
+                // guaranteed by disabled state above.
                 Debug.Assert(BeatmapSet.Value.OnlineBeatmapSetID != null);
 
                 loading.Show();
