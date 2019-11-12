@@ -130,9 +130,13 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
+            {
                 foreach (var mod in mods)
+                {
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
+                }
+            }
         }
 
         /// <summary>

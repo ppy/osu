@@ -24,6 +24,7 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
@@ -35,6 +36,8 @@ namespace osu.Game.Screens.Edit
     public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
+
+        public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
 
@@ -64,7 +67,10 @@ namespace osu.Game.Screens.Edit
         {
             this.host = host;
 
-            // TODO: should probably be done at a DrawableRuleset level to share logic with Player.
+            beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
+            beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
+
+            // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
@@ -85,87 +91,91 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
-            InternalChildren = new[]
+            InternalChild = new OsuContextMenuContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    Name = "Screen container",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                    Child = screenContainer = new Container
+                    new Container
                     {
+                        Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true
-                    }
-                },
-                new Container
-                {
-                    Name = "Top bar",
-                    RelativeSizeAxes = Axes.X,
-                    Height = 40,
-                    Child = menuBar = new EditorMenuBar
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both,
-                        Items = new[]
-                        {
-                            new MenuItem("File")
-                            {
-                                Items = fileMenuItems
-                            }
-                        }
-                    }
-                },
-                new Container
-                {
-                    Name = "Bottom bar",
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 60,
-                    Children = new Drawable[]
-                    {
-                        bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
-                        new Container
+                        Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                        Child = screenContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
-                            Child = new GridContainer
+                            Masking = true
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "Top bar",
+                        RelativeSizeAxes = Axes.X,
+                        Height = 40,
+                        Child = menuBar = new EditorMenuBar
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            Items = new[]
+                            {
+                                new MenuItem("File")
+                                {
+                                    Items = fileMenuItems
+                                }
+                            }
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "Bottom bar",
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 60,
+                        Children = new Drawable[]
+                        {
+                            bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
+                                Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                                Child = new GridContainer
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 220),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, 220)
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[]
                                     {
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding { Right = 10 },
-                                            Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                        },
-                                        new SummaryTimeline
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding { Left = 10 },
-                                            Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                        }
+                                        new Dimension(GridSizeMode.Absolute, 220),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, 220)
                                     },
-                                }
-                            },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Right = 10 },
+                                                Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                            },
+                                            new SummaryTimeline
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = 10 },
+                                                Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            }
+                                        },
+                                    }
+                                },
+                            }
                         }
-                    }
-                },
+                    },
+                }
             };
 
             menuBar.Mode.ValueChanged += onModeChanged;
@@ -241,7 +251,8 @@ namespace osu.Game.Screens.Edit
             base.OnEntering(last);
 
             Background.FadeColour(Color4.DarkGray, 500);
-            resetTrack();
+
+            resetTrack(true);
         }
 
         public override bool OnExiting(IScreen next)
@@ -252,10 +263,24 @@ namespace osu.Game.Screens.Edit
             return base.OnExiting(next);
         }
 
-        private void resetTrack()
+        private void resetTrack(bool seekToStart = false)
         {
             Beatmap.Value.Track?.ResetSpeedAdjustments();
             Beatmap.Value.Track?.Stop();
+
+            if (seekToStart)
+            {
+                double targetTime = 0;
+
+                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
+                {
+                    // seek to one beat length before the first hitobject
+                    targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
+                    targetTime -= Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(targetTime).BeatLength;
+                }
+
+                clock.Seek(Math.Max(0, targetTime));
+            }
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());

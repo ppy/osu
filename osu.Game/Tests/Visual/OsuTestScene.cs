@@ -10,6 +10,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -93,6 +95,10 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        protected override Container<Drawable> Content => content ?? base.Content;
+
+        private readonly Container content;
+
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
@@ -104,6 +110,8 @@ namespace osu.Game.Tests.Visual
                     usage.Migrate();
                 return factory;
             });
+
+            base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
         [Resolved]
