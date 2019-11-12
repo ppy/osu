@@ -24,7 +24,7 @@ namespace osu.Game.Audio
         /// </summary>
         public event Action Started;
 
-        protected Track Track;
+        protected Track Track { get; private set; }
 
         private bool hasStarted;
 
