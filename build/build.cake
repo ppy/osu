@@ -11,7 +11,8 @@ var target = Argument("target", "Build");
 var configuration = Argument("configuration", "Release");
 
 var rootDirectory = new DirectoryPath("..");
-var solution = rootDirectory.CombineWithFilePath("osu.sln");
+var desktopBuilds = rootDirectory.CombineWithFilePath("build/Desktop.proj");
+var desktopSlnf = rootDirectory.CombineWithFilePath("osu.Desktop.slnf");
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
@@ -19,7 +20,7 @@ var solution = rootDirectory.CombineWithFilePath("osu.sln");
 
 Task("Compile")
     .Does(() => {
-        DotNetCoreBuild(solution.FullPath, new DotNetCoreBuildSettings {
+        DotNetCoreBuild(desktopBuilds.FullPath, new DotNetCoreBuildSettings {
             Configuration = configuration,
         });
     });
@@ -41,7 +42,7 @@ Task("InspectCode")
     .WithCriteria(IsRunningOnWindows())
     .IsDependentOn("Compile")
     .Does(() => {
-        InspectCode(solution, new InspectCodeSettings {
+        InspectCode(desktopSlnf, new InspectCodeSettings {
             CachesHome = "inspectcode",
             OutputFile = "inspectcodereport.xml",
         });
