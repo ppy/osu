@@ -618,7 +618,7 @@ namespace osu.Game
             // side overlays which cancel each other.
             var singleDisplaySideOverlays = new OverlayContainer[] { Settings, notifications };
 
-            foreach (var overlay in new OverlayContainer[] { Settings, notifications })
+            foreach (var overlay in singleDisplaySideOverlays)
             {
                 overlay.State.ValueChanged += state =>
                 {
