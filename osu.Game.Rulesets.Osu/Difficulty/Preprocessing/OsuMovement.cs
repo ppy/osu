@@ -118,6 +118,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public double Cheesablility { get; private set; }
         public double CheesableRatio { get; private set; }
         public double Time { get; private set; }
+        public bool EndsOnSlider { get; private set; }
 
         /// <summary>
         /// Extracts movement (only for the first object in a beatmap).
@@ -163,6 +164,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             if (obj3 is Spinner)
                 obj3 = null;
+
+            if (obj2 is Slider)
+                movement.EndsOnSlider = true;
 
             var pos1 = Vector<double>.Build.Dense(new[] {(double)obj1.Position.X, (double)obj1.Position.Y});
             var pos2 = Vector<double>.Build.Dense(new[] {(double)obj2.Position.X, (double)obj2.Position.Y});
