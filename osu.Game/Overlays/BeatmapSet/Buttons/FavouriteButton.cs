@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
                 request.Failure += e =>
                 {
-                    notifications.Post(new SimpleNotification
+                    notifications?.Post(new SimpleNotification
                     {
                         Text = e.Message,
                         Icon = FontAwesome.Solid.Times,
