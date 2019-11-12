@@ -266,12 +266,14 @@ namespace osu.Game.Tournament.Screens.Editors
                         drawableContainer.Clear();
 
                         if (Model.BeatmapInfo != null)
+                        {
                             drawableContainer.Child = new TournamentBeatmapPanel(Model.BeatmapInfo, Model.Mods)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Width = 300
                             };
+                        }
                     }
                 }
             }
