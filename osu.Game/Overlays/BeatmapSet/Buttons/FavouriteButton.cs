@@ -71,15 +71,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 request.Success += () => favourited.Value = !favourited.Value;
                 request.Failure += exception =>
                 {
-                    if (exception.Message == "UnprocessableEntity")
+                    notifications.Post(new SimpleNotification
                     {
-                        notifications.Post(new SimpleNotification
-                        {
-                            Text = @"You have too many favourited beatmaps! Please unfavourite some before trying again.",
-                            Icon = FontAwesome.Solid.Times,
-                        });
-                        loading.Hide();
-                    }
+                        Text = exception.Message,
+                        Icon = FontAwesome.Solid.Times,
+                    });
+                    loading.Hide();
                 };
                 api.Queue(request);
             };
