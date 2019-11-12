@@ -7,6 +7,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
+using static osu.Game.Tests.Visual.Components.TestScenePreviewTrackManager.TestPreviewTrackManager;
 
 namespace osu.Game.Tests.Visual.Components
 {
@@ -59,6 +60,9 @@ namespace osu.Game.Tests.Visual.Components
             AddStep("start track 2", () => track2.Start());
             AddAssert("track 1 stopped", () => !track1.IsRunning);
             AddAssert("track 2 started", () => track2.IsRunning);
+            AddStep("start track 1", () => track1.Start());
+            AddAssert("track 2 stopped", () => !track2.IsRunning);
+            AddAssert("track 1 started", () => track1.IsRunning);
         }
 
         [Test]
@@ -88,9 +92,25 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("stopped", () => !track.IsRunning);
         }
 
-        private PreviewTrack getTrack() => trackManager.Get(null);
+        [Test]
+        public void TestNonPresentTrack()
+        {
+            TestPreviewTrack track = null;
 
-        private PreviewTrack getOwnedTrack()
+            AddStep("get non-present track", () =>
+            {
+                Add(new TestTrackOwner(track = getTrack()));
+                track.Alpha = 0;
+            });
+            AddUntilStep("wait loaded", () => track.IsLoaded);
+            AddStep("start", () => track.Start());
+            AddStep("seek to end", () => track.Track.Seek(track.Track.Length));
+            AddAssert("track stopped", () => !track.IsRunning);
+        }
+
+        private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
+
+        private TestPreviewTrack getOwnedTrack()
         {
             var track = getTrack();
 
@@ -122,13 +142,15 @@ namespace osu.Game.Tests.Visual.Components
             }
         }
 
-        private class TestPreviewTrackManager : PreviewTrackManager
+        public class TestPreviewTrackManager : PreviewTrackManager
         {
             protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
-            protected class TestPreviewTrack : TrackManagerPreviewTrack
+            public class TestPreviewTrack : TrackManagerPreviewTrack
             {
                 private readonly ITrackStore trackManager;
+
+                public new Track Track => base.Track;
 
                 public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)
