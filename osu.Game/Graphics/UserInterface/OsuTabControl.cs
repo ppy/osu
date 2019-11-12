@@ -51,8 +51,10 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             if (isEnumType && AddEnumEntriesAutomatically)
+            {
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
+            }
         }
 
         [BackgroundDependencyLoader]

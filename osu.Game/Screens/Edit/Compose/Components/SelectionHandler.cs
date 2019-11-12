@@ -226,7 +226,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             get
             {
-                if (!SelectedBlueprints.Any())
+                if (!selectedBlueprints.Any(b => b.IsHovered))
                     return Array.Empty<MenuItem>();
 
                 return new MenuItem[]
@@ -247,36 +247,36 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private MenuItem createHitSampleMenuItem(string name, string sampleName)
         {
-            return new ThreeStateMenuItem(name, MenuItemType.Standard, setHitSampleState)
+            return new TernaryStateMenuItem(name, MenuItemType.Standard, setHitSampleState)
             {
                 State = { Value = getHitSampleState() }
             };
 
-            void setHitSampleState(ThreeStates state)
+            void setHitSampleState(TernaryState state)
             {
                 switch (state)
                 {
-                    case ThreeStates.Disabled:
+                    case TernaryState.False:
                         RemoveHitSample(sampleName);
                         break;
 
-                    case ThreeStates.Enabled:
+                    case TernaryState.True:
                         AddHitSample(sampleName);
                         break;
                 }
             }
 
-            ThreeStates getHitSampleState()
+            TernaryState getHitSampleState()
             {
                 int countExisting = SelectedHitObjects.Count(h => h.Samples.Any(s => s.Name == sampleName));
 
                 if (countExisting == 0)
-                    return ThreeStates.Disabled;
+                    return TernaryState.False;
 
                 if (countExisting < SelectedHitObjects.Count())
-                    return ThreeStates.Indeterminate;
+                    return TernaryState.Indeterminate;
 
-                return ThreeStates.Enabled;
+                return TernaryState.True;
             }
         }
 
