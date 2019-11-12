@@ -66,27 +66,33 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             var controlPoints = new Vector2[HitObject.Path.ControlPoints.Length + 1];
             HitObject.Path.ControlPoints.CopyTo(controlPoints);
 
-            // Find the index at which the point will be inserted, by increasing x-coordinates
-            int insertionIndex = Array.FindIndex(controlPoints, 0, controlPoints.Length - 1, c => c.X >= position.X);
+            int insertionIndex = 0;
+            float minDistance = float.MaxValue;
 
-            // If no index was found, it should be inserted at the end
-            if (insertionIndex == -1)
-                insertionIndex = controlPoints.Length - 1;
+            for (int i = 0; i < controlPoints.Length - 2; i++)
+            {
+                Vector2 p1 = controlPoints[i];
+                Vector2 p2 = controlPoints[i + 1];
+
+                if (p1 == p2)
+                    continue;
+
+                Vector2 dir = p2 - p1;
+                float projLength = MathHelper.Clamp(Vector2.Dot(position - p1, dir) / dir.LengthSquared, 0, 1);
+                Vector2 proj = p1 + projLength * dir;
+
+                float dist = Vector2.Distance(position, proj);
+
+                if (dist < minDistance)
+                {
+                    insertionIndex = i + 1;
+                    minDistance = dist;
+                }
+            }
 
             // Move the control points from the insertion index onwards to make room for the insertion
             Array.Copy(controlPoints, insertionIndex, controlPoints, insertionIndex + 1, controlPoints.Length - insertionIndex - 1);
-
-            if (insertionIndex == 0)
-            {
-                // Special case for a new first control point being added - the entire slider moves
-                HitObject.Position += position;
-
-                // The first control point is always at (0, 0), but all other control points need to be re-referenced
-                for (int i = 1; i < controlPoints.Length; i++)
-                    controlPoints[i] -= position;
-            }
-            else
-                controlPoints[insertionIndex] = position;
+            controlPoints[insertionIndex] = position;
 
             onNewControlPoints(controlPoints);
         }
