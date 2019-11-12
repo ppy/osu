@@ -116,13 +116,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Duration => EndTime - StartTime;
 
-        private SliderPath path;
-
-        public SliderPath Path
-        {
-            get => path;
-            set => path = value;
-        }
+        public SliderPath Path { get; set; }
 
         public double Distance => Path.Distance;
 
