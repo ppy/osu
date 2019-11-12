@@ -185,8 +185,10 @@ namespace osu.Game.Rulesets.Objects
                     ReadOnlySpan<Vector2> cpSpan = ControlPoints.Slice(start, end - start);
 
                     foreach (Vector2 t in calculateSubpath(cpSpan))
+                    {
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                             calculatedPath.Add(t);
+                    }
 
                     start = end;
                 }
