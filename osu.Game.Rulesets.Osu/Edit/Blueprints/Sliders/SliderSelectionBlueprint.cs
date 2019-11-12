@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
@@ -71,18 +72,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             for (int i = 0; i < controlPoints.Length - 2; i++)
             {
-                Vector2 p1 = controlPoints[i];
-                Vector2 p2 = controlPoints[i + 1];
-
-                if (p1 == p2)
-                    continue;
-
-                Vector2 dir = p2 - p1;
-
-                float projLength = MathHelper.Clamp(Vector2.Dot(position - p1, dir) / dir.LengthSquared, 0, 1);
-                Vector2 proj = p1 + projLength * dir;
-
-                float dist = Vector2.DistanceSquared(position, proj);
+                float dist = new Line(controlPoints[i], controlPoints[i + 1]).DistanceToPoint(position);
 
                 if (dist < minDistance)
                 {
