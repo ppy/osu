@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
@@ -21,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class BlueprintContainer : CompositeDrawable
+    public class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         public event Action<IEnumerable<HitObject>> SelectionChanged;
 
@@ -185,6 +186,37 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    if (!selectionHandler.SelectedBlueprints.Any())
+                        return false;
+
+                    deselectAll();
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected override bool OnKeyUp(KeyUpEvent e) => false;
+
+        public bool OnPressed(PlatformAction action)
+        {
+            switch (action.ActionType)
+            {
+                case PlatformActionType.SelectAll:
+                    selectAll();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(PlatformAction action) => false;
+
         protected override void Update()
         {
             base.Update();
@@ -328,6 +360,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 else
                     blueprint.Deselect();
             }
+        }
+
+        /// <summary>
+        /// Selects all <see cref="SelectionBlueprint"/>s.
+        /// </summary>
+        private void selectAll()
+        {
+            selectionBlueprints.ToList().ForEach(m => m.Select());
+            selectionHandler.UpdateVisibility();
         }
 
         /// <summary>
