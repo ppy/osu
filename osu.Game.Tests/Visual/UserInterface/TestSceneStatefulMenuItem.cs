@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             typeof(OsuMenu),
             typeof(StatefulMenuItem),
-            typeof(ThreeStateMenuItem),
+            typeof(TernaryStateMenuItem),
             typeof(DrawableStatefulMenuItem),
         };
 
@@ -39,9 +39,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre,
                     Items = new[]
                     {
-                        new ThreeStateMenuItem("First"),
-                        new ThreeStateMenuItem("Second") { State = { BindTarget = state } },
-                        new ThreeStateMenuItem("Third") { State = { Value = TernaryState.True } },
+                        new TernaryStateMenuItem("First"),
+                        new TernaryStateMenuItem("Second") { State = { BindTarget = state } },
+                        new TernaryStateMenuItem("Third") { State = { Value = TernaryState.True } },
                     }
                 };
             });

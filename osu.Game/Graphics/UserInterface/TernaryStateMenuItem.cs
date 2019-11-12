@@ -9,37 +9,37 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An <see cref="OsuMenuItem"/> with three possible states.
     /// </summary>
-    public class ThreeStateMenuItem : StatefulMenuItem<TernaryState>
+    public class TernaryStateMenuItem : StatefulMenuItem<TernaryState>
     {
         /// <summary>
-        /// Creates a new <see cref="ThreeStateMenuItem"/>.
+        /// Creates a new <see cref="TernaryStateMenuItem"/>.
         /// </summary>
         /// <param name="text">The text to display.</param>
-        /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
-        public ThreeStateMenuItem(string text, MenuItemType type = MenuItemType.Standard)
+        /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
+        public TernaryStateMenuItem(string text, MenuItemType type = MenuItemType.Standard)
             : this(text, type, null)
         {
         }
 
         /// <summary>
-        /// Creates a new <see cref="ThreeStateMenuItem"/>.
+        /// Creates a new <see cref="TernaryStateMenuItem"/>.
         /// </summary>
         /// <param name="text">The text to display.</param>
-        /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
-        /// <param name="action">A delegate to be invoked when this <see cref="ThreeStateMenuItem"/> is pressed.</param>
-        public ThreeStateMenuItem(string text, MenuItemType type, Action<TernaryState> action)
+        /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
+        /// <param name="action">A delegate to be invoked when this <see cref="TernaryStateMenuItem"/> is pressed.</param>
+        public TernaryStateMenuItem(string text, MenuItemType type, Action<TernaryState> action)
             : this(text, getNextState, type, action)
         {
         }
 
         /// <summary>
-        /// Creates a new <see cref="ThreeStateMenuItem"/>.
+        /// Creates a new <see cref="TernaryStateMenuItem"/>.
         /// </summary>
         /// <param name="text">The text to display.</param>
-        /// <param name="changeStateFunc">A function that mutates a state to another state after this <see cref="ThreeStateMenuItem"/> is pressed.</param>
-        /// <param name="type">The type of action which this <see cref="ThreeStateMenuItem"/> performs.</param>
-        /// <param name="action">A delegate to be invoked when this <see cref="ThreeStateMenuItem"/> is pressed.</param>
-        protected ThreeStateMenuItem(string text, Func<TernaryState, TernaryState> changeStateFunc, MenuItemType type, Action<TernaryState> action)
+        /// <param name="changeStateFunc">A function that mutates a state to another state after this <see cref="TernaryStateMenuItem"/> is pressed.</param>
+        /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
+        /// <param name="action">A delegate to be invoked when this <see cref="TernaryStateMenuItem"/> is pressed.</param>
+        protected TernaryStateMenuItem(string text, Func<TernaryState, TernaryState> changeStateFunc, MenuItemType type, Action<TernaryState> action)
             : base(text, changeStateFunc, type, action)
         {
         }
