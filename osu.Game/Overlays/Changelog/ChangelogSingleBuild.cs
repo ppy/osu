@@ -68,11 +68,13 @@ namespace osu.Game.Overlays.Changelog
             }
 
             if (build != null)
+            {
                 Children = new Drawable[]
                 {
                     new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
                     new Comments(build)
                 };
+            }
         }
 
         public class ChangelogBuildWithNavigation : ChangelogBuild
