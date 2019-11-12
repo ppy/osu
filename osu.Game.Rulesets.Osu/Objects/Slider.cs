@@ -203,12 +203,14 @@ namespace osu.Game.Rulesets.Osu.Objects
             var sampleList = new List<HitSampleInfo>();
 
             if (firstSample != null)
+            {
                 sampleList.Add(new HitSampleInfo
                 {
                     Bank = firstSample.Bank,
                     Volume = firstSample.Volume,
                     Name = @"slidertick",
                 });
+            }
 
             foreach (var tick in NestedHitObjects.OfType<SliderTick>())
                 tick.Samples = sampleList;

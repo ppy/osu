@@ -69,9 +69,11 @@ namespace osu.Game.Graphics.Containers
             {
                 Vector2 offset = (input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.Position) - DrawSize / 2) * ParallaxAmount;
 
-                double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000);
+                const float parallax_duration = 100;
 
-                content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, 1000, Easing.OutQuint);
+                double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, parallax_duration);
+
+                content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, parallax_duration, Easing.OutQuint);
                 content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + System.Math.Abs(ParallaxAmount)), 0, 1000, Easing.OutQuint);
             }
 

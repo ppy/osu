@@ -195,10 +195,15 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 if (currentObject is Fruit)
                     objectWithDroplets.Add(currentObject);
+
                 if (currentObject is JuiceStream)
+                {
                     foreach (var currentJuiceElement in currentObject.NestedHitObjects)
+                    {
                         if (!(currentJuiceElement is TinyDroplet))
                             objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
+                    }
+                }
             }
 
             objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
