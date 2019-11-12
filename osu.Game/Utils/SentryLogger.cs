@@ -14,17 +14,21 @@ namespace osu.Game.Utils
     /// </summary>
     public class SentryLogger : IDisposable
     {
-        private IDisposable sentry;
+        private SentryClient sentry;
+        private Scope sentryScope;
 
         public SentryLogger(OsuGame game)
         {
             if (!game.IsDeployedBuild) return;
 
-            sentry = SentrySdk.Init(new SentryOptions
+            var options = new SentryOptions
             {
                 Dsn = new Dsn("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255"),
                 Release = game.Version
-            });
+            };
+            sentry = new SentryClient(options);
+            sentryScope = new Scope(options);
+
             Exception lastException = null;
 
             Logger.NewEntry += entry =>
@@ -44,10 +48,10 @@ namespace osu.Game.Utils
                         return;
 
                     lastException = exception;
-                    SentrySdk.CaptureEvent(new SentryEvent(exception) { Message = entry.Message });
+                    sentry.CaptureEvent(new SentryEvent(exception) { Message = entry.Message }, sentryScope);
                 }
                 else
-                    SentrySdk.AddBreadcrumb(category: entry.Target.ToString(), type: "navigation", message: entry.Message);
+                    sentryScope.AddBreadcrumb(DateTimeOffset.Now, entry.Message, entry.Target.ToString(), "navigation");
             };
         }
 
@@ -102,6 +106,7 @@ namespace osu.Game.Utils
             isDisposed = true;
             sentry?.Dispose();
             sentry = null;
+            sentryScope = null;
         }
 
         #endregion
