@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Size = new Vector2(18),
                     Shadow = false,
                 },
-                loading = new DimmedLoadingLayer(),
+                loading = new DimmedLoadingLayer(0.8f, 0.5f),
             });
 
             favourited.ValueChanged += favourited => icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
