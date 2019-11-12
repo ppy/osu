@@ -29,8 +29,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             for (int i = 0; i < 512; i++)
+            {
                 if (i % 32 < 20)
                     beatmap.HitObjects.Add(new HitCircle { Position = new Vector2(256, 192), StartTime = i * 100 });
+            }
 
             return beatmap;
         }

@@ -220,7 +220,7 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
-                    var channel = availableChannels.Where(c => c.Name == content || c.Name == $"#{content}").FirstOrDefault();
+                    var channel = availableChannels.FirstOrDefault(c => c.Name == content || c.Name == $"#{content}");
 
                     if (channel == null)
                     {
