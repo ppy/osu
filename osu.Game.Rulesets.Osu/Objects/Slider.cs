@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<HitSampleInfo>> NodeSamples { get; set; } = new List<List<HitSampleInfo>>();
+        public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
         private int repeatCount;
 
@@ -108,6 +108,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         public HitCircle HeadCircle;
         public SliderTailCircle TailCircle;
 
+        public Slider()
+        {
+            SamplesBindable.ItemsAdded += _ => updateNestedSamples();
+            SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+        }
+
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
@@ -128,18 +134,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             foreach (var e in
                 SliderEventGenerator.Generate(StartTime, SpanDuration, Velocity, TickDistance, Path.Distance, this.SpanCount(), LegacyLastTickOffset))
             {
-                var firstSample = Samples.Find(s => s.Name == HitSampleInfo.HIT_NORMAL)
-                                  ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
-                var sampleList = new List<HitSampleInfo>();
-
-                if (firstSample != null)
-                    sampleList.Add(new HitSampleInfo
-                    {
-                        Bank = firstSample.Bank,
-                        Volume = firstSample.Volume,
-                        Name = @"slidertick",
-                    });
-
                 switch (e.Type)
                 {
                     case SliderEventType.Tick:
@@ -151,7 +145,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
-                            Samples = sampleList
                         });
                         break;
 
@@ -161,7 +154,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                             StartTime = e.Time,
                             Position = Position,
                             StackHeight = StackHeight,
-                            Samples = getNodeSamples(0),
                             SampleControlPoint = SampleControlPoint,
                         });
                         break;
@@ -187,11 +179,12 @@ namespace osu.Game.Rulesets.Osu.Objects
                             Position = Position + Path.PositionAt(e.PathProgress),
                             StackHeight = StackHeight,
                             Scale = Scale,
-                            Samples = getNodeSamples(e.SpanIndex + 1)
                         });
                         break;
                 }
             }
+
+            updateNestedSamples();
         }
 
         private void updateNestedPositions()
@@ -203,7 +196,33 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TailCircle.Position = EndPosition;
         }
 
-        private List<HitSampleInfo> getNodeSamples(int nodeIndex) =>
+        private void updateNestedSamples()
+        {
+            var firstSample = Samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)
+                              ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+            var sampleList = new List<HitSampleInfo>();
+
+            if (firstSample != null)
+            {
+                sampleList.Add(new HitSampleInfo
+                {
+                    Bank = firstSample.Bank,
+                    Volume = firstSample.Volume,
+                    Name = @"slidertick",
+                });
+            }
+
+            foreach (var tick in NestedHitObjects.OfType<SliderTick>())
+                tick.Samples = sampleList;
+
+            foreach (var repeat in NestedHitObjects.OfType<RepeatPoint>())
+                repeat.Samples = getNodeSamples(repeat.RepeatIndex + 1);
+
+            if (HeadCircle != null)
+                HeadCircle.Samples = getNodeSamples(0);
+        }
+
+        private IList<HitSampleInfo> getNodeSamples(int nodeIndex) =>
             nodeIndex < NodeSamples.Count ? NodeSamples[nodeIndex] : Samples;
 
         public override Judgement CreateJudgement() => new OsuJudgement();

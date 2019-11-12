@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
         }
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
-                                                  List<List<HitSampleInfo>> nodeSamples)
+                                                  List<IList<HitSampleInfo>> nodeSamples)
         {
             return new ConvertSlider
             {
