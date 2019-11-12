@@ -35,9 +35,12 @@ namespace osu.Game.Skinning
             : base(skin)
         {
             Stream stream = storage?.GetStream(filename);
+
             if (stream != null)
+            {
                 using (LineBufferedReader reader = new LineBufferedReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
+            }
             else
                 Configuration = new DefaultSkinConfiguration();
 

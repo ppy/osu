@@ -181,8 +181,11 @@ namespace osu.Game.Screens.Play
                                 this.FadeIn(500, Easing.OutExpo);
 
                             if (!IsHovered && !IsDragged)
+                            {
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(Hide);
+                            }
+
                             break;
 
                         case Visibility.Hidden:

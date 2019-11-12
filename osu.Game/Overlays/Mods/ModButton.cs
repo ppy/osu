@@ -194,8 +194,10 @@ namespace osu.Game.Overlays.Mods
                 start = Mods.Length - 1;
 
             for (int i = start; i < Mods.Length && i >= 0; i += direction)
+            {
                 if (SelectAt(i))
                     return;
+            }
 
             Deselect();
         }

@@ -44,10 +44,14 @@ namespace osu.Game.Screens.Select.Carousel
                      criteria.Artist.Matches(Beatmap.Metadata.ArtistUnicode);
 
             if (match)
+            {
                 foreach (var criteriaTerm in criteria.SearchTerms)
+                {
                     match &=
                         Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
                         Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+                }
+            }
 
             Filtered.Value = !match;
         }
