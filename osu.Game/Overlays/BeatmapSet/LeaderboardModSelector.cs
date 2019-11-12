@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapSet
             modsContainer.Add(new ModButton(new NoMod()));
             modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
 
-            modsContainer.ForEach(button => button.OnSelectionChanged += selectionChanged);
+            modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
         }
 
         private void selectionChanged(Mod mod, bool selected)
