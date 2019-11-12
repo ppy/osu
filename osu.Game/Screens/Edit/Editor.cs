@@ -24,6 +24,7 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
@@ -90,87 +91,91 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
-            InternalChildren = new[]
+            InternalChild = new OsuContextMenuContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.Both,
+                Children = new[]
                 {
-                    Name = "Screen container",
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                    Child = screenContainer = new Container
+                    new Container
                     {
+                        Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true
-                    }
-                },
-                new Container
-                {
-                    Name = "Top bar",
-                    RelativeSizeAxes = Axes.X,
-                    Height = 40,
-                    Child = menuBar = new EditorMenuBar
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativeSizeAxes = Axes.Both,
-                        Items = new[]
-                        {
-                            new MenuItem("File")
-                            {
-                                Items = fileMenuItems
-                            }
-                        }
-                    }
-                },
-                new Container
-                {
-                    Name = "Bottom bar",
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 60,
-                    Children = new Drawable[]
-                    {
-                        bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
-                        new Container
+                        Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                        Child = screenContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
-                            Child = new GridContainer
+                            Masking = true
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "Top bar",
+                        RelativeSizeAxes = Axes.X,
+                        Height = 40,
+                        Child = menuBar = new EditorMenuBar
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            RelativeSizeAxes = Axes.Both,
+                            Items = new[]
+                            {
+                                new MenuItem("File")
+                                {
+                                    Items = fileMenuItems
+                                }
+                            }
+                        }
+                    },
+                    new Container
+                    {
+                        Name = "Bottom bar",
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 60,
+                        Children = new Drawable[]
+                        {
+                            bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ColumnDimensions = new[]
+                                Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                                Child = new GridContainer
                                 {
-                                    new Dimension(GridSizeMode.Absolute, 220),
-                                    new Dimension(),
-                                    new Dimension(GridSizeMode.Absolute, 220)
-                                },
-                                Content = new[]
-                                {
-                                    new Drawable[]
+                                    RelativeSizeAxes = Axes.Both,
+                                    ColumnDimensions = new[]
                                     {
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding { Right = 10 },
-                                            Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                        },
-                                        new SummaryTimeline
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                        },
-                                        new Container
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Padding = new MarginPadding { Left = 10 },
-                                            Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                        }
+                                        new Dimension(GridSizeMode.Absolute, 220),
+                                        new Dimension(),
+                                        new Dimension(GridSizeMode.Absolute, 220)
                                     },
-                                }
-                            },
+                                    Content = new[]
+                                    {
+                                        new Drawable[]
+                                        {
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Right = 10 },
+                                                Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                            },
+                                            new SummaryTimeline
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding { Left = 10 },
+                                                Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                            }
+                                        },
+                                    }
+                                },
+                            }
                         }
-                    }
-                },
+                    },
+                }
             };
 
             menuBar.Mode.ValueChanged += onModeChanged;
