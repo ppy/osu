@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -96,11 +97,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             beginClickSelection(e);
-            return true;
+            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             // Deselection should only occur if no selected blueprints are hovered
             // A special case for when a blueprint was selected via this click is added since OnClick() may occur outside the hitobject and should not trigger deselection
             if (endClickSelection() || selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
@@ -112,6 +116,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             SelectionBlueprint clickedBlueprint = selectionHandler.SelectedBlueprints.FirstOrDefault(b => b.IsHovered);
 
             if (clickedBlueprint == null)
@@ -125,7 +132,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             // Special case for when a drag happened instead of a click
             Schedule(() => endClickSelection());
-            return true;
+            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -141,6 +148,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragStart(DragStartEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!beginSelectionMovement())
             {
                 dragBox.UpdateDrag(e);
@@ -152,6 +162,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDrag(DragEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!moveCurrentSelection(e))
                 dragBox.UpdateDrag(e);
 
@@ -160,6 +173,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected override bool OnDragEnd(DragEndEvent e)
         {
+            if (e.Button == MouseButton.Right)
+                return false;
+
             if (!finishSelectionMovement())
             {
                 dragBox.FadeOut(250, Easing.OutQuint);
