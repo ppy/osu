@@ -132,12 +132,13 @@ csharp_preferred_modifier_order = public,private,protected,internal,new,abstract
 # Skipped because roslyn cannot separate +-*/ with << >>
 
 #Style - expression bodies
-csharp_style_expression_bodied_accessors = true:silent
+csharp_style_expression_bodied_accessors = true:warning
 csharp_style_expression_bodied_constructors = false:none
-csharp_style_expression_bodied_indexers = true:silent
+csharp_style_expression_bodied_indexers = true:warning
 csharp_style_expression_bodied_methods = true:silent
-csharp_style_expression_bodied_operators = true:silent
-csharp_style_expression_bodied_properties = true:silent
+csharp_style_expression_bodied_operators = true:warning
+csharp_style_expression_bodied_properties = true:warning
+csharp_style_expression_bodied_local_functions = true:silent
 
 #Style - expression preferences
 dotnet_style_object_initializer = true:warning
@@ -166,7 +167,6 @@ csharp_style_inlined_variable_declaration = true:warning
 csharp_style_deconstructed_variable_declaration = true:warning
 
 #Style - other C# 7.x features
-csharp_style_expression_bodied_local_functions = true:silent
 dotnet_style_prefer_inferred_tuple_names = true:warning
 csharp_prefer_simple_default_expression = true:warning
 csharp_style_pattern_local_over_anonymous_function = true:silent
