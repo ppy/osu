@@ -42,11 +42,19 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
-        private readonly TestOsuDistanceSnapGrid grid;
+        private TestOsuDistanceSnapGrid grid;
 
         public TestSceneOsuDistanceSnapGrid()
         {
             editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+        }
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            editorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
+            editorBeatmap.ControlPointInfo.Clear();
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
 
             Children = new Drawable[]
             {
@@ -58,14 +66,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
                 new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
             };
-        }
-
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            editorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
-            editorBeatmap.ControlPointInfo.Clear();
-            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
         });
 
         [TestCase(1)]
@@ -99,6 +99,27 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestCursorAfterMovementPoint()
         {
             AddStep("move mouse to just after movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 1.51f)));
+            assertSnappedDistance((float)beat_length * 2);
+        }
+
+        [Test]
+        public void TestLimitedDistance()
+        {
+            AddStep("create limited grid", () =>
+            {
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.SlateGray
+                    },
+                    grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }, new HitCircle { StartTime = 200 }),
+                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
+                };
+            });
+
+            AddStep("move mouse outside grid", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 3f)));
             assertSnappedDistance((float)beat_length * 2);
         }
 
@@ -152,8 +173,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public new float DistanceSpacing => base.DistanceSpacing;
 
-            public TestOsuDistanceSnapGrid(OsuHitObject hitObject)
-                : base(hitObject)
+            public TestOsuDistanceSnapGrid(OsuHitObject hitObject, OsuHitObject nextHitObject = null)
+                : base(hitObject, nextHitObject)
             {
             }
         }
@@ -164,9 +185,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public float GetBeatSnapDistanceAt(double referenceTime) => (float)beat_length;
 
-            public float DurationToDistance(double referenceTime, double duration) => 0;
+            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
 
-            public double DistanceToDuration(double referenceTime, float distance) => 0;
+            public double DistanceToDuration(double referenceTime, float distance) => distance;
 
             public double GetSnappedDurationFromDistance(double referenceTime, float distance) => 0;
 

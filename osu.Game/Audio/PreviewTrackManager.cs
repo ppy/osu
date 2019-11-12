@@ -46,18 +46,18 @@ namespace osu.Game.Audio
         {
             var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
-            track.Started += () =>
+            track.Started += () => Schedule(() =>
             {
                 current?.Stop();
                 current = track;
                 audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
-            track.Stopped += () =>
+            track.Stopped += () => Schedule(() =>
             {
                 current = null;
                 audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
             return track;
         }

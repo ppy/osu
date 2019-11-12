@@ -18,7 +18,6 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -76,7 +75,7 @@ namespace osu.Game.Tournament
 
             AddRange(new[]
             {
-                new OsuButton
+                new TourneyButton
                 {
                     Text = "Save Changes",
                     Width = 140,
@@ -165,15 +164,17 @@ namespace osu.Game.Tournament
 
             // link matches to rounds
             foreach (var round in ladder.Rounds)
-            foreach (var id in round.Matches)
             {
-                var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
-
-                if (found != null)
+                foreach (var id in round.Matches)
                 {
-                    found.Round.Value = round;
-                    if (round.StartDate.Value > found.Date.Value)
-                        found.Date.Value = round.StartDate.Value;
+                    var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
+
+                    if (found != null)
+                    {
+                        found.Round.Value = round;
+                        if (round.StartDate.Value > found.Date.Value)
+                            found.Date.Value = round.StartDate.Value;
+                    }
                 }
             }
 
@@ -193,15 +194,19 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             foreach (var t in ladder.Teams)
-            foreach (var p in t.Players)
-                if (string.IsNullOrEmpty(p.Username))
+            {
+                foreach (var p in t.Players)
                 {
-                    var req = new GetUserRequest(p.Id);
-                    req.Perform(API);
-                    p.Username = req.Result.Username;
+                    if (string.IsNullOrEmpty(p.Username))
+                    {
+                        var req = new GetUserRequest(p.Id);
+                        req.Perform(API);
+                        p.Username = req.Result.Username;
 
-                    addedInfo = true;
+                        addedInfo = true;
+                    }
                 }
+            }
 
             return addedInfo;
         }
@@ -214,15 +219,19 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             foreach (var r in ladder.Rounds)
-            foreach (var b in r.Beatmaps)
-                if (b.BeatmapInfo == null)
+            {
+                foreach (var b in r.Beatmaps)
                 {
-                    var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                    req.Perform(API);
-                    b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                    if (b.BeatmapInfo == null && b.ID > 0)
+                    {
+                        var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                        req.Perform(API);
+                        b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
-                    addedInfo = true;
+                        addedInfo = true;
+                    }
                 }
+            }
 
             return addedInfo;
         }

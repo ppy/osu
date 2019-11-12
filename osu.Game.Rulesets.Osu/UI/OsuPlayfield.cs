@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
-using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
-        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly FollowPointRenderer followPoints;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -30,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             InternalChildren = new Drawable[]
             {
-                connectionLayer = new FollowPointRenderer
+                followPoints = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = 2,
@@ -64,11 +63,18 @@ namespace osu.Game.Rulesets.Osu.UI
             };
 
             base.Add(h);
+
+            followPoints.AddFollowPoints((DrawableOsuHitObject)h);
         }
 
-        public override void PostProcess()
+        public override bool Remove(DrawableHitObject h)
         {
-            connectionLayer.HitObjects = HitObjectContainer.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
+            bool result = base.Remove(h);
+
+            if (result)
+                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
+
+            return result;
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)

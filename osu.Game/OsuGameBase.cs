@@ -292,8 +292,10 @@ namespace osu.Game
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
+            {
                 if (importer.HandledExtensions.Contains(extension))
                     await importer.Import(paths);
+            }
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
