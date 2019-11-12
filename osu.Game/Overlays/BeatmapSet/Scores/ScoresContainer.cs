@@ -48,31 +48,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         protected APILegacyScores Scores
         {
-            set
+            set => Schedule(() =>
             {
-                Schedule(() =>
+                topScoresContainer.Clear();
+
+                if (value?.Scores.Any() != true)
                 {
-                    topScoresContainer.Clear();
+                    scoreTable.Scores = null;
+                    scoreTable.Hide();
+                    return;
+                }
 
-                    if (value?.Scores.Any() != true)
-                    {
-                        scoreTable.Scores = null;
-                        scoreTable.Hide();
-                        return;
-                    }
+                scoreTable.Scores = value.Scores;
+                scoreTable.Show();
 
-                    scoreTable.Scores = value.Scores;
-                    scoreTable.Show();
+                var topScore = value.Scores.First();
+                var userScore = value.UserScore;
 
-                    var topScore = value.Scores.First();
-                    var userScore = value.UserScore;
+                topScoresContainer.Add(new DrawableTopScore(topScore));
 
-                    topScoresContainer.Add(new DrawableTopScore(topScore));
-
-                    if (userScore != null && userScore.Score.OnlineScoreID != topScore.OnlineScoreID)
-                        topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
-                });
-            }
+                if (userScore != null && userScore.Score.OnlineScoreID != topScore.OnlineScoreID)
+                    topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
+            });
         }
 
         public ScoresContainer()
