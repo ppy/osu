@@ -450,7 +450,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void createCarousel(Container target = null)
         {
-            AddStep($"Create carousel", () =>
+            AddStep("Create carousel", () =>
             {
                 (target ?? this).Child = carousel = new TestBeatmapCarousel
                 {
