@@ -35,6 +35,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly LoadingAnimation loadingAnimation;
         private readonly FillFlowContainer modFilter;
         private readonly LeaderboardModSelector modSelector;
+        private readonly NoScoresPlaceholder noScoresPlaceholder;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -125,6 +126,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     Spacing = new Vector2(0, spacing),
                                     Children = new Drawable[]
                                     {
+                                        noScoresPlaceholder = new NoScoresPlaceholder
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                            Alpha = 0,
+                                            Scope = { BindTarget = scope }
+                                        },
                                         topScoresContainer = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -204,6 +212,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             Scores = null;
 
+            noScoresPlaceholder.Hide();
+
             updateModFilterVisibility();
 
             if (hasNoLeaderboard)
@@ -215,6 +225,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 loadingAnimation.Hide();
                 Scores = scores;
+
+                if (!scores.Scores.Any())
+                    noScoresPlaceholder.Show();
             };
             api.Queue(getScoresRequest);
         }
