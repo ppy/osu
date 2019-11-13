@@ -46,40 +46,40 @@ namespace osu.Game.Screens.Select
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
-        public readonly FilterControl FilterControl;
+        public FilterControl FilterControl;
 
         protected virtual bool ShowFooter => true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly BeatmapOptionsOverlay BeatmapOptions;
+        protected BeatmapOptionsOverlay BeatmapOptions;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly Footer Footer;
+        protected Footer Footer;
 
         /// <summary>
         /// Contains any panel which is triggered by a footer button.
         /// Helps keep them located beneath the footer itself.
         /// </summary>
-        protected readonly Container FooterPanels;
+        protected Container FooterPanels;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
 
-        protected readonly BeatmapCarousel Carousel;
-        private readonly BeatmapInfoWedge beatmapInfoWedge;
+        protected BeatmapCarousel Carousel;
+        private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
 
-        protected readonly ModSelectOverlay ModSelect;
+        protected ModSelectOverlay ModSelect;
 
         protected SampleChannel SampleConfirm;
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        protected readonly BeatmapDetailArea BeatmapDetails;
+        protected BeatmapDetailArea BeatmapDetails;
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
@@ -90,8 +90,14 @@ namespace osu.Game.Screens.Select
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
-        protected SongSelect()
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
+
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
+            // transfer initial value so filter is in a good state (it uses our re-cached bindables).
+            transferRulesetValue();
+
             AddRangeInternal(new Drawable[]
             {
                 new ParallaxContainer
@@ -215,13 +221,7 @@ namespace osu.Game.Screens.Select
             }
 
             BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
-        }
 
-        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
-
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
-        {
             if (Footer != null)
             {
                 Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
@@ -640,7 +640,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+            transferRulesetValue();
             Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
             decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
@@ -650,6 +650,11 @@ namespace osu.Game.Screens.Select
             Beatmap.BindValueChanged(workingBeatmapChanged);
 
             boundLocalBindables = true;
+        }
+
+        private void transferRulesetValue()
+        {
+            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
         }
 
         private void delete(BeatmapSetInfo beatmap)
