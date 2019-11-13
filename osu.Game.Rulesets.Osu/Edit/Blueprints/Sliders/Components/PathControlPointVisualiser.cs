@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
@@ -90,9 +91,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
 
-        private void selectPiece(int index)
+        private void selectPiece(int index, MouseButtonEvent e)
         {
-            if (inputManager.CurrentState.Keyboard.ControlPressed)
+            if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
                 Pieces[index].IsSelected.Toggle();
             else
             {
