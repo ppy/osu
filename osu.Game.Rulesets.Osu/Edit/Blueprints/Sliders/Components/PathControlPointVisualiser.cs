@@ -144,6 +144,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             get
             {
+                if (!Pieces.Any(p => p.IsHovered))
+                    return null;
+
                 int selectedPoints = Pieces.Count(p => p.IsSelected.Value);
 
                 if (selectedPoints == 0)
