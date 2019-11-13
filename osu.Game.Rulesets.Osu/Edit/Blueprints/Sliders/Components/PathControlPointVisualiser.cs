@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             get
             {
                 if (!Pieces.Any(p => p.IsSelected.Value))
-                    return Array.Empty<MenuItem>();
+                    return null;
 
                 return new MenuItem[]
                 {
