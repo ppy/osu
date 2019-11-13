@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Comments
             OnShowMoreAction();
         }
 
-        public override void ClearComments()
+        protected override void ClearComments()
         {
             request?.Cancel();
             currentPage = 1;

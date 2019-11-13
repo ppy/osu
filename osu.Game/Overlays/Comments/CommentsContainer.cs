@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        public virtual void ClearComments()
+        protected virtual void ClearComments()
         {
             loadCancellation?.Cancel();
             deletedChildrenPlaceholder.DeletedCount.Value = 0;
