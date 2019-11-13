@@ -27,10 +27,16 @@ namespace osu.Game.Online.Chat
 
         public void OpenUrlExternally(string url)
         {
-            if (externalLinkWarning.Value)
+            if (externalLinkWarning.Value && !isDomainTrusted(url))
                 dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
                 host.OpenUrlExternally(url);
+        }
+
+        private static bool isDomainTrusted(string url)
+        {
+            // Use hashset if the count increases
+            return url.StartsWith("https://osu.ppy.sh");
         }
     }
 }
