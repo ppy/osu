@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -51,11 +52,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
-
-            Add(carousel = new TestBeatmapCarousel
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
         }
 
         /// <summary>
@@ -375,6 +371,8 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestSelectingFilteredRuleset()
         {
+            createCarousel();
+
             var testMixed = createTestBeatmapSet(set_count + 1);
             AddStep("add mixed ruleset beatmapset", () =>
             {
@@ -429,6 +427,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
         {
+            createCarousel();
+
             if (beatmapSets == null)
             {
                 beatmapSets = new List<BeatmapSetInfo>();
@@ -446,6 +446,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("Wait for load", () => changed);
+        }
+
+        private void createCarousel(Container target = null)
+        {
+            AddStep($"Create carousel", () =>
+            {
+                (target ?? this).Child = carousel = new TestBeatmapCarousel
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+            });
         }
 
         private void ensureRandomFetchSuccess() =>
