@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
-            // initial value transfer is requried for FilterControl (it uses our re-cached bindables in its asynd loac for the initial filter).
+            // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
             AddRangeInternal(new Drawable[]
