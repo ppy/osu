@@ -37,6 +37,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly FillFlowContainer modFilter;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
+        private readonly FillFlowContainer content;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -82,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FillFlowContainer
+                content = new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -223,9 +224,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (hasNoLeaderboard)
             {
                 Scores = null;
+                content.Hide();
                 return;
             }
 
+            content.Show();
             loading.Show();
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
