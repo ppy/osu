@@ -80,7 +80,6 @@ namespace osu.Game.Audio
                 return;
 
             current.Stop();
-            current = null;
         }
 
         /// <summary>
