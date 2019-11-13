@@ -200,13 +200,17 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
 
+        private bool clicked;
+
         protected override bool OnClick(ClickEvent e)
         {
+            clicked = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
 
             this.Delay(click_duration).Schedule(delegate
             {
+                clicked = false;
                 colourContainer.ResizeTo(new Vector2(idle_width, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
@@ -225,6 +229,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
+            if (clicked) return;
             base.OnHoverLost(e);
             Selected.Value = false;
         }
