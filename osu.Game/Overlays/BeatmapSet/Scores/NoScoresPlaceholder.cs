@@ -28,16 +28,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 default:
                 case BeatmapLeaderboardScope.Global:
-                text.Text = @"No scores yet. Maybe should try setting some?";
-                return;
+                    text.Text = @"No scores yet. Maybe should try setting some?";
+                    return;
 
                 case BeatmapLeaderboardScope.Friend:
-                text.Text = @"None of your friends has set a score on this map yet!";
-                return;
+                    text.Text = @"None of your friends has set a score on this map yet!";
+                    return;
 
                 case BeatmapLeaderboardScope.Country:
-                text.Text = @"No one from your country has set a score on this map yet!";
-                return;
+                    text.Text = @"No one from your country has set a score on this map yet!";
+                    return;
             }
         }
     }
