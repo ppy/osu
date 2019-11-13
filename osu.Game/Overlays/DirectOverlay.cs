@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
             get => beatmapSets;
             set
             {
-                if (beatmapSets?.Equals(value) ?? false) return;
+                if (beatmapSets?.SequenceEqual(value) ?? false) return;
 
                 beatmapSets = value?.ToList();
 
