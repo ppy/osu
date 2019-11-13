@@ -24,6 +24,8 @@ namespace osu.Game.Audio
 
         private TrackManagerPreviewTrack current;
 
+        public override bool IsPresent => Scheduler.HasPendingTasks;
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
