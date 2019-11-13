@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
-        public Action<int> RequestSelection;
+        public Action<int, MouseButtonEvent> RequestSelection;
         public Action<Vector2[]> ControlPointsChanged;
 
         public readonly BindableBool IsSelected = new BindableBool();
@@ -130,21 +130,27 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (e.Button != MouseButton.Left)
+            if (RequestSelection == null)
                 return false;
 
-            if (RequestSelection != null)
+            switch (e.Button)
             {
-                RequestSelection.Invoke(Index);
-                return true;
+                case MouseButton.Left:
+                    RequestSelection.Invoke(Index, e);
+                    return true;
+
+                case MouseButton.Right:
+                    if (!IsSelected.Value)
+                        RequestSelection.Invoke(Index, e);
+                    return false; // Allow context menu to show
             }
 
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e) => e.Button == MouseButton.Left && RequestSelection != null;
+        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
 
-        protected override bool OnClick(ClickEvent e) => e.Button == MouseButton.Left && RequestSelection != null;
+        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         protected override bool OnDragStart(DragStartEvent e) => e.Button == MouseButton.Left;
 
