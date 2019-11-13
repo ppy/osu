@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
@@ -14,28 +13,24 @@ using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Sprites;
-using System.Threading.Tasks;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly Bindable<CommentBundle> CommentBundle = new Bindable<CommentBundle>();
+        protected readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         private readonly Bindable<User> user = new Bindable<User>();
 
         [Resolved]
-        private IAPIProvider api { get; set; }
+        protected IAPIProvider API { get; private set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
-        private int currentPage;
-        private CommentBundleParameters parameters;
-        private CommentBundle commentBundle;
 
         private readonly Box background;
         private readonly Container noCommentsPlaceholder;
@@ -123,7 +118,7 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = getComments,
+                                                Action = OnShowMoreAction,
                                                 IsLoading = true,
                                             }
                                         }
@@ -142,50 +137,20 @@ namespace osu.Game.Overlays.Comments
             background.Colour = colours.Gray2;
             placeholderBackground.Colour = colours.Gray3;
 
-            user.BindTo(api.LocalUser);
+            user.BindTo(API.LocalUser);
         }
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(_ => updateComments());
-            user.BindValueChanged(_ => updateComments());
+            Sort.BindValueChanged(OnSortChanged);
+            CommentBundle.BindValueChanged(_ => updateComments());
+            user.BindValueChanged(_ => Sort.TriggerChange());
             base.LoadComplete();
         }
 
-        public void ShowComments(CommentableType type, long id)
+        public virtual void ClearComments()
         {
-            parameters = new CommentBundleParameters(type, id);
-            commentBundle = null;
-            updateComments();
-        }
-
-        public void ShowComments(CommentBundle commentBundle)
-        {
-            parameters = null;
-            this.commentBundle = commentBundle;
-            updateComments();
-        }
-
-        private void updateComments()
-        {
-            clearComments();
-
-            if (parameters == null)
-            {
-                if (commentBundle != null)
-                    onSuccess(commentBundle);
-
-                return;
-            }
-
-            getComments();
-        }
-
-        private void clearComments()
-        {
-            request?.Cancel();
             loadCancellation?.Cancel();
-            currentPage = 1;
             deletedChildrenPlaceholder.DeletedCount.Value = 0;
             noCommentsPlaceholder.Hide();
             content.Clear();
@@ -193,19 +158,15 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
         }
 
-        private void getComments()
-        {
-            if (parameters == null)
-                return;
+        protected virtual void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort) => updateComments();
 
-            request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
-            request.Success += onSuccess;
-            Task.Run(() => request.Perform(api));
+        protected virtual void OnShowMoreAction()
+        {
         }
 
-        private void onSuccess(CommentBundle response)
+        protected void AddComments(CommentBundle comments)
         {
-            if (!response.Comments.Any())
+            if (!comments.Comments.Any())
             {
                 noCommentsPlaceholder.Show();
                 moreButton.IsLoading = false;
@@ -215,21 +176,33 @@ namespace osu.Game.Overlays.Comments
 
             loadCancellation = new CancellationTokenSource();
 
-            var page = createCommentsPage(response);
+            var page = createCommentsPage(comments);
 
             LoadComponentAsync(page, loaded =>
             {
                 content.Add(loaded);
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                deletedChildrenPlaceholder.DeletedCount.Value += comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
-                updateMoreButtonState(response);
+                updateMoreButtonState(comments);
             }, loadCancellation.Token);
+        }
+
+        private void updateComments()
+        {
+            ClearComments();
+
+            var comments = CommentBundle.Value;
+
+            if (comments == null)
+                return;
+
+            AddComments(comments);
         }
 
         private FillFlowContainer createCommentsPage(CommentBundle response)
         {
-            FillFlowContainer page = new FillFlowContainer
+            var page = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -268,7 +241,6 @@ namespace osu.Game.Overlays.Comments
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
         }

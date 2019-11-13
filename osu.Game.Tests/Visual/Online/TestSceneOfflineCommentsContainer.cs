@@ -47,9 +47,9 @@ namespace osu.Game.Tests.Visual.Online
                 scroll.Clear();
                 scroll.Add(commentsContainer = new CommentsContainer());
             });
-            AddStep("load comments", () => commentsContainer.ShowComments(comment_bundle));
-            AddStep("load empty comments", () => commentsContainer.ShowComments(empty_comment_bundle));
-            AddStep("load null bundle", () => commentsContainer.ShowComments(null));
+            AddStep("load comments", () => commentsContainer.CommentBundle.Value = comment_bundle);
+            AddStep("load empty comments", () => commentsContainer.CommentBundle.Value = empty_comment_bundle);
+            AddStep("load null bundle", () => commentsContainer.CommentBundle.Value = null);
             AddStep("login", () => API.Login("user", "password"));
             AddStep("logout", API.Logout);
         }
