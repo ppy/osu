@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
@@ -26,12 +27,23 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private PostBeatmapFavouriteRequest request;
         private DimmedLoadingLayer loading;
 
-        public string TooltipText => (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+        private readonly Bindable<User> localUser = new Bindable<User>();
+
+        public string TooltipText
+        {
+            get
+            {
+                if (!Enabled.Value) return string.Empty;
+
+                return (favourited.Value ? "Unfavourite" : "Favourite") + " this beatmapset";
+            }
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(IAPIProvider api, NotificationOverlay notifications)
         {
             SpriteIcon icon;
+
             AddRange(new Drawable[]
             {
                 icon = new SpriteIcon
@@ -44,14 +56,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
                 loading = new DimmedLoadingLayer(0.8f, 0.5f),
             });
-
-            favourited.ValueChanged += favourited => icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
-
-            BeatmapSet.BindValueChanged(setInfo =>
-            {
-                Enabled.Value = BeatmapSet.Value?.OnlineBeatmapSetID > 0;
-                favourited.Value = setInfo.NewValue?.OnlineInfo?.HasFavourited ?? false;
-            }, true);
 
             Action = () =>
             {
@@ -86,7 +90,21 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
                 api.Queue(request);
             };
+
+            favourited.ValueChanged += favourited => icon.Icon = favourited.NewValue ? FontAwesome.Solid.Heart : FontAwesome.Regular.Heart;
+
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(_ => updateEnabled());
+
+            // must be run after setting the Action to ensure correct enabled state (setting an Action forces a button to be enabled).
+            BeatmapSet.BindValueChanged(setInfo =>
+            {
+                updateEnabled();
+                favourited.Value = setInfo.NewValue?.OnlineInfo?.HasFavourited ?? false;
+            }, true);
         }
+
+        private void updateEnabled() => Enabled.Value = !(localUser.Value is GuestUser) && BeatmapSet.Value?.OnlineBeatmapSetID > 0;
 
         protected override void UpdateAfterChildren()
         {
