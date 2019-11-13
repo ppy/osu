@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapSet.Buttons;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -15,7 +17,13 @@ namespace osu.Game.Tests.Visual.Online
         [SetUpSteps]
         public void SetUpSteps()
         {
-            AddStep("create button", () => Child = favourite = new FavouriteButton());
+            AddStep("create button", () => Child = favourite = new FavouriteButton
+            {
+                RelativeSizeAxes = Axes.None,
+                Size = new Vector2(50),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+            });
         }
 
         [Test]
@@ -35,7 +43,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set valid beatmap", () => favourite.BeatmapSet.Value = new BeatmapSetInfo { OnlineBeatmapSetID = 88 });
             checkEnabled(true);
             AddStep("set invalid beatmap", () => favourite.BeatmapSet.Value = new BeatmapSetInfo());
-            checkEnabled(true);
+            checkEnabled(false);
         }
 
         private void checkEnabled(bool expected)
