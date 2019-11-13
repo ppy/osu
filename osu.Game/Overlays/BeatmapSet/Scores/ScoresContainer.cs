@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Margin = new MarginPadding { Vertical = spacing }, 
+                            Margin = new MarginPadding { Vertical = spacing },
                             Children = new Drawable[]
                             {
                                 noScoresPlaceholder = new NoScoresPlaceholder
