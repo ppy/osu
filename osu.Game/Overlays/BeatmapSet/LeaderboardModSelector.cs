@@ -53,7 +53,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Add(new ModButton(new NoMod()));
-
             modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
 
             modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
@@ -119,14 +118,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
             protected override bool OnClick(ClickEvent e)
             {
-                Selected.Value = !Selected.Value;
-                return base.OnClick(e);
+                Selected.Toggle();
+                return true;
             }
 
             protected override bool OnHover(HoverEvent e)
             {
                 updateState();
-                return base.OnHover(e);
+                return false;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
