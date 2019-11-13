@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
 
-        private const double defaultCheeseLevel = 0.3;
+        private const double defaultCheeseLevel = 0.4;
         private const int cheeseLevelCount = 11;
 
         private const int difficultyCount = 20;
