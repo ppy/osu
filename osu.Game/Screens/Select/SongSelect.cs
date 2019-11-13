@@ -165,7 +165,7 @@ namespace osu.Game.Screens.Select
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = FilterControl.HEIGHT,
-                                FilterChanged = c => Carousel.Filter(c),
+                                FilterChanged = ApplyFilterToCarousel,
                                 Background = { Width = 2 },
                             },
                         }
@@ -216,6 +216,8 @@ namespace osu.Game.Screens.Select
 
             BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
         }
+
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
