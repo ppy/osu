@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double perMovementCheeseLevel = cheeseLevel;
 
             if (movement.EndsOnSlider)
-                perMovementCheeseLevel = 1;
+                perMovementCheeseLevel = 0.5 * cheeseLevel + 0.5;
 
             double cheeseMT = movement.MT * (1 + perMovementCheeseLevel * movement.CheesableRatio);
             return FittsLaw.CalculateHitProb(movement.D, cheeseMT, tp);
