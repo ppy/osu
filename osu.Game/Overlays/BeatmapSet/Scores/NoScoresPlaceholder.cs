@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Framework.Bindables;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Framework.Graphics.Sprites;
 
@@ -12,8 +11,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class NoScoresPlaceholder : Container
     {
-        public readonly Bindable<BeatmapLeaderboardScope> Scope = new Bindable<BeatmapLeaderboardScope>();
-
         private readonly SpriteText text;
 
         public NoScoresPlaceholder()
@@ -25,25 +22,22 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
         }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Scope.BindValueChanged(scope => text.Text = getText(scope.NewValue), true);
-        }
-
-        private string getText(BeatmapLeaderboardScope scope)
+        public void UpdateText(BeatmapLeaderboardScope scope)
         {
             switch (scope)
             {
                 default:
                 case BeatmapLeaderboardScope.Global:
-                return @"No scores yet. Maybe should try setting some?";
+                text.Text = @"No scores yet. Maybe should try setting some?";
+                return;
 
                 case BeatmapLeaderboardScope.Friend:
-                return @"None of your friends has set a score on this map yet!";
+                text.Text = @"None of your friends has set a score on this map yet!";
+                return;
 
                 case BeatmapLeaderboardScope.Country:
-                return @"No one from your country has set a score on this map yet!";
+                text.Text = @"No one from your country has set a score on this map yet!";
+                return;
             }
         }
     }
