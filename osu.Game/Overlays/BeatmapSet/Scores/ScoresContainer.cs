@@ -204,12 +204,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             scope.Value = BeatmapLeaderboardScope.Global;
             modSelector.DeselectAll();
-            updateModFilterVisibility();
-        }
-
-        private void updateModFilterVisibility()
-        {
-            modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter && !hasNoLeaderboard ? 1 : 0);
+            modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
         }
 
         private void getScores()
@@ -219,9 +214,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             noScoresPlaceholder.FadeOut(duration, Easing.OutQuint);
 
-            updateModFilterVisibility();
-
-            if (hasNoLeaderboard)
+            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
             {
                 Scores = null;
                 content.Hide();
@@ -244,7 +237,5 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             };
             api.Queue(getScoresRequest);
         }
-
-        private bool hasNoLeaderboard => Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending;
     }
 }
