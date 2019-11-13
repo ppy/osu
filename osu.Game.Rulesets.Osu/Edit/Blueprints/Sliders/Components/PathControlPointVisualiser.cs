@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -143,12 +144,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             get
             {
-                if (!Pieces.Any(p => p.IsSelected.Value))
+                int selectedPoints = Pieces.Count(p => p.IsSelected.Value);
+
+                if (selectedPoints == 0)
                     return null;
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Delete control points", MenuItemType.Destructive, () => deleteSelected())
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints)}", MenuItemType.Destructive, () => deleteSelected())
                 };
             }
         }
