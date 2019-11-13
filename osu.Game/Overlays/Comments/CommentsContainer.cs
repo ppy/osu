@@ -143,8 +143,8 @@ namespace osu.Game.Overlays.Comments
         protected override void LoadComplete()
         {
             Sort.BindValueChanged(OnSortChanged);
+            user.BindValueChanged(OnUserChanged);
             CommentBundle.BindValueChanged(_ => updateComments());
-            user.BindValueChanged(_ => Sort.TriggerChange());
             base.LoadComplete();
         }
 
@@ -158,7 +158,11 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
         }
 
-        protected virtual void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort) => updateComments();
+        protected virtual void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
+        {
+        }
+
+        protected virtual void OnUserChanged(ValueChangedEvent<User> user) => updateComments();
 
         protected virtual void OnShowMoreAction()
         {

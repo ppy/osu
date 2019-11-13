@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests;
+using osu.Game.Users;
 using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Comments
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays.Comments
             ClearComments();
             OnShowMoreAction();
         }
+
+        protected override void OnUserChanged(ValueChangedEvent<User> user) => Sort.TriggerChange();
 
         protected override void ClearComments()
         {
