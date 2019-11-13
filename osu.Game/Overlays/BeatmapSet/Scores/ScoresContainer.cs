@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
+        private const int duration = 200;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box background;
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
-        private readonly LoadingAnimation loadingAnimation;
+        private readonly DimmedLoadingLayer loading;
         private readonly FillFlowContainer modFilter;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
@@ -89,7 +90,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     AutoSizeAxes = Axes.Y,
                     Width = 0.95f,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, spacing),
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
@@ -116,8 +116,17 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
+                            Margin = new MarginPadding { Vertical = spacing }, 
                             Children = new Drawable[]
                             {
+                                noScoresPlaceholder = new NoScoresPlaceholder
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Alpha = 0,
+                                    AlwaysPresent = true,
+                                    Margin = new MarginPadding { Vertical = 10 }
+                                },
                                 new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
@@ -126,13 +135,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     Spacing = new Vector2(0, spacing),
                                     Children = new Drawable[]
                                     {
-                                        noScoresPlaceholder = new NoScoresPlaceholder
-                                        {
-                                            Anchor = Anchor.TopCentre,
-                                            Origin = Anchor.TopCentre,
-                                            Alpha = 0,
-                                            Scope = { BindTarget = scope }
-                                        },
                                         topScoresContainer = new FillFlowContainer
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -147,12 +149,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         }
                                     }
                                 },
-                                loadingAnimation = new LoadingAnimation
+                                new Container
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Alpha = 0,
-                                },
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    CornerRadius = 10,
+                                    Child = loading = new DimmedLoadingLayer(iconScale: 0.8f)
+                                    {
+                                        Alpha = 0,
+                                    },
+                                }
                             }
                         }
                     }
@@ -210,24 +216,28 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
-            Scores = null;
-
-            noScoresPlaceholder.Hide();
+            noScoresPlaceholder.FadeOut(duration, Easing.OutQuint);
 
             updateModFilterVisibility();
 
             if (hasNoLeaderboard)
+            {
+                Scores = null;
                 return;
+            }
 
-            loadingAnimation.Show();
+            loading.Show();
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
             {
-                loadingAnimation.Hide();
+                loading.Hide();
                 Scores = scores;
 
                 if (!scores.Scores.Any())
-                    noScoresPlaceholder.Show();
+                {
+                    noScoresPlaceholder.UpdateText(scope.Value);
+                    noScoresPlaceholder.FadeIn(duration, Easing.OutQuint);
+                }
             };
             api.Queue(getScoresRequest);
         }
