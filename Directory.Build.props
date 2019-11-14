@@ -14,6 +14,10 @@
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
+  <ItemGroup Label="Code Analysis">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.7" PrivateAssets="All" />
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Project">
     <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
     This is required due to https://github.com/NuGet/Home/issues/5740 -->
