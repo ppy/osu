@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -15,6 +16,8 @@ namespace osu.Game.Tests.Visual.Components
     {
         private readonly TestPreviewTrackManager trackManager = new TestPreviewTrackManager();
 
+        private AudioManager audio;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -24,8 +27,10 @@ namespace osu.Game.Tests.Visual.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
+            this.audio = audio;
+
             Add(trackManager);
         }
 
@@ -126,6 +131,29 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("current not changed", () => trackManager.CurrentTrack == track);
             AddStep("resume manager updates", () => trackManager.AllowUpdate = true);
             AddAssert("current is null", () => trackManager.CurrentTrack == null);
+        }
+
+        /// <summary>
+        /// Ensures that <see cref="PreviewTrackManager"/> mutes game-wide audio tracks correctly.
+        /// </summary>
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestEnsureMutingCorrectly(bool stopAnyPlaying)
+        {
+            PreviewTrack track = null;
+            TestTrackOwner owner = null;
+
+            AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
+            AddUntilStep("wait loaded", () => track.IsLoaded);
+            AddStep("start track", () => track.Start());
+            AddAssert("game is muted", () => audio.Tracks.AggregateVolume.Value == 0);
+
+            if (stopAnyPlaying)
+                AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
+            else
+                AddStep("stop track", () => track.Stop());
+
+            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
         }
 
         private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
