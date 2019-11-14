@@ -229,13 +229,13 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (clicked) return;
             base.OnHoverLost(e);
             Selected.Value = false;
         }
 
         private void selectionChanged(ValueChangedEvent<bool> args)
         {
+            if (clicked) return;
             if (args.NewValue)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
