@@ -387,22 +387,21 @@ namespace osu.Game.Beatmaps
 
                 var req = new GetBeatmapRequest(beatmap);
 
-                req.Success += res =>
-                {
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
-
-                    beatmap.Status = res.Status;
-                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-                };
-
                 req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
 
                 try
                 {
                     // intentionally blocking to limit web request concurrency
                     req.Perform(api);
+
+                    var res = req.Result;
+
+                    beatmap.Status = res.Status;
+                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
+                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+
+                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                 }
                 catch (Exception e)
                 {
