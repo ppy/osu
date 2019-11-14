@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Backends.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
@@ -25,11 +26,11 @@ namespace osu.Game.Audio
         private TrackManagerPreviewTrack current;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, IAudio audioBackend)
         {
             // this is a temporary solution to get around muting ourselves.
             // todo: update this once we have a BackgroundTrackManager or similar.
-            trackStore = new PreviewTrackStore(new OnlineStore());
+            trackStore = new PreviewTrackStore(new OnlineStore(), audioBackend);
 
             audio.AddItem(trackStore);
             trackStore.AddAdjustment(AdjustableProperty.Volume, audio.VolumeTrack);
@@ -113,10 +114,12 @@ namespace osu.Game.Audio
         private class PreviewTrackStore : AudioCollectionManager<AdjustableAudioComponent>, ITrackStore
         {
             private readonly IResourceStore<byte[]> store;
+            private readonly IAudio audioBackend;
 
-            internal PreviewTrackStore(IResourceStore<byte[]> store)
+            internal PreviewTrackStore(IResourceStore<byte[]> store, IAudio audioBackend)
             {
                 this.store = store;
+                this.audioBackend = audioBackend;
             }
 
             public Track GetVirtual(double length = double.PositiveInfinity)
@@ -139,7 +142,7 @@ namespace osu.Game.Audio
                 if (dataStream == null)
                     return null;
 
-                Track track = new TrackBass(dataStream);
+                Track track = audioBackend.CreateTrack(dataStream);
                 AddItem(track);
                 return track;
             }
