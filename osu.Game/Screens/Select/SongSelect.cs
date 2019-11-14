@@ -30,7 +30,6 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
@@ -85,10 +84,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
-
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected SongSelect()
         {
@@ -222,7 +217,7 @@ namespace osu.Game.Screens.Select
         {
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
+                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
@@ -260,13 +255,6 @@ namespace osu.Game.Screens.Select
                     }
                 });
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            mods.BindTo(Mods);
         }
 
         private DependencyContainer dependencies;
@@ -390,7 +378,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    mods.Value = Array.Empty<Mod>();
+                    Mods.Value = Array.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -537,9 +525,6 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
-
-            mods.UnbindAll();
-            Mods.Value = Array.Empty<Mod>();
 
             return false;
         }
