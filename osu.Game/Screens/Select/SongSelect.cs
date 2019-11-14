@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Container FooterPanels;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
