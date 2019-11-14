@@ -22,7 +22,7 @@ namespace osu.Game.Audio
         private AudioManager audio;
         private PreviewTrackStore trackStore;
 
-        private TrackManagerPreviewTrack current;
+        protected TrackManagerPreviewTrack CurrentTrack;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -48,17 +48,17 @@ namespace osu.Game.Audio
 
             track.Started += () => Schedule(() =>
             {
-                current?.Stop();
-                current = track;
+                CurrentTrack?.Stop();
+                CurrentTrack = track;
                 audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
             });
 
             track.Stopped += () => Schedule(() =>
             {
-                if (current != track)
+                if (CurrentTrack != track)
                     return;
 
-                current = null;
+                CurrentTrack = null;
                 audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
             });
 
@@ -76,10 +76,10 @@ namespace osu.Game.Audio
         /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
         public void StopAnyPlaying(IPreviewTrackOwner source)
         {
-            if (current == null || current.Owner != source)
+            if (CurrentTrack == null || CurrentTrack.Owner != source)
                 return;
 
-            current.Stop();
+            CurrentTrack.Stop();
             // CurrentTrack must not change until the scheduled stopped event has been invoked.
             // To ensure that this doesn't early-return on (CurrentTrack != track) check.
         }
