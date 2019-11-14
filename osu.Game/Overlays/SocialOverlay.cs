@@ -38,7 +38,7 @@ namespace osu.Game.Overlays
             get => users;
             set
             {
-                if (users?.SequenceEqual(value) ?? false)
+                if (ReferenceEquals(users, value))
                     return;
 
                 users = value?.ToList();
