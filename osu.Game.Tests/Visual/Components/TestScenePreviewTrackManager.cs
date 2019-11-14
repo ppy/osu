@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Components
 {
     public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
-        private readonly PreviewTrackManager trackManager = new TestPreviewTrackManager();
+        private readonly TestPreviewTrackManager trackManager = new TestPreviewTrackManager();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -108,6 +108,26 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("track stopped", () => !track.IsRunning);
         }
 
+        /// <summary>
+        /// Ensures that <see cref="PreviewTrackManager.CurrentTrack"/> changes correctly.
+        /// </summary>
+        [Test]
+        public void TestCurrentTrackChanges()
+        {
+            PreviewTrack track = null;
+            TestTrackOwner owner = null;
+
+            AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
+            AddUntilStep("wait loaded", () => track.IsLoaded);
+            AddStep("start track", () => track.Start());
+            AddAssert("current is track", () => trackManager.CurrentTrack == track);
+            AddStep("pause manager updates", () => trackManager.AllowUpdate = false);
+            AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
+            AddAssert("current not changed", () => trackManager.CurrentTrack == track);
+            AddStep("resume manager updates", () => trackManager.AllowUpdate = true);
+            AddAssert("current is null", () => trackManager.CurrentTrack == null);
+        }
+
         private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
 
         private TestPreviewTrack getOwnedTrack()
@@ -144,7 +164,19 @@ namespace osu.Game.Tests.Visual.Components
 
         public class TestPreviewTrackManager : PreviewTrackManager
         {
+            public bool AllowUpdate = true;
+
+            public new PreviewTrack CurrentTrack => base.CurrentTrack;
+
             protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
+
+            public override bool UpdateSubTree()
+            {
+                if (!AllowUpdate)
+                    return true;
+
+                return base.UpdateSubTree();
+            }
 
             public class TestPreviewTrack : TrackManagerPreviewTrack
             {
