@@ -387,7 +387,7 @@ namespace osu.Game.Beatmaps
 
                 var req = new GetBeatmapRequest(beatmap);
 
-                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
+                req.Failure += fail;
 
                 try
                 {
@@ -399,16 +399,18 @@ namespace osu.Game.Beatmaps
                     beatmap.Status = res.Status;
                     beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
                     beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-
-                    // note that this check only needs to be here if two identical hashed beatmaps exist int he same import.
-                    // probably fine to leave it for safety.
-                    if (set.Beatmaps.All(b => b.OnlineBeatmapID != res.OnlineBeatmapID))
-                        beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
 
                     LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                 }
                 catch (Exception e)
                 {
+                    fail(e);
+                }
+
+                void fail(Exception e)
+                {
+                    beatmap.OnlineBeatmapID = null;
                     LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})");
                 }
             }
