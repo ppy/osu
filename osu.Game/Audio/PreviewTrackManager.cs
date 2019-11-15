@@ -46,18 +46,21 @@ namespace osu.Game.Audio
         {
             var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
-            track.Started += () =>
+            track.Started += () => Schedule(() =>
             {
                 current?.Stop();
                 current = track;
                 audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
-            track.Stopped += () =>
+            track.Stopped += () => Schedule(() =>
             {
+                if (current != track)
+                    return;
+
                 current = null;
                 audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
             return track;
         }
@@ -85,7 +88,7 @@ namespace osu.Game.Audio
         /// </summary>
         protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
-        protected class TrackManagerPreviewTrack : PreviewTrack
+        public class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 

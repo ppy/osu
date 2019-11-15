@@ -1,5 +1,5 @@
 echo "Installing Cake.Tool..."
-dotnet tool install Cake.Tool --global --version 0.35.0
+dotnet tool restore
 
 # Parse arguments.
 CAKE_ARGUMENTS=()

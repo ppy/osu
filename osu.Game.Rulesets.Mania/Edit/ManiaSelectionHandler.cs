@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             editorClock = clock;
         }
 
-        public override void HandleMovement(MoveSelectionEvent moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent moveEvent)
         {
             var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
             int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             performDragMovement(moveEvent);
             performColumnMovement(lastColumn, moveEvent);
 
-            base.HandleMovement(moveEvent);
+            return true;
         }
 
         /// <summary>

@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Container FooterPanels;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
@@ -85,10 +85,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
-
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected SongSelect()
         {
@@ -222,7 +218,7 @@ namespace osu.Game.Screens.Select
         {
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
+                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
@@ -251,20 +247,15 @@ namespace osu.Game.Screens.Select
                 {
                     // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
                     if (!beatmaps.GetAllUsableBeatmapSetsEnumerable().Any() && beatmaps.StableInstallationAvailable)
+                    {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
                             Task.Run(beatmaps.ImportFromStableAsync).ContinueWith(_ => scores.ImportFromStableAsync(), TaskContinuationOptions.OnlyOnRanToCompletion);
                             Task.Run(skins.ImportFromStableAsync);
                         }));
+                    }
                 });
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            mods.BindTo(Mods);
         }
 
         private DependencyContainer dependencies;
@@ -332,12 +323,14 @@ namespace osu.Game.Screens.Select
             if (e.NewValue is DummyWorkingBeatmap) return;
 
             if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
+            {
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
                 if (e.NewValue?.BeatmapInfo?.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
                     Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
                     Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
                 }
+            }
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
@@ -386,7 +379,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    mods.Value = Array.Empty<Mod>();
+                    Mods.Value = Array.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -401,7 +394,7 @@ namespace osu.Game.Screens.Select
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
+                if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
@@ -533,9 +526,6 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
-
-            mods.UnbindAll();
-            Mods.Value = Array.Empty<Mod>();
 
             return false;
         }
