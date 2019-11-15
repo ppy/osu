@@ -308,7 +308,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                             Position = new Vector2(0, 0),
                             Path = new SliderPath(new[]
                             {
-                                new PathSegment(PathType.PerfectCurve, new[]
+                                new PathSegment(PathType.Linear, new[]
                                 {
                                     Vector2.Zero,
                                     new Vector2(25, 0),
