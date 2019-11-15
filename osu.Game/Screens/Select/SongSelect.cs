@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Select
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
-        public FilterControl FilterControl;
+        public FilterControl FilterControl { get; private set; }
 
         protected virtual bool ShowFooter => true;
 
