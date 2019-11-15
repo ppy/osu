@@ -101,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
             get => scope;
             set
             {
-                if (value.Equals(scope))
+                if (EqualityComparer<TScope>.Default.Equals(value, scope))
                     return;
 
                 scope = value;
