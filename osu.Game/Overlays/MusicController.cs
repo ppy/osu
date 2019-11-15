@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
         private OnScreenDisplay onScreenDisplay { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGame game)
+        private void load()
         {
             beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
             beatmaps.ItemAdded += handleBeatmapAdded;
