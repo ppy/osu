@@ -262,13 +262,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private PathSegment[] createPathSegments(PathType type, ReadOnlySpan<Vector2> points)
         {
-            if (type == PathType.PerfectCurve && points.Length != 3)
-            {
-                // stable only makes a perfect curve if and only if there are exactly 3 control points
-                // dissections are handled by the PathSegment itself
-                type = PathType.Bezier;
-            }
-
             var result = new List<PathSegment>();
 
             int start = 0;
@@ -283,7 +276,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     Vector2[] segmentPoints = points.Slice(start, end - start).ToArray();
                     PathType segmentType = type;
 
-                    if (segmentType == PathType.PerfectCurve && segmentPoints.Length != 3)
+                    // stable only makes a perfect curve if and only if there are exactly 3 control points and no dissection
+                    // if this is not the case, a bezier curve is used which becomes linear in the degenerate (<3 points)
+                    if (type == PathType.PerfectCurve && (points.Length != 3 || segmentPoints.Length != 3))
                         segmentType = PathType.Bezier;
 
                     result.Add(new PathSegment(segmentType, segmentPoints));
