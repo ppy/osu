@@ -452,6 +452,9 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             AddStep("Create carousel", () =>
             {
+                selectedSets.Clear();
+                eagerSelectedIDs.Clear();
+
                 (target ?? this).Child = carousel = new TestBeatmapCarousel
                 {
                     RelativeSizeAxes = Axes.Both,
