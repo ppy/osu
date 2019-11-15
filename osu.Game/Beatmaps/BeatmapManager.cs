@@ -129,9 +129,12 @@ namespace osu.Game.Beatmaps
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
+            LogForModel(beatmapSet, "Validating online IDs...");
+
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
             {
+                LogForModel(beatmapSet, "Found non-unique IDs, resetting...");
                 resetIds();
                 return;
             }
@@ -144,8 +147,12 @@ namespace osu.Game.Beatmaps
                 // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
                 // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
                 var existing = CheckForExisting(beatmapSet);
+
                 if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
+                {
+                    LogForModel(beatmapSet, "Found existing import with IDs already, resetting...");
                     resetIds();
+                }
             }
 
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
@@ -385,25 +392,30 @@ namespace osu.Game.Beatmaps
 
                 var req = new GetBeatmapRequest(beatmap);
 
-                req.Success += res =>
-                {
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
-
-                    beatmap.Status = res.Status;
-                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-                };
-
-                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
+                req.Failure += fail;
 
                 try
                 {
                     // intentionally blocking to limit web request concurrency
                     req.Perform(api);
+
+                    var res = req.Result;
+
+                    beatmap.Status = res.Status;
+                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
+                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+
+                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                 }
                 catch (Exception e)
                 {
+                    fail(e);
+                }
+
+                void fail(Exception e)
+                {
+                    beatmap.OnlineBeatmapID = null;
                     LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})");
                 }
             }
