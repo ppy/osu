@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Graphics;
@@ -30,9 +31,9 @@ namespace osu.Game.Tests.Visual.Editor
         };
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audio)
         {
-            Beatmap.Value = new WaveformTestBeatmap();
+            Beatmap.Value = new WaveformTestBeatmap(audio);
 
             Children = new Drawable[]
             {
@@ -100,7 +101,7 @@ namespace osu.Game.Tests.Visual.Editor
             }
         }
 
-        private class StartStopButton : Button
+        private class StartStopButton : OsuButton
         {
             private IAdjustableClock adjustableClock;
             private bool started;

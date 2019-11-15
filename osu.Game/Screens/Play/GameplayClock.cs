@@ -41,5 +41,7 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => underlyingClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
+
+        public IClock Source => underlyingClock;
     }
 }

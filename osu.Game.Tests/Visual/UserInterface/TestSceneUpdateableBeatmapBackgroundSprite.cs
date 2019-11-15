@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
@@ -19,6 +20,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneUpdateableBeatmapBackgroundSprite : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         private BeatmapSetInfo testBeatmap;
         private IAPIProvider api;
         private RulesetStore rulesets;
@@ -32,7 +35,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             this.api = api;
             this.rulesets = rulesets;
 
-            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu);
+            testBeatmap = ImportBeatmapTest.LoadOszIntoOsu(osu).Result;
         }
 
         [Test]
@@ -41,7 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             TestUpdateableBeatmapBackgroundSprite background = null;
 
             AddStep("load null beatmap", () => Child = background = new TestUpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both });
-            AddUntilStep("wait for load", () => background.ContentLoaded);
+            AddUntilStep("content loaded", () => background.ContentLoaded);
         }
 
         [Test]
@@ -92,13 +95,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestUnloadAndReload()
         {
             var backgrounds = new List<TestUpdateableBeatmapBackgroundSprite>();
-            ScrollContainer scrollContainer = null;
+            OsuScrollContainer scrollContainer = null;
 
             AddStep("create backgrounds hierarchy", () =>
             {
                 FillFlowContainer backgroundFlow;
 
-                Child = scrollContainer = new ScrollContainer
+                Child = scrollContainer = new OsuScrollContainer
                 {
                     Size = new Vector2(500),
                     Child = backgroundFlow = new FillFlowContainer

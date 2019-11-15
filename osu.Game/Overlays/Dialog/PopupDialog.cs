@@ -13,19 +13,16 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
-using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Dialog
 {
-    public class PopupDialog : OsuFocusedOverlayContainer
+    public abstract class PopupDialog : VisibilityContainer
     {
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
-
-        protected override bool BlockPositionalInput => false;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
@@ -90,7 +87,7 @@ namespace osu.Game.Overlays.Dialog
             }
         }
 
-        public PopupDialog()
+        protected PopupDialog()
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -134,9 +131,9 @@ namespace osu.Game.Overlays.Dialog
                             Origin = Anchor.BottomCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Position = new Vector2(0f, -50f),
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
+                            Padding = new MarginPadding { Bottom = 10 },
                             Children = new Drawable[]
                             {
                                 new Container
@@ -144,10 +141,6 @@ namespace osu.Game.Overlays.Dialog
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Size = ringSize,
-                                    Margin = new MarginPadding
-                                    {
-                                        Bottom = 30,
-                                    },
                                     Children = new Drawable[]
                                     {
                                         ring = new CircularContainer
@@ -181,15 +174,15 @@ namespace osu.Game.Overlays.Dialog
                                     Anchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
                                     TextAnchor = Anchor.TopCentre,
                                 },
                                 body = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 18))
                                 {
+                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.TopCentre,
+                                    TextAnchor = Anchor.TopCentre,
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding(15),
-                                    TextAnchor = Anchor.TopCentre,
                                 },
                             },
                         },
@@ -204,18 +197,6 @@ namespace osu.Game.Overlays.Dialog
                     },
                 },
             };
-        }
-
-        public override bool OnPressed(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.Select:
-                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
-                    return true;
-            }
-
-            return base.OnPressed(action);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -242,8 +223,6 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopIn()
         {
-            base.PopIn();
-
             actionInvoked = false;
 
             // Reset various animations but only if the dialog animation fully completed
@@ -267,7 +246,6 @@ namespace osu.Game.Overlays.Dialog
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().Click();
 
-            base.PopOut();
             content.FadeOut(EXIT_DURATION, Easing.InSine);
         }
 

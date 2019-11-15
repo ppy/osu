@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
-using osu.Game.Tests.Beatmaps;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -21,7 +20,7 @@ namespace osu.Game.Tests.Visual.Editor
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo, null);
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
             Add(new SummaryTimeline
             {

@@ -44,7 +44,17 @@ namespace osu.Game.Overlays.Changelog
             req.Failure += _ => complete = true;
 
             // This is done on a separate thread to support cancellation below
-            Task.Run(() => req.Perform(api));
+            Task.Run(() =>
+            {
+                try
+                {
+                    req.Perform(api);
+                }
+                catch
+                {
+                    complete = true;
+                }
+            });
 
             while (!complete)
             {
@@ -58,7 +68,13 @@ namespace osu.Game.Overlays.Changelog
             }
 
             if (build != null)
-                Child = new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild };
+            {
+                Children = new Drawable[]
+                {
+                    new ChangelogBuildWithNavigation(build) { SelectBuild = SelectBuild },
+                    new Comments(build)
+                };
+            }
         }
 
         public class ChangelogBuildWithNavigation : ChangelogBuild
@@ -88,24 +104,16 @@ namespace osu.Game.Overlays.Changelog
                     });
                 }
 
-                NavigationIconButton left, right;
-
-                fill.AddRange(new[]
+                fill.Insert(-1, new NavigationIconButton(Build.Versions?.Previous)
                 {
-                    left = new NavigationIconButton(Build.Versions?.Previous)
-                    {
-                        Icon = FontAwesome.Solid.ChevronLeft,
-                        SelectBuild = b => SelectBuild(b)
-                    },
-                    right = new NavigationIconButton(Build.Versions?.Next)
-                    {
-                        Icon = FontAwesome.Solid.ChevronRight,
-                        SelectBuild = b => SelectBuild(b)
-                    },
+                    Icon = FontAwesome.Solid.ChevronLeft,
+                    SelectBuild = b => SelectBuild(b)
                 });
-
-                fill.SetLayoutPosition(left, -1);
-                fill.SetLayoutPosition(right, 1);
+                fill.Insert(1, new NavigationIconButton(Build.Versions?.Next)
+                {
+                    Icon = FontAwesome.Solid.ChevronRight,
+                    SelectBuild = b => SelectBuild(b)
+                });
 
                 return fill;
             }

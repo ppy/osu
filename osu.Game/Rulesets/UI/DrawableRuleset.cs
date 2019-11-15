@@ -11,12 +11,20 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.IO.Stores;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Handlers;
@@ -50,10 +58,14 @@ namespace osu.Game.Rulesets.UI
 
         private readonly Lazy<Playfield> playfield;
 
+        private TextureStore textureStore;
+
+        private ISampleStore localSampleStore;
+
         /// <summary>
         /// The playfield.
         /// </summary>
-        public Playfield Playfield => playfield.Value;
+        public override Playfield Playfield => playfield.Value;
 
         /// <summary>
         /// Place to put drawables above hit objects but below UI.
@@ -61,6 +73,22 @@ namespace osu.Game.Rulesets.UI
         public Container Overlays { get; private set; }
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
+
+        private bool frameStablePlayback = true;
+
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback
+        {
+            get => frameStablePlayback;
+            set
+            {
+                frameStablePlayback = false;
+                if (frameStabilityContainer != null)
+                    frameStabilityContainer.FrameStablePlayback = value;
+            }
+        }
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
@@ -97,7 +125,7 @@ namespace osu.Game.Rulesets.UI
         /// <param name="ruleset">The ruleset being represented.</param>
         /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, WorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
             : base(ruleset)
         {
             if (workingBeatmap == null)
@@ -108,8 +136,6 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
 
             Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
-
-            applyBeatmapMods(mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
@@ -126,6 +152,18 @@ namespace osu.Game.Rulesets.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var resources = Ruleset.CreateResourceStore();
+
+            if (resources != null)
+            {
+                textureStore = new TextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(resources, "Textures")));
+                textureStore.AddStore(dependencies.Get<TextureStore>());
+                dependencies.Cache(textureStore);
+
+                localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
+                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
+            }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
@@ -149,6 +187,7 @@ namespace osu.Game.Rulesets.UI
             {
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
+                    FrameStablePlayback = FrameStablePlayback,
                     Child = KeyBindingInputManager
                         .WithChild(CreatePlayfieldAdjustmentContainer()
                             .WithChild(Playfield)
@@ -200,9 +239,11 @@ namespace osu.Game.Rulesets.UI
                 continueResume();
         }
 
-        public ResumeOverlay ResumeOverlay { get; private set; }
-
-        protected virtual ResumeOverlay CreateResumeOverlay() => null;
+        public override void CancelResume()
+        {
+            // called if the user pauses while the resume overlay is open
+            ResumeOverlay?.Hide();
+        }
 
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
@@ -270,19 +311,6 @@ namespace osu.Game.Rulesets.UI
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
         /// <summary>
-        /// Applies the active mods to the Beatmap.
-        /// </summary>
-        /// <param name="mods"></param>
-        private void applyBeatmapMods(IReadOnlyList<Mod> mods)
-        {
-            if (mods == null)
-                return;
-
-            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
-                mod.ApplyToBeatmap(Beatmap);
-        }
-
-        /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
@@ -315,6 +343,8 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
+            localSampleStore?.Dispose();
+
             if (Config != null)
             {
                 onScreenDisplay?.StopTracking(this, Config);
@@ -341,6 +371,11 @@ namespace osu.Game.Rulesets.UI
         /// Whether the game is paused. Used to block user input.
         /// </summary>
         public readonly BindableBool IsPaused = new BindableBool();
+
+        /// <summary>
+        /// The playfield.
+        /// </summary>
+        public abstract Playfield Playfield { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
@@ -383,6 +418,37 @@ namespace osu.Game.Rulesets.UI
         public abstract GameplayCursorContainer Cursor { get; }
 
         /// <summary>
+        /// An optional overlay used when resuming gameplay from a paused state.
+        /// </summary>
+        public ResumeOverlay ResumeOverlay { get; protected set; }
+
+        /// <summary>
+        /// Returns first available <see cref="HitWindows"/> provided by a <see cref="HitObject"/>.
+        /// </summary>
+        [CanBeNull]
+        public HitWindows FirstAvailableHitWindows
+        {
+            get
+            {
+                foreach (var h in Objects)
+                {
+                    if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
+                        return h.HitWindows;
+
+                    foreach (var n in h.NestedHitObjects)
+                    {
+                        if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
+                            return n.HitWindows;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        protected virtual ResumeOverlay CreateResumeOverlay() => null;
+
+        /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
         /// <param name="replayScore">The replay, null for local input.</param>
@@ -396,6 +462,11 @@ namespace osu.Game.Rulesets.UI
         public abstract void RequestResume(Action continueResume);
 
         /// <summary>
+        /// Invoked when the user requests to pause while the resume overlay is active.
+        /// </summary>
+        public abstract void CancelResume();
+
+        /// <summary>
         /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
         /// <see cref="DrawableRuleset"/>.
         /// </summary>
@@ -407,6 +478,52 @@ namespace osu.Game.Rulesets.UI
     {
         public BeatmapInvalidForRulesetException(string text)
             : base(text)
+        {
+        }
+    }
+
+    /// <summary>
+    /// A sample store which adds a fallback source.
+    /// </summary>
+    /// <remarks>
+    /// This is a temporary implementation to workaround ISampleStore limitations.
+    /// </remarks>
+    public class FallbackSampleStore : ISampleStore
+    {
+        private readonly ISampleStore primary;
+        private readonly ISampleStore secondary;
+
+        public FallbackSampleStore(ISampleStore primary, ISampleStore secondary)
+        {
+            this.primary = primary;
+            this.secondary = secondary;
+        }
+
+        public SampleChannel Get(string name) => primary.Get(name) ?? secondary.Get(name);
+
+        public Task<SampleChannel> GetAsync(string name) => primary.GetAsync(name) ?? secondary.GetAsync(name);
+
+        public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
+
+        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+
+        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+
+        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+
+        public BindableDouble Volume => throw new NotImplementedException();
+
+        public BindableDouble Balance => throw new NotImplementedException();
+
+        public BindableDouble Frequency => throw new NotImplementedException();
+
+        public int PlaybackConcurrency
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+
+        public void Dispose()
         {
         }
     }

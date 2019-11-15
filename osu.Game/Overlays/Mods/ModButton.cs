@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
                 }
             }
 
-            foregroundIcon.Highlighted = Selected;
+            foregroundIcon.Highlighted.Value = Selected;
 
             SelectionChanged?.Invoke(SelectedMod);
             return true;
@@ -194,8 +194,10 @@ namespace osu.Game.Overlays.Mods
                 start = Mods.Length - 1;
 
             for (int i = start; i < Mods.Length && i >= 0; i += direction)
+            {
                 if (SelectAt(i))
                     return;
+            }
 
             Deselect();
         }
@@ -283,7 +285,7 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Font = OsuFont.GetFont(size: 18)
                 },
-                new HoverClickSounds()
+                new HoverClickSounds(buttons: new[] { MouseButton.Left, MouseButton.Right })
             };
 
             Mod = mod;

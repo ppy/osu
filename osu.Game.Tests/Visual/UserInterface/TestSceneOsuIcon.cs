@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Colour = Color4.Teal,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new ScrollContainer
+                new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = flow = new FillFlowContainer<Icon>

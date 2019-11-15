@@ -17,19 +17,22 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
         }
 
-        protected override IBeatmap CreateBeatmap(Ruleset ruleset)
+        protected override IBeatmap CreateBeatmap(RulesetInfo ruleset)
         {
             var beatmap = new Beatmap
             {
                 BeatmapInfo = new BeatmapInfo
                 {
                     BaseDifficulty = new BeatmapDifficulty { CircleSize = 6 },
-                    Ruleset = ruleset.RulesetInfo
+                    Ruleset = ruleset
                 }
             };
 
             for (int i = 0; i < 512; i++)
-                beatmap.HitObjects.Add(new HitCircle { Position = new Vector2(256, 192), StartTime = i * 100 });
+            {
+                if (i % 32 < 20)
+                    beatmap.HitObjects.Add(new HitCircle { Position = new Vector2(256, 192), StartTime = i * 100 });
+            }
 
             return beatmap;
         }

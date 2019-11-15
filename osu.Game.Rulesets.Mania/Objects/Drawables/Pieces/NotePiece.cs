@@ -18,8 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// </summary>
     internal class NotePiece : Container, IHasAccentColour
     {
-        public const float NOTE_HEIGHT = 10;
-        private const float head_colour_height = 6;
+        public const float NOTE_HEIGHT = 12;
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -39,8 +38,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 colouredBox = new Box
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = head_colour_height,
-                    Alpha = 0.2f
+                    Height = NOTE_HEIGHT / 2,
+                    Alpha = 0.1f
                 }
             };
         }

@@ -34,6 +34,8 @@ namespace osu.Game.Overlays
             });
         }
 
+        protected override bool DimMainContent => false; // dimming is handled by main overlay
+
         private class BackButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
         {
             private AspectContainer aspect;
@@ -55,7 +57,6 @@ namespace osu.Game.Overlays
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Y = -15,
                                 Size = new Vector2(15),
                                 Shadow = true,
                                 Icon = FontAwesome.Solid.ChevronLeft

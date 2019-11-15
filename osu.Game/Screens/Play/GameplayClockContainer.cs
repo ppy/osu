@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
         /// </summary>
-        private readonly IAdjustableClock sourceClock;
+        private IAdjustableClock sourceClock;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -60,8 +61,6 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
-
         public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
@@ -71,6 +70,7 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.Both;
 
             sourceClock = (IAdjustableClock)beatmap.Track ?? new StopwatchClock();
+            (sourceClock as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
@@ -86,6 +86,10 @@ namespace osu.Game.Screens.Play
 
             GameplayClock.IsPaused.BindTo(IsPaused);
         }
+
+        private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
+
+        private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -131,6 +135,8 @@ namespace osu.Game.Screens.Play
             Seek(GameplayClock.CurrentTime);
             adjustableClock.Start();
             IsPaused.Value = false;
+
+            this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
         }
 
         /// <summary>
@@ -152,14 +158,23 @@ namespace osu.Game.Screens.Play
 
         public void Stop()
         {
-            adjustableClock.Stop();
+            this.TransformBindableTo(pauseFreqAdjust, 0, 200, Easing.Out).OnComplete(_ => adjustableClock.Stop());
+
             IsPaused.Value = true;
         }
 
-        public void ResetLocalAdjustments()
+        /// <summary>
+        /// Changes the backing clock to avoid using the originally provided beatmap's track.
+        /// </summary>
+        public void StopUsingBeatmapClock()
         {
-            // In the case of replays, we may have changed the playback rate.
-            UserPlaybackRate.Value = 1;
+            if (sourceClock != beatmap.Track)
+                return;
+
+            removeSourceClockAdjustments();
+
+            sourceClock = new TrackVirtual(beatmap.Track.Length);
+            adjustableClock.ChangeSource(sourceClock);
         }
 
         protected override void Update()
@@ -183,6 +198,20 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in mods.OfType<IApplicableToClock>())
                 mod.ApplyToClock(sourceClock);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            removeSourceClockAdjustments();
+            sourceClock = null;
+        }
+
+        private void removeSourceClockAdjustments()
+        {
+            sourceClock.ResetSpeedAdjustments();
+            (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
         }
     }
 }

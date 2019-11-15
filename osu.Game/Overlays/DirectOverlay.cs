@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
             get => beatmapSets;
             set
             {
-                if (beatmapSets?.Equals(value) ?? false) return;
+                if (ReferenceEquals(beatmapSets, value)) return;
 
                 beatmapSets = value?.ToList();
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays
             if (!IsLoaded)
                 return;
 
-            if (State == Visibility.Hidden)
+            if (State.Value == Visibility.Hidden)
                 return;
 
             if (API == null)

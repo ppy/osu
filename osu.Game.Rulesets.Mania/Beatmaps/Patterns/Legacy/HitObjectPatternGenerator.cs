@@ -79,9 +79,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (!convertType.HasFlag(PatternType.KeepSingle))
             {
-                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
+                if (HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH) && TotalColumns != 8)
                     convertType |= PatternType.Mirror;
-                else if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP))
+                else if (HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP))
                     convertType |= PatternType.Gathered;
             }
         }
@@ -109,8 +109,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     // Generate a new pattern by copying the last hit objects in reverse-column order
                     for (int i = RandomStart; i < TotalColumns; i++)
+                    {
                         if (PreviousPattern.ColumnHasObject(i))
                             addToPattern(pattern, RandomStart + TotalColumns - i - 1);
+                    }
 
                     return pattern;
                 }
@@ -132,8 +134,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     // Generate a new pattern by placing on the already filled columns
                     for (int i = RandomStart; i < TotalColumns; i++)
+                    {
                         if (PreviousPattern.ColumnHasObject(i))
                             addToPattern(pattern, i);
+                    }
 
                     return pattern;
                 }
@@ -263,7 +267,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// Whether this hit object can generate a note in the special column.
         /// </summary>
-        private bool hasSpecialColumn => HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP) && HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH);
+        private bool hasSpecialColumn => HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP) && HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH);
 
         /// <summary>
         /// Generates a random pattern.
@@ -364,7 +368,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     break;
             }
 
-            if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP))
+            if (HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP))
                 p2 = 1;
 
             return GetRandomNoteCount(p2, p3, p4, p5);
