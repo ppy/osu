@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet
             get => ruleset;
             set
             {
-                if (ruleset == value)
+                if (ruleset?.Equals(value) ?? false)
                 {
                     DeselectAll();
                     return;
