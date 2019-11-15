@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.MathUtils;
-using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Rulesets.Objects
@@ -19,13 +18,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly double? ExpectedDistance;
 
-        /// <summary>
-        /// The type of path.
-        /// </summary>
-        public readonly PathType Type;
-
-        [JsonProperty]
-        private Vector2[] controlPoints;
+        public readonly PathSegment[] Segments;
 
         private List<Vector2> calculatedPath;
         private List<double> cumulativeLength;
@@ -35,34 +28,18 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
         /// </summary>
-        /// <param name="type">The type of path.</param>
-        /// <param name="controlPoints">The control points of the path.</param>
-        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all
-        /// <paramref name="controlPoints"/>. The path will be shortened/lengthened to match this length.
-        /// If null, the path will use the true distance between all <paramref name="controlPoints"/>.</param>
+        /// <param name="segments">The path segments.</param>
+        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance. The path will be shortened/lengthened to match this length.
+        /// If null, the path will use the true distance.</param>
         [JsonConstructor]
-        public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
+        public SliderPath(PathSegment[] segments, double? expectedDistance = null)
         {
             this = default;
-            this.controlPoints = controlPoints;
 
-            Type = type;
+            Segments = segments;
             ExpectedDistance = expectedDistance;
 
             ensureInitialised();
-        }
-
-        /// <summary>
-        /// The control points of the path.
-        /// </summary>
-        [JsonIgnore]
-        public ReadOnlySpan<Vector2> ControlPoints
-        {
-            get
-            {
-                ensureInitialised();
-                return controlPoints.AsSpan();
-            }
         }
 
         /// <summary>
@@ -129,7 +106,6 @@ namespace osu.Game.Rulesets.Objects
 
             isInitialised = true;
 
-            controlPoints = controlPoints ?? Array.Empty<Vector2>();
             calculatedPath = new List<Vector2>();
             cumulativeLength = new List<double>();
 
@@ -137,60 +113,15 @@ namespace osu.Game.Rulesets.Objects
             calculateCumulativeLength();
         }
 
-        private List<Vector2> calculateSubpath(ReadOnlySpan<Vector2> subControlPoints)
-        {
-            switch (Type)
-            {
-                case PathType.Linear:
-                    return PathApproximator.ApproximateLinear(subControlPoints);
-
-                case PathType.PerfectCurve:
-                    //we can only use CircularArc iff we have exactly three control points and no dissection.
-                    if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
-                        break;
-
-                    // Here we have exactly 3 control points. Attempt to fit a circular arc.
-                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
-
-                    // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
-                    if (subpath.Count == 0)
-                        break;
-
-                    return subpath;
-
-                case PathType.Catmull:
-                    return PathApproximator.ApproximateCatmull(subControlPoints);
-            }
-
-            return PathApproximator.ApproximateBezier(subControlPoints);
-        }
-
         private void calculatePath()
         {
             calculatedPath.Clear();
 
-            // Sliders may consist of various subpaths separated by two consecutive vertices
-            // with the same position. The following loop parses these subpaths and computes
-            // their shape independently, consecutively appending them to calculatedPath.
-
-            int start = 0;
-            int end = 0;
-
-            for (int i = 0; i < ControlPoints.Length; ++i)
+            foreach (var segment in Segments)
             {
-                end++;
-
-                if (i == ControlPoints.Length - 1 || ControlPoints[i] == ControlPoints[i + 1])
+                foreach (Vector2 pos in segment.ComputePath())
                 {
-                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.Slice(start, end - start);
-
-                    foreach (Vector2 t in calculateSubpath(cpSpan))
-                    {
-                        if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
-                            calculatedPath.Add(t);
-                    }
-
-                    start = end;
+                    calculatedPath.Add(pos);
                 }
             }
         }
@@ -275,12 +206,10 @@ namespace osu.Game.Rulesets.Objects
 
         public bool Equals(SliderPath other)
         {
-            if (ControlPoints == null && other.ControlPoints != null)
-                return false;
-            if (other.ControlPoints == null && ControlPoints != null)
+            if ((Segments == null) != (other.Segments == null))
                 return false;
 
-            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
+            return Segments.AsSpan().SequenceEqual(other.Segments) && ExpectedDistance.Equals(other.ExpectedDistance);
         }
     }
 }

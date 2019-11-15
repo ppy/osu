@@ -188,7 +188,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
+                result = CreateSlider(pos, combo, comboOffset, new SliderPath(createPathSegments(pathType, points), length), repeatCount, nodeSamples);
 
                 // The samples are played when the slider ends, which is the last node
                 result.Samples = nodeSamples[nodeSamples.Count - 1];
@@ -260,6 +260,40 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
+        private PathSegment[] createPathSegments(PathType type, ReadOnlySpan<Vector2> points)
+        {
+            if (type == PathType.PerfectCurve && points.Length != 3)
+            {
+                // stable only makes a perfect curve if and only if there are exactly 3 control points
+                // dissections are handled by the PathSegment itself
+                type = PathType.Bezier;
+            }
+
+            var result = new List<PathSegment>();
+
+            int start = 0;
+            int end = 0;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                end++;
+
+                if (i == points.Length - 1 || points[i] == points[i + 1])
+                {
+                    Vector2[] segmentPoints = points.Slice(start, end - start).ToArray();
+                    PathType segmentType = type;
+
+                    if (segmentType == PathType.PerfectCurve && segmentPoints.Length != 3)
+                        segmentType = PathType.Bezier;
+
+                    result.Add(new PathSegment(segmentType, segmentPoints));
+                    start = end;
+                }
+            }
+
+            return result.ToArray();
+        }
+
         /// <summary>
         /// Creates a legacy Hit-type hit object.
         /// </summary>
@@ -270,19 +304,16 @@ namespace osu.Game.Rulesets.Objects.Legacy
         protected abstract HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset);
 
         /// <summary>
-        /// Creats a legacy Slider-type hit object.
+        /// Creates a legacy Slider-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
-        /// <param name="controlPoints">The slider control points.</param>
-        /// <param name="length">The slider length.</param>
-        /// <param name="pathType">The slider curve type.</param>
+        /// <param name="path">The slider path.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
-                                                  List<IList<HitSampleInfo>> nodeSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, SliderPath path, int repeatCount, List<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.

@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             Vector2 position = e.MousePosition - HitObject.Position;
 
-            var controlPoints = HitObject.Path.ControlPoints.ToArray();
+            var controlPoints = HitObject.Path.Segments[0].ControlPoints.ToArray();
             controlPoints[placementControlPointIndex.Value] = position;
 
             onNewControlPoints(controlPoints);
@@ -97,8 +97,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             position -= HitObject.Position;
 
-            var controlPoints = new Vector2[HitObject.Path.ControlPoints.Length + 1];
-            HitObject.Path.ControlPoints.CopyTo(controlPoints);
+            var controlPoints = new Vector2[HitObject.Path.Segments[0].ControlPoints.Length + 1];
+            HitObject.Path.Segments[0].ControlPoints.CopyTo(controlPoints);
 
             int insertionIndex = 0;
             float minDistance = float.MaxValue;
@@ -125,10 +125,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void onNewControlPoints(Vector2[] controlPoints)
         {
-            var unsnappedPath = new SliderPath(controlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, controlPoints);
+            var unsnappedPath = new SliderPath(new[] { new PathSegment(controlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, controlPoints) });
             var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
-            HitObject.Path = new SliderPath(unsnappedPath.Type, controlPoints, snappedDistance);
+            HitObject.Path = new SliderPath(new[] { unsnappedPath.Segments[0] }, snappedDistance);
 
             UpdateHitObject();
         }

@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            while (slider.Path.ControlPoints.Length > Pieces.Count)
+            while (slider.Path.Segments[0].ControlPoints.Length > Pieces.Count)
             {
                 var piece = new PathControlPointPiece(slider, Pieces.Count)
                 {
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 Pieces.Add(piece);
             }
 
-            while (slider.Path.ControlPoints.Length < Pieces.Count)
+            while (slider.Path.Segments[0].ControlPoints.Length < Pieces.Count)
                 Pieces.Remove(Pieces[Pieces.Count - 1]);
         }
 
@@ -94,11 +94,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     foreach (var piece in Pieces)
                     {
                         if (!piece.IsSelected.Value)
-                            newControlPoints.Add(slider.Path.ControlPoints[piece.Index]);
+                            newControlPoints.Add(slider.Path.Segments[0].ControlPoints.Span[piece.Index]);
                     }
 
                     // Ensure that there are any points to be deleted
-                    if (newControlPoints.Count == slider.Path.ControlPoints.Length)
+                    if (newControlPoints.Count == slider.Path.Segments[0].ControlPoints.Length)
                         return false;
 
                     // If there are 0 remaining control points, treat the slider as being deleted

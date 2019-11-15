@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            Position = slider.StackedPosition + slider.Path.ControlPoints[Index];
+            Position = slider.StackedPosition + slider.Path.Segments[0].ControlPoints.Span[Index];
 
             updateMarkerDisplay();
             updateConnectingPath();
@@ -115,10 +115,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             path.ClearVertices();
 
-            if (Index != slider.Path.ControlPoints.Length - 1)
+            if (Index != slider.Path.Segments[0].ControlPoints.Length - 1)
             {
                 path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[Index + 1] - slider.Path.ControlPoints[Index]);
+                path.AddVertex(slider.Path.Segments[0].ControlPoints.Span[Index + 1] - slider.Path.Segments[0].ControlPoints.Span[Index]);
             }
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            var newControlPoints = slider.Path.ControlPoints.ToArray();
+            var newControlPoints = slider.Path.Segments[0].ControlPoints.ToArray();
 
             if (Index == 0)
             {
@@ -179,8 +179,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
 
-        private bool isSegmentSeparatorWithNext => Index < slider.Path.ControlPoints.Length - 1 && slider.Path.ControlPoints[Index + 1] == slider.Path.ControlPoints[Index];
+        private bool isSegmentSeparatorWithNext
+            => Index < slider.Path.Segments[0].ControlPoints.Length - 1
+               && slider.Path.Segments[0].ControlPoints.Span[Index + 1] == slider.Path.Segments[0].ControlPoints.Span[Index];
 
-        private bool isSegmentSeparatorWithPrevious => Index > 0 && slider.Path.ControlPoints[Index - 1] == slider.Path.ControlPoints[Index];
+        private bool isSegmentSeparatorWithPrevious
+            => Index > 0
+               && slider.Path.Segments[0].ControlPoints.Span[Index - 1] == slider.Path.Segments[0].ControlPoints.Span[Index];
     }
 }

@@ -44,11 +44,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider = new Slider
             {
                 Position = new Vector2(256, 192),
-                Path = new SliderPath(PathType.Bezier, new[]
+                Path = new SliderPath(new[]
                 {
-                    Vector2.Zero,
-                    new Vector2(150, 150),
-                    new Vector2(300, 0)
+                    new PathSegment(PathType.Bezier, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(150, 150),
+                        new Vector2(300, 0)
+                    })
                 })
             };
 
@@ -196,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep($"move mouse to control point {index}", () =>
             {
-                Vector2 position = slider.Position + slider.Path.ControlPoints[index];
+                Vector2 position = slider.Position + slider.Path.Segments[0].ControlPoints.Span[index];
                 InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
             });
         }

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
-using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Audio;
 
@@ -37,8 +36,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
-                                                  List<IList<HitSampleInfo>> nodeSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, SliderPath path, int repeatCount, List<IList<HitSampleInfo>> nodeSamples)
         {
             newCombo |= forceNewCombo;
             comboOffset += extraComboOffset;
@@ -51,7 +49,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
                 Position = position,
                 NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
-                Path = new SliderPath(pathType, controlPoints, length),
+                Path = path,
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
