@@ -18,8 +18,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly double? ExpectedDistance;
 
-        public readonly PathSegment[] Segments;
-
+        private PathSegment[] segments;
         private List<Vector2> calculatedPath;
         private List<double> cumulativeLength;
 
@@ -36,11 +35,16 @@ namespace osu.Game.Rulesets.Objects
         {
             this = default;
 
-            Segments = segments;
+            this.segments = segments;
             ExpectedDistance = expectedDistance;
 
             ensureInitialised();
         }
+
+        /// <summary>
+        /// The <see cref="PathSegment"/>s of this <see cref="SliderPath"/>.
+        /// </summary>
+        public ReadOnlySpan<PathSegment> Segments => segments;
 
         /// <summary>
         /// The distance of the path after lengthening/shortening to account for <see cref="ExpectedDistance"/>.
@@ -106,6 +110,7 @@ namespace osu.Game.Rulesets.Objects
 
             isInitialised = true;
 
+            segments = segments ?? Array.Empty<PathSegment>();
             calculatedPath = new List<Vector2>();
             cumulativeLength = new List<double>();
 
@@ -117,7 +122,10 @@ namespace osu.Game.Rulesets.Objects
         {
             calculatedPath.Clear();
 
-            foreach (var segment in Segments)
+            if (segments == null)
+                return;
+
+            foreach (var segment in segments)
             {
                 foreach (Vector2 pos in segment.ComputePath())
                 {
@@ -206,10 +214,10 @@ namespace osu.Game.Rulesets.Objects
 
         public bool Equals(SliderPath other)
         {
-            if ((Segments == null) != (other.Segments == null))
+            if ((segments == null) != (other.segments == null))
                 return false;
 
-            return Segments.AsSpan().SequenceEqual(other.Segments) && ExpectedDistance.Equals(other.ExpectedDistance);
+            return Segments.SequenceEqual(other.Segments) && ExpectedDistance.Equals(other.ExpectedDistance);
         }
     }
 }
