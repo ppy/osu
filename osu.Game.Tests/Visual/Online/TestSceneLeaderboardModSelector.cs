@@ -11,8 +11,6 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Tests.Visual.Online
@@ -28,7 +26,6 @@ namespace osu.Game.Tests.Visual.Online
         {
             LeaderboardModSelector modSelector;
             FillFlowContainer<SpriteText> selectedMods;
-            Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
             Add(selectedMods = new FillFlowContainer<SpriteText>
             {
@@ -40,7 +37,6 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Ruleset = { BindTarget = ruleset }
             });
 
             modSelector.SelectedMods.ItemsAdded += mods =>
@@ -66,12 +62,12 @@ namespace osu.Game.Tests.Visual.Online
                 });
             };
 
-            AddStep("osu ruleset", () => ruleset.Value = new OsuRuleset().RulesetInfo);
-            AddStep("mania ruleset", () => ruleset.Value = new ManiaRuleset().RulesetInfo);
-            AddStep("taiko ruleset", () => ruleset.Value = new TaikoRuleset().RulesetInfo);
-            AddStep("catch ruleset", () => ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddStep("osu ruleset", () => modSelector.Ruleset = new OsuRuleset().RulesetInfo);
+            AddStep("mania ruleset", () => modSelector.Ruleset = new ManiaRuleset().RulesetInfo);
+            AddStep("taiko ruleset", () => modSelector.Ruleset = new TaikoRuleset().RulesetInfo);
+            AddStep("catch ruleset", () => modSelector.Ruleset = new CatchRuleset().RulesetInfo);
             AddStep("Deselect all", () => modSelector.DeselectAll());
-            AddStep("null ruleset", () => ruleset.Value = null);
+            AddStep("null ruleset", () => modSelector.Ruleset = null);
         }
     }
 }
