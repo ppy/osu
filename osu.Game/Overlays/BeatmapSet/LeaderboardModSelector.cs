@@ -14,7 +14,6 @@ using osuTK.Graphics;
 using System;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -43,7 +42,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (ruleset == null)
                     return;
 
-                modsContainer.Add(new ModButton(new NoMod()));
+                modsContainer.Add(new ModButton(new ModNoMod()));
                 modsContainer.AddRange(ruleset.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
 
                 modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
@@ -145,19 +144,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
             protected override void OnHighlightedChanged(ValueChangedEvent<bool> highlighted) =>
                 this.FadeColour(highlighted.NewValue ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
-        }
-
-        private class NoMod : Mod
-        {
-            public override string Name => "NoMod";
-
-            public override string Acronym => "NM";
-
-            public override double ScoreMultiplier => 1;
-
-            public override IconUsage Icon => FontAwesome.Solid.Ban;
-
-            public override ModType Type => ModType.System;
         }
     }
 }
