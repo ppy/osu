@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK;
@@ -62,7 +63,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         protected override void LoadComplete()
         {
-            filter?.BindValueChanged(f => Filter(f.NewValue), true);
+            filter?.BindValueChanged(f => scheduleFilter());
+
+            if (filter != null)
+                Filter(filter.Value);
         }
 
         public void Filter(FilterCriteria criteria)
@@ -87,6 +91,17 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     r.MatchingFilter = matchingFilter;
                 }
             });
+        }
+
+        private ScheduledDelegate scheduledFilter;
+
+        private void scheduleFilter()
+        {
+            if (filter == null)
+                return;
+
+            scheduledFilter?.Cancel();
+            scheduledFilter = Scheduler.AddDelayed(() => Filter(filter.Value), 200);
         }
 
         private void addRooms(IEnumerable<Room> rooms)
