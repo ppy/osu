@@ -243,6 +243,22 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestModsRetainedBetweenSongSelect()
+        {
+            AddAssert("empty mods", () => !Mods.Value.Any());
+
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            changeMods(new OsuModHardRock());
+
+            createSongSelect();
+
+            AddAssert("mods retained", () => Mods.Value.Any());
+        }
+
+        [Test]
         public void TestStartAfterUnMatchingFilterDoesNotStart()
         {
             createSongSelect();
