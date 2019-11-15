@@ -65,8 +65,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             filter?.BindValueChanged(f => Filter(f.NewValue), true);
         }
 
-        private FilterCriteria currentFilter;
-
         public void Filter(FilterCriteria criteria)
         {
             roomFlow.Children.ForEach(r =>
@@ -82,15 +80,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     {
                         default:
                         case SecondaryFilter.Public:
-                            r.MatchingFilter = r.Room.Availability.Value == RoomAvailability.Public;
+                            matchingFilter &= r.Room.Availability.Value == RoomAvailability.Public;
                             break;
                     }
 
                     r.MatchingFilter = matchingFilter;
                 }
             });
-
-            currentFilter = criteria;
         }
 
         private void addRooms(IEnumerable<Room> rooms)
@@ -98,7 +94,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
                 roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
 
-            Filter(currentFilter);
+            filter?.TriggerChange();
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
