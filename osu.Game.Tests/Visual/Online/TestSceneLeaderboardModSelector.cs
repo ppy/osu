@@ -11,8 +11,6 @@ using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Bindables;
-using osu.Game.Rulesets;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Tests.Visual.Online
