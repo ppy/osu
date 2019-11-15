@@ -15,7 +15,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestCaseLeadIn : RateAdjustedBeatmapTestScene
+    public class TestSceneLeadIn : RateAdjustedBeatmapTestScene
     {
         private Ruleset ruleset;
 
