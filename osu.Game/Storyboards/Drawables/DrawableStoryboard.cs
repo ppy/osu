@@ -9,6 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Game.IO;
 using osu.Game.Screens.Play;
+using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -49,11 +51,19 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddInternal(content = new Container<DrawableStoryboardLayer>
+            AddRangeInternal(new Drawable[]
             {
-                Size = new Vector2(640, 480),
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black
+                },
+                content = new Container<DrawableStoryboardLayer>
+                {
+                    Size = new Vector2(640, 480),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                }
             });
         }
 
