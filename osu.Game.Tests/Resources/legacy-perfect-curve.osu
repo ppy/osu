@@ -1,0 +1,28 @@
+osu file format v14
+
+[HitObjects]
+// Note: The slider's start point counts as a control point
+
+// 3 non-dissecting control points
+// Normal perfect curve
+0,0,15,2,0,P|100:100|200:0,1,664.999979705811
+
+// 2 non-dissecting control points
+// Should become a bezier or linear curve
+0,0,15,2,0,P|100:100,1,664.999979705811
+
+// 4 non-dissecting control points
+// Should become a bezier curve
+0,0,15,2,0,P|100:100|200:0|300:300,1,664.999979705811
+
+// 3 dissecting control points
+// Should become a bezier + linear curve
+0,0,15,2,0,P|100:100|100:100,1,664.999979705811
+
+// 4 dissecting control points
+// Should become two bezier or linear curves
+0,0,15,2,0,P|100:100|100:100|200:0,1,664.999979705811
+
+// 3 linear points
+// Should become a linear curve
+0,0,15,2,0,P|100:100|200:200,1,664.999979705811

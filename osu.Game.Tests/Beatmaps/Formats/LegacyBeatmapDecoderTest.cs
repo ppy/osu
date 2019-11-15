@@ -645,5 +645,37 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsInstanceOf<LegacyDifficultyCalculatorBeatmapDecoder>(decoder);
             }
         }
+
+        [Test]
+        public void TestLegacyPerfectCurve()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("legacy-perfect-curve.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var sliders = decoder.Decode(stream).HitObjects.Cast<ConvertSlider>().ToArray();
+
+                Assert.That(sliders[0].Path.Segments.Length, Is.EqualTo(1));
+                Assert.That(sliders[0].Path.Segments[0].Type, Is.EqualTo(PathType.PerfectCurve));
+
+                Assert.That(sliders[1].Path.Segments.Length, Is.EqualTo(1));
+                Assert.That(sliders[1].Path.Segments[0].Type, Is.EqualTo(PathType.Linear).Or.EqualTo(PathType.Bezier));
+
+                Assert.That(sliders[2].Path.Segments.Length, Is.EqualTo(1));
+                Assert.That(sliders[2].Path.Segments[0].Type, Is.EqualTo(PathType.Bezier));
+
+                Assert.That(sliders[3].Path.Segments.Length, Is.EqualTo(2));
+                Assert.That(sliders[3].Path.Segments[0].Type, Is.EqualTo(PathType.Linear).Or.EqualTo(PathType.Bezier));
+                Assert.That(sliders[3].Path.Segments[1].Type, Is.EqualTo(PathType.Linear));
+
+                Assert.That(sliders[4].Path.Segments.Length, Is.EqualTo(2));
+                Assert.That(sliders[4].Path.Segments[0].Type, Is.EqualTo(PathType.Linear).Or.EqualTo(PathType.Bezier));
+                Assert.That(sliders[4].Path.Segments[1].Type, Is.EqualTo(PathType.Linear).Or.EqualTo(PathType.Bezier));
+
+                Assert.That(sliders[5].Path.Segments.Length, Is.EqualTo(1));
+                Assert.That(sliders[5].Path.Segments[0].Type, Is.EqualTo(PathType.Linear));
+            }
+        }
     }
 }
