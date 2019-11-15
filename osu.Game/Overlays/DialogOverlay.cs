@@ -5,13 +5,16 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
     public class DialogOverlay : OsuFocusedOverlayContainer
     {
         private readonly Container dialogContainer;
-        private PopupDialog currentDialog;
+
+        public PopupDialog CurrentDialog { get; private set; }
 
         public DialogOverlay()
         {
@@ -29,19 +32,17 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
-            if (dialog == currentDialog) return;
+            if (dialog == CurrentDialog) return;
 
-            currentDialog?.Hide();
-            currentDialog = dialog;
+            CurrentDialog?.Hide();
+            CurrentDialog = dialog;
 
-            dialogContainer.Add(currentDialog);
+            dialogContainer.Add(CurrentDialog);
 
-            currentDialog.Show();
-            currentDialog.StateChanged += state => onDialogOnStateChanged(dialog, state);
-            State = Visibility.Visible;
+            CurrentDialog.Show();
+            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+            Show();
         }
-
-        protected override bool PlaySamplesOnStateChange => false;
 
         protected override bool BlockNonPositionalInput => true;
 
@@ -52,8 +53,11 @@ namespace osu.Game.Overlays
             //handle the dialog being dismissed.
             dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
-            if (dialog == currentDialog)
-                State = Visibility.Hidden;
+            if (dialog == CurrentDialog)
+            {
+                Hide();
+                CurrentDialog = null;
+            }
         }
 
         protected override void PopIn()
@@ -66,13 +70,25 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            if (currentDialog?.State == Visibility.Visible)
+            if (CurrentDialog?.State.Value == Visibility.Visible)
             {
-                currentDialog.Hide();
+                CurrentDialog.Hide();
                 return;
             }
 
             this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
+                    return true;
+            }
+
+            return base.OnPressed(action);
         }
     }
 }

@@ -10,18 +10,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : HitObjectPiece
+    public class HitCirclePiece : BlueprintPiece<HitCircle>
     {
-        private readonly HitCircle hitCircle;
-
-        public HitCirclePiece(HitCircle hitCircle)
-            : base(hitCircle)
+        public HitCirclePiece()
         {
-            this.hitCircle = hitCircle;
             Origin = Anchor.Centre;
 
-            Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
-            Scale = new Vector2(hitCircle.Scale);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             CornerRadius = Size.X / 2;
 
             InternalChild = new RingPiece();
@@ -31,12 +26,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => UpdatePosition(), true);
-            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
-            ScaleBindable.BindValueChanged(scale => Scale = new Vector2(scale.NewValue), true);
         }
 
-        protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
+        public override void UpdateFrom(HitCircle hitObject)
+        {
+            base.UpdateFrom(hitObject);
+
+            Scale = new Vector2(hitObject.Scale);
+        }
     }
 }

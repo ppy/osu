@@ -81,6 +81,9 @@ namespace osu.Game.Online.Chat
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
+            if (user.Id == api.LocalUser.Value.Id)
+                return;
+
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
                                    ?? new Channel(user);
         }
@@ -210,8 +213,27 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true);
                     break;
 
+                case "join":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
+                        break;
+                    }
+
+                    var channel = availableChannels.FirstOrDefault(c => c.Name == content || c.Name == $"#{content}");
+
+                    if (channel == null)
+                    {
+                        target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
+                        break;
+                    }
+
+                    JoinChannel(channel);
+                    CurrentChannel.Value = channel;
+                    break;
+
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
                     break;
 
                 default:

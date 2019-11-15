@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select.Filter;
 
@@ -12,6 +14,17 @@ namespace osu.Game.Screens.Select
     {
         public GroupMode Group;
         public SortMode Sort;
+
+        public OptionalRange<double> StarDifficulty;
+        public OptionalRange<float> ApproachRate;
+        public OptionalRange<float> DrainRate;
+        public OptionalRange<float> CircleSize;
+        public OptionalRange<double> Length;
+        public OptionalRange<double> BPM;
+        public OptionalRange<int> BeatDivisor;
+        public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
+        public OptionalTextFilter Creator;
+        public OptionalTextFilter Artist;
 
         public string[] SearchTerms = Array.Empty<string>();
 
@@ -26,8 +39,69 @@ namespace osu.Game.Screens.Select
             set
             {
                 searchText = value;
-                SearchTerms = searchText.Split(',', ' ', '!').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                SearchTerms = searchText.Split(new[] { ',', ' ', '!' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
             }
+        }
+
+        public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
+            where T : struct, IComparable
+        {
+            public bool IsInRange(T value)
+            {
+                if (Min != null)
+                {
+                    int comparison = Comparer<T>.Default.Compare(value, Min.Value);
+
+                    if (comparison < 0)
+                        return false;
+
+                    if (comparison == 0 && !IsLowerInclusive)
+                        return false;
+                }
+
+                if (Max != null)
+                {
+                    int comparison = Comparer<T>.Default.Compare(value, Max.Value);
+
+                    if (comparison > 0)
+                        return false;
+
+                    if (comparison == 0 && !IsUpperInclusive)
+                        return false;
+                }
+
+                return true;
+            }
+
+            public T? Min;
+            public T? Max;
+            public bool IsLowerInclusive;
+            public bool IsUpperInclusive;
+
+            public bool Equals(OptionalRange<T> other)
+                => Min.Equals(other.Min)
+                   && Max.Equals(other.Max)
+                   && IsLowerInclusive.Equals(other.IsLowerInclusive)
+                   && IsUpperInclusive.Equals(other.IsUpperInclusive);
+        }
+
+        public struct OptionalTextFilter : IEquatable<OptionalTextFilter>
+        {
+            public bool Matches(string value)
+            {
+                if (string.IsNullOrEmpty(SearchTerm))
+                    return true;
+
+                // search term is guaranteed to be non-empty, so if the string we're comparing is empty, it's not matching
+                if (string.IsNullOrEmpty(value))
+                    return false;
+
+                return value.IndexOf(SearchTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            }
+
+            public string SearchTerm;
+
+            public bool Equals(OptionalTextFilter other) => SearchTerm?.Equals(other.SearchTerm) ?? true;
         }
     }
 }

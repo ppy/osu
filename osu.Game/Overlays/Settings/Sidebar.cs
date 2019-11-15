@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Threading;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Toolbar;
 
 namespace osu.Game.Overlays.Settings
@@ -76,13 +77,14 @@ namespace osu.Game.Overlays.Settings
             return base.OnMouseMove(e);
         }
 
-        private class SidebarScrollContainer : ScrollContainer
+        private class SidebarScrollContainer : OsuScrollContainer
         {
             public SidebarScrollContainer()
             {
                 Content.Anchor = Anchor.CentreLeft;
                 Content.Origin = Anchor.CentreLeft;
                 RelativeSizeAxes = Axes.Both;
+                ScrollbarVisible = false;
             }
         }
 

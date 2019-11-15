@@ -151,11 +151,12 @@ namespace osu.Game.Overlays.Direct
                                             AutoSizeAxes = Axes.X,
                                             Height = 20,
                                             Margin = new MarginPadding { Top = vertical_padding, Bottom = vertical_padding },
-                                            Children = GetDifficultyIcons(),
+                                            Spacing = new Vector2(3),
+                                            Children = GetDifficultyIcons(colours),
                                         },
                                     },
                                 },
-                                new DownloadButton(SetInfo)
+                                new PanelDownloadButton(SetInfo)
                                 {
                                     Size = new Vector2(50, 30),
                                     Margin = new MarginPadding(horizontal_padding),

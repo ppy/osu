@@ -1,14 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Primitives;
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -16,12 +14,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public const float DEFAULT_BORDER_SIZE = 1;
 
-        private readonly SliderPath path;
+        private SliderPath path;
+
         protected Path Path => path;
 
-        private readonly BufferedContainer container;
-
-        public float PathRadius
+        public virtual float PathRadius
         {
             get => path.PathRadius;
             set => path.PathRadius = value;
@@ -44,8 +41,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
 
                 path.AccentColour = value;
-
-                container.ForceRedraw();
             }
         }
 
@@ -61,8 +56,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
 
                 path.BorderColour = value;
-
-                container.ForceRedraw();
             }
         }
 
@@ -78,23 +71,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
 
                 path.BorderSize = value;
-
-                container.ForceRedraw();
             }
         }
 
-        public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
-
         protected SliderBody()
         {
-            InternalChild = container = new BufferedContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                CacheDrawnFrameBuffer = true,
-                Child = path = new SliderPath { Blending = BlendingMode.None }
-            };
+            RecyclePath();
+        }
 
-            container.Attach(RenderbufferInternalFormat.DepthComponent16);
+        /// <summary>
+        /// Initialises a new <see cref="SliderPath"/>, releasing all resources retained by the old one.
+        /// </summary>
+        public virtual void RecyclePath()
+        {
+            InternalChild = path = new SliderPath
+            {
+                Position = path?.Position ?? Vector2.Zero,
+                PathRadius = path?.PathRadius ?? 10,
+                AccentColour = path?.AccentColour ?? Color4.White,
+                BorderColour = path?.BorderColour ?? Color4.White,
+                BorderSize = path?.BorderSize ?? DEFAULT_BORDER_SIZE,
+                Vertices = path?.Vertices ?? Array.Empty<Vector2>()
+            };
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => path.ReceivePositionalInputAt(screenSpacePos);
@@ -103,11 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// Sets the vertices of the path which should be drawn by this <see cref="SliderBody"/>.
         /// </summary>
         /// <param name="vertices">The vertices</param>
-        protected void SetVertices(IReadOnlyList<Vector2> vertices)
-        {
-            path.Vertices = vertices;
-            container.ForceRedraw();
-        }
+        protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
 
         private class SliderPath : SmoothPath
         {

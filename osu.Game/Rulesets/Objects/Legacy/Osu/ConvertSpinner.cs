@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osuTK;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Osu
@@ -21,7 +22,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public float Y => Position.Y;
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
         public bool NewCombo { get; set; }
 

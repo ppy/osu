@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -28,30 +29,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private int rollingHits;
 
+        private readonly Container<DrawableDrumRollTick> tickContainer;
+
+        private Color4 colourIdle;
+        private Color4 colourEngaged;
+
         public DrawableDrumRoll(DrumRoll drumRoll)
             : base(drumRoll)
         {
             RelativeSizeAxes = Axes.Y;
-
-            Container<DrawableDrumRollTick> tickContainer;
             MainPiece.Add(tickContainer = new Container<DrawableDrumRollTick> { RelativeSizeAxes = Axes.Both });
-
-            foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
-            {
-                var newTick = new DrawableDrumRollTick(tick);
-                newTick.OnNewResult += onNewTickResult;
-
-                AddNested(newTick);
-                tickContainer.Add(newTick);
-            }
         }
-
-        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
-
-        public override bool OnPressed(TaikoAction action) => false;
-
-        private Color4 colourIdle;
-        private Color4 colourEngaged;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -60,8 +48,51 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             colourEngaged = colours.YellowDarker;
         }
 
-        private void onNewTickResult(DrawableHitObject obj, JudgementResult result)
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
+            OnNewResult += onNewResult;
+        }
+
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableDrumRollTick tick:
+                    tickContainer.Add(tick);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            tickContainer.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case DrumRollTick tick:
+                    return new DrawableDrumRollTick(tick);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
+        }
+
+        protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
+
+        public override bool OnPressed(TaikoAction action) => false;
+
+        private void onNewResult(DrawableHitObject obj, JudgementResult result)
+        {
+            if (!(obj is DrawableDrumRollTick))
+                return;
+
             if (result.Type > HitResult.Miss)
                 rollingHits++;
             else
@@ -88,13 +119,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 ApplyResult(r => r.Type = HitResult.Miss);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {
                 case ArmedState.Hit:
                 case ArmedState.Miss:
-                    this.FadeOut(100).Expire();
+                    this.Delay(HitObject.Duration).FadeOut(100);
                     break;
             }
         }

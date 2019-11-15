@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -31,34 +32,18 @@ namespace osu.Game.Beatmaps.Drawables
         /// </summary>
         protected virtual double UnloadDelay => 10000;
 
-        private BeatmapInfo lastModel;
-        private bool firstLoad = true;
+        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Func<Drawable> createContentFunc, double timeBeforeLoad)
+            => new DelayedLoadUnloadWrapper(createContentFunc, timeBeforeLoad, UnloadDelay);
 
-        protected override DelayedLoadWrapper CreateDelayedLoadWrapper(Drawable content, double timeBeforeLoad)
-        {
-            return new DelayedLoadUnloadWrapper(() =>
-            {
-                // If DelayedLoadUnloadWrapper is attempting to RELOAD the same content (Beatmap), that means that it was
-                // previously UNLOADED and thus its children have been disposed of, so we need to recreate them here.
-                if (!firstLoad && lastModel == Beatmap.Value)
-                    return CreateDrawable(Beatmap.Value);
-
-                // If the model has changed since the previous unload (or if there was no load), then we can safely use the given content
-                lastModel = Beatmap.Value;
-                firstLoad = false;
-                return content;
-            }, timeBeforeLoad, UnloadDelay);
-        }
+        protected override double TransformDuration => 400;
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            Drawable drawable = getDrawableForModel(model);
-
+            var drawable = getDrawableForModel(model);
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Anchor = Anchor.Centre;
             drawable.Origin = Anchor.Centre;
             drawable.FillMode = FillMode.Fill;
-            drawable.OnLoadComplete += d => d.FadeInFromZero(400);
 
             return drawable;
         }

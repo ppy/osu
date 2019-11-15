@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.SearchableList
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
+        protected abstract U DefaultCategory { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
         /// <summary>
@@ -84,9 +85,15 @@ namespace osu.Game.Overlays.SearchableList
                                     AutoSizeAxes = Axes.Y,
                                     Margin = new MarginPadding { Top = controls != null ? padding : 0 },
                                 },
-                                Tabs = new PageTabControl<T>
+                                new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Padding = new MarginPadding { Right = 225 },
+                                    Child = Tabs = new PageTabControl<T>
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                    },
                                 },
                                 new Box //keep the tab strip part of autosize, but don't put it in the flow container
                                 {
@@ -109,6 +116,9 @@ namespace osu.Game.Overlays.SearchableList
 
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
+
+            DisplayStyleControl.Dropdown.Current.Value = DefaultCategory;
+            DisplayStyleControl.Dropdown.Current.TriggerChange();
         }
 
         [BackgroundDependencyLoader]

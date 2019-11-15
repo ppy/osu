@@ -12,5 +12,10 @@ namespace osu.Game.Rulesets.Mods
         /// Whether we should allow failing at the current point in time.
         /// </summary>
         bool AllowFail { get; }
+
+        /// <summary>
+        /// Whether we want to restart on fail. Only used if <see cref="AllowFail"/> is true.
+        /// </summary>
+        bool RestartOnFail { get; }
     }
 }

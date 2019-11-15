@@ -87,7 +87,12 @@ namespace osu.Game.Overlays.Profile.Header
 
             addSpacer(topLinkContainer);
 
-            if (user.LastVisit.HasValue)
+            if (user.IsOnline)
+            {
+                topLinkContainer.AddText("Currently online");
+                addSpacer(topLinkContainer);
+            }
+            else if (user.LastVisit.HasValue)
             {
                 topLinkContainer.AddText("Last seen ");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
@@ -134,6 +139,9 @@ namespace osu.Game.Overlays.Profile.Header
         private void tryAddInfo(IconUsage icon, string content, string link = null)
         {
             if (string.IsNullOrEmpty(content)) return;
+
+            // newlines could be contained in API returned user content.
+            content = content.Replace("\n", " ");
 
             bottomLinkContainer.AddIcon(icon, text =>
             {

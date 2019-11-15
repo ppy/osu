@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private void loadPlayerWithBeatmap(IBeatmap beatmap)
         {
-            Beatmap.Value = new TestWorkingBeatmap(beatmap, Clock);
+            Beatmap.Value = new TestWorkingBeatmap(beatmap);
 
             LoadScreen(player = new LeadInPlayer());
         }

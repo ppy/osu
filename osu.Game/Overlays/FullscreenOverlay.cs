@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -38,6 +39,19 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+        }
+
+        public override void Show()
+        {
+            if (State.Value == Visibility.Visible)
+            {
+                // re-trigger the state changed so we can potentially surface to front
+                State.TriggerChange();
+            }
+            else
+            {
+                base.Show();
+            }
         }
 
         protected override void PopIn()

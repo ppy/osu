@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Game.Users;
@@ -17,14 +17,15 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneHistoricalSection : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes =>
-            new[]
-            {
-                typeof(HistoricalSection),
-                typeof(PaginatedMostPlayedBeatmapContainer),
-                typeof(DrawableMostPlayedRow),
-                typeof(DrawableProfileRow)
-            };
+        protected override bool UseOnlineAPI => true;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(HistoricalSection),
+            typeof(PaginatedMostPlayedBeatmapContainer),
+            typeof(DrawableMostPlayedBeatmap),
+            typeof(DrawableProfileRow)
+        };
 
         public TestSceneHistoricalSection()
         {
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            Add(new ScrollContainer
+            Add(new OsuScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = section = new HistoricalSection(),

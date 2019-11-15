@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Users;
@@ -17,6 +18,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserRanks : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableProfileScore), typeof(RanksSection) };
 
         public TestSceneUserRanks()
@@ -33,7 +36,7 @@ namespace osu.Game.Tests.Visual.Online
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.Gray(0.2f)
                     },
-                    new ScrollContainer
+                    new OsuScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Child = ranks = new RanksSection(),

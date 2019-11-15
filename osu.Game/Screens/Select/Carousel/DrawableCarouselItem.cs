@@ -64,12 +64,12 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                 }
             };
 
-            sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
+            sampleHover = audio.Samples.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 

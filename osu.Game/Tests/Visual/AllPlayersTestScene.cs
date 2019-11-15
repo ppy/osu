@@ -4,13 +4,10 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Screens;
-using osu.Framework.Timing;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
-using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
@@ -50,26 +47,20 @@ namespace osu.Game.Tests.Visual
 
         protected abstract void AddCheckSteps();
 
-        protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
-
-        protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock clock) =>
-            new TestWorkingBeatmap(beatmap, Clock);
-
-        private Player loadPlayerFor(RulesetInfo ri)
+        private Player loadPlayerFor(RulesetInfo rulesetInfo)
         {
-            Ruleset.Value = ri;
-            var r = ri.CreateInstance();
+            Ruleset.Value = rulesetInfo;
+            var ruleset = rulesetInfo.CreateInstance();
 
-            var beatmap = CreateBeatmap(r);
-            var working = CreateWorkingBeatmap(beatmap, Clock);
+            var working = CreateWorkingBeatmap(rulesetInfo);
 
             Beatmap.Value = working;
-            Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
+            Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModNoFail) };
 
             Player?.Exit();
             Player = null;
 
-            Player = CreatePlayer(r);
+            Player = CreatePlayer(ruleset);
 
             LoadScreen(Player);
 
