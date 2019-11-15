@@ -236,7 +236,7 @@ namespace osu.Game.Graphics.UserInterface
         private void selectionChanged(ValueChangedEvent<bool> args)
         {
             if (clicked) return;
-            
+
             if (args.NewValue)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
