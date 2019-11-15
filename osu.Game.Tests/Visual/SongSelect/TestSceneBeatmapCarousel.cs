@@ -334,10 +334,19 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHiding()
         {
-            BeatmapSetInfo hidingSet = createTestBeatmapSet(1);
-            hidingSet.Beatmaps[1].Hidden = true;
+            BeatmapSetInfo hidingSet = null;
+            List<BeatmapSetInfo> hiddenList = new List<BeatmapSetInfo>();
 
-            loadBeatmaps(new List<BeatmapSetInfo> { hidingSet });
+            AddStep("create hidden set", () =>
+            {
+                hidingSet = createTestBeatmapSet(1);
+                hidingSet.Beatmaps[1].Hidden = true;
+
+                hiddenList.Clear();
+                hiddenList.Add(hidingSet);
+            });
+
+            loadBeatmaps(hiddenList);
 
             setSelected(1, 1);
 
@@ -371,11 +380,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestSelectingFilteredRuleset()
         {
+            BeatmapSetInfo testMixed = null;
+
             createCarousel();
 
-            var testMixed = createTestBeatmapSet(set_count + 1);
             AddStep("add mixed ruleset beatmapset", () =>
             {
+                testMixed = createTestBeatmapSet(set_count + 1);
+
                 for (int i = 0; i <= 2; i++)
                 {
                     testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
