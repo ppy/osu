@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
 
         [Resolved]
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         protected override void LoadComplete()
         {
-            filter.BindValueChanged(f => Filter(f.NewValue), true);
+            filter?.BindValueChanged(f => Filter(f.NewValue), true);
         }
 
         private FilterCriteria currentFilter;
