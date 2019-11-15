@@ -303,8 +303,13 @@ namespace osu.Game.Beatmaps
                     var decoder = Decoder.GetDecoder<Beatmap>(sr);
                     IBeatmap beatmap = decoder.Decode(sr);
 
+                    string hash = ms.ComputeSHA2Hash();
+
+                    if (beatmapInfos.Any(b => b.Hash == hash))
+                        continue;
+
                     beatmap.BeatmapInfo.Path = file.Filename;
-                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
+                    beatmap.BeatmapInfo.Hash = hash;
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
                     var ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
