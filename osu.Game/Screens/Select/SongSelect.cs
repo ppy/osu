@@ -53,42 +53,40 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected BeatmapOptionsOverlay BeatmapOptions;
+        protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected Footer Footer;
+        protected Footer Footer { get; private set; }
 
         /// <summary>
         /// Contains any panel which is triggered by a footer button.
         /// Helps keep them located beneath the footer itself.
         /// </summary>
-        protected Container FooterPanels;
+        protected Container FooterPanels { get; private set; }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected BeatmapCarousel Carousel;
+        protected BeatmapCarousel Carousel { get; private set; }
+
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
 
-        protected ModSelectOverlay ModSelect;
+        protected ModSelectOverlay ModSelect { get; private set; }
 
-        protected SampleChannel SampleConfirm;
+        protected SampleChannel SampleConfirm { get; private set; }
+
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        protected BeatmapDetailArea BeatmapDetails;
+        protected BeatmapDetailArea BeatmapDetails { get; private set; }
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
-
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
 
@@ -224,7 +222,7 @@ namespace osu.Game.Screens.Select
 
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
+                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
@@ -262,13 +260,6 @@ namespace osu.Game.Screens.Select
                     }
                 });
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            mods.BindTo(Mods);
         }
 
         private DependencyContainer dependencies;
@@ -392,7 +383,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    mods.Value = Array.Empty<Mod>();
+                    Mods.Value = Array.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -407,7 +398,7 @@ namespace osu.Game.Screens.Select
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
+                if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
@@ -539,9 +530,6 @@ namespace osu.Game.Screens.Select
 
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
-
-            mods.UnbindAll();
-            Mods.Value = Array.Empty<Mod>();
 
             return false;
         }
