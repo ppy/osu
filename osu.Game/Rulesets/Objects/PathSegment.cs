@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -11,27 +12,32 @@ namespace osu.Game.Rulesets.Objects
 {
     public readonly struct PathSegment : IEquatable<PathSegment>
     {
+        [JsonProperty]
         public readonly PathType Type;
-        public readonly ReadOnlyMemory<Vector2> ControlPoints;
 
-        public PathSegment(PathType type, ReadOnlyMemory<Vector2> controlPoints)
+        [JsonProperty]
+        private readonly Vector2[] controlPoints;
+
+        public PathSegment(PathType type, Vector2[] controlPoints)
         {
             if (type == PathType.PerfectCurve && controlPoints.Length != 3)
                 throw new ArgumentException($"A {nameof(PathType.PerfectCurve)} must have exactly 3 points.");
 
             Type = type;
-            ControlPoints = controlPoints;
+            this.controlPoints = controlPoints;
         }
+
+        public ReadOnlySpan<Vector2> ControlPoints => controlPoints;
 
         public List<Vector2> ComputePath()
         {
             switch (Type)
             {
                 case PathType.Linear:
-                    return PathApproximator.ApproximateLinear(ControlPoints.Span);
+                    return PathApproximator.ApproximateLinear(ControlPoints);
 
                 case PathType.PerfectCurve:
-                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(ControlPoints.Span);
+                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(ControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subpath.Count == 0)
@@ -40,12 +46,12 @@ namespace osu.Game.Rulesets.Objects
                     return subpath;
 
                 case PathType.Catmull:
-                    return PathApproximator.ApproximateCatmull(ControlPoints.Span);
+                    return PathApproximator.ApproximateCatmull(ControlPoints);
             }
 
-            return PathApproximator.ApproximateBezier(ControlPoints.Span);
+            return PathApproximator.ApproximateBezier(ControlPoints);
         }
 
-        public bool Equals(PathSegment other) => Type == other.Type && ControlPoints.Span.SequenceEqual(other.ControlPoints.Span);
+        public bool Equals(PathSegment other) => Type == other.Type && ControlPoints.SequenceEqual(other.ControlPoints);
     }
 }

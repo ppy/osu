@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            Position = slider.StackedPosition + slider.Path.Segments[0].ControlPoints.Span[Index];
+            Position = slider.StackedPosition + slider.Path.Segments[0].ControlPoints[Index];
 
             updateMarkerDisplay();
             updateConnectingPath();
@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (Index != slider.Path.Segments[0].ControlPoints.Length - 1)
             {
                 path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.Segments[0].ControlPoints.Span[Index + 1] - slider.Path.Segments[0].ControlPoints.Span[Index]);
+                path.AddVertex(slider.Path.Segments[0].ControlPoints[Index + 1] - slider.Path.Segments[0].ControlPoints[Index]);
             }
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
@@ -181,10 +181,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool isSegmentSeparatorWithNext
             => Index < slider.Path.Segments[0].ControlPoints.Length - 1
-               && slider.Path.Segments[0].ControlPoints.Span[Index + 1] == slider.Path.Segments[0].ControlPoints.Span[Index];
+               && slider.Path.Segments[0].ControlPoints[Index + 1] == slider.Path.Segments[0].ControlPoints[Index];
 
         private bool isSegmentSeparatorWithPrevious
             => Index > 0
-               && slider.Path.Segments[0].ControlPoints.Span[Index - 1] == slider.Path.Segments[0].ControlPoints.Span[Index];
+               && slider.Path.Segments[0].ControlPoints[Index - 1] == slider.Path.Segments[0].ControlPoints[Index];
     }
 }
