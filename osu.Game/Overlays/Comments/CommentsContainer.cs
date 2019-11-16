@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Comments
 
                 commentBundle = value;
 
-                OnLoadingStarted();
+                OnLoadStarted();
                 AddComments(commentBundle);
             }
         }
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Comments
 
         protected virtual void OnUserChanged(ValueChangedEvent<User> user)
         {
-            OnLoadingStarted();
+            OnLoadStarted();
             AddComments(commentBundle);
         }
 
@@ -192,7 +192,7 @@ namespace osu.Game.Overlays.Comments
         {
         }
 
-        protected virtual void OnLoadingStarted()
+        protected virtual void OnLoadStarted()
         {
             loadCancellation?.Cancel();
             moreButton.IsLoading = true;
@@ -208,14 +208,16 @@ namespace osu.Game.Overlays.Comments
                 content.Clear();
                 deletedChildrenPlaceholder.DeletedCount.Value = 0;
                 noCommentsPlaceholder.Hide();
-                onLoadingFinished(comments);
+                loadingLayer.Hide();
+                moreButton.IsLoading = true;
+                moreButton.Show();
                 return;
             }
 
             if (!comments.Comments.Any())
             {
                 noCommentsPlaceholder.Show();
-                onLoadingFinished(comments);
+                onLoadFinished(comments);
                 return;
             }
 
@@ -234,11 +236,11 @@ namespace osu.Game.Overlays.Comments
 
                 deletedChildrenPlaceholder.DeletedCount.Value += comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
-                onLoadingFinished(comments);
+                onLoadFinished(comments);
             }, loadCancellation.Token);
         }
 
-        private void onLoadingFinished(CommentBundle comments)
+        private void onLoadFinished(CommentBundle comments)
         {
             loadingLayer.Hide();
             updateMoreButtonState(comments);
@@ -269,13 +271,6 @@ namespace osu.Game.Overlays.Comments
 
         private void updateMoreButtonState(CommentBundle comments)
         {
-            if (comments == null)
-            {
-                moreButton.IsLoading = true;
-                moreButton.Show();
-                return;
-            }
-
             moreButton.IsLoading = false;
 
             if (comments.HasMore)

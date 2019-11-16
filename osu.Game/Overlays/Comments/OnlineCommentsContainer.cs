@@ -25,17 +25,17 @@ namespace osu.Game.Overlays.Comments
             if (parameters == null)
                 return;
 
-            OnLoadingStarted();
+            OnLoadStarted();
             OnShowMoreAction();
         }
 
         protected override void OnUserChanged(ValueChangedEvent<User> user) => Sort.TriggerChange();
 
-        protected override void OnLoadingStarted()
+        protected override void OnLoadStarted()
         {
             request?.Cancel();
             currentPage = 0;
-            base.OnLoadingStarted();
+            base.OnLoadStarted();
         }
 
         protected override void OnShowMoreAction()
