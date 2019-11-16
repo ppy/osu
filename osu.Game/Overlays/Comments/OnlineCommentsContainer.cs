@@ -22,23 +22,26 @@ namespace osu.Game.Overlays.Comments
 
         protected override void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
         {
-            ClearComments();
+            if (parameters == null)
+                return;
+
+            OnLoadingStarted();
             OnShowMoreAction();
         }
 
         protected override void OnUserChanged(ValueChangedEvent<User> user) => Sort.TriggerChange();
 
-        protected override void ClearComments()
+        protected override void OnLoadingStarted()
         {
             request?.Cancel();
-            currentPage = 1;
-            base.ClearComments();
+            currentPage = 0;
+            base.OnLoadingStarted();
         }
 
         protected override void OnShowMoreAction()
         {
-            request = new GetCommentsRequest(parameters, Sort.Value, currentPage++);
-            request.Success += AddComments;
+            request = new GetCommentsRequest(parameters, Sort.Value, ++currentPage);
+            request.Success += response => AddComments(response, currentPage == 1);
             Task.Run(() => request.Perform(API));
         }
 
