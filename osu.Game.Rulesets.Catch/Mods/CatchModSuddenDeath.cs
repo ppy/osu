@@ -7,5 +7,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModSuddenDeath : ModSuddenDeath
     {
+        public override string Description => @"不全连，便失败（按下切换到Perfect）";
     }
 }

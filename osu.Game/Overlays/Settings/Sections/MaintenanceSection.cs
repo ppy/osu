@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class MaintenanceSection : SettingsSection
     {
-        public override string Header => "Maintenance";
+        public override string Header => "维护";
         public override IconUsage Icon => FontAwesome.Solid.Wrench;
 
         public MaintenanceSection()

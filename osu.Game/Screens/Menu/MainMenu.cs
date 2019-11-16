@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Menu
 
         public override bool AllowExternalScreenChange => true;
 
-        public override bool AllowRateAdjustments => false;
-
         private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
@@ -270,8 +268,8 @@ namespace osu.Game.Screens.Menu
         {
             public ConfirmExitDialog(Action confirm, Action cancel)
             {
-                HeaderText = "Are you sure you want to exit?";
-                BodyText = "Last chance to back out.";
+                HeaderText = "你确定要退出osu吗?";
+                BodyText = "退出前的最后一次机会";
 
                 Icon = FontAwesome.Solid.ExclamationTriangle;
 
@@ -279,12 +277,12 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"Good bye",
+                        Text = @"再见~",
                         Action = confirm
                     },
                     new PopupDialogCancelButton
                     {
-                        Text = @"Just a little more",
+                        Text = @"再玩一会",
                         Action = cancel
                     },
                 };

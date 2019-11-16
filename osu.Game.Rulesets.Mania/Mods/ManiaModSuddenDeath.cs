@@ -7,5 +7,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModSuddenDeath : ModSuddenDeath
     {
+        public override string Description => @"不全连,遍重试";
     }
 }

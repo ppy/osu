@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold),
-                                    Text = "Star Difficulty",
+                                    Text = "难度星级",
                                     Alpha = 0,
                                     Margin = new MarginPadding { Bottom = 1 },
                                 },

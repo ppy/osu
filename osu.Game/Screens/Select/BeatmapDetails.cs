@@ -127,9 +127,9 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection("Description"),
-                                            source = new MetadataSection("Source"),
-                                            tags = new MetadataSection("Tags"),
+                                            description = new MetadataSection("描述"),
+                                            source = new MetadataSection("来源"),
+                                            tags = new MetadataSection("标签"),
                                         },
                                     },
                                 },
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Select
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Points of Failure",
+                                    Text = "失败点",
                                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                 },
                                 failRetryGraph = new FailRetryGraph

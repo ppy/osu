@@ -1,8 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-
 namespace osu.Game.Screens.Play
 {
     public class KeyCounterAction<T> : KeyCounter
@@ -18,7 +16,7 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(T action, bool forwards)
         {
-            if (!EqualityComparer<T>.Default.Equals(action, Action))
+            if (!action.Equals(Action))
                 return false;
 
             IsLit = true;
@@ -29,7 +27,7 @@ namespace osu.Game.Screens.Play
 
         public bool OnReleased(T action, bool forwards)
         {
-            if (!EqualityComparer<T>.Default.Equals(action, Action))
+            if (!action.Equals(Action))
                 return false;
 
             IsLit = false;

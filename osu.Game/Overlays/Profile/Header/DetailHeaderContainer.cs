@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
-                                            Title = "Medals",
+                                            Title = "奖章",
                                             LineColour = colours.GreenLight,
                                         },
                                         ppInfo = new OverlinedInfoContainer
@@ -151,12 +151,12 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                         {
-                                            Title = "Global Ranking",
+                                            Title = "全球排名",
                                             LineColour = colours.Yellow,
                                         },
                                         detailCountryRank = new OverlinedInfoContainer(false, 110)
                                         {
-                                            Title = "Country Ranking",
+                                            Title = "国内排名",
                                             LineColour = colours.Yellow,
                                         },
                                     }
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Profile.Header
                         },
                         rankCount = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre
                         }

@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "General";
+        protected override string Header => "总体";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)

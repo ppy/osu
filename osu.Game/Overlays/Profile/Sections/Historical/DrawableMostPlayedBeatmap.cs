@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                                     Colour = colours.GreySeafoamLighter
                                                 }.With(d =>
                                                 {
-                                                    d.AddText("mapped by ");
+                                                    d.AddText("作图者:");
                                                     d.AddUserLink(beatmap.Metadata.Author);
                                                 }),
                                             }
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "times played";
+            public string TooltipText => "次游玩";
 
             public PlayCountText(int playCount)
             {

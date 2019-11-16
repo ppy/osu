@@ -12,7 +12,6 @@ namespace osu.Game.Overlays.Settings
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
-            CommitOnFocusLost = true,
         };
     }
 }

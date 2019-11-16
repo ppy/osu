@@ -9,6 +9,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModSuddenDeath : ModSuddenDeath
     {
+        public override string Description => @"不全连，便失败（按下切换到Perfect）";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
     }
 }

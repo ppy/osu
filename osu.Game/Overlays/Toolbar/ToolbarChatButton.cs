@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarChatButton()
         {
             SetIcon(FontAwesome.Solid.Comments);
+            TooltipMain = "聊天";
+            TooltipSub = "打开/关闭聊天栏";
         }
 
         [BackgroundDependencyLoader(true)]

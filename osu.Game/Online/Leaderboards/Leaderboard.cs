@@ -101,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
             get => scope;
             set
             {
-                if (EqualityComparer<TScope>.Default.Equals(value, scope))
+                if (value.Equals(scope))
                     return;
 
                 scope = value;
@@ -138,23 +138,23 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NoneSelected:
-                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请选择一张谱面!"));
                         break;
 
                     case PlaceholderState.Unavailable:
-                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
+                        replacePlaceholder(new MessagePlaceholder(@"在线排名对这张谱面不可用!"));
                         break;
 
                     case PlaceholderState.NoScores:
-                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
+                        replacePlaceholder(new MessagePlaceholder(@"还没有任何分数记录!"));
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请登入来查看在线排行榜!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请成为一名 osu!supporter 来查看此排行榜!"));
                         break;
 
                     default:

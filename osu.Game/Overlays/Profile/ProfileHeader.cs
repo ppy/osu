@@ -28,8 +28,8 @@ namespace osu.Game.Overlays.Profile
         {
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
-            TabControl.AddItem("Info");
-            TabControl.AddItem("Modding");
+            TabControl.AddItem("资料");
+            TabControl.AddItem("摸图");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
@@ -101,8 +101,8 @@ namespace osu.Game.Overlays.Profile
         {
             public ProfileHeaderTitle()
             {
-                Title = "Player";
-                Section = "Info";
+                Title = "玩家";
+                Section = "资料";
             }
 
             [BackgroundDependencyLoader]

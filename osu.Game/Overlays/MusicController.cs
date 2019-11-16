@@ -233,24 +233,6 @@ namespace osu.Game.Overlays
             queuedDirection = null;
         }
 
-        private bool allowRateAdjustments;
-
-        /// <summary>
-        /// Whether mod rate adjustments are allowed to be applied.
-        /// </summary>
-        public bool AllowRateAdjustments
-        {
-            get => allowRateAdjustments;
-            set
-            {
-                if (allowRateAdjustments == value)
-                    return;
-
-                allowRateAdjustments = value;
-                ResetTrackAdjustments();
-            }
-        }
-
         public void ResetTrackAdjustments()
         {
             var track = current?.Track;
@@ -259,11 +241,8 @@ namespace osu.Game.Overlays
 
             track.ResetSpeedAdjustments();
 
-            if (allowRateAdjustments)
-            {
-                foreach (var mod in mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(track);
-            }
+            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(track);
         }
 
         protected override void Dispose(bool isDisposing)

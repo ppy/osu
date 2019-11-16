@@ -7,16 +7,16 @@ namespace osu.Game.Configuration
 {
     public enum ScoreMeterType
     {
-        [Description("None")]
+        [Description("无")]
         None,
 
-        [Description("Hit Error (left)")]
+        [Description("打击偏差 (左)")]
         HitErrorLeft,
 
-        [Description("Hit Error (right)")]
+        [Description("打击偏差 (右)")]
         HitErrorRight,
 
-        [Description("Hit Error (both)")]
+        [Description("打击偏差 (左右)")]
         HitErrorBoth,
     }
 }

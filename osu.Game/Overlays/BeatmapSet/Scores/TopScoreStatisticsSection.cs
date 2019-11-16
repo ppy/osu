@@ -75,9 +75,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            totalScoreColumn = new TextColumn("total score", largeFont),
-                            accuracyColumn = new TextColumn("accuracy", largeFont),
-                            maxComboColumn = new TextColumn("max combo", largeFont)
+                            totalScoreColumn = new TextColumn("总分", largeFont),
+                            accuracyColumn = new TextColumn("准确率", largeFont),
+                            maxComboColumn = new TextColumn("最大连击", largeFont)
                         }
                     },
                 }

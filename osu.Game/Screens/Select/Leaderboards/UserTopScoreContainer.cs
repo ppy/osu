@@ -48,8 +48,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = @"your personal best".ToUpper(),
-                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold),
+                            Text = @"个人最佳成绩".ToUpper(),
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold)
                         },
                         scoreContainer = new Container
                         {

@@ -20,6 +20,9 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
+            TooltipMain = "我";
+            TooltipSub = $"在这里查看个人信息";
+
             AutoSizeAxes = Axes.X;
 
             DrawableText.Font = OsuFont.GetFont(italics: true);

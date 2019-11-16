@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModDaycore : ModDaycore
     {
+        public override string Description => @"哇~~~~~~~~~哦~~~~~~~~~~~";
         public override double ScoreMultiplier => 0.3;
     }
 }

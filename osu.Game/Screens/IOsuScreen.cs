@@ -51,10 +51,5 @@ namespace osu.Game.Screens
         Bindable<WorkingBeatmap> Beatmap { get; }
 
         Bindable<RulesetInfo> Ruleset { get; }
-
-        /// <summary>
-        /// Whether mod rate adjustments are allowed to be applied.
-        /// </summary>
-        bool AllowRateAdjustments { get; }
     }
 }

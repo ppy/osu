@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override string Header => "Devices";
+        protected override string Header => "输出设备";
 
         private AudioManager audio;
         private SettingsDropdown<string> dropdown;

@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHardRock : ModHardRock, IApplicableToHitObject
     {
+        public override string Description => @"各方面的难度都增加一点...";
         public override double ScoreMultiplier => 1.06;
         public override bool Ranked => true;
 

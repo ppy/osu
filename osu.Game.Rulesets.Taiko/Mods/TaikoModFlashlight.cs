@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
+        public override string Description => @"限制视野";
+
         public override double ScoreMultiplier => 1.12;
 
         private const float default_flashlight_size = 250;

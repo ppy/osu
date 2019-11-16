@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 RightFlowContainer.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
+                    Text = $"实得: {pp * weight:0}pp (权重:{weight:P0})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,

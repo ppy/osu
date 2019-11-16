@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         Open,
 
-        [Description("Recently Ended")]
+        [Description("最近结束")]
         RecentlyEnded,
         Participated,
         Owned,

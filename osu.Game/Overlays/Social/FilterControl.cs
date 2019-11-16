@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
@@ -22,8 +23,11 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialSortCriteria
     {
+        [Description("排名")]
         Rank,
+        [Description("名字")]
         Name,
+        [Description("位置")]
         Location,
         //[Description("Time Zone")]
         //TimeZone,

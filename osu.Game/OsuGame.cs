@@ -925,8 +925,6 @@ namespace osu.Game
             {
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
 
-                musicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
-
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();
                 else

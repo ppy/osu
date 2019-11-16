@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModNightcore : ModNightcore
     {
+        public override string Description => @"动次打次动次打次~";
         public override double ScoreMultiplier => 1;
     }
 }

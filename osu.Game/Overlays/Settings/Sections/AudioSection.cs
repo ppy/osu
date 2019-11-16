@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class AudioSection : SettingsSection
     {
-        public override string Header => "Audio";
+        public override string Header => "音频";
         public override IconUsage Icon => FontAwesome.Solid.VolumeUp;
 
         public AudioSection()

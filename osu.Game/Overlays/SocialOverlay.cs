@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.ComponentModel;
 using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
@@ -16,6 +17,7 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using osu.Framework.Threading;
+
 
 namespace osu.Game.Overlays
 {
@@ -38,7 +40,7 @@ namespace osu.Game.Overlays
             get => users;
             set
             {
-                if (ReferenceEquals(users, value))
+                if (users?.Equals(value) ?? false)
                     return;
 
                 users = value?.ToList();
@@ -207,7 +209,10 @@ namespace osu.Game.Overlays
 
     public enum SortDirection
     {
+        [Description("正序")]
         Ascending,
+
+        [Description("倒序")]
         Descending
     }
 }

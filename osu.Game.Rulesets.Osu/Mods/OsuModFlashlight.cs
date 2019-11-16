@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModFlashlight : ModFlashlight<OsuHitObject>, IApplicableToDrawableHitObjects
     {
+        public override string Description => @"限制视野";
         public override double ScoreMultiplier => 1.12;
 
         private const float default_flashlight_size = 180;

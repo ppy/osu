@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Text = @"Selected Mods",
+                    Text = @"已选择的Mod",
                     Alpha = 0,
                 },
             };
@@ -86,6 +86,8 @@ namespace osu.Game.Screens.Select
 
     public enum BeatmapDetailTab
     {
+        //本人技术不佳,无法翻译此处
+        //加Description会报'Container' is an ambiguous reference between 'osu.Framework.Graphics.Containers.Container' and 'System.ComponentModel.Container'
         Details,
         Local,
         Country,

@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHalfTime : ModHalfTime
     {
+        public override string Description => @"减<<<<<<速 ( 0.75倍速 ) ( 按下切换到Daycore )";
         public override double ScoreMultiplier => 0.3;
     }
 }
