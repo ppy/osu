@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Ranking.Pages
                             Colour = colours.PinkDarker,
                             Shadow = false,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                            Text = "total score",
+                            Text = "总分",
                             Margin = new MarginPadding { Bottom = 15 },
                         },
                         new BeatmapDetails(Beatmap.BeatmapInfo)
@@ -359,7 +359,7 @@ namespace osu.Game.Screens.Ranking.Pages
 
                 if (!string.IsNullOrEmpty(creator))
                 {
-                    versionMapper.Text = $"mapped by {creator}";
+                    versionMapper.Text = $"作图者 {creator}";
 
                     if (!string.IsNullOrEmpty(beatmap.Version))
                         versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;

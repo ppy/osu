@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage Icon => FontAwesome.Solid.ArrowsAltV;
 
-        public override string Description => "Hit them at the right size!";
+        public override string Description => "在正确的大小击打物件!";
 
         protected override float StartScale => 0.5f;
     }

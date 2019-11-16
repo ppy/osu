@@ -59,9 +59,10 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Font = OsuFont.Numeric.With(size: 12),
+                            Font = OsuFont.Numeric.With(size: 15),
                             Colour = colours.Yellow,
-                            Text = @"Development Build"
+                           // Text = @"早期开发版本(Development Build)"
+                           Text = @"早期开发版本"
                         },
                         new Sprite
                         {

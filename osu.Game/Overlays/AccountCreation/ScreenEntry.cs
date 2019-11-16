@@ -65,11 +65,11 @@ namespace osu.Game.Overlays.AccountCreation
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.GetFont(size: 20),
-                            Text = "Let's create an account!",
+                            Text = "让我们创建一个账号!",
                         },
                         usernameTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "username",
+                            PlaceholderText = "用户名(最多15字符)",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         emailTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "email address",
+                            PlaceholderText = "电子邮箱地址",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         passwordTextBox = new OsuPasswordTextBox
                         {
-                            PlaceholderText = "password",
+                            PlaceholderText = "密码",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this,
                         },
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.AccountCreation
                                     AutoSizeAxes = Axes.Y,
                                     Child = new SettingsButton
                                     {
-                                        Text = "Register",
+                                        Text = "注册",
                                         Margin = new MarginPadding { Vertical = 20 },
                                         Action = performRegistration
                                     }
@@ -126,14 +126,16 @@ namespace osu.Game.Overlays.AccountCreation
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
-            usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
+            usernameDescription.AddText("这将在您的资料卡内公开显示,", cp => cp.Font = cp.Font.With(size: 16));
+            usernameDescription.AddText("你不能输入任何带有亵渎,冒充他人等不良信息,", cp => cp.Font = cp.Font.With(size: 16));
+            usernameDescription.AddText("另外,也请不要泄露任何真实信息!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold, size: 16));
 
-            emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
-            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold));
+            emailAddressDescription.AddText("这将会用于发送通知和验证邮件. 我们不会发送垃圾邮件.", cp => cp.Font = cp.Font.With(size: 16));
+            emailAddressDescription.AddText("请确保正确填写!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold, size: 16));
 
-            passwordDescription.AddText("At least ");
-            characterCheckText = passwordDescription.AddText("8 characters long");
-            passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
+            passwordDescription.AddText("请输入至少", cp => cp.Font = cp.Font.With(size: 16));
+            characterCheckText = passwordDescription.AddText("8个字符", cp => cp.Font = cp.Font.With(size: 16));
+            passwordDescription.AddText(". 选择一个你能记住的长密码,比如说你喜欢的一首歌?", cp => cp.Font = cp.Font.With(size: 16));
 
             passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
@@ -188,7 +190,7 @@ namespace osu.Game.Overlays.AccountCreation
                         }
                         else
                         {
-                            passwordDescription.AddErrors(new[] { "Something happened... but we're not sure what." });
+                            passwordDescription.AddErrors(new[] { "出现了未知错误,请稍后再试" });
                         }
 
                         registerShake.Shake();

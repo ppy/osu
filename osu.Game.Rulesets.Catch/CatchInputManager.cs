@@ -17,13 +17,13 @@ namespace osu.Game.Rulesets.Catch
 
     public enum CatchAction
     {
-        [Description("Move left")]
+        [Description("向左移动")]
         MoveLeft,
 
-        [Description("Move right")]
+        [Description("向右移动")]
         MoveRight,
 
-        [Description("Engage dash")]
+        [Description("冲刺")]
         Dash,
     }
 }

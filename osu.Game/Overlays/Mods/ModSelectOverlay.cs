@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = @"Gameplay Mods",
+                                                Text = @"游戏Mod",
                                                 Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Text = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play.\nOthers are just for fun.",
+                                                Text = "可以让你以不同的方式来进行游戏。有些 Mod 对你的游戏分数会有影响\n还有一些仅供娱乐。",
                                             },
                                         },
                                     },
@@ -219,7 +219,7 @@ namespace osu.Game.Overlays.Mods
                                             DeselectAllButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Deselect All",
+                                                Text = "重置Mods",
                                                 Action = DeselectAll,
                                                 Margin = new MarginPadding
                                                 {
@@ -229,7 +229,7 @@ namespace osu.Game.Overlays.Mods
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Close",
+                                                Text = "关闭",
                                                 Action = Hide,
                                                 Margin = new MarginPadding
                                                 {
@@ -238,7 +238,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new OsuSpriteText
                                             {
-                                                Text = @"Score Multiplier:",
+                                                Text = @"分数倍率:",
                                                 Font = OsuFont.GetFont(size: 30),
                                                 Margin = new MarginPadding
                                                 {
@@ -256,7 +256,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             UnrankedLabel = new OsuSpriteText
                                             {
-                                                Text = @"(Unranked)",
+                                                Text = @"(不计入排名)",
                                                 Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {

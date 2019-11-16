@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Edit
 {
     public class ToolboxGroup : PlayerSettingsGroup
     {
-        protected override string Title => "toolbox";
+        protected override string Title => "工具栏";
 
         public ToolboxGroup()
         {

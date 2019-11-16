@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Mods.Sections
 
         public DifficultyIncreaseSection()
         {
-            Header = @"Difficulty Increase";
+            Header = @"增加难度";
         }
     }
 }

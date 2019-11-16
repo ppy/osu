@@ -72,11 +72,11 @@ namespace osu.Game.Overlays.OSD
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Name = "Shortcut",
+                    Name = "快捷键",
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(shortcut) ? "NO KEY BOUND" : shortcut.ToUpperInvariant()
+                    Text = string.IsNullOrEmpty(shortcut) ? "没有快捷键" : shortcut.ToUpperInvariant()
                 },
             };
         }

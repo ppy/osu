@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Increase visibility of first object when visual impairment mods are enabled",
+                    LabelText = "在Hidden Mod下显示第一个物件的缩圈",
                     Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
                 },
             };

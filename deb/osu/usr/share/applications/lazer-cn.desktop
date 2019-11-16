@@ -1,0 +1,7 @@
+
+[Desktop Entry]
+Type=Application
+Name=osu!lazer(中文)
+Icon=/opt/matrixfeather-osu/icon.png
+Exec=/opt/matrixfeather-osu/osu!
+Categories=Game

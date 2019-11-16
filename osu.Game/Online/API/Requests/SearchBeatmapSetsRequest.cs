@@ -34,18 +34,21 @@ namespace osu.Game.Online.API.Requests
     {
         Any,
 
-        [Description("Has Leaderboard")]
+        [Description("拥有排行榜")]
         Leaderboard,
+        [Description("计入排名的")]
         Ranked,
         Qualified,
         Loved,
+        [Description("我喜欢的")]
         Favourites,
 
         [Description("Pending & WIP")]
         Pending,
+        [Description("坟图")]
         Graveyard,
 
-        [Description("My Maps")]
+        [Description("我的图")]
         Mine,
     }
 }

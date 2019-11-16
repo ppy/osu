@@ -33,12 +33,12 @@ namespace osu.Game.Screens.Select.Details
                 //mania specific
                 if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
                 {
-                    firstValue.Title = "Key Amount";
+                    firstValue.Title = "键位数量";
                     firstValue.Value = (int)Math.Round(Beatmap?.BaseDifficulty?.CircleSize ?? 0);
                 }
                 else
                 {
-                    firstValue.Title = "Circle Size";
+                    firstValue.Title = "圆圈大小";
                     firstValue.Value = Beatmap?.BaseDifficulty?.CircleSize ?? 0;
                 }
 
@@ -59,10 +59,10 @@ namespace osu.Game.Screens.Select.Details
                 Children = new[]
                 {
                     firstValue = new StatisticRow(), //circle size/key amount
-                    hpDrain = new StatisticRow { Title = "HP Drain" },
-                    accuracy = new StatisticRow { Title = "Accuracy" },
-                    approachRate = new StatisticRow { Title = "Approach Rate" },
-                    starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
+                    hpDrain = new StatisticRow { Title = "掉血速度" },
+                    accuracy = new StatisticRow { Title = "准确率" },
+                    approachRate = new StatisticRow { Title = "缩圈速度" },
+                    starDifficulty = new StatisticRow(10, true) { Title = "难度星级" },
                 },
             };
         }

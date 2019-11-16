@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNightcore : ModNightcore
     {
+        public override string Description => @"洞次打次洞次打次~";
         public override double ScoreMultiplier => 1.12;
     }
 }

@@ -7,5 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModPerfect : ModPerfect
     {
+        public override string Description => @"不SS,便重试";
     }
 }

@@ -7,49 +7,49 @@ namespace osu.Game.Screens.Select.Filter
 {
     public enum GroupMode
     {
-        [Description("All")]
+        [Description("所有")]
         All,
 
-        [Description("Artist")]
+        [Description("艺术家")]
         Artist,
 
-        [Description("Author")]
+        [Description("作图者")]
         Author,
 
         [Description("BPM")]
         BPM,
 
-        [Description("Collections")]
+        [Description("收藏")]
         Collections,
 
-        [Description("Date Added")]
+        [Description("添加日期")]
         DateAdded,
 
-        [Description("Difficulty")]
+        [Description("难度")]
         Difficulty,
 
-        [Description("Favourites")]
+        [Description("我喜欢的")]
         Favourites,
 
-        [Description("Length")]
+        [Description("长度")]
         Length,
 
-        [Description("My Maps")]
+        [Description("我的图")]
         MyMaps,
 
-        [Description("No Grouping")]
+        [Description("不分组")]
         NoGrouping,
 
-        [Description("Rank Achieved")]
+        [Description("Rank日期")]
         RankAchieved,
 
-        [Description("Ranked Status")]
+        [Description("Rank状态")]
         RankedStatus,
 
-        [Description("Recently Played")]
+        [Description("最近游玩")]
         RecentlyPlayed,
 
-        [Description("Title")]
+        [Description("标题")]
         Title
     }
 }

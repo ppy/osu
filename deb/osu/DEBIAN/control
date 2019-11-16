@@ -1,0 +1,12 @@
+Package: matrixfeather-osu
+Version: 2019.1113.0+matrix-feather2
+Section: games
+Priority: optional
+Depends: dotnet-runtime-3.0
+Architecture: amd64
+Maintainer: MATRIX-feather<midnightcarnival@outlook.com>
+Installed-Size: 317440kB
+Description: rhythm is just a *click* away!
+ 这是一个适用于Debian系linux发行版的中文非官方osu!lazer包,适用于不怎么了解英语的玩家.
+ 报告游戏问题 : https://github.com/ppy/osu/issues ;
+ 报告安装包&翻译问题 : mailto:midnightcarnival@outlook.com ;

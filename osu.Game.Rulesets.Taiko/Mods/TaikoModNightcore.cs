@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModNightcore : ModNightcore
     {
+        public override string Description => @"动次打次动次打次~";
         public override double ScoreMultiplier => 1.12;
     }
 }

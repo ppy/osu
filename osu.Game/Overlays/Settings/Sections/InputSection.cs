@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class InputSection : SettingsSection
     {
-        public override string Header => "Input";
+        public override string Header => "输入";
         public override IconUsage Icon => FontAwesome.Regular.Keyboard;
 
         public InputSection(KeyBindingPanel keyConfig)

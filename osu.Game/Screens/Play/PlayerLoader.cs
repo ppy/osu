@@ -474,12 +474,12 @@ namespace osu.Game.Screens.Play
                                     Bottom = 40
                                 },
                             },
-                            new MetadataLine("Source", metadata.Source)
+                            new MetadataLine("来源:", metadata.Source)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
-                            new MetadataLine("Mapper", metadata.AuthorString)
+                            new MetadataLine("作图者:", metadata.AuthorString)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
@@ -504,7 +504,7 @@ namespace osu.Game.Screens.Play
         {
             public MutedNotification()
             {
-                Text = "Your music volume is set to 0%! Click here to restore it.";
+                Text = "音乐音量为0%! 点击这里恢复";
             }
 
             public override bool IsImportant => true;

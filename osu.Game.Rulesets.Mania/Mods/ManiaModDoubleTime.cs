@@ -7,6 +7,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModDoubleTime : ModDoubleTime
     {
+        public override string Description => @"加>>>>>>>>>>速( 1.5倍速 ) ( 按下切换到NightCore )";
         public override double ScoreMultiplier => 1;
     }
 }

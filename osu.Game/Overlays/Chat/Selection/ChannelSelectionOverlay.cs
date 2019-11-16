@@ -111,14 +111,14 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = @"Chat Channels",
+                                    Text = @"聊天频道",
                                     Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
                                 search = new HeaderSearchTextBox
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    PlaceholderText = @"Search",
+                                    PlaceholderText = @"搜索",
                                 },
                             },
                         },
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 {
                     new ChannelSection
                     {
-                        Header = "All Channels",
+                        Header = "所有频道",
                         Channels = channels,
                     },
                 };

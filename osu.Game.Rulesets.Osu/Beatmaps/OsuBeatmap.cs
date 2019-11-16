@@ -21,19 +21,19 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             {
                 new BeatmapStatistic
                 {
-                    Name = @"Circle Count",
+                    Name = @"圆圈数",
                     Content = circles.ToString(),
                     Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Slider Count",
+                    Name = @"滑条数",
                     Content = sliders.ToString(),
                     Icon = FontAwesome.Regular.Circle
                 },
                 new BeatmapStatistic
                 {
-                    Name = @"Spinner Count",
+                    Name = @"转盘数",
                     Content = spinners.ToString(),
                     Icon = FontAwesome.Regular.Circle
                 }
