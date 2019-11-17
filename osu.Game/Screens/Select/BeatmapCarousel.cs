@@ -351,7 +351,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Half the height of the visible content.
         /// <remarks>
-        /// This is different from the height of <see cref="ScrollContainer{T}.displayableContent"/>, since
+        /// This is different from the height of <see cref="ScrollContainer{T}"/>.displayableContent, since
         /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
         /// </remarks>
         /// </summary>
