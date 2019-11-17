@@ -18,10 +18,14 @@
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.7" PrivateAssets="All" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
   </ItemGroup>
+  <PropertyGroup Label="Documentation">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
   <PropertyGroup Label="Project">
     <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
     This is required due to https://github.com/NuGet/Home/issues/5740 -->
-    <NoWarn>NU1701</NoWarn>
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
     <Authors>ppy Pty Ltd</Authors>
