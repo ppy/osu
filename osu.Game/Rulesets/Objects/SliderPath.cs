@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.MathUtils;
+using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Rulesets.Objects
@@ -23,6 +24,18 @@ namespace osu.Game.Rulesets.Objects
         private List<double> cumulativeLength;
 
         private bool isInitialised;
+
+        /// <summary>
+        /// Creates a new <see cref="SliderPath"/> with one segment.
+        /// </summary>
+        /// <param name="type">The type of path.</param>
+        /// <param name="controlPoints">The control points of the path.</param>
+        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance. The path will be shortened/lengthened to match this length.
+        /// If null, the path will use the true distance.</param>
+        public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
+            : this(new[] { new PathSegment(type, controlPoints) }, expectedDistance)
+        {
+        }
 
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
