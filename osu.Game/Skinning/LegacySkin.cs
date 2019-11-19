@@ -26,7 +26,11 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
-        protected new LegacySkinConfiguration Configuration => (LegacySkinConfiguration)base.Configuration;
+        protected new LegacySkinConfiguration Configuration
+        {
+            get => base.Configuration as LegacySkinConfiguration;
+            set => base.Configuration = value;
+        }
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
@@ -41,10 +45,10 @@ namespace osu.Game.Skinning
             if (stream != null)
             {
                 using (LineBufferedReader reader = new LineBufferedReader(stream))
-                    base.Configuration = new LegacySkinDecoder().Decode(reader);
+                    Configuration = new LegacySkinDecoder().Decode(reader);
             }
             else
-                base.Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
+                Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
 
             if (storage != null)
             {
