@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual float StripHeight() => 1;
 
         /// <summary>
-        /// Whether entries should be automatically populated if <see cref="T"/> is an <see cref="Enum"/> type.
+        /// Whether entries should be automatically populated if <typeparamref name="T"/> is an <see cref="Enum"/> type.
         /// </summary>
         protected virtual bool AddEnumEntriesAutomatically => true;
 
