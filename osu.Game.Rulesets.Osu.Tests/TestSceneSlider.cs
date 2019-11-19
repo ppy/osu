@@ -226,6 +226,45 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
+        [Test]
+        public void TestSliderWithMultipleSeparatedSegments()
+        {
+            AddStep("create slider", () =>
+            {
+                var bezierSegment = new List<Vector2> { Vector2.Zero };
+
+                for (int i = 1; i < 50; i++)
+                {
+                    bezierSegment.Add(new Vector2(i * 10, -300));
+                    bezierSegment.Add(new Vector2(i * 10, 300));
+                }
+
+                var slider = create(new Vector2(-200),
+                    new PathSegment(PathType.Bezier, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(80, -125),
+                        new Vector2(150, 105),
+                        new Vector2(260, 0),
+                    }),
+                    new PathSegment(PathType.PerfectCurve, new[]
+                    {
+                        new Vector2(350, 0),
+                        new Vector2(430, 48),
+                        new Vector2(350, 110),
+                    }),
+                    new PathSegment(PathType.Linear, new[]
+                    {
+                        new Vector2(300, 150),
+                        new Vector2(260, 400),
+                        new Vector2(0, 400),
+                    })
+                );
+
+                Add(slider);
+            });
+        }
+
         private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
 
         private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
