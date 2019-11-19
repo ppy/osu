@@ -13,15 +13,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
     {
         public new HitCircle HitObject => (HitCircle)base.HitObject;
 
+        private readonly HitCirclePiece circlePiece;
+
         public HitCirclePlacementBlueprint()
             : base(new HitCircle())
         {
-            InternalChild = new HitCirclePiece(HitObject);
+            InternalChild = circlePiece = new HitCirclePiece();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            circlePiece.UpdateFrom(HitObject);
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            HitObject.StartTime = EditorClock.CurrentTime;
             EndPlacement();
             return true;
         }

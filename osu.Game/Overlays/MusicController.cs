@@ -98,19 +98,12 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Start playing the current track (if not already playing).
         /// </summary>
-        public void Play()
-        {
-            if (!IsPlaying)
-                TogglePause();
-        }
-
-        /// <summary>
-        /// Toggle pause / play.
-        /// </summary>
         /// <returns>Whether the operation was successful.</returns>
-        public bool TogglePause()
+        public bool Play(bool restart = false)
         {
             var track = current?.Track;
+
+            IsUserPaused = false;
 
             if (track == null)
             {
@@ -121,16 +114,38 @@ namespace osu.Game.Overlays
                 return true;
             }
 
-            if (track.IsRunning)
-            {
-                IsUserPaused = true;
-                track.Stop();
-            }
-            else
-            {
+            if (restart)
+                track.Restart();
+            else if (!IsPlaying)
                 track.Start();
-                IsUserPaused = false;
-            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Stop playing the current track and pause at the current position.
+        /// </summary>
+        public void Stop()
+        {
+            var track = current?.Track;
+
+            IsUserPaused = true;
+            if (track?.IsRunning == true)
+                track.Stop();
+        }
+
+        /// <summary>
+        /// Toggle pause / play.
+        /// </summary>
+        /// <returns>Whether the operation was successful.</returns>
+        public bool TogglePause()
+        {
+            var track = current?.Track;
+
+            if (track?.IsRunning == true)
+                Stop();
+            else
+                Play();
 
             return true;
         }
@@ -218,6 +233,24 @@ namespace osu.Game.Overlays
             queuedDirection = null;
         }
 
+        private bool allowRateAdjustments;
+
+        /// <summary>
+        /// Whether mod rate adjustments are allowed to be applied.
+        /// </summary>
+        public bool AllowRateAdjustments
+        {
+            get => allowRateAdjustments;
+            set
+            {
+                if (allowRateAdjustments == value)
+                    return;
+
+                allowRateAdjustments = value;
+                ResetTrackAdjustments();
+            }
+        }
+
         public void ResetTrackAdjustments()
         {
             var track = current?.Track;
@@ -226,8 +259,11 @@ namespace osu.Game.Overlays
 
             track.ResetSpeedAdjustments();
 
-            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(track);
+            if (allowRateAdjustments)
+            {
+                foreach (var mod in mods.Value.OfType<IApplicableToClock>())
+                    mod.ApplyToClock(track);
+            }
         }
 
         protected override void Dispose(bool isDisposing)

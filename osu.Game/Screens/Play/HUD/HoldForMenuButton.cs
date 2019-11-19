@@ -100,9 +100,11 @@ namespace osu.Game.Screens.Play.HUD
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
             else
+            {
                 Alpha = Interpolation.ValueAt(
                     MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 200),
                     Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+            }
         }
 
         private class Button : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
