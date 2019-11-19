@@ -2,14 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Skinning;
 using osuTK;
@@ -23,12 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private bool cursorExpand;
 
-        private Bindable<float> cursorScale;
-        private Bindable<bool> autoCursorScale;
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-
         private Container expandTarget;
-        private Drawable scaleTarget;
 
         public OsuCursor()
         {
@@ -43,43 +35,19 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, IBindable<WorkingBeatmap> beatmap)
+        private void load()
         {
             InternalChild = expandTarget = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = scaleTarget = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+                Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                 }
             };
-
-            this.beatmap.BindTo(beatmap);
-            this.beatmap.ValueChanged += _ => calculateScale();
-
-            cursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
-            cursorScale.ValueChanged += _ => calculateScale();
-
-            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
-            autoCursorScale.ValueChanged += _ => calculateScale();
-
-            calculateScale();
-        }
-
-        private void calculateScale()
-        {
-            float scale = cursorScale.Value;
-
-            if (autoCursorScale.Value && beatmap.Value != null)
-            {
-                // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
-                scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
-            }
-
-            scaleTarget.Scale = new Vector2(scale);
         }
 
         private const float pressed_scale = 1.2f;

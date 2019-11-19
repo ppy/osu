@@ -66,11 +66,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         protected readonly Container FooterPanels;
 
-        protected override BackgroundScreen CreateBackground()
-        {
-            var background = new BackgroundScreenBeatmap();
-            return background;
-        }
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected readonly BeatmapCarousel Carousel;
         private readonly BeatmapInfoWedge beatmapInfoWedge;
@@ -89,10 +85,6 @@ namespace osu.Game.Screens.Select
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
-
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
 
         protected SongSelect()
         {
@@ -226,7 +218,7 @@ namespace osu.Game.Screens.Select
         {
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
+                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
@@ -255,20 +247,15 @@ namespace osu.Game.Screens.Select
                 {
                     // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
                     if (!beatmaps.GetAllUsableBeatmapSetsEnumerable().Any() && beatmaps.StableInstallationAvailable)
+                    {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
                             Task.Run(beatmaps.ImportFromStableAsync).ContinueWith(_ => scores.ImportFromStableAsync(), TaskContinuationOptions.OnlyOnRanToCompletion);
                             Task.Run(skins.ImportFromStableAsync);
                         }));
+                    }
                 });
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            mods.BindTo(Mods);
         }
 
         private DependencyContainer dependencies;
@@ -336,12 +323,14 @@ namespace osu.Game.Screens.Select
             if (e.NewValue is DummyWorkingBeatmap) return;
 
             if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
+            {
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
                 if (e.NewValue?.BeatmapInfo?.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
                     Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
                     Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
                 }
+            }
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
@@ -390,7 +379,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    mods.Value = Array.Empty<Mod>();
+                    Mods.Value = Array.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -405,15 +394,12 @@ namespace osu.Game.Screens.Select
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
+                if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
                     WorkingBeatmap previous = Beatmap.Value;
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, previous);
-
-                    if (this.IsCurrentScreen() && Beatmap.Value?.Track != previous?.Track)
-                        ensurePlayingSelected(true);
 
                     if (beatmap != null)
                     {
@@ -423,6 +409,9 @@ namespace osu.Game.Screens.Select
                             sampleChangeBeatmap.Play();
                     }
                 }
+
+                if (this.IsCurrentScreen())
+                    ensurePlayingSelected();
 
                 UpdateBeatmap(Beatmap.Value);
             }
@@ -490,7 +479,9 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected();
+
+                // restart playback on returning to song select, regardless.
+                music?.Play();
             }
 
             base.OnResuming(last);
@@ -536,9 +527,6 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
-            mods.UnbindAll();
-            Mods.Value = Array.Empty<Mod>();
-
             return false;
         }
 
@@ -581,19 +569,24 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
-        private void ensurePlayingSelected(bool restart = false)
+        private readonly WeakReference<Track> lastTrack = new WeakReference<Track>(null);
+
+        /// <summary>
+        /// Ensures some music is playing for the current track.
+        /// Will resume playback from a manual user pause if the track has changed.
+        /// </summary>
+        private void ensurePlayingSelected()
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning)
-            {
-                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+            bool isNewTrack = !lastTrack.TryGetTarget(out var last) || last != track;
 
-                if (restart)
-                    track.Restart();
-                else
-                    track.Start();
-            }
+            track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+
+            if (!track.IsRunning && (music?.IsUserPaused != true || isNewTrack))
+                music?.Play(true);
+
+            lastTrack.SetTarget(track);
         }
 
         private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -28,6 +29,11 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         private const double control_point_leniency = 1;
 
+        /// <summary>
+        /// Invoked after <see cref="ApplyDefaults"/> has completed on this <see cref="HitObject"/>.
+        /// </summary>
+        public event Action DefaultsApplied;
+
         public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
 
         /// <summary>
@@ -39,7 +45,7 @@ namespace osu.Game.Rulesets.Objects
             set => StartTimeBindable.Value = value;
         }
 
-        private List<HitSampleInfo> samples;
+        public readonly BindableList<HitSampleInfo> SamplesBindable = new BindableList<HitSampleInfo>();
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
@@ -48,10 +54,14 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public List<HitSampleInfo> Samples
+        public IList<HitSampleInfo> Samples
         {
-            get => samples ?? (samples = new List<HitSampleInfo>());
-            set => samples = value;
+            get => SamplesBindable;
+            set
+            {
+                SamplesBindable.Clear();
+                SamplesBindable.AddRange(value);
+            }
         }
 
         [JsonIgnore]
@@ -66,7 +76,6 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The hit windows for this <see cref="HitObject"/>.
         /// </summary>
-        [CanBeNull]
         public HitWindows HitWindows { get; set; }
 
         private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
@@ -113,10 +122,9 @@ namespace osu.Game.Rulesets.Objects
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
-            {
-                h.HitWindows = HitWindows;
                 h.ApplyDefaults(controlPointInfo, difficulty);
-            }
+
+            DefaultsApplied?.Invoke();
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -147,7 +155,7 @@ namespace osu.Game.Rulesets.Objects
         /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter{T}"/>.
         /// </para>
         /// </summary>
-        [CanBeNull]
+        [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }

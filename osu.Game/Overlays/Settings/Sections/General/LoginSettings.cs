@@ -200,6 +200,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             private TextBox username;
             private TextBox password;
+            private ShakeContainer shakeSignIn;
             private IAPIProvider api;
 
             public Action RequestHide;
@@ -208,6 +209,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
                     api.Login(username.Text, password.Text);
+                else
+                    shakeSignIn.Shake();
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
@@ -244,10 +247,23 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
-                    new SettingsButton
+                    new Container
                     {
-                        Text = "Sign in",
-                        Action = performLogin
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            shakeSignIn = new ShakeContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Child = new SettingsButton
+                                {
+                                    Text = "Sign in",
+                                    Action = performLogin
+                                },
+                            }
+                        }
                     },
                     new SettingsButton
                     {
