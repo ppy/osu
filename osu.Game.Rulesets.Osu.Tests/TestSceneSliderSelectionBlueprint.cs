@@ -44,14 +44,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             slider = new Slider
             {
                 Position = new Vector2(256, 192),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Bezier, new[]
                 {
-                    new PathSegment(PathType.Bezier, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(150, 150),
-                        new Vector2(300, 0)
-                    })
+                    Vector2.Zero,
+                    new Vector2(150, 150),
+                    new Vector2(300, 0)
                 })
             };
 

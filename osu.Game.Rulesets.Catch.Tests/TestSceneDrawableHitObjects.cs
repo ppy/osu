@@ -101,14 +101,11 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
                 X = xCoords,
                 StartTime = playfieldTime + 1000,
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Linear, new[]
                 {
-                    new PathSegment(PathType.Linear, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(0, 200)
-                    }),
-                }),
+                    Vector2.Zero,
+                    new Vector2(0, 200)
+                })
             };
 
             juice.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());

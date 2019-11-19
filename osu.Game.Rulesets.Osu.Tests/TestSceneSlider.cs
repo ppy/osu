@@ -275,14 +275,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(239, 176),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
-                    new PathSegment(PathType.PerfectCurve, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(154, 28),
-                        new Vector2(52, -34)
-                    }),
+                    Vector2.Zero,
+                    new Vector2(154, 28),
+                    new Vector2(52, -34)
                 }, 700),
                 RepeatCount = repeats,
                 StackHeight = 10
@@ -309,13 +306,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-(distance / 2), 0),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Linear, new[]
                 {
-                    new PathSegment(PathType.Linear, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(distance, 0),
-                    }),
+                    Vector2.Zero,
+                    new Vector2(distance, 0),
                 }, distance),
                 RepeatCount = repeats,
                 StackHeight = stackHeight
@@ -330,14 +324,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
-                    new PathSegment(PathType.PerfectCurve, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(200, 200),
-                        new Vector2(400, 0)
-                    })
+                    Vector2.Zero,
+                    new Vector2(200, 200),
+                    new Vector2(400, 0)
                 }, 600),
                 RepeatCount = repeats,
             };
@@ -353,17 +344,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Linear, new[]
                 {
-                    new PathSegment(PathType.Linear, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(150, 75),
-                        new Vector2(200, 0),
-                        new Vector2(300, -200),
-                        new Vector2(400, 0),
-                        new Vector2(430, 0)
-                    })
+                    Vector2.Zero,
+                    new Vector2(150, 75),
+                    new Vector2(200, 0),
+                    new Vector2(300, -200),
+                    new Vector2(400, 0),
+                    new Vector2(430, 0)
                 }),
                 RepeatCount = repeats,
             };
@@ -391,16 +379,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Bezier, new[]
                 {
-                    new PathSegment(PathType.Bezier, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(150, 75),
-                        new Vector2(200, 100),
-                        new Vector2(300, -200),
-                        new Vector2(430, 0)
-                    })
+                    Vector2.Zero,
+                    new Vector2(150, 75),
+                    new Vector2(200, 100),
+                    new Vector2(300, -200),
+                    new Vector2(430, 0)
                 }),
                 RepeatCount = repeats,
             };
@@ -416,17 +401,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(0, 0),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Linear, new[]
                 {
-                    new PathSegment(PathType.Linear, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(-200, 0),
-                        new Vector2(0, 0),
-                        new Vector2(0, -200),
-                        new Vector2(-200, -200),
-                        new Vector2(0, -200)
-                    })
+                    Vector2.Zero,
+                    new Vector2(-200, 0),
+                    new Vector2(0, 0),
+                    new Vector2(0, -200),
+                    new Vector2(-200, -200),
+                    new Vector2(0, -200)
                 }),
                 RepeatCount = repeats,
             };
@@ -446,15 +428,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-100, 0),
-                Path = new SliderPath(new[]
+                Path = new SliderPath(PathType.Catmull, new[]
                 {
-                    new PathSegment(PathType.Catmull, new[]
-                    {
-                        Vector2.Zero,
-                        new Vector2(50, -50),
-                        new Vector2(150, 50),
-                        new Vector2(200, 0)
-                    })
+                    Vector2.Zero,
+                    new Vector2(50, -50),
+                    new Vector2(150, 50),
+                    new Vector2(200, 0)
                 }),
                 RepeatCount = repeats,
                 NodeSamples = repeatSamples

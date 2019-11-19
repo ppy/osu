@@ -306,13 +306,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                         {
                             StartTime = time_slider_start,
                             Position = new Vector2(0, 0),
-                            Path = new SliderPath(new[]
+                            Path = new SliderPath(PathType.Linear, new[]
                             {
-                                new PathSegment(PathType.Linear, new[]
-                                {
-                                    Vector2.Zero,
-                                    new Vector2(25, 0),
-                                })
+                                Vector2.Zero,
+                                new Vector2(25, 0),
                             }, 25),
                         }
                     },

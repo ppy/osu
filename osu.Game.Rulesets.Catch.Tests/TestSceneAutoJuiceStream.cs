@@ -38,13 +38,10 @@ namespace osu.Game.Rulesets.Catch.Tests
                 beatmap.HitObjects.Add(new JuiceStream
                 {
                     X = 0.5f - width / 2,
-                    Path = new SliderPath(new[]
+                    Path = new SliderPath(PathType.Linear, new[]
                     {
-                        new PathSegment(PathType.Linear, new[]
-                        {
-                            Vector2.Zero,
-                            new Vector2(width * CatchPlayfield.BASE_WIDTH, 0)
-                        }),
+                        Vector2.Zero,
+                        new Vector2(width * CatchPlayfield.BASE_WIDTH, 0)
                     }),
                     StartTime = i * 2000,
                     NewCombo = i % 8 == 0
