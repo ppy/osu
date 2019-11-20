@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -71,7 +72,7 @@ namespace osu.Game.Graphics.Containers
 
                 const float parallax_duration = 100;
 
-                double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, parallax_duration);
+                double elapsed = Math.Clamp(Clock.ElapsedFrameTime, 0, parallax_duration);
 
                 content.Position = Interpolation.ValueAt(elapsed, content.Position, offset, 0, parallax_duration, Easing.OutQuint);
                 content.Scale = Interpolation.ValueAt(elapsed, content.Scale, new Vector2(1 + System.Math.Abs(ParallaxAmount)), 0, 1000, Easing.OutQuint);
