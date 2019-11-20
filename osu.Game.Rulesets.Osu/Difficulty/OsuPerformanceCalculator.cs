@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
         private readonly int countHitCircles;
+        private readonly int countSpinners;
         private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
@@ -34,6 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
+            countSpinners = Beatmap.HitObjects.Count(h => h is Spinner);
 
             beatmapMaxCombo = Beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
@@ -61,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 0.90f;
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95f;
+                multiplier *= 1.0f - Math.Pow((float)countSpinners / beatmapMaxCombo, 0.85f);
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
