@@ -32,6 +32,7 @@ namespace osu.Game.Online.API.Requests
 
     public enum BeatmapSearchCategory
     {
+        [Description("所有")]
         Any,
 
         [Description("拥有排行榜")]

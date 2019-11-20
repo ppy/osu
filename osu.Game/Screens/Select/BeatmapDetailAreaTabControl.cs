@@ -12,7 +12,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-
+//由于第18行有"Container",和翻译需要的System.ComponentModel冲突,故无法翻译
 namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailAreaTabControl : Container

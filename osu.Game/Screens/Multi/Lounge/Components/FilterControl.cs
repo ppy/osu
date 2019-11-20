@@ -54,16 +54,20 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
     public enum PrimaryFilter
     {
+        [Description("开放中的")]
         Open,
 
-        [Description("最近结束")]
+        [Description("最近结束的")]
         RecentlyEnded,
+        [Description("参加过的")]
         Participated,
+        [Description("我拥有的")]
         Owned,
     }
 
     public enum SecondaryFilter
     {
+        [Description("公开的")]
         Public,
         //Private,
     }

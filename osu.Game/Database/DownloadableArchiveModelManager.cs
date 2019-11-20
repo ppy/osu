@@ -62,7 +62,7 @@ namespace osu.Game.Database
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"Downloading {request.Model}",
+                Text = $"正在下载 {request.Model}",
             };
 
             request.DownloadProgressed += progress =>
@@ -121,7 +121,7 @@ namespace osu.Game.Database
                 if (error is OperationCanceledException) return;
 
                 notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
+                Logger.Error(error, $"{HumanisedModelName.Titleize()} 下载失败!");
                 currentDownloads.Remove(request);
             }
         }

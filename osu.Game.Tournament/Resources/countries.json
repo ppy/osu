@@ -1,172 +1,172 @@
 [
     {
         "FlagName": "BD",
-        "FullName": "Bangladesh",
+        "FullName": "孟加拉国",
         "Acronym": "BGD"
     },
     {
         "FlagName": "BE",
-        "FullName": "Belgium",
+        "FullName": "比利时",
         "Acronym": "BEL"
     },
     {
         "FlagName": "BF",
-        "FullName": "Burkina Faso",
+        "FullName": "布基纳法索",
         "Acronym": "BFA"
     },
     {
         "FlagName": "BG",
-        "FullName": "Bulgaria",
+        "FullName": "保加利亚",
         "Acronym": "BGR"
     },
     {
         "FlagName": "BA",
-        "FullName": "Bosnia and Herzegovina",
+        "FullName": "波斯尼亚和黑塞哥维那",
         "Acronym": "BIH"
     },
     {
         "FlagName": "BB",
-        "FullName": "Barbados",
+        "FullName": "巴巴多斯",
         "Acronym": "BRB"
     },
     {
         "FlagName": "WF",
-        "FullName": "Wallis and Futuna",
+        "FullName": "瓦利斯和富图纳群岛",
         "Acronym": "WLF"
     },
     {
         "FlagName": "BL",
-        "FullName": "Saint Barthelemy",
+        "FullName": "圣巴托洛缪岛",
         "Acronym": "BLM"
     },
     {
         "FlagName": "BM",
-        "FullName": "Bermuda",
+        "FullName": "百慕大",
         "Acronym": "BMU"
     },
     {
         "FlagName": "BN",
-        "FullName": "Brunei",
+        "FullName": "文莱",
         "Acronym": "BRN"
     },
     {
         "FlagName": "BO",
-        "FullName": "Bolivia",
+        "FullName": "玻利维亚",
         "Acronym": "BOL"
     },
     {
         "FlagName": "BH",
-        "FullName": "Bahrain",
+        "FullName": "巴林",
         "Acronym": "BHR"
     },
     {
         "FlagName": "BI",
-        "FullName": "Burundi",
+        "FullName": "布隆迪",
         "Acronym": "BDI"
     },
     {
         "FlagName": "BJ",
-        "FullName": "Benin",
+        "FullName": "贝宁",
         "Acronym": "BEN"
     },
     {
         "FlagName": "BT",
-        "FullName": "Bhutan",
+        "FullName": "不丹",
         "Acronym": "BTN"
     },
     {
         "FlagName": "JM",
-        "FullName": "Jamaica",
+        "FullName": "牙买加",
         "Acronym": "JAM"
     },
     {
         "FlagName": "BV",
-        "FullName": "Bouvet Island",
+        "FullName": "布维岛",
         "Acronym": "BVT"
     },
     {
         "FlagName": "BW",
-        "FullName": "Botswana",
+        "FullName": "博茨瓦纳",
         "Acronym": "BWA"
     },
     {
         "FlagName": "WS",
-        "FullName": "Samoa",
+        "FullName": "萨摩亚",
         "Acronym": "WSM"
     },
     {
         "FlagName": "BQ",
-        "FullName": "Bonaire, Saint Eustatius and Saba",
+        "FullName": "博奈尔岛，圣尤斯达蒂斯和萨巴岛",
         "Acronym": "BES"
     },
     {
         "FlagName": "BR",
-        "FullName": "Brazil",
+        "FullName": "巴西",
         "Acronym": "BRA"
     },
     {
         "FlagName": "BS",
-        "FullName": "Bahamas",
+        "FullName": "巴哈马",
         "Acronym": "BHS"
     },
     {
         "FlagName": "JE",
-        "FullName": "Jersey",
+        "FullName": "泽西岛",
         "Acronym": "JEY"
     },
     {
         "FlagName": "BY",
-        "FullName": "Belarus",
+        "FullName": "白俄罗斯",
         "Acronym": "BLR"
     },
     {
         "FlagName": "BZ",
-        "FullName": "Belize",
+        "FullName": "伯利兹",
         "Acronym": "BLZ"
     },
     {
         "FlagName": "RU",
-        "FullName": "Russia",
+        "FullName": "俄罗斯",
         "Acronym": "RUS"
     },
     {
         "FlagName": "RW",
-        "FullName": "Rwanda",
+        "FullName": "卢旺达",
         "Acronym": "RWA"
     },
     {
         "FlagName": "RS",
-        "FullName": "Serbia",
+        "FullName": "塞尔维亚",
         "Acronym": "SRB"
     },
     {
         "FlagName": "TL",
-        "FullName": "East Timor",
+        "FullName": "东帝汶",
         "Acronym": "TLS"
     },
     {
         "FlagName": "RE",
-        "FullName": "Reunion",
+        "FullName": "留尼旺",
         "Acronym": "REU"
     },
     {
         "FlagName": "TM",
-        "FullName": "Turkmenistan",
+        "FullName": "土库曼斯坦",
         "Acronym": "TKM"
     },
     {
         "FlagName": "TJ",
-        "FullName": "Tajikistan",
+        "FullName": "塔吉克斯坦",
         "Acronym": "TJK"
     },
     {
         "FlagName": "RO",
-        "FullName": "Romania",
+        "FullName": "罗马尼亚",
         "Acronym": "ROU"
     },
     {
         "FlagName": "TK",
-        "FullName": "Tokelau",
+        "FullName": "托克劳",
         "Acronym": "TKL"
     },
     {
@@ -306,7 +306,7 @@
     },
     {
         "FlagName": "HK",
-        "FullName": "Hong Kong",
+        "FullName": "中华人民共和国香港特别行政区",
         "Acronym": "HKG"
     },
     {
@@ -426,7 +426,7 @@
     },
     {
         "FlagName": "ZA",
-        "FullName": "South Africa",
+        "FullName": "南非共和国",
         "Acronym": "ZAF"
     },
     {
@@ -436,7 +436,7 @@
     },
     {
         "FlagName": "IT",
-        "FullName": "Italy",
+        "FullName": "意大利",
         "Acronym": "ITA"
     },
     {
@@ -471,7 +471,7 @@
     },
     {
         "FlagName": "ES",
-        "FullName": "Spain",
+        "FullName": "西班牙",
         "Acronym": "ESP"
     },
     {
@@ -526,7 +526,7 @@
     },
     {
         "FlagName": "MO",
-        "FullName": "Macao",
+        "FullName": "中华人民共和国澳门特别行政区",
         "Acronym": "MAC"
     },
     {
@@ -616,7 +616,7 @@
     },
     {
         "FlagName": "FR",
-        "FullName": "France",
+        "FullName": "发过",
         "Acronym": "FRA"
     },
     {
@@ -631,7 +631,7 @@
     },
     {
         "FlagName": "FI",
-        "FullName": "Finland",
+        "FullName": "芬兰",
         "Acronym": "FIN"
     },
     {
@@ -661,17 +661,17 @@
     },
     {
         "FlagName": "NL",
-        "FullName": "Netherlands",
+        "FullName": "荷兰",
         "Acronym": "NLD"
     },
     {
         "FlagName": "NO",
-        "FullName": "Norway",
+        "FullName": "挪威",
         "Acronym": "NOR"
     },
     {
         "FlagName": "NA",
-        "FullName": "Namibia",
+        "FullName": "纳米比亚",
         "Acronym": "NAM"
     },
     {
@@ -701,7 +701,7 @@
     },
     {
         "FlagName": "NZ",
-        "FullName": "New Zealand",
+        "FullName": "新西兰",
         "Acronym": "NZL"
     },
     {
@@ -721,7 +721,7 @@
     },
     {
         "FlagName": "CK",
-        "FullName": "Cook Islands",
+        "FullName": "库克群岛",
         "Acronym": "COK"
     },
     {
@@ -746,7 +746,7 @@
     },
     {
         "FlagName": "CN",
-        "FullName": "China",
+        "FullName": "中华人民共和国",
         "Acronym": "CHN"
     },
     {
@@ -756,7 +756,7 @@
     },
     {
         "FlagName": "CL",
-        "FullName": "Chile",
+        "FullName": "智利",
         "Acronym": "CHL"
     },
     {
@@ -766,7 +766,7 @@
     },
     {
         "FlagName": "CA",
-        "FullName": "Canada",
+        "FullName": "加拿大",
         "Acronym": "CAN"
     },
     {
@@ -886,7 +886,7 @@
     },
     {
         "FlagName": "KR",
-        "FullName": "South Korea",
+        "FullName": "南韩",
         "Acronym": "KOR"
     },
     {
@@ -896,7 +896,7 @@
     },
     {
         "FlagName": "KP",
-        "FullName": "North Korea",
+        "FullName": "北韩",
         "Acronym": "PRK"
     },
     {
@@ -936,7 +936,7 @@
     },
     {
         "FlagName": "SG",
-        "FullName": "Singapore",
+        "FullName": "新加坡",
         "Acronym": "SGP"
     },
     {
@@ -976,7 +976,7 @@
     },
     {
         "FlagName": "DE",
-        "FullName": "Germany",
+        "FullName": "德国",
         "Acronym": "DEU"
     },
     {
@@ -991,7 +991,7 @@
     },
     {
         "FlagName": "US",
-        "FullName": "United States",
+        "FullName": "美国",
         "Acronym": "USA"
     },
     {
@@ -1031,7 +1031,7 @@
     },
     {
         "FlagName": "TW",
-        "FullName": "Taiwan",
+        "FullName": "中华人民共和国台湾省",
         "Acronym": "TWN"
     },
     {
@@ -1086,7 +1086,7 @@
     },
     {
         "FlagName": "TH",
-        "FullName": "Thailand",
+        "FullName": "泰国",
         "Acronym": "THA"
     },
     {
@@ -1156,7 +1156,7 @@
     },
     {
         "FlagName": "IS",
-        "FullName": "Iceland",
+        "FullName": "冰岛",
         "Acronym": "ISL"
     },
     {
@@ -1196,12 +1196,12 @@
     },
     {
         "FlagName": "AU",
-        "FullName": "Australia",
+        "FullName": "澳大利亚",
         "Acronym": "AUS"
     },
     {
         "FlagName": "AT",
-        "FullName": "Austria",
+        "FullName": "奥地利",
         "Acronym": "AUT"
     },
     {
@@ -1211,7 +1211,7 @@
     },
     {
         "FlagName": "IN",
-        "FullName": "India",
+        "FullName": "印度",
         "Acronym": "IND"
     },
     {
@@ -1226,12 +1226,12 @@
     },
     {
         "FlagName": "IE",
-        "FullName": "Ireland",
+        "FullName": "爱尔兰",
         "Acronym": "IRL"
     },
     {
         "FlagName": "ID",
-        "FullName": "Indonesia",
+        "FullName": "印度尼西亚",
         "Acronym": "IDN"
     },
     {

@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Menu
         {
             buttonsPlay.Add(new Button(@"单人", @"button-solo-select", FontAwesome.Solid.User, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
             buttonsPlay.Add(new Button(@"多人", @"button-generic-select", FontAwesome.Solid.Users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
-            buttonsPlay.Add(new Button(@"图标", @"button-generic-select", OsuIcon.Charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.Add(new Button(@"图表", @"button-generic-select", OsuIcon.Charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
             buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
 
             buttonsTopLevel.Add(new Button(@"开始", @"button-play-select", OsuIcon.Logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));

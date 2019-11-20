@@ -7,12 +7,13 @@ namespace osu.Game.Online.Multiplayer
 {
     public enum RoomAvailability
     {
+        [Description(@"公开")]
         Public,
 
-        [Description(@"Friends Only")]
+        [Description(@"仅好友")]
         FriendsOnly,
 
-        [Description(@"Invite Only")]
+        [Description(@"仅邀请")]
         InviteOnly,
     }
 }
