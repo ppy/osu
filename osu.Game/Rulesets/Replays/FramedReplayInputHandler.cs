@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
-using osuTK;
 
 namespace osu.Game.Rulesets.Replays
 {

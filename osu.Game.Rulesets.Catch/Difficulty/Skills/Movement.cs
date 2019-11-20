@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {

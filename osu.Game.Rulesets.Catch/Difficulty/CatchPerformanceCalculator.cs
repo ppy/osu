@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
