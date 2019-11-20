@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
@@ -12,6 +14,8 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "Volume";
 
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "Sound" });
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuConfigManager config)
         {
@@ -22,8 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 new SettingsSlider<double> { LabelText = "Effect", Bindable = audio.VolumeSample, KeyboardStep = 0.01f },
                 new SettingsSlider<double> { LabelText = "Music", Bindable = audio.VolumeTrack, KeyboardStep = 0.01f },
             };
-
-            Keywords = new[] { "Sound" };
         }
     }
 }

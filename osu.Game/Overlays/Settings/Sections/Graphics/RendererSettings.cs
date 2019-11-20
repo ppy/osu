@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -11,6 +13,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     public class RendererSettings : SettingsSubsection
     {
         protected override string Header => "Renderer";
+
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "FPS" });
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig)
@@ -30,8 +34,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
-
-            Keywords = new[] { "fps" };
         }
     }
 }
