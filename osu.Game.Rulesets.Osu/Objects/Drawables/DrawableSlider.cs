@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -165,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             Tracking.Value = Ball.Tracking;
 
-            double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+            double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
             Body.UpdateProgress(completionProgress);

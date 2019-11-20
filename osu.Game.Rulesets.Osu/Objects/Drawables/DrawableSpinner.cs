@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -136,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
-        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress => Math.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
