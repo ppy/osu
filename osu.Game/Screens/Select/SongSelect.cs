@@ -88,8 +88,6 @@ namespace osu.Game.Screens.Select
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
 
-        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
-
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
@@ -261,6 +259,8 @@ namespace osu.Game.Screens.Select
                 });
             }
         }
+
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
 
         private DependencyContainer dependencies;
 
