@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - pos.Y) * (p[2].X - pos.X) - (p[1].X - pos.X) * (p[2].Y - pos.Y));
+                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, p[0].Y * p[1].X - p[0].X * p[1].Y);
 
                 if (points.Length == 2 && pathType == PathType.PerfectCurve && isLinear(points))
                     pathType = PathType.Linear;
@@ -265,15 +265,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var result = new List<PathSegment>();
 
             int start = 0;
-            int end = 0;
 
             for (int i = 0; i < points.Length; i++)
             {
-                end++;
-
                 if (i == points.Length - 1 || points[i] == points[i + 1])
                 {
-                    Vector2[] segmentPoints = points.Slice(start, end - start).ToArray();
+                    Vector2[] segmentPoints = points.Slice(start, i + 1 - start).ToArray();
                     PathType segmentType = type;
 
                     // stable only makes a perfect curve if and only if there are exactly 3 control points and no dissection
@@ -282,7 +279,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         segmentType = PathType.Bezier;
 
                     result.Add(new PathSegment(segmentType, segmentPoints));
-                    start = ++end;
+
+                    // p0     p1     p2
+                    // ^i     ^i+1   ^i+2
+                    // If p0 == p1, then the next segment should start at i+2, but i is incremented one during the for-loop
+                    // Effectively, in the next iteration, i == start == p2
+                    i += 1;
+                    start = i + 1;
                 }
             }
 
