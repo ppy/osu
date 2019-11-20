@@ -517,6 +517,12 @@ namespace osu.Game.Rulesets.UI
 
         public BindableDouble Frequency => throw new NotImplementedException();
 
+        public IBindable<double> AggregateVolume => throw new NotImplementedException();
+
+        public IBindable<double> AggregateBalance => throw new NotImplementedException();
+
+        public IBindable<double> AggregateFrequency => throw new NotImplementedException();
+
         public int PlaybackConcurrency
         {
             get => throw new NotImplementedException();
