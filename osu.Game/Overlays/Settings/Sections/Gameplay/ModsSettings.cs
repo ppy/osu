@@ -18,7 +18,8 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 new SettingsCheckbox
                 {
                     LabelText = "Increase visibility of first object when visual impairment mods are enabled",
-                    Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
+                    Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility),
+                    Keywords = new[] { "Hidden", "Traceable" }
                 },
             };
         }

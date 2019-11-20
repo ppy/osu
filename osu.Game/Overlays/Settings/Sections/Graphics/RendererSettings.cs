@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
+
+            Keywords = new[] { "fps" };
         }
     }
 }
