@@ -246,9 +246,9 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
+        /// Creates and adds the visual representation of a <typeparamref name="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
+        /// <param name="hitObject">The <typeparamref name="TObject"/> to add the visual representation for.</param>
         private void addHitObject(TObject hitObject)
         {
             var drawableObject = CreateDrawableRepresentation(hitObject);
