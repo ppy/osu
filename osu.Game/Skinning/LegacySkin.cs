@@ -80,10 +80,10 @@ namespace osu.Game.Skinning
                 case GlobalSkinColour colour:
                     return SkinUtils.As<TValue>(getCustomColour(colour.ToString()));
 
-                case LegacySkinConfigurations legacy:
+                case LegacySkinConfiguration.LegacySetting legacy:
                     switch (legacy)
                     {
-                        case LegacySkinConfigurations.Version:
+                        case LegacySkinConfiguration.LegacySetting.Version:
                             if (Configuration.LegacyVersion is decimal version)
                                 return SkinUtils.As<TValue>(new Bindable<decimal>(version));
 
