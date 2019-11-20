@@ -183,6 +183,9 @@ namespace osu.Game.Scoring
 
         public override string ToString() => $"{User} playing {Beatmap}";
 
-        public bool Equals(ScoreInfo other) => other?.OnlineScoreID == OnlineScoreID;
+        public bool Equals(ScoreInfo other) =>
+            other?.OnlineScoreID == OnlineScoreID
+            && other?.BeatmapInfoID == BeatmapInfoID
+            && other.Hash == Hash;
     }
 }
