@@ -260,7 +260,11 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria) => Carousel.Filter(criteria);
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
+        {
+            if (this.IsCurrentScreen())
+                Carousel.Filter(criteria);
+        }
 
         private DependencyContainer dependencies;
 
@@ -432,6 +436,8 @@ namespace osu.Game.Screens.Select
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            Carousel.Filter(FilterControl.CreateCriteria(), false);
 
             this.FadeInFromZero(250);
             FilterControl.Activate();
