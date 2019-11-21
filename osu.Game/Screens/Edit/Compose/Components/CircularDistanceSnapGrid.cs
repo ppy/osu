@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float distance = direction.Length;
 
             float radius = DistanceSpacing;
-            int radialCount = MathHelper.Clamp((int)Math.Round(distance / radius), 1, MaxIntervals);
+            int radialCount = Math.Clamp((int)Math.Round(distance / radius), 1, MaxIntervals);
 
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
             Vector2 snappedPosition = CentrePosition + normalisedDirection * radialCount * radius;
