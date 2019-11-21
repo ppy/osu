@@ -72,14 +72,7 @@ namespace osu.Game.Overlays.BeatmapSet
             if (SelectedMods.Any())
                 return;
 
-            if (IsHovered)
-            {
-                modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = false);
-            }
-            else
-            {
-                highlightAll();
-            }
+            modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.IsActive.Value = !IsHovered);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -94,22 +87,19 @@ namespace osu.Game.Overlays.BeatmapSet
             updateHighlighted();
         }
 
-        public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
-
-        private void highlightAll() => modsContainer.ForEach(mod => mod.Highlighted.Value = true);
+        public void DeselectAll() => modsContainer.ForEach(mod => mod.Highlighted.Value = false);
 
         private class ModButton : ModIcon
         {
             private const int duration = 200;
 
-            public readonly BindableBool Selected = new BindableBool();
+            public readonly BindableBool IsActive = new BindableBool();
             public Action<Mod, bool> OnSelectionChanged;
 
             public ModButton(Mod mod)
                 : base(mod)
             {
                 Scale = new Vector2(0.4f);
-                Highlighted.Value = true;
                 Add(new HoverClickSounds());
             }
 
@@ -117,35 +107,39 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 base.LoadComplete();
 
-                Selected.BindValueChanged(selected =>
+                IsActive.BindValueChanged(hovered =>
                 {
-                    updateState();
-                    OnSelectionChanged?.Invoke(Mod, selected.NewValue);
-                });
+                    if (Highlighted.Value)
+                        return;
+
+                    this.FadeColour(hovered.NewValue ? Color4.White : Color4.DimGray, duration, Easing.OutQuint);
+                }, true);
+            }
+
+            protected override void OnHighlightedChanged(ValueChangedEvent<bool> highlighted)
+            {
+                base.OnHighlightedChanged(highlighted);
+                OnSelectionChanged?.Invoke(Mod, highlighted.NewValue);
+                IsActive.TriggerChange();
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                Selected.Toggle();
+                Highlighted.Toggle();
                 return true;
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                updateState();
+                IsActive.Value = true;
                 return false;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-                updateState();
+                IsActive.Value = false;
             }
-
-            private void updateState() => Highlighted.Value = IsHovered || Selected.Value;
-
-            protected override void OnHighlightedChanged(ValueChangedEvent<bool> highlighted) =>
-                this.FadeColour(highlighted.NewValue ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
         }
     }
 }
