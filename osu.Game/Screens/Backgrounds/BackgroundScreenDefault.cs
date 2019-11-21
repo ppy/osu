@@ -46,6 +46,7 @@ namespace osu.Game.Screens.Backgrounds
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
             mode.ValueChanged += _ => Next();
+            beatmap.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
