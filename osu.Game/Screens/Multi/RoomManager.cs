@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
@@ -45,7 +44,7 @@ namespace osu.Game.Screens.Multi
             currentFilter.BindValueChanged(_ =>
             {
                 if (IsLoaded)
-                    schedulePoll();
+                    PollImmediately();
             });
         }
 
@@ -156,14 +155,6 @@ namespace osu.Game.Screens.Multi
             api.Queue(pollReq);
 
             return tcs.Task;
-        }
-
-        private ScheduledDelegate scheduledPoll;
-
-        private void schedulePoll()
-        {
-            scheduledPoll?.Cancel();
-            scheduledPoll = Scheduler.AddDelayed(PollImmediately, 200);
         }
 
         /// <summary>
