@@ -13,7 +13,7 @@ Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the 
 
 ## Status
 
-This project is still heavily under development, but is in a state where users are encouraged to try it out and keep it installed alongside the stable osu! client. It will continue to evolve over the coming months and hopefully bring some new unique features to the table.
+This project is under development but users can combine it with the stable osu! client. The project will evolve and bring new features to the table.
 
 We are accepting bug reports (please report with as much detail as possible). Feature requests are welcome as long as you read and understand the contribution guidelines listed below.
 
