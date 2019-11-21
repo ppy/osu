@@ -685,7 +685,7 @@ namespace osu.Game.Screens.Select
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+            p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private class CarouselRoot : CarouselGroupEagerSelect

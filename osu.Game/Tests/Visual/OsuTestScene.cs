@@ -22,7 +22,6 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
-using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -250,7 +249,7 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = MathHelper.Clamp(seek, 0, Length);
+                    offset = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
                     return offset == seek;
