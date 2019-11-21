@@ -263,15 +263,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             /// <returns></returns>
             private IList<HitSampleInfo> sampleInfoListAt(double time)
             {
-                if (HitObject is IHasCurve curveData)
-                {
-                    double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
+                if (!(HitObject is IHasCurve curveData))
+                    return HitObject.Samples;
 
-                    int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                    return curveData.NodeSamples[index];
-                }
+                double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
 
-                return HitObject.Samples;
+                int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
+                return curveData.NodeSamples[index];
             }
         }
     }
