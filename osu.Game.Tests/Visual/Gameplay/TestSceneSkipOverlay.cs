@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 {
                     skip = new SkipOverlay(6000)
                     {
-                        RequestSeek = _ => requestCount++
+                        RequestSkip = () => requestCount++
                     }
                 },
             };
@@ -56,17 +56,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddUntilStep("wait for fade", () => skip.Children.First().Alpha == 0);
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            checkRequestCount(1);
-        }
-
-        [Test]
-        public void TestClickOnlyActuatesOnce()
-        {
-            AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkRequestCount(1);
         }

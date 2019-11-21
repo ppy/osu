@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
     {
         private readonly double startTime;
 
-        public Action<double> RequestSeek;
+        public Action RequestSkip;
 
         private Button button;
         private Box remainingTimeBox;
@@ -90,11 +90,6 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        /// <summary>
-        /// Duration before gameplay start time required before skip button displays.
-        /// </summary>
-        private const double skip_buffer = 1000;
-
         private const double fade_time = 300;
 
         private double beginFadeTime => startTime - fade_time;
@@ -104,7 +99,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             // skip is not required if there is no extra "empty" time to skip.
-            if (Clock.CurrentTime > beginFadeTime - skip_buffer)
+            if (Clock.CurrentTime > beginFadeTime - GameplayClockContainer.MINIMUM_SKIP_TIME)
             {
                 Alpha = 0;
                 Expire();
@@ -115,10 +110,9 @@ namespace osu.Game.Screens.Play
             using (BeginAbsoluteSequence(beginFadeTime))
                 this.FadeOut(fade_time);
 
-            button.Action = () => RequestSeek?.Invoke(beginFadeTime);
+            button.Action = () => RequestSkip?.Invoke();
 
             displayTime = Time.Current;
-
             Expire();
         }
 
@@ -335,13 +329,7 @@ namespace osu.Game.Screens.Play
                 box.FlashColour(Color4.White, 500, Easing.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);
 
-                bool result = base.OnClick(e);
-
-                // for now, let's disable the skip button after the first press.
-                // this will likely need to be contextual in the future (bound from external components).
-                Enabled.Value = false;
-
-                return result;
+                return base.OnClick(e);
             }
         }
     }
