@@ -18,26 +18,40 @@ namespace osu.Game.Tests.Visual.Gameplay
         private SkipOverlay skip;
         private int requestCount;
 
+        private FramedOffsetClock offsetClock;
+        private StopwatchClock stopwatchClock;
+
+        private double increment;
+
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             requestCount = 0;
+            increment = 6000;
+
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Clock = new FramedOffsetClock(Clock)
-                {
-                    Offset = -Clock.CurrentTime,
-                },
+                Clock = offsetClock = new FramedOffsetClock(stopwatchClock = new StopwatchClock(true)),
                 Children = new Drawable[]
                 {
                     skip = new SkipOverlay(6000)
                     {
-                        RequestSeek = _ => requestCount++
+                        RequestSkip = () =>
+                        {
+                            requestCount++;
+                            offsetClock.Offset += increment;
+                        }
                     }
                 },
             };
         });
+
+        protected override void Update()
+        {
+            if (stopwatchClock != null)
+                stopwatchClock.Rate = Clock.Rate;
+        }
 
         [Test]
         public void TestFadeOnIdle()
@@ -64,11 +78,27 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestClickOnlyActuatesOnce()
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
-            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("click", () =>
+            {
+                increment = 6000 - offsetClock.CurrentTime - GameplayClockContainer.MINIMUM_SKIP_TIME / 2;
+                InputManager.Click(MouseButton.Left);
+            });
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             AddStep("click", () => InputManager.Click(MouseButton.Left));
             checkRequestCount(1);
+        }
+
+        [Test]
+        public void TestClickOnlyActuatesMultipleTimes()
+        {
+            AddStep("set increment lower", () => increment = 3000);
+            AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkRequestCount(2);
         }
 
         [Test]

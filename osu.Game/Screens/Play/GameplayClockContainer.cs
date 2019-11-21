@@ -89,6 +89,11 @@ namespace osu.Game.Screens.Play
 
         private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
+        /// <summary>
+        /// Duration before gameplay start time required before skip button displays.
+        /// </summary>
+        public const double MINIMUM_SKIP_TIME = 1000;
+
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
@@ -128,6 +133,23 @@ namespace osu.Game.Screens.Play
             IsPaused.Value = false;
 
             this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
+        }
+
+        /// <summary>
+        /// Skip forward to the next valid skip point.
+        /// </summary>
+        public void Skip()
+        {
+            if (GameplayClock.CurrentTime > gameplayStartTime - MINIMUM_SKIP_TIME)
+                return;
+
+            double skipTarget = gameplayStartTime - MINIMUM_SKIP_TIME;
+
+            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+                // double skip exception for storyboards with very long intros
+                skipTarget = 0;
+
+            Seek(skipTarget);
         }
 
         /// <summary>
