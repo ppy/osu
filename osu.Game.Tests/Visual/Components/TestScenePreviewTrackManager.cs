@@ -143,6 +143,17 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
             TestTrackOwner owner = null;
 
+            AddStep("ensure volume not zero", () =>
+            {
+                if (audio.Volume.Value == 0)
+                    audio.Volume.Value = 1;
+
+                if (audio.VolumeTrack.Value == 0)
+                    audio.VolumeTrack.Value = 1;
+            });
+
+            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
+
             AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
             AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start track", () => track.Start());
