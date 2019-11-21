@@ -64,24 +64,34 @@ namespace osu.Game.Overlays.BeatmapSet
             else
                 SelectedMods.Remove(mod);
 
-            if (!SelectedMods.Any() && !IsHovered)
+            updateHighlighted();
+        }
+
+        private void updateHighlighted()
+        {
+            if (SelectedMods.Any())
+                return;
+
+            if (IsHovered)
+            {
+                modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = false);
+            }
+            else
+            {
                 highlightAll();
+            }
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (!SelectedMods.Any())
-                modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = false);
-
+            updateHighlighted();
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-
-            if (!SelectedMods.Any())
-                highlightAll();
+            updateHighlighted();
         }
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
