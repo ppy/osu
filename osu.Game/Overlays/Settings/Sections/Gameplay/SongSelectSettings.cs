@@ -26,21 +26,21 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Show converted beatmaps",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                    Keywords = new[] { "Converts" }
+                    Keywords = new[] { "convert" }
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
-                    Keywords = new[] { "Stars" }
+                    Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "up to",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
-                    Keywords = new[] { "Stars" }
+                    Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
