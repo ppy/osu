@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Selected.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
+            Selected.BindValueChanged(selected => background.Colour = selected.NewValue ? highlightedColour : backgroundColour, true);
         }
     }
 }
