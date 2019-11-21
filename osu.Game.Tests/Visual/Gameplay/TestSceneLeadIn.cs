@@ -4,12 +4,15 @@
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -39,11 +42,33 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        private void loadPlayerWithBeatmap(IBeatmap beatmap)
+        [TestCase(1000, 0)]
+        [TestCase(0, 0)]
+        [TestCase(-1000, -1000)]
+        [TestCase(-10000, -10000)]
+        public void TestStoryboardProducesCorrectStartTime(double firstStoryboardEvent, double expectedStartTime)
+        {
+            var storyboard = new Storyboard();
+
+            var sprite = new StoryboardSprite("unknown", Anchor.TopLeft, Vector2.Zero);
+            sprite.TimelineGroup.Alpha.Add(Easing.None, firstStoryboardEvent, firstStoryboardEvent + 500, 0, 1);
+
+            storyboard.GetLayer("Background").Add(sprite);
+
+            loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo), storyboard);
+
+            AddAssert($"first frame is {expectedStartTime}", () =>
+            {
+                Debug.Assert(player.FirstFrameClockTime != null);
+                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
+            });
+        }
+
+        private void loadPlayerWithBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
             AddStep("create player", () =>
             {
-                Beatmap.Value = CreateWorkingBeatmap(beatmap);
+                Beatmap.Value = CreateWorkingBeatmap(beatmap, storyboard);
                 LoadScreen(player = new LeadInPlayer());
             });
 
