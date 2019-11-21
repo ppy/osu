@@ -452,9 +452,6 @@ namespace osu.Game.Screens.Select
             if (!itemsCache.IsValid)
                 updateItems();
 
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
-
             // Remove all items that should no longer be on-screen
             scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
@@ -517,6 +514,14 @@ namespace osu.Game.Screens.Select
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!scrollPositionCache.IsValid)
+                updateScrollPosition();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -637,8 +642,11 @@ namespace osu.Game.Screens.Select
 
         private void updateScrollPosition()
         {
-            if (scrollTarget != null) scroll.ScrollTo(scrollTarget.Value);
-            scrollPositionCache.Validate();
+            if (scrollTarget != null)
+            {
+                scroll.ScrollTo(scrollTarget.Value);
+                scrollPositionCache.Validate();
+            }
         }
 
         /// <summary>
