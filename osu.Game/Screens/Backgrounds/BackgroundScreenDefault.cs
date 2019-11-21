@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
-        private Bindable<BackgroundMode> mode;
+        private Bindable<BackgroundSource> mode;
 
         [Resolved]
         private IBindable<WorkingBeatmap> beatmap { get; set; }
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Backgrounds
         {
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
-            mode = config.GetBindable<BackgroundMode>(OsuSetting.BackgroundMode);
+            mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
 
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Backgrounds
             {
                 switch (mode.Value)
                 {
-                    case BackgroundMode.Beatmap:
+                    case BackgroundSource.Beatmap:
                         newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
                         break;
 

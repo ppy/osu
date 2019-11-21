@@ -3,9 +3,9 @@
 
 namespace osu.Game.Configuration
 {
-    public enum BackgroundMode
+    public enum BackgroundSource
     {
-        Default,
+        Skin,
         Beatmap
     }
 }
