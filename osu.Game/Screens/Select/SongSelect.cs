@@ -46,48 +46,54 @@ namespace osu.Game.Screens.Select
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
-        public readonly FilterControl FilterControl;
+        public FilterControl FilterControl { get; private set; }
 
         protected virtual bool ShowFooter => true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly BeatmapOptionsOverlay BeatmapOptions;
+        protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly Footer Footer;
+        protected Footer Footer { get; private set; }
 
         /// <summary>
         /// Contains any panel which is triggered by a footer button.
         /// Helps keep them located beneath the footer itself.
         /// </summary>
-        protected readonly Container FooterPanels;
+        protected Container FooterPanels { get; private set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected readonly BeatmapCarousel Carousel;
-        private readonly BeatmapInfoWedge beatmapInfoWedge;
+        protected BeatmapCarousel Carousel { get; private set; }
+
+        private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
 
-        protected readonly ModSelectOverlay ModSelect;
+        protected ModSelectOverlay ModSelect { get; private set; }
 
-        protected SampleChannel SampleConfirm;
+        protected SampleChannel SampleConfirm { get; private set; }
+
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        protected readonly BeatmapDetailArea BeatmapDetails;
+        protected BeatmapDetailArea BeatmapDetails { get; private set; }
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
 
-        protected SongSelect()
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
+            // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
+            transferRulesetValue();
+
             AddRangeInternal(new Drawable[]
             {
                 new ParallaxContainer
@@ -161,7 +167,7 @@ namespace osu.Game.Screens.Select
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Height = FilterControl.HEIGHT,
-                                FilterChanged = c => Carousel.Filter(c),
+                                FilterChanged = ApplyFilterToCarousel,
                                 Background = { Width = 2 },
                             },
                         }
@@ -211,11 +217,7 @@ namespace osu.Game.Screens.Select
             }
 
             BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
-        {
             if (Footer != null)
             {
                 Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
@@ -256,6 +258,12 @@ namespace osu.Game.Screens.Select
                     }
                 });
             }
+        }
+
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
+        {
+            if (this.IsCurrentScreen())
+                Carousel.Filter(criteria);
         }
 
         private DependencyContainer dependencies;
@@ -428,6 +436,8 @@ namespace osu.Game.Screens.Select
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            Carousel.Filter(FilterControl.CreateCriteria(), false);
 
             this.FadeInFromZero(250);
             FilterControl.Activate();
@@ -624,7 +634,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+            transferRulesetValue();
             Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
             decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
@@ -634,6 +644,11 @@ namespace osu.Game.Screens.Select
             Beatmap.BindValueChanged(workingBeatmapChanged);
 
             boundLocalBindables = true;
+        }
+
+        private void transferRulesetValue()
+        {
+            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
         }
 
         private void delete(BeatmapSetInfo beatmap)
