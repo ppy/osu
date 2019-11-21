@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
@@ -15,26 +17,26 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private LeadInPlayer player;
 
-        [Test]
-        public void TestShortLeadIn()
+        private const double lenience_ms = 10;
+
+        private const double first_hit_object = 2170;
+
+        [TestCase(1000, 0)]
+        [TestCase(2000, 0)]
+        [TestCase(3000, first_hit_object - 3000)]
+        [TestCase(10000, first_hit_object - 10000)]
+        public void TestLeadInProducesCorrectStartTime(double leadIn, double expectedStartTime)
         {
             loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
             {
-                BeatmapInfo = { AudioLeadIn = 1000 }
+                BeatmapInfo = { AudioLeadIn = leadIn }
             });
 
-            AddAssert("correct lead-in", () => Precision.AlmostEquals(player.FirstFrameClockTime.Value, 0, 100));
-        }
-
-        [Test]
-        public void TestLongLeadIn()
-        {
-            loadPlayerWithBeatmap(new TestBeatmap(new OsuRuleset().RulesetInfo)
+            AddAssert($"first frame is {expectedStartTime}", () =>
             {
-                BeatmapInfo = { AudioLeadIn = 10000 }
+                Debug.Assert(player.FirstFrameClockTime != null);
+                return Precision.AlmostEquals(player.FirstFrameClockTime.Value, expectedStartTime, lenience_ms);
             });
-
-            AddAssert("correct lead-in", () => Precision.AlmostEquals(player.FirstFrameClockTime.Value, player.GameplayStartTime - 10000, 100));
         }
 
         private void loadPlayerWithBeatmap(IBeatmap beatmap)
@@ -61,6 +63,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public double GameplayStartTime => DrawableRuleset.GameplayStartTime;
 
+            public double FirstHitObjectTime => DrawableRuleset.Objects.First().StartTime;
+
             public double GameplayClockTime => GameplayClockContainer.GameplayClock.CurrentTime;
 
             protected override void UpdateAfterChildren()
@@ -73,6 +77,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     AddInternal(new OsuSpriteText
                     {
                         Text = $"GameplayStartTime: {DrawableRuleset.GameplayStartTime} "
+                               + $"FirstHitObjectTime: {FirstHitObjectTime} "
                                + $"LeadInTime: {Beatmap.Value.BeatmapInfo.AudioLeadIn} "
                                + $"FirstFrameClockTime: {FirstFrameClockTime}"
                     });
