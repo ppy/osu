@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void updateFilter()
         {
+            scheduledFilterUpdate?.Cancel();
+
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
