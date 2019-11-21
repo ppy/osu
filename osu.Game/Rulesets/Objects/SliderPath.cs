@@ -138,12 +138,14 @@ namespace osu.Game.Rulesets.Objects
             if (segments == null)
                 return;
 
+            Vector2 lastControlPoint = Vector2.Zero;
+
             foreach (var segment in segments)
             {
-                foreach (Vector2 pos in segment.ComputePath())
-                {
+                foreach (Vector2 pos in segment.ComputePath(lastControlPoint))
                     calculatedPath.Add(pos);
-                }
+
+                lastControlPoint = segment.ControlPoints[segment.ControlPoints.Length - 1];
             }
         }
 

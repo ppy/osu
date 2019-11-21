@@ -81,9 +81,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         pointCount++;
                 }
 
-                var points = new Vector2[pointCount];
+                var points = new Vector2[pointCount - 1];
 
-                int pointIndex = 1;
+                int pointIndex = 0;
 
                 foreach (string t in pointSplit)
                 {
@@ -116,9 +116,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - pos.Y) * (p[2].X - pos.X) - (p[1].X - pos.X) * (p[2].Y - pos.Y));
 
-                if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
+                if (points.Length == 2 && pathType == PathType.PerfectCurve && isLinear(points))
                     pathType = PathType.Linear;
 
                 int repeatCount = Parsing.ParseInt(split[6]);
@@ -278,11 +278,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                     // stable only makes a perfect curve if and only if there are exactly 3 control points and no dissection
                     // if this is not the case, a bezier curve is used which becomes linear in the degenerate (<3 points)
-                    if (type == PathType.PerfectCurve && (points.Length != 3 || segmentPoints.Length != 3))
+                    if (type == PathType.PerfectCurve && (points.Length != 2 || segmentPoints.Length != 2))
                         segmentType = PathType.Bezier;
 
                     result.Add(new PathSegment(segmentType, segmentPoints));
-                    start = end;
+                    start = ++end;
                 }
             }
 

@@ -29,15 +29,20 @@ namespace osu.Game.Rulesets.Objects
 
         public ReadOnlySpan<Vector2> ControlPoints => controlPoints;
 
-        public List<Vector2> ComputePath()
+        public List<Vector2> ComputePath(Vector2 referencePoint)
         {
+            // stackalloc isn't used as controlPoints can be of arbitrary length and may overflow the stack
+            var fullControlPoints = new Vector2[controlPoints.Length + 1];
+            controlPoints.CopyTo(fullControlPoints.AsSpan().Slice(1));
+            fullControlPoints[0] = referencePoint;
+
             switch (Type)
             {
                 case PathType.Linear:
-                    return PathApproximator.ApproximateLinear(ControlPoints);
+                    return PathApproximator.ApproximateLinear(fullControlPoints);
 
                 case PathType.PerfectCurve:
-                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(ControlPoints);
+                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(fullControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subpath.Count == 0)
@@ -46,10 +51,10 @@ namespace osu.Game.Rulesets.Objects
                     return subpath;
 
                 case PathType.Catmull:
-                    return PathApproximator.ApproximateCatmull(ControlPoints);
+                    return PathApproximator.ApproximateCatmull(fullControlPoints);
             }
 
-            return PathApproximator.ApproximateBezier(ControlPoints);
+            return PathApproximator.ApproximateBezier(fullControlPoints);
         }
 
         public bool Equals(PathSegment other) => Type == other.Type && ControlPoints.SequenceEqual(other.ControlPoints);
