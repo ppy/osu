@@ -1,0 +1,4 @@
+M:System.Object.Equals(System.Object,System.Object)~System.Boolean;Don't use object.Equals. Use IEquatable<T> or EqualityComparer<T>.Default instead.
+M:System.Object.Equals(System.Object)~System.Boolean;Don't use object.Equals. Use IEquatable<T> or EqualityComparer<T>.Default instead.
+M:System.ValueType.Equals(System.Object)~System.Boolean;Don't use object.Equals(Fallbacks to ValueType). Use IEquatable<T> or EqualityComparer<T>.Default instead.
+T:System.IComparable;Don't use non-generic IComparable. Use generic version instead.

@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Music
                         break;
                 }
 
-                dstIndex = MathHelper.Clamp(dstIndex, 0, items.Count - 1);
+                dstIndex = Math.Clamp(dstIndex, 0, items.Count - 1);
 
                 if (srcIndex == dstIndex)
                     return;

@@ -41,17 +41,17 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates the download request for this <see cref="TModel"/>.
+        /// Creates the download request for this <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
 
         /// <summary>
-        /// Begin a download for the requested <see cref="TModel"/>.
+        /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
         public bool Download(TModel model, bool minimiseDownloadSize = false)
@@ -131,9 +131,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists.</returns>
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
         protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
