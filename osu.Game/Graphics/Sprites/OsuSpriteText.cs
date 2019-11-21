@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Sprites
     public static class OsuSpriteTextTransformExtensions
     {
         /// <summary>
-        /// Sets <see cref="OsuSpriteText.Text"/> to a new value after a duration.
+        /// Sets <see cref="SpriteText.Text">Text</see> to a new value after a duration.
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public static TransformSequence<T> TransformTextTo<T>(this T spriteText, string newText, double duration = 0, Easing easing = Easing.None)
@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.Sprites
             => spriteText.TransformTo(nameof(OsuSpriteText.Text), newText, duration, easing);
 
         /// <summary>
-        /// Sets <see cref="OsuSpriteText.Text"/> to a new value after a duration.
+        /// Sets <see cref="SpriteText.Text">Text</see> to a new value after a duration.
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public static TransformSequence<T> TransformTextTo<T>(this TransformSequence<T> t, string newText, double duration = 0, Easing easing = Easing.None)
