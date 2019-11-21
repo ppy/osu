@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             positionBindable.BindValueChanged(_ => updatePosition());
             pathBindable.BindValueChanged(_ => updatePosition(), true);
+
+            // TODO: This has no drawable content. Support for skins should be added.
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

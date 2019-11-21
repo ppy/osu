@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Menu
 
         public override bool AllowExternalScreenChange => true;
 
+        public override bool AllowRateAdjustments => false;
+
         private Screen songSelect;
 
         private MenuSideFlashes sideFlashes;
@@ -62,14 +64,16 @@ namespace osu.Game.Screens.Menu
 
         protected override BackgroundScreen CreateBackground() => background;
 
-        private Bindable<int> holdDelay;
+        private Bindable<float> holdDelay;
+        private Bindable<bool> loginDisplayed;
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
         [BackgroundDependencyLoader(true)]
-        private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config)
+        private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
-            holdDelay = config.GetBindable<int>(OsuSetting.UIHoldActivationDelay);
+            holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
             if (host.CanExit)
             {
@@ -170,7 +174,6 @@ namespace osu.Game.Screens.Menu
             Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
-        private bool loginDisplayed;
         private bool exitConfirmed;
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -198,10 +201,10 @@ namespace osu.Game.Screens.Menu
 
             bool displayLogin()
             {
-                if (!loginDisplayed)
+                if (!loginDisplayed.Value)
                 {
                     Scheduler.AddDelayed(() => login?.Show(), 500);
-                    loginDisplayed = true;
+                    loginDisplayed.Value = true;
                 }
 
                 return true;
