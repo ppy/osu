@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu;
@@ -22,9 +23,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = 1000 }
             });
 
-            AddUntilStep("player loaded", () => player.IsLoaded && player.Alpha == 1);
-
-            AddAssert("correct lead-in", () => player.FirstFrameClockTime == 0);
+            AddAssert("correct lead-in", () => Precision.AlmostEquals(player.FirstFrameClockTime.Value, 0, 100));
         }
 
         [Test]
@@ -35,7 +34,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                 BeatmapInfo = { AudioLeadIn = 10000 }
             });
 
-            AddAssert("correct lead-in", () => player.FirstFrameClockTime == player.GameplayStartTime - 10000);
+            AddAssert("correct lead-in", () => Precision.AlmostEquals(player.FirstFrameClockTime.Value, player.GameplayStartTime - 10000, 100));
         }
 
         private void loadPlayerWithBeatmap(IBeatmap beatmap)
