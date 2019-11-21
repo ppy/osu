@@ -81,7 +81,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AccentColour = Color4.Red,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0.5f,
                     Scale = new Vector2(1.333f)
                 });
@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             base.Update();
 
-            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
+            border.Alpha = (float)Math.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
         private Color4 colourForRepresentation(FruitVisualRepresentation representation)

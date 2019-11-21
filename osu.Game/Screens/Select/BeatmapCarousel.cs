@@ -24,7 +24,7 @@ using osu.Game.Screens.Select.Carousel;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapCarousel : OsuScrollContainer
+    public class BeatmapCarousel : CompositeDrawable
     {
         private const float bleed_top = FilterControl.HEIGHT;
         private const float bleed_bottom = Footer.HEIGHT;
@@ -61,6 +61,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public bool BeatmapSetsLoaded { get; private set; }
 
+        private readonly OsuScrollContainer scroll;
+
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
@@ -80,6 +82,9 @@ namespace osu.Game.Screens.Select
             var _ = newRoot.Drawables;
 
             root = newRoot;
+            if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
+                selectedBeatmapSet = null;
+
             scrollableContent.Clear(false);
             itemsCache.Invalidate();
             scrollPositionCache.Invalidate();
@@ -110,13 +115,17 @@ namespace osu.Game.Screens.Select
         public BeatmapCarousel()
         {
             root = new CarouselRoot(this);
-            Child = new OsuContextMenuContainer
+            InternalChild = new OsuContextMenuContainer
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Child = scrollableContent = new Container<DrawableCarouselItem>
+                RelativeSizeAxes = Axes.Both,
+                Child = scroll = new CarouselScrollContainer
                 {
-                    RelativeSizeAxes = Axes.X,
+                    Masking = false,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = scrollableContent = new Container<DrawableCarouselItem>
+                    {
+                        RelativeSizeAxes = Axes.X,
+                    }
                 }
             };
         }
@@ -127,7 +136,7 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
-            RightClickScrollingEnabled.ValueChanged += enabled => RightMouseScrollbar = enabled.NewValue;
+            RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
 
             loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
@@ -342,7 +351,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Half the height of the visible content.
         /// <remarks>
-        /// This is different from the height of <see cref="ScrollContainer{T}.displayableContent"/>, since
+        /// This is different from the height of <see cref="ScrollContainer{T}"/>.displayableContent, since
         /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
         /// </remarks>
         /// </summary>
@@ -351,12 +360,12 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// The position of the lower visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleBottomBound => Current + DrawHeight + bleed_bottom;
+        private float visibleBottomBound => scroll.Current + DrawHeight + bleed_bottom;
 
         /// <summary>
         /// The position of the upper visible bound with respect to the current scroll position.
         /// </summary>
-        private float visibleUpperBound => Current - bleed_top;
+        private float visibleUpperBound => scroll.Current - bleed_top;
 
         public void FlushPendingFilterOperations()
         {
@@ -443,9 +452,6 @@ namespace osu.Game.Screens.Select
             if (!itemsCache.IsValid)
                 updateItems();
 
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
-
             // Remove all items that should no longer be on-screen
             scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
@@ -508,6 +514,14 @@ namespace osu.Game.Screens.Select
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!scrollPositionCache.IsValid)
+                updateScrollPosition();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -628,8 +642,11 @@ namespace osu.Game.Screens.Select
 
         private void updateScrollPosition()
         {
-            if (scrollTarget != null) ScrollTo(scrollTarget.Value);
-            scrollPositionCache.Validate();
+            if (scrollTarget != null)
+            {
+                scroll.ScrollTo(scrollTarget.Value);
+                scrollPositionCache.Validate();
+            }
         }
 
         /// <summary>
@@ -668,7 +685,7 @@ namespace osu.Game.Screens.Select
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+            p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private class CarouselRoot : CarouselGroupEagerSelect
@@ -686,6 +703,36 @@ namespace osu.Game.Screens.Select
                     carousel.SelectNextRandom();
                 else
                     base.PerformSelection();
+            }
+        }
+
+        private class CarouselScrollContainer : OsuScrollContainer
+        {
+            private bool rightMouseScrollBlocked;
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                if (e.Button == MouseButton.Right)
+                {
+                    // we need to block right click absolute scrolling when hovering a carousel item so context menus can display.
+                    // this can be reconsidered when we have an alternative to right click scrolling.
+                    if (GetContainingInputManager().HoveredDrawables.OfType<DrawableCarouselItem>().Any())
+                    {
+                        rightMouseScrollBlocked = true;
+                        return false;
+                    }
+                }
+
+                rightMouseScrollBlocked = false;
+                return base.OnMouseDown(e);
+            }
+
+            protected override bool OnDragStart(DragStartEvent e)
+            {
+                if (rightMouseScrollBlocked)
+                    return false;
+
+                return base.OnDragStart(e);
             }
         }
     }

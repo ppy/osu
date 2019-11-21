@@ -10,8 +10,10 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -70,11 +72,15 @@ namespace osu.Game.Tests.Beatmaps
                                     break;
 
                                 if (objectCounter >= ourMapping.Objects.Count)
+                                {
                                     Assert.Fail($"The conversion did not generate a hitobject, but should have, for hitobject at time: {expectedMapping.StartTime}:\n"
                                                 + $"Expected: {JsonConvert.SerializeObject(expectedMapping.Objects[objectCounter])}\n");
+                                }
                                 else if (objectCounter >= expectedMapping.Objects.Count)
+                                {
                                     Assert.Fail($"The conversion generated a hitobject, but should not have, for hitobject at time: {ourMapping.StartTime}:\n"
                                                 + $"Received: {JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}\n");
+                                }
                                 else if (!expectedMapping.Objects[objectCounter].Equals(ourMapping.Objects[objectCounter]))
                                 {
                                     Assert.Fail($"The conversion generated differing hitobjects for object at time: {expectedMapping.StartTime}:\n"
@@ -141,7 +147,7 @@ namespace osu.Game.Tests.Beatmaps
         private IBeatmap getBeatmap(string name)
         {
             using (var resStream = openResource($"{resource_namespace}.{name}.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
@@ -200,6 +206,8 @@ namespace osu.Game.Tests.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
 
             protected override Texture GetBackground() => throw new NotImplementedException();
+
+            protected override VideoSprite GetVideo() => throw new NotImplementedException();
 
             protected override Track GetTrack() => throw new NotImplementedException();
 

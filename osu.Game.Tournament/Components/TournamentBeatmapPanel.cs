@@ -125,12 +125,13 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Gray,
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
             });
 
             if (!string.IsNullOrEmpty(mods))
+            {
                 AddInternal(new Sprite
                 {
                     Texture = textures.Get($"mods/{mods}"),
@@ -139,6 +140,7 @@ namespace osu.Game.Tournament.Components
                     Margin = new MarginPadding(20),
                     Scale = new Vector2(0.5f)
                 });
+            }
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)

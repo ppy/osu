@@ -44,6 +44,8 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
+        protected Bindable<bool> ShowVideo { get; private set; }
+
         protected double DimLevel => DimOffset.Value + (EnableUserDim.Value ? UserDimLevel.Value : 0);
 
         protected override Container<Drawable> Content => dimContent;
@@ -63,11 +65,13 @@ namespace osu.Game.Graphics.Containers
         {
             UserDimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            ShowVideo = config.GetBindable<bool>(OsuSetting.ShowVideoBackground);
 
             EnableUserDim.ValueChanged += _ => UpdateVisuals();
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
             DimOffset.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
+            ShowVideo.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
         }
 

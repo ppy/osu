@@ -4,10 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Threading;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -30,12 +34,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
         protected virtual string SampleNamespace => null;
 
-        protected SkinnableSound Samples;
+        protected SkinnableSound Samples { get; private set; }
 
         protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
-        public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
+        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : (IReadOnlyList<DrawableHitObject>)Array.Empty<DrawableHitObject>();
 
         /// <summary>
         /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
@@ -74,7 +78,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public JudgementResult Result { get; private set; }
 
-        private bool judgementOccurred;
+        private BindableList<HitSampleInfo> samplesBindable;
+        private Bindable<double> startTimeBindable;
+        private Bindable<int> comboIndexBindable;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -86,9 +92,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public IBindable<ArmedState> State => state;
 
-        protected DrawableHitObject(HitObject hitObject)
+        protected DrawableHitObject([NotNull] HitObject hitObject)
         {
-            HitObject = hitObject;
+            HitObject = hitObject ?? throw new ArgumentNullException(nameof(hitObject));
         }
 
         [BackgroundDependencyLoader]
@@ -103,26 +109,120 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
             }
 
-            var samples = GetSamples().ToArray();
-
-            if (samples.Length > 0)
-            {
-                if (HitObject.SampleControlPoint == null)
-                    throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                                                          + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-
-                samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
-                foreach (var s in samples)
-                    s.Namespace = SampleNamespace;
-
-                AddInternal(Samples = new SkinnableSound(samples));
-            }
+            loadSamples();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            HitObject.DefaultsApplied += onDefaultsApplied;
+
+            startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
+            startTimeBindable.BindValueChanged(_ => updateState(ArmedState.Idle, true));
+
+            if (HitObject is IHasComboInformation combo)
+            {
+                comboIndexBindable = combo.ComboIndexBindable.GetBoundCopy();
+                comboIndexBindable.BindValueChanged(_ => updateAccentColour(), true);
+            }
+
+            samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
+            samplesBindable.ItemsAdded += _ => loadSamples();
+            samplesBindable.ItemsRemoved += _ => loadSamples();
+
             updateState(ArmedState.Idle, true);
+            onDefaultsApplied();
+        }
+
+        private void loadSamples()
+        {
+            if (Samples != null)
+            {
+                RemoveInternal(Samples);
+                Samples = null;
+            }
+
+            var samples = GetSamples().ToArray();
+
+            if (samples.Length <= 0)
+                return;
+
+            if (HitObject.SampleControlPoint == null)
+            {
+                throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                                                      + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+            }
+
+            samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
+            foreach (var s in samples)
+                s.Namespace = SampleNamespace;
+
+            AddInternal(Samples = new SkinnableSound(samples));
+        }
+
+        private void onDefaultsApplied() => apply(HitObject);
+
+        private void apply(HitObject hitObject)
+        {
+#pragma warning disable 618 // can be removed 20200417
+            if (GetType().GetMethod(nameof(AddNested), BindingFlags.NonPublic | BindingFlags.Instance)?.DeclaringType != typeof(DrawableHitObject))
+                return;
+#pragma warning restore 618
+
+            if (nestedHitObjects.IsValueCreated)
+            {
+                nestedHitObjects.Value.Clear();
+                ClearNestedHitObjects();
+            }
+
+            foreach (var h in hitObject.NestedHitObjects)
+            {
+                var drawableNested = CreateNestedHitObject(h) ?? throw new InvalidOperationException($"{nameof(CreateNestedHitObject)} returned null for {h.GetType().ReadableName()}.");
+
+                addNested(drawableNested);
+                AddNestedHitObject(drawableNested);
+            }
+        }
+
+        /// <summary>
+        /// Invoked by the base <see cref="DrawableHitObject"/> to add nested <see cref="DrawableHitObject"/>s to the hierarchy.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to be added.</param>
+        protected virtual void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+        }
+
+        /// <summary>
+        /// Adds a nested <see cref="DrawableHitObject"/>. This should not be used except for legacy nested <see cref="DrawableHitObject"/> usages.
+        /// </summary>
+        /// <param name="h"></param>
+        [Obsolete("Use AddNestedHitObject() / ClearNestedHitObjects() / CreateNestedHitObject() instead.")] // can be removed 20200417
+        protected virtual void AddNested(DrawableHitObject h) => addNested(h);
+
+        /// <summary>
+        /// Invoked by the base <see cref="DrawableHitObject"/> to remove all previously-added nested <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual void ClearNestedHitObjects()
+        {
+        }
+
+        /// <summary>
+        /// Creates the drawable representation for a nested <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/>.</param>
+        /// <returns>The drawable representation for <paramref name="hitObject"/>.</returns>
+        protected virtual DrawableHitObject CreateNestedHitObject(HitObject hitObject) => null;
+
+        private void addNested(DrawableHitObject hitObject)
+        {
+            // Todo: Exists for legacy purposes, can be removed 20200417
+
+            hitObject.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
+            hitObject.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
+            hitObject.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
+
+            nestedHitObjects.Value.Add(hitObject);
         }
 
         #region State / Transform Management
@@ -132,6 +232,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
+#pragma warning disable 618 // (legacy state management) - can be removed 20200227
+
         /// <summary>
         /// Enables automatic transform management of this hitobject. Implementation of transforms should be done in <see cref="UpdateInitialTransforms"/> and <see cref="UpdateStateTransforms"/> only. Rewinding and removing previous states is done automatically.
         /// </summary>
@@ -139,6 +241,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Going forward, this is the preferred way of implementing <see cref="DrawableHitObject"/>s. Previous functionality
         /// is offered as a compatibility layer until all rulesets have been migrated across.
         /// </remarks>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual bool UseTransformStateManagement => true;
 
         protected override void ClearInternal(bool disposeChildren = true) => throw new InvalidOperationException($"Should never clear a {nameof(DrawableHitObject)}");
@@ -150,6 +253,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (UseTransformStateManagement)
             {
+                LifetimeEnd = double.MaxValue;
+
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
                 base.ApplyTransformsAt(transformTime, true);
@@ -159,7 +264,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 {
                     UpdateInitialTransforms();
 
-                    var judgementOffset = Math.Min(HitObject.HitWindows?.HalfWindowFor(HitResult.Miss) ?? double.MaxValue, Result?.TimeOffset ?? 0);
+                    var judgementOffset = Result?.TimeOffset ?? 0;
 
                     using (BeginDelayedSequence(InitialLifetimeOffset + judgementOffset, true))
                     {
@@ -167,6 +272,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
                         state.Value = newState;
                     }
                 }
+
+                if (state.Value != ArmedState.Idle && LifetimeEnd == double.MaxValue)
+                    Expire();
             }
             else
                 state.Value = newState;
@@ -183,6 +291,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Apply (generally fade-in) transforms leading into the <see cref="HitObject"/> start time.
         /// The local drawable hierarchy is recursively delayed to <see cref="LifetimeStart"/> for convenience.
+        ///
+        /// By default this will fade in the object from zero with no duration.
         /// </summary>
         /// <remarks>
         /// This is called once before every <see cref="UpdateStateTransforms"/>. This is to ensure a good state in the case
@@ -190,10 +300,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </remarks>
         protected virtual void UpdateInitialTransforms()
         {
+            this.FadeInFromZero();
         }
 
         /// <summary>
         /// Apply transforms based on the current <see cref="ArmedState"/>. Previous states are automatically cleared.
+        /// In the case of a non-idle <see cref="ArmedState"/>, and if <see cref="Drawable.LifetimeEnd"/> was not set during this call, <see cref="Drawable.Expire"/> will be invoked.
         /// </summary>
         /// <param name="state">The new armed state.</param>
         protected virtual void UpdateStateTransforms(ArmedState state)
@@ -219,18 +331,43 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Should generally not be used when <see cref="UseTransformStateManagement"/> is true; use <see cref="UpdateStateTransforms"/> instead.
         /// </summary>
         /// <param name="state">The new armed state.</param>
+        [Obsolete("Use UpdateInitialTransforms()/UpdateStateTransforms() instead")] // can be removed 20200227
         protected virtual void UpdateState(ArmedState state)
         {
         }
 
+#pragma warning restore 618
+
         #endregion
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected sealed override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             base.SkinChanged(skin, allowFallback);
 
+            updateAccentColour();
+
+            ApplySkin(skin, allowFallback);
+
+            if (IsLoaded)
+                updateState(State.Value, true);
+        }
+
+        private void updateAccentColour()
+        {
             if (HitObject is IHasComboInformation combo)
-                AccentColour.Value = skin.GetValue<SkinConfiguration, Color4?>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            {
+                var comboColours = CurrentSkin.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+                AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
+            }
+        }
+
+        /// <summary>
+        /// Called when a change is made to the skin.
+        /// </summary>
+        /// <param name="skin">The new skin.</param>
+        /// <param name="allowFallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
+        protected virtual void ApplySkin(ISkinSource skin, bool allowFallback)
+        {
         }
 
         /// <summary>
@@ -268,6 +405,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
+        /// <summary>
+        /// Schedules an <see cref="Action"/> to this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only provided temporarily until hitobject pooling is implemented.
+        /// </remarks>
+        protected internal new ScheduledDelegate Schedule(Action action) => base.Schedule(action);
+
         private double? lifetimeStart;
 
         public override double LifetimeStart
@@ -275,8 +420,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             get => lifetimeStart ?? (HitObject.StartTime - InitialLifetimeOffset);
             set
             {
-                base.LifetimeStart = value;
                 lifetimeStart = value;
+                base.LifetimeStart = value;
             }
         }
 
@@ -287,7 +432,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <remarks>
         /// This is only used as an optimisation to delay the initial update of this <see cref="DrawableHitObject"/> and may be tuned more aggressively if required.
         /// It is indirectly used to decide the automatic transform offset provided to <see cref="UpdateInitialTransforms"/>.
-        /// A more accurate <see cref="LifetimeStart"/> should be set inside <see cref="UpdateState"/> for an <see cref="ArmedState.Idle"/> state.
+        /// A more accurate <see cref="LifetimeStart"/> should be set for further optimisation (in <see cref="LoadComplete"/>, for example).
         /// </remarks>
         protected virtual double InitialLifetimeOffset => 10000;
 
@@ -302,15 +447,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
             UpdateResult(false);
         }
 
-        protected virtual void AddNested(DrawableHitObject h)
-        {
-            h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-            h.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
-            h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
-
-            nestedHitObjects.Value.Add(h);
-        }
-
         /// <summary>
         /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
         /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
@@ -323,11 +459,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (!Result.HasResult)
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
-            judgementOccurred = true;
-
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            Result.TimeOffset = Time.Current - endTime;
+
+            Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
             switch (Result.Type)
             {
@@ -357,21 +492,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Time.Elapsed < 0)
                 return false;
 
-            judgementOccurred = false;
-
-            if (AllJudged)
+            if (Judged)
                 return false;
-
-            foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateResult(userTriggered);
-
-            if (judgementOccurred || Judged)
-                return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             CheckForResult(userTriggered, Time.Current - endTime);
 
-            return judgementOccurred;
+            return Judged;
         }
 
         /// <summary>
@@ -391,7 +518,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(HitObject, judgement);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            HitObject.DefaultsApplied -= onDefaultsApplied;
+        }
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject

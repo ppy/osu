@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.Chat
@@ -10,16 +11,16 @@ namespace osu.Game.Online.Chat
     public static class MessageFormatter
     {
         // [[Performance Points]] -> wiki:Performance Points (https://osu.ppy.sh/wiki/Performance_Points)
-        private static readonly Regex wiki_regex = new Regex(@"\[\[([^\]]+)\]\]");
+        private static readonly Regex wiki_regex = new Regex(@"\[\[(?<text>[^\]]+)\]\]");
 
         // (test)[https://osu.ppy.sh/b/1234] -> test (https://osu.ppy.sh/b/1234)
-        private static readonly Regex old_link_regex = new Regex(@"\(([^\)]*)\)\[([a-z]+://[^ ]+)\]");
+        private static readonly Regex old_link_regex = new Regex(@"\((?<text>(((?<=\\)[\(\)])|[^\(\)])*(((?<open>\()(((?<=\\)[\(\)])|[^\(\)])*)+((?<close-open>\))(((?<=\\)[\(\)])|[^\(\)])*)+)*(?(open)(?!)))\)\[(?<url>[a-z]+://[^ ]+)\]");
 
         // [https://osu.ppy.sh/b/1234 Beatmap [Hard] (poop)] -> Beatmap [hard] (poop) (https://osu.ppy.sh/b/1234)
-        private static readonly Regex new_link_regex = new Regex(@"\[([a-z]+://[^ ]+) ([^\[\]]*(((?<open>\[)[^\[\]]*)+((?<close-open>\])[^\[\]]*)+)*(?(open)(?!)))\]");
+        private static readonly Regex new_link_regex = new Regex(@"\[(?<url>[a-z]+://[^ ]+) (?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]");
 
         // [test](https://osu.ppy.sh/b/1234) -> test (https://osu.ppy.sh/b/1234) aka correct markdown format
-        private static readonly Regex markdown_link_regex = new Regex(@"\[([^\]]*)\]\(([a-z]+://[^ ]+)\)");
+        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)(\s+(?<title>""([^""]|(?<=\\)"")*""))?\)");
 
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
@@ -48,7 +49,7 @@ namespace osu.Game.Online.Chat
         // Unicode emojis
         private static readonly Regex emoji_regex = new Regex(@"(\uD83D[\uDC00-\uDE4F])");
 
-        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null)
+        private static void handleMatches(Regex regex, string display, string link, MessageFormatterResult result, int startIndex = 0, LinkAction? linkActionOverride = null, char[] escapeChars = null)
         {
             int captureOffset = 0;
 
@@ -58,15 +59,19 @@ namespace osu.Game.Online.Chat
 
                 var displayText = string.Format(display,
                     m.Groups[0],
-                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups["text"].Value,
+                    m.Groups["url"].Value).Trim();
 
                 var linkText = string.Format(link,
                     m.Groups[0],
-                    m.Groups.Count > 1 ? m.Groups[1].Value : "",
-                    m.Groups.Count > 2 ? m.Groups[2].Value : "").Trim();
+                    m.Groups["text"].Value,
+                    m.Groups["url"].Value).Trim();
 
                 if (displayText.Length == 0 || linkText.Length == 0) continue;
+
+                // Remove backslash escapes in front of the characters provided in escapeChars
+                if (escapeChars != null)
+                    displayText = escapeChars.Aggregate(displayText, (current, c) => current.Replace($"\\{c}", c.ToString()));
 
                 // Check for encapsulated links
                 if (result.Links.Find(l => (l.Index <= index && l.Index + l.Length >= index + m.Length) || (index <= l.Index && index + m.Length >= l.Index + l.Length)) == null)
@@ -76,7 +81,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    var details = getLinkDetails(linkText);
+                    var details = GetLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
                     //adjust the offset for processing the current matches group.
@@ -90,15 +95,21 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 var index = m.Index;
-                var link = m.Groups["link"].Value;
-                var indexLength = link.Length;
+                var linkText = m.Groups["link"].Value;
+                var indexLength = linkText.Length;
 
-                var details = getLinkDetails(link);
-                result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
+                var details = GetLinkDetails(linkText);
+                var link = new Link(linkText, index, indexLength, details.Action, details.Argument);
+
+                // sometimes an already-processed formatted link can reduce to a simple URL, too
+                // (example: [mean example - https://osu.ppy.sh](https://osu.ppy.sh))
+                // therefore we need to check if any of the pre-existing links contains the raw one we found
+                if (result.Links.All(existingLink => !existingLink.Overlaps(link)))
+                    result.Links.Add(link);
             }
         }
 
-        private static LinkDetails getLinkDetails(string url)
+        public static LinkDetails GetLinkDetails(string url)
         {
             var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
@@ -122,6 +133,7 @@ namespace osu.Game.Online.Chat
                                 return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
 
                             case "u":
+                            case "users":
                                 return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
                         }
                     }
@@ -182,13 +194,13 @@ namespace osu.Game.Online.Chat
             var result = new MessageFormatterResult(toFormat);
 
             // handle the [link display] format
-            handleMatches(new_link_regex, "{2}", "{1}", result, startIndex);
+            handleMatches(new_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the standard markdown []() format
-            handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex);
+            handleMatches(markdown_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '[', ']' });
 
             // handle the ()[] link format
-            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex);
+            handleMatches(old_link_regex, "{1}", "{2}", result, startIndex, escapeChars: new[] { '(', ')' });
 
             // handle wiki links
             handleMatches(wiki_regex, "{1}", "https://osu.ppy.sh/wiki/{1}", result, startIndex);
@@ -243,17 +255,17 @@ namespace osu.Game.Online.Chat
                 OriginalText = Text = text;
             }
         }
+    }
 
-        public class LinkDetails
+    public class LinkDetails
+    {
+        public LinkAction Action;
+        public string Argument;
+
+        public LinkDetails(LinkAction action, string argument)
         {
-            public LinkAction Action;
-            public string Argument;
-
-            public LinkDetails(LinkAction action, string argument)
-            {
-                Action = action;
-                Argument = argument;
-            }
+            Action = action;
+            Argument = argument;
         }
     }
 
@@ -267,6 +279,7 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
+        Custom
     }
 
     public class Link : IComparable<Link>
@@ -285,6 +298,8 @@ namespace osu.Game.Online.Chat
             Action = action;
             Argument = argument;
         }
+
+        public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
 
         public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
     }

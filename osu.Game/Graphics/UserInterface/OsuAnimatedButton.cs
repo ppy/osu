@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = HoverColour,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                         Alpha = 0,
                     },
                 }

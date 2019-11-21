@@ -31,6 +31,10 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float MessagePadding => default_message_padding;
 
+        private const float default_timestamp_padding = 65;
+
+        protected virtual float TimestampPadding => default_timestamp_padding;
+
         private const float default_horizontal_padding = 15;
 
         protected virtual float HorizontalPadding => default_horizontal_padding;
@@ -87,7 +91,12 @@ namespace osu.Game.Overlays.Chat
             {
                 Shadow = false,
                 Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
-                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true)
+                Truncate = true,
+                EllipsisString = "… :",
+                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                MaxWidth = MessagePadding - TimestampPadding
             };
 
             if (hasBackground)

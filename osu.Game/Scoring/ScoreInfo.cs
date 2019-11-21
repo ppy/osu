@@ -11,8 +11,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Users;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Scoring
 {
@@ -183,6 +183,10 @@ namespace osu.Game.Scoring
 
         public override string ToString() => $"{User} playing {Beatmap}";
 
-        public bool Equals(ScoreInfo other) => other?.OnlineScoreID == OnlineScoreID;
+        public bool Equals(ScoreInfo other) =>
+            other != null
+            && other.OnlineScoreID == OnlineScoreID
+            && other.BeatmapInfoID == BeatmapInfoID
+            && other.Hash == Hash;
     }
 }

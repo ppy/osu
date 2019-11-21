@@ -103,6 +103,7 @@ namespace osu.Game.Screens.Play
             var newColumns = new BufferedContainer<Column>
             {
                 CacheDrawnFrameBuffer = true,
+                RedrawOnScale = false,
                 RelativeSizeAxes = Axes.Both,
             };
 
@@ -255,7 +256,7 @@ namespace osu.Game.Screens.Play
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)Math.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;
