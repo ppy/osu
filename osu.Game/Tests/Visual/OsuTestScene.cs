@@ -10,6 +10,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -20,7 +22,6 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
-using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -93,6 +94,10 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        protected override Container<Drawable> Content => content ?? base.Content;
+
+        private readonly Container content;
+
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
@@ -104,6 +109,8 @@ namespace osu.Game.Tests.Visual
                     usage.Migrate();
                 return factory;
             });
+
+            base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
         [Resolved]
@@ -242,7 +249,7 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = MathHelper.Clamp(seek, 0, Length);
+                    offset = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
                     return offset == seek;
