@@ -41,7 +41,13 @@ namespace osu.Game.Overlays.Comments
         protected override void OnShowMoreAction()
         {
             request = new GetCommentsRequest(parameters, Sort.Value, ++currentPage);
-            request.Success += response => AddComments(response, currentPage == 1);
+            request.Success += response =>
+            {
+                if (currentPage == 1)
+                    ResetComments(response);
+                else
+                    AddComments(response, false);
+            };
             Task.Run(() => request.Perform(API));
         }
 

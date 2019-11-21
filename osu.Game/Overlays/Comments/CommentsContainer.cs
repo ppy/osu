@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Comments
                 commentBundle = value;
 
                 OnLoadStarted();
-                AddComments(commentBundle);
+                ResetComments(commentBundle);
             }
         }
 
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Comments
         protected virtual void OnUserChanged(ValueChangedEvent<User> user)
         {
             OnLoadStarted();
-            AddComments(commentBundle);
+            ResetComments(commentBundle);
         }
 
         protected virtual void OnShowMoreAction()
@@ -203,12 +203,13 @@ namespace osu.Game.Overlays.Comments
                 loadingLayer.Show();
         }
 
-        protected void AddComments(CommentBundle comments, bool clearContent = true)
+        protected void ResetComments(CommentBundle comments)
         {
             if (comments == null)
             {
                 content.Clear();
                 deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                totalCommentsCounter.Current.Value = 0;
                 noCommentsPlaceholder.Hide();
                 loadingLayer.Hide();
                 moreButton.IsLoading = true;
@@ -218,34 +219,47 @@ namespace osu.Game.Overlays.Comments
 
             if (!comments.Comments.Any())
             {
+                content.Clear();
+                deletedChildrenPlaceholder.DeletedCount.Value = 0;
                 noCommentsPlaceholder.Show();
                 onLoadFinished(comments);
                 return;
             }
 
+            AddComments(comments, true);
+        }
+
+        protected void AddComments(CommentBundle comments, bool reset)
+        {
             loadCancellation = new CancellationTokenSource();
 
             var page = createCommentsPage(comments);
 
             LoadComponentAsync(page, loaded =>
             {
-                if (clearContent)
+                if (reset)
+                {
                     content.Clear();
+                    deletedChildrenPlaceholder.DeletedCount.Value = getDeletedComments(comments);
+                }
+                else
+                {
+                    deletedChildrenPlaceholder.DeletedCount.Value += getDeletedComments(comments);
+                }
 
                 noCommentsPlaceholder.Hide();
 
                 content.Add(loaded);
 
-                deletedChildrenPlaceholder.DeletedCount.Value += comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
-
-                totalCommentsCounter.Current.Value = comments.Total;
-
                 onLoadFinished(comments);
             }, loadCancellation.Token);
         }
 
+        private int getDeletedComments(CommentBundle comments) => comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+
         private void onLoadFinished(CommentBundle comments)
         {
+            totalCommentsCounter.Current.Value = comments.Total;
             loadingLayer.Hide();
             updateMoreButtonState(comments);
         }
