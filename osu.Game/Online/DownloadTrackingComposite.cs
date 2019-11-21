@@ -11,7 +11,7 @@ using osu.Game.Online.API;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A component which tracks a <see cref="TModel"/> through potential download/import/deletion.
+    /// A component which tracks a <typeparamref name="TModel"/> through potential download/import/deletion.
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
         where TModel : class, IEquatable<TModel>
@@ -22,7 +22,7 @@ namespace osu.Game.Online
         private TModelManager manager;
 
         /// <summary>
-        /// Holds the current download state of the <see cref="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
+        /// Holds the current download state of the <typeparamref name="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
         /// </summary>
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
