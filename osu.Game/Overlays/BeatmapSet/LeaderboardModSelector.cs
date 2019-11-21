@@ -114,13 +114,12 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     this.FadeColour(hovered.NewValue ? Color4.White : Color4.DimGray, duration, Easing.OutQuint);
                 }, true);
-            }
 
-            protected override void OnHighlightedChanged(ValueChangedEvent<bool> highlighted)
-            {
-                base.OnHighlightedChanged(highlighted);
-                OnSelectionChanged?.Invoke(Mod, highlighted.NewValue);
-                IsActive.TriggerChange();
+                Highlighted.BindValueChanged(highlighted =>
+                {
+                    OnSelectionChanged?.Invoke(Mod, highlighted.NewValue);
+                    IsActive.TriggerChange();
+                }, true);
             }
 
             protected override bool OnClick(ClickEvent e)
