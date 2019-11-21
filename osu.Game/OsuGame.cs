@@ -71,7 +71,7 @@ namespace osu.Game
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
-        protected RavenLogger RavenLogger;
+        protected SentryLogger SentryLogger;
 
         public virtual Storage GetStorageForStableInstall() => null;
 
@@ -110,7 +110,7 @@ namespace osu.Game
 
             forwardLoggedErrorsToNotifications();
 
-            RavenLogger = new RavenLogger(this);
+            SentryLogger = new SentryLogger(this);
         }
 
         private void updateBlockingOverlayFade() =>
@@ -166,7 +166,7 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
 
-            dependencies.Cache(RavenLogger);
+            dependencies.Cache(SentryLogger);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
@@ -486,7 +486,7 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            RavenLogger.Dispose();
+            SentryLogger.Dispose();
         }
 
         protected override void LoadComplete()

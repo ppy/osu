@@ -57,23 +57,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             typeof(DrawableCarouselBeatmapSet),
         };
 
-        private class TestSongSelect : PlaySongSelect
-        {
-            public Action StartRequested;
-
-            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
-
-            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
-            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
-            public new BeatmapCarousel Carousel => base.Carousel;
-
-            protected override bool OnStart()
-            {
-                StartRequested?.Invoke();
-                return base.OnStart();
-            }
-        }
-
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]
@@ -100,6 +83,17 @@ namespace osu.Game.Tests.Visual.SongSelect
             Ruleset.Value = new OsuRuleset().RulesetInfo;
             manager?.Delete(manager.GetAllUsableBeatmapSets());
         });
+
+        [Test]
+        public void TestSingleFilterOnEnter()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
 
         [Test]
         public void TestAudioResuming()
@@ -372,6 +366,31 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             base.Dispose(isDisposing);
             rulesets?.Dispose();
+        }
+
+        private class TestSongSelect : PlaySongSelect
+        {
+            public Action StartRequested;
+
+            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
+            public new BeatmapCarousel Carousel => base.Carousel;
+
+            protected override bool OnStart()
+            {
+                StartRequested?.Invoke();
+                return base.OnStart();
+            }
+
+            public int FilterCount;
+
+            protected override void ApplyFilterToCarousel(FilterCriteria criteria)
+            {
+                FilterCount++;
+                base.ApplyFilterToCarousel(criteria);
+            }
         }
     }
 }
