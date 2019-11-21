@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Show converted beatmaps",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
-                    Keywords = new[] { "convert" }
                 },
                 new SettingsSlider<double, StarSlider>
                 {
