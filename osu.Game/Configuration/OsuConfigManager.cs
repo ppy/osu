@@ -118,7 +118,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
-            Set(OsuSetting.BackgroundMode, BackgroundMode.Default);
+            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
         }
 
         public OsuConfigManager(Storage storage)
@@ -189,6 +189,6 @@ namespace osu.Game.Configuration
         IntroSequence,
         UIHoldActivationDelay,
         HitLighting,
-        BackgroundMode
+        MenuBackgroundSource
     }
 }
