@@ -152,7 +152,7 @@ namespace osu.Game.Screens.Play
         }
 
         /// <summary>
-        /// Skip forwardto the next valid skip point.
+        /// Skip forward to the next valid skip point.
         /// </summary>
         public void Skip()
         {
