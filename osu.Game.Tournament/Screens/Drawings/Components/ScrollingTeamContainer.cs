@@ -125,20 +125,20 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                         foreach (var c in Children)
                         {
-                            if (c is ScrollingTeam stc)
+                            if (!(c is ScrollingTeam stc))
+                                continue;
+
+                            if (closest == null)
                             {
-                                if (closest == null)
-                                {
-                                    closest = stc;
-                                    continue;
-                                }
-
-                                float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
-                                float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
-
-                                if (o < lastOffset)
-                                    closest = stc;
+                                closest = stc;
+                                continue;
                             }
+
+                            float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
+                            float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
+
+                            if (o < lastOffset)
+                                closest = stc;
                         }
 
                         Trace.Assert(closest != null, "closest != null");

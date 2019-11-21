@@ -380,25 +380,25 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (judgedObject is DrawableOsuHitObject osuObject)
+            if (!(judgedObject is DrawableOsuHitObject osuObject))
+                return;
+
+            OsuSpriteText text;
+            Add(text = new OsuSpriteText
             {
-                OsuSpriteText text;
-                Add(text = new OsuSpriteText
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = result.IsHit ? "Hit!" : "Miss!",
-                    Colour = result.IsHit ? Color4.Green : Color4.Red,
-                    Font = OsuFont.GetFont(size: 30),
-                    Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
-                });
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = result.IsHit ? "Hit!" : "Miss!",
+                Colour = result.IsHit ? Color4.Green : Color4.Red,
+                Font = OsuFont.GetFont(size: 30),
+                Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
+            });
 
-                text.Delay(150)
-                    .Then().FadeOut(200)
-                    .Then().Expire();
+            text.Delay(150)
+                .Then().FadeOut(200)
+                .Then().Expire();
 
-                judgementOffsetDirection *= -1;
-            }
+            judgementOffsetDirection *= -1;
         }
     }
 }
