@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.UI
 {
     public class ModIcon : Container, IHasTooltip
     {
-        public readonly BindableBool Highlighted = new BindableBool();
+        public readonly BindableBool Selected = new BindableBool();
 
         private readonly SpriteIcon modIcon;
         private readonly SpriteIcon background;
@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.UI
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Highlighted.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
+            Selected.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
         }
     }
 }
