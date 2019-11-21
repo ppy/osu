@@ -104,7 +104,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("button down", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep("wait for overlay disapper", () => !skip.IsAlive);
+            AddUntilStep("wait for overlay disappear", () => !skip.IsPresent);
             AddAssert("ensure button didn't disappear", () => skip.Children.First().Alpha > 0);
             AddStep("button up", () => InputManager.ReleaseButton(MouseButton.Left));
             checkRequestCount(0);
