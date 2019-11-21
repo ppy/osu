@@ -57,6 +57,7 @@ namespace osu.Game.Overlays.Comments
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
         private readonly DimmedLoadingLayer loadingLayer;
+        private readonly TotalCommentsCounter totalCommentsCounter;
 
         public CommentsContainer()
         {
@@ -75,6 +76,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        totalCommentsCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -235,6 +237,8 @@ namespace osu.Game.Overlays.Comments
                 content.Add(loaded);
 
                 deletedChildrenPlaceholder.DeletedCount.Value += comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+
+                totalCommentsCounter.Current.Value = comments.Total;
 
                 onLoadFinished(comments);
             }, loadCancellation.Token);

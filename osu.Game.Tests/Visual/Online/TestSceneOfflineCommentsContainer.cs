@@ -57,6 +57,7 @@ namespace osu.Game.Tests.Visual.Online
         private static readonly CommentBundle empty_comment_bundle = new CommentBundle
         {
             Comments = new List<Comment>(),
+            Total = 0,
         };
 
         private static readonly CommentBundle comment_bundle = new CommentBundle
@@ -138,6 +139,7 @@ namespace osu.Game.Tests.Visual.Online
                 }
             },
             TopLevelCount = 4,
+            Total = 7
         };
     }
 }
