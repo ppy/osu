@@ -124,6 +124,8 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
+
+            button.Enabled.Value = Time.Current < startTime - GameplayClockContainer.MINIMUM_SKIP_TIME;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
