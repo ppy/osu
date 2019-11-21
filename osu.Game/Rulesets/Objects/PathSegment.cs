@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Objects
 
         public PathSegment(PathType type, Vector2[] controlPoints)
         {
-            if (type == PathType.PerfectCurve && controlPoints.Length != 3)
-                throw new ArgumentException($"A {nameof(PathType.PerfectCurve)} must have exactly 3 points.");
+            if (type == PathType.PerfectCurve && controlPoints.Length != 2)
+                throw new ArgumentException($"A {nameof(PathType.PerfectCurve)} must have exactly 2 auxiliary control points.");
 
             Type = type;
             this.controlPoints = controlPoints;
