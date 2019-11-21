@@ -80,8 +80,7 @@ namespace osu.Game.Audio
                 return;
 
             CurrentTrack.Stop();
-            // CurrentTrack must not change until the scheduled stopped event has been invoked.
-            // To ensure that this doesn't early-return on (CurrentTrack != track) check.
+            // CurrentTrack should not be set to null here as it will result in incorrect handling in the track.Stopped callback above.
         }
 
         /// <summary>
