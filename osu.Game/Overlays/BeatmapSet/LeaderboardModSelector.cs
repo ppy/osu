@@ -97,7 +97,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private class ModButton : ModIcon
         {
-            private const float mod_scale = 0.4f;
             private const int duration = 200;
 
             public readonly BindableBool Selected = new BindableBool();
@@ -106,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet
             public ModButton(Mod mod)
                 : base(mod)
             {
-                Scale = new Vector2(mod_scale);
+                Scale = new Vector2(0.4f);
                 Highlighted.Value = true;
                 Add(new HoverClickSounds());
             }
