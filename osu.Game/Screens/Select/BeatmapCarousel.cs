@@ -351,7 +351,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Half the height of the visible content.
         /// <remarks>
-        /// This is different from the height of <see cref="ScrollContainer{T}.displayableContent"/>, since
+        /// This is different from the height of <see cref="ScrollContainer{T}"/>.displayableContent, since
         /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
         /// </remarks>
         /// </summary>
@@ -452,9 +452,6 @@ namespace osu.Game.Screens.Select
             if (!itemsCache.IsValid)
                 updateItems();
 
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
-
             // Remove all items that should no longer be on-screen
             scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
@@ -517,6 +514,14 @@ namespace osu.Game.Screens.Select
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!scrollPositionCache.IsValid)
+                updateScrollPosition();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -637,8 +642,11 @@ namespace osu.Game.Screens.Select
 
         private void updateScrollPosition()
         {
-            if (scrollTarget != null) scroll.ScrollTo(scrollTarget.Value);
-            scrollPositionCache.Validate();
+            if (scrollTarget != null)
+            {
+                scroll.ScrollTo(scrollTarget.Value);
+                scrollPositionCache.Validate();
+            }
         }
 
         /// <summary>
@@ -677,7 +685,7 @@ namespace osu.Game.Screens.Select
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+            p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private class CarouselRoot : CarouselGroupEagerSelect
