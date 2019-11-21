@@ -60,6 +60,7 @@ namespace osu.Game.Tournament.IPC
                 const string file_ipc_channel_filename = "ipc-channel.txt";
 
                 if (Storage.Exists(file_ipc_filename))
+                {
                     scheduled = Scheduler.AddDelayed(delegate
                     {
                         try
@@ -134,6 +135,7 @@ namespace osu.Game.Tournament.IPC
                             // file might be in use.
                         }
                     }, 250, true);
+                }
             }
             catch (Exception e)
             {
