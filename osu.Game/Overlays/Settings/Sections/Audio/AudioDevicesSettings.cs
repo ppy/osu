@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 dropdown = new AudioDeviceSettingsDropdown
                 {
-                    Keywords = new[] { "Speaker" }
+                    Keywords = new[] { "speaker", "headphone", "output" }
                 }
             };
 

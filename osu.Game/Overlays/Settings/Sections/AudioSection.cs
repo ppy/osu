@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         public override string Header => "Audio";
 
-        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "Sound" });
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(new[] { "sound" });
 
         public override IconUsage Icon => FontAwesome.Solid.VolumeUp;
 
