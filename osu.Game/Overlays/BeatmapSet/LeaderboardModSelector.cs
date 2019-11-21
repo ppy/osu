@@ -20,34 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
     public class LeaderboardModSelector : CompositeDrawable
     {
         public readonly BindableList<Mod> SelectedMods = new BindableList<Mod>();
-
-        private RulesetInfo ruleset;
-
-        public RulesetInfo Ruleset
-        {
-            get => ruleset;
-            set
-            {
-                if (ruleset?.Equals(value) ?? false)
-                {
-                    DeselectAll();
-                    return;
-                }
-
-                ruleset = value;
-
-                SelectedMods.Clear();
-                modsContainer.Clear();
-
-                if (ruleset == null)
-                    return;
-
-                modsContainer.Add(new ModButton(new ModNoMod()));
-                modsContainer.AddRange(ruleset.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
-
-                modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
-            }
-        }
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
 
@@ -62,6 +35,26 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Full,
                 Spacing = new Vector2(4),
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Ruleset.BindValueChanged(onRulesetChanged, true);
+        }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        {
+            SelectedMods.Clear();
+            modsContainer.Clear();
+
+            if (ruleset.NewValue == null)
+                return;
+
+            modsContainer.Add(new ModButton(new ModNoMod()));
+            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
+
+            modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
         }
 
         private void selectionChanged(Mod mod, bool selected)
