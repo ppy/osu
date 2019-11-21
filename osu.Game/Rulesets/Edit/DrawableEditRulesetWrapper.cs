@@ -64,6 +64,10 @@ namespace osu.Game.Rulesets.Edit
             drawableRuleset.Playfield.PostProcess();
         }
 
+        public override bool PropagatePositionalInputSubTree => false;
+
+        public override bool PropagateNonPositionalInputSubTree => false;
+
         public PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
 
         protected override void Dispose(bool isDisposing)

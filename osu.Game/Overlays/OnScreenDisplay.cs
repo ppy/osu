@@ -86,7 +86,7 @@ namespace osu.Game.Overlays
         /// <param name="source">The object that registered the <see cref="ConfigManager{T}"/> to be tracked.</param>
         /// <param name="configManager">The <see cref="ConfigManager{T}"/> that is being tracked.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="configManager"/> is null.</exception>
-        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <see cref="source"/>.</exception>
+        /// <exception cref="InvalidOperationException">If <paramref name="configManager"/> is not being tracked from the same <paramref name="source"/>.</exception>
         public void StopTracking(object source, ITrackableConfigManager configManager)
         {
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));

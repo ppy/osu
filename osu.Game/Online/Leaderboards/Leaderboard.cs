@@ -75,8 +75,10 @@ namespace osu.Game.Online.Leaderboards
                     int i = 0;
 
                     foreach (var s in scrollFlow.Children)
+                    {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
+                    }
 
                     scrollContainer.ScrollTo(0f, false);
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
@@ -99,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
             get => scope;
             set
             {
-                if (value.Equals(scope))
+                if (EqualityComparer<TScope>.Default.Equals(value, scope))
                     return;
 
                 scope = value;
@@ -342,13 +344,17 @@ namespace osu.Game.Online.Leaderboards
                 else
                 {
                     if (bottomY - fadeBottom > 0 && FadeBottom)
+                    {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
+                    }
                     else if (FadeTop)
+                    {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / LeaderboardScore.HEIGHT, 1)));
+                    }
                 }
             }
         }

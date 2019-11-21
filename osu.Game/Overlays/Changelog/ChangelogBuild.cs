@@ -15,6 +15,7 @@ using osu.Game.Users;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using System.Net;
+using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -67,22 +68,34 @@ namespace osu.Game.Overlays.Changelog
 
                 foreach (APIChangelogEntry entry in categoryEntries)
                 {
-                    LinkFlowContainer title = new LinkFlowContainer
-                    {
-                        Direction = FillDirection.Full,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Vertical = 5 },
-                    };
-
                     var entryColour = entry.Major ? colours.YellowLight : Color4.White;
 
-                    title.AddIcon(entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus, t =>
+                    LinkFlowContainer title;
+
+                    Container titleContainer = new Container
                     {
-                        t.Font = fontSmall;
-                        t.Colour = entryColour;
-                        t.Padding = new MarginPadding { Left = -17, Right = 5 };
-                    });
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Margin = new MarginPadding { Vertical = 5 },
+                        Children = new Drawable[]
+                        {
+                            new SpriteIcon
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.CentreRight,
+                                Size = new Vector2(fontSmall.Size),
+                                Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
+                                Colour = entryColour,
+                                Margin = new MarginPadding { Right = 5 },
+                            },
+                            title = new LinkFlowContainer
+                            {
+                                Direction = FillDirection.Full,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                            }
+                        }
+                    };
 
                     title.AddText(entry.Title, t =>
                     {
@@ -97,7 +110,7 @@ namespace osu.Game.Overlays.Changelog
                             t.Font = fontLarge;
                             t.Colour = entryColour;
                         });
-                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
+                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl,
                             creationParameters: t =>
                             {
                                 t.Font = fontLarge;
@@ -117,6 +130,7 @@ namespace osu.Game.Overlays.Changelog
                     });
 
                     if (entry.GithubUser.UserId != null)
+                    {
                         title.AddUserLink(new User
                         {
                             Username = entry.GithubUser.OsuUsername,
@@ -126,20 +140,25 @@ namespace osu.Game.Overlays.Changelog
                             t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
+                    }
                     else if (entry.GithubUser.GithubUrl != null)
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t =>
+                    {
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
                         {
                             t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
+                    }
                     else
+                    {
                         title.AddText(entry.GithubUser.DisplayName, t =>
                         {
                             t.Font = fontSmall;
                             t.Colour = entryColour;
                         });
+                    }
 
-                    ChangelogEntries.Add(title);
+                    ChangelogEntries.Add(titleContainer);
 
                     if (!string.IsNullOrEmpty(entry.MessageHtml))
                     {

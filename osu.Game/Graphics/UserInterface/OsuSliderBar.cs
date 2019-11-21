@@ -17,7 +17,7 @@ using osu.Framework.Input.Events;
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
@@ -175,9 +175,9 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(MathHelper.Clamp(
+            leftBox.Scale = new Vector2(Math.Clamp(
                 Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(MathHelper.Clamp(
+            rightBox.Scale = new Vector2(Math.Clamp(
                 DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 

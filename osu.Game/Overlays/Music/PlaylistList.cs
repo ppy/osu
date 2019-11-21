@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Music
                 beatmaps.ForEach(addBeatmapSet);
 
                 beatmapBacking.BindTo(beatmap);
-                beatmapBacking.ValueChanged += _ => updateSelectedSet();
+                beatmapBacking.ValueChanged += _ => Scheduler.AddOnce(updateSelectedSet);
             }
 
             private void addBeatmapSet(BeatmapSetInfo obj)
@@ -109,7 +109,11 @@ namespace osu.Game.Overlays.Music
             private void updateSelectedSet()
             {
                 foreach (PlaylistItem s in items.Children)
+                {
                     s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo?.ID;
+                    if (s.Selected)
+                        ScrollIntoView(s);
+                }
             }
 
             public string SearchTerm
@@ -213,7 +217,7 @@ namespace osu.Game.Overlays.Music
                         break;
                 }
 
-                dstIndex = MathHelper.Clamp(dstIndex, 0, items.Count - 1);
+                dstIndex = Math.Clamp(dstIndex, 0, items.Count - 1);
 
                 if (srcIndex == dstIndex)
                     return;
