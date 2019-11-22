@@ -107,8 +107,6 @@ namespace osu.Game.Rulesets.UI
                     modIcon.Colour = colours.Yellow;
                     break;
             }
-
-            background.Colour = backgroundColour;
         }
 
         protected override void LoadComplete()
