@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Play
 
         private readonly double gameplayStartTime;
 
+        private readonly double firstHitObjectTime;
+
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
@@ -66,6 +68,7 @@ namespace osu.Game.Screens.Play
             this.beatmap = beatmap;
             this.mods = mods;
             this.gameplayStartTime = gameplayStartTime;
+            this.firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -102,9 +105,22 @@ namespace osu.Game.Screens.Play
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
-            UserPlaybackRate.ValueChanged += _ => updateRate();
+            // sane default provided by ruleset.
+            double startTime = Math.Min(0, gameplayStartTime);
 
-            Seek(Math.Min(-beatmap.BeatmapInfo.AudioLeadIn, gameplayStartTime));
+            // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
+            // this is commonly used to display an intro before the audio track start.
+            startTime = Math.Min(startTime, beatmap.Storyboard.FirstEventTime);
+
+            // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
+            // this is not available as an option in the live editor but can still be applied via .osu editing.
+            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
+                startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+
+            Seek(startTime);
+
+            adjustableClock.ProcessFrame();
+            UserPlaybackRate.ValueChanged += _ => updateRate();
         }
 
         public void Restart()
