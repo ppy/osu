@@ -33,10 +33,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
         private readonly DimmedLoadingLayer loading;
-        private readonly FillFlowContainer filterControls;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
         private readonly FillFlowContainer content;
+        private readonly NotSupporterPlaceholder notSupporterPlaceholder;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -93,22 +93,30 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        filterControls = new FillFlowContainer
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            AutoSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Direction = FillDirection.Vertical,
                             Spacing = new Vector2(0, spacing),
                             Children = new Drawable[]
                             {
                                 new LeaderboardScopeSelector
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Current = { BindTarget = scope }
                                 },
-                                new NotSupporterPlaceholder(),
+                                notSupporterPlaceholder = new NotSupporterPlaceholder
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Alpha = 0,
+                                },
                                 modSelector = new LeaderboardModSelector
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Ruleset = { BindTarget = ruleset }
                                 }
                             }
@@ -207,7 +215,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             scope.Value = BeatmapLeaderboardScope.Global;
             modSelector.DeselectAll();
-            filterControls.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
+            modSelector.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
         }
 
         private void getScores()

@@ -17,8 +17,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             LinkFlowContainer text;
 
             AutoSizeAxes = Axes.Both;
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
             Child = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
