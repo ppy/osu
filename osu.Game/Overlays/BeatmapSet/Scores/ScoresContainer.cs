@@ -23,7 +23,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoresContainer : CompositeDrawable
     {
         private const int spacing = 15;
-        private const int duration = 200;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -215,7 +214,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
-            noScoresPlaceholder.FadeOut(duration, Easing.OutQuint);
+            noScoresPlaceholder.Hide();
 
             if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
             {
@@ -233,10 +232,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Scores = scores;
 
                 if (!scores.Scores.Any())
-                {
-                    noScoresPlaceholder.UpdateText(scope.Value);
-                    noScoresPlaceholder.FadeIn(duration, Easing.OutQuint);
-                }
+                    noScoresPlaceholder.ShowWithScope(scope.Value);
             };
             api.Queue(getScoresRequest);
         }
