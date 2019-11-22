@@ -193,7 +193,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             var beatmapRuleset = beatmap.NewValue?.Ruleset;
 
             if (ruleset.Value?.Equals(beatmapRuleset) ?? false)
+            {
                 modSelector.DeselectAll();
+                ruleset.TriggerChange();
+            }
             else
                 ruleset.Value = beatmapRuleset;
 
