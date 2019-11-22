@@ -36,7 +36,9 @@ namespace osu.Game.Screens.Ranking
             Size = new Vector2(50);
 
             Masking = true;
+
             CornerRadius = 25;
+            CornerExponent = 2;
 
             activeColour = colours.PinkDarker;
             inactiveColour = OsuColour.Gray(0.8f);
