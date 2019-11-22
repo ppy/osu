@@ -20,34 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
     public class LeaderboardModSelector : CompositeDrawable
     {
         public readonly BindableList<Mod> SelectedMods = new BindableList<Mod>();
-
-        private RulesetInfo ruleset;
-
-        public RulesetInfo Ruleset
-        {
-            get => ruleset;
-            set
-            {
-                if (ruleset?.Equals(value) ?? false)
-                {
-                    DeselectAll();
-                    return;
-                }
-
-                ruleset = value;
-
-                SelectedMods.Clear();
-                modsContainer.Clear();
-
-                if (ruleset == null)
-                    return;
-
-                modsContainer.Add(new ModButton(new ModNoMod()));
-                modsContainer.AddRange(ruleset.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
-
-                modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
-            }
-        }
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private readonly FillFlowContainer<ModButton> modsContainer;
 
@@ -64,6 +37,38 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Ruleset.BindValueChanged(onRulesetChanged, true);
+        }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> ruleset)
+        {
+            SelectedMods.Clear();
+            modsContainer.Clear();
+
+            if (ruleset.NewValue == null)
+                return;
+
+            modsContainer.Add(new ModButton(new ModNoMod()));
+            modsContainer.AddRange(ruleset.NewValue.CreateInstance().GetAllMods().Where(m => m.Ranked).Select(m => new ModButton(m)));
+
+            modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateHighlighted();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            updateHighlighted();
+        }
+
         private void selectionChanged(Mod mod, bool selected)
         {
             if (selected)
@@ -71,43 +76,30 @@ namespace osu.Game.Overlays.BeatmapSet
             else
                 SelectedMods.Remove(mod);
 
-            if (!SelectedMods.Any() && !IsHovered)
-                highlightAll();
+            updateHighlighted();
         }
 
-        protected override bool OnHover(HoverEvent e)
+        private void updateHighlighted()
         {
-            if (!SelectedMods.Any())
-                modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = false);
+            if (SelectedMods.Any())
+                return;
 
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            base.OnHoverLost(e);
-
-            if (!SelectedMods.Any())
-                highlightAll();
+            modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = !IsHovered);
         }
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
 
-        private void highlightAll() => modsContainer.ForEach(mod => mod.Highlighted.Value = true);
-
         private class ModButton : ModIcon
         {
-            private const float mod_scale = 0.4f;
             private const int duration = 200;
 
-            public readonly BindableBool Selected = new BindableBool();
+            public readonly BindableBool Highlighted = new BindableBool();
             public Action<Mod, bool> OnSelectionChanged;
 
             public ModButton(Mod mod)
                 : base(mod)
             {
-                Scale = new Vector2(mod_scale);
-                Highlighted.Value = true;
+                Scale = new Vector2(0.4f);
                 Add(new HoverClickSounds());
             }
 
@@ -115,11 +107,19 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 base.LoadComplete();
 
+                Highlighted.BindValueChanged(highlighted =>
+                {
+                    if (Selected.Value)
+                        return;
+
+                    this.FadeColour(highlighted.NewValue ? Color4.White : Color4.DimGray, duration, Easing.OutQuint);
+                }, true);
+
                 Selected.BindValueChanged(selected =>
                 {
-                    updateState();
                     OnSelectionChanged?.Invoke(Mod, selected.NewValue);
-                });
+                    Highlighted.TriggerChange();
+                }, true);
             }
 
             protected override bool OnClick(ClickEvent e)
@@ -130,20 +130,15 @@ namespace osu.Game.Overlays.BeatmapSet
 
             protected override bool OnHover(HoverEvent e)
             {
-                updateState();
+                Highlighted.Value = true;
                 return false;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
                 base.OnHoverLost(e);
-                updateState();
+                Highlighted.Value = false;
             }
-
-            private void updateState() => Highlighted.Value = IsHovered || Selected.Value;
-
-            protected override void OnHighlightedChanged(ValueChangedEvent<bool> highlighted) =>
-                this.FadeColour(highlighted.NewValue ? Color4.White : Color4.Gray, duration, Easing.OutQuint);
         }
     }
 }

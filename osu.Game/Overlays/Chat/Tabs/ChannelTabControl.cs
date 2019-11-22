@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         private void tabCloseRequested(TabItem<Channel> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
-            int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
+            int currentIndex = Math.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
 
             if (tab == SelectedTab && totalTabs > 1)
                 // Select the tab after tab-to-be-removed's index, or the tab before if current == last

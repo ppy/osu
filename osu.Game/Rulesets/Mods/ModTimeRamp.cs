@@ -9,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -59,7 +58,7 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
         private void applyAdjustment(double amount)
         {
-            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * MathHelper.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
+            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
 
             switch (clock)
             {

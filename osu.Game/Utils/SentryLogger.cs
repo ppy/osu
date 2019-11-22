@@ -2,30 +2,33 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Threading.Tasks;
 using osu.Framework.Logging;
-using SharpRaven;
-using SharpRaven.Data;
+using Sentry;
 
 namespace osu.Game.Utils
 {
     /// <summary>
     /// Report errors to sentry.
     /// </summary>
-    public class RavenLogger : IDisposable
+    public class SentryLogger : IDisposable
     {
-        private readonly RavenClient raven = new RavenClient("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255");
+        private SentryClient sentry;
+        private Scope sentryScope;
 
-        private readonly List<Task> tasks = new List<Task>();
-
-        public RavenLogger(OsuGame game)
+        public SentryLogger(OsuGame game)
         {
-            raven.Release = game.Version;
-
             if (!game.IsDeployedBuild) return;
+
+            var options = new SentryOptions
+            {
+                Dsn = new Dsn("https://5e342cd55f294edebdc9ad604d28bbd3@sentry.io/1255255"),
+                Release = game.Version
+            };
+
+            sentry = new SentryClient(options);
+            sentryScope = new Scope(options);
 
             Exception lastException = null;
 
@@ -46,10 +49,10 @@ namespace osu.Game.Utils
                         return;
 
                     lastException = exception;
-                    queuePendingTask(raven.CaptureAsync(new SentryEvent(exception) { Message = entry.Message }));
+                    sentry.CaptureEvent(new SentryEvent(exception) { Message = entry.Message }, sentryScope);
                 }
                 else
-                    raven.AddTrail(new Breadcrumb(entry.Target.ToString(), BreadcrumbType.Navigation) { Message = entry.Message });
+                    sentryScope.AddBreadcrumb(DateTimeOffset.Now, entry.Message, entry.Target.ToString(), "navigation");
             };
         }
 
@@ -81,19 +84,9 @@ namespace osu.Game.Utils
             return true;
         }
 
-        private void queuePendingTask(Task<string> task)
-        {
-            lock (tasks) tasks.Add(task);
-            task.ContinueWith(_ =>
-            {
-                lock (tasks)
-                    tasks.Remove(task);
-            });
-        }
-
         #region Disposal
 
-        ~RavenLogger()
+        ~SentryLogger()
         {
             Dispose(false);
         }
@@ -112,7 +105,9 @@ namespace osu.Game.Utils
                 return;
 
             isDisposed = true;
-            lock (tasks) Task.WaitAll(tasks.ToArray(), 5000);
+            sentry?.Dispose();
+            sentry = null;
+            sentryScope = null;
         }
 
         #endregion
