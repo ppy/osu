@@ -22,17 +22,19 @@ namespace osu.Game.Skinning
 
             if (animatable)
             {
-                for (int i = 0;; i++)
+                for (int i = 0; true; i++)
                 {
                     if ((texture = getFrameTexture(i)) == null)
                         break;
 
                     if (animation == null)
+                    {
                         animation = new TextureAnimation
                         {
                             DefaultFrameLength = default_frame_time,
                             Repeat = looping
                         };
+                    }
 
                     animation.AddFrame(texture);
                 }
@@ -42,10 +44,12 @@ namespace osu.Game.Skinning
                 return animation;
 
             if ((texture = source.GetTexture(componentName)) != null)
+            {
                 return new Sprite
                 {
                     Texture = texture
                 };
+            }
 
             return null;
         }

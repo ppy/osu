@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -22,6 +23,14 @@ namespace osu.Game.Graphics.Containers
         public readonly Bindable<bool> EnableUserDim = new Bindable<bool>(true);
 
         /// <summary>
+        /// The dim offset to be applied to the container in addition to user-specified dim.
+        /// </summary>
+        /// <remarks>
+        /// Used in the player component where a temporary offset must be applied in breaks to lighten the content.
+        /// </remarks>
+        public readonly Bindable<float> DimOffset = new Bindable<float>();
+
+        /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
         /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
@@ -37,7 +46,7 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<bool> ShowVideo { get; private set; }
 
-        protected double DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0;
+        protected double DimLevel => DimOffset.Value + (EnableUserDim.Value ? UserDimLevel.Value : 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -60,6 +69,7 @@ namespace osu.Game.Graphics.Containers
 
             EnableUserDim.ValueChanged += _ => UpdateVisuals();
             UserDimLevel.ValueChanged += _ => UpdateVisuals();
+            DimOffset.ValueChanged += _ => UpdateVisuals();
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             ShowVideo.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
@@ -84,7 +94,7 @@ namespace osu.Game.Graphics.Containers
             ContentDisplayed = ShowDimContent;
 
             dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            dimContent.FadeColour(OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(OsuColour.Gray(Math.Min(1 - (float)DimLevel, 1)), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }

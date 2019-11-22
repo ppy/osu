@@ -41,17 +41,17 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates the download request for this <see cref="TModel"/>.
+        /// Creates the download request for this <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
 
         /// <summary>
-        /// Begin a download for the requested <see cref="TModel"/>.
+        /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
         public bool Download(TModel model, bool minimiseDownloadSize = false)
@@ -76,21 +76,17 @@ namespace osu.Game.Database
                 Task.Factory.StartNew(async () =>
                 {
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    await Import(notification, filename);
+                    var imported = await Import(notification, filename);
+
+                    // for now a failed import will be marked as a failed download for simplicity.
+                    if (!imported.Any())
+                        DownloadFailed?.Invoke(request);
+
                     currentDownloads.Remove(request);
                 }, TaskCreationOptions.LongRunning);
             };
 
-            request.Failure += error =>
-            {
-                DownloadFailed?.Invoke(request);
-
-                if (error is OperationCanceledException) return;
-
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
-                currentDownloads.Remove(request);
-            };
+            request.Failure += triggerFailure;
 
             notification.CancelRequested += () =>
             {
@@ -103,11 +99,31 @@ namespace osu.Game.Database
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    request.Perform(api);
+                }
+                catch (Exception error)
+                {
+                    triggerFailure(error);
+                }
+            }, TaskCreationOptions.LongRunning);
 
             DownloadBegan?.Invoke(request);
-
             return true;
+
+            void triggerFailure(Exception error)
+            {
+                DownloadFailed?.Invoke(request);
+
+                if (error is OperationCanceledException) return;
+
+                notification.State = ProgressNotificationState.Cancelled;
+                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
+                currentDownloads.Remove(request);
+            }
         }
 
         public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, modelStore.ConsumableItems.Where(m => !m.DeletePending));
@@ -115,9 +131,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists.</returns>
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
         protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
