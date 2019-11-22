@@ -4,8 +4,8 @@
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Input;
@@ -18,40 +18,38 @@ namespace osu.Game.Tests.Visual.Gameplay
         private SkipOverlay skip;
         private int requestCount;
 
-        private FramedOffsetClock offsetClock;
-        private StopwatchClock stopwatchClock;
-
         private double increment;
+
+        private GameplayClockContainer gameplayClockContainer;
+        private GameplayClock gameplayClock;
+
+        private const double skip_time = 6000;
 
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
             requestCount = 0;
-            increment = 6000;
+            increment = skip_time;
 
-            Child = new Container
+            Child = gameplayClockContainer = new GameplayClockContainer(CreateWorkingBeatmap(CreateBeatmap(new OsuRuleset().RulesetInfo)), new Mod[] { }, 0)
             {
                 RelativeSizeAxes = Axes.Both,
-                Clock = offsetClock = new FramedOffsetClock(stopwatchClock = new StopwatchClock(true)),
                 Children = new Drawable[]
                 {
-                    skip = new SkipOverlay(6000)
+                    skip = new SkipOverlay(skip_time)
                     {
                         RequestSkip = () =>
                         {
                             requestCount++;
-                            offsetClock.Offset += increment;
+                            gameplayClockContainer.Seek(gameplayClock.CurrentTime + increment);
                         }
                     }
                 },
             };
-        });
 
-        protected override void Update()
-        {
-            if (stopwatchClock != null)
-                stopwatchClock.Rate = Clock.Rate;
-        }
+            gameplayClockContainer.Start();
+            gameplayClock = gameplayClockContainer.GameplayClock;
+        });
 
         [Test]
         public void TestFadeOnIdle()
@@ -80,7 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("click", () =>
             {
-                increment = 6000 - offsetClock.CurrentTime - GameplayClockContainer.MINIMUM_SKIP_TIME / 2;
+                increment = skip_time - gameplayClock.CurrentTime - GameplayClockContainer.MINIMUM_SKIP_TIME / 2;
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("click", () => InputManager.Click(MouseButton.Left));
@@ -106,7 +104,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move mouse", () => InputManager.MoveMouseTo(skip.ScreenSpaceDrawQuad.Centre));
             AddStep("button down", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep("wait for overlay disapper", () => !skip.IsAlive);
+            AddUntilStep("wait for overlay disappear", () => !skip.IsPresent);
             AddAssert("ensure button didn't disappear", () => skip.Children.First().Alpha > 0);
             AddStep("button up", () => InputManager.ReleaseButton(MouseButton.Left));
             checkRequestCount(0);
