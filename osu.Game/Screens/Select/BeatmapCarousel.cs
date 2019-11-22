@@ -640,10 +640,19 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
         }
 
+        private bool firstScroll = true;
+
         private void updateScrollPosition()
         {
             if (scrollTarget != null)
             {
+                if (firstScroll)
+                {
+                    // reduce movement when first displaying the carousel.
+                    scroll.ScrollTo(scrollTarget.Value - 200, false);
+                    firstScroll = false;
+                }
+
                 scroll.ScrollTo(scrollTarget.Value);
                 scrollPositionCache.Validate();
             }
