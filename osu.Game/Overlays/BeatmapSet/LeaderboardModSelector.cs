@@ -57,6 +57,18 @@ namespace osu.Game.Overlays.BeatmapSet
             modsContainer.ForEach(button => button.OnSelectionChanged = selectionChanged);
         }
 
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateHighlighted();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            updateHighlighted();
+        }
+
         private void selectionChanged(Mod mod, bool selected)
         {
             if (selected)
@@ -73,18 +85,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 return;
 
             modsContainer.Children.Where(button => !button.IsHovered).ForEach(button => button.Highlighted.Value = !IsHovered);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            updateHighlighted();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            base.OnHoverLost(e);
-            updateHighlighted();
         }
 
         public void DeselectAll() => modsContainer.ForEach(mod => mod.Selected.Value = false);
