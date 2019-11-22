@@ -106,6 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 {
                                     Current = { BindTarget = scope }
                                 },
+                                new NotSupporterPlaceholder(),
                                 modSelector = new LeaderboardModSelector
                                 {
                                     Ruleset = { BindTarget = ruleset }
