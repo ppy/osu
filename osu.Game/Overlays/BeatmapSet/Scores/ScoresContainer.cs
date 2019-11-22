@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-        private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>();
+        private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>(BeatmapLeaderboardScope.Global);
         private readonly Bindable<User> user = new Bindable<User>();
 
         private readonly Box background;
@@ -107,12 +107,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     Origin = Anchor.TopCentre,
                                     Current = { BindTarget = scope }
                                 },
-                                notSupporterPlaceholder = new NotSupporterPlaceholder
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    Alpha = 0,
-                                },
                                 modSelector = new LeaderboardModSelector
                                 {
                                     Anchor = Anchor.TopCentre,
@@ -135,6 +129,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                     Margin = new MarginPadding { Vertical = 10 }
+                                },
+                                notSupporterPlaceholder = new NotSupporterPlaceholder
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Alpha = 0,
                                 },
                                 new FillFlowContainer
                                 {
@@ -213,9 +213,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void onUserChanged(ValueChangedEvent<User> user)
         {
-            scope.Value = BeatmapLeaderboardScope.Global;
             modSelector.DeselectAll();
-            modSelector.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
+            modSelector.FadeTo(userIsSupporter ? 1 : 0);
+            getScores();
         }
 
         private void getScores()
@@ -230,6 +230,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Scores = null;
                 content.Hide();
                 return;
+            }
+
+            if (scope.Value != BeatmapLeaderboardScope.Global && !userIsSupporter)
+            {
+                Scores = null;
+                notSupporterPlaceholder.Show();
+                loading.Hide();
+                return;
+            }
+            else
+            {
+                notSupporterPlaceholder.Hide();
             }
 
             content.Show();
@@ -247,5 +259,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             api.Queue(getScoresRequest);
         }
+
+        private bool userIsSupporter => api.IsLoggedIn && api.LocalUser.Value.IsSupporter;
     }
 }
