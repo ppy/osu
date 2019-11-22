@@ -225,6 +225,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             content.Show();
             loading.Show();
+
             getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
             {
@@ -234,6 +235,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (!scores.Scores.Any())
                     noScoresPlaceholder.ShowWithScope(scope.Value);
             };
+
             api.Queue(getScoresRequest);
         }
     }
