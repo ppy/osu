@@ -13,6 +13,10 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Framework.Bindables;
+using osu.Game.Rulesets;
+using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -20,31 +24,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const int spacing = 15;
 
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<BeatmapLeaderboardScope> scope = new Bindable<BeatmapLeaderboardScope>();
+        private readonly Bindable<User> user = new Bindable<User>();
+
         private readonly Box background;
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
-        private readonly LoadingAnimation loadingAnimation;
+        private readonly DimmedLoadingLayer loading;
+        private readonly FillFlowContainer filterControls;
+        private readonly LeaderboardModSelector modSelector;
+        private readonly NoScoresPlaceholder noScoresPlaceholder;
+        private readonly FillFlowContainer content;
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
         private GetScoresRequest getScoresRequest;
-
-        private BeatmapInfo beatmap;
-
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                if (beatmap == value)
-                    return;
-
-                beatmap = value;
-
-                getScores(beatmap);
-            }
-        }
 
         protected APILegacyScores Scores
         {
@@ -85,7 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                new FillFlowContainer
+                content = new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -93,28 +90,78 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     AutoSizeAxes = Axes.Y,
                     Width = 0.95f,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, spacing),
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        topScoresContainer = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5),
-                        },
-                        scoreTable = new ScoreTable
+                        filterControls = new FillFlowContainer
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, spacing),
+                            Children = new Drawable[]
+                            {
+                                new LeaderboardScopeSelector
+                                {
+                                    Current = { BindTarget = scope }
+                                },
+                                modSelector = new LeaderboardModSelector
+                                {
+                                    Ruleset = { BindTarget = ruleset }
+                                }
+                            }
+                        },
+                        new Container
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                            Margin = new MarginPadding { Vertical = spacing },
+                            Children = new Drawable[]
+                            {
+                                noScoresPlaceholder = new NoScoresPlaceholder
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Alpha = 0,
+                                    AlwaysPresent = true,
+                                    Margin = new MarginPadding { Vertical = 10 }
+                                },
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Spacing = new Vector2(0, spacing),
+                                    Children = new Drawable[]
+                                    {
+                                        topScoresContainer = new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 5),
+                                        },
+                                        scoreTable = new ScoreTable
+                                        {
+                                            Anchor = Anchor.TopCentre,
+                                            Origin = Anchor.TopCentre,
+                                        }
+                                    }
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Masking = true,
+                                    CornerRadius = 10,
+                                    Child = loading = new DimmedLoadingLayer(iconScale: 0.8f)
+                                    {
+                                        Alpha = 0,
+                                    },
+                                }
+                            }
                         }
                     }
-                },
-                loadingAnimation = new LoadingAnimation
-                {
-                    Alpha = 0,
-                    Margin = new MarginPadding(20),
                 },
             };
         }
@@ -123,25 +170,72 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private void load(OsuColour colours)
         {
             background.Colour = colours.Gray2;
+
+            user.BindTo(api.LocalUser);
         }
 
-        private void getScores(BeatmapInfo beatmap)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            scope.BindValueChanged(_ => getScores());
+            ruleset.BindValueChanged(_ => getScores());
+
+            modSelector.SelectedMods.ItemsAdded += _ => getScores();
+            modSelector.SelectedMods.ItemsRemoved += _ => getScores();
+
+            Beatmap.BindValueChanged(onBeatmapChanged);
+            user.BindValueChanged(onUserChanged, true);
+        }
+
+        private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
+        {
+            var beatmapRuleset = beatmap.NewValue?.Ruleset;
+
+            if (ruleset.Value?.Equals(beatmapRuleset) ?? false)
+            {
+                modSelector.DeselectAll();
+                ruleset.TriggerChange();
+            }
+            else
+                ruleset.Value = beatmapRuleset;
+
+            scope.Value = BeatmapLeaderboardScope.Global;
+        }
+
+        private void onUserChanged(ValueChangedEvent<User> user)
+        {
+            scope.Value = BeatmapLeaderboardScope.Global;
+            modSelector.DeselectAll();
+            filterControls.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
+        }
+
+        private void getScores()
         {
             getScoresRequest?.Cancel();
             getScoresRequest = null;
 
-            Scores = null;
+            noScoresPlaceholder.Hide();
 
-            if (beatmap?.OnlineBeatmapID.HasValue != true || beatmap.Status <= BeatmapSetOnlineStatus.Pending)
+            if (Beatmap.Value?.OnlineBeatmapID.HasValue != true || Beatmap.Value.Status <= BeatmapSetOnlineStatus.Pending)
+            {
+                Scores = null;
+                content.Hide();
                 return;
+            }
 
-            loadingAnimation.Show();
-            getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
+            content.Show();
+            loading.Show();
+
+            getScoresRequest = new GetScoresRequest(Beatmap.Value, Beatmap.Value.Ruleset, scope.Value, modSelector.SelectedMods);
             getScoresRequest.Success += scores =>
             {
-                loadingAnimation.Hide();
+                loading.Hide();
                 Scores = scores;
+
+                if (!scores.Scores.Any())
+                    noScoresPlaceholder.ShowWithScope(scope.Value);
             };
+
             api.Queue(getScoresRequest);
         }
     }
