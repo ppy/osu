@@ -63,12 +63,12 @@ namespace osu.Game.Screens.Play
 
         private readonly FramedOffsetClock platformOffsetClock;
 
-        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime, double firstHitObjectTime)
+        public GameplayClockContainer(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, double gameplayStartTime)
         {
             this.beatmap = beatmap;
             this.mods = mods;
             this.gameplayStartTime = gameplayStartTime;
-            this.firstHitObjectTime = firstHitObjectTime;
+            this.firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
 
             RelativeSizeAxes = Axes.Both;
 

@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime, DrawableRuleset.Objects.First().StartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             addUnderlayComponents(GameplayClockContainer);
             addGameplayComponents(GameplayClockContainer, working);
