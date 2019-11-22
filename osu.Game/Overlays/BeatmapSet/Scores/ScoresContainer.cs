@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ScoreTable scoreTable;
         private readonly FillFlowContainer topScoresContainer;
         private readonly DimmedLoadingLayer loading;
-        private readonly FillFlowContainer modFilter;
+        private readonly FillFlowContainer filterControls;
         private readonly LeaderboardModSelector modSelector;
         private readonly NoScoresPlaceholder noScoresPlaceholder;
         private readonly FillFlowContainer content;
@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
                     {
-                        modFilter = new FillFlowContainer
+                        filterControls = new FillFlowContainer
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -207,7 +207,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             scope.Value = BeatmapLeaderboardScope.Global;
             modSelector.DeselectAll();
-            modFilter.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
+            filterControls.FadeTo(api.IsLoggedIn && api.LocalUser.Value.IsSupporter ? 1 : 0);
         }
 
         private void getScores()
