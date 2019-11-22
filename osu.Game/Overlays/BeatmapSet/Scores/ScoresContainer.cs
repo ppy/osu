@@ -107,7 +107,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 {
                                     Current = { BindTarget = scope }
                                 },
-                                modSelector = new LeaderboardModSelector()
+                                modSelector = new LeaderboardModSelector
+                                {
+                                    Ruleset = { BindTarget = ruleset }
+                                }
                             }
                         },
                         new Container
@@ -187,7 +190,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void onBeatmapChanged(ValueChangedEvent<BeatmapInfo> beatmap)
         {
-            ruleset.Value = modSelector.Ruleset = beatmap.NewValue?.Ruleset;
+            var beatmapRuleset = beatmap.NewValue?.Ruleset;
+
+            if (ruleset.Value?.Equals(beatmapRuleset) ?? false)
+                modSelector.DeselectAll();
+            else
+                ruleset.Value = beatmapRuleset;
+
             scope.Value = BeatmapLeaderboardScope.Global;
         }
 

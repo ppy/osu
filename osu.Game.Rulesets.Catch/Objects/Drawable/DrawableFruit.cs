@@ -278,7 +278,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             base.Update();
 
-            border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
+            border.Alpha = (float)Math.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
         private Color4 colourForRepresentation(FruitVisualRepresentation representation)
