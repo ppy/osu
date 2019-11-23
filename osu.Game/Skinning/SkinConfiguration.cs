@@ -46,7 +46,7 @@ namespace osu.Game.Skinning
             set => comboColours = value.ToList();
         }
 
-        public void AddComboColours(params Color4[] colours) => colours.ForEach(c => comboColours.Add(c));
+        public void AddComboColours(params Color4[] colours) => comboColours.AddRange(colours);
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
