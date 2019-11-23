@@ -213,9 +213,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void onUserChanged(ValueChangedEvent<User> user)
         {
-            modSelector.DeselectAll();
+            if (modSelector.SelectedMods.Any())
+                modSelector.DeselectAll();
+            else
+                getScores();
+
             modSelector.FadeTo(userIsSupporter ? 1 : 0);
-            getScores();
         }
 
         private void getScores()
