@@ -3,15 +3,35 @@
 
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModCinema : ModAutoplay
+    public abstract class ModCinema<T> : ModCinema, IApplicableToDrawableRuleset<T>
+        where T : HitObject
+    {
+        public virtual void ApplyToDrawableRuleset(DrawableRuleset<T> drawableRuleset)
+        {
+            drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
+
+            drawableRuleset.Playfield.AlwaysPresent = true;
+            drawableRuleset.Playfield.Hide();
+        }
+    }
+
+    public class ModCinema : ModAutoplay, IApplicableToHUD
     {
         public override string Name => "Cinema";
         public override string Acronym => "CN";
-        public override bool HasImplementation => false;
         public override IconUsage Icon => OsuIcon.ModCinema;
         public override string Description => "Watch the video without visual distractions.";
+
+        public void ApplyToHUD(HUDOverlay overlay)
+        {
+            overlay.AlwaysPresent = true;
+            overlay.Hide();
+        }
     }
 }
