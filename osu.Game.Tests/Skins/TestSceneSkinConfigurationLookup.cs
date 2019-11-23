@@ -127,7 +127,6 @@ namespace osu.Game.Tests.Skins
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255),
             });
-            AddStep("Clear combo colours from source2", () => source2.Configuration.ClearComboColours());
             AddStep("Disallow default colours fallback in source2", () => source2.Configuration.AllowDefaultComboColoursFallback = allowFallback);
 
             AddAssert($"Check retrieved combo colours from {(allowFallback ? "source1" : "fallback source")}", () =>
