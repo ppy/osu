@@ -71,9 +71,16 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddRepeatStep("move mouse on settings", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
             AddAssert("loader still active", () => loader.IsCurrentScreen());
-            AddRepeatStep("move mouse on loader", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.TopLeft + (new Vector2(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft.X, loader.ScreenSpaceDrawQuad.BottomLeft.Y) - loader.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
-            AddAssert("loader still active", () => loader.IsCurrentScreen());
-            AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+            AddUntilStep("move mouse on loader", () =>
+            {
+                InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.TopLeft + (new Vector2(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft.X, loader.ScreenSpaceDrawQuad.BottomLeft.Y) - loader.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle());
+                return player.IsCurrentScreen();
+            });
+
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddStep("move mouse to settings", () => InputManager.MoveMouseTo(loader.VisualSettings));
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
         }
 
         [Test]
@@ -81,11 +88,12 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
             AddStep("show focused overlay", () => container.NotificationOverlay.Show());
             AddWaitStep("wait a bit", 10);
             AddAssert("loader still active", () => loader.IsCurrentScreen());
             AddStep("hide focused overlay", () => container.NotificationOverlay.Hide());
-            AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+            AddUntilStep("wait for player to be current", () => player.IsCurrentScreen());
         }
 
         [Test]
