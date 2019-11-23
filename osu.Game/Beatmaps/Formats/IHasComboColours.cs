@@ -17,10 +17,5 @@ namespace osu.Game.Beatmaps.Formats
         /// Adds combo colours to the list.
         /// </summary>
         void AddComboColours(params Color4[] colours);
-
-        /// <summary>
-        /// Clear current combo colours from the list.
-        /// </summary>
-        void ClearComboColours();
     }
 }
