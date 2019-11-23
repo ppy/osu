@@ -246,11 +246,14 @@ namespace osu.Game.Screens.Play
             });
         }
 
+        private readonly Bindable<float> dimOffset = new Bindable<float>();
+
         private void updateUserDimState()
         {
-            var lighten = lightenDuringBreaks.Value && breakOverlay.IsBreakTime;
-            DimmableStoryboard.EnableUserDim.Value = !lighten;
-            Background.EnableUserDim.Value = !lighten;
+            const float light_amount = 0.3f;
+
+            var lighten = lightenDuringBreaks.Value && breakOverlay.IsBreakTime.Value;
+            dimOffset.Value = lighten ? -light_amount : 0;
         }
 
         private WorkingBeatmap loadBeatmap()
@@ -321,7 +324,7 @@ namespace osu.Game.Screens.Play
             if (canPause)
                 Pause();
             else
-                this.Exit();
+            this.Exit();
         }
 
         /// <summary>
@@ -334,7 +337,7 @@ namespace osu.Game.Screens.Play
             RestartRequested?.Invoke();
 
             if (this.IsCurrentScreen())
-                performImmediateExit();
+            performImmediateExit();
             else
                 this.MakeCurrent();
         }
@@ -464,7 +467,7 @@ namespace osu.Game.Screens.Play
             if (IsResuming)
             {
                 DrawableRuleset.CancelResume();
-                IsResuming = false;
+            IsResuming = false;
             }
 
             GameplayClockContainer.Stop();
@@ -512,9 +515,13 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
+            Background.DimOffset.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            Background.DimOffset.BindTo(dimOffset);
+
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            DimmableStoryboard.DimOffset.BindTo(dimOffset);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
