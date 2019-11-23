@@ -10,6 +10,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -20,7 +22,6 @@ using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Tests.Beatmaps;
-using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -28,9 +29,9 @@ namespace osu.Game.Tests.Visual
     {
         [Cached(typeof(Bindable<WorkingBeatmap>))]
         [Cached(typeof(IBindable<WorkingBeatmap>))]
-        private OsuTestBeatmap beatmap;
+        private NonNullableBindable<WorkingBeatmap> beatmap;
 
-        protected BindableBeatmap Beatmap => beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
@@ -73,10 +74,13 @@ namespace osu.Game.Tests.Visual
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
             var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
 
-            beatmap = new OsuTestBeatmap(working)
+            beatmap = new NonNullableBindable<WorkingBeatmap>(working) { Default = working };
+            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
-                Default = working
-            };
+                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
+                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
+                    b.OldValue.RecycleTrack();
+            }));
 
             Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -90,6 +94,10 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        protected override Container<Drawable> Content => content ?? base.Content;
+
+        private readonly Container content;
+
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
@@ -101,6 +109,8 @@ namespace osu.Game.Tests.Visual
                     usage.Migrate();
                 return factory;
             });
+
+            base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
         [Resolved]
@@ -239,7 +249,7 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = MathHelper.Clamp(seek, 0, Length);
+                    offset = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
                     return offset == seek;
@@ -316,14 +326,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public void RunTestBlocking(TestScene test) => runner.RunTestBlocking(test);
-        }
-
-        private class OsuTestBeatmap : BindableBeatmap
-        {
-            public OsuTestBeatmap(WorkingBeatmap defaultValue)
-                : base(defaultValue)
-            {
-            }
         }
     }
 }
