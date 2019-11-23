@@ -20,25 +20,23 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using Humanizer;
-using osu.Game.Online.API;
 
 namespace osu.Game.Online.Leaderboards
 {
     public class LeaderboardScore : OsuClickableContainer
     {
+        public readonly int RankPosition;
+
         public const float HEIGHT = 60;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
-        private const float rank_width = 35;
+        private const float rank_width = 30;
 
         protected Container RankContainer { get; private set; }
 
         private readonly ScoreInfo score;
-        private readonly int rank;
-        private readonly bool allowHighlight;
 
         private Box background;
         private Container content;
@@ -51,18 +49,17 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
+        public LeaderboardScore(ScoreInfo score, int rank)
         {
             this.score = score;
-            this.rank = rank;
-            this.allowHighlight = allowHighlight;
+            RankPosition = rank;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour)
+        private void load()
         {
             var user = score.User;
 
@@ -82,8 +79,8 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, italics: true),
-                            Text = rank.ToMetric(decimals: rank < 100000 ? 1 : 0),
+                            Font = OsuFont.GetFont(size: 22, italics: true),
+                            Text = RankPosition.ToString(),
                         },
                     },
                 },
@@ -103,7 +100,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
+                                    Colour = Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },

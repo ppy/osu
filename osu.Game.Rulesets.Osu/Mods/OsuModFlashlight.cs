@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var destination = e.MousePosition;
 
                 FlashlightPosition = Interpolation.ValueAt(
-                    Math.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
+                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);
 
                 return base.OnMouseMove(e);
             }

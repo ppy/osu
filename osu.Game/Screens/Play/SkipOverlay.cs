@@ -23,7 +23,7 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public class SkipOverlay : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class SkipOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private readonly double startTime;
 
@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Play
         private double displayTime;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+        protected override bool BlockPositionalInput => false;
 
         /// <summary>
         /// Displays a skip overlay, giving the user the ability to skip forward.
@@ -181,11 +182,8 @@ namespace osu.Game.Screens.Play
                                 this.FadeIn(500, Easing.OutExpo);
 
                             if (!IsHovered && !IsDragged)
-                            {
                                 using (BeginDelayedSequence(1000))
                                     scheduledHide = Schedule(Hide);
-                            }
-
                             break;
 
                         case Visibility.Hidden:

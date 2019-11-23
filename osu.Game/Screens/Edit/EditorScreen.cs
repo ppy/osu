@@ -10,23 +10,28 @@ using osu.Game.Beatmaps;
 namespace osu.Game.Screens.Edit
 {
     /// <summary>
-    /// TODO: eventually make this inherit Screen and add a local screen stack inside the Editor.
+    /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.
     /// </summary>
-    public abstract class EditorScreen : Container
+    public class EditorScreen : Container
     {
-        [Resolved]
-        protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        protected EditorScreen()
+        public EditorScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = content = new Container { RelativeSizeAxes = Axes.Both };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IBindable<WorkingBeatmap> beatmap)
+        {
+            Beatmap.BindTo(beatmap);
         }
 
         protected override void LoadComplete()

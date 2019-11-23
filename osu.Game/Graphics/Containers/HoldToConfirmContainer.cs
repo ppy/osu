@@ -2,11 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -14,13 +12,12 @@ namespace osu.Game.Graphics.Containers
     {
         public Action Action;
 
+        private const int default_activation_delay = 200;
         private const int fadeout_delay = 200;
 
-        /// <summary>
-        /// Whether currently in a fired state (and the confirm <see cref="Action"/> has been sent).
-        /// </summary>
-        public bool Fired { get; private set; }
+        private readonly double activationDelay;
 
+        private bool fired;
         private bool confirming;
 
         /// <summary>
@@ -30,35 +27,35 @@ namespace osu.Game.Graphics.Containers
 
         public Bindable<double> Progress = new BindableDouble();
 
-        private Bindable<float> holdActivationDelay;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        /// <summary>
+        /// Create a new instance.
+        /// </summary>
+        /// <param name="activationDelay">The time requried before an action is confirmed.</param>
+        protected HoldToConfirmContainer(double activationDelay = default_activation_delay)
         {
-            holdActivationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            this.activationDelay = activationDelay;
         }
 
         protected void BeginConfirm()
         {
-            if (confirming || (!AllowMultipleFires && Fired)) return;
+            if (confirming || (!AllowMultipleFires && fired)) return;
 
             confirming = true;
 
-            this.TransformBindableTo(Progress, 1, holdActivationDelay.Value * (1 - Progress.Value), Easing.Out).OnComplete(_ => Confirm());
+            this.TransformBindableTo(Progress, 1, activationDelay * (1 - Progress.Value), Easing.Out).OnComplete(_ => Confirm());
         }
 
         protected virtual void Confirm()
         {
             Action?.Invoke();
-            Fired = true;
+            fired = true;
         }
 
         protected void AbortConfirm()
         {
-            if (!AllowMultipleFires && Fired) return;
+            if (!AllowMultipleFires && fired) return;
 
             confirming = false;
-            Fired = false;
 
             this.TransformBindableTo(Progress, 0, fadeout_delay, Easing.Out);
         }

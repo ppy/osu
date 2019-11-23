@@ -57,13 +57,11 @@ namespace osu.Game.Screens.Multi.Components
             var beatmap = CurrentItem.Value?.Beatmap;
 
             if (beatmap == null)
-            {
                 textFlow.AddText("No beatmap selected", s =>
                 {
                     s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;
                 });
-            }
             else
             {
                 textFlow.AddLink(new[]
@@ -83,7 +81,7 @@ namespace osu.Game.Screens.Multi.Components
                         Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
-                }, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
+                }, null, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
             }
         }
     }

@@ -76,9 +76,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
-
-        public IEnumerable<string> Keywords { get; set; }
+        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
 
         public bool MatchingFilter
         {

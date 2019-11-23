@@ -42,7 +42,6 @@ namespace osu.Game.Screens.Menu
         public IntroSequence()
         {
             RelativeSizeAxes = Axes.Both;
-            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]

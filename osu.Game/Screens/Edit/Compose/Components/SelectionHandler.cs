@@ -7,33 +7,29 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
-using osu.Game.Audio;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
     /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
     /// </summary>
-    public class SelectionHandler : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
+    public class SelectionHandler : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
-        public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
+        protected IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
-        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.DrawableObject.HitObject);
+        protected IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject.HitObject);
 
         private Drawable outline;
 
@@ -69,25 +65,29 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #region User Input Handling
 
         /// <summary>
-        /// Handles the selected <see cref="DrawableHitObject"/>s being moved.
+        /// Handles the selected <see cref="DrawableHitObject"/>s being dragged.
         /// </summary>
-        /// <param name="moveEvent">The move event.</param>
-        /// <returns>Whether any <see cref="DrawableHitObject"/>s were moved.</returns>
-        public virtual bool HandleMovement(MoveSelectionEvent moveEvent) => false;
-
-        public bool OnPressed(PlatformAction action)
+        /// <param name="blueprint">The <see cref="SelectionBlueprint"/> that received the drag event.</param>
+        /// <param name="dragEvent">The drag event.</param>
+        public virtual void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
-            switch (action.ActionMethod)
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return base.OnKeyDown(e);
+
+            switch (e.Key)
             {
-                case PlatformActionMethod.Delete:
-                    deleteSelected();
+                case Key.Delete:
+                    foreach (var h in selectedBlueprints.ToList())
+                        placementHandler.Delete(h.HitObject.HitObject);
                     return true;
             }
 
-            return false;
+            return base.OnKeyDown(e);
         }
-
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
 
         #endregion
 
@@ -143,15 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             UpdateVisibility();
         }
 
-        private void deleteSelected()
-        {
-            foreach (var h in selectedBlueprints.ToList())
-                placementHandler.Delete(h.DrawableObject.HitObject);
-        }
-
         #endregion
-
-        #region Outline Display
 
         /// <summary>
         /// Updates whether this <see cref="SelectionHandler"/> is visible.
@@ -187,104 +179,5 @@ namespace osu.Game.Screens.Edit.Compose.Components
             outline.Size = bottomRight - topLeft;
             outline.Position = topLeft;
         }
-
-        #endregion
-
-        #region Sample Changes
-
-        /// <summary>
-        /// Adds a hit sample to all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="sampleName">The name of the hit sample.</param>
-        public void AddHitSample(string sampleName)
-        {
-            foreach (var h in SelectedHitObjects)
-            {
-                // Make sure there isn't already an existing sample
-                if (h.Samples.Any(s => s.Name == sampleName))
-                    continue;
-
-                h.Samples.Add(new HitSampleInfo { Name = sampleName });
-            }
-        }
-
-        /// <summary>
-        /// Removes a hit sample from all selected <see cref="HitObject"/>s.
-        /// </summary>
-        /// <param name="sampleName">The name of the hit sample.</param>
-        public void RemoveHitSample(string sampleName)
-        {
-            foreach (var h in SelectedHitObjects)
-                h.SamplesBindable.RemoveAll(s => s.Name == sampleName);
-        }
-
-        #endregion
-
-        #region Context Menu
-
-        public virtual MenuItem[] ContextMenuItems
-        {
-            get
-            {
-                if (!selectedBlueprints.Any(b => b.IsHovered))
-                    return Array.Empty<MenuItem>();
-
-                var items = new List<MenuItem>
-                {
-                    new OsuMenuItem("Sound")
-                    {
-                        Items = new[]
-                        {
-                            createHitSampleMenuItem("Whistle", HitSampleInfo.HIT_WHISTLE),
-                            createHitSampleMenuItem("Clap", HitSampleInfo.HIT_CLAP),
-                            createHitSampleMenuItem("Finish", HitSampleInfo.HIT_FINISH)
-                        }
-                    },
-                    new OsuMenuItem("Delete", MenuItemType.Destructive, deleteSelected),
-                };
-
-                if (selectedBlueprints.Count == 1)
-                    items.AddRange(selectedBlueprints[0].ContextMenuItems);
-
-                return items.ToArray();
-            }
-        }
-
-        private MenuItem createHitSampleMenuItem(string name, string sampleName)
-        {
-            return new TernaryStateMenuItem(name, MenuItemType.Standard, setHitSampleState)
-            {
-                State = { Value = getHitSampleState() }
-            };
-
-            void setHitSampleState(TernaryState state)
-            {
-                switch (state)
-                {
-                    case TernaryState.False:
-                        RemoveHitSample(sampleName);
-                        break;
-
-                    case TernaryState.True:
-                        AddHitSample(sampleName);
-                        break;
-                }
-            }
-
-            TernaryState getHitSampleState()
-            {
-                int countExisting = SelectedHitObjects.Count(h => h.Samples.Any(s => s.Name == sampleName));
-
-                if (countExisting == 0)
-                    return TernaryState.False;
-
-                if (countExisting < SelectedHitObjects.Count())
-                    return TernaryState.Indeterminate;
-
-                return TernaryState.True;
-            }
-        }
-
-        #endregion
     }
 }

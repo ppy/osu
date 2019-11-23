@@ -81,13 +81,9 @@ namespace osu.Game.Skinning
                 var ch = skin.GetSample(s);
 
                 if (ch == null && allowFallback)
-                {
                     foreach (var lookup in s.LookupNames)
-                    {
                         if ((ch = samples.Get($"Gameplay/{lookup}")) != null)
                             break;
-                    }
-                }
 
                 if (ch != null)
                 {
@@ -95,10 +91,8 @@ namespace osu.Game.Skinning
                     ch.Volume.Value = s.Volume / 100.0;
 
                     if (adjustments != null)
-                    {
                         foreach (var adjustment in adjustments)
                             ch.AddAdjustment(adjustment.property, adjustment.bindable);
-                    }
                 }
 
                 return ch;
@@ -110,10 +104,8 @@ namespace osu.Game.Skinning
             base.Dispose(isDisposing);
 
             if (channels != null)
-            {
                 foreach (var c in channels)
                     c.Dispose();
-            }
         }
     }
 }

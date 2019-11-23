@@ -4,7 +4,6 @@
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
@@ -38,22 +37,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
 
-            Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
+            Search.Current.BindValueChanged(_ => updateFilter());
             Tabs.Current.BindValueChanged(_ => updateFilter(), true);
-        }
-
-        private ScheduledDelegate scheduledFilterUpdate;
-
-        private void scheduleUpdateFilter()
-        {
-            scheduledFilterUpdate?.Cancel();
-            scheduledFilterUpdate = Scheduler.AddDelayed(updateFilter, 200);
         }
 
         private void updateFilter()
         {
-            scheduledFilterUpdate?.Cancel();
-
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,

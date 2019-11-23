@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
+using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Skinning;
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
-        private readonly FollowPointRenderer followPoints;
+        private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             InternalChildren = new Drawable[]
             {
-                followPoints = new FollowPointRenderer
+                connectionLayer = new FollowPointRenderer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Depth = 2,
@@ -56,25 +57,24 @@ namespace osu.Game.Rulesets.Osu.UI
         public override void Add(DrawableHitObject h)
         {
             h.OnNewResult += onNewResult;
-            h.OnLoadComplete += d =>
+
+            if (h is IDrawableHitObjectWithProxiedApproach c)
             {
-                if (d is IDrawableHitObjectWithProxiedApproach c)
-                    approachCircles.Add(c.ProxiedLayer.CreateProxy());
-            };
+                var original = c.ProxiedLayer;
+
+                // Hitobjects only have lifetimes set on LoadComplete. For nested hitobjects (e.g. SliderHeads), this only happens when the parenting slider becomes visible.
+                // This delegation is required to make sure that the approach circles for those not-yet-loaded objects aren't added prematurely.
+                original.OnLoadComplete += addApproachCircleProxy;
+            }
 
             base.Add(h);
-
-            followPoints.AddFollowPoints((DrawableOsuHitObject)h);
         }
 
-        public override bool Remove(DrawableHitObject h)
+        private void addApproachCircleProxy(Drawable d) => approachCircles.Add(d.CreateProxy());
+
+        public override void PostProcess()
         {
-            bool result = base.Remove(h);
-
-            if (result)
-                followPoints.RemoveFollowPoints((DrawableOsuHitObject)h);
-
-            return result;
+            connectionLayer.HitObjects = HitObjectContainer.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Origin = Anchor.Centre,
                 Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
-                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale)
+                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale * 1.65f)
             };
 
             judgementLayer.Add(explosion);

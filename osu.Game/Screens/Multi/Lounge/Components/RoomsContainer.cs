@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
 
-        [Resolved(CanBeNull = true)]
-        private Bindable<FilterCriteria> filter { get; set; }
-
         [Resolved]
         private Bindable<Room> currentRoom { get; set; }
 
@@ -60,10 +57,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             addRooms(rooms);
         }
 
-        protected override void LoadComplete()
-        {
-            filter?.BindValueChanged(f => Filter(f.NewValue), true);
-        }
+        private FilterCriteria currentFilter;
 
         public void Filter(FilterCriteria criteria)
         {
@@ -80,13 +74,15 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     {
                         default:
                         case SecondaryFilter.Public:
-                            matchingFilter &= r.Room.Availability.Value == RoomAvailability.Public;
+                            r.MatchingFilter = r.Room.Availability.Value == RoomAvailability.Public;
                             break;
                     }
 
                     r.MatchingFilter = matchingFilter;
                 }
             });
+
+            currentFilter = criteria;
         }
 
         private void addRooms(IEnumerable<Room> rooms)
@@ -94,8 +90,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
                 roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
 
-            if (filter != null)
-                Filter(filter.Value);
+            Filter(currentFilter);
         }
 
         private void removeRooms(IEnumerable<Room> rooms)

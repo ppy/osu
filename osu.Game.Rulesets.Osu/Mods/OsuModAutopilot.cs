@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail), typeof(ModAutoplay) };
 
         public bool AllowFail => false;
-        public bool RestartOnFail => false;
 
         private OsuInputManager inputManager;
 

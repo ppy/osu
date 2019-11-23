@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -25,9 +24,7 @@ namespace osu.Game.Overlays
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
-
-        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
+        private List<BeatmapSetInfo> beatmapSets;
 
         public bool IsUserPaused { get; private set; }
 
@@ -49,7 +46,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapSets.AddRange(beatmaps.GetAllUsableBeatmapSets().OrderBy(_ => RNG.Next()));
+            beatmapSets = beatmaps.GetAllUsableBeatmapSets();
             beatmaps.ItemAdded += handleBeatmapAdded;
             beatmaps.ItemRemoved += handleBeatmapRemoved;
         }
@@ -57,7 +54,7 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             beatmap.BindValueChanged(beatmapChanged, true);
-            mods.BindValueChanged(_ => ResetTrackAdjustments(), true);
+            mods.BindValueChanged(_ => updateAudioAdjustments(), true);
             base.LoadComplete();
         }
 
@@ -75,7 +72,7 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Returns whether the current beatmap track is playing.
         /// </summary>
-        public bool IsPlaying => current?.Track.IsRunning ?? false;
+        public bool IsPlaying => beatmap.Value.Track.IsRunning;
 
         private void handleBeatmapAdded(BeatmapSetInfo set) =>
             Schedule(() => beatmapSets.Add(set));
@@ -98,40 +95,10 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Start playing the current track (if not already playing).
         /// </summary>
-        /// <returns>Whether the operation was successful.</returns>
-        public bool Play(bool restart = false)
+        public void Play()
         {
-            var track = current?.Track;
-
-            IsUserPaused = false;
-
-            if (track == null)
-            {
-                if (beatmap.Disabled)
-                    return false;
-
-                next(true);
-                return true;
-            }
-
-            if (restart)
-                track.Restart();
-            else if (!IsPlaying)
-                track.Start();
-
-            return true;
-        }
-
-        /// <summary>
-        /// Stop playing the current track and pause at the current position.
-        /// </summary>
-        public void Stop()
-        {
-            var track = current?.Track;
-
-            IsUserPaused = true;
-            if (track?.IsRunning == true)
-                track.Stop();
+            if (!IsPlaying)
+                TogglePause();
         }
 
         /// <summary>
@@ -142,10 +109,25 @@ namespace osu.Game.Overlays
         {
             var track = current?.Track;
 
-            if (track?.IsRunning == true)
-                Stop();
+            if (track == null)
+            {
+                if (beatmap.Disabled)
+                    return false;
+
+                next(true);
+                return true;
+            }
+
+            if (track.IsRunning)
+            {
+                IsUserPaused = true;
+                track.Stop();
+            }
             else
-                Play();
+            {
+                track.Start();
+                IsUserPaused = false;
+            }
 
             return true;
         }
@@ -158,7 +140,7 @@ namespace osu.Game.Overlays
         {
             queuedDirection = TrackChangeDirection.Prev;
 
-            var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
+            var playable = beatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? beatmapSets.LastOrDefault();
 
             if (playable != null)
             {
@@ -183,7 +165,7 @@ namespace osu.Game.Overlays
             if (!instant)
                 queuedDirection = TrackChangeDirection.Next;
 
-            var playable = BeatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? BeatmapSets.FirstOrDefault();
+            var playable = beatmapSets.SkipWhile(i => i.ID != current.BeatmapSetInfo.ID).Skip(1).FirstOrDefault() ?? beatmapSets.FirstOrDefault();
 
             if (playable != null)
             {
@@ -218,8 +200,8 @@ namespace osu.Game.Overlays
                 else
                 {
                     //figure out the best direction based on order in playlist.
-                    var last = BeatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap.NewValue == null ? -1 : BeatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
+                    var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
+                    var next = beatmap.NewValue == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
                 }
@@ -228,30 +210,12 @@ namespace osu.Game.Overlays
             current = beatmap.NewValue;
             TrackChanged?.Invoke(current, direction);
 
-            ResetTrackAdjustments();
+            updateAudioAdjustments();
 
             queuedDirection = null;
         }
 
-        private bool allowRateAdjustments;
-
-        /// <summary>
-        /// Whether mod rate adjustments are allowed to be applied.
-        /// </summary>
-        public bool AllowRateAdjustments
-        {
-            get => allowRateAdjustments;
-            set
-            {
-                if (allowRateAdjustments == value)
-                    return;
-
-                allowRateAdjustments = value;
-                ResetTrackAdjustments();
-            }
-        }
-
-        public void ResetTrackAdjustments()
+        private void updateAudioAdjustments()
         {
             var track = current?.Track;
             if (track == null)
@@ -259,11 +223,8 @@ namespace osu.Game.Overlays
 
             track.ResetSpeedAdjustments();
 
-            if (allowRateAdjustments)
-            {
-                foreach (var mod in mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(track);
-            }
+            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
+                mod.ApplyToClock(track);
         }
 
         protected override void Dispose(bool isDisposing)

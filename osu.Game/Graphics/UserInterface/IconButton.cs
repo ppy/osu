@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4? iconColour;
 
         /// <summary>
-        /// The icon colour. This does not affect <see cref="Drawable.Colour">Colour</see>.
+        /// The icon colour. This does not affect <see cref="IconButton.Colour"/>.
         /// </summary>
         public Color4 IconColour
         {
@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// The icon scale. This does not affect <see cref="Drawable.Scale">Scale</see>.
+        /// The icon scale. This does not affect <see cref="IconButton.Scale"/>.
         /// </summary>
         public Vector2 IconScale
         {

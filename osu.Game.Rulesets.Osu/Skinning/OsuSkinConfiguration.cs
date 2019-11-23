@@ -9,7 +9,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         HitCircleOverlap,
         SliderBorderSize,
         SliderPathRadius,
-        AllowSliderBallTint,
         CursorExpand,
     }
 }

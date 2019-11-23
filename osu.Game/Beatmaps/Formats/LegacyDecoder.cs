@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.IO;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -21,7 +21,7 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(LineBufferedReader stream, T output)
+        protected override void ParseStreamInto(StreamReader stream, T output)
         {
             Section section = Section.None;
 
@@ -189,15 +189,7 @@ namespace osu.Game.Beatmaps.Formats
             Foreground = 3
         }
 
-        internal class LegacyDifficultyControlPoint : DifficultyControlPoint
-        {
-            public LegacyDifficultyControlPoint()
-            {
-                SpeedMultiplierBindable.Precision = double.Epsilon;
-            }
-        }
-
-        internal class LegacySampleControlPoint : SampleControlPoint
+        internal class LegacySampleControlPoint : SampleControlPoint, IEquatable<LegacySampleControlPoint>
         {
             public int CustomSampleBank;
 
@@ -211,9 +203,9 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool EquivalentTo(ControlPoint other) =>
-                base.EquivalentTo(other) && other is LegacySampleControlPoint otherTyped &&
-                CustomSampleBank == otherTyped.CustomSampleBank;
+            public bool Equals(LegacySampleControlPoint other)
+                => base.Equals(other)
+                   && CustomSampleBank == other?.CustomSampleBank;
         }
     }
 }

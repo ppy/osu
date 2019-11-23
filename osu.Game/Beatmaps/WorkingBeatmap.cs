@@ -133,10 +133,8 @@ namespace osu.Game.Beatmaps
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
 
             foreach (var mod in mods.OfType<IApplicableToHitObject>())
-            {
-                foreach (var obj in converted.HitObjects)
-                    mod.ApplyToHitObject(obj);
-            }
+            foreach (var obj in converted.HitObjects)
+                mod.ApplyToHitObject(obj);
 
             processor?.PostProcess();
 

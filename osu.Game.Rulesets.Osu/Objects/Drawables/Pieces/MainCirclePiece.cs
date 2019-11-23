@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public MainCirclePiece()
+        public MainCirclePiece(int index)
         {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
@@ -31,7 +31,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 glow = new GlowPiece(),
                 circle = new CirclePiece(),
-                number = new NumberPiece(),
+                number = new NumberPiece
+                {
+                    Text = (index + 1).ToString(),
+                },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
                 explode = new ExplodePiece(),
@@ -39,14 +42,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private readonly IBindable<ArmedState> state = new Bindable<ArmedState>();
-        private readonly IBindable<Color4> accentColour = new Bindable<Color4>();
-        private readonly IBindable<int> indexInCurrentCombo = new Bindable<int>();
+
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
 
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject)
         {
-            OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
-
             state.BindTo(drawableObject.State);
             state.BindValueChanged(updateState, true);
 
@@ -57,9 +58,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 glow.Colour = colour.NewValue;
                 circle.Colour = colour.NewValue;
             }, true);
-
-            indexInCurrentCombo.BindTo(osuObject.IndexInCurrentComboBindable);
-            indexInCurrentCombo.BindValueChanged(index => number.Text = (index.NewValue + 1).ToString(), true);
         }
 
         private void updateState(ValueChangedEvent<ArmedState> state)

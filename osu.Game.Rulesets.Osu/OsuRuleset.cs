@@ -139,7 +139,6 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModSpinIn(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp(), new ModWindDown()),
-                        new OsuModTraceable(),
                     };
 
                 case ModType.System:

@@ -218,17 +218,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
 
                 AddInternal(marker = new Marker());
-            }
 
-            protected override void LoadComplete()
-            {
-                base.LoadComplete();
-
-                CurrentNumber.BindValueChanged(div =>
+                CurrentNumber.ValueChanged += div =>
                 {
                     marker.MoveToX(getMappedPosition(div.NewValue), 100, Easing.OutQuint);
                     marker.Flash();
-                }, true);
+                };
             }
 
             protected override void UpdateValue(float value)

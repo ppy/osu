@@ -164,7 +164,6 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 if (team != null)
                 {
                     foreach (var p in team.Players)
-                    {
                         players.Add(new OsuSpriteText
                         {
                             Text = p.Username,
@@ -173,7 +172,6 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
                             Origin = left ? Anchor.CentreRight : Anchor.CentreLeft,
                         });
-                    }
                 }
             }
 

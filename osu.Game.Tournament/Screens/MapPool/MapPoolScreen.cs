@@ -60,32 +60,32 @@ namespace osu.Game.Tournament.Screens.MapPool
                         {
                             Text = "Current Mode"
                         },
-                        buttonRedBan = new TourneyButton
+                        buttonRedBan = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Ban",
                             Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
                         },
-                        buttonBlueBan = new TourneyButton
+                        buttonBlueBan = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Ban",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
                         },
-                        buttonRedPick = new TourneyButton
+                        buttonRedPick = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Pick",
                             Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
                         },
-                        buttonBluePick = new TourneyButton
+                        buttonBluePick = new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Pick",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
                         },
                         new ControlPanel.Spacer(),
-                        new TourneyButton
+                        new OsuButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Reset",
@@ -196,7 +196,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             setNextMode();
 
-            if (pickType == ChoiceType.Pick && currentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
+            if (pickType == ChoiceType.Pick)
             {
                 scheduledChange?.Cancel();
                 scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);

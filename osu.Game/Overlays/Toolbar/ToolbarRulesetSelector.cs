@@ -18,6 +18,8 @@ namespace osu.Game.Overlays.Toolbar
 {
     public class ToolbarRulesetSelector : RulesetSelector
     {
+        private const float padding = 10;
+
         protected Drawable ModeButtonLine { get; private set; }
 
         public ToolbarRulesetSelector()
@@ -37,7 +39,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 ModeButtonLine = new Container
                 {
-                    Size = new Vector2(ToolbarButton.WIDTH, 3),
+                    Size = new Vector2(padding * 2 + ToolbarButton.WIDTH, 3),
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
                     Masking = true,
@@ -89,6 +91,7 @@ namespace osu.Game.Overlays.Toolbar
             RelativeSizeAxes = Axes.Y,
             AutoSizeAxes = Axes.X,
             Direction = FillDirection.Horizontal,
+            Padding = new MarginPadding { Left = padding, Right = padding },
         };
 
         protected override bool OnKeyDown(KeyDownEvent e)

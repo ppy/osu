@@ -75,6 +75,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
                 testBeatmapLabels(instance);
 
+                // TODO: adjust cases once more info is shown for other gamemodes
                 switch (instance)
                 {
                     case OsuRuleset _:
@@ -98,6 +99,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                         break;
                 }
             }
+
+            testNullBeatmap();
         }
 
         private void testBeatmapLabels(Ruleset ruleset)
@@ -114,8 +117,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
         }
 
-        [Test]
-        public void TestNullBeatmap()
+        private void testNullBeatmap()
         {
             selectBeatmap(null);
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
@@ -123,12 +125,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
             AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
-        }
-
-        [Test]
-        public void TestTruncation()
-        {
-            selectBeatmap(createLongMetadata());
         }
 
         private void selectBeatmap([CanBeNull] IBeatmap b)
@@ -167,25 +163,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                     BaseDifficulty = new BeatmapDifficulty()
                 },
                 HitObjects = objects
-            };
-        }
-
-        private IBeatmap createLongMetadata()
-        {
-            return new Beatmap
-            {
-                BeatmapInfo = new BeatmapInfo
-                {
-                    Metadata = new BeatmapMetadata
-                    {
-                        AuthorString = "WWWWWWWWWWWWWWW",
-                        Artist = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Artist",
-                        Source = "Verrrrry long Source",
-                        Title = "Verrrrry long Title"
-                    },
-                    Version = "Verrrrrrrrrrrrrrrrrrrrrrrrrrrrry long Version",
-                    Status = BeatmapSetOnlineStatus.Graveyard,
-                },
             };
         }
 

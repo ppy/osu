@@ -95,12 +95,12 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (netcoreapp3.0)",
+            "label": "Restore (netcoreapp2.2)",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "restore",
-                "build/Desktop.proj"
+                "osu.sln"
             ],
             "problemMatcher": []
         }

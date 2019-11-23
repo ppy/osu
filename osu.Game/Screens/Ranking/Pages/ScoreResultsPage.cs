@@ -169,19 +169,12 @@ namespace osu.Game.Screens.Ranking.Pages
                         },
                     },
                 },
-                new FillFlowContainer
+                new ReplayDownloadButton(score)
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Margin = new MarginPadding { Bottom = 10 },
-                    Spacing = new Vector2(5),
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
-                    {
-                        new ReplayDownloadButton(score),
-                        new RetryButton()
-                    }
+                    Size = new Vector2(50, 30),
                 },
             };
 
@@ -260,7 +253,9 @@ namespace osu.Game.Screens.Ranking.Pages
             {
                 this.date = date;
 
-                AutoSizeAxes = Axes.Both;
+                AutoSizeAxes = Axes.Y;
+
+                Width = 140;
 
                 Masking = true;
                 CornerRadius = 5;
@@ -276,26 +271,22 @@ namespace osu.Game.Screens.Ranking.Pages
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Gray6,
                     },
-                    new FillFlowContainer
+                    new OsuSpriteText
                     {
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        Text = date.ToShortDateString(),
                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                        Spacing = new Vector2(10),
-                        Children = new[]
-                        {
-                            new OsuSpriteText
-                            {
-                                Text = date.ToShortDateString(),
-                                Colour = Color4.White,
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = date.ToShortTimeString(),
-                                Colour = Color4.White,
-                            }
-                        }
+                        Colour = Color4.White,
                     },
+                    new OsuSpriteText
+                    {
+                        Origin = Anchor.CentreRight,
+                        Anchor = Anchor.CentreRight,
+                        Text = date.ToShortTimeString(),
+                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                        Colour = Color4.White,
+                    }
                 };
             }
         }

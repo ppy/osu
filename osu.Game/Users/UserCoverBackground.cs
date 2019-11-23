@@ -46,7 +46,6 @@ namespace osu.Game.Users
                     };
                 }
                 else
-                {
                     InternalChild = new Sprite
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -55,7 +54,6 @@ namespace osu.Game.Users
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre
                     };
-                }
             }
 
             protected override void LoadComplete()

@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Multi.Lounge
                     },
                 },
             };
+
+            Filter.Search.Exit += this.Exit;
         }
 
         protected override void UpdateAfterChildren()

@@ -131,7 +131,6 @@ namespace osu.Game.Tournament.Components
             });
 
             if (!string.IsNullOrEmpty(mods))
-            {
                 AddInternal(new Sprite
                 {
                     Texture = textures.Get($"mods/{mods}"),
@@ -140,7 +139,6 @@ namespace osu.Game.Tournament.Components
                     Margin = new MarginPadding(20),
                     Scale = new Vector2(0.5f)
                 });
-            }
         }
 
         private void matchChanged(ValueChangedEvent<TournamentMatch> match)

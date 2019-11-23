@@ -3,20 +3,16 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using static osu.Game.Tests.Visual.Components.TestScenePreviewTrackManager.TestPreviewTrackManager;
 
 namespace osu.Game.Tests.Visual.Components
 {
     public class TestScenePreviewTrackManager : OsuTestScene, IPreviewTrackOwner
     {
-        private readonly TestPreviewTrackManager trackManager = new TestPreviewTrackManager();
-
-        private AudioManager audio;
+        private readonly PreviewTrackManager trackManager = new TestPreviewTrackManager();
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -27,10 +23,8 @@ namespace osu.Game.Tests.Visual.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            this.audio = audio;
-
             Add(trackManager);
         }
 
@@ -40,7 +34,6 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
 
             AddStep("get track", () => track = getOwnedTrack());
-            AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start", () => track.Start());
             AddAssert("started", () => track.IsRunning);
             AddStep("stop", () => track.Stop());
@@ -59,15 +52,10 @@ namespace osu.Game.Tests.Visual.Components
                 track2 = getOwnedTrack();
             });
 
-            AddUntilStep("wait loaded", () => track1.IsLoaded && track2.IsLoaded);
-
             AddStep("start track 1", () => track1.Start());
             AddStep("start track 2", () => track2.Start());
             AddAssert("track 1 stopped", () => !track1.IsRunning);
             AddAssert("track 2 started", () => track2.IsRunning);
-            AddStep("start track 1", () => track1.Start());
-            AddAssert("track 2 stopped", () => !track2.IsRunning);
-            AddAssert("track 1 started", () => track1.IsRunning);
         }
 
         [Test]
@@ -76,7 +64,6 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
 
             AddStep("get track", () => track = getOwnedTrack());
-            AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start", () => track.Start());
             AddStep("stop by owner", () => trackManager.StopAnyPlaying(this));
             AddAssert("stopped", () => !track.IsRunning);
@@ -89,7 +76,6 @@ namespace osu.Game.Tests.Visual.Components
             PreviewTrack track = null;
 
             AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
-            AddUntilStep("wait loaded", () => track.IsLoaded);
             AddStep("start", () => track.Start());
             AddStep("attempt stop", () => trackManager.StopAnyPlaying(this));
             AddAssert("not stopped", () => track.IsRunning);
@@ -97,100 +83,22 @@ namespace osu.Game.Tests.Visual.Components
             AddAssert("stopped", () => !track.IsRunning);
         }
 
-        [Test]
-        public void TestNonPresentTrack()
-        {
-            TestPreviewTrack track = null;
+        private PreviewTrack getTrack() => trackManager.Get(null);
 
-            AddStep("get non-present track", () =>
-            {
-                Add(new TestTrackOwner(track = getTrack()));
-                track.Alpha = 0;
-            });
-            AddUntilStep("wait loaded", () => track.IsLoaded);
-            AddStep("start", () => track.Start());
-            AddStep("seek to end", () => track.Track.Seek(track.Track.Length));
-            AddAssert("track stopped", () => !track.IsRunning);
-        }
-
-        /// <summary>
-        /// Ensures that <see cref="PreviewTrackManager.CurrentTrack"/> changes correctly.
-        /// </summary>
-        [Test]
-        public void TestCurrentTrackChanges()
-        {
-            PreviewTrack track = null;
-            TestTrackOwner owner = null;
-
-            AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
-            AddUntilStep("wait loaded", () => track.IsLoaded);
-            AddStep("start track", () => track.Start());
-            AddAssert("current is track", () => trackManager.CurrentTrack == track);
-            AddStep("pause manager updates", () => trackManager.AllowUpdate = false);
-            AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
-            AddAssert("current not changed", () => trackManager.CurrentTrack == track);
-            AddStep("resume manager updates", () => trackManager.AllowUpdate = true);
-            AddAssert("current is null", () => trackManager.CurrentTrack == null);
-        }
-
-        /// <summary>
-        /// Ensures that <see cref="PreviewTrackManager"/> mutes game-wide audio tracks correctly.
-        /// </summary>
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestEnsureMutingCorrectly(bool stopAnyPlaying)
-        {
-            PreviewTrack track = null;
-            TestTrackOwner owner = null;
-
-            AddStep("ensure volume not zero", () =>
-            {
-                if (audio.Volume.Value == 0)
-                    audio.Volume.Value = 1;
-
-                if (audio.VolumeTrack.Value == 0)
-                    audio.VolumeTrack.Value = 1;
-            });
-
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
-
-            AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
-            AddUntilStep("wait loaded", () => track.IsLoaded);
-            AddStep("start track", () => track.Start());
-            AddAssert("game is muted", () => audio.Tracks.AggregateVolume.Value == 0);
-
-            if (stopAnyPlaying)
-                AddStep("stop any playing", () => trackManager.StopAnyPlaying(owner));
-            else
-                AddStep("stop track", () => track.Stop());
-
-            AddAssert("game not muted", () => audio.Tracks.AggregateVolume.Value != 0);
-        }
-
-        private TestPreviewTrack getTrack() => (TestPreviewTrack)trackManager.Get(null);
-
-        private TestPreviewTrack getOwnedTrack()
+        private PreviewTrack getOwnedTrack()
         {
             var track = getTrack();
 
-            LoadComponentAsync(track, Add);
+            Add(track);
 
             return track;
         }
 
         private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
         {
-            private readonly PreviewTrack track;
-
             public TestTrackOwner(PreviewTrack track)
             {
-                this.track = track;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                LoadComponentAsync(track, AddInternal);
+                AddInternal(track);
             }
 
             protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -201,27 +109,13 @@ namespace osu.Game.Tests.Visual.Components
             }
         }
 
-        public class TestPreviewTrackManager : PreviewTrackManager
+        private class TestPreviewTrackManager : PreviewTrackManager
         {
-            public bool AllowUpdate = true;
-
-            public new PreviewTrack CurrentTrack => base.CurrentTrack;
-
             protected override TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TestPreviewTrack(beatmapSetInfo, trackStore);
 
-            public override bool UpdateSubTree()
-            {
-                if (!AllowUpdate)
-                    return true;
-
-                return base.UpdateSubTree();
-            }
-
-            public class TestPreviewTrack : TrackManagerPreviewTrack
+            protected class TestPreviewTrack : TrackManagerPreviewTrack
             {
                 private readonly ITrackStore trackManager;
-
-                public new Track Track => base.Track;
 
                 public TestPreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackManager)
                     : base(beatmapSetInfo, trackManager)

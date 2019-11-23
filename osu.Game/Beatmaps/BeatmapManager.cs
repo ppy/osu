@@ -20,7 +20,6 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -90,7 +89,7 @@ namespace osu.Game.Beatmaps
         protected override Task Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive, CancellationToken cancellationToken = default)
         {
             if (archive != null)
-                beatmapSet.Beatmaps = createBeatmapDifficulties(beatmapSet.Files);
+                beatmapSet.Beatmaps = createBeatmapDifficulties(archive);
 
             foreach (BeatmapInfo b in beatmapSet.Beatmaps)
             {
@@ -129,12 +128,9 @@ namespace osu.Game.Beatmaps
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
-            LogForModel(beatmapSet, "Validating online IDs...");
-
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
             {
-                LogForModel(beatmapSet, "Found non-unique IDs, resetting...");
                 resetIds();
                 return;
             }
@@ -147,12 +143,8 @@ namespace osu.Game.Beatmaps
                 // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
                 // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
                 var existing = CheckForExisting(beatmapSet);
-
                 if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
-                {
-                    LogForModel(beatmapSet, "Found existing import with IDs already, resetting...");
                     resetIds();
-                }
             }
 
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
@@ -272,7 +264,7 @@ namespace osu.Game.Beatmaps
             }
 
             Beatmap beatmap;
-            using (var stream = new LineBufferedReader(reader.GetStream(mapName)))
+            using (var stream = new StreamReader(reader.GetStream(mapName)))
                 beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
             return new BeatmapSetInfo
@@ -287,15 +279,15 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Create all required <see cref="BeatmapInfo"/>s for the provided archive.
         /// </summary>
-        private List<BeatmapInfo> createBeatmapDifficulties(List<BeatmapSetFileInfo> files)
+        private List<BeatmapInfo> createBeatmapDifficulties(ArchiveReader reader)
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
-            foreach (var file in files.Where(f => f.Filename.EndsWith(".osu")))
+            foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
             {
-                using (var raw = Files.Store.GetStream(file.FileInfo.StoragePath))
+                using (var raw = reader.GetStream(name))
                 using (var ms = new MemoryStream()) //we need a memory stream so we can seek
-                using (var sr = new LineBufferedReader(ms))
+                using (var sr = new StreamReader(ms))
                 {
                     raw.CopyTo(ms);
                     ms.Position = 0;
@@ -303,18 +295,12 @@ namespace osu.Game.Beatmaps
                     var decoder = Decoder.GetDecoder<Beatmap>(sr);
                     IBeatmap beatmap = decoder.Decode(sr);
 
-                    string hash = ms.ComputeSHA2Hash();
-
-                    if (beatmapInfos.Any(b => b.Hash == hash))
-                        continue;
-
-                    beatmap.BeatmapInfo.Path = file.Filename;
-                    beatmap.BeatmapInfo.Hash = hash;
+                    beatmap.BeatmapInfo.Path = name;
+                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
                     var ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
                     beatmap.BeatmapInfo.Ruleset = ruleset;
-
                     // TODO: this should be done in a better place once we actually need to dynamically update it.
                     beatmap.BeatmapInfo.StarDifficulty = ruleset?.CreateInstance().CreateDifficultyCalculator(new DummyConversionBeatmap(beatmap)).Calculate().StarRating ?? 0;
                     beatmap.BeatmapInfo.Length = calculateLength(beatmap);
@@ -392,32 +378,20 @@ namespace osu.Game.Beatmaps
 
                 var req = new GetBeatmapRequest(beatmap);
 
-                req.Failure += fail;
-
-                try
+                req.Success += res =>
                 {
-                    // intentionally blocking to limit web request concurrency
-                    req.Perform(api);
-
-                    var res = req.Result;
+                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
 
                     beatmap.Status = res.Status;
                     beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
                     beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                     beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+                };
 
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
-                }
-                catch (Exception e)
-                {
-                    fail(e);
-                }
+                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
 
-                void fail(Exception e)
-                {
-                    beatmap.OnlineBeatmapID = null;
-                    LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})");
-                }
+                // intentionally blocking to limit web request concurrency
+                req.Perform(api);
             }
         }
     }

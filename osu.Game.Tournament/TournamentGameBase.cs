@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -19,16 +18,15 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
-using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
 {
-    [Cached(typeof(TournamentGameBase))]
     public abstract class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
@@ -78,7 +76,7 @@ namespace osu.Game.Tournament
 
             AddRange(new[]
             {
-                new TourneyButton
+                new OsuButton
                 {
                     Text = "Save Changes",
                     Width = 140,
@@ -129,8 +127,6 @@ namespace osu.Game.Tournament
                 ladder = new LadderInfo();
             }
 
-            Ruleset.BindTo(ladder.Ruleset);
-
             dependencies.Cache(ladder);
 
             bool addedInfo = false;
@@ -169,17 +165,15 @@ namespace osu.Game.Tournament
 
             // link matches to rounds
             foreach (var round in ladder.Rounds)
+            foreach (var id in round.Matches)
             {
-                foreach (var id in round.Matches)
-                {
-                    var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
+                var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
 
-                    if (found != null)
-                    {
-                        found.Round.Value = round;
-                        if (round.StartDate.Value > found.Date.Value)
-                            found.Date.Value = round.StartDate.Value;
-                    }
+                if (found != null)
+                {
+                    found.Round.Value = round;
+                    if (round.StartDate.Value > found.Date.Value)
+                        found.Date.Value = round.StartDate.Value;
                 }
             }
 
@@ -199,13 +193,15 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             foreach (var t in ladder.Teams)
-            {
-                foreach (var p in t.Players)
+            foreach (var p in t.Players)
+                if (string.IsNullOrEmpty(p.Username))
                 {
-                    PopulateUser(p);
+                    var req = new GetUserRequest(p.Id);
+                    req.Perform(API);
+                    p.Username = req.Result.Username;
+
                     addedInfo = true;
                 }
-            }
 
             return addedInfo;
         }
@@ -218,45 +214,17 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             foreach (var r in ladder.Rounds)
-            {
-                foreach (var b in r.Beatmaps)
+            foreach (var b in r.Beatmaps)
+                if (b.BeatmapInfo == null)
                 {
-                    if (b.BeatmapInfo == null && b.ID > 0)
-                    {
-                        var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                        req.Perform(API);
-                        b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                    var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                    req.Perform(API);
+                    b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
-                        addedInfo = true;
-                    }
+                    addedInfo = true;
                 }
-            }
 
             return addedInfo;
-        }
-
-        public void PopulateUser(User user, Action success = null, Action failure = null)
-        {
-            var req = new GetUserRequest(user.Id, Ruleset.Value);
-
-            req.Success += res =>
-            {
-                user.Username = res.Username;
-                user.Statistics = res.Statistics;
-                user.Username = res.Username;
-                user.Country = res.Country;
-                user.Cover = res.Cover;
-
-                success?.Invoke();
-            };
-
-            req.Failure += _ =>
-            {
-                user.Id = 1;
-                failure?.Invoke();
-            };
-
-            API.Queue(req);
         }
 
         protected override void LoadComplete()

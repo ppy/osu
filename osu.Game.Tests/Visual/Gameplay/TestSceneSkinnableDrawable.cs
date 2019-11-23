@@ -326,11 +326,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
-            public event Action SourceChanged
-            {
-                add { }
-                remove { }
-            }
+            public event Action SourceChanged;
         }
 
         private class TestSkinComponent : ISkinComponent

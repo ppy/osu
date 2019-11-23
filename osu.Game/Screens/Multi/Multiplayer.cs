@@ -167,17 +167,14 @@ namespace osu.Game.Screens.Multi
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
-                Schedule(forcefullyExit);
+                forcefullyExit();
         }
 
         private void forcefullyExit()
         {
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
-            {
-                while (this.IsCurrentScreen())
-                    this.Exit();
-            }
+                this.Exit();
             else
             {
                 this.MakeCurrent();
@@ -215,8 +212,6 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnExiting(IScreen next)
         {
-            roomManager.PartRoom();
-
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
             {
                 screenStack.Exit();

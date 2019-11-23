@@ -60,10 +60,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown
-                {
-                    Keywords = new[] { "speaker", "headphone", "output" }
-                }
+                dropdown = new AudioDeviceSettingsDropdown()
             };
 
             updateItems();

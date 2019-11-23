@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -95,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return value;
         }
 
-        private float accuracy() => totalHits() == 0 ? 0 : Math.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
+        private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
         private int totalHits() => tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
         private int totalSuccessfulHits() => tinyTicksHit + ticksHit + fruitsHit;
         private int totalComboHits() => misses + ticksHit + fruitsHit;

@@ -89,7 +89,11 @@ namespace osu.Game.Screens.Select.Options
         /// <param name="icon">Icon of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
         /// <param name="action">Binding the button does.</param>
-        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action, Key? hotkey = null)
+        /// <param name="depth">
+        /// <para>Lower depth to be put on the left, and higher to be put on the right.</para>
+        /// <para>Notice this is different to <see cref="Footer"/>!</para>
+        /// </param>
+        public void AddButton(string firstLine, string secondLine, IconUsage icon, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
             var button = new BeatmapOptionsButton
             {
@@ -97,6 +101,7 @@ namespace osu.Game.Screens.Select.Options
                 SecondLineText = secondLine,
                 Icon = icon,
                 ButtonColour = colour,
+                Depth = depth,
                 Action = () =>
                 {
                     Hide();
@@ -105,7 +110,7 @@ namespace osu.Game.Screens.Select.Options
                 HotKey = hotkey
             };
 
-            buttonsContainer.Add(button);
+            buttonsContainer.Insert((int)depth, button);
         }
     }
 }

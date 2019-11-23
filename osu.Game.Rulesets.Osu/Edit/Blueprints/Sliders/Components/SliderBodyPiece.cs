@@ -11,15 +11,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : BlueprintPiece<Slider>
+    public class SliderBodyPiece : SliderPiece
     {
+        private readonly Slider slider;
         private readonly ManualSliderBody body;
 
-        public SliderBodyPiece()
+        public SliderBodyPiece(Slider slider)
+            : base(slider)
         {
+            this.slider = slider;
+
             InternalChild = body = new ManualSliderBody
             {
-                AccentColour = Color4.Transparent
+                AccentColour = Color4.Transparent,
             };
         }
 
@@ -27,23 +31,24 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private void load(OsuColour colours)
         {
             body.BorderColour = colours.Yellow;
+
+            PositionBindable.BindValueChanged(_ => updatePosition(), true);
+            ScaleBindable.BindValueChanged(scale => body.PathRadius = scale.NewValue * OsuHitObject.OBJECT_RADIUS, true);
         }
 
-        public override void UpdateFrom(Slider hitObject)
-        {
-            base.UpdateFrom(hitObject);
+        private void updatePosition() => Position = slider.StackedPosition;
 
-            body.PathRadius = hitObject.Scale * OsuHitObject.OBJECT_RADIUS;
+        protected override void Update()
+        {
+            base.Update();
 
             var vertices = new List<Vector2>();
-            hitObject.Path.GetPathToProgress(vertices, 0, 1);
+            slider.Path.GetPathToProgress(vertices, 0, 1);
 
             body.SetVertices(vertices);
 
             Size = body.Size;
             OriginPosition = body.PathOffset;
         }
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
     }
 }

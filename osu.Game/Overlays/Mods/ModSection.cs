@@ -112,7 +112,6 @@ namespace osu.Game.Overlays.Mods
                 if (selected == null) continue;
 
                 foreach (var type in modTypes)
-                {
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
@@ -120,7 +119,6 @@ namespace osu.Game.Overlays.Mods
                         else
                             Scheduler.AddDelayed(button.Deselect, delay += 50);
                     }
-                }
             }
         }
 
@@ -160,8 +158,7 @@ namespace osu.Game.Overlays.Mods
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Both,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Spacing = new Vector2(50f, 0f),

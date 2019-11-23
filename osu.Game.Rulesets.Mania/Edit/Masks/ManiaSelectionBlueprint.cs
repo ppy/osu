@@ -9,8 +9,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
     public abstract class ManiaSelectionBlueprint : SelectionBlueprint
     {
-        protected ManiaSelectionBlueprint(DrawableHitObject drawableObject)
-            : base(drawableObject)
+        protected ManiaSelectionBlueprint(DrawableHitObject hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
         }

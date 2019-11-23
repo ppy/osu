@@ -81,10 +81,8 @@ namespace osu.Game.Rulesets.Difficulty.Utils
                 yield return array[i];
 
             if (Count == capacity)
-            {
                 for (int i = 0; i < marker; ++i)
                     yield return array[i];
-            }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -85,15 +85,9 @@ namespace osu.Game.Overlays.SearchableList
                                     AutoSizeAxes = Axes.Y,
                                     Margin = new MarginPadding { Top = controls != null ? padding : 0 },
                                 },
-                                new Container
+                                Tabs = new PageTabControl<T>
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Padding = new MarginPadding { Right = 225 },
-                                    Child = Tabs = new PageTabControl<T>
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                    },
                                 },
                                 new Box //keep the tab strip part of autosize, but don't put it in the flow container
                                 {

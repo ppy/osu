@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,9 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
+using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -29,7 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double ring_appear_offset = 100;
 
-        private readonly Container<DrawableSwellTick> ticks;
+        private readonly List<DrawableSwellTick> ticks = new List<DrawableSwellTick>();
+
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
@@ -106,9 +108,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             });
 
-            AddInternal(ticks = new Container<DrawableSwellTick> { RelativeSizeAxes = Axes.Both });
-
             MainPiece.Add(symbol = new SwellSymbolPiece());
+
+            foreach (var tick in HitObject.NestedHitObjects.OfType<SwellTick>())
+            {
+                var vis = new DrawableSwellTick(tick);
+
+                ticks.Add(vis);
+                AddInternal(vis);
+                AddNested(vis);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -127,49 +136,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Width *= Parent.RelativeChildSize.X;
         }
 
-        protected override void AddNestedHitObject(DrawableHitObject hitObject)
-        {
-            base.AddNestedHitObject(hitObject);
-
-            switch (hitObject)
-            {
-                case DrawableSwellTick tick:
-                    ticks.Add(tick);
-                    break;
-            }
-        }
-
-        protected override void ClearNestedHitObjects()
-        {
-            base.ClearNestedHitObjects();
-            ticks.Clear();
-        }
-
-        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case SwellTick tick:
-                    return new DrawableSwellTick(tick);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
-        }
-
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
             {
-                DrawableSwellTick nextTick = null;
-
-                foreach (var t in ticks)
-                {
-                    if (!t.IsHit)
-                    {
-                        nextTick = t;
-                        break;
-                    }
-                }
+                var nextTick = ticks.Find(j => !j.IsHit);
 
                 nextTick?.TriggerResult(HitResult.Great);
 
@@ -178,7 +149,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 var completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
-                    .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
                     .Then()
                     .FadeTo(completion / 8, 2000, Easing.OutQuint);
 

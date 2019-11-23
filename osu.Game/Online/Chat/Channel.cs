@@ -14,7 +14,7 @@ namespace osu.Game.Online.Chat
 {
     public class Channel
     {
-        public const int MAX_HISTORY = 300;
+        public readonly int MaxHistory = 300;
 
         /// <summary>
         /// Contains every joined user except the current logged in user. Currently only returned for PM channels.
@@ -79,6 +79,8 @@ namespace osu.Game.Online.Chat
         /// Signalles if the current user joined this channel or not. Defaults to false.
         /// </summary>
         public Bindable<bool> Joined = new Bindable<bool>();
+
+        public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
         public Channel()
@@ -160,8 +162,8 @@ namespace osu.Game.Online.Chat
         {
             // never purge local echos
             int messageCount = Messages.Count - pendingMessages.Count;
-            if (messageCount > MAX_HISTORY)
-                Messages.RemoveRange(0, messageCount - MAX_HISTORY);
+            if (messageCount > MaxHistory)
+                Messages.RemoveRange(0, messageCount - MaxHistory);
         }
     }
 }

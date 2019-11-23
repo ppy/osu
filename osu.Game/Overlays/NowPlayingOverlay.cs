@@ -81,6 +81,7 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
+                            OrderChanged = musicController.ChangeBeatmapSetPosition
                         },
                         playerContainer = new Container
                         {
@@ -168,13 +169,12 @@ namespace osu.Game.Overlays
                                         },
                                     }
                                 },
-                                progressBar = new HoverableProgressBar
+                                progressBar = new ProgressBar
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
-                                    Height = progress_height / 2,
+                                    Height = progress_height,
                                     FillColour = colours.Yellow,
-                                    BackgroundColour = colours.YellowDarker.Opacity(0.5f),
                                     OnSeek = musicController.SeekTo
                                 }
                             },
@@ -400,21 +400,6 @@ namespace osu.Game.Overlays
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
                 return base.OnDragEnd(e);
-            }
-        }
-
-        private class HoverableProgressBar : ProgressBar
-        {
-            protected override bool OnHover(HoverEvent e)
-            {
-                this.ResizeHeightTo(progress_height, 500, Easing.OutQuint);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                this.ResizeHeightTo(progress_height / 2, 500, Easing.OutQuint);
-                base.OnHoverLost(e);
             }
         }
     }

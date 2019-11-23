@@ -101,11 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             public IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup) => throw new NotImplementedException();
 
-            public event Action SourceChanged
-            {
-                add { }
-                remove { }
-            }
+            public event Action SourceChanged;
         }
 
         private class MovingCursorInputManager : ManualInputManager

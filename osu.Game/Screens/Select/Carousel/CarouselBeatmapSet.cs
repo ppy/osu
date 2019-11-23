@@ -49,31 +49,14 @@ namespace osu.Game.Screens.Select.Carousel
                     return otherSet.BeatmapSet.DateAdded.CompareTo(BeatmapSet.DateAdded);
 
                 case SortMode.BPM:
-                    return compareUsingAggregateMax(otherSet, b => b.BPM);
+                    return BeatmapSet.MaxBPM.CompareTo(otherSet.BeatmapSet.MaxBPM);
 
                 case SortMode.Length:
-                    return compareUsingAggregateMax(otherSet, b => b.Length);
+                    return BeatmapSet.MaxLength.CompareTo(otherSet.BeatmapSet.MaxLength);
 
                 case SortMode.Difficulty:
-                    return compareUsingAggregateMax(otherSet, b => b.StarDifficulty);
+                    return BeatmapSet.MaxStarDifficulty.CompareTo(otherSet.BeatmapSet.MaxStarDifficulty);
             }
-        }
-
-        /// <summary>
-        /// All beatmaps which are not filtered and valid for display.
-        /// </summary>
-        protected IEnumerable<BeatmapInfo> ValidBeatmaps => Beatmaps.Where(b => !b.Filtered.Value).Select(b => b.Beatmap);
-
-        private int compareUsingAggregateMax(CarouselBeatmapSet other, Func<BeatmapInfo, double> func)
-        {
-            var ourBeatmaps = ValidBeatmaps.Any();
-            var otherBeatmaps = other.ValidBeatmaps.Any();
-
-            if (!ourBeatmaps && !otherBeatmaps) return 0;
-            if (!ourBeatmaps) return -1;
-            if (!otherBeatmaps) return 1;
-
-            return ValidBeatmaps.Max(func).CompareTo(other.ValidBeatmaps.Max(func));
         }
 
         public override void Filter(FilterCriteria criteria)

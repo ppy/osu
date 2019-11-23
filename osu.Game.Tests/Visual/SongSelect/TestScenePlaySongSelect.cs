@@ -16,7 +16,6 @@ using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
@@ -34,8 +33,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private BeatmapManager manager;
 
         private RulesetStore rulesets;
-
-        private MusicController music;
 
         private WorkingBeatmap defaultBeatmap;
 
@@ -57,6 +54,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             typeof(DrawableCarouselBeatmapSet),
         };
 
+        private class TestSongSelect : PlaySongSelect
+        {
+            public Action StartRequested;
+
+            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
+            public new BeatmapCarousel Carousel => base.Carousel;
+
+            protected override bool OnStart()
+            {
+                StartRequested?.Invoke();
+                return base.OnStart();
+            }
+        }
+
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]
@@ -64,11 +78,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         {
             Dependencies.Cache(rulesets = new RulesetStore(ContextFactory));
             Dependencies.Cache(manager = new BeatmapManager(LocalStorage, ContextFactory, rulesets, null, audio, host, defaultBeatmap = Beatmap.Default));
-
-            Dependencies.Cache(music = new MusicController());
-
-            // required to get bindables attached
-            Add(music);
 
             Beatmap.SetDefault();
 
@@ -83,70 +92,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             Ruleset.Value = new OsuRuleset().RulesetInfo;
             manager?.Delete(manager.GetAllUsableBeatmapSets());
         });
-
-        [Test]
-        public void TestSingleFilterOnEnter()
-        {
-            addRulesetImportStep(0);
-            addRulesetImportStep(0);
-
-            createSongSelect();
-
-            AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
-        }
-
-        [Test]
-        public void TestAudioResuming()
-        {
-            createSongSelect();
-
-            addRulesetImportStep(0);
-            addRulesetImportStep(0);
-
-            checkMusicPlaying(true);
-            AddStep("select first", () => songSelect.Carousel.SelectBeatmap(songSelect.Carousel.BeatmapSets.First().Beatmaps.First()));
-            checkMusicPlaying(true);
-
-            AddStep("manual pause", () => music.TogglePause());
-            checkMusicPlaying(false);
-            AddStep("select next difficulty", () => songSelect.Carousel.SelectNext(skipDifficulties: false));
-            checkMusicPlaying(false);
-
-            AddStep("select next set", () => songSelect.Carousel.SelectNext());
-            checkMusicPlaying(true);
-        }
-
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestAudioRemainsCorrectOnRulesetChange(bool rulesetsInSameBeatmap)
-        {
-            createSongSelect();
-
-            // start with non-osu! to avoid convert confusion
-            changeRuleset(1);
-
-            if (rulesetsInSameBeatmap)
-            {
-                AddStep("import multi-ruleset map", () =>
-                {
-                    var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
-                    manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
-                });
-            }
-            else
-            {
-                addRulesetImportStep(1);
-                addRulesetImportStep(0);
-            }
-
-            checkMusicPlaying(true);
-
-            AddStep("manual pause", () => music.TogglePause());
-            checkMusicPlaying(false);
-
-            changeRuleset(0);
-            checkMusicPlaying(!rulesetsInSameBeatmap);
-        }
 
         [Test]
         public void TestDummy()
@@ -183,10 +128,12 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        [Ignore("needs fixing")]
         public void TestImportUnderDifferentRuleset()
         {
             createSongSelect();
-            addRulesetImportStep(2);
+            changeRuleset(2);
+            addRulesetImportStep(0);
             AddUntilStep("no selection", () => songSelect.Carousel.SelectedBeatmap == null);
         }
 
@@ -237,22 +184,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
-        public void TestModsRetainedBetweenSongSelect()
-        {
-            AddAssert("empty mods", () => !Mods.Value.Any());
-
-            createSongSelect();
-
-            addRulesetImportStep(0);
-
-            changeMods(new OsuModHardRock());
-
-            createSongSelect();
-
-            AddAssert("mods retained", () => Mods.Value.Any());
-        }
-
-        [Test]
         public void TestStartAfterUnMatchingFilterDoesNotStart()
         {
             createSongSelect();
@@ -292,9 +223,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private static int importId;
         private int getImportId() => ++importId;
-
-        private void checkMusicPlaying(bool playing) =>
-            AddUntilStep($"music {(playing ? "" : "not ")}playing", () => music.IsPlaying == playing);
 
         private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => Mods.Value = mods);
 
@@ -360,37 +288,6 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmaps = beatmaps,
                 DateAdded = DateTimeOffset.UtcNow,
             };
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            rulesets?.Dispose();
-        }
-
-        private class TestSongSelect : PlaySongSelect
-        {
-            public Action StartRequested;
-
-            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
-
-            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
-            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
-            public new BeatmapCarousel Carousel => base.Carousel;
-
-            protected override bool OnStart()
-            {
-                StartRequested?.Invoke();
-                return base.OnStart();
-            }
-
-            public int FilterCount;
-
-            protected override void ApplyFilterToCarousel(FilterCriteria criteria)
-            {
-                FilterCount++;
-                base.ApplyFilterToCarousel(criteria);
-            }
         }
     }
 }

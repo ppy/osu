@@ -46,7 +46,6 @@ namespace osu.Game.Input
                         continue;
 
                     foreach (var insertable in group.Skip(count).Take(aimCount - count))
-                    {
                         // insert any defaults which are missing.
                         usage.Context.DatabasedKeyBinding.Add(new DatabasedKeyBinding
                         {
@@ -55,7 +54,6 @@ namespace osu.Game.Input
                             RulesetID = rulesetId,
                             Variant = variant
                         });
-                    }
                 }
             }
         }

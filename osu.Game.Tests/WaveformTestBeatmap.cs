@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Tests.Resources;
 
@@ -57,7 +56,7 @@ namespace osu.Game.Tests
         private Beatmap createTestBeatmap()
         {
             using (var beatmapStream = getBeatmapStream())
-            using (var beatmapReader = new LineBufferedReader(beatmapStream))
+            using (var beatmapReader = new StreamReader(beatmapStream))
                 return Decoder.GetDecoder<Beatmap>(beatmapReader).Decode(beatmapReader);
         }
     }

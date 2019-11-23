@@ -13,30 +13,31 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
     {
         public new HitCircle HitObject => (HitCircle)base.HitObject;
 
-        private readonly HitCirclePiece circlePiece;
-
         public HitCirclePlacementBlueprint()
             : base(new HitCircle())
         {
-            InternalChild = circlePiece = new HitCirclePiece();
+            InternalChild = new HitCirclePiece(HitObject);
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
-            circlePiece.UpdateFrom(HitObject);
+            // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+            HitObject.Position = Parent?.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position) ?? Vector2.Zero;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
+            HitObject.StartTime = EditorClock.CurrentTime;
             EndPlacement();
             return true;
         }
 
-        public override void UpdatePosition(Vector2 screenSpacePosition)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            HitObject.Position = ToLocalSpace(screenSpacePosition);
+            HitObject.Position = e.MousePosition;
+            return true;
         }
     }
 }

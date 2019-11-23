@@ -14,6 +14,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected virtual bool AllowCommit => false;
 
+        public override bool HandleLeftRightArrows => false;
+
         public SearchTextBox()
         {
             Height = 35;

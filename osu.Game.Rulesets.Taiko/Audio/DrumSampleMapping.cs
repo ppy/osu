@@ -19,7 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Audio
         {
             this.controlPoints = controlPoints;
 
-            IEnumerable<SampleControlPoint> samplePoints = controlPoints.SamplePoints.Count == 0 ? new[] { controlPoints.SamplePointAt(double.MinValue) } : controlPoints.SamplePoints;
+            IEnumerable<SampleControlPoint> samplePoints;
+            if (controlPoints.SamplePoints.Count == 0)
+                // Get the default sample point
+                samplePoints = new[] { controlPoints.SamplePointAt(double.MinValue) };
+            else
+                samplePoints = controlPoints.SamplePoints;
 
             foreach (var s in samplePoints)
             {

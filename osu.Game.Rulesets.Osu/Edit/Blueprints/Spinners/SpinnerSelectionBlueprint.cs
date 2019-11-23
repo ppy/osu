@@ -8,21 +8,14 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
-    public class SpinnerSelectionBlueprint : OsuSelectionBlueprint<Spinner>
+    public class SpinnerSelectionBlueprint : OsuSelectionBlueprint
     {
         private readonly SpinnerPiece piece;
 
         public SpinnerSelectionBlueprint(DrawableSpinner spinner)
             : base(spinner)
         {
-            InternalChild = piece = new SpinnerPiece();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            piece.UpdateFrom(HitObject);
+            InternalChild = piece = new SpinnerPiece((Spinner)spinner.HitObject);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => piece.ReceivePositionalInputAt(screenSpacePos);

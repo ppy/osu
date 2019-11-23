@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.Beatmaps;
@@ -38,21 +37,9 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int ComboOffset { get; set; }
 
-        public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
+        public int IndexInCurrentCombo { get; set; }
 
-        public int IndexInCurrentCombo
-        {
-            get => IndexInCurrentComboBindable.Value;
-            set => IndexInCurrentComboBindable.Value = value;
-        }
-
-        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
-
-        public int ComboIndex
-        {
-            get => ComboIndexBindable.Value;
-            set => ComboIndexBindable.Value = value;
-        }
+        public int ComboIndex { get; set; }
 
         /// <summary>
         /// Difference between the distance to the next object
@@ -61,16 +48,10 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public float DistanceToHyperDash { get; set; }
 
-        public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
-
         /// <summary>
         /// The next fruit starts a new combo. Used for explodey.
         /// </summary>
-        public virtual bool LastInCombo
-        {
-            get => LastInComboBindable.Value;
-            set => LastInComboBindable.Value = value;
-        }
+        public virtual bool LastInCombo { get; set; }
 
         public float Scale { get; set; } = 1;
 
@@ -93,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }
 
-        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
+        protected override HitWindows CreateHitWindows() => null;
     }
 
     public enum FruitVisualRepresentation

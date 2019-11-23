@@ -18,17 +18,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableHitCircle : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
-        public ApproachCircle ApproachCircle { get; }
+        public ApproachCircle ApproachCircle;
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
-        public OsuAction? HitAction => HitArea.HitAction;
+        public OsuAction? HitAction => hitArea.HitAction;
 
-        public readonly HitReceptor HitArea;
-        public readonly SkinnableDrawable CirclePiece;
         private readonly Container scaleContainer;
+
+        private readonly HitArea hitArea;
+
+        private readonly SkinnableDrawable mainContent;
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
@@ -46,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        HitArea = new HitReceptor
+                        hitArea = new HitArea
                         {
                             Hit = () =>
                             {
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                                 return true;
                             },
                         },
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece()),
+                        mainContent = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.HitCircle), _ => new MainCirclePiece(HitObject.IndexInCurrentCombo)),
                         ApproachCircle = new ApproachCircle
                         {
                             Alpha = 0,
@@ -67,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
             };
 
-            Size = HitArea.DrawSize;
+            Size = hitArea.DrawSize;
         }
 
         [BackgroundDependencyLoader]
@@ -131,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateInitialTransforms();
 
-            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
+            mainContent.FadeInFromZero(HitObject.TimeFadeIn);
 
             ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1f, HitObject.TimePreempt);
@@ -151,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                     Expire(true);
 
-                    HitArea.HitAction = null;
+                    hitArea.HitAction = null;
                     break;
 
                 case ArmedState.Miss:
@@ -170,7 +172,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => ApproachCircle;
 
-        public class HitReceptor : Drawable, IKeyBindingHandler<OsuAction>
+        private class HitArea : Drawable, IKeyBindingHandler<OsuAction>
         {
             // IsHovered is used
             public override bool HandlePositionalInput => true;
@@ -179,7 +181,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             public OsuAction? HitAction;
 
-            public HitReceptor()
+            public HitArea()
             {
                 Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 

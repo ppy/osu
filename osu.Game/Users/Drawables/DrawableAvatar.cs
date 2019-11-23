@@ -13,7 +13,6 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Users.Drawables
 {
-    [LongRunningLoad]
     public class DrawableAvatar : Container
     {
         /// <summary>

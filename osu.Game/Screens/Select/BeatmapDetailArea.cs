@@ -36,11 +36,6 @@ namespace osu.Game.Screens.Select
         {
             AddRangeInternal(new Drawable[]
             {
-                content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
-                },
                 new BeatmapDetailAreaTabControl
                 {
                     RelativeSizeAxes = Axes.X,
@@ -62,6 +57,11 @@ namespace osu.Game.Screens.Select
                                 break;
                         }
                     },
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
                 },
             });
 

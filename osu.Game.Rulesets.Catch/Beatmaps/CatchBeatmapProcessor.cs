@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
+using osuTK;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Mods;
 
@@ -77,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             catchObject.XOffset = 0;
 
                             if (catchObject is TinyDroplet)
-                                catchObject.XOffset = Math.Clamp(rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH, -catchObject.X, 1 - catchObject.X);
+                                catchObject.XOffset = MathHelper.Clamp(rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH, -catchObject.X, 1 - catchObject.X);
                             else if (catchObject is Droplet)
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                         }
@@ -194,15 +195,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             {
                 if (currentObject is Fruit)
                     objectWithDroplets.Add(currentObject);
-
                 if (currentObject is JuiceStream)
-                {
                     foreach (var currentJuiceElement in currentObject.NestedHitObjects)
-                    {
                         if (!(currentJuiceElement is TinyDroplet))
                             objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
-                    }
-                }
             }
 
             objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
@@ -229,7 +225,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 else
                 {
                     currentObject.DistanceToHyperDash = distanceToHyper;
-                    lastExcess = Math.Clamp(distanceToHyper, 0, halfCatcherWidth);
+                    lastExcess = MathHelper.Clamp(distanceToHyper, 0, halfCatcherWidth);
                 }
 
                 lastDirection = thisDirection;

@@ -10,16 +10,14 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BackButton : VisibilityContainer
+    public class BackButton : VisibilityContainer, IKeyBindingHandler<GlobalAction>
     {
         public Action Action;
 
         private readonly TwoLayerButton button;
 
-        public BackButton(Receptor receptor)
+        public BackButton()
         {
-            receptor.OnBackPressed = () => button.Click();
-
             Size = TwoLayerButton.SIZE_EXTENDED;
 
             Child = button = new TwoLayerButton
@@ -39,6 +37,19 @@ namespace osu.Game.Graphics.UserInterface
             button.HoverColour = colours.PinkDark;
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                Action?.Invoke();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+
         protected override void PopIn()
         {
             button.MoveToX(0, 400, Easing.OutQuint);
@@ -49,25 +60,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
             button.FadeOut(400, Easing.OutQuint);
-        }
-
-        public class Receptor : Drawable, IKeyBindingHandler<GlobalAction>
-        {
-            public Action OnBackPressed;
-
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        OnBackPressed?.Invoke();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
         }
     }
 }

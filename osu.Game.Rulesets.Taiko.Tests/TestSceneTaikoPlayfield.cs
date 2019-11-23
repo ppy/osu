@@ -53,11 +53,6 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Strong Rim", () => addRimHit(true));
             AddStep("Add bar line", () => addBarLine(false));
             AddStep("Add major bar line", () => addBarLine(true));
-            AddStep("Add centre w/ bar line", () =>
-            {
-                addCentreHit(false);
-                addBarLine(true);
-            });
             AddStep("Height test 1", () => changePlayfieldSize(1));
             AddStep("Height test 2", () => changePlayfieldSize(2));
             AddStep("Height test 3", () => changePlayfieldSize(3));
@@ -66,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Reset height", () => changePlayfieldSize(6));
 
             var controlPointInfo = new ControlPointInfo();
-            controlPointInfo.Add(0, new TimingControlPoint());
+            controlPointInfo.TimingPoints.Add(new TimingControlPoint());
 
             WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
@@ -142,7 +137,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
+            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
@@ -157,7 +152,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
+            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
@@ -239,7 +234,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         private class TestStrongNestedHit : DrawableStrongNestedHit
         {
             public TestStrongNestedHit(DrawableHitObject mainObject)
-                : base(new StrongHitObject { StartTime = mainObject.HitObject.StartTime }, mainObject)
+                : base(null, mainObject)
             {
             }
 

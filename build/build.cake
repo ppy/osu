@@ -1,5 +1,5 @@
-#addin "nuget:?package=CodeFileSanity&version=0.0.33"
-#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2019.2.1"
+#addin "nuget:?package=CodeFileSanity&version=0.0.21"
+#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2019.1.1"
 #tool "nuget:?package=NVika.MSBuild&version=1.0.1"
 var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
 
@@ -11,9 +11,7 @@ var target = Argument("target", "Build");
 var configuration = Argument("configuration", "Release");
 
 var rootDirectory = new DirectoryPath("..");
-var sln = rootDirectory.CombineWithFilePath("osu.sln");
-var desktopBuilds = rootDirectory.CombineWithFilePath("build/Desktop.proj");
-var desktopSlnf = rootDirectory.CombineWithFilePath("osu.Desktop.slnf");
+var solution = rootDirectory.CombineWithFilePath("osu.sln");
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
@@ -21,7 +19,7 @@ var desktopSlnf = rootDirectory.CombineWithFilePath("osu.Desktop.slnf");
 
 Task("Compile")
     .Does(() => {
-        DotNetCoreBuild(desktopBuilds.FullPath, new DotNetCoreBuildSettings {
+        DotNetCoreBuild(solution.FullPath, new DotNetCoreBuildSettings {
             Configuration = configuration,
         });
     });
@@ -43,7 +41,7 @@ Task("InspectCode")
     .WithCriteria(IsRunningOnWindows())
     .IsDependentOn("Compile")
     .Does(() => {
-        InspectCode(desktopSlnf, new InspectCodeSettings {
+        InspectCode(solution, new InspectCodeSettings {
             CachesHome = "inspectcode",
             OutputFile = "inspectcodereport.xml",
         });
@@ -61,12 +59,8 @@ Task("CodeFileSanity")
         });
     });
 
-Task("DotnetFormat")
-    .Does(() => DotNetCoreTool(sln.FullPath, "format", "--dry-run --check"));
-
 Task("Build")
     .IsDependentOn("CodeFileSanity")
-    .IsDependentOn("DotnetFormat")
     .IsDependentOn("InspectCode")
     .IsDependentOn("Test");
 

@@ -31,8 +31,6 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<ButtonState> StateChanged;
 
-        public readonly Key TriggerKey;
-
         private readonly Container iconText;
         private readonly Container box;
         private readonly Box boxHoverLayer;
@@ -45,6 +43,7 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
+        private readonly Key triggerKey;
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
@@ -54,7 +53,7 @@ namespace osu.Game.Screens.Menu
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
-            TriggerKey = triggerKey;
+            this.triggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
@@ -211,7 +210,7 @@ namespace osu.Game.Screens.Menu
             if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
                 return false;
 
-            if (TriggerKey == e.Key && TriggerKey != Key.Unknown)
+            if (triggerKey == e.Key && triggerKey != Key.Unknown)
             {
                 trigger();
                 return true;
@@ -236,7 +235,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            iconText.Alpha = Math.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
+            iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
             base.Update();
         }
 

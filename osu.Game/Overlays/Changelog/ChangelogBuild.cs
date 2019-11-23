@@ -14,8 +14,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using System.Net;
-using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -68,34 +66,22 @@ namespace osu.Game.Overlays.Changelog
 
                 foreach (APIChangelogEntry entry in categoryEntries)
                 {
+                    LinkFlowContainer title = new LinkFlowContainer
+                    {
+                        Direction = FillDirection.Full,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Margin = new MarginPadding { Vertical = 5 },
+                    };
+
                     var entryColour = entry.Major ? colours.YellowLight : Color4.White;
 
-                    LinkFlowContainer title;
-
-                    Container titleContainer = new Container
+                    title.AddIcon(FontAwesome.Solid.Check, t =>
                     {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Margin = new MarginPadding { Vertical = 5 },
-                        Children = new Drawable[]
-                        {
-                            new SpriteIcon
-                            {
-                                Anchor = Anchor.CentreLeft,
-                                Origin = Anchor.CentreRight,
-                                Size = new Vector2(fontSmall.Size),
-                                Icon = entry.Type == ChangelogEntryType.Fix ? FontAwesome.Solid.Check : FontAwesome.Solid.Plus,
-                                Colour = entryColour,
-                                Margin = new MarginPadding { Right = 5 },
-                            },
-                            title = new LinkFlowContainer
-                            {
-                                Direction = FillDirection.Full,
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
-                        }
-                    };
+                        t.Font = fontSmall;
+                        t.Colour = entryColour;
+                        t.Padding = new MarginPadding { Left = -17, Right = 5 };
+                    });
 
                     title.AddText(entry.Title, t =>
                     {
@@ -110,7 +96,7 @@ namespace osu.Game.Overlays.Changelog
                             t.Font = fontLarge;
                             t.Colour = entryColour;
                         });
-                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl,
+                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", entry.GithubUrl, Online.Chat.LinkAction.External,
                             creationParameters: t =>
                             {
                                 t.Font = fontLarge;
@@ -130,7 +116,6 @@ namespace osu.Game.Overlays.Changelog
                     });
 
                     if (entry.GithubUser.UserId != null)
-                    {
                         title.AddUserLink(new User
                         {
                             Username = entry.GithubUser.OsuUsername,
@@ -140,25 +125,20 @@ namespace osu.Game.Overlays.Changelog
                             t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
-                    }
                     else if (entry.GithubUser.GithubUrl != null)
-                    {
-                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, t =>
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl, Online.Chat.LinkAction.External, null, null, t =>
                         {
                             t.Font = fontMedium;
                             t.Colour = entryColour;
                         });
-                    }
                     else
-                    {
                         title.AddText(entry.GithubUser.DisplayName, t =>
                         {
                             t.Font = fontSmall;
                             t.Colour = entryColour;
                         });
-                    }
 
-                    ChangelogEntries.Add(titleContainer);
+                    ChangelogEntries.Add(title);
 
                     if (!string.IsNullOrEmpty(entry.MessageHtml))
                     {
@@ -169,7 +149,7 @@ namespace osu.Game.Overlays.Changelog
                         };
 
                         // todo: use markdown parsing once API returns markdown
-                        message.AddText(WebUtility.HtmlDecode(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty)), t =>
+                        message.AddText(Regex.Replace(entry.MessageHtml, @"<(.|\n)*?>", string.Empty), t =>
                         {
                             t.Font = fontSmall;
                             t.Colour = new Color4(235, 184, 254, 255);

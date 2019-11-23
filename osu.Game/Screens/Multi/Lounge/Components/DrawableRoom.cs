@@ -74,9 +74,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             set
             {
                 matchingFilter = value;
-
-                if (IsLoaded)
-                    this.FadeTo(MatchingFilter ? 1 : 0, 200);
+                this.FadeTo(MatchingFilter ? 1 : 0, 200);
             }
         }
 
@@ -205,11 +203,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
-            if (matchingFilter)
-                this.FadeInFromZero(transition_duration);
-            else
-                Alpha = 0;
+            this.FadeInFromZero(transition_duration);
         }
 
         private class RoomName : OsuSpriteText

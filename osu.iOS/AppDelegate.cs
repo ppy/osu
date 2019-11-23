@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using Foundation;
 using osu.Framework.iOS;
+using osu.Game;
 using UIKit;
 
 namespace osu.iOS
@@ -15,12 +16,9 @@ namespace osu.iOS
 
         protected override Framework.Game CreateGame() => game = new OsuGameIOS();
 
-        public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
+        public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
         {
-            if (url.IsFileUrl)
-                Task.Run(() => game.Import(url.Path));
-            else
-                Task.Run(() => game.HandleLink(url.AbsoluteString));
+            Task.Run(() => game.Import(url.Path));
             return true;
         }
     }

@@ -10,8 +10,6 @@ namespace osu.Game.Tournament.Screens
 {
     public abstract class TournamentScreen : CompositeDrawable
     {
-        public const double FADE_DELAY = 200;
-
         [Resolved]
         protected LadderInfo LadderInfo { get; private set; }
 
@@ -20,8 +18,14 @@ namespace osu.Game.Tournament.Screens
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Hide() => this.FadeOut(FADE_DELAY);
+        public override void Hide()
+        {
+            this.FadeOut(200);
+        }
 
-        public override void Show() => this.FadeIn(FADE_DELAY);
+        public override void Show()
+        {
+            this.FadeIn(200);
+        }
     }
 }

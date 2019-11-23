@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -82,10 +81,12 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            InternalChildren.ForEach(c => c.Filter(criteria));
-            // IEnumerable<T>.OrderBy() is used instead of List<T>.Sort() to ensure sorting stability
-            var criteriaComparer = Comparer<CarouselItem>.Create((x, y) => x.CompareTo(criteria, y));
-            InternalChildren = InternalChildren.OrderBy(c => c, criteriaComparer).ToList();
+            var children = new List<CarouselItem>(InternalChildren);
+
+            children.Sort((x, y) => x.CompareTo(criteria, y));
+            children.ForEach(c => c.Filter(criteria));
+
+            InternalChildren = children;
         }
 
         protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)

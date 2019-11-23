@@ -6,7 +6,6 @@ namespace osu.Game.Configuration
     public enum IntroSequence
     {
         Circles,
-        Triangles,
-        Random
+        Triangles
     }
 }

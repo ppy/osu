@@ -11,7 +11,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
@@ -23,14 +25,14 @@ namespace osu.Game.Tournament.Screens.Editors
     public class TeamEditorScreen : TournamentEditorScreen<TeamEditorScreen.TeamRow, TournamentTeam>
     {
         [Resolved]
-        private TournamentGameBase game { get; set; }
+        private Framework.Game game { get; set; }
 
         protected override BindableList<TournamentTeam> Storage => LadderInfo.Teams;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            ControlPanel.Add(new TourneyButton
+            ControlPanel.Add(new OsuButton
             {
                 RelativeSizeAxes = Axes.X,
                 Text = "Add all countries",
@@ -197,9 +199,6 @@ namespace osu.Game.Tournament.Screens.Editors
                     [Resolved]
                     protected IAPIProvider API { get; private set; }
 
-                    [Resolved]
-                    private TournamentGameBase game { get; set; }
-
                     private readonly Bindable<string> userId = new Bindable<string>();
 
                     private readonly Container drawableContainer;
@@ -282,7 +281,25 @@ namespace osu.Game.Tournament.Screens.Editors
                                 return;
                             }
 
-                            game.PopulateUser(user, updatePanel, updatePanel);
+                            var req = new GetUserRequest(user.Id);
+
+                            req.Success += res =>
+                            {
+                                // TODO: this should be done in a better way.
+                                user.Username = res.Username;
+                                user.Country = res.Country;
+                                user.Cover = res.Cover;
+
+                                updatePanel();
+                            };
+
+                            req.Failure += _ =>
+                            {
+                                user.Id = 1;
+                                updatePanel();
+                            };
+
+                            API.Queue(req);
                         }, true);
                     }
 

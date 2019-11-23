@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Distance => Path.Distance;
 
-        public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
+        public List<List<HitSampleInfo>> NodeSamples { get; set; } = new List<List<HitSampleInfo>>();
 
         public double? LegacyLastTickOffset { get; set; }
     }

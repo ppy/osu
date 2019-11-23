@@ -19,16 +19,13 @@ using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
-using osu.Game.Screens.Edit.Compose;
-using osu.Game.Screens.Edit.Setup;
-using osu.Game.Screens.Edit.Timing;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
@@ -36,8 +33,6 @@ namespace osu.Game.Screens.Edit
     public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
-
-        public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
 
@@ -67,10 +62,7 @@ namespace osu.Game.Screens.Edit
         {
             this.host = host;
 
-            beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
-            beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
-
-            // Todo: should probably be done at a DrawableRuleset level to share logic with Player.
+            // TODO: should probably be done at a DrawableRuleset level to share logic with Player.
             var sourceClock = (IAdjustableClock)Beatmap.Value.Track ?? new StopwatchClock();
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
@@ -91,102 +83,92 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
 
-            InternalChild = new OsuContextMenuContainer
+            InternalChildren = new[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new[]
+                new Container
                 {
-                    new Container
+                    Name = "Screen container",
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = 40, Bottom = 60 },
+                    Child = screenContainer = new Container
                     {
-                        Name = "Screen container",
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 40, Bottom = 60 },
-                        Child = screenContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true
-                        }
-                    },
-                    new Container
+                        Masking = true
+                    }
+                },
+                new Container
+                {
+                    Name = "Top bar",
+                    RelativeSizeAxes = Axes.X,
+                    Height = 40,
+                    Child = menuBar = new EditorMenuBar
                     {
-                        Name = "Top bar",
-                        RelativeSizeAxes = Axes.X,
-                        Height = 40,
-                        Child = menuBar = new EditorMenuBar
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        Items = new[]
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            RelativeSizeAxes = Axes.Both,
-                            Items = new[]
+                            new MenuItem("File")
                             {
-                                new MenuItem("File")
-                                {
-                                    Items = fileMenuItems
-                                }
+                                Items = fileMenuItems
                             }
                         }
-                    },
-                    new Container
+                    }
+                },
+                new Container
+                {
+                    Name = "Bottom bar",
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 60,
+                    Children = new Drawable[]
                     {
-                        Name = "Bottom bar",
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        Height = 60,
-                        Children = new Drawable[]
+                        bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
+                        new Container
                         {
-                            bottomBackground = new Box { RelativeSizeAxes = Axes.Both },
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
+                            Child = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Vertical = 5, Horizontal = 10 },
-                                Child = new GridContainer
+                                ColumnDimensions = new[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ColumnDimensions = new[]
-                                    {
-                                        new Dimension(GridSizeMode.Absolute, 220),
-                                        new Dimension(),
-                                        new Dimension(GridSizeMode.Absolute, 220)
-                                    },
-                                    Content = new[]
-                                    {
-                                        new Drawable[]
-                                        {
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Right = 10 },
-                                                Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
-                                            },
-                                            new SummaryTimeline
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                            },
-                                            new Container
-                                            {
-                                                RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Left = 10 },
-                                                Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
-                                            }
-                                        },
-                                    }
+                                    new Dimension(GridSizeMode.Absolute, 220),
+                                    new Dimension(),
+                                    new Dimension(GridSizeMode.Absolute, 220)
                                 },
-                            }
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = 10 },
+                                            Child = new TimeInfoContainer { RelativeSizeAxes = Axes.Both },
+                                        },
+                                        new SummaryTimeline
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Left = 10 },
+                                            Child = new PlaybackControl { RelativeSizeAxes = Axes.Both },
+                                        }
+                                    },
+                                }
+                            },
                         }
-                    },
-                }
+                    }
+                },
             };
 
             menuBar.Mode.ValueChanged += onModeChanged;
 
             bottomBackground.Colour = colours.Gray2;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            clock.ProcessFrame();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -251,8 +233,7 @@ namespace osu.Game.Screens.Edit
             base.OnEntering(last);
 
             Background.FadeColour(Color4.DarkGray, 500);
-
-            resetTrack(true);
+            resetTrack();
         }
 
         public override bool OnExiting(IScreen next)
@@ -263,24 +244,10 @@ namespace osu.Game.Screens.Edit
             return base.OnExiting(next);
         }
 
-        private void resetTrack(bool seekToStart = false)
+        private void resetTrack()
         {
             Beatmap.Value.Track?.ResetSpeedAdjustments();
             Beatmap.Value.Track?.Stop();
-
-            if (seekToStart)
-            {
-                double targetTime = 0;
-
-                if (Beatmap.Value.Beatmap.HitObjects.Count > 0)
-                {
-                    // seek to one beat length before the first hitobject
-                    targetTime = Beatmap.Value.Beatmap.HitObjects[0].StartTime;
-                    targetTime -= Beatmap.Value.Beatmap.ControlPointInfo.TimingPointAt(targetTime).BeatLength;
-                }
-
-                clock.Seek(Math.Max(0, targetTime));
-            }
         }
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
@@ -291,10 +258,6 @@ namespace osu.Game.Screens.Edit
 
             switch (e.NewValue)
             {
-                case EditorScreenMode.SongSetup:
-                    currentScreen = new SetupScreen();
-                    break;
-
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
                     break;
@@ -303,8 +266,8 @@ namespace osu.Game.Screens.Edit
                     currentScreen = new DesignScreen();
                     break;
 
-                case EditorScreenMode.Timing:
-                    currentScreen = new TimingScreen();
+                default:
+                    currentScreen = new EditorScreen();
                     break;
             }
 

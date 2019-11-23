@@ -91,10 +91,8 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has started.
         /// </summary>
-        /// <param name="startTime">The start time of <see cref="HitObject"/> at the placement point. If null, the current clock time is used.</param>
-        protected void BeginPlacement(double? startTime = null)
+        protected void BeginPlacement()
         {
-            HitObject.StartTime = startTime ?? EditorClock.CurrentTime;
             placementHandler.BeginPlacement(HitObject);
             PlacementBegun = true;
         }
@@ -109,12 +107,6 @@ namespace osu.Game.Rulesets.Edit
                 BeginPlacement();
             placementHandler.EndPlacement(HitObject);
         }
-
-        /// <summary>
-        /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
-        /// </summary>
-        /// <param name="screenSpacePosition">The screen-space position.</param>
-        public abstract void UpdatePosition(Vector2 screenSpacePosition);
 
         /// <summary>
         /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,
@@ -133,7 +125,7 @@ namespace osu.Game.Rulesets.Edit
                 case ScrollEvent _:
                     return false;
 
-                case MouseButtonEvent _:
+                case MouseEvent _:
                     return true;
 
                 default:

@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
-using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -16,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly LoadingAnimation loading;
 
-        public DimmedLoadingLayer(float dimAmount = 0.5f, float iconScale = 1f)
+        public DimmedLoadingLayer()
         {
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -24,9 +23,9 @@ namespace osu.Game.Graphics.UserInterface
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(dimAmount),
+                    Colour = Color4.Black.Opacity(0.5f),
                 },
-                loading = new LoadingAnimation { Scale = new Vector2(iconScale) },
+                loading = new LoadingAnimation(),
             };
         }
 

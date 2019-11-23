@@ -11,22 +11,28 @@ using osu.Game.Database;
 
 namespace osu.Game.Rulesets
 {
-    public class RulesetStore : DatabaseBackedStore, IDisposable
+    /// <summary>
+    /// Todo: All of this needs to be moved to a RulesetStore.
+    /// </summary>
+    public class RulesetStore : DatabaseBackedStore
     {
-        private const string ruleset_library_prefix = "osu.Game.Rulesets";
+        private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
 
-        private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
+        static RulesetStore()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
+
+            // On android in release configuration assemblies are loaded from the apk directly into memory.
+            // We cannot read assemblies from cwd, so should check loaded assemblies instead.
+            loadFromAppDomain();
+
+            loadFromDisk();
+        }
 
         public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
-            // On android in release configuration assemblies are loaded from the apk directly into memory.
-            // We cannot read assemblies from cwd, so should check loaded assemblies instead.
-            loadFromAppDomain();
-            loadFromDisk();
             addMissingRulesets();
-
-            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetAssembly;
         }
 
         /// <summary>
@@ -48,7 +54,9 @@ namespace osu.Game.Rulesets
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
-        private Assembly resolveRulesetAssembly(object sender, ResolveEventArgs args) => loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
+        private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
+
+        private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
         private void addMissingRulesets()
         {
@@ -56,7 +64,7 @@ namespace osu.Game.Rulesets
             {
                 var context = usage.Context;
 
-                var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
+                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
 
                 //add all legacy modes in correct order
                 foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
@@ -69,10 +77,8 @@ namespace osu.Game.Rulesets
 
                 //add any other modes
                 foreach (var r in instances.Where(r => r.LegacyID == null))
-                {
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
-                }
 
                 context.SaveChanges();
 
@@ -107,7 +113,7 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private void loadFromAppDomain()
+        private static void loadFromAppDomain()
         {
             foreach (var ruleset in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -120,7 +126,7 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private void loadFromDisk()
+        private static void loadFromDisk()
         {
             try
             {
@@ -129,17 +135,17 @@ namespace osu.Game.Rulesets
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
             }
-            catch (Exception e)
+            catch
             {
-                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
         }
 
-        private void loadRulesetFromFile(string file)
+        private static void loadRulesetFromFile(string file)
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (loadedAssemblies.Values.Any(t => t.Namespace == filename))
+            if (loaded_assemblies.Values.Any(t => t.Namespace == filename))
                 return;
 
             try
@@ -152,30 +158,19 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private void addRuleset(Assembly assembly)
+        private static void addRuleset(Assembly assembly)
         {
-            if (loadedAssemblies.ContainsKey(assembly))
+            if (loaded_assemblies.ContainsKey(assembly))
                 return;
 
             try
             {
-                loadedAssemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
             }
             catch (Exception e)
             {
                 Logger.Error(e, $"Failed to add ruleset {assembly}");
             }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetAssembly;
         }
     }
 }

@@ -2,9 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Configuration;
-using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -15,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Children = new Drawable[]
+            Children = new[]
             {
                 new SettingsCheckbox
                 {
@@ -27,18 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Parallax",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
                 },
-                new SettingsSlider<float, TimeSlider>
-                {
-                    LabelText = "Hold-to-confirm activation time",
-                    Bindable = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay),
-                    KeyboardStep = 50
-                },
             };
-        }
-
-        private class TimeSlider : OsuSliderBar<float>
-        {
-            public override string TooltipText => Current.Value.ToString("N0") + "ms";
         }
     }
 }

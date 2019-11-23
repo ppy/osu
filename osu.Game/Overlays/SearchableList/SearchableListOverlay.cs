@@ -88,6 +88,8 @@ namespace osu.Game.Overlays.SearchableList
                     },
                 },
             };
+
+            Filter.Search.Exit = Hide;
         }
 
         protected override void Update()

@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shaders;
-using osu.Framework.MathUtils;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osu.Framework.Screens;
@@ -60,9 +59,6 @@ namespace osu.Game.Screens
 
         private IntroScreen getIntroSequence()
         {
-            if (introSequence == IntroSequence.Random)
-                introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
-
             switch (introSequence)
             {
                 case IntroSequence.Circles:

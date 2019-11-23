@@ -24,19 +24,14 @@ namespace osu.Game.Beatmaps.Formats
         public new static void Register()
         {
             AddDecoder<Beatmap>(@"osu file format v", m => new LegacyDifficultyCalculatorBeatmapDecoder(int.Parse(m.Split('v').Last())));
-            SetFallbackDecoder<Beatmap>(() => new LegacyDifficultyCalculatorBeatmapDecoder());
         }
 
         protected override TimingControlPoint CreateTimingControlPoint()
-            => new LegacyDifficultyCalculatorTimingControlPoint();
+            => new LegacyDifficultyCalculatorControlPoint();
 
-        private class LegacyDifficultyCalculatorTimingControlPoint : TimingControlPoint
+        private class LegacyDifficultyCalculatorControlPoint : TimingControlPoint
         {
-            public LegacyDifficultyCalculatorTimingControlPoint()
-            {
-                BeatLengthBindable.MinValue = double.MinValue;
-                BeatLengthBindable.MaxValue = double.MaxValue;
-            }
+            public override double BeatLength { get; set; } = DEFAULT_BEAT_LENGTH;
         }
     }
 }

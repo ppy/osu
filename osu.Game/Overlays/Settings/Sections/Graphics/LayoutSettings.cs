@@ -75,14 +75,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
                     Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
-                    KeyboardStep = 0.01f,
-                    Keywords = new[] { "scale", "letterbox" },
+                    KeyboardStep = 0.01f
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
                     LabelText = "Screen Scaling",
                     Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
-                    Keywords = new[] { "scale", "letterbox" },
                 },
                 scalingSettings = new FillFlowContainer<SettingsSlider<float>>
                 {

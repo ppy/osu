@@ -12,7 +12,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
-using osu.Game.IO;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 
@@ -35,12 +34,9 @@ namespace osu.Game.Skinning
             : base(skin)
         {
             Stream stream = storage?.GetStream(filename);
-
             if (stream != null)
-            {
-                using (LineBufferedReader reader = new LineBufferedReader(stream))
+                using (StreamReader reader = new StreamReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
-            }
             else
                 Configuration = new DefaultSkinConfiguration();
 

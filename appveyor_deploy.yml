@@ -1,6 +1,6 @@
 clone_depth: 1
 version: '{build}'
-image: Visual Studio 2019
+image: Previous Visual Studio 2017
 test: off
 skip_non_tags: true
 build_script:

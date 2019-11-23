@@ -87,8 +87,9 @@ namespace osu.Game.Screens.Multi
         public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             currentJoinRoomRequest?.Cancel();
-            currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
+            currentJoinRoomRequest = null;
 
+            currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
             currentJoinRoomRequest.Success += () =>
             {
                 joinedRoom = room;
@@ -97,8 +98,7 @@ namespace osu.Game.Screens.Multi
 
             currentJoinRoomRequest.Failure += exception =>
             {
-                if (!(exception is OperationCanceledException))
-                    Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
+                Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
                 onError?.Invoke(exception.ToString());
             };
 
@@ -107,8 +107,6 @@ namespace osu.Game.Screens.Multi
 
         public void PartRoom()
         {
-            currentJoinRoomRequest?.Cancel();
-
             if (joinedRoom == null)
                 return;
 

@@ -35,10 +35,6 @@ namespace osu.Game.Online.Leaderboards
 
         private bool scoresLoadedOnce;
 
-        private readonly Container content;
-
-        protected override Container<Drawable> Content => content;
-
         private IEnumerable<ScoreInfo> scores;
 
         public IEnumerable<ScoreInfo> Scores
@@ -64,21 +60,19 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var scoreFlow = CreateScoreFlow();
-                scoreFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
+                var sf = CreateScoreFlow();
+                sf.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate = Schedule(() => LoadComponentAsync(scoreFlow, _ =>
+                showScoresDelegate = Schedule(() => LoadComponentAsync(sf, _ =>
                 {
-                    scrollContainer.Add(scrollFlow = scoreFlow);
+                    scrollContainer.Add(scrollFlow = sf);
 
                     int i = 0;
 
                     foreach (var s in scrollFlow.Children)
-                    {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
-                    }
 
                     scrollContainer.ScrollTo(0f, false);
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
@@ -101,7 +95,7 @@ namespace osu.Game.Online.Leaderboards
             get => scope;
             set
             {
-                if (EqualityComparer<TScope>.Default.Equals(value, scope))
+                if (value.Equals(scope))
                     return;
 
                 scope = value;
@@ -122,7 +116,9 @@ namespace osu.Game.Online.Leaderboards
             {
                 if (value != PlaceholderState.Successful)
                 {
-                    Reset();
+                    getScoresRequest?.Cancel();
+                    getScoresRequest = null;
+                    Scores = null;
                 }
 
                 if (value == placeholderState)
@@ -166,35 +162,12 @@ namespace osu.Game.Online.Leaderboards
 
         protected Leaderboard()
         {
-            InternalChildren = new Drawable[]
+            Children = new Drawable[]
             {
-                new GridContainer
+                scrollContainer = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RowDimensions = new[]
-                    {
-                        new Dimension(),
-                        new Dimension(GridSizeMode.AutoSize),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            scrollContainer = new OsuScrollContainer
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                ScrollbarVisible = false,
-                            }
-                        },
-                        new Drawable[]
-                        {
-                            content = new Container
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                            },
-                        }
-                    },
+                    ScrollbarVisible = false,
                 },
                 loading = new LoadingAnimation(),
                 placeholderContainer = new Container
@@ -202,13 +175,6 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Both
                 },
             };
-        }
-
-        protected virtual void Reset()
-        {
-            getScoresRequest?.Cancel();
-            getScoresRequest = null;
-            Scores = null;
         }
 
         private IAPIProvider api;
@@ -344,17 +310,13 @@ namespace osu.Game.Online.Leaderboards
                 else
                 {
                     if (bottomY - fadeBottom > 0 && FadeBottom)
-                    {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
-                    }
                     else if (FadeTop)
-                    {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / LeaderboardScore.HEIGHT, 1)));
-                    }
                 }
             }
         }

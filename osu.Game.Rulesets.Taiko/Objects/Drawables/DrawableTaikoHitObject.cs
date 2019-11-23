@@ -11,7 +11,6 @@ using osu.Game.Audio;
 using System.Collections.Generic;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -110,12 +109,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     {
         public override Vector2 OriginPosition => new Vector2(DrawHeight / 2);
 
-        public new TaikoHitType HitObject;
-
         protected readonly Vector2 BaseSize;
+
         protected readonly TaikoPiece MainPiece;
 
-        private readonly Container<DrawableStrongNestedHit> strongHitContainer;
+        public new TaikoHitType HitObject;
 
         protected DrawableTaikoHitObject(TaikoHitType hitObject)
             : base(hitObject)
@@ -131,36 +129,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Content.Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
 
-            AddInternal(strongHitContainer = new Container<DrawableStrongNestedHit>());
-        }
+            var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
 
-        protected override void AddNestedHitObject(DrawableHitObject hitObject)
-        {
-            base.AddNestedHitObject(hitObject);
-
-            switch (hitObject)
+            if (strongObject != null)
             {
-                case DrawableStrongNestedHit strong:
-                    strongHitContainer.Add(strong);
-                    break;
+                var strongHit = CreateStrongHit(strongObject);
+
+                AddNested(strongHit);
+                AddInternal(strongHit);
             }
-        }
-
-        protected override void ClearNestedHitObjects()
-        {
-            base.ClearNestedHitObjects();
-            strongHitContainer.Clear();
-        }
-
-        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case StrongHitObject strong:
-                    return CreateStrongHit(strong);
-            }
-
-            return base.CreateNestedHitObject(hitObject);
         }
 
         // Normal and clap samples are handled by the drum
