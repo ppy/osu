@@ -242,10 +242,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loading.Hide();
                 return;
             }
-            else
-            {
-                notSupporterPlaceholder.Hide();
-            }
+
+            notSupporterPlaceholder.Hide();
 
             content.Show();
             loading.Show();
