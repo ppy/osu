@@ -197,7 +197,7 @@ namespace osu.Game.Tournament.Components
                     stats = new (string heading, string content)[]
                     {
                         ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
-                        ("AR", $"{ar:0.#}{srExtra}"),
+                        ("AR", $"{ar:0.#}{hardRockExtra}"),
                         ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
                     };
                     break;
@@ -215,7 +215,7 @@ namespace osu.Game.Tournament.Components
                     stats = new (string heading, string content)[]
                     {
                         ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
-                        ("AR", $"{ar:0.#}{srExtra}"),
+                        ("AR", $"{ar:0.#}"),
                     };
                     break;
             }
