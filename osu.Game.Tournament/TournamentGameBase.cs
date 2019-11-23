@@ -202,7 +202,8 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    PopulateUser(p);
+                    if (p.Username == null || p.Statistics == null)
+                        PopulateUser(p);
                     addedInfo = true;
                 }
             }
@@ -243,7 +244,6 @@ namespace osu.Game.Tournament
             {
                 user.Username = res.Username;
                 user.Statistics = res.Statistics;
-                user.Username = res.Username;
                 user.Country = res.Country;
                 user.Cover = res.Cover;
 
