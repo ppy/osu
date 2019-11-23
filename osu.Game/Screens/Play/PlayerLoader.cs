@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Play
 
         private BeatmapMetadataDisplay info;
 
+        private FillFlowContainer<PlayerSettingsGroup> settingsContainer;
+
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
 
@@ -100,7 +102,7 @@ namespace osu.Game.Screens.Play
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new FillFlowContainer<PlayerSettingsGroup>
+                settingsContainer = new PlayerSettingsContainer
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
@@ -223,7 +225,7 @@ namespace osu.Game.Screens.Play
         // Here because IsHovered will not update unless we do so.
         public override bool HandlePositionalInput => true;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && idleTracker.IsIdle.Value && inputManager?.DraggedDrawable == null;
+        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && (!settingsContainer.IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
@@ -526,6 +528,11 @@ namespace osu.Game.Screens.Play
                     return true;
                 };
             }
+        }
+
+        private class PlayerSettingsContainer : FillFlowContainer<PlayerSettingsGroup>
+        {
+            public override bool HandlePositionalInput => true;
         }
     }
 }
