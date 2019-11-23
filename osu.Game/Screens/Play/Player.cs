@@ -324,7 +324,7 @@ namespace osu.Game.Screens.Play
             if (canPause)
                 Pause();
             else
-            this.Exit();
+                this.Exit();
         }
 
         /// <summary>
@@ -337,7 +337,7 @@ namespace osu.Game.Screens.Play
             RestartRequested?.Invoke();
 
             if (this.IsCurrentScreen())
-            performImmediateExit();
+                performImmediateExit();
             else
                 this.MakeCurrent();
         }
@@ -467,7 +467,7 @@ namespace osu.Game.Screens.Play
             if (IsResuming)
             {
                 DrawableRuleset.CancelResume();
-            IsResuming = false;
+                IsResuming = false;
             }
 
             GameplayClockContainer.Stop();
