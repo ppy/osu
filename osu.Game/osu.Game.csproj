@@ -8,6 +8,7 @@
     <Title>osu!</Title>
     <PackageId>ppy.osu.Game</PackageId>
     <PackageIcon>icon.png</PackageIcon>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup Label="Icon">
     <None Include="..\assets\lazer-nuget.png">
