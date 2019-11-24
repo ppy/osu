@@ -7,6 +7,7 @@
   <PropertyGroup Label="Nuget">
     <Title>osu!</Title>
     <PackageId>ppy.osu.Game</PackageId>
+    <Version>0.0.0</Version>
     <PackageIcon>icon.png</PackageIcon>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
