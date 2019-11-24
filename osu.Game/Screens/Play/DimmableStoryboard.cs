@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => IgnoreUserSettings.Value || ShowStoryboard.Value && DimLevel < 1;
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowStoryboard.Value && DimLevel < 1);
 
         private void initializeStoryboard(bool async)
         {

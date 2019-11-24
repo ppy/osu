@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => IgnoreUserSettings.Value || ShowVideo.Value && DimLevel < 1;
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowVideo.Value && DimLevel < 1);
 
         private void initializeVideo(bool async)
         {
