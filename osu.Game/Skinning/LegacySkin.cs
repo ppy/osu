@@ -26,7 +26,7 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
-        protected new LegacySkinConfiguration Configuration
+        public new LegacySkinConfiguration Configuration
         {
             get => base.Configuration as LegacySkinConfiguration;
             set => base.Configuration = value;
