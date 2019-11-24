@@ -22,6 +22,11 @@ namespace osu.Game.Graphics.Containers
         public readonly Bindable<bool> EnableUserDim = new Bindable<bool>(true);
 
         /// <summary>
+        /// Whether or not user-configured settings relating to visibility of elements should be ignored
+        /// </summary>
+        public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
+
+        /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
         /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
@@ -63,6 +68,7 @@ namespace osu.Game.Graphics.Containers
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             ShowVideo.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
+            IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
         }
 
         protected override void LoadComplete()

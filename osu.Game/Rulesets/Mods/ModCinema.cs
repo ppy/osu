@@ -1,7 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
@@ -21,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public class ModCinema : ModAutoplay, IApplicableToHUD
+    public class ModCinema : ModAutoplay, IApplicableToHUD, IApplicableToScreen
     {
         public override string Name => "Cinema";
         public override string Acronym => "CN";
@@ -33,5 +36,9 @@ namespace osu.Game.Rulesets.Mods
             overlay.AlwaysPresent = true;
             overlay.Hide();
         }
+
+        public bool EnableDim => false;
+        public bool ForceVideo => true;
+        public bool ForceStoryboard => true;
     }
 }
