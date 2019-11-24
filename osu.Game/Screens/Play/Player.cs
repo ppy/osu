@@ -432,7 +432,7 @@ namespace osu.Game.Screens.Play
             // cannot pause if we are already in a fail state
             && !HasFailed
             // cannot pause if already paused (or in a cooldown state) unless we are in a resuming state.
-            && (IsResuming || (GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive));
+            && (IsResuming || GameplayClockContainer.IsPaused.Value == false && !pauseCooldownActive);
 
         private bool pauseCooldownActive =>
             lastPauseActionTime.HasValue && GameplayClockContainer.GameplayClock.CurrentTime < lastPauseActionTime + pause_cooldown;
