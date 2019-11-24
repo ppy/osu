@@ -10,8 +10,8 @@ build:
   verbosity: minimal
 after_build:
   - ps: dotnet tool restore
-  - ps: dotnet CodeFileSanity
   - ps: dotnet format --dry-run --check
+  - ps: .\InspectCode.ps1
 test:
   assemblies:
     except:
