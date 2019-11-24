@@ -498,8 +498,24 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            Background.EnableUserDim.Value = true;
-            Background.BlurAmount.Value = 0;
+            var screenOverride = Mods.Value.OfType<IApplicableToScreen>();
+
+            if (screenOverride.Count() == 1)
+            {
+                var setting = screenOverride.Single();
+
+                Background.EnableUserDim.Value = setting.EnableDim;
+                DimmableVideo.EnableUserDim.Value = setting.EnableDim;
+                DimmableStoryboard.EnableUserDim.Value = setting.EnableDim;
+
+                DimmableVideo.IgnoreUserSettings.Value = setting.ForceVideo;
+                DimmableStoryboard.IgnoreUserSettings.Value = setting.ForceStoryboard;
+            }
+            else
+            {
+                Background.EnableUserDim.Value = true;
+                Background.BlurAmount.Value = 0;
+            }
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
