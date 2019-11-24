@@ -13,6 +13,12 @@
       "commands": [
         "dotnet-format"
       ]
+    },
+    "codefilesanity": {
+      "version": "0.0.33",
+      "commands": [
+        "CodeFileSanity"
+      ]
     }
   }
 }
