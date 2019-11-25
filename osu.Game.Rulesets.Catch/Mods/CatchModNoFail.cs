@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModNoFail : ModNoFail
     {
-        public override string Description => @"不管怎么样,你都失败不了";
+        public override string Description => @"无论如何,你都失败不了";
     }
 }

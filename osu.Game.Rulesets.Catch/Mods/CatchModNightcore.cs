@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModNightcore : ModNightcore
     {
-        public override string Description => @"洞次打次洞次打次~";
+        public override string Description => @"动次打次动次打次~";
         public override double ScoreMultiplier => 1.06;
     }
 }

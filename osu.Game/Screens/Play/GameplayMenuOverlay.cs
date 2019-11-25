@@ -280,7 +280,7 @@ namespace osu.Game.Screens.Play
             {
                 new OsuSpriteText
                 {
-                    Text = "你这次已经尝试了",
+                    Text = "你这次已经重试了",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),
@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Play
                 },
                 new OsuSpriteText
                 {
-                    Text = " ",
+                    Text = "",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),

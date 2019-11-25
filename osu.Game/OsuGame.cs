@@ -245,7 +245,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"This link type is not yet supported!",
+                        Text = @"该链接的类型尚不支持!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -433,7 +433,7 @@ namespace osu.Game
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = $"Click here to {taskName}",
+                    Text = $"点此以 {taskName}",
                     Activated = () =>
                     {
                         performFromMainMenu(action, taskName, targetScreen, true);
@@ -723,7 +723,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
-                        Text = "Subsequent messages have been logged. Click to view log files.",
+                        Text = "有关更多消息已记录至日志,点此查看.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
@@ -748,7 +748,7 @@ namespace osu.Game
             if (d is OverlayContainer overlay)
                 overlays.Add(overlay);
 
-            // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
+            // schedule is here to ensure thyijiluzhimponent loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
             Schedule(() =>

@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("导出", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("在系统编辑器中打开", MenuItemType.Standard, exportBeatmap));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
