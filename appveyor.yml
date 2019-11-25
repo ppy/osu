@@ -6,7 +6,7 @@ dotnet_csproj:
   file: 'osu.Game\osu.Game.csproj' # Use wildcard when it's able to exclude Xamarin projects
   version: '0.0.{build}'
 cache:
-  - '%LOCALAPPDATA%\NuGet\v3-cache' -> appveyor.yml
+  - '%LOCALAPPDATA%\NuGet\v3-cache -> appveyor.yml'
 before_build:
   - ps: dotnet --info # Useful when version mismatch between CI and local
   - ps: nuget restore -verbosity quiet # Only nuget.exe knows both new (.NET Core) and old (Xamarin) projects
@@ -25,3 +25,4 @@ test:
     except:
       - '**\*Android*'
       - '**\*iOS*'
+      - 'build\**\*'
