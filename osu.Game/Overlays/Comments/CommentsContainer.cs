@@ -240,11 +240,7 @@ namespace osu.Game.Overlays.Comments
                 if (reset)
                 {
                     content.Clear();
-                    deletedChildrenPlaceholder.DeletedCount.Value = getDeletedComments(comments);
-                }
-                else
-                {
-                    deletedChildrenPlaceholder.DeletedCount.Value += getDeletedComments(comments);
+                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
                 }
 
                 noCommentsPlaceholder.Hide();
@@ -254,8 +250,6 @@ namespace osu.Game.Overlays.Comments
                 onLoadFinished(comments);
             }, loadCancellation.Token);
         }
-
-        private int getDeletedComments(CommentBundle comments) => comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
         private void onLoadFinished(CommentBundle comments)
         {
@@ -279,7 +273,8 @@ namespace osu.Game.Overlays.Comments
                 {
                     page.Add(new DrawableComment(c)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        ShowDeleted = { BindTarget = ShowDeleted },
+                        OnDeletion = () => deletedChildrenPlaceholder.DeletedCount.Value++
                     });
                 }
             }

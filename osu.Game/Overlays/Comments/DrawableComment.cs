@@ -17,6 +17,7 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
+using System;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Overlays.Comments
     {
         private const int avatar_size = 40;
         private const int margin = 10;
+
+        public Action OnDeletion;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
 
@@ -36,12 +39,12 @@ namespace osu.Game.Overlays.Comments
         private readonly VotePill votePill;
         private readonly LinkFlowContainer message;
         private readonly OsuSpriteText deletedIndicator;
+        private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
 
         public DrawableComment(Comment comment)
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
-            DeletedChildrenPlaceholder deletedChildrenPlaceholder;
             FillFlowContainer info;
 
             this.comment = comment;
@@ -190,8 +193,6 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            deletedChildrenPlaceholder.DeletedCount.Value = comment.Replies.Count(c => c.IsDeleted);
-
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
             else
@@ -243,7 +244,8 @@ namespace osu.Game.Overlays.Comments
 
             comment.Replies.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
             {
-                ShowDeleted = { BindTarget = ShowDeleted }
+                ShowDeleted = { BindTarget = ShowDeleted },
+                OnDeletion = () => deletedChildrenPlaceholder.DeletedCount.Value++
             }));
         }
 
@@ -263,6 +265,9 @@ namespace osu.Game.Overlays.Comments
                 content.FadeColour(deleted.NewValue ? OsuColour.Gray(0.5f) : Color4.White);
                 votePill.FadeTo(deleted.NewValue ? 0 : 1);
                 deletedIndicator.FadeTo(deleted.NewValue ? 1 : 0);
+
+                if (deleted.NewValue)
+                    OnDeletion?.Invoke();
             }, true);
 
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
