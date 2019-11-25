@@ -154,7 +154,6 @@ namespace osu.Game.Overlays.Comments
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
                                                 Spacing = new Vector2(10, 0),
-                                                Colour = OsuColour.Gray(0.7f),
                                                 Children = new Drawable[]
                                                 {
                                                     new OsuSpriteText
@@ -162,7 +161,8 @@ namespace osu.Game.Overlays.Comments
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
                                                         Font = OsuFont.GetFont(size: 12),
-                                                        Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                                        Text = HumanizerUtils.Humanize(comment.CreatedAt),
+                                                        Colour = OsuColour.Gray(0.7f),
                                                     },
                                                     deleteButton = new DeleteCommentButton(comment)
                                                     {
@@ -294,8 +294,7 @@ namespace osu.Game.Overlays.Comments
                 Alpha = comment.IsTopLevel && comment.Replies.Any() ? 1 : 0;
                 Child = icon = new SpriteIcon
                 {
-                    Size = new Vector2(12),
-                    Colour = OsuColour.Gray(0.7f)
+                    Size = new Vector2(12)
                 };
             }
 
