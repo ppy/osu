@@ -136,7 +136,7 @@ namespace osu.Game.Screens.Play
             addGameplayComponents(GameplayClockContainer, working);
             addOverlayComponents(GameplayClockContainer, working);
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
@@ -150,7 +150,11 @@ namespace osu.Game.Screens.Play
 
             lightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
             lightenDuringBreaks.ValueChanged += _ => updateUserDimState();
-            breakOverlay.IsBreakTime.ValueChanged += _ => updateUserDimState();
+            breakOverlay.IsBreakTime.ValueChanged += _ =>
+            {
+                updateUserDimState();
+                updatePauseOnFocusLostState();
+            };
         }
 
         private void addUnderlayComponents(Container target)
@@ -255,6 +259,11 @@ namespace osu.Game.Screens.Play
             var lighten = lightenDuringBreaks.Value && breakOverlay.IsBreakTime.Value;
             dimOffset.Value = lighten ? -light_amount : 0;
         }
+
+        private void updatePauseOnFocusLostState() =>
+            HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
+                                                     && !DrawableRuleset.HasReplayLoaded.Value
+                                                     && !breakOverlay.IsBreakTime.Value;
 
         private WorkingBeatmap loadBeatmap()
         {
