@@ -19,7 +19,7 @@ after_build:
   - ps: dotnet format --dry-run --check
   - ps: .\InspectCode.ps1
 artifacts:
-  - path: '**\*.nupkg'
+  - path: 'artifacts\nupkg\*.nupkg'
 test:
   assemblies:
     except:

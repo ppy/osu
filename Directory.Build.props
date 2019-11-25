@@ -36,5 +36,6 @@
     <Company>ppy Pty Ltd</Company>
     <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\nupkg\</PackageOutputPath>
   </PropertyGroup>
 </Project>
