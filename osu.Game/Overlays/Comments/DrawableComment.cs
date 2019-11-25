@@ -101,6 +101,7 @@ namespace osu.Game.Overlays.Comments
                                                 Size = new Vector2(avatar_size),
                                                 Masking = true,
                                                 CornerRadius = avatar_size / 2f,
+                                                CornerExponent = 2,
                                             },
                                         }
                                     },
