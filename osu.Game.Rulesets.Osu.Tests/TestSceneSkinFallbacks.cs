@@ -16,6 +16,7 @@ using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
@@ -125,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 if (!enabled) return null;
 
-                return new SpriteText
+                return new OsuSpriteText
                 {
                     Text = identifier,
                     Font = OsuFont.Default.With(size: 30),

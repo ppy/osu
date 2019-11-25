@@ -185,14 +185,14 @@ namespace osu.Game.Rulesets.Osu.Replays
         {
             Vector2 spinCentreOffset = SPINNER_CENTRE - prevPos;
             float distFromCentre = spinCentreOffset.Length;
-            float distToTangentPoint = (float)Math.Sqrt(distFromCentre * distFromCentre - SPIN_RADIUS * SPIN_RADIUS);
+            float distToTangentPoint = MathF.Sqrt(distFromCentre * distFromCentre - SPIN_RADIUS * SPIN_RADIUS);
 
             if (distFromCentre > SPIN_RADIUS)
             {
                 // Previous cursor position was outside spin circle, set startPosition to the tangent point.
 
                 // Angle between centre offset and tangent point offset.
-                float angle = (float)Math.Asin(SPIN_RADIUS / distFromCentre);
+                float angle = MathF.Asin(SPIN_RADIUS / distFromCentre);
 
                 if (angle > 0)
                 {
@@ -204,8 +204,8 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
 
                 // Rotate by angle so it's parallel to tangent line
-                spinCentreOffset.X = spinCentreOffset.X * (float)Math.Cos(angle) - spinCentreOffset.Y * (float)Math.Sin(angle);
-                spinCentreOffset.Y = spinCentreOffset.X * (float)Math.Sin(angle) + spinCentreOffset.Y * (float)Math.Cos(angle);
+                spinCentreOffset.X = spinCentreOffset.X * MathF.Cos(angle) - spinCentreOffset.Y * MathF.Sin(angle);
+                spinCentreOffset.Y = spinCentreOffset.X * MathF.Sin(angle) + spinCentreOffset.Y * MathF.Cos(angle);
 
                 // Set length to distToTangentPoint
                 spinCentreOffset.Normalize();
@@ -331,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     Vector2 difference = startPosition - SPINNER_CENTRE;
 
                     float radius = difference.Length;
-                    float angle = radius == 0 ? 0 : (float)Math.Atan2(difference.Y, difference.X);
+                    float angle = radius == 0 ? 0 : MathF.Atan2(difference.Y, difference.X);
 
                     double t;
 
