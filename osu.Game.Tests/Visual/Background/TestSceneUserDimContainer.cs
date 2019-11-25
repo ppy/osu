@@ -188,6 +188,23 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
+        /// Check if the <see cref="UserDimContainer"/> is properly adding DimAmount to it's dim level.
+        /// </summary>
+        [Test]
+        public void DimAmountTest()
+        {
+            performFullSetup();
+            AddStep("Set user dim level to 0.5", () => songSelect.DimLevel.Value = 0.5f);
+            AddStep("Set dim offset to -0.7", () => songSelect.DimOffset.Value = -0.7f);
+            waitForDim();
+            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddStep("EnableUserDim disabled", () => songSelect.DimEnabled.Value = false);
+            AddStep("Set dim offset to 0.3", () => songSelect.DimOffset.Value = 0.3f);
+            waitForDim();
+            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+        }
+
+        /// <summary>
         /// Check if the visual settings container retains dim and blur when pausing
         /// </summary>
         [Test]
@@ -297,10 +314,12 @@ namespace osu.Game.Tests.Visual.Background
             {
                 FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
                 DimEnabled.BindTo(background.EnableUserDim);
+                DimOffset.BindTo(background.DimOffset);
                 return background;
             }
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
+            public readonly Bindable<float> DimOffset = new Bindable<float>();
             public readonly Bindable<double> DimLevel = new Bindable<double>();
             public readonly Bindable<double> BlurLevel = new Bindable<double>();
 
@@ -313,7 +332,7 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
             }
 
-            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
+            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(Math.Min(1 - (float)((FadeAccessibleBackground)Background).DimLevel, 1));
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
@@ -399,6 +418,8 @@ namespace osu.Game.Tests.Visual.Background
         {
             protected override DimmableBackground CreateFadeContainer() => dimmable = new TestDimmableBackground { RelativeSizeAxes = Axes.Both };
 
+            public double DimLevel => dimmable.DimLevel;
+
             public Color4 CurrentColour => dimmable.CurrentColour;
 
             public float CurrentAlpha => dimmable.CurrentAlpha;
@@ -415,6 +436,8 @@ namespace osu.Game.Tests.Visual.Background
 
         private class TestDimmableBackground : BackgroundScreenBeatmap.DimmableBackground
         {
+            public new double DimLevel => base.DimLevel;
+
             public Color4 CurrentColour => Content.Colour;
             public float CurrentAlpha => Content.Alpha;
         }

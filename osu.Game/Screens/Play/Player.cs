@@ -53,6 +53,7 @@ namespace osu.Game.Screens.Play
         public bool HasFailed { get; private set; }
 
         private Bindable<bool> mouseWheelDisabled;
+        private Bindable<bool> lightenDuringBreaks;
 
         private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
@@ -146,6 +147,10 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+
+            lightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+            lightenDuringBreaks.ValueChanged += _ => updateUserDimState();
+            breakOverlay.IsBreakTime.ValueChanged += _ => updateUserDimState();
         }
 
         private void addUnderlayComponents(Container target)
@@ -239,6 +244,16 @@ namespace osu.Game.Screens.Play
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             });
+        }
+
+        private readonly Bindable<float> dimOffset = new Bindable<float>();
+
+        private void updateUserDimState()
+        {
+            const float light_amount = 0.3f;
+
+            var lighten = lightenDuringBreaks.Value && breakOverlay.IsBreakTime.Value;
+            dimOffset.Value = lighten ? -light_amount : 0;
         }
 
         private WorkingBeatmap loadBeatmap()
@@ -500,9 +515,13 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
+            Background.DimOffset.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            Background.DimOffset.BindTo(dimOffset);
+
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+            DimmableStoryboard.DimOffset.BindTo(dimOffset);
 
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
