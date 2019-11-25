@@ -16,7 +16,7 @@ build:
   parallel: true
   verbosity: minimal
 artifacts:
-  - path: '**\*.nupkg'
+  - path: 'artifacts\nupkg\*.nupkg'
 deploy:
   - provider: Environment
     name: nuget
