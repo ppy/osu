@@ -29,10 +29,21 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public Action OnDeleted;
+        public readonly Comment Comment;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
 
-        protected readonly Comment Comment;
+        public string GetMessage()
+        {
+            if (api.LocalUser.Value.IsAdmin)
+                return Comment.Message;
+
+            if (IsDeleted.Value)
+                return @"deleted";
+
+            return Comment.Message;
+        }
+
         protected readonly BindableBool IsDeleted = new BindableBool();
 
         [Resolved]
@@ -48,7 +59,7 @@ namespace osu.Game.Overlays.Comments
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly DeleteCommentButton deleteButton;
 
-        public DrawableComment(Comment comment)
+        public DrawableComment(Comment comment, DrawableComment drawableParent)
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
@@ -136,7 +147,10 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         AutoSizeAxes = Axes.Both,
                                                     },
-                                                    new ParentUsername(comment),
+                                                    new ParentUsername(drawableParent)
+                                                    {
+                                                        Alpha = drawableParent == null ? 0 : 1
+                                                    },
                                                     deletedIndicator = new OsuSpriteText
                                                     {
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
@@ -283,7 +297,7 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
-        protected virtual DrawableComment CreateDrawableReply(Comment comment) => new DrawableComment(comment)
+        protected virtual DrawableComment CreateDrawableReply(Comment comment) => new DrawableComment(comment, this)
         {
             ShowDeleted = { BindTarget = ShowDeleted },
             OnDeleted = OnReplyDeleted
@@ -339,18 +353,17 @@ namespace osu.Game.Overlays.Comments
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            public string TooltipText => getParentMessage();
+            public string TooltipText => parent?.GetMessage();
 
-            private readonly Comment parentComment;
+            private readonly DrawableComment parent;
 
-            public ParentUsername(Comment comment)
+            public ParentUsername(DrawableComment parent)
             {
-                parentComment = comment.ParentComment;
+                this.parent = parent;
 
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
                 Spacing = new Vector2(3, 0);
-                Alpha = comment.ParentId == null ? 0 : 1;
                 Children = new Drawable[]
                 {
                     new SpriteIcon
@@ -361,17 +374,9 @@ namespace osu.Game.Overlays.Comments
                     new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                        Text = parentComment?.User?.Username ?? parentComment?.LegacyName
+                        Text = parent?.Comment.User?.Username ?? parent?.Comment.LegacyName
                     }
                 };
-            }
-
-            private string getParentMessage()
-            {
-                if (parentComment == null)
-                    return string.Empty;
-
-                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
         }
     }

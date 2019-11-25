@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Comments
                 loadingLayer.Show();
         }
 
-        protected virtual DrawableComment CreateDrawableComment(Comment comment) => new DrawableComment(comment)
+        protected virtual DrawableComment CreateDrawableComment(Comment comment) => new DrawableComment(comment, null)
         {
             ShowDeleted = { BindTarget = ShowDeleted },
             OnDeleted = OnCommentDeleted
