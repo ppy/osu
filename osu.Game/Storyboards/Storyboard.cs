@@ -17,6 +17,8 @@ namespace osu.Game.Storyboards
 
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
 
+        public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
+
         public Storyboard()
         {
             layers.Add("Background", new StoryboardLayer("Background", 3));
