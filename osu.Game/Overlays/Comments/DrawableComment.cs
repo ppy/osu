@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            deletedChildrenPlaceholder.DeletedCount.Value = comment.DeletedChildrenCount;
+            deletedChildrenPlaceholder.DeletedCount.Value = comment.Replies.Count(c => c.IsDeleted);
 
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Comments
 
             if (comment.HasMessage)
             {
-                var formattedSource = MessageFormatter.FormatText(comment.GetMessage);
+                var formattedSource = MessageFormatter.FormatText(comment.Message);
                 message.AddLinks(formattedSource.Text, formattedSource.Links);
             }
 
@@ -233,7 +233,7 @@ namespace osu.Game.Overlays.Comments
                     }
                 });
 
-                if (comment.ChildComments.Any())
+                if (comment.Replies.Any())
                 {
                     AddInternal(new ChevronButton(comment)
                     {
@@ -245,7 +245,7 @@ namespace osu.Game.Overlays.Comments
                 }
             }
 
-            comment.ChildComments.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
+            comment.Replies.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
             {
                 ShowDeleted = { BindTarget = ShowDeleted }
             }));
@@ -268,7 +268,7 @@ namespace osu.Game.Overlays.Comments
 
             public ChevronButton(Comment comment)
             {
-                Alpha = comment.IsTopLevel && comment.ChildComments.Any() ? 1 : 0;
+                Alpha = comment.IsTopLevel && comment.Replies.Any() ? 1 : 0;
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
@@ -338,7 +338,7 @@ namespace osu.Game.Overlays.Comments
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
         }
     }

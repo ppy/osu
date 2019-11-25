@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
@@ -13,37 +12,55 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Users;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private readonly CommentableType type;
-        private readonly long id;
-
-        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
 
+        private CommentBundle commentBundle;
+
+        public CommentBundle CommentBundle
+        {
+            get => commentBundle;
+            set
+            {
+                if (commentBundle == value)
+                    return;
+
+                commentBundle = value;
+
+                OnLoadStarted();
+                ResetComments(commentBundle);
+            }
+        }
+
+        protected readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        private readonly Bindable<User> user = new Bindable<User>();
+
         [Resolved]
-        private IAPIProvider api { get; set; }
+        protected IAPIProvider API { get; private set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
-        private int currentPage;
 
         private readonly Box background;
+        private readonly Container noCommentsPlaceholder;
+        private readonly Box placeholderBackground;
         private readonly FillFlowContainer content;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
+        private readonly DimmedLoadingLayer loadingLayer;
+        private readonly TotalCommentsCounter totalCommentsCounter;
 
-        public CommentsContainer(CommentableType type, long id)
+        public CommentsContainer()
         {
-            this.type = type;
-            this.id = id;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
@@ -59,16 +76,49 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        totalCommentsCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
                         },
-                        content = new FillFlowContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                noCommentsPlaceholder = new Container
+                                {
+                                    Height = 80,
+                                    RelativeSizeAxes = Axes.X,
+                                    Alpha = 0,
+                                    Children = new Drawable[]
+                                    {
+                                        placeholderBackground = new Box
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                        },
+                                        new SpriteText
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Margin = new MarginPadding { Left = 50 },
+                                            Text = @"No comments yet."
+                                        }
+                                    }
+                                },
+                                content = new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                },
+                                loadingLayer = new DimmedLoadingLayer
+                                {
+                                    Alpha = 0,
+                                }
+                            }
                         },
                         new Container
                         {
@@ -101,7 +151,8 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = getComments
+                                                Action = OnShowMoreAction,
+                                                IsLoading = true,
                                             }
                                         }
                                     }
@@ -117,42 +168,105 @@ namespace osu.Game.Overlays.Comments
         private void load()
         {
             background.Colour = colours.Gray2;
+            placeholderBackground.Colour = colours.Gray3;
+
+            user.BindTo(API.LocalUser);
         }
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(onSortChanged, true);
+            Sort.BindValueChanged(OnSortChanged);
+            user.BindValueChanged(OnUserChanged);
             base.LoadComplete();
         }
 
-        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
+        protected virtual void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
         {
-            clearComments();
-            getComments();
         }
 
-        private void getComments()
+        protected virtual void OnUserChanged(ValueChangedEvent<User> user)
         {
-            request?.Cancel();
+            OnLoadStarted();
+            ResetComments(commentBundle);
+        }
+
+        protected virtual void OnShowMoreAction()
+        {
+        }
+
+        protected virtual void OnLoadStarted()
+        {
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
-            request.Success += onSuccess;
-            api.Queue(request);
-        }
-
-        private void clearComments()
-        {
-            currentPage = 1;
-            deletedChildrenPlaceholder.DeletedCount.Value = 0;
             moreButton.IsLoading = true;
-            content.Clear();
+
+            if (content.Children.Any() || noCommentsPlaceholder.IsPresent)
+                loadingLayer.Show();
         }
 
-        private void onSuccess(CommentBundle response)
+        protected void ResetComments(CommentBundle comments)
+        {
+            if (comments == null)
+            {
+                content.Clear();
+                deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                totalCommentsCounter.Current.Value = 0;
+                noCommentsPlaceholder.Hide();
+                loadingLayer.Hide();
+                moreButton.IsLoading = true;
+                moreButton.Show();
+                return;
+            }
+
+            if (!comments.Comments.Any())
+            {
+                content.Clear();
+                deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                noCommentsPlaceholder.Show();
+                onLoadFinished(comments);
+                return;
+            }
+
+            AddComments(comments, true);
+        }
+
+        protected void AddComments(CommentBundle comments, bool reset)
         {
             loadCancellation = new CancellationTokenSource();
 
-            FillFlowContainer page = new FillFlowContainer
+            var page = createCommentsPage(comments);
+
+            LoadComponentAsync(page, loaded =>
+            {
+                if (reset)
+                {
+                    content.Clear();
+                    deletedChildrenPlaceholder.DeletedCount.Value = getDeletedComments(comments);
+                }
+                else
+                {
+                    deletedChildrenPlaceholder.DeletedCount.Value += getDeletedComments(comments);
+                }
+
+                noCommentsPlaceholder.Hide();
+
+                content.Add(loaded);
+
+                onLoadFinished(comments);
+            }, loadCancellation.Token);
+        }
+
+        private int getDeletedComments(CommentBundle comments) => comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+
+        private void onLoadFinished(CommentBundle comments)
+        {
+            totalCommentsCounter.Current.Value = comments.Total;
+            loadingLayer.Hide();
+            updateMoreButtonState(comments);
+        }
+
+        private FillFlowContainer createCommentsPage(CommentBundle response)
+        {
+            var page = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -170,28 +284,26 @@ namespace osu.Game.Overlays.Comments
                 }
             }
 
-            LoadComponentAsync(page, loaded =>
+            return page;
+        }
+
+        private void updateMoreButtonState(CommentBundle comments)
+        {
+            moreButton.IsLoading = false;
+
+            if (comments.HasMore)
             {
-                content.Add(loaded);
+                int loadedTopLevelComments = 0;
+                content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                moreButton.Current.Value = comments.TopLevelCount - loadedTopLevelComments;
+            }
 
-                if (response.HasMore)
-                {
-                    int loadedTopLevelComments = 0;
-                    content.Children.OfType<FillFlowContainer>().ForEach(p => loadedTopLevelComments += p.Children.OfType<DrawableComment>().Count());
-
-                    moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
-                    moreButton.IsLoading = false;
-                }
-
-                moreButton.FadeTo(response.HasMore ? 1 : 0);
-            }, loadCancellation.Token);
+            moreButton.FadeTo(comments.HasMore ? 1 : 0);
         }
 
         protected override void Dispose(bool isDisposing)
         {
-            request?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
         }

@@ -3,16 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
-    public class TestSceneCommentsContainer : OsuTestScene
+    public class TestSceneOnlineCommentsContainer : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -28,32 +26,25 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override bool UseOnlineAPI => true;
 
-        public TestSceneCommentsContainer()
+        public TestSceneOnlineCommentsContainer()
         {
-            BasicScrollContainer scrollFlow;
+            var commentsContainer = new OnlineCommentsContainer();
+            BasicScrollContainer scroll;
 
-            Add(scrollFlow = new BasicScrollContainer
+            Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Child = commentsContainer
             });
 
-            AddStep("Big Black comments", () =>
+            AddStep("Idle state", () =>
             {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
+                scroll.Clear();
+                scroll.Add(commentsContainer = new OnlineCommentsContainer());
             });
-
-            AddStep("Airman comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
-            });
-
-            AddStep("lazer build comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
-            });
+            AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
+            AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
+            AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
         }
     }
 }
