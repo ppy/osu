@@ -123,6 +123,21 @@ namespace osu.Game.Tests.Visual.Online
                     EditedAt = DateTimeOffset.Now,
                     VotesCount = 1000,
                     EditedById = 1,
+                },
+                new Comment
+                {
+                    Id = 10,
+                    Message = "Try to delete me (if you're logged-in)",
+                    UserId = 1001,
+                    CreatedAt = DateTimeOffset.Now,
+                },
+                new Comment
+                {
+                    Id = 11,
+                    ParentId = 10,
+                    Message = "I'm here for visual",
+                    LegacyName = "xx_69_lmao_xx",
+                    CreatedAt = DateTimeOffset.Now,
                 }
             },
             IncludedComments = new List<Comment>(),
@@ -136,10 +151,15 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Id = 1,
                     Username = "Good_Admin"
+                },
+                new User
+                {
+                    Id = 1001,
+                    Username = "You"
                 }
             },
-            TopLevelCount = 4,
-            Total = 7
+            TopLevelCount = 5,
+            Total = 9
         };
     }
 }

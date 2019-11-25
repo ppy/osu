@@ -215,7 +215,8 @@ namespace osu.Game.Overlays.Comments
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.GetFont(size: 12),
-                    Text = $@"edited {HumanizerUtils.Humanize(comment.EditedAt.Value)} by {comment.EditedUser.Username}"
+                    Text = $@"edited {HumanizerUtils.Humanize(comment.EditedAt.Value)} by {comment.EditedUser.Username}",
+                    Colour = OsuColour.Gray(0.7f)
                 });
             }
 
