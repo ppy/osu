@@ -227,7 +227,7 @@ namespace osu.Game.Online.API
             {
                 try
                 {
-                    return JObject.Parse(req.ResponseString).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                    return JObject.Parse(req.GetResponseString()).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
                 }
                 catch
                 {

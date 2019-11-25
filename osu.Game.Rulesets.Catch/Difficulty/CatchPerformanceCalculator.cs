@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Longer maps are worth more
             float lengthBonus =
                 0.95f + 0.4f * Math.Min(1.0f, numTotalHits / 3000.0f) +
-                (numTotalHits > 3000 ? (float)Math.Log10(numTotalHits / 3000.0f) * 0.5f : 0.0f);
+                (numTotalHits > 3000 ? MathF.Log10(numTotalHits / 3000.0f) * 0.5f : 0.0f);
 
             // Longer maps are worth more
             value *= lengthBonus;
@@ -96,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return value;
         }
 
-        private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
+        private float accuracy() => totalHits() == 0 ? 0 : Math.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
         private int totalHits() => tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
         private int totalSuccessfulHits() => tinyTicksHit + ticksHit + fruitsHit;
         private int totalComboHits() => misses + ticksHit + fruitsHit;

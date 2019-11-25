@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
@@ -54,11 +53,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (allowSpecial && TotalColumns == 8)
             {
                 const float local_x_divisor = 512f / 7;
-                return MathHelper.Clamp((int)Math.Floor(position / local_x_divisor), 0, 6) + 1;
+                return Math.Clamp((int)MathF.Floor(position / local_x_divisor), 0, 6) + 1;
             }
 
             float localXDivisor = 512f / TotalColumns;
-            return MathHelper.Clamp((int)Math.Floor(position / localXDivisor), 0, TotalColumns - 1);
+            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     drainTime = 10000;
 
                 BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
+                conversionDifficulty = ((difficulty.DrainRate + Math.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;

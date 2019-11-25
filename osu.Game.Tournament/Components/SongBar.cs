@@ -106,6 +106,7 @@ namespace osu.Game.Tournament.Components
                     Width = main_width,
                     Height = TournamentBeatmapPanel.HEIGHT,
                     CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
+                    CornerExponent = 2,
                     Children = new Drawable[]
                     {
                         new Box
@@ -126,6 +127,7 @@ namespace osu.Game.Tournament.Components
                         {
                             Masking = true,
                             CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
+                            CornerExponent = 2,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,

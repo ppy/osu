@@ -113,7 +113,7 @@ namespace osu.Game.Online.API
             cancelled = true;
             WebRequest?.Abort();
 
-            string responseString = WebRequest?.ResponseString;
+            string responseString = WebRequest?.GetResponseString();
 
             if (!string.IsNullOrEmpty(responseString))
             {
@@ -150,7 +150,7 @@ namespace osu.Game.Online.API
         private class DisplayableError
         {
             [JsonProperty("error")]
-            public string ErrorMessage;
+            public string ErrorMessage { get; set; }
         }
     }
 
