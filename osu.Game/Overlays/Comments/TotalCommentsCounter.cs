@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Comments
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.Gray(0.05f)
                             },
-                            counter = new SpriteText
+                            counter = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
