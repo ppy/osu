@@ -246,7 +246,10 @@ namespace osu.Game.Overlays.Comments
             LoadComponentAsync(page, loaded =>
             {
                 if (reset)
+                {
                     content.Clear();
+                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                }
 
                 noCommentsPlaceholder.Hide();
 
