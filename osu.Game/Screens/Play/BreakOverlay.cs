@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
@@ -16,6 +16,8 @@ namespace osu.Game.Screens.Play
 {
     public class BreakOverlay : Container
     {
+        private readonly ScoreProcessor scoreProcessor;
+
         /// <summary>
         /// The duration of the break overlay fading.
         /// </summary>
@@ -60,9 +62,12 @@ namespace osu.Game.Screens.Play
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
+        private readonly double gameplayStartTime;
 
-        public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor = null)
+        public BreakOverlay(bool letterboxing, double gameplayStartTime = 0, ScoreProcessor scoreProcessor = null)
         {
+            this.gameplayStartTime = gameplayStartTime;
+            this.scoreProcessor = scoreProcessor;
             RelativeSizeAxes = Axes.Both;
             Child = fadeContainer = new Container
             {
@@ -154,7 +159,8 @@ namespace osu.Game.Screens.Play
             }
 
             var currentBreak = breaks[CurrentBreakIndex];
-            isBreakTime.Value = currentBreak.HasEffect && currentBreak.Contains(time);
+
+            isBreakTime.Value = (currentBreak.HasEffect && currentBreak.Contains(time)) || (time < gameplayStartTime || scoreProcessor.HasCompleted);
         }
 
         private void initializeBreaks()
