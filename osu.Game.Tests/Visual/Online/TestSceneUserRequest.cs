@@ -11,7 +11,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Users;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Graphics.UserInterface;
 
@@ -94,11 +94,11 @@ namespace osu.Game.Tests.Visual.Online
 
                 AddRange(new Drawable[]
                 {
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Text = $@"Username: {user.NewValue?.Username}"
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Text = $@"RankedScore: {user.NewValue?.Statistics.RankedScore}"
                     },

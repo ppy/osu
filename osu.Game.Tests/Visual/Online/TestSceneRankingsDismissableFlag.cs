@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osuTK;
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
                     Size = new Vector2(30, 20),
                     Country = countryA,
                 },
-                text = new SpriteText
+                text = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
