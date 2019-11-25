@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Bindables;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.Online
@@ -45,7 +46,7 @@ namespace osu.Game.Tests.Visual.Online
 
             modSelector.SelectedMods.ItemsAdded += mods =>
             {
-                mods.ForEach(mod => selectedMods.Add(new SpriteText
+                mods.ForEach(mod => selectedMods.Add(new OsuSpriteText
                 {
                     Text = mod.Acronym,
                 }));
