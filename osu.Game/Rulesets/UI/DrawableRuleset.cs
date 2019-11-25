@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.UI
             Playfield.PostProcess();
 
             foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
+                mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
         }
 
         public override void RequestResume(Action continueResume)
