@@ -203,6 +203,14 @@ namespace osu.Game.Overlays.Comments
                 loadingLayer.Show();
         }
 
+        protected virtual DrawableComment CreateDrawableComment(Comment comment) => new DrawableComment(comment)
+        {
+            ShowDeleted = { BindTarget = ShowDeleted },
+            OnDeleted = OnCommentDeleted
+        };
+
+        protected void OnCommentDeleted() => deletedChildrenPlaceholder.DeletedCount.Value++;
+
         protected void ResetComments(CommentBundle comments)
         {
             if (comments == null)
@@ -270,13 +278,7 @@ namespace osu.Game.Overlays.Comments
             foreach (var c in response.Comments)
             {
                 if (c.IsTopLevel)
-                {
-                    page.Add(new DrawableComment(c)
-                    {
-                        ShowDeleted = { BindTarget = ShowDeleted },
-                        OnDeletion = () => deletedChildrenPlaceholder.DeletedCount.Value++
-                    });
-                }
+                    page.Add(CreateDrawableComment(c));
             }
 
             return page;

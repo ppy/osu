@@ -28,18 +28,19 @@ namespace osu.Game.Overlays.Comments
         private const int avatar_size = 40;
         private const int margin = 10;
 
-        public Action OnDeletion;
+        public Action OnDeleted;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
+
+        protected readonly Comment Comment;
+        protected readonly BindableBool IsDeleted = new BindableBool();
 
         [Resolved]
         private IAPIProvider api { get; set; }
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
-        private readonly BindableBool isDeleted = new BindableBool();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
-        private readonly Comment comment;
         private readonly GridContainer content;
         private readonly VotePill votePill;
         private readonly LinkFlowContainer message;
@@ -53,7 +54,7 @@ namespace osu.Game.Overlays.Comments
             FillFlowContainer childCommentsContainer;
             FillFlowContainer info;
 
-            this.comment = comment;
+            Comment = comment;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -164,10 +165,7 @@ namespace osu.Game.Overlays.Comments
                                                         Text = HumanizerUtils.Humanize(comment.CreatedAt),
                                                         Colour = OsuColour.Gray(0.7f),
                                                     },
-                                                    deleteButton = new DeleteCommentButton(comment)
-                                                    {
-                                                        IsDeleted = { BindTarget = isDeleted }
-                                                    },
+                                                    deleteButton = CreateDeleteButton(),
                                                     new RepliesButton(comment.RepliesCount)
                                                     {
                                                         Expanded = { BindTarget = childrenExpanded }
@@ -253,38 +251,50 @@ namespace osu.Game.Overlays.Comments
                 }
             }
 
-            comment.Replies.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
-            {
-                ShowDeleted = { BindTarget = ShowDeleted },
-                OnDeletion = () => deletedChildrenPlaceholder.DeletedCount.Value++
-            }));
+            comment.Replies.ForEach(c => childCommentsContainer.Add(CreateDrawableReply(c)));
         }
 
         protected override void LoadComplete()
         {
-            isDeleted.Value = comment.IsDeleted;
+            IsDeleted.Value = Comment.IsDeleted;
 
             ShowDeleted.BindValueChanged(show =>
             {
-                if (isDeleted.Value)
+                if (IsDeleted.Value)
                     this.FadeTo(show.NewValue ? 1 : 0);
             });
 
-            isDeleted.BindValueChanged(deleted =>
+            IsDeleted.BindValueChanged(deleted =>
             {
                 ShowDeleted.TriggerChange();
                 content.FadeColour(deleted.NewValue ? OsuColour.Gray(0.5f) : Color4.White);
                 votePill.FadeTo(deleted.NewValue ? 0 : 1);
                 deletedIndicator.FadeTo(deleted.NewValue ? 1 : 0);
-                deleteButton.FadeTo(!deleted.NewValue && (api.LocalUser.Value.Id == comment.UserId || api.LocalUser.Value.IsAdmin) ? 1 : 0);
+                deleteButton.FadeTo(!deleted.NewValue && (api.LocalUser.Value.Id == Comment.UserId || api.LocalUser.Value.IsAdmin) ? 1 : 0);
+
+                if (deleted.NewValue && !api.LocalUser.Value.IsAdmin)
+                    message.Clear();
 
                 if (deleted.NewValue)
-                    OnDeletion?.Invoke();
+                    OnDeleted?.Invoke();
             }, true);
 
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             base.LoadComplete();
         }
+
+        protected virtual DrawableComment CreateDrawableReply(Comment comment) => new DrawableComment(comment)
+        {
+            ShowDeleted = { BindTarget = ShowDeleted },
+            OnDeleted = OnReplyDeleted
+        };
+
+        protected virtual DeleteCommentButton CreateDeleteButton() => new DeleteCommentButton
+        {
+            IsDeleted = { BindTarget = IsDeleted }
+        };
+
+        protected void OnReplyDeleted() => deletedChildrenPlaceholder.DeletedCount.Value++;
 
         private class ChevronButton : ShowChildrenButton
         {

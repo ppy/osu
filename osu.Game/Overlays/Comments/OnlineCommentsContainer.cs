@@ -3,6 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 using System.Threading.Tasks;
 
@@ -51,10 +52,35 @@ namespace osu.Game.Overlays.Comments
             Task.Run(() => request.Perform(API));
         }
 
+        protected override DrawableComment CreateDrawableComment(Comment comment) => new OnlineDrawableComment(comment)
+        {
+            ShowDeleted = { BindTarget = ShowDeleted },
+            OnDeleted = OnCommentDeleted
+        };
+
         protected override void Dispose(bool isDisposing)
         {
             request?.Cancel();
             base.Dispose(isDisposing);
+        }
+
+        private class OnlineDrawableComment : DrawableComment
+        {
+            public OnlineDrawableComment(Comment comment)
+                : base(comment)
+            {
+            }
+
+            protected override DrawableComment CreateDrawableReply(Comment comment) => new OnlineDrawableComment(comment)
+            {
+                ShowDeleted = { BindTarget = ShowDeleted },
+                OnDeleted = OnReplyDeleted
+            };
+
+            protected override DeleteCommentButton CreateDeleteButton() => new OnlineDeleteCommentButton(Comment)
+            {
+                IsDeleted = { BindTarget = IsDeleted }
+            };
         }
     }
 }

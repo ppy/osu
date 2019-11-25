@@ -4,15 +4,10 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
-using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using osuTK;
-using osu.Game.Online.API;
 using osu.Framework.Bindables;
-using osu.Game.Online.API.Requests;
 using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -26,21 +21,13 @@ namespace osu.Game.Overlays.Comments
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
-        [Resolved]
-        private IAPIProvider api { get; set; }
-
         private OsuSpriteText text;
-        private DeleteCommentRequest request;
 
-        private readonly long id;
-
-        public DeleteCommentButton(Comment comment)
+        public DeleteCommentButton()
         {
-            id = comment.Id;
-
             AutoSizeAxes = Axes.Both;
             LoadingAnimationSize = new Vector2(8);
-            Action = onAction;
+            Action = OnAction;
 
             IdleColour = OsuColour.Gray(0.7f);
             HoverColour = Color4.White;
@@ -61,23 +48,13 @@ namespace osu.Game.Overlays.Comments
 
         protected override void OnLoadFinished() => text.FadeIn(duration, Easing.OutQuint);
 
-        private void onAction()
+        protected virtual void OnAction()
         {
-            request = new DeleteCommentRequest(id);
-            request.Success += _ => onSuccess();
-            api.Queue(request);
-        }
-
-        private void onSuccess()
-        {
-            IsDeleted.Value = true;
-            IsLoading = false;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            request?.Cancel();
+            Scheduler.AddDelayed(() =>
+            {
+                IsDeleted.Value = true;
+                IsLoading = false;
+            }, 50);
         }
     }
 }
