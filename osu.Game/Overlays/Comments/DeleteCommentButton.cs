@@ -10,6 +10,7 @@ using osuTK;
 using osu.Framework.Bindables;
 using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -27,10 +28,15 @@ namespace osu.Game.Overlays.Comments
         {
             AutoSizeAxes = Axes.Both;
             LoadingAnimationSize = new Vector2(8);
-            Action = OnAction;
 
             IdleColour = OsuColour.Gray(0.7f);
             HoverColour = Color4.White;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(DialogOverlay dialogOverlay)
+        {
+            Action = () => dialogOverlay.Push(new DeleteCommentDialog(OnConfirmation, () => IsLoading = false));
         }
 
         protected override Drawable CreateContent() => new Container
@@ -48,13 +54,10 @@ namespace osu.Game.Overlays.Comments
 
         protected override void OnLoadFinished() => text.FadeIn(duration, Easing.OutQuint);
 
-        protected virtual void OnAction()
+        protected virtual void OnConfirmation()
         {
-            Scheduler.AddDelayed(() =>
-            {
-                IsDeleted.Value = true;
-                IsLoading = false;
-            }, 50);
+            IsDeleted.Value = true;
+            IsLoading = false;
         }
     }
 }

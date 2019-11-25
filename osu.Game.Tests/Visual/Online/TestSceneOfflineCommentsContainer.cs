@@ -9,6 +9,8 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -27,15 +29,22 @@ namespace osu.Game.Tests.Visual.Online
             typeof(VotePill)
         };
 
+        [Cached]
+        private readonly DialogOverlay dialogOverlay;
+
         private readonly BasicScrollContainer scroll;
         private CommentsContainer commentsContainer;
 
         public TestSceneOfflineCommentsContainer()
         {
-            Add(scroll = new BasicScrollContainer
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer = new CommentsContainer()
+                scroll = new BasicScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = commentsContainer = new CommentsContainer()
+                },
+                dialogOverlay = new DialogOverlay(),
             });
         }
 

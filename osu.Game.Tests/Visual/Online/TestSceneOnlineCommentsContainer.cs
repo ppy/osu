@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -26,15 +28,22 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override bool UseOnlineAPI => true;
 
+        [Cached]
+        private readonly DialogOverlay dialogOverlay;
+
         public TestSceneOnlineCommentsContainer()
         {
             var commentsContainer = new OnlineCommentsContainer();
             BasicScrollContainer scroll;
 
-            Add(scroll = new BasicScrollContainer
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer
+                scroll = new BasicScrollContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = commentsContainer
+                },
+                dialogOverlay = new DialogOverlay(),
             });
 
             AddStep("Idle state", () =>

@@ -22,10 +22,10 @@ namespace osu.Game.Overlays.Comments
             id = comment.Id;
         }
 
-        protected override void OnAction()
+        protected override void OnConfirmation()
         {
             request = new DeleteCommentRequest(id);
-            request.Success += _ => base.OnAction();
+            request.Success += _ => base.OnConfirmation();
             api.Queue(request);
         }
 
