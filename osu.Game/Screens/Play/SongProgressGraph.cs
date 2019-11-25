@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play
                     return;
 
                 var firstHit = objects.First().StartTime;
-                var lastHit = objects.Max(o => (o.GetEndTime()));
+                var lastHit = objects.Max(o => o.GetEndTime());
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
