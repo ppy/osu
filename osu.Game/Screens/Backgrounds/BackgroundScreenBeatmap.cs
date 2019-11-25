@@ -6,7 +6,6 @@ using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
@@ -74,7 +73,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    if ((Background as BeatmapBackground)?.Beatmap == beatmap)
+                    if ((Background as BeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
                         return;
 
                     cancellationSource?.Cancel();
@@ -105,22 +104,6 @@ namespace osu.Game.Screens.Backgrounds
             if (!(other is BackgroundScreenBeatmap otherBeatmapBackground)) return false;
 
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
-        }
-
-        protected class BeatmapBackground : Background
-        {
-            public readonly WorkingBeatmap Beatmap;
-
-            public BeatmapBackground(WorkingBeatmap beatmap)
-            {
-                Beatmap = beatmap;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Sprite.Texture = Beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
-            }
         }
 
         public class DimmableBackground : UserDimContainer

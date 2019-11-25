@@ -640,10 +640,19 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
         }
 
+        private bool firstScroll = true;
+
         private void updateScrollPosition()
         {
             if (scrollTarget != null)
             {
+                if (firstScroll)
+                {
+                    // reduce movement when first displaying the carousel.
+                    scroll.ScrollTo(scrollTarget.Value - 200, false);
+                    firstScroll = false;
+                }
+
                 scroll.ScrollTo(scrollTarget.Value);
                 scrollPositionCache.Validate();
             }
@@ -661,8 +670,8 @@ namespace osu.Game.Screens.Select
         {
             // The radius of the circle the carousel moves on.
             const float circle_radius = 3;
-            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
-            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
+            float discriminant = MathF.Max(0, circle_radius * circle_radius - dist * dist);
+            float x = (circle_radius - MathF.Sqrt(discriminant)) * halfHeight;
 
             return 125 + x;
         }

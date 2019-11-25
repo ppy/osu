@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Longer maps are worth more
             float lengthBonus =
                 0.95f + 0.4f * Math.Min(1.0f, numTotalHits / 3000.0f) +
-                (numTotalHits > 3000 ? (float)Math.Log10(numTotalHits / 3000.0f) * 0.5f : 0.0f);
+                (numTotalHits > 3000 ? MathF.Log10(numTotalHits / 3000.0f) * 0.5f : 0.0f);
 
             // Longer maps are worth more
             value *= lengthBonus;
