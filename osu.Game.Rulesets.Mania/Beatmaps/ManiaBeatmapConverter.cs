@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
-            int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
+            int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 
             return base.ConvertBeatmap(original);
