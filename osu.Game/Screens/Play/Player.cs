@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Play
                 },
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
-                    RequestSeek = GameplayClockContainer.Seek
+                    RequestSkip = GameplayClockContainer.Skip
                 },
                 FailOverlay = new FailOverlay
                 {
