@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         }
     }
 
-    public class ModCinema : ModAutoplay, IApplicableToHUD, IApplicableToScreen
+    public class ModCinema : ModAutoplay, IApplicableToHUD, IApplicableToPlayer
     {
         public override string Name => "Cinema";
         public override string Acronym => "CN";
@@ -34,8 +34,14 @@ namespace osu.Game.Rulesets.Mods
             overlay.Hide();
         }
 
-        public bool EnableDim => false;
-        public bool ForceVideo => true;
-        public bool ForceStoryboard => true;
+        public void ApplyToPlayer(Player player)
+        {
+            player.Background.EnableUserDim.Value = false;
+            player.DimmableVideo.EnableUserDim.Value = false;
+            player.DimmableStoryboard.EnableUserDim.Value = false;
+
+            player.DimmableVideo.IgnoreUserSettings.Value = true;
+            player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+        }
     }
 }
