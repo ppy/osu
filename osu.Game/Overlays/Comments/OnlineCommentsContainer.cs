@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Comments
             Task.Run(() => request.Perform(API));
         }
 
-        protected override DrawableComment CreateDrawableComment(Comment comment) => new OnlineDrawableComment(comment, null)
+        protected override DrawableComment CreateDrawableComment(Comment comment) => new OnlineDrawableComment(comment)
         {
             ShowDeleted = { BindTarget = ShowDeleted },
             OnDeleted = OnCommentDeleted
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Comments
 
         private class OnlineDrawableComment : DrawableComment
         {
-            public OnlineDrawableComment(Comment comment, OnlineDrawableComment drawableParent)
+            public OnlineDrawableComment(Comment comment, OnlineDrawableComment drawableParent = null)
                 : base(comment, drawableParent)
             {
             }

@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Comments
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly DeleteCommentButton deleteButton;
 
-        public DrawableComment(Comment comment, DrawableComment drawableParent)
+        public DrawableComment(Comment comment, DrawableComment drawableParent = null)
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;

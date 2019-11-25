@@ -203,7 +203,7 @@ namespace osu.Game.Overlays.Comments
                 loadingLayer.Show();
         }
 
-        protected virtual DrawableComment CreateDrawableComment(Comment comment) => new DrawableComment(comment, null)
+        protected virtual DrawableComment CreateDrawableComment(Comment comment) => new DrawableComment(comment)
         {
             ShowDeleted = { BindTarget = ShowDeleted },
             OnDeleted = OnCommentDeleted
@@ -246,10 +246,7 @@ namespace osu.Game.Overlays.Comments
             LoadComponentAsync(page, loaded =>
             {
                 if (reset)
-                {
                     content.Clear();
-                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
-                }
 
                 noCommentsPlaceholder.Hide();
 
