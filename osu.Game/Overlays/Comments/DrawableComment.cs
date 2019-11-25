@@ -18,6 +18,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osuTK.Graphics;
 using System;
+using osu.Framework.Allocation;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -30,6 +32,9 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool ShowDeleted = new BindableBool();
 
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private readonly BindableBool childrenExpanded = new BindableBool(true);
         private readonly BindableBool isDeleted = new BindableBool();
 
@@ -40,6 +45,7 @@ namespace osu.Game.Overlays.Comments
         private readonly LinkFlowContainer message;
         private readonly OsuSpriteText deletedIndicator;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private readonly DeleteCommentButton deleteButton;
 
         public DrawableComment(Comment comment)
         {
@@ -158,6 +164,10 @@ namespace osu.Game.Overlays.Comments
                                                         Font = OsuFont.GetFont(size: 12),
                                                         Text = HumanizerUtils.Humanize(comment.CreatedAt)
                                                     },
+                                                    deleteButton = new DeleteCommentButton(comment)
+                                                    {
+                                                        IsDeleted = { BindTarget = isDeleted }
+                                                    },
                                                     new RepliesButton(comment.RepliesCount)
                                                     {
                                                         Expanded = { BindTarget = childrenExpanded }
@@ -265,6 +275,7 @@ namespace osu.Game.Overlays.Comments
                 content.FadeColour(deleted.NewValue ? OsuColour.Gray(0.5f) : Color4.White);
                 votePill.FadeTo(deleted.NewValue ? 0 : 1);
                 deletedIndicator.FadeTo(deleted.NewValue ? 1 : 0);
+                deleteButton.FadeTo(!deleted.NewValue && (api.LocalUser.Value.Id == comment.UserId || api.LocalUser.Value.IsAdmin) ? 1 : 0);
 
                 if (deleted.NewValue)
                     OnDeletion?.Invoke();
