@@ -167,7 +167,7 @@ namespace osu.Game.Overlays.Mods
                     Spacing = new Vector2(50f, 0f),
                     Margin = new MarginPadding
                     {
-                        Top = 6,
+                        Top = 20,
                     },
                     AlwaysPresent = true
                 },
