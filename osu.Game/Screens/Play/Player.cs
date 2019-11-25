@@ -80,8 +80,8 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
-        protected DimmableStoryboard DimmableStoryboard { get; private set; }
-        protected DimmableVideo DimmableVideo { get; private set; }
+        public DimmableStoryboard DimmableStoryboard { get; private set; }
+        public DimmableVideo DimmableVideo { get; private set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -498,24 +498,8 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            var screenOverride = Mods.Value.OfType<IApplicableToScreen>();
-
-            if (screenOverride.Count() == 1)
-            {
-                var setting = screenOverride.Single();
-
-                Background.EnableUserDim.Value = setting.EnableDim;
-                DimmableVideo.EnableUserDim.Value = setting.EnableDim;
-                DimmableStoryboard.EnableUserDim.Value = setting.EnableDim;
-
-                DimmableVideo.IgnoreUserSettings.Value = setting.ForceVideo;
-                DimmableStoryboard.IgnoreUserSettings.Value = setting.ForceStoryboard;
-            }
-            else
-            {
-                Background.EnableUserDim.Value = true;
-                Background.BlurAmount.Value = 0;
-            }
+            Background.EnableUserDim.Value = true;
+            Background.BlurAmount.Value = 0;
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -524,6 +508,9 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Restart();
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToPlayer>())
+                mod.ApplyToPlayer(this);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);
