@@ -150,7 +150,7 @@ namespace osu.Game.Online.API
         private class DisplayableError
         {
             [JsonProperty("error")]
-            public string ErrorMessage;
+            public string ErrorMessage { get; set; }
         }
     }
 
