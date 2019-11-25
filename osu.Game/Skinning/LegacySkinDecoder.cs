@@ -1,18 +1,19 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Globalization;
 using osu.Game.Beatmaps.Formats;
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinDecoder : LegacyDecoder<DefaultSkinConfiguration>
+    public class LegacySkinDecoder : LegacyDecoder<LegacySkinConfiguration>
     {
         public LegacySkinDecoder()
             : base(1)
         {
         }
 
-        protected override void ParseLine(DefaultSkinConfiguration skin, Section section, string line)
+        protected override void ParseLine(LegacySkinConfiguration skin, Section section, string line)
         {
             if (section != Section.Colours)
             {
@@ -31,6 +32,14 @@ namespace osu.Game.Skinning
 
                             case @"Author":
                                 skin.SkinInfo.Creator = pair.Value;
+                                return;
+
+                            case @"Version":
+                                if (pair.Value == "latest")
+                                    skin.LegacyVersion = LegacySkinConfiguration.LATEST_VERSION;
+                                else if (decimal.TryParse(pair.Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var version))
+                                    skin.LegacyVersion = version;
+
                                 return;
                         }
 
