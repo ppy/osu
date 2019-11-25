@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -27,9 +28,14 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
+        private readonly BindableBool isDeleted = new BindableBool();
 
         private readonly FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
+        private readonly GridContainer content;
+        private readonly VotePill votePill;
+        private readonly LinkFlowContainer message;
+        private readonly OsuSpriteText deletedIndicator;
 
         public DrawableComment(Comment comment)
         {
@@ -37,9 +43,6 @@ namespace osu.Game.Overlays.Comments
             FillFlowContainer childCommentsContainer;
             DeletedChildrenPlaceholder deletedChildrenPlaceholder;
             FillFlowContainer info;
-            LinkFlowContainer message;
-            GridContainer content;
-            VotePill votePill;
 
             this.comment = comment;
 
@@ -124,9 +127,8 @@ namespace osu.Game.Overlays.Comments
                                                         AutoSizeAxes = Axes.Both,
                                                     },
                                                     new ParentUsername(comment),
-                                                    new OsuSpriteText
+                                                    deletedIndicator = new OsuSpriteText
                                                     {
-                                                        Alpha = comment.IsDeleted ? 1 : 0,
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                                                         Text = @"deleted",
                                                     }
@@ -212,12 +214,6 @@ namespace osu.Game.Overlays.Comments
                 message.AddLinks(formattedSource.Text, formattedSource.Links);
             }
 
-            if (comment.IsDeleted)
-            {
-                content.FadeColour(OsuColour.Gray(0.5f));
-                votePill.Hide();
-            }
-
             if (comment.IsTopLevel)
             {
                 AddInternal(new Container
@@ -253,11 +249,22 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
+            isDeleted.Value = comment.IsDeleted;
+
             ShowDeleted.BindValueChanged(show =>
             {
-                if (comment.IsDeleted)
+                if (isDeleted.Value)
                     this.FadeTo(show.NewValue ? 1 : 0);
+            });
+
+            isDeleted.BindValueChanged(deleted =>
+            {
+                ShowDeleted.TriggerChange();
+                content.FadeColour(deleted.NewValue ? OsuColour.Gray(0.5f) : Color4.White);
+                votePill.FadeTo(deleted.NewValue ? 0 : 1);
+                deletedIndicator.FadeTo(deleted.NewValue ? 1 : 0);
             }, true);
+
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
             base.LoadComplete();
         }
