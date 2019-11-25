@@ -12,13 +12,13 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -104,7 +104,7 @@ namespace osu.Game.Tournament
                             Colour = Color4.Red,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Please make the window wider",
                             Font = OsuFont.Default.With(weight: "bold"),
