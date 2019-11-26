@@ -158,4 +158,17 @@ namespace osu.Game.Rulesets.Objects
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
+
+    public static class HitObjectExtensions
+    {
+        /// <summary>
+        /// Returns the end time of this object.
+        /// </summary>
+        /// <remarks>
+        /// This returns the <see cref="IHasEndTime.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
+        /// </remarks>
+        /// <param name="hitObject">The object.</param>
+        /// <returns>The end time of this object.</returns>
+        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
+    }
 }
