@@ -15,8 +15,7 @@ build:
   project: build\Desktop.proj # Skipping Xamarin Release that's slow and covered by fastlane
   parallel: true
   verbosity: minimal
-artifacts:
-  - path: 'artifacts\nupkg\*.nupkg'
+  publish_nuget: true
 deploy:
   - provider: Environment
     name: nuget

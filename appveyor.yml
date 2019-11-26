@@ -14,12 +14,11 @@ build:
   project: osu.sln
   parallel: true
   verbosity: minimal
+  publish_nuget: true
 after_build:
   - ps: dotnet tool restore
   - ps: dotnet format --dry-run --check
   - ps: .\InspectCode.ps1
-artifacts:
-  - path: 'artifacts\nupkg\*.nupkg'
 test:
   assemblies:
     except:
