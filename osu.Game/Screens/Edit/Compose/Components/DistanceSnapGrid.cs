@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -70,7 +69,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            StartTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
+            StartTime = hitObject.GetEndTime();
         }
 
         protected override void LoadComplete()
