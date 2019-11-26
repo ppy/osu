@@ -74,7 +74,7 @@ If you are not interested in debugging osu!, you can add `-c Release` to gain pe
 
 If the build fails, try to restore NuGet packages with `dotnet restore`.
 
-_Due to historical feature gap between .NET Core and Xamarin, running `dotnet` CLI from the root directory will probably not work. You can try to run the CLI towards single .NET Core project, or helper project at `build/Desktop.proj`. Or you can get help from your IDE of choice to run the correct commands. We are keeping configuration files in the repository for the popular IDEs._
+_Due to historical feature gap between .NET Core and Xamarin, running `dotnet` CLI from the root directory will not work for most commands. This can be resolved by specifying a target `.csproj` or the helper project at `build/Desktop.proj`. Configurations have been provided to work around this issue for all supported IDEs mentioned above._
 
 ### Testing with resource/framework modifications
 
@@ -82,7 +82,7 @@ Sometimes it may be necessary to cross-test changes in [osu-resources](https://g
 
 ### Code analysis
 
-Before committing your code, please run code formatter. It can be achieved with command `dotnet format`, or `Format code` command in your IDE. (Defaults to `Ctrl+K,Ctrl+D` in Visual Studio, `Shift+Alt+F` in Visual Studio Code, or `Ctrl+Alt+L` in Rider)
+Before committing your code, please run a code formatter. It can be achieved with `dotnet format` in command line, or `Format code` command in your IDE.
 
 We have adopted some cross-platform, compiler integrated analyzers. They can provide warnings when you are editing, building inside IDE or from command line, as-if they are provided by the compiler itself.
 
