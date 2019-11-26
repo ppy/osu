@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
@@ -202,7 +203,7 @@ namespace osu.Game.Overlays.Chat
                                 RelativeSizeAxes = Axes.X,
                                 Height = lineHeight,
                             },
-                            text = new SpriteText
+                            text = new OsuSpriteText
                             {
                                 Margin = new MarginPadding { Horizontal = 10 },
                                 Text = time.ToLocalTime().ToString("dd MMM yyyy"),
