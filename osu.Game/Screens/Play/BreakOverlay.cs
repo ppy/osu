@@ -140,27 +140,34 @@ namespace osu.Game.Screens.Play
             updateBreakTimeBindable();
         }
 
-        private void updateBreakTimeBindable()
+        private void updateBreakTimeBindable() =>
+            isBreakTime.Value = getCurrentBreak()?.HasEffect == true
+                                || Clock.CurrentTime < gameplayStartTime
+                                || scoreProcessor?.HasCompleted == true;
+
+        private BreakPeriod getCurrentBreak()
         {
-            if (breaks == null || breaks.Count == 0)
-                return;
-
-            var time = Clock.CurrentTime;
-
-            if (time > breaks[CurrentBreakIndex].EndTime)
+            if (breaks?.Count > 0)
             {
-                while (time > breaks[CurrentBreakIndex].EndTime && CurrentBreakIndex < breaks.Count - 1)
-                    CurrentBreakIndex++;
-            }
-            else
-            {
-                while (time < breaks[CurrentBreakIndex].StartTime && CurrentBreakIndex > 0)
-                    CurrentBreakIndex--;
+                var time = Clock.CurrentTime;
+
+                if (time > breaks[CurrentBreakIndex].EndTime)
+                {
+                    while (time > breaks[CurrentBreakIndex].EndTime && CurrentBreakIndex < breaks.Count - 1)
+                        CurrentBreakIndex++;
+                }
+                else
+                {
+                    while (time < breaks[CurrentBreakIndex].StartTime && CurrentBreakIndex > 0)
+                        CurrentBreakIndex--;
+                }
+
+                var closest = breaks[CurrentBreakIndex];
+
+                return closest.Contains(time) ? closest : null;
             }
 
-            var currentBreak = breaks[CurrentBreakIndex];
-
-            isBreakTime.Value = (currentBreak.HasEffect && currentBreak.Contains(time)) || (time < gameplayStartTime || scoreProcessor?.HasCompleted == true);
+            return null;
         }
 
         private void initializeBreaks()
