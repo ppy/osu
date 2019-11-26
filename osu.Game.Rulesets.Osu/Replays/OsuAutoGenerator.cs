@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void addDelayedMovements(OsuHitObject h, OsuHitObject prev)
         {
-            double endTime = (prev as IHasEndTime)?.EndTime ?? prev.StartTime;
+            double endTime = prev.GetEndTime();
 
             HitWindows hitWindows = null;
 
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             var startFrame = new OsuReplayFrame(h.StartTime, new Vector2(startPosition.X, startPosition.Y), action);
 
             // TODO: Why do we delay 1 ms if the object is a spinner? There already is KEY_UP_DELAY from hEndTime.
-            double hEndTime = ((h as IHasEndTime)?.EndTime ?? h.StartTime) + KEY_UP_DELAY;
+            double hEndTime = h.GetEndTime() + KEY_UP_DELAY;
             int endDelay = h is Spinner ? 1 : 0;
             var endFrame = new OsuReplayFrame(hEndTime + endDelay, new Vector2(h.StackedEndPosition.X, h.StackedEndPosition.Y));
 
