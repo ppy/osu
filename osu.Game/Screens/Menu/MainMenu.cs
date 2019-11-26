@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -170,8 +169,6 @@ namespace osu.Game.Screens.Menu
                     track.Start();
                 }
             }
-
-            Beatmap.ValueChanged += beatmap_ValueChanged;
         }
 
         private bool exitConfirmed;
@@ -218,14 +215,6 @@ namespace osu.Game.Screens.Menu
 
             seq.OnComplete(_ => buttons.SetOsuLogo(null));
             seq.OnAbort(_ => buttons.SetOsuLogo(null));
-        }
-
-        private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
-        {
-            if (!this.IsCurrentScreen())
-                return;
-
-            ((BackgroundScreenDefault)Background).Next();
         }
 
         public override void OnSuspending(IScreen next)

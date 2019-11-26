@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
-            float aimRotation = MathHelper.RadiansToDegrees((float)Math.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = MathHelper.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)
                 aimRotation += aimRotation < Rotation ? 360 : -360;
 

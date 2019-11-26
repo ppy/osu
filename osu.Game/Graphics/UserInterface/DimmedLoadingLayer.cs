@@ -10,7 +10,7 @@ using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DimmedLoadingLayer : VisibilityContainer
+    public class DimmedLoadingLayer : OverlayContainer
     {
         private const float transition_duration = 250;
 

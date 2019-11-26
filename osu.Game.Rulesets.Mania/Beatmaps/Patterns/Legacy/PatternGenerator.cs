@@ -53,11 +53,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (allowSpecial && TotalColumns == 8)
             {
                 const float local_x_divisor = 512f / 7;
-                return Math.Clamp((int)Math.Floor(position / local_x_divisor), 0, 6) + 1;
+                return Math.Clamp((int)MathF.Floor(position / local_x_divisor), 0, 6) + 1;
             }
 
             float localXDivisor = 512f / TotalColumns;
-            return Math.Clamp((int)Math.Floor(position / localXDivisor), 0, TotalColumns - 1);
+            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
