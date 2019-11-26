@@ -111,7 +111,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             float adjustedAlpha = HideAlphaDiscrepancies
                 // Cubically scale alpha to make it drop off more sharply.
-                ? (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
+                ? MathF.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3)
                 : 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
