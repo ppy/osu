@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             foreach (var obj in originalPattern.HitObjects)
             {
-                if (!Precision.AlmostEquals(EndTime, (obj as IHasEndTime)?.EndTime ?? obj.StartTime))
+                if (!Precision.AlmostEquals(EndTime, obj.GetEndTime()))
                     intermediatePattern.Add(obj);
                 else
                     endTimePattern.Add(obj);

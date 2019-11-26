@@ -9,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             yield return new ConvertValue
             {
                 StartTime = hitObject.StartTime,
-                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
+                EndTime = hitObject.GetEndTime(),
                 Column = ((ManiaHitObject)hitObject).Column
             };
         }
