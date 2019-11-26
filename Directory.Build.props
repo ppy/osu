@@ -28,6 +28,7 @@
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
+    <IsPackable>false</IsPackable>
     <Authors>ppy Pty Ltd</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ppy/osu</PackageProjectUrl>
@@ -36,6 +37,5 @@
     <Company>ppy Pty Ltd</Company>
     <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
-    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts\nupkg\</PackageOutputPath>
   </PropertyGroup>
 </Project>
