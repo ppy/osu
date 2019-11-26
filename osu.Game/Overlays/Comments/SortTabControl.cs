@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Bindables;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays.Comments
 
                 public TabButton(CommentsSortCriteria value)
                 {
-                    Add(text = new SpriteText
+                    Add(text = new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14),
                         Text = value.ToString()
