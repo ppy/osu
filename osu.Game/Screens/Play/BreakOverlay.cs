@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Play
 
             var currentBreak = breaks[CurrentBreakIndex];
 
-            isBreakTime.Value = (currentBreak.HasEffect && currentBreak.Contains(time)) || (time < gameplayStartTime || scoreProcessor.HasCompleted);
+            isBreakTime.Value = (currentBreak.HasEffect && currentBreak.Contains(time)) || (time < gameplayStartTime || scoreProcessor?.HasCompleted == true);
         }
 
         private void initializeBreaks()
