@@ -12,9 +12,9 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Users;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -99,7 +99,7 @@ namespace osu.Game.Overlays.Comments
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                         },
-                                        new SpriteText
+                                        new OsuSpriteText
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,

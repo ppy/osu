@@ -45,6 +45,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
             AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
             AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
+            AddStep("news comments", () => commentsContainer.ShowComments(CommentableType.NewsPost, 715));
         }
     }
 }
