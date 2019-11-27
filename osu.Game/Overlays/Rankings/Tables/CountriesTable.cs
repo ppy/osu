@@ -3,12 +3,10 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Users.Drawables;
-using osuTK;
 using System;
 using osu.Game.Users;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -29,31 +27,16 @@ namespace osu.Game.Overlays.Rankings.Tables
             new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
-        protected override Drawable[] CreateContent(int index, CountryStatistics item) => new Drawable[]
+        protected override Country GetCountry(CountryStatistics item) => item.Country;
+
+        protected override Drawable CreateFlagContent(CountryStatistics item) => new OsuSpriteText
         {
-            new OsuSpriteText
-            {
-                Text = $"#{index + 1}",
-                Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
-            },
-            new FillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
-                Spacing = new Vector2(7, 0),
-                Children = new Drawable[]
-                {
-                    new UpdateableFlag(item.Country)
-                    {
-                        Size = new Vector2(20, 13),
-                        ShowPlaceholderOnNull = false,
-                    },
-                    new RowText
-                    {
-                        Text = $@"{item.Country.FullName}",
-                    }
-                }
-            },
+            Font = OsuFont.GetFont(size: TEXT_SIZE),
+            Text = $@"{item.Country.FullName}",
+        };
+
+        protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new[]
+        {
             new ColoredRowText
             {
                 Text = $@"{item.ActiveUsers:N0}",

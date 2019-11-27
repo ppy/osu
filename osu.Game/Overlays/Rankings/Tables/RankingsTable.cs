@@ -10,6 +10,9 @@ using osu.Framework.Extensions;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Users;
+using osu.Game.Users.Drawables;
+using osuTK;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -54,9 +57,11 @@ namespace osu.Game.Overlays.Rankings.Tables
                 value.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
 
                 Columns = mainHeaders.Concat(CreateAdditionalHeaders()).ToArray();
-                Content = value.Select((s, i) => CreateContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
+                Content = value.Select((s, i) => createContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
             }
         }
+
+        private Drawable[] createContent(int index, TModel item) => new Drawable[] { createIndexDrawable(index), createMainContent(item) }.Concat(CreateAdditionalContent(item)).ToArray();
 
         private static TableColumn[] mainHeaders => new[]
         {
@@ -66,9 +71,35 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected abstract TableColumn[] CreateAdditionalHeaders();
 
-        protected abstract Drawable[] CreateContent(int index, TModel item);
+        protected abstract Drawable[] CreateAdditionalContent(TModel item);
 
         protected override Drawable CreateHeader(int index, TableColumn column) => new HeaderText(column?.Header ?? string.Empty, HighlightedColumn());
+
+        protected abstract Country GetCountry(TModel item);
+
+        protected abstract Drawable CreateFlagContent(TModel item);
+
+        private OsuSpriteText createIndexDrawable(int index) => new OsuSpriteText
+        {
+            Text = $"#{index + 1}",
+            Font = OsuFont.GetFont(size: TEXT_SIZE, weight: FontWeight.Bold)
+        };
+
+        private FillFlowContainer createMainContent(TModel item) => new FillFlowContainer
+        {
+            AutoSizeAxes = Axes.Both,
+            Direction = FillDirection.Horizontal,
+            Spacing = new Vector2(7, 0),
+            Children = new Drawable[]
+            {
+                new UpdateableFlag(GetCountry(item))
+                {
+                    Size = new Vector2(20, 13),
+                    ShowPlaceholderOnNull = false,
+                },
+                CreateFlagContent(item)
+            }
+        };
 
         protected virtual string HighlightedColumn() => @"Performance";
 

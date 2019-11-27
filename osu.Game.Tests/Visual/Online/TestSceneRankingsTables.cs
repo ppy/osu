@@ -29,6 +29,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ScoresTable),
             typeof(CountriesTable),
             typeof(TableRowBackground),
+            typeof(UserBasedTable),
             typeof(RankingsTable<>)
         };
 
