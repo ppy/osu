@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected override TableColumn[] CreateHeaders() => new[]
         {
-            new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
-            new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username
+            new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
+            new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username
             new TableColumn("Accuracy", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
             new TableColumn("Play Count", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
             new TableColumn("Performance", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
