@@ -22,6 +22,11 @@ namespace osu.Game.Graphics.UserInterface
         private readonly MouseButton[] buttons;
 
         /// <summary>
+        /// Length of debounce for click sound playback, in milliseconds. Default is 0ms.
+        /// </summary>
+        public double ClickDebounceTime { get; set; }
+
+        /// <summary>
         /// a container which plays sounds on hover and click for any specified <see cref="MouseButton"/>s.
         /// </summary>
         /// <param name="sampleSet">Set of click samples to play.</param>
@@ -43,10 +48,10 @@ namespace osu.Game.Graphics.UserInterface
 
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
             {
-                if (DebounceTime <= 0)
+                if (ClickDebounceTime <= 0)
                     sampleClick?.Play();
                 else
-                    playDelegate = Scheduler.AddDelayed(() => sampleClick?.Play(), DebounceTime);
+                    playDelegate = Scheduler.AddDelayed(() => sampleClick?.Play(), ClickDebounceTime);
             }
 
             return base.OnClick(e);

@@ -22,9 +22,9 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleHover;
 
         /// <summary>
-        /// Length of debounce for sound playback, in milliseconds. Default is 50ms.
+        /// Length of debounce for hover sound playback, in milliseconds. Default is 50ms.
         /// </summary>
-        public double DebounceTime { get; set; } = 50;
+        public double HoverDebounceTime { get; set; } = 50;
 
         protected readonly HoverSampleSet SampleSet;
 
@@ -40,10 +40,10 @@ namespace osu.Game.Graphics.UserInterface
         {
             playDelegate?.Cancel();
 
-            if (DebounceTime <= 0)
+            if (HoverDebounceTime <= 0)
                 sampleHover?.Play();
             else
-                playDelegate = Scheduler.AddDelayed(() => sampleHover?.Play(), DebounceTime);
+                playDelegate = Scheduler.AddDelayed(() => sampleHover?.Play(), HoverDebounceTime);
 
             return base.OnHover(e);
         }
