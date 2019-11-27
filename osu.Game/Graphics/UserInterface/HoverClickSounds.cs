@@ -46,7 +46,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 var debounceMs = (int)DebounceTime.TotalMilliseconds;
 
-                if (debounceMs == 0)
+                if (debounceMs <= 0)
                     sampleClick?.Play();
                 else
                     playDelegate = Scheduler.AddDelayed(() => sampleClick?.Play(), debounceMs);
