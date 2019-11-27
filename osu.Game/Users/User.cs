@@ -129,7 +129,7 @@ namespace osu.Game.Users
         [JsonProperty]
         private string[] playstyle
         {
-            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
         }
 
         public PlayStyle[] PlayStyles;

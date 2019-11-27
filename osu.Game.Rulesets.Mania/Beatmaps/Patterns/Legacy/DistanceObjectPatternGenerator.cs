@@ -364,7 +364,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     break;
             }
 
-            bool isDoubleSample(HitSampleInfo sample) => sample.Name == HitSampleInfo.HIT_CLAP || sample.Name == HitSampleInfo.HIT_FINISH;
+            static bool isDoubleSample(HitSampleInfo sample) => sample.Name == HitSampleInfo.HIT_CLAP || sample.Name == HitSampleInfo.HIT_FINISH;
 
             bool canGenerateTwoNotes = !convertType.HasFlag(PatternType.LowProbability);
             canGenerateTwoNotes &= HitObject.Samples.Any(isDoubleSample) || sampleInfoListAt(HitObject.StartTime).Any(isDoubleSample);
@@ -474,9 +474,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns></returns>
         private IList<HitSampleInfo> sampleInfoListAt(double time)
         {
-            var curveData = HitObject as IHasCurve;
-
-            if (curveData == null)
+            if (!(HitObject is IHasCurve curveData))
                 return HitObject.Samples;
 
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;

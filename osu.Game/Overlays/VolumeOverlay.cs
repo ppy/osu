@@ -30,8 +30,7 @@ namespace osu.Game.Overlays
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
-        private readonly Bindable<bool> isMuted = new Bindable<bool>();
-        public Bindable<bool> IsMuted => isMuted;
+        public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -66,7 +65,7 @@ namespace osu.Game.Overlays
                         muteButton = new MuteButton
                         {
                             Margin = new MarginPadding { Top = 100 },
-                            Current = { BindTarget = isMuted }
+                            Current = { BindTarget = IsMuted }
                         }
                     }
                 },
@@ -76,7 +75,7 @@ namespace osu.Game.Overlays
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            isMuted.BindValueChanged(muted =>
+            IsMuted.BindValueChanged(muted =>
             {
                 if (muted.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);

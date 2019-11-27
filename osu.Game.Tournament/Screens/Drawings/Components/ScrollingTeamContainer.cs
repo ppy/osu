@@ -125,9 +125,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                         foreach (var c in Children)
                         {
-                            var stc = c as ScrollingTeam;
-
-                            if (stc == null)
+                            if (!(c is ScrollingTeam stc))
                                 continue;
 
                             if (closest == null)
@@ -203,15 +201,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
             foreach (var c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-
-                if (st == null)
-                    continue;
-
-                if (st.Team == team)
+                if (c is ScrollingTeam st)
                 {
-                    st.FadeOut(200);
-                    st.Expire();
+                    if (st.Team == team)
+                    {
+                        st.FadeOut(200);
+                        st.Expire();
+                    }
                 }
             }
         }
@@ -295,14 +291,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             foreach (var c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-                if (st == null)
-                    continue;
-
-                if (st.Selected)
+                if (c is ScrollingTeam st)
                 {
-                    st.Selected = false;
-                    RemoveTeam(st.Team);
+                    if (st.Selected)
+                    {
+                        st.Selected = false;
+                        RemoveTeam(st.Team);
+                    }
                 }
             }
         }
