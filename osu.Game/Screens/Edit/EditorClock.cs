@@ -7,7 +7,6 @@ using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osuTK;
 
 namespace osu.Game.Screens.Edit
 {
@@ -125,7 +124,7 @@ namespace osu.Game.Screens.Edit
                 seekTime = nextTimingPoint.Time;
 
             // Ensure the sought point is within the boundaries
-            seekTime = MathHelper.Clamp(seekTime, 0, TrackLength);
+            seekTime = Math.Clamp(seekTime, 0, TrackLength);
             Seek(seekTime);
         }
     }

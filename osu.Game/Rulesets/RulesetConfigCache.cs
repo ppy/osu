@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets
 
             // ensures any potential database operations are finalised before game destruction.
             foreach (var c in configCache.Values)
-                (c as IDisposable)?.Dispose();
+                c?.Dispose();
         }
     }
 }

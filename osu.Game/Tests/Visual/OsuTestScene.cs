@@ -10,6 +10,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
@@ -19,8 +21,8 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
-using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -93,6 +95,10 @@ namespace osu.Game.Tests.Visual
             return Dependencies;
         }
 
+        protected override Container<Drawable> Content => content ?? base.Content;
+
+        private readonly Container content;
+
         protected OsuTestScene()
         {
             localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
@@ -104,6 +110,8 @@ namespace osu.Game.Tests.Visual
                     usage.Migrate();
                 return factory;
             });
+
+            base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
         [Resolved]
@@ -112,10 +120,10 @@ namespace osu.Game.Tests.Visual
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
         protected WorkingBeatmap CreateWorkingBeatmap(RulesetInfo ruleset) =>
-            CreateWorkingBeatmap(CreateBeatmap(ruleset));
+            CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
 
-        protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap) =>
-            new ClockBackedTestWorkingBeatmap(beatmap, Clock, audio);
+        protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, audio);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -161,7 +169,7 @@ namespace osu.Game.Tests.Visual
             /// <param name="referenceClock">A clock which should be used instead of a stopwatch for virtual time progression.</param>
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
             public ClockBackedTestWorkingBeatmap(RulesetInfo ruleset, IFrameBasedClock referenceClock, AudioManager audio)
-                : this(new TestBeatmap(ruleset), referenceClock, audio)
+                : this(new TestBeatmap(ruleset), null, referenceClock, audio)
             {
             }
 
@@ -169,11 +177,12 @@ namespace osu.Game.Tests.Visual
             /// Create an instance which provides the <see cref="IBeatmap"/> when requested.
             /// </summary>
             /// <param name="beatmap">The beatmap</param>
+            /// <param name="storyboard">The storyboard.</param>
             /// <param name="referenceClock">An optional clock which should be used instead of a stopwatch for virtual time progression.</param>
             /// <param name="audio">Audio manager. Required if a reference clock isn't provided.</param>
             /// <param name="length">The length of the returned virtual track.</param>
-            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
-                : base(beatmap)
+            public ClockBackedTestWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard, IFrameBasedClock referenceClock, AudioManager audio, double length = 60000)
+                : base(beatmap, storyboard)
             {
                 if (referenceClock != null)
                 {
@@ -210,7 +219,7 @@ namespace osu.Game.Tests.Visual
 
                 public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-                public Track GetVirtual(double length = Double.PositiveInfinity)
+                public Track GetVirtual(double length = double.PositiveInfinity)
                 {
                     var track = new TrackVirtualManual(referenceClock) { Length = length };
                     AddItem(track);
@@ -242,7 +251,7 @@ namespace osu.Game.Tests.Visual
 
                 public override bool Seek(double seek)
                 {
-                    offset = MathHelper.Clamp(seek, 0, Length);
+                    offset = Math.Clamp(seek, 0, Length);
                     lastReferenceTime = null;
 
                     return offset == seek;

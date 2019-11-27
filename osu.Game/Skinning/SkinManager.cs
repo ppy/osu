@@ -96,7 +96,7 @@ namespace osu.Game.Skinning
             else
             {
                 model.Name = model.Name.Replace(".osk", "");
-                model.Creator = model.Creator ?? "Unknown";
+                model.Creator ??= "Unknown";
             }
         }
 

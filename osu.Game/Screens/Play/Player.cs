@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Play
                 },
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
-                    RequestSeek = GameplayClockContainer.Seek
+                    RequestSkip = GameplayClockContainer.Skip
                 },
                 FailOverlay = new FailOverlay
                 {
@@ -468,7 +468,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (breakOverlay.IsBreakTime.Value || GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            if (breakOverlay.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -535,8 +535,6 @@ namespace osu.Game.Screens.Play
                     // still want to block if we are within the cooldown period and not already paused.
                     return true;
             }
-
-            GameplayClockContainer.ResetLocalAdjustments();
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.

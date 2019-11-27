@@ -206,8 +206,8 @@ namespace osu.Game.Screens.Menu
                                 continue;
 
                             float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
-                            float rotationCos = (float)Math.Cos(rotation);
-                            float rotationSin = (float)Math.Sin(rotation);
+                            float rotationCos = MathF.Cos(rotation);
+                            float rotationSin = MathF.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 

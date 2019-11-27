@@ -43,6 +43,11 @@ namespace osu.Game.Beatmaps.ControlPoints
             set => BeatLengthBindable.Value = value;
         }
 
+        /// <summary>
+        /// The BPM at this control point.
+        /// </summary>
+        public double BPM => 60000 / BeatLength;
+
         public override bool EquivalentTo(ControlPoint other) =>
             other is TimingControlPoint otherTyped
             && TimeSignature == otherTyped.TimeSignature && BeatLength.Equals(otherTyped.BeatLength);

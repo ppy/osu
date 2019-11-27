@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
         {
-            positionOffset = positionOffset ?? Vector2.Zero;
+            positionOffset ??= Vector2.Zero;
 
             var circle = new HitCircle
             {

@@ -26,6 +26,12 @@ namespace osu.Game.Skinning
         [CanBeNull]
         protected IResourceStore<SampleChannel> Samples;
 
+        public new LegacySkinConfiguration Configuration
+        {
+            get => base.Configuration as LegacySkinConfiguration;
+            set => base.Configuration = value;
+        }
+
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
@@ -35,11 +41,14 @@ namespace osu.Game.Skinning
             : base(skin)
         {
             Stream stream = storage?.GetStream(filename);
+
             if (stream != null)
+            {
                 using (LineBufferedReader reader = new LineBufferedReader(stream))
                     Configuration = new LegacySkinDecoder().Decode(reader);
+            }
             else
-                Configuration = new DefaultSkinConfiguration();
+                Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
 
             if (storage != null)
             {
@@ -70,6 +79,18 @@ namespace osu.Game.Skinning
 
                 case GlobalSkinColour colour:
                     return SkinUtils.As<TValue>(getCustomColour(colour.ToString()));
+
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    switch (legacy)
+                    {
+                        case LegacySkinConfiguration.LegacySetting.Version:
+                            if (Configuration.LegacyVersion is decimal version)
+                                return SkinUtils.As<TValue>(new Bindable<decimal>(version));
+
+                            break;
+                    }
+
+                    break;
 
                 case SkinCustomColourLookup customColour:
                     return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));

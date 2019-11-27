@@ -10,15 +10,17 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
-        public Action<int> RequestSelection;
+        public Action<int, MouseButtonEvent> RequestSelection;
         public Action<Vector2[]> ControlPointsChanged;
 
         public readonly BindableBool IsSelected = new BindableBool();
@@ -29,7 +31,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private readonly Container marker;
         private readonly Drawable markerRing;
 
-        private bool isClicked;
+        [Resolved(CanBeNull = true)]
+        private IDistanceSnapProvider snapProvider { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -101,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
             Color4 colour = isSegmentSeparator ? colours.Red : colours.Yellow;
-            if (IsHovered || isClicked || IsSelected.Value)
+            if (IsHovered || IsSelected.Value)
                 colour = Color4.White;
             marker.Colour = colour;
         }
@@ -127,23 +130,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            isClicked = true;
-            return true;
+            if (RequestSelection == null)
+                return false;
+
+            switch (e.Button)
+            {
+                case MouseButton.Left:
+                    RequestSelection.Invoke(Index, e);
+                    return true;
+
+                case MouseButton.Right:
+                    if (!IsSelected.Value)
+                        RequestSelection.Invoke(Index, e);
+                    return false; // Allow context menu to show
+            }
+
+            return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            isClicked = false;
-            return true;
-        }
+        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
 
-        protected override bool OnClick(ClickEvent e)
-        {
-            RequestSelection?.Invoke(Index);
-            return true;
-        }
+        protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
-        protected override bool OnDragStart(DragStartEvent e) => true;
+        protected override bool OnDragStart(DragStartEvent e) => e.Button == MouseButton.Left;
 
         protected override bool OnDrag(DragEvent e)
         {
@@ -151,12 +160,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             if (Index == 0)
             {
-                // Special handling for the head - only the position of the slider changes
-                slider.Position += e.Delta;
+                // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
+                (Vector2 snappedPosition, double snappedTime) = snapProvider?.GetSnappedPosition(e.MousePosition, slider.StartTime) ?? (e.MousePosition, slider.StartTime);
+                Vector2 movementDelta = snappedPosition - slider.Position;
+
+                slider.Position += movementDelta;
+                slider.StartTime = snappedTime;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
                 for (int i = 1; i < newControlPoints.Length; i++)
-                    newControlPoints[i] -= e.Delta;
+                    newControlPoints[i] -= movementDelta;
             }
             else
                 newControlPoints[Index] += e.Delta;

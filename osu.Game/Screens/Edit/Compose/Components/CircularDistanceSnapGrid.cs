@@ -12,8 +12,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        protected CircularDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
-            : base(hitObject, centrePosition)
+        protected CircularDistanceSnapGrid(HitObject hitObject, HitObject nextHitObject, Vector2 centrePosition)
+            : base(hitObject, nextHitObject, centrePosition)
         {
         }
 
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
             float dy = Math.Max(centrePosition.Y, DrawHeight - centrePosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
-            int requiredCircles = (int)(maxDistance / DistanceSpacing);
+            int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceSpacing));
 
             for (int i = 0; i < requiredCircles; i++)
             {
@@ -65,15 +65,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public override (Vector2 position, double time) GetSnappedPosition(Vector2 position)
         {
-            Vector2 direction = position - CentrePosition;
+            if (MaxIntervals == 0)
+                return (CentrePosition, StartTime);
 
+            Vector2 direction = position - CentrePosition;
             if (direction == Vector2.Zero)
                 direction = new Vector2(0.001f, 0.001f);
 
             float distance = direction.Length;
 
             float radius = DistanceSpacing;
-            int radialCount = Math.Max(1, (int)Math.Round(distance / radius));
+            int radialCount = Math.Clamp((int)MathF.Round(distance / radius), 1, MaxIntervals);
 
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
             Vector2 snappedPosition = CentrePosition + normalisedDirection * radialCount * radius;

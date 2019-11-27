@@ -116,17 +116,11 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Duration => EndTime - StartTime;
 
-        private SliderPath path;
-
-        public SliderPath Path
-        {
-            get => path;
-            set => path = value;
-        }
+        public SliderPath Path { get; set; }
 
         public double Distance => Path.Distance;
 
-        public List<List<HitSampleInfo>> NodeSamples { get; set; } = new List<List<HitSampleInfo>>();
+        public List<IList<HitSampleInfo>> NodeSamples { get; set; } = new List<IList<HitSampleInfo>>();
 
         public double? LegacyLastTickOffset { get; set; }
     }

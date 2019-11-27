@@ -218,12 +218,17 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 }
 
                 AddInternal(marker = new Marker());
+            }
 
-                CurrentNumber.ValueChanged += div =>
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                CurrentNumber.BindValueChanged(div =>
                 {
                     marker.MoveToX(getMappedPosition(div.NewValue), 100, Easing.OutQuint);
                     marker.Flash();
-                };
+                }, true);
             }
 
             protected override void UpdateValue(float value)
@@ -284,7 +289,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {
