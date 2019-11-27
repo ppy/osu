@@ -68,11 +68,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void createCountryTable(RulesetInfo ruleset, int page = 1)
         {
-            loading.Show();
-
-            request?.Cancel();
-            cancellationToken?.Cancel();
-            cancellationToken = new CancellationTokenSource();
+            onLoadStarted();
 
             request = new GetCountryRankingsRequest(ruleset, page);
             ((GetCountryRankingsRequest)request).Success += rankings => Schedule(() =>
@@ -82,12 +78,7 @@ namespace osu.Game.Tests.Visual.Online
                     Rankings = rankings.Countries,
                 };
 
-                LoadComponentAsync(table, t =>
-                {
-                    scrollFlow.Clear();
-                    scrollFlow.Add(t);
-                    loading.Hide();
-                }, cancellationToken.Token);
+                loadTable(table);
             });
 
             api.Queue(request);
@@ -95,11 +86,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void createPerformanceTable(RulesetInfo ruleset, string country, int page = 1)
         {
-            loading.Show();
-
-            request?.Cancel();
-            cancellationToken?.Cancel();
-            cancellationToken = new CancellationTokenSource();
+            onLoadStarted();
 
             request = new GetUserRankingsRequest(ruleset, country: country, page: page);
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
@@ -109,12 +96,7 @@ namespace osu.Game.Tests.Visual.Online
                     Rankings = rankings.Users,
                 };
 
-                LoadComponentAsync(table, t =>
-                {
-                    scrollFlow.Clear();
-                    scrollFlow.Add(t);
-                    loading.Hide();
-                }, cancellationToken.Token);
+                loadTable(table);
             });
 
             api.Queue(request);
@@ -122,11 +104,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private void createScoreTable(RulesetInfo ruleset, int page = 1)
         {
-            loading.Show();
-
-            request?.Cancel();
-            cancellationToken?.Cancel();
-            cancellationToken = new CancellationTokenSource();
+            onLoadStarted();
 
             request = new GetUserRankingsRequest(ruleset, UserRankingsType.Score, page);
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
@@ -136,15 +114,28 @@ namespace osu.Game.Tests.Visual.Online
                     Rankings = rankings.Users,
                 };
 
-                LoadComponentAsync(table, t =>
-                {
-                    scrollFlow.Clear();
-                    scrollFlow.Add(t);
-                    loading.Hide();
-                }, cancellationToken.Token);
+                loadTable(table);
             });
 
             api.Queue(request);
+        }
+
+        private void onLoadStarted()
+        {
+            loading.Show();
+            request?.Cancel();
+            cancellationToken?.Cancel();
+            cancellationToken = new CancellationTokenSource();
+        }
+
+        private void loadTable(Drawable table)
+        {
+            LoadComponentAsync(table, t =>
+            {
+                scrollFlow.Clear();
+                scrollFlow.Add(t);
+                loading.Hide();
+            }, cancellationToken.Token);
         }
     }
 }
