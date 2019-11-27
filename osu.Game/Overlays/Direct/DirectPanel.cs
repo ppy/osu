@@ -149,8 +149,10 @@ namespace osu.Game.Overlays.Direct
                     icons.Add(new GroupedDifficultyIcon(SetInfo.Beatmaps.FindAll(b => b.Ruleset.Equals(ruleset)), ruleset, this is DirectListPanel ? Color4.White : colours.Gray5));
             }
             else
+            {
                 foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
                     icons.Add(new DifficultyIcon(b));
+            }
 
             return icons;
         }

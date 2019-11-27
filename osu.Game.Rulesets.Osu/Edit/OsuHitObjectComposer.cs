@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
@@ -60,25 +61,40 @@ namespace osu.Game.Rulesets.Osu.Edit
             var objects = selectedHitObjects.ToList();
 
             if (objects.Count == 0)
+                return createGrid(h => h.StartTime <= EditorClock.CurrentTime);
+
+            double minTime = objects.Min(h => h.StartTime);
+            return createGrid(h => h.StartTime < minTime, objects.Count + 1);
+        }
+
+        /// <summary>
+        /// Creates a grid from the last <see cref="HitObject"/> matching a predicate to a target <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="sourceSelector">A predicate that matches <see cref="HitObject"/>s where the grid can start from.
+        /// Only the last <see cref="HitObject"/> matching the predicate is used.</param>
+        /// <param name="targetOffset">An offset from the <see cref="HitObject"/> selected via <paramref name="sourceSelector"/> at which the grid should stop.</param>
+        /// <returns>The <see cref="OsuDistanceSnapGrid"/> from a selected <see cref="HitObject"/> to a target <see cref="HitObject"/>.</returns>
+        private OsuDistanceSnapGrid createGrid(Func<HitObject, bool> sourceSelector, int targetOffset = 1)
+        {
+            if (targetOffset < 1) throw new ArgumentOutOfRangeException(nameof(targetOffset));
+
+            int sourceIndex = -1;
+
+            for (int i = 0; i < EditorBeatmap.HitObjects.Count; i++)
             {
-                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime <= EditorClock.CurrentTime);
+                if (!sourceSelector(EditorBeatmap.HitObjects[i]))
+                    break;
 
-                if (lastObject == null)
-                    return null;
-
-                return new OsuDistanceSnapGrid(lastObject);
+                sourceIndex = i;
             }
-            else
-            {
-                double minTime = objects.Min(h => h.StartTime);
 
-                var lastObject = EditorBeatmap.HitObjects.LastOrDefault(h => h.StartTime < minTime);
+            if (sourceIndex == -1)
+                return null;
 
-                if (lastObject == null)
-                    return null;
+            OsuHitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
+            OsuHitObject targetObject = sourceIndex + targetOffset < EditorBeatmap.HitObjects.Count ? EditorBeatmap.HitObjects[sourceIndex + targetOffset] : null;
 
-                return new OsuDistanceSnapGrid(lastObject);
-            }
+            return new OsuDistanceSnapGrid(sourceObject, targetObject);
         }
     }
 }

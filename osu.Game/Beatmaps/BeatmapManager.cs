@@ -25,7 +25,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
@@ -129,9 +129,12 @@ namespace osu.Game.Beatmaps
         {
             var beatmapIds = beatmapSet.Beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
+            LogForModel(beatmapSet, "Validating online IDs...");
+
             // ensure all IDs are unique
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1))
             {
+                LogForModel(beatmapSet, "Found non-unique IDs, resetting...");
                 resetIds();
                 return;
             }
@@ -144,8 +147,12 @@ namespace osu.Game.Beatmaps
                 // reset the import ids (to force a re-fetch) *unless* they match the candidate CheckForExisting set.
                 // we can ignore the case where the new ids are contained by the CheckForExisting set as it will either be used (import skipped) or deleted.
                 var existing = CheckForExisting(beatmapSet);
+
                 if (existing == null || existingBeatmaps.Any(b => !existing.Beatmaps.Contains(b)))
+                {
+                    LogForModel(beatmapSet, "Found existing import with IDs already, resetting...");
                     resetIds();
+                }
             }
 
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
@@ -296,8 +303,13 @@ namespace osu.Game.Beatmaps
                     var decoder = Decoder.GetDecoder<Beatmap>(sr);
                     IBeatmap beatmap = decoder.Decode(sr);
 
+                    string hash = ms.ComputeSHA2Hash();
+
+                    if (beatmapInfos.Any(b => b.Hash == hash))
+                        continue;
+
                     beatmap.BeatmapInfo.Path = file.Filename;
-                    beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
+                    beatmap.BeatmapInfo.Hash = hash;
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
                     var ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
@@ -322,7 +334,8 @@ namespace osu.Game.Beatmaps
 
             var lastObject = b.HitObjects.Last();
 
-            double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+            double endTime = lastObject.GetEndTime();
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
@@ -380,25 +393,30 @@ namespace osu.Game.Beatmaps
 
                 var req = new GetBeatmapRequest(beatmap);
 
-                req.Success += res =>
-                {
-                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
-
-                    beatmap.Status = res.Status;
-                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
-                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
-                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
-                };
-
-                req.Failure += e => { LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})"); };
+                req.Failure += fail;
 
                 try
                 {
                     // intentionally blocking to limit web request concurrency
                     req.Perform(api);
+
+                    var res = req.Result;
+
+                    beatmap.Status = res.Status;
+                    beatmap.BeatmapSet.Status = res.BeatmapSet.Status;
+                    beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
+                    beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
+
+                    LogForModel(set, $"Online retrieval mapped {beatmap} to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.");
                 }
                 catch (Exception e)
                 {
+                    fail(e);
+                }
+
+                void fail(Exception e)
+                {
+                    beatmap.OnlineBeatmapID = null;
                     LogForModel(set, $"Online retrieval failed for {beatmap} ({e.Message})");
                 }
             }

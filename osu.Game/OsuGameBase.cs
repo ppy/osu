@@ -26,7 +26,6 @@ using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -75,8 +74,6 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        private Bindable<WorkingBeatmap> beatmap; // cached via load() method
-
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
@@ -86,7 +83,7 @@ namespace osu.Game
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -202,16 +199,16 @@ namespace osu.Game
             // this adds a global reduction of track volume for the time being.
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
-            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
+            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
                 if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
                     b.OldValue.RecycleTrack();
             }));
 
-            dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
-            dependencies.CacheAs(beatmap);
+            dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
+            dependencies.CacheAs(Beatmap);
 
             FileStore.Cleanup();
 
@@ -228,7 +225,7 @@ namespace osu.Game
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new ScalingContainer(ScalingMode.Everything) { Child = MenuCursorContainer });
+            base.Content.Add(CreateScalingContainer().WithChild(MenuCursorContainer));
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
@@ -237,6 +234,8 @@ namespace osu.Game
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
         }
+
+        protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
 
         protected override void LoadComplete()
         {
@@ -292,8 +291,10 @@ namespace osu.Game
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
+            {
                 if (importer.HandledExtensions.Contains(extension))
                     await importer.Import(paths);
+            }
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
