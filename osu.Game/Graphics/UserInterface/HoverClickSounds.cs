@@ -1,12 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -34,10 +36,21 @@ namespace osu.Game.Graphics.UserInterface
             this.buttons = buttons ?? new[] { MouseButton.Left };
         }
 
+        private ScheduledDelegate playDelegate;
+
         protected override bool OnClick(ClickEvent e)
         {
+            playDelegate?.Cancel();
+
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
-                sampleClick?.Play();
+            {
+                var debounceMs = (int)DebounceTime.TotalMilliseconds;
+
+                if (debounceMs == 0)
+                    sampleClick?.Play();
+                else
+                    playDelegate = Scheduler.AddDelayed(() => sampleClick?.Play(), debounceMs);
+            }
 
             return base.OnClick(e);
         }
