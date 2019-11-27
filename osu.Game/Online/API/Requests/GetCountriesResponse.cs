@@ -3,13 +3,13 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
     public class GetCountriesResponse : ResponseWithCursor
     {
         [JsonProperty("ranking")]
-        public List<APICountryRankings> Countries;
+        public List<CountryStatistics> Countries;
     }
 }
