@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -23,10 +22,9 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleHover;
 
         /// <summary>
-        /// Length of debounce for sound playback.
-        /// Set this to <see cref="TimeSpan.Zero"/> to disable debouncing.
+        /// Length of debounce for sound playback, in milliseconds. Default is 50ms.
         /// </summary>
-        public TimeSpan DebounceTime { get; set; } = TimeSpan.FromMilliseconds(50);
+        public double DebounceTime { get; set; } = 50;
 
         protected readonly HoverSampleSet SampleSet;
 
@@ -42,12 +40,10 @@ namespace osu.Game.Graphics.UserInterface
         {
             playDelegate?.Cancel();
 
-            var debounceMs = (int)DebounceTime.TotalMilliseconds;
-
-            if (debounceMs <= 0)
+            if (DebounceTime <= 0)
                 sampleHover?.Play();
             else
-                playDelegate = Scheduler.AddDelayed(() => sampleHover?.Play(), debounceMs);
+                playDelegate = Scheduler.AddDelayed(() => sampleHover?.Play(), DebounceTime);
 
             return base.OnHover(e);
         }
