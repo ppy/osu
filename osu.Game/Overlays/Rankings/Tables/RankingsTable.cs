@@ -23,23 +23,6 @@ namespace osu.Game.Overlays.Rankings.Tables
         private readonly int page;
         private readonly FillFlowContainer backgroundFlow;
 
-        public IReadOnlyList<TModel> Rankings
-        {
-            set
-            {
-                Content = null;
-                backgroundFlow.Clear();
-
-                if (value?.Any() != true)
-                    return;
-
-                value.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
-
-                Columns = CreateHeaders();
-                Content = value.Select((s, i) => CreateContent(page * items_per_page - (items_per_page - i), s)).ToArray().ToRectangular();
-            }
-        }
-
         protected RankingsTable(int page)
         {
             this.page = page;
@@ -56,6 +39,23 @@ namespace osu.Game.Overlays.Rankings.Tables
                 Depth = 1f,
                 Margin = new MarginPadding { Top = row_height }
             });
+        }
+
+        public IReadOnlyList<TModel> Rankings
+        {
+            set
+            {
+                Content = null;
+                backgroundFlow.Clear();
+
+                if (value?.Any() != true)
+                    return;
+
+                value.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
+
+                Columns = CreateHeaders();
+                Content = value.Select((s, i) => CreateContent(page * items_per_page - (items_per_page - i), s)).ToArray().ToRectangular();
+            }
         }
 
         protected abstract TableColumn[] CreateHeaders();
