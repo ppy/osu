@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
             Spacing = new Vector2(7, 0),
-            Children = new Drawable[]
+            Children = new[]
             {
                 new UpdateableFlag(GetCountry(item))
                 {

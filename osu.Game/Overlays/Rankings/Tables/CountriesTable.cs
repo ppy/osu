@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             Text = $@"{item.Country.FullName}",
         };
 
-        protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new[]
+        protected override Drawable[] CreateAdditionalContent(CountryStatistics item) => new Drawable[]
         {
             new ColoredRowText
             {
