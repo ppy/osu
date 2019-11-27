@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
@@ -77,12 +76,13 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
         private void scoresLoaded(IEnumerable<APIRoomScoreInfo> scores)
         {
-            Action<SpriteText> gray = s => s.Colour = colours.GrayC;
-            Action<SpriteText> white = s =>
+            void gray(SpriteText s) => s.Colour = colours.GrayC;
+
+            void white(SpriteText s)
             {
                 s.Font = s.Font.With(size: s.Font.Size * 1.4f);
                 s.Colour = colours.GrayF;
-            };
+            }
 
             rankText.AddText(name + "\n", white);
             rankText.AddText("You are placed ", gray);

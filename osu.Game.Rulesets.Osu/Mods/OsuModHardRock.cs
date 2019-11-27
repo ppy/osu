@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
-            var slider = hitObject as Slider;
-            if (slider == null)
+            if (!(hitObject is Slider slider))
                 return;
 
             slider.NestedHitObjects.OfType<SliderTick>().ForEach(h => h.Position = new Vector2(h.Position.X, OsuPlayfield.BASE_SIZE.Y - h.Position.Y));

@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Comments
                         }
                     }
                 },
-                sideNumber = new SpriteText
+                sideNumber = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
