@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return (trackStore ?? (trackStore = AudioManager.GetTrackStore(store))).Get(getPathForFile(Metadata.AudioFile));
+                    return (trackStore ??= AudioManager.GetTrackStore(store)).Get(getPathForFile(Metadata.AudioFile));
                 }
                 catch
                 {
