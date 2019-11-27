@@ -7,13 +7,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
 using osu.Game.Graphics.Containers;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class ScoresTable : RankingsTable<APIUserRankings>
+    public class ScoresTable : RankingsTable<UserStatistics>
     {
         public ScoresTable(int page = 1)
             : base(page)
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
-        protected override Drawable[] CreateContent(int index, APIUserRankings item)
+        protected override Drawable[] CreateContent(int index, UserStatistics item)
         {
             var content = new List<Drawable>
             {

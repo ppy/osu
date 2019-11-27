@@ -7,12 +7,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osu.Game.Online.API.Requests.Responses;
 using System;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
-    public class CountriesTable : RankingsTable<APICountryRankings>
+    public class CountriesTable : RankingsTable<CountryStatistics>
     {
         public CountriesTable(int page = 1)
             : base(page)
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             new TableColumn("Avg. Perf.", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         };
 
-        protected override Drawable[] CreateContent(int index, APICountryRankings item) => new Drawable[]
+        protected override Drawable[] CreateContent(int index, CountryStatistics item) => new Drawable[]
         {
             new OsuSpriteText
             {
