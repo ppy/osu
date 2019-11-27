@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public class Background : CompositeDrawable
     {
+        private const float blur_scale = 0.5f;
+
         public readonly Sprite Sprite;
 
         private readonly string textureName;
@@ -64,7 +66,10 @@ namespace osu.Game.Graphics.Backgrounds
                 });
             }
 
-            bufferedContainer?.BlurTo(newBlurSigma, duration, easing);
+            if (bufferedContainer != null)
+                bufferedContainer.FrameBufferScale = newBlurSigma == Vector2.Zero ? Vector2.One : new Vector2(blur_scale);
+
+            bufferedContainer?.BlurTo(newBlurSigma * blur_scale, duration, easing);
         }
     }
 }
