@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Play
                 },
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
-                    RequestSeek = GameplayClockContainer.Seek
+                    RequestSkip = GameplayClockContainer.Skip
                 },
                 FailOverlay = new FailOverlay
                 {
@@ -468,7 +468,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (breakOverlay.IsBreakTime.Value || GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            if (breakOverlay.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
