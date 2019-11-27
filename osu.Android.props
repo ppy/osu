@@ -1,5 +1,6 @@
 <Project>
-<PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
     <SchemaVersion>2.0</SchemaVersion>

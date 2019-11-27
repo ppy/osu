@@ -83,9 +83,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 storyboardSprite = null;
 
-                EventType type;
-
-                if (!Enum.TryParse(split[0], out type))
+                if (!Enum.TryParse(split[0], out EventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)

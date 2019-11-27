@@ -152,7 +152,7 @@ namespace osu.Game.Tournament.IPC
         {
             protected override string LocateBasePath()
             {
-                bool checkExists(string p)
+                static bool checkExists(string p)
                 {
                     return File.Exists(Path.Combine(p, "ipc.txt"));
                 }
@@ -180,7 +180,7 @@ namespace osu.Game.Tournament.IPC
                     try
                     {
                         using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                            stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(String.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+                            stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
                         if (checkExists(stableInstallPath))
                             return stableInstallPath;

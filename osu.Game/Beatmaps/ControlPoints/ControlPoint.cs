@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private ControlPointGroup controlPointGroup;
 
-        public void AttachGroup(ControlPointGroup pointGroup) => this.controlPointGroup = pointGroup;
+        public void AttachGroup(ControlPointGroup pointGroup) => controlPointGroup = pointGroup;
 
         public int CompareTo(ControlPoint other) => Time.CompareTo(other.Time);
 

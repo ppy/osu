@@ -226,9 +226,7 @@ namespace osu.Game.IO.Legacy
 
                 public override Type BindToType(string assemblyName, string typeName)
                 {
-                    Type typeToDeserialize;
-
-                    if (cache.TryGetValue(assemblyName + typeName, out typeToDeserialize))
+                    if (cache.TryGetValue(assemblyName + typeName, out var typeToDeserialize))
                         return typeToDeserialize;
 
                     List<Type> tmpTypes = new List<Type>();
