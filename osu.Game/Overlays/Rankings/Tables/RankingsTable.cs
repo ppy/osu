@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Rankings.Tables
                 value.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
 
                 Columns = CreateHeaders();
-                Content = value.Select((s, i) => CreateContent(page * items_per_page - (items_per_page - i), s)).ToArray().ToRectangular();
+                Content = value.Select((s, i) => CreateContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
             }
         }
 
