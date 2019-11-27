@@ -53,12 +53,18 @@ namespace osu.Game.Overlays.Rankings.Tables
 
                 value.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
 
-                Columns = CreateHeaders();
+                Columns = mainHeaders.Concat(CreateAdditionalHeaders()).ToArray();
                 Content = value.Select((s, i) => CreateContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
             }
         }
 
-        protected abstract TableColumn[] CreateHeaders();
+        private static TableColumn[] mainHeaders => new[]
+        {
+            new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.Absolute, 50)), // place
+            new TableColumn(string.Empty, Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed)), // flag and username (country name)
+        };
+
+        protected abstract TableColumn[] CreateAdditionalHeaders();
 
         protected abstract Drawable[] CreateContent(int index, TModel item);
 
