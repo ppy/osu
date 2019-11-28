@@ -82,7 +82,7 @@ Sometimes it may be necessary to cross-test changes in [osu-resources](https://g
 
 ### Code analysis
 
-Before committing your code, please run a code formatter. This can be achieved with running `dotnet format` in the command line, or the `Format code` command in your IDE.
+Before committing your code, please run a code formatter. This can be achieved by running `dotnet format` in the command line, or using the `Format code` command in your IDE.
 
 We have adopted some cross-platform, compiler integrated analyzers. They can provide warnings when you are editing, building inside IDE or from command line, as-if they are provided by the compiler itself.
 
