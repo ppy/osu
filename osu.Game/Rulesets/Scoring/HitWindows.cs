@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Scoring
                     return miss;
 
                 default:
-                    throw new ArgumentException(nameof(result));
+                    throw new ArgumentException("Unknown enum member", nameof(result));
             }
         }
 
