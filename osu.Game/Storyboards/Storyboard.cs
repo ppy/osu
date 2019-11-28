@@ -29,8 +29,7 @@ namespace osu.Game.Storyboards
 
         public StoryboardLayer GetLayer(string name)
         {
-            StoryboardLayer layer;
-            if (!layers.TryGetValue(name, out layer))
+            if (!layers.TryGetValue(name, out var layer))
                 layers[name] = layer = new StoryboardLayer(name, layers.Values.Min(l => l.Depth) - 1);
 
             return layer;
