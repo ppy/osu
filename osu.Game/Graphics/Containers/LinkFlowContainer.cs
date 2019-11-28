@@ -19,14 +19,8 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        private OsuGame game;
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game)
-        {
-            // will be null in tests
-            this.game = game;
-        }
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -82,7 +76,7 @@ namespace osu.Game.Graphics.Containers
                     if (action != null)
                         action();
                     else
-                        game.HandleLink(link);
+                        game?.HandleLink(link);
                 },
             });
         }
