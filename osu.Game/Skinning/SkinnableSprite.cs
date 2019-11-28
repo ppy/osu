@@ -28,14 +28,12 @@ namespace osu.Game.Skinning
 
         private class SpriteComponent : ISkinComponent
         {
-            private readonly string textureName;
-
             public SpriteComponent(string textureName)
             {
-                this.textureName = textureName;
+                LookupName = textureName;
             }
 
-            public string LookupName => textureName;
+            public string LookupName { get; }
         }
     }
 }
