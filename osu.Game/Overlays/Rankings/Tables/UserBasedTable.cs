@@ -28,39 +28,24 @@ namespace osu.Game.Overlays.Rankings.Tables
             new TableColumn("A", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
         }).ToArray();
 
-        protected override Country GetCountry(UserStatistics item) => item.User.Country;
+        protected sealed override Country GetCountry(UserStatistics item) => item.User.Country;
 
-        protected override Drawable CreateFlagContent(UserStatistics item)
+        protected sealed override Drawable CreateFlagContent(UserStatistics item)
         {
             var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: TEXT_SIZE)) { AutoSizeAxes = Axes.Both };
             username.AddUserLink(item.User);
             return username;
         }
 
-        protected override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]
+        protected sealed override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]
         {
-            new ColoredRowText
-            {
-                Text = $@"{item.Accuracy:F2}%",
-            },
-            new ColoredRowText
-            {
-                Text = $@"{item.PlayCount:N0}",
-            },
+            new ColoredRowText { Text = $@"{item.Accuracy:F2}%", },
+            new ColoredRowText { Text = $@"{item.PlayCount:N0}", },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {
-            new ColoredRowText
-            {
-                Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}",
-            },
-            new ColoredRowText
-            {
-                Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}",
-            },
-            new ColoredRowText
-            {
-                Text = $@"{item.GradesCount.A:N0}",
-            }
+            new ColoredRowText { Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}", },
+            new ColoredRowText { Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}", },
+            new ColoredRowText { Text = $@"{item.GradesCount.A:N0}", }
         }).ToArray();
 
         protected abstract TableColumn[] CreateUniqueHeaders();
