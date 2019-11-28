@@ -73,11 +73,7 @@ namespace osu.Game.Tests.Visual.Online
             request = new GetCountryRankingsRequest(ruleset, page);
             ((GetCountryRankingsRequest)request).Success += rankings => Schedule(() =>
             {
-                var table = new CountriesTable(page)
-                {
-                    Rankings = rankings.Countries,
-                };
-
+                var table = new CountriesTable(page, rankings.Countries);
                 loadTable(table);
             });
 
@@ -91,11 +87,7 @@ namespace osu.Game.Tests.Visual.Online
             request = new GetUserRankingsRequest(ruleset, country: country, page: page);
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
-                var table = new PerformanceTable(page)
-                {
-                    Rankings = rankings.Users,
-                };
-
+                var table = new PerformanceTable(page, rankings.Users);
                 loadTable(table);
             });
 
@@ -109,11 +101,7 @@ namespace osu.Game.Tests.Visual.Online
             request = new GetUserRankingsRequest(ruleset, UserRankingsType.Score, page);
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
-                var table = new ScoresTable(page)
-                {
-                    Rankings = rankings.Users,
-                };
-
+                var table = new ScoresTable(page, rankings.Users);
                 loadTable(table);
             });
 
