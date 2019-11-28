@@ -39,7 +39,6 @@
   <Rules AnalyzerId="Microsoft.CodeQuality.CSharp.Analyzers" RuleNamespace="Microsoft.CodeQuality.CSharp.Analyzers">
     <Rule Id="CA1001" Action="None" />
     <Rule Id="CA1032" Action="None" />
-    <Rule Id="CA1065" Action="None" />
     <Rule Id="CA2200" Action="None" />
   </Rules>
   <Rules AnalyzerId="Microsoft.NetCore.Analyzers" RuleNamespace="Microsoft.NetCore.Analyzers">
