@@ -192,7 +192,7 @@ namespace osu.Game.IO.Legacy
             }
         }
 
-        public class DynamicDeserializer
+        public static class DynamicDeserializer
         {
             private static VersionConfigToNamespaceAssemblyObjectBinder versionBinder;
             private static BinaryFormatter formatter;
