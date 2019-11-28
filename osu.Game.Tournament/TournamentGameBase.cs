@@ -129,6 +129,9 @@ namespace osu.Game.Tournament
                 ladder = new LadderInfo();
             }
 
+            if (ladder.Ruleset.Value == null)
+                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
+
             Ruleset.BindTo(ladder.Ruleset);
 
             dependencies.Cache(ladder);
