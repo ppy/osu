@@ -259,7 +259,7 @@ namespace osu.Game.Tournament.Components
                 Margin = new MarginPadding { Horizontal = 15, Vertical = 1 };
                 AutoSizeAxes = Axes.Both;
 
-                void cp(SpriteText s, Color4 colour)
+                static void cp(SpriteText s, Color4 colour)
                 {
                     s.Colour = colour;
                     s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
@@ -267,7 +267,7 @@ namespace osu.Game.Tournament.Components
 
                 for (var i = 0; i < tuples.Length; i++)
                 {
-                    var tuple = tuples[i];
+                    var (heading, content) = tuples[i];
 
                     if (i > 0)
                     {
@@ -278,9 +278,9 @@ namespace osu.Game.Tournament.Components
                         });
                     }
 
-                    AddText(new OsuSpriteText { Text = tuple.heading }, s => cp(s, OsuColour.Gray(0.33f)));
+                    AddText(new OsuSpriteText { Text = heading }, s => cp(s, OsuColour.Gray(0.33f)));
                     AddText(" ", s => cp(s, OsuColour.Gray(0.33f)));
-                    AddText(new OsuSpriteText { Text = tuple.content }, s => cp(s, OsuColour.Gray(0.5f)));
+                    AddText(new OsuSpriteText { Text = content }, s => cp(s, OsuColour.Gray(0.5f)));
                 }
             }
         }

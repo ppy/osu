@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
             this.beatmap = beatmap;
             this.mods = mods;
             this.gameplayStartTime = gameplayStartTime;
-            this.firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
+            firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
 
             RelativeSizeAxes = Axes.Both;
 

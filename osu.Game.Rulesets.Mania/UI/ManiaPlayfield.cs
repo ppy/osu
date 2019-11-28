@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var stage in stages)
             {
-                sum = sum + stage.Columns.Count;
+                sum += stage.Columns.Count;
                 if (sum > column)
                     return stage;
             }
