@@ -7,13 +7,14 @@ using System;
 using osu.Game.Users;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
     public class CountriesTable : RankingsTable<CountryStatistics>
     {
-        public CountriesTable(int page = 1)
-            : base(page)
+        public CountriesTable(int page, IReadOnlyList<CountryStatistics> rankings)
+            : base(page, rankings)
         {
         }
 

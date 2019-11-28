@@ -23,12 +23,9 @@ namespace osu.Game.Overlays.Rankings.Tables
         private const float row_height = 25;
         private const int items_per_page = 50;
 
-        private readonly int page;
-        private readonly FillFlowContainer backgroundFlow;
-
-        protected RankingsTable(int page)
+        protected RankingsTable(int page, IReadOnlyList<TModel> rankings)
         {
-            this.page = page;
+            FillFlowContainer backgroundFlow;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -42,23 +39,11 @@ namespace osu.Game.Overlays.Rankings.Tables
                 Depth = 1f,
                 Margin = new MarginPadding { Top = row_height }
             });
-        }
 
-        public IReadOnlyList<TModel> Rankings
-        {
-            set
-            {
-                Content = null;
-                backgroundFlow.Clear();
+            rankings.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
 
-                if (value?.Any() != true)
-                    return;
-
-                value.ForEach(_ => backgroundFlow.Add(new TableRowBackground()));
-
-                Columns = mainHeaders.Concat(CreateAdditionalHeaders()).ToArray();
-                Content = value.Select((s, i) => createContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
-            }
+            Columns = mainHeaders.Concat(CreateAdditionalHeaders()).ToArray();
+            Content = rankings.Select((s, i) => createContent((page - 1) * items_per_page + i, s)).ToArray().ToRectangular();
         }
 
         private Drawable[] createContent(int index, TModel item) => new Drawable[] { createIndexDrawable(index), createMainContent(item) }.Concat(CreateAdditionalContent(item)).ToArray();
