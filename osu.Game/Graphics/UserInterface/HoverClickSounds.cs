@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -7,7 +7,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -20,11 +19,6 @@ namespace osu.Game.Graphics.UserInterface
     {
         private SampleChannel sampleClick;
         private readonly MouseButton[] buttons;
-
-        /// <summary>
-        /// Length of debounce for click sound playback, in milliseconds. Default is 0ms.
-        /// </summary>
-        public double ClickDebounceTime { get; set; }
 
         /// <summary>
         /// a container which plays sounds on hover and click for any specified <see cref="MouseButton"/>s.
@@ -40,19 +34,10 @@ namespace osu.Game.Graphics.UserInterface
             this.buttons = buttons ?? new[] { MouseButton.Left };
         }
 
-        private ScheduledDelegate playDelegate;
-
         protected override bool OnClick(ClickEvent e)
         {
-            playDelegate?.Cancel();
-
             if (buttons.Contains(e.Button) && Contains(e.ScreenSpaceMousePosition))
-            {
-                if (ClickDebounceTime <= 0)
-                    sampleClick?.Play();
-                else
-                    playDelegate = Scheduler.AddDelayed(() => sampleClick?.Play(), ClickDebounceTime);
-            }
+                sampleClick?.Play();
 
             return base.OnClick(e);
         }
