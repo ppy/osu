@@ -1,7 +1,8 @@
 <!-- Contains required properties for osu!framework projects. -->
 <Project>
   <PropertyGroup Label="C#">
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>$(MSBuildThisFileDirectory)app.manifest</ApplicationManifest>
@@ -28,6 +29,7 @@
     <NoWarn>$(NoWarn);NU1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Nuget">
+    <IsPackable>false</IsPackable>
     <Authors>ppy Pty Ltd</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ppy/osu</PackageProjectUrl>

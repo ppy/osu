@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select
             newRoot.Filter(activeCriteria);
 
             // preload drawables as the ctor overhead is quite high currently.
-            var _ = newRoot.Drawables;
+            _ = newRoot.Drawables;
 
             root = newRoot;
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))

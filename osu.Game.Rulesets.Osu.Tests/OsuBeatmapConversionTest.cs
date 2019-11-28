@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     break;
             }
 
-            ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
+            static ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
             {
                 StartTime = obj.StartTime,
                 EndTime = obj.GetEndTime(),

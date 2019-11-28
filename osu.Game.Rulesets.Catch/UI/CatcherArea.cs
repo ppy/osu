@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
-                additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
+                additive.OriginPosition += new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
                 additive.Position = Position;
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
