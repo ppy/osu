@@ -113,6 +113,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [Ignore("Will be resolved with merge of https://github.com/ppy/osu/pull/6992")]
         public void TestExitTooSoon()
         {
             pauseAndConfirm();
