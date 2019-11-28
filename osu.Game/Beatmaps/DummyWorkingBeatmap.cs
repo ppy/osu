@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps
 
             private class DummyRuleset : Ruleset
             {
-                public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
+                public override IEnumerable<Mod> GetModsFor(ModType type) => Array.Empty<Mod>();
 
                 public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
                 {

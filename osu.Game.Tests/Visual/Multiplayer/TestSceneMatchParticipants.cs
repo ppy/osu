@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             });
 
             AddStep(@"set max", () => Room.MaxParticipants.Value = 10);
-            AddStep(@"clear users", () => Room.Participants.Value = new User[] { });
+            AddStep(@"clear users", () => Room.Participants.Value = System.Array.Empty<User>());
             AddStep(@"set max to null", () => Room.MaxParticipants.Value = null);
         }
     }
