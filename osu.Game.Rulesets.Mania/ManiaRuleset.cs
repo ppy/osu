@@ -158,7 +158,7 @@ namespace osu.Game.Rulesets.Mania
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Mania
                     return stage1Bindings.Concat(stage2Bindings);
             }
 
-            return new KeyBinding[0];
+            return Array.Empty<KeyBinding>();
         }
 
         public override string GetVariantName(int variant)

@@ -26,6 +26,7 @@ using osu.Game.Rulesets.Osu.Difficulty;
 using osu.Game.Rulesets.Osu.Skinning;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using System;
 
 namespace osu.Game.Rulesets.Osu
 {
@@ -149,7 +150,7 @@ namespace osu.Game.Rulesets.Osu
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
