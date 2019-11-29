@@ -1,5 +1,6 @@
 <Project>
-<PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
     <SchemaVersion>2.0</SchemaVersion>
@@ -53,6 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ppy.osu.Game.Resources" Version="2019.1010.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.1122.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.1128.1" />
   </ItemGroup>
 </Project>

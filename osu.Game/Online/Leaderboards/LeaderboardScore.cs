@@ -288,17 +288,15 @@ namespace osu.Game.Online.Leaderboards
         private class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
-
-            private readonly string name;
             private readonly FillFlowContainer content;
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText => name;
+            public string TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
-                name = statistic.Name;
+                TooltipText = statistic.Name;
                 AutoSizeAxes = Axes.Both;
 
                 Child = content = new FillFlowContainer

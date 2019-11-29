@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 if (progress % 2 >= 1)
                     progress = 1 - progress % 1;
                 else
-                    progress = progress % 1;
+                    progress %= 1;
 
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
                 var diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;

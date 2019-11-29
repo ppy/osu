@@ -54,8 +54,8 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
 
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
@@ -128,6 +128,9 @@ namespace osu.Game.Tournament
             {
                 ladder = new LadderInfo();
             }
+
+            if (ladder.Ruleset.Value == null)
+                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
 

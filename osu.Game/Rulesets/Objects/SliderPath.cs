@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Objects
 
             isInitialised = true;
 
-            controlPoints = controlPoints ?? Array.Empty<Vector2>();
+            controlPoints ??= Array.Empty<Vector2>();
             calculatedPath = new List<Vector2>();
             cumulativeLength = new List<double>();
 
