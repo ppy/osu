@@ -1,8 +1,7 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
@@ -11,7 +10,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
-using System;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
@@ -19,16 +17,20 @@ namespace osu.Game.Rulesets.Catch.Mods
     {
         public override string Description => @"Use the mouse to control the catcher.";
 
-        public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset) =>
-            ((Container)drawableRuleset.Playfield.Parent).Add(new CatchModRelaxHelper(drawableRuleset.Playfield as CatchPlayfield));
+        public void ApplyToDrawableRuleset(DrawableRuleset<CatchHitObject> drawableRuleset)
+        {
+            drawableRuleset.Cursor.Add(new MouseInputHelper((CatchPlayfield)drawableRuleset.Playfield));
+        }
 
-        private class CatchModRelaxHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
+        private class MouseInputHelper : Drawable, IKeyBindingHandler<CatchAction>, IRequireHighFrequencyMousePosition
         {
             private readonly CatcherArea.Catcher catcher;
 
-            public CatchModRelaxHelper(CatchPlayfield catchPlayfield)
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            public MouseInputHelper(CatchPlayfield playfield)
             {
-                catcher = catchPlayfield.CatcherArea.MovableCatcher;
+                catcher = playfield.CatcherArea.MovableCatcher;
                 RelativeSizeAxes = Axes.Both;
             }
 
