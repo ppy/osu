@@ -58,7 +58,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 userVotes = value;
                 userVotes.ForEach(v =>
                 {
-                    foreach(var c in Comments)
+                    foreach (var c in Comments)
                     {
                         if (v == c.Id)
                         {
