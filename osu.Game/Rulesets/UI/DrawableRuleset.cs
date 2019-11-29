@@ -224,7 +224,7 @@ namespace osu.Game.Rulesets.UI
             Playfield.PostProcess();
 
             foreach (var mod in mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
+                mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
         }
 
         public override void RequestResume(Action continueResume)
@@ -246,9 +246,9 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
+        /// Creates and adds the visual representation of a <typeparamref name="TObject"/> to this <see cref="DrawableRuleset{TObject}"/>.
         /// </summary>
-        /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
+        /// <param name="hitObject">The <typeparamref name="TObject"/> to add the visual representation for.</param>
         private void addHitObject(TObject hitObject)
         {
             var drawableObject = CreateDrawableRepresentation(hitObject);
@@ -436,8 +436,10 @@ namespace osu.Game.Rulesets.UI
                         return h.HitWindows;
 
                     foreach (var n in h.NestedHitObjects)
+                    {
                         if (h.HitWindows.WindowFor(HitResult.Miss) > 0)
                             return n.HitWindows;
+                    }
                 }
 
                 return null;
@@ -514,6 +516,12 @@ namespace osu.Game.Rulesets.UI
         public BindableDouble Balance => throw new NotImplementedException();
 
         public BindableDouble Frequency => throw new NotImplementedException();
+
+        public IBindable<double> AggregateVolume => throw new NotImplementedException();
+
+        public IBindable<double> AggregateBalance => throw new NotImplementedException();
+
+        public IBindable<double> AggregateFrequency => throw new NotImplementedException();
 
         public int PlaybackConcurrency
         {

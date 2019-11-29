@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
-                additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
+                additive.OriginPosition += new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
                 additive.Position = Position;
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     fruit.Y -= RNG.NextSingle() * diff;
                 }
 
-                fruit.X = MathHelper.Clamp(fruit.X, -CATCHER_SIZE / 2, CATCHER_SIZE / 2);
+                fruit.X = Math.Clamp(fruit.X, -CATCHER_SIZE / 2, CATCHER_SIZE / 2);
 
                 caughtFruit.Add(fruit);
             }
@@ -378,7 +378,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 double speed = BASE_SPEED * dashModifier * hyperDashModifier;
 
                 Scale = new Vector2(Math.Abs(Scale.X) * direction, Scale.Y);
-                X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * speed, 0, 1);
+                X = (float)Math.Clamp(X + direction * Clock.ElapsedFrameTime * speed, 0, 1);
 
                 // Correct overshooting.
                 if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||

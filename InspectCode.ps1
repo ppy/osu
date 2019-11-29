@@ -21,7 +21,7 @@ if ($DryRun) { $cakeArguments += "-dryrun" }
 if ($Experimental) { $cakeArguments += "-experimental" }
 $cakeArguments += $ScriptArgs
 
-dotnet tool install Cake.Tool --global --version 0.35.0
-dotnet cake ./build/build.cake --bootstrap
-dotnet cake ./build/build.cake $cakeArguments
+dotnet tool restore
+dotnet cake ./build/InspectCode.cake --bootstrap
+dotnet cake ./build/InspectCode.cake $cakeArguments
 exit $LASTEXITCODE

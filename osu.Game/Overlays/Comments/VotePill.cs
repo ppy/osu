@@ -48,8 +48,6 @@ namespace osu.Game.Overlays.Comments
         {
             this.comment = comment;
 
-            Action = onAction;
-
             AutoSizeAxes = Axes.X;
             Height = 20;
             LoadingAnimationSize = new Vector2(10);
@@ -60,6 +58,9 @@ namespace osu.Game.Overlays.Comments
         {
             AccentColour = borderContainer.BorderColour = sideNumber.Colour = colours.GreenLight;
             hoverLayer.Colour = Color4.Black.Opacity(0.5f);
+
+            if (api.IsLoggedIn && api.LocalUser.Value.Id != comment.UserId)
+                Action = onAction;
         }
 
         protected override void LoadComplete()
@@ -109,7 +110,7 @@ namespace osu.Game.Overlays.Comments
                         }
                     }
                 },
-                sideNumber = new SpriteText
+                sideNumber = new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
@@ -157,6 +158,9 @@ namespace osu.Game.Overlays.Comments
 
         private void updateDisplay()
         {
+            if (Action == null)
+                return;
+
             if (isVoted.Value)
             {
                 hoverLayer.FadeTo(IsHovered ? 1 : 0);

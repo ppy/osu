@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -9,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
@@ -28,6 +28,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// The snapping time at <see cref="CentrePosition"/>.
         /// </summary>
         protected double StartTime { get; private set; }
+
+        /// <summary>
+        /// The maximum number of distance snapping intervals allowed.
+        /// </summary>
+        protected int MaxIntervals { get; private set; }
 
         /// <summary>
         /// The position which the grid is centred on.
@@ -49,19 +54,22 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private readonly Cached gridCache = new Cached();
         private readonly HitObject hitObject;
+        private readonly HitObject nextHitObject;
 
-        protected DistanceSnapGrid(HitObject hitObject, Vector2 centrePosition)
+        protected DistanceSnapGrid(HitObject hitObject, [CanBeNull] HitObject nextHitObject, Vector2 centrePosition)
         {
             this.hitObject = hitObject;
+            this.nextHitObject = nextHitObject;
 
             CentrePosition = centrePosition;
+
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            StartTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
+            StartTime = hitObject.GetEndTime();
         }
 
         protected override void LoadComplete()
@@ -74,6 +82,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void updateSpacing()
         {
             DistanceSpacing = SnapProvider.GetBeatSnapDistanceAt(StartTime);
+
+            if (nextHitObject == null)
+                MaxIntervals = int.MaxValue;
+            else
+            {
+                // +1 is added since a snapped hitobject may have its start time slightly less than the snapped time due to floating point errors
+                double maxDuration = nextHitObject.StartTime - StartTime + 1;
+                MaxIntervals = (int)(maxDuration / SnapProvider.DistanceToDuration(StartTime, DistanceSpacing));
+            }
+
             gridCache.Invalidate();
         }
 

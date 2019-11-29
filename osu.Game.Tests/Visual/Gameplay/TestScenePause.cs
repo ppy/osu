@@ -113,6 +113,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [Ignore("Will be resolved with merge of https://github.com/ppy/osu/pull/6992")]
         public void TestExitTooSoon()
         {
             pauseAndConfirm();
@@ -212,6 +213,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        [Ignore("Will be resolved with merge of https://github.com/ppy/osu/pull/6992")]
         public void TestRestartAfterResume()
         {
             pauseAndConfirm();
@@ -237,6 +239,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player not exited", () => Player.IsCurrentScreen());
             AddStep("exit", () => Player.Exit());
             confirmExited();
+            confirmNoTrackAdjustments();
         }
 
         private void confirmPaused()
@@ -256,6 +259,11 @@ namespace osu.Game.Tests.Visual.Gameplay
         private void confirmExited()
         {
             AddUntilStep("player exited", () => !Player.IsCurrentScreen());
+        }
+
+        private void confirmNoTrackAdjustments()
+        {
+            AddAssert("track has no adjustments", () => Beatmap.Value.Track.AggregateFrequency.Value == 1);
         }
 
         private void restart() => AddStep("restart", () => Player.Restart());

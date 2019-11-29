@@ -7,43 +7,29 @@ var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Build");
+var target = Argument("target", "CodeAnalysis");
 var configuration = Argument("configuration", "Release");
 
 var rootDirectory = new DirectoryPath("..");
-var solution = rootDirectory.CombineWithFilePath("osu.sln");
+var sln = rootDirectory.CombineWithFilePath("osu.sln");
+var desktopSlnf = rootDirectory.CombineWithFilePath("osu.Desktop.slnf");
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
 ///////////////////////////////////////////////////////////////////////////////
 
-Task("Compile")
-    .Does(() => {
-        DotNetCoreBuild(solution.FullPath, new DotNetCoreBuildSettings {
-            Configuration = configuration,
-        });
-    });
-
-Task("Test")
-    .IsDependentOn("Compile")
-    .Does(() => {
-        var testAssemblies = GetFiles(rootDirectory + "/**/*.Tests/bin/**/*.Tests.dll");
-
-        DotNetCoreVSTest(testAssemblies, new DotNetCoreVSTestSettings {
-            Logger = AppVeyor.IsRunningOnAppVeyor ? "Appveyor" : $"trx",
-            Parallel = true,
-            ToolTimeout = TimeSpan.FromMinutes(10),
-        });
-    });
-
-// windows only because both inspectcore and nvika depend on net45
+// windows only because both inspectcode and nvika depend on net45
 Task("InspectCode")
     .WithCriteria(IsRunningOnWindows())
-    .IsDependentOn("Compile")
     .Does(() => {
-        InspectCode(solution, new InspectCodeSettings {
+        InspectCode(desktopSlnf, new InspectCodeSettings {
             CachesHome = "inspectcode",
             OutputFile = "inspectcodereport.xml",
+            ArgumentCustomization = arg => {
+                if (AppVeyor.IsRunningOnAppVeyor) // Don't flood CI output
+                    arg.Append("--verbosity:WARN");
+                    return arg;
+            },
         });
 
         int returnCode = StartProcess(nVikaToolPath, $@"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
@@ -59,9 +45,8 @@ Task("CodeFileSanity")
         });
     });
 
-Task("Build")
+Task("CodeAnalysis")
     .IsDependentOn("CodeFileSanity")
-    .IsDependentOn("InspectCode")
-    .IsDependentOn("Test");
+    .IsDependentOn("InspectCode");
 
 RunTarget(target);
