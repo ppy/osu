@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -38,14 +38,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                //lock catcher to mouse position horizontally
-                catcher.X = e.MousePosition.X / DrawSize.X;
-
-                //make Yuzu face the direction he's moving
-                var direction = Math.Sign(e.Delta.X);
-                if (direction != 0)
-                    catcher.Scale = new Vector2(Math.Abs(catcher.Scale.X) * direction, catcher.Scale.Y);
-
+                catcher.UpdatePosition(e.MousePosition.X / DrawSize.X);
                 return base.OnMouseMove(e);
             }
         }
