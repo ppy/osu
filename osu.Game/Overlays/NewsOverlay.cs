@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -56,13 +57,31 @@ namespace osu.Game.Overlays
             };
 
             header.Current.BindTo(Current);
+
             Current.TriggerChange();
         }
 
-        public void ShowFrontPage()
+        private CancellationTokenSource loadChildCancellation;
+
+        protected void LoadChildContent(NewsContent newContent)
         {
-            Current.Value = null;
+            content.FadeTo(0.2f, 300, Easing.OutQuint);
+
+            loadChildCancellation?.Cancel();
+
+            LoadComponentAsync(newContent, c =>
+            {
+                content.Child = c;
+                content.FadeIn(300, Easing.OutQuint);
+            }, (loadChildCancellation = new CancellationTokenSource()).Token);
+        }
+
+        public void ShowArticle(string article)
+        {
+            Current.Value = article;
             Show();
         }
+
+        public void ShowFrontPage() => ShowArticle(null);
     }
 }
