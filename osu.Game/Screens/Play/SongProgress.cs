@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play
@@ -34,7 +33,8 @@ namespace osu.Game.Screens.Play
         public override bool HandleNonPositionalInput => AllowSeeking;
         public override bool HandlePositionalInput => AllowSeeking;
 
-        private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
+        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+        private double lastHitTime => objects.Last().GetEndTime() + 1;
 
         private double firstHitTime => objects.First().StartTime;
 

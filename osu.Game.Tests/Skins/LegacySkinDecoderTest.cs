@@ -25,7 +25,9 @@ namespace osu.Game.Tests.Skins
                 var comboColors = decoder.Decode(stream).ComboColours;
 
                 List<Color4> expectedColors;
+
                 if (hasColours)
+                {
                     expectedColors = new List<Color4>
                     {
                         new Color4(142, 199, 255, 255),
@@ -33,6 +35,7 @@ namespace osu.Game.Tests.Skins
                         new Color4(128, 255, 255, 255),
                         new Color4(100, 100, 100, 100),
                     };
+                }
                 else
                     expectedColors = new DefaultSkin().Configuration.ComboColours;
 
@@ -55,6 +58,33 @@ namespace osu.Game.Tests.Skins
                 Assert.AreEqual("test skin", config.SkinInfo.Name);
                 Assert.AreEqual("TestValue", config.ConfigDictionary["TestLookup"]);
             }
+        }
+
+        [Test]
+        public void TestDecodeSpecifiedVersion()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-20.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.AreEqual(2.0m, decoder.Decode(stream).LegacyVersion);
+        }
+
+        [Test]
+        public void TestDecodeLatestVersion()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-latest.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.AreEqual(LegacySkinConfiguration.LATEST_VERSION, decoder.Decode(stream).LegacyVersion);
+        }
+
+        [Test]
+        public void TestDecodeNoVersion()
+        {
+            var decoder = new LegacySkinDecoder();
+            using (var resStream = TestResources.OpenResource("skin-empty.ini"))
+            using (var stream = new LineBufferedReader(resStream))
+                Assert.IsNull(decoder.Decode(stream).LegacyVersion);
         }
     }
 }

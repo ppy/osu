@@ -29,7 +29,7 @@ namespace osu.Game.Updater
             version = game.Version;
 
             if (game.IsDeployedBuild)
-                Schedule(() => Task.Run(() => checkForUpdateAsync()));
+                Schedule(() => Task.Run(checkForUpdateAsync));
         }
 
         private async void checkForUpdateAsync()

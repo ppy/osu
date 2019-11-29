@@ -100,7 +100,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             var diff = Math.Max(score1.Value, score2.Value) - Math.Min(score1.Value, score2.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
-            winningBar.ResizeWidthTo(Math.Min(0.4f, (float)Math.Pow(diff / 1500000f, 0.5) / 2), 400, Easing.OutQuint);
+            winningBar.ResizeWidthTo(Math.Min(0.4f, MathF.Pow(diff / 1500000f, 0.5f) / 2), 400, Easing.OutQuint);
         }
 
         protected override void Update()

@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Objects
             set => StartTimeBindable.Value = value;
         }
 
-        private List<HitSampleInfo> samples;
+        public readonly BindableList<HitSampleInfo> SamplesBindable = new BindableList<HitSampleInfo>();
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
@@ -54,10 +54,14 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public List<HitSampleInfo> Samples
+        public IList<HitSampleInfo> Samples
         {
-            get => samples ?? (samples = new List<HitSampleInfo>());
-            set => samples = value;
+            get => SamplesBindable;
+            set
+            {
+                SamplesBindable.Clear();
+                SamplesBindable.AddRange(value);
+            }
         }
 
         [JsonIgnore]
@@ -153,5 +157,18 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
+    }
+
+    public static class HitObjectExtensions
+    {
+        /// <summary>
+        /// Returns the end time of this object.
+        /// </summary>
+        /// <remarks>
+        /// This returns the <see cref="IHasEndTime.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
+        /// </remarks>
+        /// <param name="hitObject">The object.</param>
+        /// <returns>The end time of this object.</returns>
+        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
     }
 }
