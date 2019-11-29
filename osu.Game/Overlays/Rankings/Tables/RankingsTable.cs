@@ -23,15 +23,25 @@ namespace osu.Game.Overlays.Rankings.Tables
         private const float row_height = 25;
         private const int items_per_page = 50;
 
+        private readonly int page;
+        private readonly IReadOnlyList<TModel> rankings;
+
         protected RankingsTable(int page, IReadOnlyList<TModel> rankings)
         {
-            FillFlowContainer backgroundFlow;
+            this.page = page;
+            this.rankings = rankings;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
             Padding = new MarginPadding { Horizontal = horizontal_inset };
             RowSize = new Dimension(GridSizeMode.Absolute, row_height);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            FillFlowContainer backgroundFlow;
 
             AddInternal(backgroundFlow = new FillFlowContainer
             {
