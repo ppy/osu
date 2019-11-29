@@ -370,6 +370,7 @@ namespace osu.Game.Screens.Ranking.Pages
             }
         }
 
+        [LongRunningLoad]
         private class UserHeader : Container
         {
             private readonly User user;
