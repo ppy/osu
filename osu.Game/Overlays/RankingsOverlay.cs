@@ -111,9 +111,6 @@ namespace osu.Game.Overlays
 
             Show();
 
-            if (country.Value?.FlagName == requested.FlagName)
-                return;
-
             country.Value = requested;
         }
 
