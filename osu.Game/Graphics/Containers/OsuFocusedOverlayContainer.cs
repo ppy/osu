@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            closeOnMouseUp = !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition) ? true : false;
+            closeOnMouseUp = !base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition);
 
             return base.OnMouseDown(e);
         }
