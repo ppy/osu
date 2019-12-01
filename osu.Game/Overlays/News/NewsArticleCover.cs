@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.News
             [BackgroundDependencyLoader]
             private void load(LargeTextureStore store)
             {
-                Texture = store.Get(url ?? "Headers/changelog");
+                Texture = store.Get(url ?? "Headers/news");
             }
         }
     }

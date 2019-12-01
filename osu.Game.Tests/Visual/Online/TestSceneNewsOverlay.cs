@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.News;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -41,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             public TestNewsContent()
             {
-                Spacing = new osuTK.Vector2(0, 10);
+                Spacing = new Vector2(0, 10);
                 Add(new TestCard("https://osu.ppy.sh/help/wiki/shared/news/banners/CWC_2019_banner.jpg"));
                 Add(new TestCard("https://osu.ppy.sh/help/wiki/shared/news/banners/CWC_2019_banner.jpg"));
                 Add(new TestCard("https://osu.ppy.sh/help/wiki/shared/news/banners/CWC_2019_banner.jpg"));
