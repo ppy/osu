@@ -20,6 +20,6 @@ namespace osu.Game.Users
         [JsonProperty(@"code")]
         public string FlagName;
 
-        public bool Equals(Country other) => FlagName == other.FlagName;
+        public bool Equals(Country other) => FlagName == other?.FlagName;
     }
 }
