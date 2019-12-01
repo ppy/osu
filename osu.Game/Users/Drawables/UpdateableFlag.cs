@@ -43,9 +43,7 @@ namespace osu.Game.Users.Drawables
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Country != null)
-                rankingsOverlay?.ShowCountry(Country);
-
+            rankingsOverlay?.ShowCountry(Country);
             return true;
         }
     }
