@@ -4,7 +4,6 @@
 using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
-using System.Threading.Tasks;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -48,7 +47,7 @@ namespace osu.Game.Overlays.Comments
                 else
                     AddComments(response, false);
             };
-            Task.Run(() => request.Perform(API));
+            API.PerformAsync(request);
         }
 
         protected override void Dispose(bool isDisposing)
