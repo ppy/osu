@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             request = new GetBeatmapSetRequest(beatmap.OnlineBeatmapID.Value, BeatmapSetLookupType.BeatmapId);
             request.Success += res => Schedule(() =>
             {
-                panel = new DirectGridPanel(res.ToBeatmapSet(rulesets));
+                panel = new DirectGridPanel(res.ToBeatmapSet(rulesets), false);
                 LoadComponentAsync(panel, AddInternal, loadCancellation.Token);
             });
 

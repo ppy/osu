@@ -44,10 +44,13 @@ namespace osu.Game.Overlays.Direct
 
         protected override Container<Drawable> Content => content;
 
-        protected DirectPanel(BeatmapSetInfo setInfo)
+        private readonly bool fetchOnline;
+
+        protected DirectPanel(BeatmapSetInfo setInfo, bool fetchOnline = false)
         {
             Debug.Assert(setInfo.OnlineBeatmapSetID != null);
 
+            this.fetchOnline = fetchOnline;
             SetInfo = setInfo;
         }
 
@@ -123,7 +126,10 @@ namespace osu.Game.Overlays.Direct
         protected override bool OnClick(ClickEvent e)
         {
             Debug.Assert(SetInfo.OnlineBeatmapSetID != null);
-            beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
+            if (fetchOnline)
+                beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
+            else
+                beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
             return true;
         }
 
