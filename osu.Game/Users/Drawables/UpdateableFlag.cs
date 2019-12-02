@@ -23,7 +23,7 @@ namespace osu.Game.Users.Drawables
         {
             Country = country;
         }
-
+        
         protected override Drawable CreateDrawable(Country country)
         {
             if (country == null && !ShowPlaceholderOnNull)

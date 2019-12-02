@@ -19,7 +19,7 @@ namespace osu.Game.Users.Drawables
         {
             this.country = country;
         }
-
+        
         [BackgroundDependencyLoader]
         private void load(TextureStore ts)
         {

@@ -128,6 +128,7 @@ namespace osu.Game.Users
                                         Text = user.Username,
                                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 18, italics: true),
                                     },
+
                                     infoContainer = new FillFlowContainer
                                     {
                                         Anchor = Anchor.BottomLeft,
@@ -143,6 +144,25 @@ namespace osu.Game.Users
                                                 Width = 30f,
                                                 RelativeSizeAxes = Axes.Y,
                                             },
+
+                                            // new UpdateableRank(user.Statics.Rank)
+                                            // {
+                                            //     Width = 30f,
+                                            //     RelativeSizeAxes = Axes.Y,
+                                            // },
+                                            
+                                            new OsuSpriteText
+                                            {
+                                                Text = "#" + user.Statistics.Ranks.Global.ToString(),
+                                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 24, italics: true),
+                                            },
+
+                                            new OsuSpriteText
+                                            {
+                                                Text = "#" + user.Statistics.Ranks.Country.ToString(),
+                                                Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 24, italics: true),
+                                            },
+
                                         },
                                     },
                                 },
