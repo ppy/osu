@@ -99,17 +99,7 @@ namespace osu.Game.Database
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    request.Perform(api);
-                }
-                catch (Exception error)
-                {
-                    triggerFailure(error);
-                }
-            }, TaskCreationOptions.LongRunning);
+            api.PerformAsync(request);
 
             DownloadBegan?.Invoke(request);
             return true;
