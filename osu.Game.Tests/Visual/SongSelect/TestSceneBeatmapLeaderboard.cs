@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
@@ -62,7 +61,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     Accuracy = 1,
                     MaxCombo = 244,
                     TotalScore = 1707827,
-                    Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                    Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
                     User = new User
                     {
                         Id = 6602580,
