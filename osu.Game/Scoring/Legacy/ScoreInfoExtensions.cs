@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
 {
-    public static class ScoreInfoLegacyExtensions
+    public static class ScoreInfoExtensions
     {
         public static int? GetCountGeki(this ScoreInfo scoreInfo)
         {
