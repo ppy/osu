@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             mods = Score.Mods;
             countGreat = Score.Statistics[HitResult.Great];
             countGood = Score.Statistics[HitResult.Good];
-            countMeh =Score.Statistics[HitResult.Meh];
+            countMeh = Score.Statistics[HitResult.Meh];
             countMiss = Score.Statistics[HitResult.Miss];
 
             // Don't count scores made with supposedly unranked mods
