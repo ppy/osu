@@ -280,7 +280,7 @@ namespace osu.Game.Rulesets.Objects
             if (other.ControlPoints == null && ControlPoints != null)
                 return false;
 
-            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
+            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance == other.ExpectedDistance && Type == other.Type;
         }
     }
 }
