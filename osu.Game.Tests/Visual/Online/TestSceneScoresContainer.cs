@@ -224,10 +224,13 @@ namespace osu.Game.Tests.Visual.Online
 
             foreach (var s in allScores.Scores)
             {
-                s.Statistics.Add("count_300", RNG.Next(2000));
-                s.Statistics.Add("count_100", RNG.Next(2000));
-                s.Statistics.Add("count_50", RNG.Next(2000));
-                s.Statistics.Add("count_miss", RNG.Next(2000));
+                s.Statistics = new Dictionary<string, int>
+                {
+                    { "count_300", RNG.Next(2000) },
+                    { "count_100", RNG.Next(2000) },
+                    { "count_50", RNG.Next(2000) },
+                    { "count_miss", RNG.Next(2000) }
+                };
             }
 
             AddStep("Load all scores", () =>
