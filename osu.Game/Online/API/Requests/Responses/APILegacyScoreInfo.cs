@@ -40,33 +40,36 @@ namespace osu.Game.Online.API.Requests.Responses
                 Mods = mods,
             };
 
-            foreach (var kvp in Statistics)
+            if (Statistics != null)
             {
-                switch (kvp.Key)
+                foreach (var kvp in Statistics)
                 {
-                    case @"count_geki":
-                        scoreInfo.SetCountGeki(kvp.Value);
-                        break;
+                    switch (kvp.Key)
+                    {
+                        case @"count_geki":
+                            scoreInfo.SetCountGeki(kvp.Value);
+                            break;
 
-                    case @"count_300":
-                        scoreInfo.SetCount300(kvp.Value);
-                        break;
+                        case @"count_300":
+                            scoreInfo.SetCount300(kvp.Value);
+                            break;
 
-                    case @"count_katu":
-                        scoreInfo.SetCountKatu(kvp.Value);
-                        break;
+                        case @"count_katu":
+                            scoreInfo.SetCountKatu(kvp.Value);
+                            break;
 
-                    case @"count_100":
-                        scoreInfo.SetCount100(kvp.Value);
-                        break;
+                        case @"count_100":
+                            scoreInfo.SetCount100(kvp.Value);
+                            break;
 
-                    case @"count_50":
-                        scoreInfo.SetCount50(kvp.Value);
-                        break;
+                        case @"count_50":
+                            scoreInfo.SetCount50(kvp.Value);
+                            break;
 
-                    case @"count_miss":
-                        scoreInfo.SetCountMiss(kvp.Value);
-                        break;
+                        case @"count_miss":
+                            scoreInfo.SetCountMiss(kvp.Value);
+                            break;
+                    }
                 }
             }
 
