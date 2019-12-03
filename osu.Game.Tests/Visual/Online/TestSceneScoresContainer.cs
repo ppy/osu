@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -9,9 +9,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.BeatmapSet.Scores;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using osuTK.Graphics;
@@ -66,12 +64,12 @@ namespace osu.Game.Tests.Visual.Online
                                 FlagName = @"ES",
                             },
                         },
-                        Mods = new Mod[]
+                        Mods = new[]
                         {
-                            new OsuModDoubleTime(),
-                            new OsuModHidden(),
-                            new OsuModFlashlight(),
-                            new OsuModHardRock(),
+                            new OsuModDoubleTime().Acronym,
+                            new OsuModHidden().Acronym,
+                            new OsuModFlashlight().Acronym,
+                            new OsuModHardRock().Acronym,
                         },
                         Rank = ScoreRank.XH,
                         PP = 200,
@@ -91,11 +89,11 @@ namespace osu.Game.Tests.Visual.Online
                                 FlagName = @"BR",
                             },
                         },
-                        Mods = new Mod[]
+                        Mods = new[]
                         {
-                            new OsuModDoubleTime(),
-                            new OsuModHidden(),
-                            new OsuModFlashlight(),
+                            new OsuModDoubleTime().Acronym,
+                            new OsuModHidden().Acronym,
+                            new OsuModFlashlight().Acronym,
                         },
                         Rank = ScoreRank.S,
                         PP = 190,
@@ -115,10 +113,10 @@ namespace osu.Game.Tests.Visual.Online
                                 FlagName = @"JP",
                             },
                         },
-                        Mods = new Mod[]
+                        Mods = new[]
                         {
-                            new OsuModDoubleTime(),
-                            new OsuModHidden(),
+                            new OsuModDoubleTime().Acronym,
+                            new OsuModHidden().Acronym,
                         },
                         Rank = ScoreRank.B,
                         PP = 180,
@@ -138,9 +136,9 @@ namespace osu.Game.Tests.Visual.Online
                                 FlagName = @"CA",
                             },
                         },
-                        Mods = new Mod[]
+                        Mods = new[]
                         {
-                            new OsuModDoubleTime(),
+                            new OsuModDoubleTime().Acronym,
                         },
                         Rank = ScoreRank.C,
                         PP = 170,
@@ -208,12 +206,12 @@ namespace osu.Game.Tests.Visual.Online
                                 FlagName = @"ES",
                             },
                         },
-                        Mods = new Mod[]
+                        Mods = new[]
                         {
-                            new OsuModDoubleTime(),
-                            new OsuModHidden(),
-                            new OsuModFlashlight(),
-                            new OsuModHardRock(),
+                            new OsuModDoubleTime().Acronym,
+                            new OsuModHidden().Acronym,
+                            new OsuModFlashlight().Acronym,
+                            new OsuModHardRock().Acronym,
                         },
                         Rank = ScoreRank.XH,
                         PP = 200,
@@ -226,10 +224,10 @@ namespace osu.Game.Tests.Visual.Online
 
             foreach (var s in allScores.Scores)
             {
-                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
-                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
-                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
-                s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
+                s.Statistics.Add("count_300", RNG.Next(2000));
+                s.Statistics.Add("count_100", RNG.Next(2000));
+                s.Statistics.Add("count_50", RNG.Next(2000));
+                s.Statistics.Add("count_miss", RNG.Next(2000));
             }
 
             AddStep("Load all scores", () =>

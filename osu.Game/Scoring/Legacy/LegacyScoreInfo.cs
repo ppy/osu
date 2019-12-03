@@ -5,114 +5,139 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring.Legacy
 {
-    public class LegacyScoreInfo : ScoreInfo
+    public static class ScoreInfoLegacyExtensions
     {
-        private int countGeki;
-
-        public int CountGeki
+        public static int? GetCountGeki(this ScoreInfo scoreInfo)
         {
-            get => countGeki;
-            set
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
-                countGeki = value;
+                case 3:
+                    return scoreInfo.Statistics[HitResult.Perfect];
+            }
 
-                switch (Ruleset?.ID ?? RulesetID)
-                {
-                    case 3:
-                        Statistics[HitResult.Perfect] = value;
-                        break;
-                }
+            return null;
+        }
+
+        public static void SetCountGeki(this ScoreInfo scoreInfo, int value)
+        {
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+            {
+                case 3:
+                    scoreInfo.Statistics[HitResult.Perfect] = value;
+                    break;
             }
         }
 
-        private int count300;
-
-        public int Count300
+        public static int? GetCount300(this ScoreInfo scoreInfo)
         {
-            get => count300;
-            set
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
-                count300 = value;
+                case 0:
+                case 1:
+                case 3:
+                    return scoreInfo.Statistics[HitResult.Great];
 
-                switch (Ruleset?.ID ?? RulesetID)
-                {
-                    case 0:
-                    case 1:
-                    case 3:
-                        Statistics[HitResult.Great] = value;
-                        break;
+                case 2:
+                    return scoreInfo.Statistics[HitResult.Perfect];
+            }
 
-                    case 2:
-                        Statistics[HitResult.Perfect] = value;
-                        break;
-                }
+            return null;
+        }
+
+        public static void SetCount300(this ScoreInfo scoreInfo, int value)
+        {
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+            {
+                case 0:
+                case 1:
+                case 3:
+                    scoreInfo.Statistics[HitResult.Great] = value;
+                    break;
+
+                case 2:
+                    scoreInfo.Statistics[HitResult.Perfect] = value;
+                    break;
             }
         }
 
-        private int countKatu;
-
-        public int CountKatu
+        public static int? GetCountKatu(this ScoreInfo scoreInfo)
         {
-            get => countKatu;
-            set
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
-                countKatu = value;
+                case 3:
+                    return scoreInfo.Statistics[HitResult.Good];
+            }
 
-                switch (Ruleset?.ID ?? RulesetID)
-                {
-                    case 3:
-                        Statistics[HitResult.Good] = value;
-                        break;
-                }
+            return null;
+        }
+
+        public static void SetCountKatu(this ScoreInfo scoreInfo, int value)
+        {
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+            {
+                case 3:
+                    scoreInfo.Statistics[HitResult.Good] = value;
+                    break;
             }
         }
 
-        private int count100;
-
-        public int Count100
+        public static int? GetCount100(this ScoreInfo scoreInfo)
         {
-            get => count100;
-            set
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
-                count100 = value;
+                case 0:
+                case 1:
+                    return scoreInfo.Statistics[HitResult.Good];
 
-                switch (Ruleset?.ID ?? RulesetID)
-                {
-                    case 0:
-                    case 1:
-                        Statistics[HitResult.Good] = value;
-                        break;
+                case 3:
+                    return scoreInfo.Statistics[HitResult.Ok];
+            }
 
-                    case 3:
-                        Statistics[HitResult.Ok] = value;
-                        break;
-                }
+            return null;
+        }
+
+        public static void SetCount100(this ScoreInfo scoreInfo, int value)
+        {
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+            {
+                case 0:
+                case 1:
+                    scoreInfo.Statistics[HitResult.Good] = value;
+                    break;
+
+                case 3:
+                    scoreInfo.Statistics[HitResult.Ok] = value;
+                    break;
             }
         }
 
-        private int count50;
-
-        public int Count50
+        public static int? GetCount50(this ScoreInfo scoreInfo)
         {
-            get => count50;
-            set
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
             {
-                count50 = value;
+                case 0:
+                case 3:
+                    return scoreInfo.Statistics[HitResult.Meh];
+            }
 
-                switch (Ruleset?.ID ?? RulesetID)
-                {
-                    case 0:
-                    case 3:
-                        Statistics[HitResult.Meh] = value;
-                        break;
-                }
+            return null;
+        }
+
+        public static void SetCount50(this ScoreInfo scoreInfo, int value)
+        {
+            switch (scoreInfo.Ruleset?.ID ?? scoreInfo.RulesetID)
+            {
+                case 0:
+                case 3:
+                    scoreInfo.Statistics[HitResult.Meh] = value;
+                    break;
             }
         }
 
-        public int CountMiss
-        {
-            get => Statistics[HitResult.Miss];
-            set => Statistics[HitResult.Miss] = value;
-        }
+        public static int? GetCountMiss(this ScoreInfo scoreInfo) =>
+            scoreInfo.Statistics[HitResult.Miss];
+
+        public static void SetCountMiss(this ScoreInfo scoreInfo, int value) =>
+            scoreInfo.Statistics[HitResult.Miss] = value;
     }
 }

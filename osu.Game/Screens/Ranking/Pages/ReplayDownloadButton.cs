@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -24,7 +23,7 @@ namespace osu.Game.Screens.Ranking.Pages
                 if (State.Value == DownloadState.LocallyAvailable)
                     return ReplayAvailability.Local;
 
-                if (Model.Value is APILegacyScoreInfo apiScore && apiScore.Replay)
+                if (!string.IsNullOrEmpty(Model.Value.Hash))
                     return ReplayAvailability.Online;
 
                 return ReplayAvailability.NotAvailable;
