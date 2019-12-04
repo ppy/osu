@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Direct
 
         private readonly bool fetchOnline;
 
-        protected DirectPanel(BeatmapSetInfo setInfo, bool fetchOnline = false)
+        protected DirectPanel(BeatmapSetInfo setInfo, bool fetchOnline = true)
         {
             Debug.Assert(setInfo.OnlineBeatmapSetID != null);
 
