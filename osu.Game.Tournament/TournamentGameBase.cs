@@ -228,7 +228,7 @@ namespace osu.Game.Tournament
                     if (b.BeatmapInfo == null && b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                        req.Perform(API);
+                        API.Perform(req);
                         b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                         addedInfo = true;
