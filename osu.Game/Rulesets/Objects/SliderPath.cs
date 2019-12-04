@@ -273,14 +273,6 @@ namespace osu.Game.Rulesets.Objects
             return p0 + (p1 - p0) * (float)w;
         }
 
-        public bool Equals(SliderPath other)
-        {
-            if (ControlPoints == null && other.ControlPoints != null)
-                return false;
-            if (other.ControlPoints == null && ControlPoints != null)
-                return false;
-
-            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
-        }
+        public bool Equals(SliderPath other) => ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance == other.ExpectedDistance && Type == other.Type;
     }
 }
