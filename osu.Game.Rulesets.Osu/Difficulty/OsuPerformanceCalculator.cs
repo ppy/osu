@@ -45,10 +45,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+            countGreat = Score.Statistics[HitResult.Great];
+            countGood = Score.Statistics[HitResult.Good];
+            countMeh = Score.Statistics[HitResult.Meh];
+            countMiss = Score.Statistics[HitResult.Miss];
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
