@@ -24,12 +24,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         public TestSceneDrawableJudgement()
         {
             foreach (HitResult result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Skip(1))
+            {
                 AddStep("Show " + result.GetDescription(), () => SetContents(() =>
                     new DrawableOsuJudgement(new JudgementResult(new HitObject(), new Judgement()) { Type = result }, null)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }));
+            }
         }
     }
 }

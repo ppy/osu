@@ -83,9 +83,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 storyboardSprite = null;
 
-                EventType type;
-
-                if (!Enum.TryParse(split[0], out type))
+                if (!Enum.TryParse(split[0], out EventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
@@ -144,16 +142,16 @@ namespace osu.Game.Beatmaps.Formats
                         var endTime = split.Length > 3 ? double.Parse(split[3], CultureInfo.InvariantCulture) : double.MaxValue;
                         var groupNumber = split.Length > 4 ? int.Parse(split[4]) : 0;
                         timelineGroup = storyboardSprite?.AddTrigger(triggerName, startTime, endTime, groupNumber);
-                    }
                         break;
+                    }
 
                     case "L":
                     {
                         var startTime = double.Parse(split[1], CultureInfo.InvariantCulture);
                         var loopCount = int.Parse(split[2]);
                         timelineGroup = storyboardSprite?.AddLoop(startTime, loopCount);
-                    }
                         break;
+                    }
 
                     default:
                     {
@@ -171,16 +169,16 @@ namespace osu.Game.Beatmaps.Formats
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Alpha.Add(easing, startTime, endTime, startValue, endValue);
-                            }
                                 break;
+                            }
 
                             case "S":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
-                            }
                                 break;
+                            }
 
                             case "V":
                             {
@@ -189,16 +187,16 @@ namespace osu.Game.Beatmaps.Formats
                                 var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
-                            }
                                 break;
+                            }
 
                             case "R":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
-                            }
                                 break;
+                            }
 
                             case "M":
                             {
@@ -208,24 +206,24 @@ namespace osu.Game.Beatmaps.Formats
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startX, endX);
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startY, endY);
-                            }
                                 break;
+                            }
 
                             case "MX":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.X.Add(easing, startTime, endTime, startValue, endValue);
-                            }
                                 break;
+                            }
 
                             case "MY":
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
                                 timelineGroup?.Y.Add(easing, startTime, endTime, startValue, endValue);
-                            }
                                 break;
+                            }
 
                             case "C":
                             {
@@ -238,8 +236,8 @@ namespace osu.Game.Beatmaps.Formats
                                 timelineGroup?.Colour.Add(easing, startTime, endTime,
                                     new Color4(startRed / 255f, startGreen / 255f, startBlue / 255f, 1),
                                     new Color4(endRed / 255f, endGreen / 255f, endBlue / 255f, 1));
-                            }
                                 break;
+                            }
 
                             case "P":
                             {
@@ -259,14 +257,16 @@ namespace osu.Game.Beatmaps.Formats
                                         timelineGroup?.FlipV.Add(easing, startTime, endTime, true, startTime == endTime);
                                         break;
                                 }
-                            }
+
                                 break;
+                            }
 
                             default:
                                 throw new InvalidDataException($@"Unknown command type: {commandType}");
                         }
-                    }
+
                         break;
+                    }
                 }
             }
         }

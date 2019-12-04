@@ -7,6 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -29,9 +30,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("key counter reset", () => ((ScoreAccessiblePlayer)Player).HUDOverlay.KeyCounter.Children.All(kc => kc.CountPresses == 0));
         }
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
-            var working = base.CreateWorkingBeatmap(beatmap);
+            var working = base.CreateWorkingBeatmap(beatmap, storyboard);
 
             track = (ClockBackedTestWorkingBeatmap.TrackVirtualManual)working.Track;
 

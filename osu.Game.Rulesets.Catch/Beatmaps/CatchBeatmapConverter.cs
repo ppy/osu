@@ -8,6 +8,7 @@ using System;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -22,48 +23,44 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         protected override IEnumerable<CatchHitObject> ConvertHitObject(HitObject obj, IBeatmap beatmap)
         {
-            var curveData = obj as IHasCurve;
             var positionData = obj as IHasXPosition;
             var comboData = obj as IHasCombo;
-            var endTime = obj as IHasEndTime;
-            var legacyOffset = obj as IHasLegacyLastTickOffset;
 
-            if (curveData != null)
+            switch (obj)
             {
-                yield return new JuiceStream
-                {
-                    StartTime = obj.StartTime,
-                    Samples = obj.Samples,
-                    Path = curveData.Path,
-                    NodeSamples = curveData.NodeSamples,
-                    RepeatCount = curveData.RepeatCount,
-                    X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
-                    NewCombo = comboData?.NewCombo ?? false,
-                    ComboOffset = comboData?.ComboOffset ?? 0,
-                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset ?? 0
-                };
-            }
-            else if (endTime != null)
-            {
-                yield return new BananaShower
-                {
-                    StartTime = obj.StartTime,
-                    Samples = obj.Samples,
-                    Duration = endTime.Duration,
-                    NewCombo = comboData?.NewCombo ?? false,
-                    ComboOffset = comboData?.ComboOffset ?? 0,
-                };
-            }
-            else
-            {
-                yield return new Fruit
-                {
-                    StartTime = obj.StartTime,
-                    Samples = obj.Samples,
-                    NewCombo = comboData?.NewCombo ?? false,
-                    ComboOffset = comboData?.ComboOffset ?? 0,
-                    X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH
-                };
+                case IHasCurve curveData:
+                    return new JuiceStream
+                    {
+                        StartTime = obj.StartTime,
+                        Samples = obj.Samples,
+                        Path = curveData.Path,
+                        NodeSamples = curveData.NodeSamples,
+                        RepeatCount = curveData.RepeatCount,
+                        X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
+                        LegacyLastTickOffset = (obj as IHasLegacyLastTickOffset)?.LegacyLastTickOffset ?? 0
+                    }.Yield();
+
+                case IHasEndTime endTime:
+                    return new BananaShower
+                    {
+                        StartTime = obj.StartTime,
+                        Samples = obj.Samples,
+                        Duration = endTime.Duration,
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
+                    }.Yield();
+
+                default:
+                    return new Fruit
+                    {
+                        StartTime = obj.StartTime,
+                        Samples = obj.Samples,
+                        NewCombo = comboData?.NewCombo ?? false,
+                        ComboOffset = comboData?.ComboOffset ?? 0,
+                        X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH
+                    }.Yield();
             }
         }
 

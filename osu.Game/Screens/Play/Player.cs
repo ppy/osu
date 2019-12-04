@@ -30,6 +30,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Play
 {
+    [Cached]
     public class Player : ScreenWithBeatmapBackground
     {
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
@@ -178,7 +179,7 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -202,7 +203,7 @@ namespace osu.Game.Screens.Play
                 },
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
-                    RequestSeek = GameplayClockContainer.Seek
+                    RequestSkip = GameplayClockContainer.Skip
                 },
                 FailOverlay = new FailOverlay
                 {
@@ -311,14 +312,19 @@ namespace osu.Game.Screens.Play
                 this.Exit();
         }
 
+        /// <summary>
+        /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
+        /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
+        /// </summary>
         public void Restart()
         {
-            if (!this.IsCurrentScreen()) return;
-
             sampleRestart?.Play();
-
             RestartRequested?.Invoke();
-            performImmediateExit();
+
+            if (this.IsCurrentScreen())
+                performImmediateExit();
+            else
+                this.MakeCurrent();
         }
 
         private ScheduledDelegate completionProgressDelegate;
@@ -443,7 +449,12 @@ namespace osu.Game.Screens.Play
         {
             if (!canPause) return;
 
-            IsResuming = false;
+            if (IsResuming)
+            {
+                DrawableRuleset.CancelResume();
+                IsResuming = false;
+            }
+
             GameplayClockContainer.Stop();
             PauseOverlay.Show();
             lastPauseActionTime = GameplayClockContainer.GameplayClock.CurrentTime;
@@ -457,7 +468,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (breakOverlay.IsBreakTime.Value || GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            if (breakOverlay.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -525,7 +536,15 @@ namespace osu.Game.Screens.Play
                     return true;
             }
 
-            GameplayClockContainer.ResetLocalAdjustments();
+            if (canPause)
+            {
+                Pause();
+                return true;
+            }
+
+            // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
+            // as we are no longer the current screen, we cannot guarantee the track is still usable.
+            GameplayClockContainer.StopUsingBeatmapClock();
 
             fadeOut();
             return base.OnExiting(next);
