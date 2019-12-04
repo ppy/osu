@@ -49,10 +49,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (Column == null)
                 return base.OnMouseDown(e);
 
-            HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
             HitObject.Column = Column.Index;
-
-            BeginPlacement();
+            BeginPlacement(TimeAt(e.ScreenSpaceMousePosition));
             return true;
         }
 

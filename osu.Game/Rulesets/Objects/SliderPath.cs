@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Objects
 
             isInitialised = true;
 
-            controlPoints = controlPoints ?? Array.Empty<Vector2>();
+            controlPoints ??= Array.Empty<Vector2>();
             calculatedPath = new List<Vector2>();
             cumulativeLength = new List<double>();
 
@@ -185,8 +185,10 @@ namespace osu.Game.Rulesets.Objects
                     ReadOnlySpan<Vector2> cpSpan = ControlPoints.Slice(start, end - start);
 
                     foreach (Vector2 t in calculateSubpath(cpSpan))
+                    {
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                             calculatedPath.Add(t);
+                    }
 
                     start = end;
                 }
@@ -244,7 +246,7 @@ namespace osu.Game.Rulesets.Objects
 
         private double progressToDistance(double progress)
         {
-            return MathHelper.Clamp(progress, 0, 1) * Distance;
+            return Math.Clamp(progress, 0, 1) * Distance;
         }
 
         private Vector2 interpolateVertices(int i, double d)
@@ -271,14 +273,6 @@ namespace osu.Game.Rulesets.Objects
             return p0 + (p1 - p0) * (float)w;
         }
 
-        public bool Equals(SliderPath other)
-        {
-            if (ControlPoints == null && other.ControlPoints != null)
-                return false;
-            if (other.ControlPoints == null && ControlPoints != null)
-                return false;
-
-            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
-        }
+        public bool Equals(SliderPath other) => ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance == other.ExpectedDistance && Type == other.Type;
     }
 }

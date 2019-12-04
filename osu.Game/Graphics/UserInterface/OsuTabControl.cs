@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         protected virtual float StripHeight() => 1;
 
         /// <summary>
-        /// Whether entries should be automatically populated if <see cref="T"/> is an <see cref="Enum"/> type.
+        /// Whether entries should be automatically populated if <typeparamref name="T"/> is an <see cref="Enum"/> type.
         /// </summary>
         protected virtual bool AddEnumEntriesAutomatically => true;
 
@@ -51,8 +51,10 @@ namespace osu.Game.Graphics.UserInterface
             });
 
             if (isEnumType && AddEnumEntriesAutomatically)
+            {
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -97,7 +99,7 @@ namespace osu.Game.Graphics.UserInterface
 
             // dont bother calculating if the strip is invisible
             if (strip.Colour.MaxAlpha > 0)
-                strip.Width = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
+                strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
         }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour

@@ -65,6 +65,7 @@ namespace osu.Game.Storyboards
         public virtual IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {
             if (offset != 0)
+            {
                 return timelineSelector(this).Commands.Select(command =>
                     new CommandTimeline<T>.TypedCommand
                     {
@@ -74,6 +75,7 @@ namespace osu.Game.Storyboards
                         StartValue = command.StartValue,
                         EndValue = command.EndValue,
                     });
+            }
 
             return timelineSelector(this).Commands;
         }
