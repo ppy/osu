@@ -191,15 +191,7 @@ namespace osu.Game.Overlays
                     tcs.SetResult(false);
                 };
 
-                try
-                {
-                    req.Perform(API);
-                }
-                catch
-                {
-                    initialFetchTask = null;
-                    tcs.SetResult(false);
-                }
+                await API.PerformAsync(req);
 
                 await tcs.Task;
             });
