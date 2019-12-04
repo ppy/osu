@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
+using System;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Users;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Comments
 {
     public class OnlineCommentsContainer : CommentsContainer
     {
-        private GetCommentsRequest request;
         private int currentPage;
         private CommentBundleParameters parameters;
 
@@ -19,41 +19,20 @@ namespace osu.Game.Overlays.Comments
             Sort.TriggerChange();
         }
 
-        protected override void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
+        protected override APIRequest FetchComments(Action<CommentBundle> commentsCallback)
         {
             if (parameters == null)
-                return;
+                return null;
 
-            OnLoadStarted();
-            OnShowMoreAction();
+            var req = new GetCommentsRequest(parameters, Sort.Value, ++currentPage);
+            req.Success += r => commentsCallback?.Invoke(r);
+            return req;
         }
-
-        protected override void OnUserChanged(ValueChangedEvent<User> user) => Sort.TriggerChange();
 
         protected override void OnLoadStarted()
         {
-            request?.Cancel();
             currentPage = 0;
             base.OnLoadStarted();
-        }
-
-        protected override void OnShowMoreAction()
-        {
-            request = new GetCommentsRequest(parameters, Sort.Value, ++currentPage);
-            request.Success += response =>
-            {
-                if (currentPage == 1)
-                    ResetComments(response);
-                else
-                    AddComments(response, false);
-            };
-            API.PerformAsync(request);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            request?.Cancel();
-            base.Dispose(isDisposing);
         }
     }
 }

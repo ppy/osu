@@ -16,11 +16,14 @@ using osu.Game.Users;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Threading;
+using System;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentsContainer : CompositeDrawable
+    public abstract class CommentsContainer : CompositeDrawable
     {
+        protected abstract APIRequest FetchComments(Action<CommentBundle> commentsCallback);
+
         private CommentBundle commentBundle;
 
         public CommentBundle CommentBundle
@@ -33,8 +36,28 @@ namespace osu.Game.Overlays.Comments
 
                 commentBundle = value;
 
-                OnLoadStarted();
-                ResetComments(commentBundle);
+                if (commentBundle == null)
+                {
+                    content.Clear();
+                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                    totalCommentsCounter.Current.Value = 0;
+                    noCommentsPlaceholder.Hide();
+                    loadingLayer.Hide();
+                    moreButton.IsLoading = true;
+                    moreButton.Show();
+                    return;
+                }
+
+                if (!commentBundle.Comments.Any())
+                {
+                    content.Clear();
+                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                    noCommentsPlaceholder.Show();
+                    onLoadFinished(commentBundle);
+                    return;
+                }
+
+                AddComments(commentBundle, true);
             }
         }
 
@@ -42,10 +65,13 @@ namespace osu.Game.Overlays.Comments
         private readonly Bindable<User> user = new Bindable<User>();
 
         [Resolved]
-        protected IAPIProvider API { get; private set; }
+        private IAPIProvider api { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
+
+        private APIRequest getCommentsRequest;
+        private ScheduledDelegate pendingUpdateComments;
 
         private CancellationTokenSource showCommentsCancellationSource;
         private ScheduledDelegate showCommentsDelegate;
@@ -60,7 +86,7 @@ namespace osu.Game.Overlays.Comments
         private readonly TotalCommentsCounter totalCommentsCounter;
         private readonly CommentsHeader commentsHeader;
 
-        public CommentsContainer()
+        protected CommentsContainer()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -151,7 +177,7 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = OnShowMoreAction,
+                                                Action = () => getComments(true),
                                                 IsLoading = true,
                                             }
                                         }
@@ -170,28 +196,46 @@ namespace osu.Game.Overlays.Comments
             background.Colour = colours.Gray2;
             placeholderBackground.Colour = colours.Gray3;
 
-            user.BindTo(API.LocalUser);
+            user.BindTo(api.LocalUser);
         }
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(OnSortChanged);
-            user.BindValueChanged(OnUserChanged);
+            Sort.BindValueChanged(onSortChanged);
+            user.BindValueChanged(_ => Sort.TriggerChange());
             base.LoadComplete();
         }
 
-        protected virtual void OnSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
-        {
-        }
-
-        protected virtual void OnUserChanged(ValueChangedEvent<User> user)
+        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
         {
             OnLoadStarted();
-            ResetComments(commentBundle);
+            getComments();
         }
 
-        protected virtual void OnShowMoreAction()
+        private void getComments(bool add = false)
         {
+            getCommentsRequest?.Cancel();
+            getCommentsRequest = null;
+
+            pendingUpdateComments?.Cancel();
+            pendingUpdateComments = Schedule(() =>
+            {
+                getCommentsRequest = FetchComments(comments => Schedule(() =>
+                {
+                    if (add)
+                    {
+                        AddComments(comments, false);
+                        return;
+                    }
+
+                    CommentBundle = comments;
+                }));
+
+                if (getCommentsRequest == null)
+                    return;
+
+                api.PerformAsync(getCommentsRequest);
+            });
         }
 
         protected virtual void OnLoadStarted()
@@ -202,32 +246,6 @@ namespace osu.Game.Overlays.Comments
 
             if (content.Children.Any() || noCommentsPlaceholder.IsPresent)
                 loadingLayer.Show();
-        }
-
-        protected void ResetComments(CommentBundle comments)
-        {
-            if (comments == null)
-            {
-                content.Clear();
-                deletedChildrenPlaceholder.DeletedCount.Value = 0;
-                totalCommentsCounter.Current.Value = 0;
-                noCommentsPlaceholder.Hide();
-                loadingLayer.Hide();
-                moreButton.IsLoading = true;
-                moreButton.Show();
-                return;
-            }
-
-            if (!comments.Comments.Any())
-            {
-                content.Clear();
-                deletedChildrenPlaceholder.DeletedCount.Value = 0;
-                noCommentsPlaceholder.Show();
-                onLoadFinished(comments);
-                return;
-            }
-
-            AddComments(comments, true);
         }
 
         protected void AddComments(CommentBundle comments, bool reset)
