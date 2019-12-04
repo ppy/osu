@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
+    [LongRunningLoad]
     public class MedalIcon : Container
     {
         private readonly string slug;
