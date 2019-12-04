@@ -3,17 +3,16 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
-    [TestFixture]
-    public class TestSceneOfflineCommentsContainer : OsuTestScene
+    public class TestSceneCommentsContainer : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -27,31 +26,31 @@ namespace osu.Game.Tests.Visual.Online
             typeof(VotePill)
         };
 
-        private readonly BasicScrollContainer scroll;
-        private CommentsContainer commentsContainer;
+        protected override bool UseOnlineAPI => true;
 
-        public TestSceneOfflineCommentsContainer()
+        public TestSceneCommentsContainer()
         {
+            var commentsContainer = new CommentsContainer();
+            BasicScrollContainer scroll;
+
             Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer = new CommentsContainer()
+                Child = commentsContainer
             });
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
             AddStep("Idle state", () =>
             {
                 scroll.Clear();
                 scroll.Add(commentsContainer = new CommentsContainer());
             });
-            AddStep("load comments", () => commentsContainer.CommentBundle = comment_bundle);
-            AddStep("load empty comments", () => commentsContainer.CommentBundle = empty_comment_bundle);
+            AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
+            AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));
+            AddStep("lazer build comments", () => commentsContainer.ShowComments(CommentableType.Build, 4772));
+            AddStep("news comments", () => commentsContainer.ShowComments(CommentableType.NewsPost, 715));
+            AddStep("load local bundle", () => commentsContainer.CommentBundle = comment_bundle);
+            AddStep("load local empty bundle", () => commentsContainer.CommentBundle = empty_comment_bundle);
             AddStep("load null bundle", () => commentsContainer.CommentBundle = null);
-            AddStep("login", () => API.Login("user", "password"));
-            AddStep("logout", API.Logout);
         }
 
         private static readonly CommentBundle empty_comment_bundle = new CommentBundle
