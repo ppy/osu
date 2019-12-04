@@ -131,29 +131,29 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+            AddFont(Resources, @"Fonts/osuFont");
+            AddFont(Resources, @"Fonts/Exo2.0-Medium");
+            AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Hangul"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Compatibility"));
+            AddFont(Resources, @"Fonts/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Bold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+            AddFont(Resources, @"Fonts/Exo2.0-Regular");
+            AddFont(Resources, @"Fonts/Exo2.0-RegularItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-SemiBold");
+            AddFont(Resources, @"Fonts/Exo2.0-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Bold");
+            AddFont(Resources, @"Fonts/Exo2.0-BoldItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Light");
+            AddFont(Resources, @"Fonts/Exo2.0-LightItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Black");
+            AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Medium"));
+            AddFont(Resources, @"Fonts/Venera");
+            AddFont(Resources, @"Fonts/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera-Medium");
 
             runMigrations();
 

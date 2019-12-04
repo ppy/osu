@@ -23,6 +23,7 @@ namespace osu.Game.Users
 
         protected override Drawable CreateDrawable(User user) => new Cover(user);
 
+        [LongRunningLoad]
         private class Cover : CompositeDrawable
         {
             private readonly User user;
