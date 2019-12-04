@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Select
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct, IComparable
         {
+            public bool HasFilter => Max != null || Min != null;
+
             public bool IsInRange(T value)
             {
                 if (Min != null)
@@ -87,9 +89,11 @@ namespace osu.Game.Screens.Select
 
         public struct OptionalTextFilter : IEquatable<OptionalTextFilter>
         {
+            public bool HasFilter => !string.IsNullOrEmpty(SearchTerm);
+
             public bool Matches(string value)
             {
-                if (string.IsNullOrEmpty(SearchTerm))
+                if (!HasFilter)
                     return true;
 
                 // search term is guaranteed to be non-empty, so if the string we're comparing is empty, it's not matching
