@@ -21,8 +21,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        public readonly BindableBool ShowDeleted = new BindableBool();
-
         private CommentBundle commentBundle;
 
         public CommentBundle CommentBundle
@@ -60,6 +58,7 @@ namespace osu.Game.Overlays.Comments
         private readonly CommentsShowMoreButton moreButton;
         private readonly DimmedLoadingLayer loadingLayer;
         private readonly TotalCommentsCounter totalCommentsCounter;
+        private readonly CommentsHeader commentsHeader;
 
         public CommentsContainer()
         {
@@ -79,10 +78,9 @@ namespace osu.Game.Overlays.Comments
                     Children = new Drawable[]
                     {
                         totalCommentsCounter = new TotalCommentsCounter(),
-                        new CommentsHeader
+                        commentsHeader = new CommentsHeader
                         {
-                            Sort = { BindTarget = Sort },
-                            ShowDeleted = { BindTarget = ShowDeleted }
+                            Sort = { BindTarget = Sort }
                         },
                         new Container
                         {
@@ -142,7 +140,7 @@ namespace osu.Game.Overlays.Comments
                                     {
                                         deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
                                         {
-                                            ShowDeleted = { BindTarget = ShowDeleted }
+                                            ShowDeleted = { BindTarget = commentsHeader.ShowDeleted }
                                         },
                                         new Container
                                         {
@@ -280,7 +278,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     page.Add(new DrawableComment(c)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        ShowDeleted = { BindTarget = commentsHeader.ShowDeleted }
                     });
                 }
             }
