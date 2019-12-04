@@ -15,6 +15,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Users;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -48,7 +49,8 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private OsuColour colours { get; set; }
 
-        private CancellationTokenSource loadCancellation;
+        private CancellationTokenSource showCommentsCancellationSource;
+        private ScheduledDelegate showCommentsDelegate;
 
         private readonly Box background;
         private readonly Container noCommentsPlaceholder;
@@ -196,7 +198,8 @@ namespace osu.Game.Overlays.Comments
 
         protected virtual void OnLoadStarted()
         {
-            loadCancellation?.Cancel();
+            showCommentsCancellationSource?.Cancel();
+            showCommentsDelegate?.Cancel();
             moreButton.IsLoading = true;
 
             if (content.Children.Any() || noCommentsPlaceholder.IsPresent)
@@ -231,11 +234,9 @@ namespace osu.Game.Overlays.Comments
 
         protected void AddComments(CommentBundle comments, bool reset)
         {
-            loadCancellation = new CancellationTokenSource();
-
             var page = createCommentsPage(comments);
 
-            LoadComponentAsync(page, loaded =>
+            showCommentsDelegate = Schedule(() => LoadComponentAsync(page, loaded =>
             {
                 if (reset)
                 {
@@ -252,7 +253,7 @@ namespace osu.Game.Overlays.Comments
                 content.Add(loaded);
 
                 onLoadFinished(comments);
-            }, loadCancellation.Token);
+            }, (showCommentsCancellationSource = new CancellationTokenSource()).Token));
         }
 
         private int getDeletedComments(CommentBundle comments) => comments.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
@@ -300,12 +301,6 @@ namespace osu.Game.Overlays.Comments
             }
 
             moreButton.FadeTo(comments.HasMore ? 1 : 0);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            loadCancellation?.Cancel();
-            base.Dispose(isDisposing);
         }
     }
 }
