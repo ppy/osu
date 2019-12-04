@@ -25,6 +25,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <returns>Whether equivalent.</returns>
         public abstract bool EquivalentTo(ControlPoint other);
 
-        public bool Equals(ControlPoint other) => Time.Equals(other?.Time) && EquivalentTo(other);
+        public bool Equals(ControlPoint other) => Time == other?.Time && EquivalentTo(other);
     }
 }
