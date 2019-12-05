@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Objects
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
         /// and the path will be shortened/lengthened to match this length.
         /// </summary>
-        public readonly double? ExpectedDistance;
+        public readonly Bindable<double?> ExpectedDistance = new Bindable<double?>();
 
         /// <summary>
         /// The control points of the path.
@@ -43,7 +43,8 @@ namespace osu.Game.Rulesets.Objects
         [JsonConstructor]
         public SliderPath(PathControlPoint[] controlPoints = null, double? expectedDistance = null)
         {
-            ExpectedDistance = expectedDistance;
+            ExpectedDistance.Value = expectedDistance;
+            ExpectedDistance.ValueChanged += _ => pathCache.Invalidate();
 
             ControlPoints.ItemsAdded += items =>
             {
@@ -205,18 +206,20 @@ namespace osu.Game.Rulesets.Objects
             cumulativeLength.Clear();
             cumulativeLength.Add(l);
 
+            double? expectedDistance = ExpectedDistance.Value;
+
             for (int i = 0; i < calculatedPath.Count - 1; ++i)
             {
                 Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
                 double d = diff.Length;
 
                 // Shorted slider paths that are too long compared to the expected distance
-                if (ExpectedDistance.HasValue && ExpectedDistance - l < d)
+                if (expectedDistance.HasValue && expectedDistance - l < d)
                 {
-                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((ExpectedDistance - l) / d);
+                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((expectedDistance - l) / d);
                     calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
 
-                    l = ExpectedDistance.Value;
+                    l = expectedDistance.Value;
                     cumulativeLength.Add(l);
                     break;
                 }
@@ -226,7 +229,7 @@ namespace osu.Game.Rulesets.Objects
             }
 
             // Lengthen slider paths that are too short compared to the expected distance
-            if (ExpectedDistance.HasValue && l < ExpectedDistance && calculatedPath.Count > 1)
+            if (expectedDistance.HasValue && l < expectedDistance && calculatedPath.Count > 1)
             {
                 Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
                 double d = diff.Length;
@@ -234,8 +237,8 @@ namespace osu.Game.Rulesets.Objects
                 if (d <= 0)
                     return;
 
-                calculatedPath[calculatedPath.Count - 1] += diff * (float)((ExpectedDistance - l) / d);
-                cumulativeLength[calculatedPath.Count - 1] = ExpectedDistance.Value;
+                calculatedPath[calculatedPath.Count - 1] += diff * (float)((expectedDistance - l) / d);
+                cumulativeLength[calculatedPath.Count - 1] = expectedDistance.Value;
             }
         }
 
