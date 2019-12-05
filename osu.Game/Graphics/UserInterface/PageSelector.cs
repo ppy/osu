@@ -13,6 +13,7 @@ using osuTK;
 using osu.Game.Graphics.Containers;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -192,7 +193,7 @@ namespace osu.Game.Graphics.UserInterface
             {
             }
 
-            protected override Drawable CreateText(string text) => SpriteText = new SpriteText
+            protected override Drawable CreateText(string text) => SpriteText = new OsuSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -293,7 +294,7 @@ namespace osu.Game.Graphics.UserInterface
                 Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Text = text.ToUpper(),
                         Font = OsuFont.GetFont(size: 12),
