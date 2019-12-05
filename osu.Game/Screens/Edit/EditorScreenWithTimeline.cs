@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Edit
 
         protected abstract Drawable CreateMainContent();
 
-        protected virtual Drawable CreateTimelineContent() => new Container { };
+        protected virtual Drawable CreateTimelineContent() => new Container();
 
         protected TimelineArea CreateTimelineArea() => new TimelineArea { RelativeSizeAxes = Axes.Both };
     }

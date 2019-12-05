@@ -44,7 +44,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 d.Expire();
         }
 
-        private void add(HitObject h) => Add(new TimelineHitObjectRepresentation(h));
+        private void add(HitObject h)
+        {
+            var yOffset = Children.Count(d => d.X == h.StartTime);
+
+            Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * 4 });
+        }
 
         private class TimelineHitObjectRepresentation : CompositeDrawable
         {
@@ -52,7 +57,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public TimelineHitObjectRepresentation(HitObject hitObject)
             {
-                this.HitObject = hitObject;
+                HitObject = hitObject;
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
 
@@ -63,6 +68,25 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 RelativePositionAxes = Axes.X;
                 RelativeSizeAxes = Axes.X;
 
+                if (hitObject is IHasEndTime)
+                {
+                    AddInternal(new Container
+                    {
+                        CornerRadius = 2,
+                        Masking = true,
+                        Size = new Vector2(1, 3),
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RelativePositionAxes = Axes.X,
+                        RelativeSizeAxes = Axes.X,
+                        Colour = Color4.Black,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        }
+                    });
+                }
+
                 AddInternal(new Circle
                 {
                     Size = new Vector2(16),
@@ -71,20 +95,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     RelativePositionAxes = Axes.X,
                     AlwaysPresent = true,
                     Colour = Color4.White,
+                    BorderColour = Color4.Black,
+                    BorderThickness = 3,
                 });
-
-                if (hitObject is IHasEndTime)
-                {
-                    AddInternal(new Box
-                    {
-                        Size = new Vector2(1, 5),
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        RelativePositionAxes = Axes.X,
-                        RelativeSizeAxes = Axes.X,
-                        Colour = Color4.White,
-                    });
-                }
             }
         }
     }
