@@ -75,6 +75,8 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public bool IsReply => ParentId.HasValue;
 
+        public bool IsEdited => EditedById.HasValue;
+
         public bool HasMessage => !string.IsNullOrEmpty(Message);
 
         public bool IsVoted { get; set; }

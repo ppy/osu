@@ -4,6 +4,7 @@
 using Newtonsoft.Json;
 using osu.Game.Users;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
@@ -18,18 +19,18 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 comments = value;
-                comments.ForEach(child =>
+
+                comments.ForEach(comment =>
                 {
-                    if (child.ParentId != null)
+                    if (comment.IsReply)
                     {
-                        comments.ForEach(parent =>
+                        var parent = comments.FirstOrDefault(parent => parent.Id == comment.ParentId);
+
+                        if (parent != null)
                         {
-                            if (parent.Id == child.ParentId)
-                            {
-                                parent.Replies.Add(child);
-                                child.ParentComment = parent;
-                            }
-                        });
+                            parent.Replies.Add(comment);
+                            comment.ParentComment = parent;
+                        }
                     }
                 });
             }
@@ -56,17 +57,7 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 userVotes = value;
-                userVotes.ForEach(v =>
-                {
-                    foreach (var c in Comments)
-                    {
-                        if (v == c.Id)
-                        {
-                            c.IsVoted = true;
-                            break;
-                        }
-                    }
-                });
+                userVotes.ForEach(vote => Comments.FirstOrDefault(comment => vote == comment.Id).IsVoted = true);
             }
         }
 
@@ -80,16 +71,12 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 users = value;
 
-                value.ForEach(u =>
+                Comments.ForEach(comment =>
                 {
-                    Comments.ForEach(c =>
-                    {
-                        if (c.UserId == u.Id)
-                            c.User = u;
+                    comment.User = users.FirstOrDefault(user => user.Id == comment.UserId);
 
-                        if (c.EditedById == u.Id)
-                            c.EditedUser = u;
-                    });
+                    if (comment.IsEdited)
+                        comment.EditedUser = users.FirstOrDefault(user => user.Id == comment.EditedById);
                 });
             }
         }

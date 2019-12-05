@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Comments
             else
                 username.AddText(comment.LegacyName);
 
-            if (comment.EditedAt.HasValue)
+            if (comment.IsEdited)
             {
                 info.Add(new OsuSpriteText
                 {
