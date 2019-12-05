@@ -13,12 +13,12 @@ using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneSliderPath2 : OsuTestScene
+    public class TestSceneSliderPath : OsuTestScene
     {
         private readonly SmoothPath drawablePath;
-        private SliderPath2 path;
+        private SliderPath path;
 
-        public TestSceneSliderPath2()
+        public TestSceneSliderPath()
         {
             Child = drawablePath = new SmoothPath
             {
@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            path = new SliderPath2();
+            path = new SliderPath();
         });
 
         protected override void Update()
