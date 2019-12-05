@@ -70,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Hide", rankingsOverlay.Hide);
         }
 
-        private static Country us_country = new Country
+        private static readonly Country us_country = new Country
         {
             FlagName = "US",
             FullName = "United States"
