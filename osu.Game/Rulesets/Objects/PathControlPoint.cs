@@ -18,6 +18,17 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly Bindable<PathType?> Type = new Bindable<PathType?>();
 
+        /// <summary>
+        /// Invoked when any property of this <see cref="PathControlPoint"/> is changed.
+        /// </summary>
+        internal event Action Changed;
+
+        public PathControlPoint()
+        {
+            Position.ValueChanged += _ => Changed?.Invoke();
+            Type.ValueChanged += _ => Changed?.Invoke();
+        }
+
         public bool Equals(PathControlPoint other) => Position.Value == other.Position.Value && Type.Value == other.Type.Value;
     }
 }
