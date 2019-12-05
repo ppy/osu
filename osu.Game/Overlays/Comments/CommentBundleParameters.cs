@@ -7,8 +7,14 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentBundleParameters
     {
+        /// <summary>
+        /// The type of resource to get comments for.
+        /// </summary>
         public CommentableType Type { get; private set; }
 
+        /// <summary>
+        /// The id of the resource to get comments for.
+        /// </summary>
         public long Id { get; private set; }
 
         public CommentBundleParameters(CommentableType type, long id)
