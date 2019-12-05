@@ -209,9 +209,10 @@ namespace osu.Game.Tests.Visual.Background
         public void TransitionTest()
         {
             performFullSetup();
-            var results = new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } });
-            AddStep("Transition to Results", () => player.Push(results));
-            AddUntilStep("Wait for results is current", results.IsCurrentScreen);
+            FadeAccessibleResults results = null;
+            AddStep("Transition to Results", () => player.Push(results =
+                new FadeAccessibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
+            AddUntilStep("Wait for results is current", () => results.IsCurrentScreen());
             waitForDim();
             AddAssert("Screen is undimmed, original background retained", () =>
                 songSelect.IsBackgroundUndimmed() && songSelect.IsBackgroundCurrent() && results.IsBlurCorrect());

@@ -151,18 +151,18 @@ namespace osu.Game.Graphics.UserInterface
         private void updateTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                TooltipText = ((int)Convert.ChangeType(value, typeof(int))).ToString("N0");
+                TooltipText = value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
             else
             {
-                double floatValue = (double)Convert.ChangeType(value, typeof(double));
-                double floatMinValue = (double)Convert.ChangeType(CurrentNumber.MinValue, typeof(double));
-                double floatMaxValue = (double)Convert.ChangeType(CurrentNumber.MaxValue, typeof(double));
+                double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
+                double floatMinValue = CurrentNumber.MinValue.ToDouble(NumberFormatInfo.InvariantInfo);
+                double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
                 if (floatMaxValue == 1 && floatMinValue >= -1)
                     TooltipText = floatValue.ToString("P0");
                 else
                 {
-                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+                    var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
                     var significantDigits = findPrecision(decimalPrecision);
