@@ -20,8 +20,8 @@ namespace osu.Game.Overlays
 {
     public class RankingsOverlay : FullscreenOverlay
     {
-        private readonly Bindable<Country> country = new Bindable<Country>();
-        private readonly Bindable<RankingsScope> scope = new Bindable<RankingsScope>();
+        protected readonly Bindable<Country> Country = new Bindable<Country>();
+        protected readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly BasicScrollContainer scrollFlow;
@@ -58,8 +58,8 @@ namespace osu.Game.Overlays
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
-                                Country = { BindTarget = country },
-                                Scope = { BindTarget = scope },
+                                Country = { BindTarget = Country },
+                                Scope = { BindTarget = Scope },
                                 Ruleset = { BindTarget = ruleset }
                             },
                             new Container
@@ -98,19 +98,19 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
-            country.BindValueChanged(_ =>
+            Country.BindValueChanged(_ =>
             {
                 // if a country is requested, force performance scope.
-                if (country.Value != null)
-                    scope.Value = RankingsScope.Performance;
+                if (Country.Value != null)
+                    Scope.Value = RankingsScope.Performance;
 
                 Scheduler.AddOnce(loadNewContent);
             }, true);
-            scope.BindValueChanged(_ =>
+            Scope.BindValueChanged(_ =>
             {
                 // country filtering is only valid for performance scope.
-                if (scope.Value != RankingsScope.Performance)
-                    country.Value = null;
+                if (Scope.Value != RankingsScope.Performance)
+                    Country.Value = null;
 
                 Scheduler.AddOnce(loadNewContent);
             }, true);
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            country.Value = requested;
+            Country.Value = requested;
         }
 
         private void loadNewContent()
@@ -154,10 +154,10 @@ namespace osu.Game.Overlays
 
         private APIRequest createScopedRequest()
         {
-            switch (scope.Value)
+            switch (Scope.Value)
             {
                 case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: country.Value?.FlagName);
+                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
 
                 case RankingsScope.Country:
                     return new GetCountryRankingsRequest(ruleset.Value);
