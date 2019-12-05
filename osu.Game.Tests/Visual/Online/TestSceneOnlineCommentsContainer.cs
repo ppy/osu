@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneOnlineCommentsContainer()
         {
-            var commentsContainer = new OnlineCommentsContainer();
+            var commentsContainer = new CommentsContainer();
             BasicScrollContainer scroll;
 
             Add(scroll = new BasicScrollContainer
@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Idle state", () =>
             {
                 scroll.Clear();
-                scroll.Add(commentsContainer = new OnlineCommentsContainer());
+                scroll.Add(commentsContainer = new CommentsContainer());
             });
             AddStep("Big Black comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 41823));
             AddStep("Airman comments", () => commentsContainer.ShowComments(CommentableType.Beatmapset, 24313));

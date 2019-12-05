@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Users;
-using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -36,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
             Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = commentsContainer = new OfflineCommentsContainer()
+                Child = commentsContainer = new CommentsContainer()
             });
         }
 
@@ -46,7 +45,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Idle state", () =>
             {
                 scroll.Clear();
-                scroll.Add(commentsContainer = new OfflineCommentsContainer());
+                scroll.Add(commentsContainer = new CommentsContainer());
             });
             AddStep("load comments", () => commentsContainer.CommentBundle = comment_bundle);
             AddStep("load empty comments", () => commentsContainer.CommentBundle = empty_comment_bundle);
@@ -142,10 +141,5 @@ namespace osu.Game.Tests.Visual.Online
             TopLevelCount = 4,
             Total = 7
         };
-
-        private class OfflineCommentsContainer : CommentsContainer
-        {
-            protected override APIRequest FetchComments(Action<CommentBundle> commentsCallback) => null;
-        }
     }
 }
