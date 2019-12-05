@@ -200,8 +200,7 @@ namespace osu.Game.Overlays
         {
             LoadComponentAsync(table, t =>
             {
-                contentPlaceholder.Clear();
-                contentPlaceholder.Add(t);
+                contentPlaceholder.Child = t;
                 loading.Hide();
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
