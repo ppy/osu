@@ -47,10 +47,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     HighColour = colours.BlueDarker,
                     Depth = float.MaxValue
                 },
-                new TimelineHitObjectDisplay
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
             };
 
             // We don't want the centre marker to scroll

@@ -16,8 +16,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     internal class TimelineHitObjectDisplay : TimelinePart
     {
-        [Resolved]
-        private IEditorBeatmap beatmap { get; set; }
+        private IEditorBeatmap beatmap { get; }
+
+        public TimelineHitObjectDisplay(IEditorBeatmap beatmap)
+        {
+            this.beatmap = beatmap;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
@@ -27,18 +31,20 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             beatmap.HitObjectAdded += add;
             beatmap.HitObjectRemoved += remove;
+            beatmap.StartTimeChanged += h =>
+            {
+                remove(h);
+                add(h);
+            };
         }
 
         private void remove(HitObject h)
         {
-            foreach (var d in InternalChildren.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
+            foreach (var d in Children.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
                 d.Expire();
         }
 
-        private void add(HitObject h)
-        {
-            Add(new TimelineHitObjectRepresentation(h));
-        }
+        private void add(HitObject h) => Add(new TimelineHitObjectRepresentation(h));
 
         private class TimelineHitObjectRepresentation : CompositeDrawable
         {
