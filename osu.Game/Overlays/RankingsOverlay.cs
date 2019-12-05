@@ -26,10 +26,10 @@ namespace osu.Game.Overlays
 
         private readonly BasicScrollContainer scrollFlow;
         private readonly Box background;
-        private readonly Container contentPlaceholder;
+        private readonly Container tableContainer;
         private readonly DimmedLoadingLayer loading;
 
-        private APIRequest request;
+        private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
 
         [Resolved]
@@ -68,7 +68,7 @@ namespace osu.Game.Overlays
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    contentPlaceholder = new Container
+                                    tableContainer = new Container
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
@@ -132,76 +132,81 @@ namespace osu.Game.Overlays
 
         private void loadNewContent()
         {
-            scrollFlow.ScrollToStart();
-
             loading.Show();
 
             cancellationToken?.Cancel();
-            request?.Cancel();
+            lastRequest?.Cancel();
 
+            var request = createScopedRequest();
+            lastRequest = request;
+
+            if (request == null)
+            {
+                loadTable(null);
+                return;
+            }
+
+            request.Success += () => loadTable(createTableFromResponse(request));
+            request.Failure += _ => loadTable(null);
+
+            api.Queue(request);
+        }
+
+        private APIRequest createScopedRequest()
+        {
             switch (scope.Value)
             {
-                default:
-                    contentPlaceholder.Clear();
-                    loading.Hide();
-                    return;
-
                 case RankingsScope.Performance:
-                    createPerformanceTable();
-                    return;
+                    return new GetUserRankingsRequest(ruleset.Value, country: country.Value?.FlagName);
 
                 case RankingsScope.Country:
-                    createCountryTable();
-                    return;
+                    return new GetCountryRankingsRequest(ruleset.Value);
 
                 case RankingsScope.Score:
-                    createScoreTable();
-                    return;
+                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
             }
+
+            return null;
         }
 
-        private void createCountryTable()
+        private Drawable createTableFromResponse(APIRequest request)
         {
-            request = new GetCountryRankingsRequest(ruleset.Value);
-            ((GetCountryRankingsRequest)request).Success += rankings => Schedule(() =>
+            switch (request)
             {
-                var table = new CountriesTable(1, rankings.Countries);
-                loadTable(table);
-            });
+                case GetUserRankingsRequest userRequest:
+                    switch (userRequest.Type)
+                    {
+                        case UserRankingsType.Performance:
+                            return new PerformanceTable(1, userRequest.Result.Users);
 
-            api.Queue(request);
-        }
+                        case UserRankingsType.Score:
+                            return new ScoresTable(1, userRequest.Result.Users);
+                    }
 
-        private void createPerformanceTable()
-        {
-            request = new GetUserRankingsRequest(ruleset.Value, country: country.Value?.FlagName);
-            ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
-            {
-                var table = new PerformanceTable(1, rankings.Users);
-                loadTable(table);
-            });
+                    return null;
 
-            api.Queue(request);
-        }
+                case GetCountryRankingsRequest countryRequest:
+                    return new CountriesTable(1, countryRequest.Result.Countries);
+            }
 
-        private void createScoreTable()
-        {
-            request = new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
-            ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
-            {
-                var table = new ScoresTable(1, rankings.Users);
-                loadTable(table);
-            });
-
-            api.Queue(request);
+            return null;
         }
 
         private void loadTable(Drawable table)
         {
+            scrollFlow.ScrollToStart();
+
+            if (table == null)
+            {
+                tableContainer.Clear();
+                loading.Hide();
+                return;
+            }
+
             LoadComponentAsync(table, t =>
             {
-                contentPlaceholder.Child = t;
                 loading.Hide();
+                tableContainer.Child = table;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
     }
