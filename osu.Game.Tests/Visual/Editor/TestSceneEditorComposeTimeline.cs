@@ -35,20 +35,14 @@ namespace osu.Game.Tests.Visual.Editor
             typeof(CentreMarker)
         };
 
-        [Cached(typeof(IEditorBeatmap))]
-        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
-
-        public TestSceneEditorComposeTimeline()
-        {
-            editorBeatmap = new EditorBeatmap<OsuHitObject>(
-                (Beatmap<OsuHitObject>)
-                CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, new Mod[] { })
-            );
-        }
-
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            var editorBeatmap = new EditorBeatmap<OsuHitObject>(
+                (Beatmap<OsuHitObject>)
+                CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, new Mod[] { })
+            );
+
             Beatmap.Value = new WaveformTestBeatmap(audio);
 
             Children = new Drawable[]
