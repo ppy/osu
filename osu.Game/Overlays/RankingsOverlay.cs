@@ -15,6 +15,7 @@ using osu.Game.Online.API;
 using System.Threading;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
+using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
 {
@@ -30,6 +31,7 @@ namespace osu.Game.Overlays
         private readonly DimmedLoadingLayer loading;
 
         private APIRequest request;
+        private ScheduledDelegate showTableDelegate;
         private CancellationTokenSource cancellationToken;
 
         [Resolved]
@@ -120,10 +122,9 @@ namespace osu.Game.Overlays
 
             loading.Show();
 
+            showTableDelegate?.Cancel();
             cancellationToken?.Cancel();
             request?.Cancel();
-
-            cancellationToken = new CancellationTokenSource();
 
             switch (scope.Value)
             {
@@ -184,12 +185,12 @@ namespace osu.Game.Overlays
 
         private void loadTable(Drawable table)
         {
-            LoadComponentAsync(table, t =>
+            showTableDelegate = Schedule(() => LoadComponentAsync(table, t =>
             {
                 contentPlaceholder.Clear();
                 contentPlaceholder.Add(t);
                 loading.Hide();
-            }, cancellationToken.Token);
+            }, (cancellationToken = new CancellationTokenSource()).Token));
         }
     }
 }
