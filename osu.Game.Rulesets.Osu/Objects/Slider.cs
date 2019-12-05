@@ -28,19 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
-
-        public SliderPath Path
-        {
-            get => PathBindable.Value;
-            set
-            {
-                PathBindable.Value = value;
-                endPositionCache.Invalidate();
-
-                updateNestedPositions();
-            }
-        }
+        public SliderPath Path { get; set; } = new SliderPath(new[] { new PathControlPoint { Type = { Value = PathType.Bezier } } });
 
         public double Distance => Path.Distance;
 
