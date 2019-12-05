@@ -79,8 +79,8 @@ namespace osu.Game.Screens.Select
             public bool IsUpperInclusive;
 
             public bool Equals(OptionalRange<T> other)
-                => Min.Equals(other.Min)
-                   && Max.Equals(other.Max)
+                => EqualityComparer<T?>.Default.Equals(Min, other.Min)
+                   && EqualityComparer<T?>.Default.Equals(Max, other.Max)
                    && IsLowerInclusive.Equals(other.IsLowerInclusive)
                    && IsUpperInclusive.Equals(other.IsUpperInclusive);
         }

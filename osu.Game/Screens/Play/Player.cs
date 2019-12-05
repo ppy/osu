@@ -536,6 +536,12 @@ namespace osu.Game.Screens.Play
                     return true;
             }
 
+            if (canPause)
+            {
+                Pause();
+                return true;
+            }
+
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.
             // as we are no longer the current screen, we cannot guarantee the track is still usable.
             GameplayClockContainer.StopUsingBeatmapClock();
