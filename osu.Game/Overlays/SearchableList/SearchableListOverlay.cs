@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListOverlay : FullscreenOverlay
     {
-        public static readonly float WIDTH_PADDING = 80;
+        public const float WIDTH_PADDING = 80;
     }
 
     public abstract class SearchableListOverlay<T, U, S> : SearchableListOverlay
@@ -88,8 +88,6 @@ namespace osu.Game.Overlays.SearchableList
                     },
                 },
             };
-
-            Filter.Search.Exit = Hide;
         }
 
         protected override void Update()

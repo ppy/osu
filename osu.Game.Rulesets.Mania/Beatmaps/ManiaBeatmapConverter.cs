@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 if (TargetColumns >= 10)
                 {
-                    TargetColumns = TargetColumns / 2;
+                    TargetColumns /= 2;
                     Dual = true;
                 }
             }
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         {
             BeatmapDifficulty difficulty = original.BeatmapInfo.BaseDifficulty;
 
-            int seed = (int)Math.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)Math.Round(difficulty.ApproachRate);
+            int seed = (int)MathF.Round(difficulty.DrainRate + difficulty.CircleSize) * 20 + (int)(difficulty.OverallDifficulty * 41.2) + (int)MathF.Round(difficulty.ApproachRate);
             Random = new FastRandom(seed);
 
             return base.ConvertBeatmap(original);
@@ -156,37 +156,44 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// <returns>The hit objects generated.</returns>
         private IEnumerable<ManiaHitObject> generateConverted(HitObject original, IBeatmap originalBeatmap)
         {
-            var endTimeData = original as IHasEndTime;
-            var distanceData = original as IHasDistance;
-            var positionData = original as IHasPosition;
-
             Patterns.PatternGenerator conversion = null;
 
-            if (distanceData != null)
+            switch (original)
             {
-                var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
-                conversion = generator;
-
-                for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                case IHasDistance _:
                 {
-                    recordNote(time, positionData?.Position ?? Vector2.Zero);
-                    computeDensity(time);
+                    var generator = new DistanceObjectPatternGenerator(Random, original, beatmap, lastPattern, originalBeatmap);
+                    conversion = generator;
+
+                    var positionData = original as IHasPosition;
+
+                    for (double time = original.StartTime; !Precision.DefinitelyBigger(time, generator.EndTime); time += generator.SegmentDuration)
+                    {
+                        recordNote(time, positionData?.Position ?? Vector2.Zero);
+                        computeDensity(time);
+                    }
+
+                    break;
                 }
-            }
-            else if (endTimeData != null)
-            {
-                conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
-                recordNote(endTimeData.EndTime, new Vector2(256, 192));
-                computeDensity(endTimeData.EndTime);
-            }
-            else if (positionData != null)
-            {
-                computeDensity(original.StartTime);
+                case IHasEndTime endTimeData:
+                {
+                    conversion = new EndTimeObjectPatternGenerator(Random, original, beatmap, originalBeatmap);
 
-                conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+                    recordNote(endTimeData.EndTime, new Vector2(256, 192));
+                    computeDensity(endTimeData.EndTime);
+                    break;
+                }
 
-                recordNote(original.StartTime, positionData.Position);
+                case IHasPosition positionData:
+                {
+                    computeDensity(original.StartTime);
+
+                    conversion = new HitObjectPatternGenerator(Random, original, beatmap, lastPattern, lastTime, lastPosition, density, lastStair, originalBeatmap);
+
+                    recordNote(original.StartTime, positionData.Position);
+                    break;
+                }
             }
 
             if (conversion == null)
@@ -219,14 +226,13 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
             private Pattern generate()
             {
-                var endTimeData = HitObject as IHasEndTime;
                 var positionData = HitObject as IHasXPosition;
 
                 int column = GetColumn(positionData?.X ?? 0);
 
                 var pattern = new Pattern();
 
-                if (endTimeData != null)
+                if (HitObject is IHasEndTime endTimeData)
                 {
                     pattern.Add(new HoldNote
                     {
@@ -237,7 +243,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                         Tail = { Samples = sampleInfoListAt(endTimeData.EndTime) },
                     });
                 }
-                else if (positionData != null)
+                else if (HitObject is IHasXPosition)
                 {
                     pattern.Add(new Note
                     {
@@ -255,11 +261,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
             /// </summary>
             /// <param name="time">The time to retrieve the sample info list from.</param>
             /// <returns></returns>
-            private List<HitSampleInfo> sampleInfoListAt(double time)
+            private IList<HitSampleInfo> sampleInfoListAt(double time)
             {
-                var curveData = HitObject as IHasCurve;
-
-                if (curveData == null)
+                if (!(HitObject is IHasCurve curveData))
                     return HitObject.Samples;
 
                 double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();

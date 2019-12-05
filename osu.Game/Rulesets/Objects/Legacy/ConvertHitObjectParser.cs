@@ -74,9 +74,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 string[] pointSplit = split[5].Split('|');
 
                 int pointCount = 1;
+
                 foreach (var t in pointSplit)
+                {
                     if (t.Length > 1)
                         pointCount++;
+                }
 
                 var points = new Vector2[pointCount];
 
@@ -113,7 +116,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+                static bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
 
                 if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
                     pathType = PathType.Linear;
@@ -174,14 +177,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         if (i >= adds.Length)
                             break;
 
-                        int sound;
-                        int.TryParse(adds[i], out sound);
+                        int.TryParse(adds[i], out var sound);
                         nodeSoundTypes[i] = (LegacySoundType)sound;
                     }
                 }
 
                 // Generate the final per-node samples
-                var nodeSamples = new List<List<HitSampleInfo>>(nodes);
+                var nodeSamples = new List<IList<HitSampleInfo>>(nodes);
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
@@ -279,7 +281,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
         protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
-                                                  List<List<HitSampleInfo>> nodeSamples);
+                                                  List<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.

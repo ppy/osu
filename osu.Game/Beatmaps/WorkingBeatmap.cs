@@ -133,8 +133,10 @@ namespace osu.Game.Beatmaps
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
 
             foreach (var mod in mods.OfType<IApplicableToHitObject>())
-            foreach (var obj in converted.HitObjects)
-                mod.ApplyToHitObject(obj);
+            {
+                foreach (var obj in converted.HitObjects)
+                    mod.ApplyToHitObject(obj);
+            }
 
             processor?.PostProcess();
 
@@ -148,7 +150,7 @@ namespace osu.Game.Beatmaps
 
         public bool BeatmapLoaded => beatmapLoadTask?.IsCompleted ?? false;
 
-        public Task<IBeatmap> LoadBeatmapAsync() => (beatmapLoadTask ?? (beatmapLoadTask = Task.Factory.StartNew(() =>
+        public Task<IBeatmap> LoadBeatmapAsync() => beatmapLoadTask ??= Task.Factory.StartNew(() =>
         {
             // Todo: Handle cancellation during beatmap parsing
             var b = GetBeatmap() ?? new Beatmap();
@@ -160,7 +162,7 @@ namespace osu.Game.Beatmaps
             b.BeatmapInfo = BeatmapInfo;
 
             return b;
-        }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default)));
+        }, beatmapCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         public IBeatmap Beatmap
         {

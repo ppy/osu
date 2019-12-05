@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework;
@@ -53,13 +54,13 @@ namespace osu.Game.Database
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Fired when a new <see cref="TModel"/> becomes available in the database.
+        /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemAdded;
 
         /// <summary>
-        /// Fired when a <see cref="TModel"/> is removed from the database.
+        /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemRemoved;
@@ -94,7 +95,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import one or more <see cref="TModel"/> items from filesystem <paramref name="paths"/>.
+        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
         /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more archive locations on disk.</param>
@@ -107,10 +108,10 @@ namespace osu.Game.Database
             return Import(notification, paths);
         }
 
-        protected async Task Import(ProgressNotification notification, params string[] paths)
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = "Import is initialising...";
+            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
 
             int current = 0;
 
@@ -146,7 +147,7 @@ namespace osu.Game.Database
 
             if (imported.Count == 0)
             {
-                notification.Text = "Import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
@@ -167,10 +168,12 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            return imported;
         }
 
         /// <summary>
-        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// </summary>
         /// <param name="path">The archive location on disk.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
@@ -261,15 +264,18 @@ namespace osu.Game.Database
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
+
             foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+            {
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
+            }
 
             return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
         }
 
         /// <summary>
-        /// Import an item from a <see cref="TModel"/>.
+        /// Import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
@@ -399,20 +405,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var b in items)
             {
-                foreach (var b in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
 
-                    Delete(b);
+                Delete(b);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -438,20 +441,17 @@ namespace osu.Game.Database
 
             int i = 0;
 
-            using (ContextFactory.GetForWrite())
+            foreach (var item in items)
             {
-                foreach (var item in items)
-                {
-                    if (notification.State == ProgressNotificationState.Cancelled)
-                        // user requested abort
-                        return;
+                if (notification.State == ProgressNotificationState.Cancelled)
+                    // user requested abort
+                    return;
 
-                    notification.Text = $"Restoring ({++i} of {items.Count})";
+                notification.Text = $"Restoring ({++i} of {items.Count})";
 
-                    Undelete(item);
+                Undelete(item);
 
-                    notification.Progress = (float)i / items.Count;
-                }
+                notification.Progress = (float)i / items.Count;
             }
 
             notification.State = ProgressNotificationState.Completed;
@@ -488,12 +488,16 @@ namespace osu.Game.Database
 
             // import files to manager
             foreach (string file in reader.Filenames)
+            {
                 using (Stream s = reader.GetStream(file))
+                {
                     fileInfos.Add(new TFileModel
                     {
                         Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
                         FileInfo = files.Add(s)
                     });
+                }
+            }
 
             return fileInfos;
         }
@@ -585,12 +589,12 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// After an existing <see cref="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to restore the existing
         /// item and skip the import. This method allows changing that behaviour.
         /// </summary>
         /// <param name="existing">The existing model.</param>
         /// <param name="import">The newly imported model.</param>
-        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing a force a re-import.</returns>
+        /// <returns>Whether the existing model should be restored and used. Returning false will delete the existing and force a re-import.</returns>
         protected virtual bool CanUndelete(TModel existing, TModel import) => true;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
@@ -654,8 +658,10 @@ namespace osu.Game.Database
         private void handleEvent(Action a)
         {
             if (delayingEvents)
+            {
                 lock (queuedEvents)
                     queuedEvents.Add(a);
+            }
             else
                 a.Invoke();
         }

@@ -40,9 +40,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             for (int i = 0; i < max_sprites; i++)
             {
-                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
-                // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
-                parts[i].InvalidationID = 1;
+                // -1 signals that the part is unusable, and should not be drawn
+                parts[i].InvalidationID = -1;
             }
         }
 
@@ -112,7 +111,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             for (int i = 0; i < parts.Length; ++i)
             {
                 parts[i].Time -= time;
-                ++parts[i].InvalidationID;
+
+                if (parts[i].InvalidationID != -1)
+                    ++parts[i].InvalidationID;
             }
 
             time = 0;
@@ -205,8 +206,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             public TrailDrawNode(CursorTrail source)
                 : base(source)
             {
-                for (int i = 0; i < max_sprites; i++)
-                    parts[i].InvalidationID = 0;
             }
 
             public override void ApplyState()
@@ -218,11 +217,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 size = Source.partSize;
                 time = Source.time;
 
-                for (int i = 0; i < Source.parts.Length; ++i)
-                {
-                    if (Source.parts[i].InvalidationID > parts[i].InvalidationID)
-                        parts[i] = Source.parts[i];
-                }
+                Source.parts.CopyTo(parts, 0);
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
@@ -234,6 +229,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 for (int i = 0; i < parts.Length; ++i)
                 {
+                    if (parts[i].InvalidationID == -1)
+                        continue;
+
                     vertexBatch.DrawTime = parts[i].Time;
 
                     Vector2 pos = parts[i].Position;
