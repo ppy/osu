@@ -13,6 +13,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Graphics;
@@ -25,10 +29,22 @@ namespace osu.Game.Tests.Visual.Editor
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TimelineArea),
+            typeof(TimelineHitObjectDisplay),
             typeof(Timeline),
             typeof(TimelineButton),
             typeof(CentreMarker)
         };
+
+        [Cached(typeof(IEditorBeatmap))]
+        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
+
+        public TestSceneEditorComposeTimeline()
+        {
+            editorBeatmap = new EditorBeatmap<OsuHitObject>(
+                (Beatmap<OsuHitObject>)
+                CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, new Mod[] { })
+            );
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
