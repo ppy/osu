@@ -17,6 +17,13 @@ namespace osu.Game.Rulesets.Objects
     public class SliderPath
     {
         /// <summary>
+        /// The current version of this <see cref="SliderPath"/>. Updated when any change to the path occurs.
+        /// </summary>
+        public IBindable<int> Version => version;
+
+        private readonly Bindable<int> version = new Bindable<int>();
+
+        /// <summary>
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
         /// and the path will be shortened/lengthened to match this length.
         /// </summary>
@@ -39,25 +46,23 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public SliderPath()
         {
-            ExpectedDistance.ValueChanged += _ => pathCache.Invalidate();
+            ExpectedDistance.ValueChanged += _ => invalidate();
 
             ControlPoints.ItemsAdded += items =>
             {
                 foreach (var c in items)
-                    c.Changed += onControlPointChanged;
+                    c.Changed += invalidate;
 
-                onControlPointChanged();
+                invalidate();
             };
 
             ControlPoints.ItemsRemoved += items =>
             {
                 foreach (var c in items)
-                    c.Changed -= onControlPointChanged;
+                    c.Changed -= invalidate;
 
-                onControlPointChanged();
+                invalidate();
             };
-
-            void onControlPointChanged() => pathCache.Invalidate();
         }
 
         /// <summary>
@@ -139,6 +144,12 @@ namespace osu.Game.Rulesets.Objects
 
             double d = progressToDistance(progress);
             return interpolateVertices(indexOfDistance(d), d);
+        }
+
+        private void invalidate()
+        {
+            pathCache.Invalidate();
+            version.Value++;
         }
 
         private void ensureValid()
