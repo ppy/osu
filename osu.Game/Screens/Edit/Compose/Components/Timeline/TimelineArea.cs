@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,11 +12,14 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : CompositeDrawable
+    public class TimelineArea : Container
     {
-        private readonly Timeline timeline;
+        private Timeline timeline;
 
-        public TimelineArea()
+        protected override Container<Drawable> Content => timeline;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Masking = true;
             CornerRadius = 5;
