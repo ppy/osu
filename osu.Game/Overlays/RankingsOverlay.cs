@@ -98,9 +98,25 @@ namespace osu.Game.Overlays
 
         protected override void LoadComplete()
         {
-            country.BindValueChanged(_ => redraw(), true);
-            scope.BindValueChanged(_ => redraw(), true);
-            ruleset.BindValueChanged(_ => redraw(), true);
+            country.BindValueChanged(_ =>
+            {
+                // if a country is requested, force performance scope.
+                if (country.Value != null)
+                    scope.Value = RankingsScope.Performance;
+
+                Scheduler.AddOnce(loadNewContent);
+            }, true);
+            scope.BindValueChanged(_ =>
+            {
+                // country filtering is only valid for performance scope.
+                if (scope.Value != RankingsScope.Performance)
+                    country.Value = null;
+
+                Scheduler.AddOnce(loadNewContent);
+            }, true);
+
+            ruleset.BindValueChanged(_ => Scheduler.AddOnce(loadNewContent), true);
+
             base.LoadComplete();
         }
 
@@ -114,7 +130,7 @@ namespace osu.Game.Overlays
             country.Value = requested;
         }
 
-        private void redraw()
+        private void loadNewContent()
         {
             scrollFlow.ScrollToStart();
 
