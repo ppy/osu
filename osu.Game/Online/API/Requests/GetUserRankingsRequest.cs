@@ -15,7 +15,7 @@ namespace osu.Game.Online.API.Requests
         public GetUserRankingsRequest(RulesetInfo ruleset, UserRankingsType type = UserRankingsType.Performance, int page = 1, string country = null)
             : base(ruleset, page)
         {
-            this.Type = type;
+            Type = type;
             this.country = country;
         }
 
