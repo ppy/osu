@@ -258,6 +258,7 @@ namespace osu.Game.Overlays.Comments
 
         private void onLoadStarted()
         {
+            currentPage = 0;
             showCommentsCancellationSource?.Cancel();
             showCommentsDelegate?.Cancel();
             moreButton.IsLoading = true;
