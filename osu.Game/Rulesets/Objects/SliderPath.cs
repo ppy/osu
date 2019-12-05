@@ -37,13 +37,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
         /// </summary>
-        /// <param name="controlPoints">An optional set of <see cref="PathControlPoint"/>s to initialise the path with.</param>
-        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all control points.
-        /// The path will be shortened/lengthened to match this length. If null, the path will use the true distance between all control points.</param>
-        [JsonConstructor]
-        public SliderPath(PathControlPoint[] controlPoints = null, double? expectedDistance = null)
+        public SliderPath()
         {
-            ExpectedDistance.Value = expectedDistance;
             ExpectedDistance.ValueChanged += _ => pathCache.Invalidate();
 
             ControlPoints.ItemsAdded += items =>
@@ -62,9 +57,31 @@ namespace osu.Game.Rulesets.Objects
                 onControlPointChanged();
             };
 
-            ControlPoints.AddRange(controlPoints);
-
             void onControlPointChanged() => pathCache.Invalidate();
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="SliderPath"/>.
+        /// </summary>
+        /// <param name="controlPoints">An optional set of <see cref="PathControlPoint"/>s to initialise the path with.</param>
+        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all control points.
+        /// The path will be shortened/lengthened to match this length. If null, the path will use the true distance between all control points.</param>
+        [JsonConstructor]
+        public SliderPath(PathControlPoint[] controlPoints, double? expectedDistance = null)
+            : this()
+        {
+            ControlPoints.AddRange(controlPoints);
+            ExpectedDistance.Value = expectedDistance;
+        }
+
+        public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
+            : this()
+        {
+            foreach (var c in controlPoints)
+                ControlPoints.Add(new PathControlPoint { Position = { Value = c } });
+            ControlPoints[0].Type.Value = type;
+
+            ExpectedDistance.Value = expectedDistance;
         }
 
         /// <summary>
