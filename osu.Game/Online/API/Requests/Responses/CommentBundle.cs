@@ -24,7 +24,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 {
                     if (comment.IsReply)
                     {
-                        var parent = comments.FirstOrDefault(parent => parent.Id == comment.ParentId);
+                        var parent = comments.FirstOrDefault(p => p.Id == comment.ParentId);
 
                         if (parent != null)
                         {
@@ -57,7 +57,12 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 userVotes = value;
-                userVotes.ForEach(vote => Comments.FirstOrDefault(comment => vote == comment.Id).IsVoted = true);
+                userVotes.ForEach(vote =>
+                {
+                    var votedComment = Comments.FirstOrDefault(comment => vote == comment.Id);
+                    if (votedComment != null)
+                        votedComment.IsVoted = true;
+                });
             }
         }
 
