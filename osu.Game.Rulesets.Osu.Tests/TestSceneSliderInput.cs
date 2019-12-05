@@ -313,16 +313,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                             }, 25),
                         }
                     },
-                    ControlPointInfo =
-                    {
-                        DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
-                    },
                     BeatmapInfo =
                     {
                         BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                         Ruleset = new OsuRuleset().RulesetInfo
                     },
                 });
+
+                Beatmap.Value.Beatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 0.1f });
 
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } });
 

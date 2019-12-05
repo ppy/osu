@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Select
         public OptionalRange<double> BPM;
         public OptionalRange<int> BeatDivisor;
         public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
+        public OptionalTextFilter Creator;
+        public OptionalTextFilter Artist;
 
         public string[] SearchTerms = Array.Empty<string>();
 
@@ -44,6 +46,8 @@ namespace osu.Game.Screens.Select
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
             where T : struct, IComparable
         {
+            public bool HasFilter => Max != null || Min != null;
+
             public bool IsInRange(T value)
             {
                 if (Min != null)
@@ -53,7 +57,7 @@ namespace osu.Game.Screens.Select
                     if (comparison < 0)
                         return false;
 
-                    if (comparison == 0 && !IsInclusive)
+                    if (comparison == 0 && !IsLowerInclusive)
                         return false;
                 }
 
@@ -64,7 +68,7 @@ namespace osu.Game.Screens.Select
                     if (comparison > 0)
                         return false;
 
-                    if (comparison == 0 && !IsInclusive)
+                    if (comparison == 0 && !IsUpperInclusive)
                         return false;
                 }
 
@@ -73,12 +77,35 @@ namespace osu.Game.Screens.Select
 
             public T? Min;
             public T? Max;
-            public bool IsInclusive;
+            public bool IsLowerInclusive;
+            public bool IsUpperInclusive;
 
             public bool Equals(OptionalRange<T> other)
-                => Min.Equals(other.Min)
-                   && Max.Equals(other.Max)
-                   && IsInclusive.Equals(other.IsInclusive);
+                => EqualityComparer<T?>.Default.Equals(Min, other.Min)
+                   && EqualityComparer<T?>.Default.Equals(Max, other.Max)
+                   && IsLowerInclusive.Equals(other.IsLowerInclusive)
+                   && IsUpperInclusive.Equals(other.IsUpperInclusive);
+        }
+
+        public struct OptionalTextFilter : IEquatable<OptionalTextFilter>
+        {
+            public bool HasFilter => !string.IsNullOrEmpty(SearchTerm);
+
+            public bool Matches(string value)
+            {
+                if (!HasFilter)
+                    return true;
+
+                // search term is guaranteed to be non-empty, so if the string we're comparing is empty, it's not matching
+                if (string.IsNullOrEmpty(value))
+                    return false;
+
+                return value.IndexOf(SearchTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            }
+
+            public string SearchTerm;
+
+            public bool Equals(OptionalTextFilter other) => SearchTerm?.Equals(other.SearchTerm) ?? true;
         }
     }
 }

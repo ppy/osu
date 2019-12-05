@@ -9,6 +9,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -17,6 +18,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Skins
 {
     [TestFixture]
+    [HeadlessTest]
     public class TestSceneSkinConfigurationLookup : OsuTestScene
     {
         private LegacySkin source1;
@@ -112,6 +114,14 @@ namespace osu.Game.Tests.Skins
                     return true;
                 }
             });
+        }
+
+        [Test]
+        public void TestLegacyVersionLookup()
+        {
+            AddStep("Set source1 version 2.3", () => source1.Configuration.LegacyVersion = 2.3m);
+            AddStep("Set source2 version null", () => source2.Configuration.LegacyVersion = null);
+            AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
         }
 
         public enum LookupType
