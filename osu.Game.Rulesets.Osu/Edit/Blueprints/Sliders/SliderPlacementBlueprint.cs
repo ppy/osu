@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private HitCirclePiece headCirclePiece;
         private HitCirclePiece tailCirclePiece;
 
-        private readonly List<Segment> segments = new List<Segment>();
-        private Vector2 cursor;
         private InputManager inputManager;
 
         private PlacementState state;
@@ -40,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             : base(new Objects.Slider())
         {
             RelativeSizeAxes = Axes.Both;
-            segments.Add(new Segment(Vector2.Zero));
+            HitObject.Path.ControlPoints.Add(new PathControlPoint { Position = { Value = Vector2.Zero } });
         }
 
         [BackgroundDependencyLoader]
@@ -74,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case PlacementState.Body:
                     // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
                     // is used instead since snapping control points doesn't make much sense
-                    cursor = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                    HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 1].Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
         }
@@ -91,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     switch (e.Button)
                     {
                         case MouseButton.Left:
-                            segments.Last().ControlPoints.Add(cursor);
+                            HitObject.Path.ControlPoints.Add(new PathControlPoint { Position = { Value = HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 1].Position.Value } });
                             break;
                     }
 
@@ -110,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
-            segments.Add(new Segment(segments[segments.Count - 1].ControlPoints.Last()));
+            HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 2].Type.Value = PathType.Bezier;
             return true;
         }
 
@@ -134,12 +132,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            Vector2[] newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-
-            var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
-            var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
-
-            HitObject.Path = new SliderPath(unsnappedPath.Type, newControlPoints, snappedDistance);
+            HitObject.Path.ExpectedDistance.Value = null;
+            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.Distance) ?? (float)HitObject.Path.Distance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);

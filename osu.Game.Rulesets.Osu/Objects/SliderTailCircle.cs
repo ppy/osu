@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Osu.Objects
     /// </summary>
     public class SliderTailCircle : SliderCircle
     {
-        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+        private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         public SliderTailCircle(Slider slider)
         {
-            pathBindable.BindTo(slider.PathBindable);
-            pathBindable.BindValueChanged(_ => Position = slider.EndPosition);
+            pathVersion.BindTo(slider.Path.Version);
+            pathVersion.BindValueChanged(_ => Position = slider.EndPosition);
         }
 
         public override Judgement CreateJudgement() => new OsuSliderTailJudgement();

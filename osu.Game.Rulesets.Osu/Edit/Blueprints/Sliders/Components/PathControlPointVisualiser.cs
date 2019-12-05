@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            while (slider.Path.ControlPoints.Length > Pieces.Count)
+            while (slider.Path.ControlPoints.Count > Pieces.Count)
             {
                 var piece = new PathControlPointPiece(slider, Pieces.Count)
                 {
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 Pieces.Add(piece);
             }
 
-            while (slider.Path.ControlPoints.Length < Pieces.Count)
+            while (slider.Path.ControlPoints.Count < Pieces.Count)
                 Pieces.Remove(Pieces[Pieces.Count - 1]);
         }
 
@@ -105,29 +105,32 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool deleteSelected()
         {
-            var newControlPoints = new List<Vector2>();
+            int countDeleted = 0;
 
             foreach (var piece in Pieces)
             {
-                if (!piece.IsSelected.Value)
-                    newControlPoints.Add(slider.Path.ControlPoints[piece.Index]);
+                if (piece.IsSelected.Value)
+                {
+                    slider.Path.ControlPoints.RemoveAt(piece.Index);
+                    countDeleted++;
+                }
             }
 
             // Ensure that there are any points to be deleted
-            if (newControlPoints.Count == slider.Path.ControlPoints.Length)
+            if (countDeleted == 0)
                 return false;
 
             // If there are 0 remaining control points, treat the slider as being deleted
-            if (newControlPoints.Count == 0)
+            if (slider.Path.ControlPoints.Count == 0)
             {
                 placementHandler?.Delete(slider);
                 return true;
             }
 
             // Make control points relative
-            Vector2 first = newControlPoints[0];
-            for (int i = 0; i < newControlPoints.Count; i++)
-                newControlPoints[i] = newControlPoints[i] - first;
+            Vector2 first = slider.Path.ControlPoints[0].Position.Value;
+            for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
+                slider.Path.ControlPoints[i].Position.Value = slider.Path.ControlPoints[i].Position.Value - first;
 
             // The slider's position defines the position of the first control point, and all further control points are relative to that point
             slider.Position += first;
@@ -136,7 +139,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             foreach (var piece in Pieces)
                 piece.IsSelected.Value = false;
 
-            ControlPointsChanged?.Invoke(newControlPoints.ToArray());
             return true;
         }
 

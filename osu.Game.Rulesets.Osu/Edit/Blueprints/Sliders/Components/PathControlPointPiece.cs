@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            Position = slider.StackedPosition + slider.Path.ControlPoints[Index];
+            Position = slider.StackedPosition + slider.Path.ControlPoints[Index].Position.Value;
 
             updateMarkerDisplay();
             updateConnectingPath();
@@ -116,10 +116,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             path.ClearVertices();
 
-            if (Index != slider.Path.ControlPoints.Length - 1)
+            if (Index != slider.Path.ControlPoints.Count - 1)
             {
                 path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[Index + 1] - slider.Path.ControlPoints[Index]);
+                path.AddVertex(slider.Path.ControlPoints[Index + 1].Position.Value - slider.Path.ControlPoints[Index].Position.Value);
             }
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
@@ -156,8 +156,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            var newControlPoints = slider.Path.ControlPoints.ToArray();
-
             if (Index == 0)
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
@@ -168,29 +166,17 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 slider.StartTime = snappedTime;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
-                for (int i = 1; i < newControlPoints.Length; i++)
-                    newControlPoints[i] -= movementDelta;
+                for (int i = 1; i < slider.Path.ControlPoints.Count; i++)
+                    slider.Path.ControlPoints[i].Position.Value -= movementDelta;
             }
             else
-                newControlPoints[Index] += e.Delta;
-
-            if (isSegmentSeparatorWithNext)
-                newControlPoints[Index + 1] = newControlPoints[Index];
-
-            if (isSegmentSeparatorWithPrevious)
-                newControlPoints[Index - 1] = newControlPoints[Index];
-
-            ControlPointsChanged?.Invoke(newControlPoints);
+                slider.Path.ControlPoints[Index].Position.Value += e.Delta;
 
             return true;
         }
 
         protected override bool OnDragEnd(DragEndEvent e) => true;
 
-        private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
-
-        private bool isSegmentSeparatorWithNext => Index < slider.Path.ControlPoints.Length - 1 && slider.Path.ControlPoints[Index + 1] == slider.Path.ControlPoints[Index];
-
-        private bool isSegmentSeparatorWithPrevious => Index > 0 && slider.Path.ControlPoints[Index - 1] == slider.Path.ControlPoints[Index];
+        private bool isSegmentSeparator => slider.Path.ControlPoints[Index].Type.Value.HasValue;
     }
 }
