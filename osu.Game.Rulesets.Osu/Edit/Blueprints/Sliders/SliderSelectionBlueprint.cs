@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.UserInterface;
@@ -42,6 +43,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
                 ControlPointVisualiser = new PathControlPointVisualiser(sliderObject, true)
             };
+        }
+
+        private IBindable<int> pathVersion;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            pathVersion = HitObject.Path.Version.GetBoundCopy();
+            pathVersion.BindValueChanged(_ => updatePath());
         }
 
         protected override void Update()
@@ -112,10 +123,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return insertionIndex;
         }
 
-        private void onNewControlPoints(Vector2[] controlPoints)
+        private void updatePath()
         {
             HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
-
             UpdateHitObject();
         }
 
