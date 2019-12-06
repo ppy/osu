@@ -16,23 +16,20 @@ namespace osu.Game.Screens.Edit.Compose
         protected override Drawable CreateMainContent()
         {
             var ruleset = Beatmap.Value.BeatmapInfo.Ruleset?.CreateInstance();
-
             composer = ruleset?.CreateHitObjectComposer();
 
-            if (composer != null)
-            {
-                var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
+            if (ruleset == null || composer == null)
+                return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
 
-                // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
-                // full access to all skin sources.
-                var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
+            var beatmapSkinProvider = new BeatmapSkinProvidingContainer(Beatmap.Value.Skin);
 
-                // load the skinning hierarchy first.
-                // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
-                return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(composer));
-            }
+            // the beatmapSkinProvider is used as the fallback source here to allow the ruleset-specific skin implementation
+            // full access to all skin sources.
+            var rulesetSkinProvider = new SkinProvidingContainer(ruleset.CreateLegacySkinProvider(beatmapSkinProvider));
 
-            return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
+            // load the skinning hierarchy first.
+            // this is intentionally done in two stages to ensure things are in a loaded state before exposing the ruleset to skin sources.
+            return beatmapSkinProvider.WithChild(rulesetSkinProvider.WithChild(composer));
         }
 
         protected override Drawable CreateTimelineContent() => new TimelineHitObjectDisplay(composer.EditorBeatmap);
