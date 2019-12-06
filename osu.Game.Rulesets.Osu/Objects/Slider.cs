@@ -28,7 +28,23 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public SliderPath Path { get; set; } = new SliderPath(new[] { new PathControlPoint { Type = { Value = PathType.Bezier } } });
+        private readonly SliderPath path = new SliderPath(new[] { new PathControlPoint { Type = { Value = PathType.Linear } } });
+
+        public SliderPath Path
+        {
+            get => path;
+            set
+            {
+                path.ControlPoints.Clear();
+                path.ExpectedDistance.Value = null;
+
+                if (value != null)
+                {
+                    path.ControlPoints.AddRange(value.ControlPoints);
+                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
+                }
+            }
+        }
 
         public double Distance => Path.Distance;
 
@@ -38,8 +54,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.Position = value;
-                endPositionCache.Invalidate();
-
                 updateNestedPositions();
             }
         }
@@ -102,6 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
 
             Path.OffsetChanged += offset => Position += offset;
+            Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -179,6 +194,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void updateNestedPositions()
         {
+            endPositionCache.Invalidate();
+
             if (HeadCircle != null)
                 HeadCircle.Position = Position;
 
