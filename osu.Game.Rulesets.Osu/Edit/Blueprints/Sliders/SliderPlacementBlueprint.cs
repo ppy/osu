@@ -30,6 +30,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private InputManager inputManager;
 
         private PlacementState state;
+        private PathControlPoint segmentStart;
+        private PathControlPoint cursor;
+        private int currentSegmentLength = 1;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
@@ -38,7 +41,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             : base(new Objects.Slider())
         {
             RelativeSizeAxes = Axes.Both;
-            HitObject.Path.ControlPoints.Add(new PathControlPoint { Position = { Value = Vector2.Zero } });
+
+            segmentStart = HitObject.Path.ControlPoints[0];
+
         }
 
         [BackgroundDependencyLoader]
@@ -70,9 +75,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
+                    ensureCursor();
+
                     // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
                     // is used instead since snapping control points doesn't make much sense
-                    HitObject.Path.ControlPoints.Last().Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                    cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
         }
@@ -89,7 +96,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     switch (e.Button)
                     {
                         case MouseButton.Left:
-                            HitObject.Path.ControlPoints.Add(new PathControlPoint { Position = { Value = HitObject.Path.ControlPoints.Last().Position.Value } });
+                            ensureCursor();
+
+                            // Detatch the cursor
+                            cursor = null;
                             break;
                     }
 
@@ -108,8 +118,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
-            // At the point of a double click, there's guaranteed to be at least two points - one from the click, and one from the cursor
-            HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 2].Type.Value = PathType.Bezier;
+            // Todo: This should all not occur on double click, but rather if the previous control point is hovered.
+            segmentStart = HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 1];
+            segmentStart.Type.Value = PathType.Linear;
+
+            currentSegmentLength = 1;
             return true;
         }
 
@@ -129,6 +142,34 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             base.Update();
             updateSlider();
+        }
+
+        private void updatePathType()
+        {
+            switch (currentSegmentLength)
+            {
+                case 1:
+                case 2:
+                    segmentStart.Type.Value = PathType.Linear;
+                    break;
+                case 3:
+                    segmentStart.Type.Value = PathType.PerfectCurve;
+                    break;
+                default:
+                    segmentStart.Type.Value = PathType.Bezier;
+                    break;
+            }
+        }
+
+        private void ensureCursor()
+        {
+            if (cursor == null)
+            {
+                HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
+                currentSegmentLength++;
+
+                updatePathType();
+            }
         }
 
         private void updateSlider()
