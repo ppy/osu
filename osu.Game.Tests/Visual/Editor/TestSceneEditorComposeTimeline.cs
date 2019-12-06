@@ -13,9 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Osu;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
@@ -38,12 +36,9 @@ namespace osu.Game.Tests.Visual.Editor
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(
-                (Beatmap<OsuHitObject>)
-                CreateWorkingBeatmap(new OsuRuleset().RulesetInfo).GetPlayableBeatmap(new OsuRuleset().RulesetInfo, new Mod[] { })
-            );
-
             Beatmap.Value = new WaveformTestBeatmap(audio);
+
+            var editorBeatmap = new EditorBeatmap<HitObject>((Beatmap<HitObject>)Beatmap.Value.Beatmap);
 
             Children = new Drawable[]
             {
@@ -60,6 +55,7 @@ namespace osu.Game.Tests.Visual.Editor
                 },
                 new TimelineArea
                 {
+                    Child = new TimelineHitObjectDisplay(editorBeatmap),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,

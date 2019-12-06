@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         public TimelineHitObjectDisplay(IEditorBeatmap beatmap)
         {
+            RelativeSizeAxes = Axes.Both;
+
             this.beatmap = beatmap;
         }
 

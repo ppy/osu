@@ -36,18 +36,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             this.adjustableClock = adjustableClock;
 
-            Children = new Drawable[]
+            Add(waveform = new WaveformGraph
             {
-                waveform = new WaveformGraph
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.Blue.Opacity(0.2f),
-                    LowColour = colours.BlueLighter,
-                    MidColour = colours.BlueDark,
-                    HighColour = colours.BlueDarker,
-                    Depth = float.MaxValue
-                },
-            };
+                RelativeSizeAxes = Axes.Both,
+                Colour = colours.Blue.Opacity(0.2f),
+                LowColour = colours.BlueLighter,
+                MidColour = colours.BlueDark,
+                HighColour = colours.BlueDarker,
+                Depth = float.MaxValue
+            });
 
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker());

@@ -35,9 +35,6 @@ namespace osu.Game.Screens.Edit.Compose
             return new ScreenWhiteBox.UnderConstructionMessage(ruleset == null ? "This beatmap" : $"{ruleset.Description}'s composer");
         }
 
-        protected override Drawable CreateTimelineContent() => new TimelineHitObjectDisplay(composer.EditorBeatmap)
-        {
-            RelativeSizeAxes = Axes.Both,
-        };
+        protected override Drawable CreateTimelineContent() => new TimelineHitObjectDisplay(composer.EditorBeatmap);
     }
 }
