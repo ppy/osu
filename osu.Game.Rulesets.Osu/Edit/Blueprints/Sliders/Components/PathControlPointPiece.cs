@@ -21,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
         public Action<int, MouseButtonEvent> RequestSelection;
-        public Action<Vector2[]> ControlPointsChanged;
 
         public readonly BindableBool IsSelected = new BindableBool();
         public readonly int Index;
@@ -103,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             markerRing.Alpha = IsSelected.Value ? 1 : 0;
 
-            Color4 colour = isSegmentSeparator ? colours.Red : colours.Yellow;
+            Color4 colour = slider.Path.ControlPoints[Index].Type.Value.HasValue ? colours.Red : colours.Yellow;
             if (IsHovered || IsSelected.Value)
                 colour = Color4.White;
             marker.Colour = colour;
@@ -176,7 +175,5 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         }
 
         protected override bool OnDragEnd(DragEndEvent e) => true;
-
-        private bool isSegmentSeparator => slider.Path.ControlPoints[Index].Type.Value.HasValue;
     }
 }
