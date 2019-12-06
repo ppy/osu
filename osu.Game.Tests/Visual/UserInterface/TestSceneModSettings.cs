@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneModCustomizationSettings : OsuTestScene
+    public class TestSceneModSettings : OsuTestScene
     {
         private TestModSelectOverlay modSelect;
 
@@ -27,13 +27,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.BottomCentre,
             });
 
-            var testMod = new TestModCustomizable1();
+            var testMod = new TestModCustomisable1();
 
             AddStep("open", modSelect.Show);
-            AddAssert("button disabled", () => !modSelect.CustomizeButton.Enabled.Value);
+            AddAssert("button disabled", () => !modSelect.CustomiseButton.Enabled.Value);
             AddStep("select mod", () => modSelect.SelectMod(testMod));
-            AddAssert("button enabled", () => modSelect.CustomizeButton.Enabled.Value);
-            AddStep("open customization", () => modSelect.CustomizeButton.Click());
+            AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
+            AddStep("open Customisation", () => modSelect.CustomiseButton.Click());
             AddStep("deselect mod", () => modSelect.SelectMod(testMod));
             AddAssert("controls hidden", () => modSelect.ModSettingsContainer.Alpha == 0);
         }
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestModSelectOverlay : ModSelectOverlay
         {
             public new Container ModSettingsContainer => base.ModSettingsContainer;
-            public new TriangleButton CustomizeButton => base.CustomizeButton;
+            public new TriangleButton CustomiseButton => base.CustomiseButton;
 
             public void SelectMod(Mod mod) =>
                 ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
@@ -57,8 +57,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                     {
                         section.Mods = new Mod[]
                         {
-                            new TestModCustomizable1(),
-                            new TestModCustomizable2()
+                            new TestModCustomisable1(),
+                            new TestModCustomisable2()
                         };
                     }
                     else
@@ -67,21 +67,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestModCustomizable1 : TestModCustomizable
+        private class TestModCustomisable1 : TestModCustomisable
         {
-            public override string Name => "Customizable Mod 1";
+            public override string Name => "Customisable Mod 1";
 
             public override string Acronym => "CM1";
         }
 
-        private class TestModCustomizable2 : TestModCustomizable
+        private class TestModCustomisable2 : TestModCustomisable
         {
-            public override string Name => "Customizable Mod 2";
+            public override string Name => "Customisable Mod 2";
 
             public override string Acronym => "CM2";
         }
 
-        private abstract class TestModCustomizable : Mod, IApplicableMod
+        private abstract class TestModCustomisable : Mod, IApplicableMod
         {
             public override double ScoreMultiplier => 1.0;
 
