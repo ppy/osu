@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             var sliderObject = (Slider)slider.HitObject;
 
+            type = sliderObject.Path.Type;
+
             InternalChildren = new Drawable[]
             {
                 BodyPiece = new SliderBodyPiece(),
@@ -93,6 +95,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
+        private PathType type;
+
         private int addControlPoint(Vector2 position)
         {
             position -= HitObject.Position;
@@ -118,6 +122,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             Array.Copy(controlPoints, insertionIndex, controlPoints, insertionIndex + 1, controlPoints.Length - insertionIndex - 1);
             controlPoints[insertionIndex] = position;
 
+            if (controlPoints.Length > 3)
+            {
+                type = PathType.Bezier;
+            }
+
             onNewControlPoints(controlPoints);
 
             return insertionIndex;
@@ -125,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void onNewControlPoints(Vector2[] controlPoints)
         {
-            var unsnappedPath = new SliderPath(controlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, controlPoints);
+            var unsnappedPath = new SliderPath(controlPoints.Length > 2 ? type : PathType.Linear, controlPoints);
             var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(unsnappedPath.Type, controlPoints, snappedDistance);

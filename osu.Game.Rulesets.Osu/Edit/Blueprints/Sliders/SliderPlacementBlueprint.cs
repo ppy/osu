@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private SliderBodyPiece bodyPiece;
         private HitCirclePiece headCirclePiece;
         private HitCirclePiece tailCirclePiece;
+        private PathType type = PathType.PerfectCurve;
 
         private readonly List<Segment> segments = new List<Segment>();
         private Vector2 cursor;
@@ -92,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     {
                         case MouseButton.Left:
                             segments.Last().ControlPoints.Add(cursor);
+                            if (segments.Last().ControlPoints.Count > 3)
+                                type = PathType.Bezier;
                             break;
                     }
 
@@ -111,6 +114,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
             segments.Add(new Segment(segments[segments.Count - 1].ControlPoints.Last()));
+            type = PathType.Bezier;
             return true;
         }
 
@@ -136,7 +140,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Vector2[] newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
 
-            var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+            var unsnappedPath = new SliderPath(newControlPoints.Length > 2 ? type : PathType.Linear, newControlPoints);
             var snappedDistance = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)unsnappedPath.Distance) ?? (float)unsnappedPath.Distance;
 
             HitObject.Path = new SliderPath(unsnappedPath.Type, newControlPoints, snappedDistance);
