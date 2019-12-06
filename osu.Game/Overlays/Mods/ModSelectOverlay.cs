@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Mods
     public class ModSelectOverlay : WaveOverlayContainer
     {
         protected readonly TriangleButton DeselectAllButton;
-        protected readonly TriangleButton CustomizeButton;
+        protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
 
         protected readonly OsuSpriteText MultiplierLabel;
@@ -232,7 +232,7 @@ namespace osu.Game.Overlays.Mods
                                                     Right = 20
                                                 }
                                             },
-                                            CustomizeButton = new TriangleButton
+                                            CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
                                                 Text = "Customization",
@@ -351,7 +351,7 @@ namespace osu.Game.Overlays.Mods
                 ModSettingsContent.RemoveAll(section => section.Mod == removed);
 
             bool hasSettings = ModSettingsContent.Children.Count > 0;
-            CustomizeButton.Enabled.Value = hasSettings;
+            CustomiseButton.Enabled.Value = hasSettings;
 
             if (!hasSettings)
                 ModSettingsContainer.Hide();
