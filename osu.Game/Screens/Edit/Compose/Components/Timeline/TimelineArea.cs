@@ -24,8 +24,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             Masking = true;
             CornerRadius = 5;
 
-            OsuCheckbox hitObjectsCheckbox;
-            OsuCheckbox hitSoundsCheckbox;
             OsuCheckbox waveformCheckbox;
 
             InternalChildren = new Drawable[]
@@ -64,8 +62,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            hitObjectsCheckbox = new OsuCheckbox { LabelText = "Hit objects" },
-                                            hitSoundsCheckbox = new OsuCheckbox { LabelText = "Hit sounds" },
                                             waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
                                         }
                                     }
@@ -123,8 +119,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            hitObjectsCheckbox.Current.Value = true;
-            hitSoundsCheckbox.Current.Value = true;
             waveformCheckbox.Current.Value = true;
 
             timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
