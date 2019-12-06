@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -29,6 +30,8 @@ namespace osu.Game.Rulesets.Osu.UI
             : base(ruleset, beatmap, mods)
         {
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
