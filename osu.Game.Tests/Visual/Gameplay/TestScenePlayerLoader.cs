@@ -76,8 +76,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestEarlyExit()
         {
-            AddStep("apply mods", () => Mods.Value = new[] { new OsuModNightcore() });
-            AddStep("load dummy beatmap", () => ResetPlayer(false));
+            AddStep("load dummy beatmap", () => ResetPlayer(false, () => Mods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
             AddStep("exit loader", () => loader.Exit());
