@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case PlacementState.Body:
                     // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
                     // is used instead since snapping control points doesn't make much sense
-                    HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 1].Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
+                    HitObject.Path.ControlPoints.Last().Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
         }
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     switch (e.Button)
                     {
                         case MouseButton.Left:
-                            HitObject.Path.ControlPoints.Add(new PathControlPoint { Position = { Value = HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 1].Position.Value } });
+                            HitObject.Path.ControlPoints.Add(new PathControlPoint { Position = { Value = HitObject.Path.ControlPoints.Last().Position.Value } });
                             break;
                     }
 
@@ -108,6 +108,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
+            // At the point of a double click, there's guaranteed to be at least two points - one from the click, and one from the cursor
             HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 2].Type.Value = PathType.Bezier;
             return true;
         }
