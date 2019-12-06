@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
     {
         public override bool AllowBackButton => false; // handled by HoldForMenuButton
 
+        public override bool AllowRateAdjustments => false; // handled by GameplayClockContainer
+
         protected override UserActivity InitialActivity => new UserActivity.SoloGame(Beatmap.Value.BeatmapInfo, Ruleset.Value);
 
         public override float BackgroundParallaxAmount => 0.1f;

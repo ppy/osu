@@ -209,7 +209,10 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             if (!IsPaused.Value)
+            {
                 userOffsetClock.ProcessFrame();
+                updateRate();
+            }
 
             base.Update();
         }
@@ -218,15 +221,23 @@ namespace osu.Game.Screens.Play
         {
             if (sourceClock == null) return;
 
-            sourceClock.ResetSpeedAdjustments();
-
-            if (sourceClock is IHasTempoAdjust tempo)
-                tempo.TempoAdjust = UserPlaybackRate.Value;
-            else
-                sourceClock.Rate = UserPlaybackRate.Value;
+            bool rateApplied = false;
 
             foreach (var mod in mods.OfType<IApplicableToClock>())
-                mod.ApplyToClock(sourceClock);
+            {
+                mod.ApplyToClock(sourceClock, UserPlaybackRate.Value);
+                rateApplied = true;
+            }
+
+            if (!rateApplied)
+            {
+                sourceClock.ResetSpeedAdjustments();
+
+                if (sourceClock is IHasTempoAdjust tempo)
+                    tempo.TempoAdjust = UserPlaybackRate.Value;
+                else
+                    sourceClock.Rate = UserPlaybackRate.Value;
+            }
         }
 
         protected override void Dispose(bool isDisposing)

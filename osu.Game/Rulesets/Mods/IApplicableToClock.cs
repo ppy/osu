@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public interface IApplicableToClock : IApplicableMod
     {
-        void ApplyToClock(IAdjustableClock clock);
+        void ApplyToClock(IAdjustableClock clock, double proposedRate = 1);
     }
 }

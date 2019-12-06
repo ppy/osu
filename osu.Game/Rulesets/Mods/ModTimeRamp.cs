@@ -6,12 +6,11 @@ using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToClock, IApplicableToBeatmap
+    public abstract class ModTimeRamp : Mod, IApplicableToClock, IApplicableToBeatmap
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
@@ -26,14 +25,14 @@ namespace osu.Game.Rulesets.Mods
         private double beginRampTime;
         private IAdjustableClock clock;
 
-        public virtual void ApplyToClock(IAdjustableClock clock)
+        private double lastAdjust = 1;
+
+        public virtual void ApplyToClock(IAdjustableClock clock, double proposedRate = 1)
         {
             this.clock = clock;
 
-            lastAdjust = 1;
-
             // for preview purposes. during gameplay, Update will overwrite this setting.
-            applyAdjustment(1);
+            applyAdjustment((clock.CurrentTime - beginRampTime) / finalRateTime, proposedRate);
         }
 
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
@@ -44,20 +43,14 @@ namespace osu.Game.Rulesets.Mods
             finalRateTime = final_rate_progress * (lastObject?.GetEndTime() ?? 0);
         }
 
-        public virtual void Update(Playfield playfield)
-        {
-            applyAdjustment((clock.CurrentTime - beginRampTime) / finalRateTime);
-        }
-
-        private double lastAdjust = 1;
-
         /// <summary>
         /// Adjust the rate along the specified ramp
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
-        private void applyAdjustment(double amount)
+        /// <param name="proposedRate">The incoming proposed rate to consider.</param>
+        private void applyAdjustment(double amount, double proposedRate)
         {
-            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
+            double adjust = proposedRate * (1 + (Math.Sign(FinalRateAdjustment) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment)));
 
             switch (clock)
             {

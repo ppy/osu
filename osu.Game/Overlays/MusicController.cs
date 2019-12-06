@@ -251,13 +251,15 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void ResetTrackAdjustments()
+        public void ResetTrackAdjustments() => current?.Track?.ResetSpeedAdjustments();
+
+        protected override void Update()
         {
+            base.Update();
+
             var track = current?.Track;
             if (track == null)
                 return;
-
-            track.ResetSpeedAdjustments();
 
             if (allowRateAdjustments)
             {

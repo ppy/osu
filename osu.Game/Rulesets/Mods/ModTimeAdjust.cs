@@ -7,18 +7,18 @@ using osu.Framework.Timing;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeAdjust : Mod
+    public abstract class ModTimeAdjust : Mod, IApplicableToClock
     {
         public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp) };
 
         protected abstract double RateAdjust { get; }
 
-        public virtual void ApplyToClock(IAdjustableClock clock)
+        public virtual void ApplyToClock(IAdjustableClock clock, double proposedRate = 1)
         {
             if (clock is IHasTempoAdjust tempo)
-                tempo.TempoAdjust *= RateAdjust;
+                tempo.TempoAdjust = proposedRate * RateAdjust;
             else
-                clock.Rate *= RateAdjust;
+                clock.Rate = proposedRate * RateAdjust;
         }
     }
 }

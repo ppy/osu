@@ -14,12 +14,22 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage Icon => FontAwesome.Solid.Question;
         public override string Description => "Whoaaaaa...";
 
-        public override void ApplyToClock(IAdjustableClock clock)
+        public override void ApplyToClock(IAdjustableClock clock, double proposedRate = 1)
         {
+            const double adjust = 0.75;
+
             if (clock is IHasPitchAdjust pitchAdjust)
-                pitchAdjust.PitchAdjust *= RateAdjust;
+            {
+                pitchAdjust.PitchAdjust = adjust;
+
+                // todo: this can be removed once we have tempo support in AddAdjustment
+                if (clock is IHasTempoAdjust tempo)
+                    tempo.TempoAdjust = 1 / adjust * proposedRate * RateAdjust;
+                else
+                    clock.Rate = proposedRate;
+            }
             else
-                base.ApplyToClock(clock);
+                base.ApplyToClock(clock, proposedRate);
         }
     }
 }
