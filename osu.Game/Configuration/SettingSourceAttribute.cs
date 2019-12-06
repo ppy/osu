@@ -8,6 +8,7 @@ using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Configuration
@@ -40,8 +41,9 @@ namespace osu.Game.Configuration
             foreach (var property in configProperties)
             {
                 var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
+                var prop = property.GetValue(obj);
 
-                switch (property.GetValue(obj))
+                switch (prop)
                 {
                     case BindableNumber<float> bNumber:
                         yield return new SettingsSlider<float>
@@ -78,6 +80,30 @@ namespace osu.Game.Configuration
                         };
 
                         break;
+
+                    case Bindable<string> bString:
+                        yield return new SettingsTextBox
+                        {
+                            LabelText = attr.Label,
+                            Bindable = bString
+                        };
+
+                        break;
+
+                    case IBindable bindable:
+
+                        var dropdownType = typeof(SettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
+
+                        var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
+
+                        dropdown.GetType().GetProperty(nameof(IHasCurrentValue<object>.Current))?.SetValue(dropdown, obj);
+
+                        yield return dropdown;
+
+                        break;
+
+                    default:
+                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({prop})");
                 }
             }
         }
