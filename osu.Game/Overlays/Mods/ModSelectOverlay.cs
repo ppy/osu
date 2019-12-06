@@ -345,7 +345,7 @@ namespace osu.Game.Overlays.Mods
             if (added is IModHasSettings)
                 ModSettingsContent.Add(new ModControlSection(added));
             else if (removed is IModHasSettings)
-                ModSettingsContent.Remove(ModSettingsContent.Children.Where(section => section.Mod == removed).Single());
+                ModSettingsContent.Remove(ModSettingsContent.Children.Single(section => section.Mod == removed));
 
             CustomizeButton.Enabled.Value = ModSettingsContent.Children.Count > 0;
 
