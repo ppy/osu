@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 BodyPiece = new SliderBodyPiece(),
                 HeadBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.Start),
                 TailBlueprint = CreateCircleSelectionBlueprint(slider, SliderPosition.End),
-                ControlPointVisualiser = new PathControlPointVisualiser(sliderObject, true) { ControlPointsChanged = onNewControlPoints },
+                ControlPointVisualiser = new PathControlPointVisualiser(sliderObject, true)
             };
         }
 

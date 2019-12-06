@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        public Action<Vector2[]> ControlPointsChanged;
-
         internal readonly Container<PathControlPointPiece> Pieces;
         private readonly Slider slider;
         private readonly bool allowSelection;
@@ -57,10 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             while (slider.Path.ControlPoints.Count > Pieces.Count)
             {
-                var piece = new PathControlPointPiece(slider, Pieces.Count)
-                {
-                    ControlPointsChanged = c => ControlPointsChanged?.Invoke(c),
-                };
+                var piece = new PathControlPointPiece(slider, Pieces.Count);
 
                 if (allowSelection)
                     piece.RequestSelection = selectPiece;
