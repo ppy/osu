@@ -262,6 +262,7 @@ namespace osu.Game.Rulesets.Objects
                 {
                     // The expected distance is negative or zero
                     // TODO: Perhaps negative path lengths should be disallowed altogether
+                    cumulativeLength.Add(0);
                     return;
                 }
 

@@ -146,7 +146,41 @@ namespace osu.Game.Tests.Visual.Gameplay
                         break;
                 }
             });
+        }
 
+        [Test]
+        public void TestLengthenLastSegment()
+        {
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("lengthen last segment", () => path.ExpectedDistance.Value = 300);
+        }
+
+        [Test]
+        public void TestShortenLastSegment()
+        {
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("shorten last segment", () => path.ExpectedDistance.Value = 150);
+        }
+
+        [Test]
+        public void TestShortenFirstSegment()
+        {
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("shorten first segment", () => path.ExpectedDistance.Value = 50);
+        }
+
+        [Test]
+        public void TestShortenToZeroLength()
+        {
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("shorten to 0 length", () => path.ExpectedDistance.Value = 0);
+        }
+
+        [Test]
+        public void TestShortenToNegativeLength()
+        {
+            AddStep("create path", () => path.ControlPoints.AddRange(createSegment(PathType.Linear, Vector2.Zero, new Vector2(0, 100), new Vector2(100))));
+            AddStep("shorten to -10 length", () => path.ExpectedDistance.Value = -10);
         }
 
         private List<PathControlPoint> createSegment(PathType type, params Vector2[] controlPoints)
