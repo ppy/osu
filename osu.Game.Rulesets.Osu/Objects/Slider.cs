@@ -100,6 +100,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             SamplesBindable.ItemsAdded += _ => updateNestedSamples();
             SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+
+            Path.OffsetChanged += offset => Position += offset;
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)

@@ -117,14 +117,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return true;
             }
 
-            // Make control points relative
-            Vector2 first = slider.Path.ControlPoints[0].Position.Value;
-            for (int i = 0; i < slider.Path.ControlPoints.Count; i++)
-                slider.Path.ControlPoints[i].Position.Value = slider.Path.ControlPoints[i].Position.Value - first;
-
-            // The slider's position defines the position of the first control point, and all further control points are relative to that point
-            slider.Position += first;
-
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
                 piece.IsSelected.Value = false;

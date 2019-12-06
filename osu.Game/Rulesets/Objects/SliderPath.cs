@@ -17,6 +17,12 @@ namespace osu.Game.Rulesets.Objects
     public class SliderPath
     {
         /// <summary>
+        /// Invoked when the offset of the path changes.
+        /// The provided value indicates the offset, and should be used to re-calculate the position of the containing drawable.
+        /// </summary>
+        public event Action<Vector2> OffsetChanged;
+
+        /// <summary>
         /// The current version of this <see cref="SliderPath"/>. Updated when any change to the path occurs.
         /// </summary>
         public IBindable<int> Version => version;
@@ -61,6 +67,20 @@ namespace osu.Game.Rulesets.Objects
             {
                 foreach (var c in items)
                     c.Changed -= invalidate;
+
+                // Make all control points relative to the first one
+                if (ControlPoints.Count > 0)
+                {
+                    Vector2 first = ControlPoints[0].Position.Value;
+
+                    if (first != Vector2.Zero)
+                    {
+                        foreach (var c in ControlPoints)
+                            c.Position.Value -= first;
+
+                        OffsetChanged?.Invoke(first);
+                    }
+                }
 
                 invalidate();
             };
