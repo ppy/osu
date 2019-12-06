@@ -40,6 +40,7 @@ namespace osu.Game.Rulesets.Objects
 
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
+        private double calculatedLength;
 
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
@@ -158,7 +159,7 @@ namespace osu.Game.Rulesets.Objects
                 return;
 
             calculatePath();
-            calculateCumulativeLength();
+            calculateLength();
 
             pathCache.Validate();
         }
@@ -227,46 +228,48 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        private void calculateCumulativeLength()
+        private void calculateLength()
         {
-            double l = 0;
-
+            calculatedLength = 0;
             cumulativeLength.Clear();
-            cumulativeLength.Add(l);
+            cumulativeLength.Add(0);
 
-            double? expectedDistance = ExpectedDistance.Value;
-
-            for (int i = 0; i < calculatedPath.Count - 1; ++i)
+            for (int i = 0; i < calculatedPath.Count - 1; i++)
             {
                 Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
-                double d = diff.Length;
-
-                // Shorted slider paths that are too long compared to the expected distance
-                if (expectedDistance.HasValue && expectedDistance - l < d)
-                {
-                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((expectedDistance - l) / d);
-                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
-
-                    l = expectedDistance.Value;
-                    cumulativeLength.Add(l);
-                    break;
-                }
-
-                l += d;
-                cumulativeLength.Add(l);
+                calculatedLength += diff.Length;
+                cumulativeLength.Add(calculatedLength);
             }
 
-            // Lengthen slider paths that are too short compared to the expected distance
-            if (expectedDistance.HasValue && l < expectedDistance && calculatedPath.Count > 1)
+            if (ExpectedDistance.Value is double expectedDistance && calculatedLength != expectedDistance)
             {
-                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
-                double d = diff.Length;
+                // The last length is always incorrect
+                cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
 
-                if (d <= 0)
+                int pathEndIndex = calculatedPath.Count - 1;
+
+                if (calculatedLength > expectedDistance)
+                {
+                    // The path will be shortened further, in which case we should trim any more unnecessary lengths and their associated path segments
+                    while (cumulativeLength.Count > 0 && cumulativeLength[cumulativeLength.Count - 1] > expectedDistance)
+                    {
+                        cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
+                        calculatedPath.RemoveAt(pathEndIndex--);
+                    }
+                }
+
+                if (pathEndIndex <= 0)
+                {
+                    // The expected distance is negative or zero
+                    // TODO: Perhaps negative path lengths should be disallowed altogether
                     return;
+                }
 
-                calculatedPath[calculatedPath.Count - 1] += diff * (float)((expectedDistance - l) / d);
-                cumulativeLength[calculatedPath.Count - 1] = expectedDistance.Value;
+                // The direction of the segment to shorten or lengthen
+                Vector2 dir = (calculatedPath[pathEndIndex] - calculatedPath[pathEndIndex - 1]).Normalized();
+
+                calculatedPath[pathEndIndex] = calculatedPath[pathEndIndex - 1] + dir * (float)(expectedDistance - cumulativeLength[cumulativeLength.Count - 1]);
+                cumulativeLength.Add(expectedDistance);
             }
         }
 
