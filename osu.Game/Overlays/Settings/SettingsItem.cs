@@ -97,10 +97,7 @@ namespace osu.Game.Overlays.Settings
                 controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
 
                 if (ShowsDefaultIndicator)
-                {
                     restoreDefaultButton.Bindable = controlWithCurrent.Current;
-                    restoreDefaultButton.Bindable.TriggerChange();
-                }
             }
         }
 
@@ -116,6 +113,7 @@ namespace osu.Game.Overlays.Settings
                     bindable = value;
                     bindable.ValueChanged += _ => UpdateState();
                     bindable.DisabledChanged += _ => UpdateState();
+                    UpdateState();
                 }
             }
 
