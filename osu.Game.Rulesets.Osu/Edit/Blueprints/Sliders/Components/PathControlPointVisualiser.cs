@@ -14,6 +14,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -100,20 +101,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool deleteSelected()
         {
-            int countDeleted = 0;
-
-            foreach (var piece in Pieces)
-            {
-                if (piece.IsSelected.Value)
-                {
-                    slider.Path.ControlPoints.RemoveAt(piece.Index);
-                    countDeleted++;
-                }
-            }
+            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.Index).Select(i => slider.Path.ControlPoints[i]).ToList();
 
             // Ensure that there are any points to be deleted
-            if (countDeleted == 0)
+            if (toRemove.Count == 0)
                 return false;
+
+            foreach (var c in toRemove)
+                slider.Path.ControlPoints.Remove(c);
 
             // If there are 0 remaining control points, treat the slider as being deleted
             if (slider.Path.ControlPoints.Count == 0)
