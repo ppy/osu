@@ -20,6 +20,7 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class DialogButton : OsuClickableContainer
     {
+        private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
         private const float hover_duration = 500;
         private const float glow_fade_duration = 250;
@@ -99,7 +100,7 @@ namespace osu.Game.Graphics.UserInterface
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
-                            Width = 0.8f,
+                            Width = idle_width,
                             Masking = true,
                             MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffectParameters
@@ -199,14 +200,18 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
 
+        private bool clicked;
+
         protected override bool OnClick(ClickEvent e)
         {
+            clicked = true;
             colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
             flash();
 
             this.Delay(click_duration).Schedule(delegate
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f));
+                clicked = false;
+                colourContainer.ResizeTo(new Vector2(idle_width, 1f));
                 spriteText.Spacing = Vector2.Zero;
                 glowContainer.FadeOut();
             });
@@ -230,6 +235,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private void selectionChanged(ValueChangedEvent<bool> args)
         {
+            if (clicked) return;
+
             if (args.NewValue)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
@@ -238,7 +245,7 @@ namespace osu.Game.Graphics.UserInterface
             }
             else
             {
-                colourContainer.ResizeTo(new Vector2(0.8f, 1f), hover_duration, Easing.OutElastic);
+                colourContainer.ResizeTo(new Vector2(idle_width, 1f), hover_duration, Easing.OutElastic);
                 spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
                 glowContainer.FadeOut(glow_fade_duration, Easing.Out);
             }
