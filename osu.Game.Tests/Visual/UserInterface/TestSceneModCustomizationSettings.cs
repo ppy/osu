@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Anchor = Anchor.BottomCentre,
             });
 
-            var testMod = new TestModCustomizable();
+            var testMod = new TestModCustomizable1();
 
             AddStep("open", modSelect.Show);
             AddAssert("button disabled", () => !modSelect.CustomizeButton.Enabled.Value);
@@ -44,64 +44,74 @@ namespace osu.Game.Tests.Visual.UserInterface
             public new TriangleButton CustomizeButton => base.CustomizeButton;
 
             public void SelectMod(Mod mod) =>
-                ModSectionsContainer.Children.Single((s) => s.ModType == mod.Type)
-                    .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
+                ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
+                                    .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
 
             public ModControlSection GetControlSection(Mod mod) =>
-                ModSettingsContent.Children.FirstOrDefault((s) => s.Mod == mod);
+                ModSettingsContent.Children.FirstOrDefault(s => s.Mod == mod);
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
 
                 foreach (var section in ModSectionsContainer)
+                {
                     if (section.ModType == ModType.Conversion)
-                        section.Mods = new Mod[] { new TestModCustomizable() };
+                    {
+                        section.Mods = new Mod[]
+                        {
+                            new TestModCustomizable1(),
+                            new TestModCustomizable2()
+                        };
+                    }
                     else
                         section.Mods = new Mod[] { };
+                }
             }
         }
 
-        private class TestModCustomizable : Mod, IModHasSettings
+        private class TestModCustomizable1 : TestModCustomizable
         {
-            public override string Name => "Customizable Mod";
+            public override string Name => "Customizable Mod 1";
 
-            public override string Acronym => "CM";
+            public override string Acronym => "CM1";
+        }
 
+        private class TestModCustomizable2 : TestModCustomizable
+        {
+            public override string Name => "Customizable Mod 2";
+
+            public override string Acronym => "CM2";
+        }
+
+        private abstract class TestModCustomizable : Mod, IModHasSettings
+        {
             public override double ScoreMultiplier => 1.0;
 
             public override ModType Type => ModType.Conversion;
 
-            public readonly BindableFloat sliderBindable = new BindableFloat
+            public readonly BindableFloat SliderBindable = new BindableFloat
             {
                 MinValue = 0,
                 MaxValue = 10,
             };
 
-            public readonly BindableBool tickBindable = new BindableBool();
+            public readonly BindableBool TickBindable = new BindableBool();
 
-            public Drawable[] CreateControls()
-            {
-                BindableFloat sliderControl = new BindableFloat();
-                BindableBool tickControl = new BindableBool();
-
-                sliderControl.BindTo(sliderBindable);
-                tickControl.BindTo(tickBindable);
-
-                return new Drawable[]
+            public Drawable[] CreateControls() =>
+                new Drawable[]
                 {
                     new SettingsSlider<float>
                     {
                         LabelText = "Slider",
-                        Bindable = sliderControl
+                        Bindable = SliderBindable
                     },
                     new SettingsCheckbox
                     {
                         LabelText = "Checkbox",
-                        Bindable = tickControl
+                        Bindable = TickBindable
                     }
                 };
-            }
         }
     }
 }
