@@ -108,7 +108,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 return false;
 
             foreach (var c in toRemove)
+            {
+                // The first control point in the slider must have a type, so take it from the previous "first" one
+                // Todo: Should be handled within SliderPath itself
+                if (c == slider.Path.ControlPoints[0] && slider.Path.ControlPoints.Count > 1 && slider.Path.ControlPoints[1].Type.Value == null)
+                    slider.Path.ControlPoints[1].Type.Value = slider.Path.ControlPoints[0].Type.Value;
+
                 slider.Path.ControlPoints.Remove(c);
+            }
 
             // If there are 0 remaining control points, treat the slider as being deleted
             if (slider.Path.ControlPoints.Count == 0)
