@@ -49,7 +49,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     return this.GetAnimation(component.LookupName, true, false);
 
                 case OsuSkinComponents.SliderFollowCircle:
-                    return this.GetAnimation("sliderfollowcircle", true, true);
+                    var followCircle = this.GetAnimation("sliderfollowcircle", true, true);
+                    followCircle.Scale *= 0.5f;
+                    return followCircle;
 
                 case OsuSkinComponents.SliderBall:
                     var sliderBallContent = this.GetAnimation("sliderb", true, true, "");
