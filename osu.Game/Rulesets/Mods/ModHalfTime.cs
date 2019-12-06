@@ -3,7 +3,9 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
@@ -19,6 +21,16 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModDoubleTime)).ToArray();
 
-        protected override double RateAdjust => 0.75;
+        [SettingSource("Speed decrease", "The actual decrease to apply")]
+        public BindableNumber<double> SpeedChange { get; } = new BindableDouble()
+        {
+            MinValue = 0.5,
+            MaxValue = 0.99,
+            Default = 0.75,
+            Value = 0.75,
+            Precision = 0.01,
+        };
+
+        protected override double RateAdjust => SpeedChange.Value;
     }
 }
