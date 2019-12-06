@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -236,6 +237,7 @@ namespace osu.Game.Overlays.Mods
                                                 Width = 180,
                                                 Text = "Customization",
                                                 Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
+                                                Enabled = { Value = false },
                                                 Margin = new MarginPadding
                                                 {
                                                     Right = 20
@@ -331,7 +333,6 @@ namespace osu.Game.Overlays.Mods
 
             SelectedMods.ValueChanged += updateModSettings;
             Ruleset.ValueChanged += _ => ModSettingsContent.Clear();
-            CustomizeButton.Enabled.Value = false;
 
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
@@ -339,18 +340,21 @@ namespace osu.Game.Overlays.Mods
 
         private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
         {
-            var added = selectedMods.NewValue.Except(selectedMods.OldValue).FirstOrDefault();
-            var removed = selectedMods.OldValue.Except(selectedMods.NewValue).FirstOrDefault();
+            foreach (var added in selectedMods.NewValue.Except(selectedMods.OldValue))
+            {
+                var controls = added.CreateSettingsControls().ToList();
+                if (controls.Count > 0)
+                    ModSettingsContent.Add(new ModControlSection(added) { Children = controls });
+            }
 
-            if (added is IModHasSettings)
-                ModSettingsContent.Add(new ModControlSection(added));
-            else if (removed is IModHasSettings)
-                ModSettingsContent.Remove(ModSettingsContent.Children.Single(section => section.Mod == removed));
+            foreach (var removed in selectedMods.OldValue.Except(selectedMods.NewValue))
+                ModSettingsContent.RemoveAll(section => section.Mod == removed);
 
-            CustomizeButton.Enabled.Value = ModSettingsContent.Children.Count > 0;
+            bool hasSettings = ModSettingsContent.Children.Count > 0;
+            CustomizeButton.Enabled.Value = hasSettings;
 
-            if (ModSettingsContainer.Alpha == 1 && ModSettingsContent.Children.Count == 0)
-                ModSettingsContainer.Alpha = 0;
+            if (!hasSettings)
+                ModSettingsContainer.Hide();
         }
 
         public void DeselectAll()
