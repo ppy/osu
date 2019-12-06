@@ -114,8 +114,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void onNewControlPoints(Vector2[] controlPoints)
         {
-            HitObject.Path.ExpectedDistance.Value = null;
-            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.Distance) ?? (float)HitObject.Path.Distance;
+            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
 
             UpdateHitObject();
         }

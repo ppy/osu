@@ -104,6 +104,18 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
+        /// The distance of the path prior to lengthening/shortening to account for <see cref="ExpectedDistance"/>.
+        /// </summary>
+        public double CalculatedDistance
+        {
+            get
+            {
+                ensureValid();
+                return calculatedLength;
+            }
+        }
+
+        /// <summary>
         /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
         /// to 1 (end of the slider) and stores the generated path in the given list.
         /// </summary>
@@ -251,7 +263,7 @@ namespace osu.Game.Rulesets.Objects
                 if (calculatedLength > expectedDistance)
                 {
                     // The path will be shortened further, in which case we should trim any more unnecessary lengths and their associated path segments
-                    while (cumulativeLength.Count > 0 && cumulativeLength[cumulativeLength.Count - 1] > expectedDistance)
+                    while (cumulativeLength.Count > 0 && cumulativeLength[cumulativeLength.Count - 1] >= expectedDistance)
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
