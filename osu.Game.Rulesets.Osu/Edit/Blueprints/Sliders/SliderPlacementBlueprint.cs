@@ -93,8 +93,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     {
                         case MouseButton.Left:
                             segments.Last().ControlPoints.Add(cursor);
-                            if (segments.Last().ControlPoints.Count > 3)
-                                type = PathType.Bezier;
                             break;
                     }
 
@@ -126,6 +124,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void endCurve()
         {
+            if (segments.Last().ControlPoints.Count >= 3)
+                type = PathType.Bezier;
             updateSlider();
             EndPlacement();
         }
