@@ -48,11 +48,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             var yOffset = Children.Count(d => d.X == h.StartTime);
 
-            Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * 4 });
+            Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS });
         }
 
         private class TimelineHitObjectRepresentation : CompositeDrawable
         {
+            public const float THICKNESS = 3;
+
             public readonly HitObject HitObject;
 
             public TimelineHitObjectRepresentation(HitObject hitObject)
@@ -74,7 +76,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     {
                         CornerRadius = 2,
                         Masking = true,
-                        Size = new Vector2(1, 3),
+                        Size = new Vector2(1, THICKNESS),
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         RelativePositionAxes = Axes.X,
@@ -96,7 +98,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     AlwaysPresent = true,
                     Colour = Color4.White,
                     BorderColour = Color4.Black,
-                    BorderThickness = 3,
+                    BorderThickness = THICKNESS,
                 });
             }
         }
