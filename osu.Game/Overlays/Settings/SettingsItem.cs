@@ -53,27 +53,10 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        // hold a reference to the provided bindable so we don't have to in every settings section.
-        private Bindable<T> bindable;
-
         public virtual Bindable<T> Bindable
         {
-            get => bindable;
-
-            set
-            {
-                if (bindable != null)
-                    controlWithCurrent?.Current.UnbindFrom(bindable);
-
-                bindable = value;
-                controlWithCurrent?.Current.BindTo(bindable);
-
-                if (ShowsDefaultIndicator)
-                {
-                    restoreDefaultButton.Bindable = bindable.GetBoundCopy();
-                    restoreDefaultButton.Bindable.TriggerChange();
-                }
-            }
+            get => controlWithCurrent.Current;
+            set => controlWithCurrent.Current = value;
         }
 
         public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
@@ -110,7 +93,15 @@ namespace osu.Game.Overlays.Settings
         private void load()
         {
             if (controlWithCurrent != null)
+            {
                 controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+
+                if (ShowsDefaultIndicator)
+                {
+                    restoreDefaultButton.Bindable = controlWithCurrent.Current;
+                    restoreDefaultButton.Bindable.TriggerChange();
+                }
+            }
         }
 
         private class RestoreDefaultValueButton : Container, IHasTooltip
