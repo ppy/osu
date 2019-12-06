@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineArea : Container
     {
-        private Timeline timeline;
+        private readonly Timeline timeline = new Timeline { RelativeSizeAxes = Axes.Both };
 
         protected override Container<Drawable> Content => timeline;
 
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            timeline = new Timeline { RelativeSizeAxes = Axes.Both }
+                            timeline
                         },
                     },
                     ColumnDimensions = new[]
