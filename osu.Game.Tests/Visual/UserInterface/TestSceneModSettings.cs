@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("open", modSelect.Show);
             AddAssert("button disabled", () => !modSelect.CustomiseButton.Enabled.Value);
+            AddUntilStep("wait for button load", () => modSelect.ButtonsLoaded);
             AddStep("select mod", () => modSelect.SelectMod(testMod));
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
             AddStep("open Customisation", () => modSelect.CustomiseButton.Click());
@@ -42,6 +43,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public new Container ModSettingsContainer => base.ModSettingsContainer;
             public new TriangleButton CustomiseButton => base.CustomiseButton;
+
+            public bool ButtonsLoaded => ModSectionsContainer.Children.All(c => c.ModIconsLoaded);
 
             public void SelectMod(Mod mod) =>
                 ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
