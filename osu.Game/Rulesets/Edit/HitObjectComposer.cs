@@ -335,6 +335,9 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
 
+        /// <summary>
+        /// An editor-specific beatmap, exposing mutation events.
+        /// </summary>
         public IEditorBeatmap EditorBeatmap { get; protected set; }
 
         /// <summary>
