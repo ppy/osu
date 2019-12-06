@@ -6,9 +6,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
-using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -47,9 +47,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
                                     .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
 
-            public ModControlSection GetControlSection(Mod mod) =>
-                ModSettingsContent.Children.FirstOrDefault(s => s.Mod == mod);
-
             protected override void LoadComplete()
             {
                 base.LoadComplete();
@@ -84,34 +81,23 @@ namespace osu.Game.Tests.Visual.UserInterface
             public override string Acronym => "CM2";
         }
 
-        private abstract class TestModCustomizable : Mod, IModHasSettings
+        private abstract class TestModCustomizable : Mod, IApplicableMod
         {
             public override double ScoreMultiplier => 1.0;
 
             public override ModType Type => ModType.Conversion;
 
-            public readonly BindableFloat SliderBindable = new BindableFloat
+            [SettingSource("Sample float", "Change something for a mod")]
+            public BindableFloat SliderBindable { get; } = new BindableFloat
             {
                 MinValue = 0,
                 MaxValue = 10,
+                Default = 5,
+                Value = 7
             };
 
-            public readonly BindableBool TickBindable = new BindableBool();
-
-            public Drawable[] CreateControls() =>
-                new Drawable[]
-                {
-                    new SettingsSlider<float>
-                    {
-                        LabelText = "Slider",
-                        Bindable = SliderBindable
-                    },
-                    new SettingsCheckbox
-                    {
-                        LabelText = "Checkbox",
-                        Bindable = TickBindable
-                    }
-                };
+            [SettingSource("Sample bool", "Clicking this changes a setting")]
+            public BindableBool TickBindable { get; } = new BindableBool();
         }
     }
 }
