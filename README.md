@@ -127,9 +127,11 @@ Please also note that game resources are covered by a separate licence. Please s
 
 ### 发行版
 
+**以下为官方(英文版)下载链接,目前只编译了Linux版本,其他平台后续补全** *(~~因为硬盘空间不够了~~)*
 如果你对开发不感兴趣, 你仍然可以下载我们的[二进制发行版](https://github.com/ppy/osu/releases).
 
 **最新构建:**
+
 
 | [Windows (64位)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://testflight.apple.com/join/2tLcjWlF) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
 | ------------- | ------------- | ------------- | ------------- |
@@ -138,7 +140,7 @@ Please also note that game resources are covered by a separate licence. Please s
 
 如果你的平台没有列在上面, 你仍然有机会可以通过下面的指令自行编译安装.
 
-- **:[译者个人打的Debian包](https://github.com/MATRIX-feather/osulazer-package),Debian系统克隆源码后运行`build-deb.sh`即可
+- **:[译者个人打的Deb包qwp](https://github.com/MATRIX-feather/osulazer-package),Debian系发行版(Ubuntu等)克隆源码后运行`build-deb.sh`即可
 
 ### 下载源码
 
