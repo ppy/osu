@@ -127,7 +127,8 @@ Please also note that game resources are covered by a separate licence. Please s
 
 ### 发行版
 
-**以下为官方(英文版)下载链接,目前只编译了Linux版本,其他平台后续补全** *(~~因为硬盘空间不够了~~)*
+**以下均为官方(英文版)下载链接,目前只编译了Linux版本,其他平台后续补全** *(~~因为硬盘空间不够了~~)*
+
 如果你对开发不感兴趣, 你仍然可以下载我们的[二进制发行版](https://github.com/ppy/osu/releases).
 
 **最新构建:**
