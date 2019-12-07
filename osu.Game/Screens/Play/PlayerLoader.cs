@@ -55,9 +55,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool PlayResumeSound => false;
 
-        protected Task LoadTask;
+        protected Task LoadTask { get; private set; }
 
-        protected Task DisposalTask;
+        protected Task DisposalTask { get; private set; }
 
         private InputManager inputManager;
         private IdleTracker idleTracker;
