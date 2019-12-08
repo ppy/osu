@@ -178,11 +178,9 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnClick(ClickEvent e)
         {
-            scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
-
             SelectNext(1);
 
-            return base.OnClick(e);
+            return true;
         }
 
         /// <summary>
