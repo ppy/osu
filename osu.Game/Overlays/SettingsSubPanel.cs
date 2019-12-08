@@ -4,12 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Ranking;
 using osuTK;
@@ -36,7 +34,7 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+        private class BackButton : OsuClickableContainer
         {
             private AspectContainer aspect;
 
@@ -85,20 +83,6 @@ namespace osu.Game.Overlays
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
                 return base.OnMouseUp(e);
             }
-
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        Click();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action) => false;
         }
     }
 }
