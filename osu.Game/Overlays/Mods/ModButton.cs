@@ -167,10 +167,6 @@ namespace osu.Game.Overlays.Mods
             {
                 switch (e.Button)
                 {
-                    case MouseButton.Left:
-                        SelectNext(1);
-                        break;
-
                     case MouseButton.Right:
                         SelectNext(-1);
                         break;
@@ -178,6 +174,15 @@ namespace osu.Game.Overlays.Mods
             }
 
             return true;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
+            
+            SelectNext(1);
+
+            return base.OnClick(e);
         }
 
         /// <summary>
