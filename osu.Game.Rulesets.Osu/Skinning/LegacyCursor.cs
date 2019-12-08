@@ -39,6 +39,10 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Origin = Anchor.Centre,
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
             cursor.Spin(10000, RotationDirection.Clockwise);
         }
     }
