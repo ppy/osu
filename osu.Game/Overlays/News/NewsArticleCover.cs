@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.News
         [LongRunningLoad]
         private class NewsArticleCoverBackground : Sprite
         {
-            private string url;
+            private readonly string url;
 
             public NewsArticleCoverBackground(string url)
             {

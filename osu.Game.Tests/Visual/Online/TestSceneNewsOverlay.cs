@@ -31,10 +31,6 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestNewsOverlay : NewsOverlay
         {
-            public TestNewsOverlay()
-            {
-            }
-
             public void ShowContent(NewsContent content) => LoadChildContent(content);
         }
 
