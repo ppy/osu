@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Origin = Anchor.Centre;
         }
 
+        private NonPlayfieldSprite cursor;
+
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
@@ -30,13 +32,14 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new NonPlayfieldSprite
+                cursor = new NonPlayfieldSprite
                 {
                     Texture = skin.GetTexture("cursor"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 }
             };
+            cursor.Spin(10000, RotationDirection.Clockwise);
         }
     }
 }
