@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
@@ -141,6 +140,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                     case 2:
                         path.ControlPoints.AddRange(createSegment(PathType.PerfectCurve, Vector2.Zero, new Vector2(0, 100)));
                         break;
+
                     case 4:
                         path.ControlPoints.AddRange(createSegment(PathType.PerfectCurve, Vector2.Zero, new Vector2(0, 100), new Vector2(100), new Vector2(100, 0)));
                         break;
