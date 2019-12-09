@@ -55,7 +55,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool PlayResumeSound => false;
 
-        private Task loadTask;
+        protected Task LoadTask { get; private set; }
+
+        protected Task DisposalTask { get; private set; }
 
         private InputManager inputManager;
         private IdleTracker idleTracker;
@@ -159,7 +161,7 @@ namespace osu.Game.Screens.Play
             player.RestartCount = restartCount;
             player.RestartRequested = restartRequested;
 
-            loadTask = LoadComponentAsync(player, _ => info.Loading = false);
+            LoadTask = LoadComponentAsync(player, _ => info.Loading = false);
         }
 
         private void contentIn()
@@ -250,7 +252,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        loadTask = null;
+                        LoadTask = null;
 
                         //By default, we want to load the player and never be returned to.
                         //Note that this may change if the player we load requested a re-run.
@@ -301,7 +303,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                loadTask?.ContinueWith(_ => player.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
             }
         }
 
