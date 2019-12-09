@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mods
             double adjust = 1 + (Math.Sign(FinalRateAdjustment) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
 
             track.Tempo.Value /= lastAdjust;
-            track.Tempo.Value *= lastAdjust;
+            track.Tempo.Value *= adjust;
 
             lastAdjust = adjust;
         }
