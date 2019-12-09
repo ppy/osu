@@ -11,6 +11,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 using osuTK.Graphics;
@@ -20,10 +22,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
-        public Action<int, MouseButtonEvent> RequestSelection;
+        public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
 
         public readonly BindableBool IsSelected = new BindableBool();
-        public readonly int Index;
+
+        public readonly PathControlPoint ControlPoint;
 
         private readonly Slider slider;
         private readonly Path path;
@@ -36,10 +39,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public PathControlPointPiece(Slider slider, int index)
+        private IBindable<Vector2> sliderPosition;
+        private IBindable<int> pathVersion;
+
+        public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
-            Index = index;
+
+            ControlPoint = controlPoint;
 
             Origin = Anchor.Centre;
             AutoSizeAxes = Axes.Both;
@@ -85,47 +92,40 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             };
         }
 
-        protected override void Update()
+        protected override void LoadComplete()
         {
-            base.Update();
+            base.LoadComplete();
 
-            Position = slider.StackedPosition + slider.Path.ControlPoints[Index].Position.Value;
+            sliderPosition = slider.PositionBindable.GetBoundCopy();
+            sliderPosition.BindValueChanged(_ => updateDisplay());
 
+            pathVersion = slider.Path.Version.GetBoundCopy();
+            pathVersion.BindValueChanged(_ => updateDisplay());
+
+            IsSelected.BindValueChanged(_ => updateMarkerDisplay());
+
+            updateDisplay();
+        }
+
+        private void updateDisplay()
+        {
             updateMarkerDisplay();
             updateConnectingPath();
         }
 
-        /// <summary>
-        /// Updates the state of the circular control point marker.
-        /// </summary>
-        private void updateMarkerDisplay()
-        {
-            markerRing.Alpha = IsSelected.Value ? 1 : 0;
-
-            Color4 colour = slider.Path.ControlPoints[Index].Type.Value.HasValue ? colours.Red : colours.Yellow;
-            if (IsHovered || IsSelected.Value)
-                colour = Color4.White;
-            marker.Colour = colour;
-        }
-
-        /// <summary>
-        /// Updates the path connecting this control point to the previous one.
-        /// </summary>
-        private void updateConnectingPath()
-        {
-            path.ClearVertices();
-
-            if (Index != slider.Path.ControlPoints.Count - 1)
-            {
-                path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[Index + 1].Position.Value - slider.Path.ControlPoints[Index].Position.Value);
-            }
-
-            path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
-        }
-
         // The connecting path is excluded from positional input
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateMarkerDisplay();
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            updateMarkerDisplay();
+        }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
@@ -135,12 +135,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             switch (e.Button)
             {
                 case MouseButton.Left:
-                    RequestSelection.Invoke(Index, e);
+                    RequestSelection.Invoke(this, e);
                     return true;
 
                 case MouseButton.Right:
                     if (!IsSelected.Value)
-                        RequestSelection.Invoke(Index, e);
+                        RequestSelection.Invoke(this, e);
                     return false; // Allow context menu to show
             }
 
@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            if (Index == 0)
+            if (ControlPoint == slider.Path.ControlPoints[0])
             {
                 // Special handling for the head control point - the position of the slider changes which means the snapped position and time have to be taken into account
                 (Vector2 snappedPosition, double snappedTime) = snapProvider?.GetSnappedPosition(e.MousePosition, slider.StartTime) ?? (e.MousePosition, slider.StartTime);
@@ -169,11 +169,47 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                     slider.Path.ControlPoints[i].Position.Value -= movementDelta;
             }
             else
-                slider.Path.ControlPoints[Index].Position.Value += e.Delta;
+                ControlPoint.Position.Value += e.Delta;
 
             return true;
         }
 
         protected override bool OnDragEnd(DragEndEvent e) => true;
+
+        /// <summary>
+        /// Updates the state of the circular control point marker.
+        /// </summary>
+        private void updateMarkerDisplay()
+        {
+            Position = slider.StackedPosition + ControlPoint.Position.Value;
+
+            markerRing.Alpha = IsSelected.Value ? 1 : 0;
+
+            Color4 colour = ControlPoint.Type.Value != null ? colours.Red : colours.Yellow;
+            if (IsHovered || IsSelected.Value)
+                colour = Color4.White;
+            marker.Colour = colour;
+        }
+
+        /// <summary>
+        /// Updates the path connecting this control point to the previous one.
+        /// </summary>
+        private void updateConnectingPath()
+        {
+            path.ClearVertices();
+
+            int index = slider.Path.ControlPoints.IndexOf(ControlPoint);
+
+            if (index == -1)
+                return;
+
+            if (++index != slider.Path.ControlPoints.Count)
+            {
+                path.AddVertex(Vector2.Zero);
+                path.AddVertex(slider.Path.ControlPoints[index].Position.Value - ControlPoint.Position.Value);
+            }
+
+            path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
+        }
     }
 }
