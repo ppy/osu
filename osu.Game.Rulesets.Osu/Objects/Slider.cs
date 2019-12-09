@@ -113,8 +113,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             SamplesBindable.ItemsAdded += _ => updateNestedSamples();
             SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
-
-            Path.OffsetChanged += offset => Position += offset;
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 

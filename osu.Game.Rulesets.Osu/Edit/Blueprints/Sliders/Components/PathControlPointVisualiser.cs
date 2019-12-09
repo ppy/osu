@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
+using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
@@ -121,6 +122,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 placementHandler?.Delete(slider);
                 return true;
             }
+
+            // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
+            // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
+            Vector2 first = slider.Path.ControlPoints[0].Position.Value;
+            foreach (var c in slider.Path.ControlPoints)
+                c.Position.Value -= first;
+            slider.Position += first;
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
