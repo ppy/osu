@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Select
         }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
-            where T : struct, IComparable
+            where T : struct
         {
             public bool HasFilter => Max != null || Min != null;
 
