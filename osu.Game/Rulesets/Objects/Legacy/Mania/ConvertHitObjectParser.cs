@@ -3,7 +3,6 @@
 
 using osuTK;
 using osu.Game.Audio;
-using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
-using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Audio;
 
