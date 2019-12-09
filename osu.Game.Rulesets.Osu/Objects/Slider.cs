@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
