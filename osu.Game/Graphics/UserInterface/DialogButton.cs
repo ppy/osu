@@ -22,8 +22,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float idle_width = 0.8f;
         private const float hover_width = 0.9f;
+
         private const float hover_duration = 500;
-        private const float glow_fade_duration = 250;
         private const float click_duration = 200;
 
         public readonly BindableBool Selected = new BindableBool();
@@ -200,30 +200,50 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
 
-        private bool clicked;
+        private bool clickAnimating;
 
         protected override bool OnClick(ClickEvent e)
         {
-            clicked = true;
-            colourContainer.ResizeTo(new Vector2(1.5f, 1f), click_duration, Easing.In);
-            flash();
-
-            this.Delay(click_duration).Schedule(delegate
+            var flash = new Box
             {
-                clicked = false;
-                colourContainer.ResizeTo(new Vector2(idle_width, 1f));
-                spriteText.Spacing = Vector2.Zero;
-                glowContainer.FadeOut();
-            });
+                RelativeSizeAxes = Axes.Both,
+                Colour = ButtonColour,
+                Blending = BlendingParameters.Additive,
+                Alpha = 0.05f
+            };
+
+            colourContainer.Add(flash);
+            flash.FadeOutFromOne(100).Expire();
+
+            clickAnimating = true;
+            colourContainer.ResizeWidthTo(colourContainer.Width * 1.05f, 100, Easing.OutQuint)
+                           .OnComplete(_ =>
+                           {
+                               clickAnimating = false;
+                               Selected.TriggerChange();
+                           });
 
             return base.OnClick(e);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            colourContainer.ResizeWidthTo(hover_width * 0.98f, click_duration * 4, Easing.OutQuad);
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            if (Selected.Value)
+                colourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
+            return base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-
             Selected.Value = true;
+
             return true;
         }
 
@@ -235,36 +255,21 @@ namespace osu.Game.Graphics.UserInterface
 
         private void selectionChanged(ValueChangedEvent<bool> args)
         {
-            if (clicked) return;
+            if (clickAnimating)
+                return;
 
             if (args.NewValue)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
-                colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);
-                glowContainer.FadeIn(glow_fade_duration, Easing.Out);
+                colourContainer.ResizeWidthTo(hover_width, hover_duration, Easing.OutElastic);
+                glowContainer.FadeIn(hover_duration, Easing.OutQuint);
             }
             else
             {
-                colourContainer.ResizeTo(new Vector2(idle_width, 1f), hover_duration, Easing.OutElastic);
+                colourContainer.ResizeWidthTo(idle_width, hover_duration, Easing.OutElastic);
                 spriteText.TransformSpacingTo(Vector2.Zero, hover_duration, Easing.OutElastic);
-                glowContainer.FadeOut(glow_fade_duration, Easing.Out);
+                glowContainer.FadeOut(hover_duration, Easing.OutQuint);
             }
-        }
-
-        private void flash()
-        {
-            var flash = new Box
-            {
-                RelativeSizeAxes = Axes.Both
-            };
-
-            colourContainer.Add(flash);
-
-            flash.Colour = ButtonColour;
-            flash.Blending = BlendingParameters.Additive;
-            flash.Alpha = 0.3f;
-            flash.FadeOutFromOne(click_duration);
-            flash.Expire();
         }
 
         private void updateGlow()
