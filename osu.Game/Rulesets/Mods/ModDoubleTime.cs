@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModDoubleTime : ModTimeAdjust
+    public abstract class ModDoubleTime : ModRateAdjust
     {
         public override string Name => "Double Time";
         public override string Acronym => "DT";
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModHalfTime)).ToArray();
 
         [SettingSource("Speed increase", "The actual increase to apply")]
-        public BindableNumber<double> SpeedChange { get; } = new BindableDouble
+        public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             MinValue = 1.01,
             MaxValue = 2,
@@ -30,7 +30,5 @@ namespace osu.Game.Rulesets.Mods
             Value = 1.5,
             Precision = 0.01,
         };
-
-        protected override double RateAdjust => SpeedChange.Value;
     }
 }
