@@ -27,6 +27,6 @@
     <PackageReference Include="Sentry" Version="1.2.0" />
     <PackageReference Include="SharpCompress" Version="0.24.0" />
     <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.6.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
 </Project>
