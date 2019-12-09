@@ -18,11 +18,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            rotate = spin;
+            this.spin = spin;
         }
 
         private NonPlayfieldSprite cursor;
-        private readonly bool rotate;
+        private readonly bool spin;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         protected override void LoadComplete()
         {
-            if (rotate)
+            if (spin)
                 cursor.Spin(10000, RotationDirection.Clockwise);
         }
     }
