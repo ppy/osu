@@ -3,6 +3,7 @@
 
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Mods
@@ -14,9 +15,19 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage Icon => FontAwesome.Solid.Question;
         public override string Description => "Whoaaaaa...";
 
+        private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
+        private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
+
         public override void ApplyToTrack(Track track)
         {
-            track.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
+            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
+
+            SpeedChange.BindValueChanged(val =>
+            {
+                freqAdjust.Value = SpeedChange.Default;
+                tempoAdjust.Value = val.NewValue / SpeedChange.Default;
+            }, true);
         }
     }
 }
