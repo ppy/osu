@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnHover(HoverEvent e)
         {
             updateMarkerDisplay();
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
