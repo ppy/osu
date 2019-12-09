@@ -26,12 +26,25 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         internal event Action Changed;
 
+        /// <summary>
+        /// Creates a new <see cref="PathControlPoint"/>.
+        /// </summary>
         public PathControlPoint()
+            : this(Vector2.Zero, null)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="PathControlPoint"/> with a provided position and type.
+        /// </summary>
+        /// <param name="position">The initial position.</param>
+        /// <param name="type">The initial type.</param>
+        public PathControlPoint(Vector2 position, PathType? type = null)
         {
             Position.ValueChanged += _ => Changed?.Invoke();
             Type.ValueChanged += _ => Changed?.Invoke();
         }
 
-        public bool Equals(PathControlPoint other) => Position.Value == other.Position.Value && Type.Value == other.Type.Value;
+        public bool Equals(PathControlPoint other) => Position.Value == other?.Position.Value && Type.Value == other.Type.Value;
     }
 }

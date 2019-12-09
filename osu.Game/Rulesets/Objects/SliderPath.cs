@@ -40,12 +40,10 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public readonly BindableList<PathControlPoint> ControlPoints = new BindableList<PathControlPoint>();
 
-        public readonly List<int> Test = new List<int>();
-
-        private readonly Cached pathCache = new Cached();
-
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
+        private readonly Cached pathCache = new Cached();
+
         private double calculatedLength;
 
         /// <summary>
@@ -87,7 +85,7 @@ namespace osu.Game.Rulesets.Objects
         }
 
         /// <summary>
-        /// Creates a new <see cref="SliderPath"/>.
+        /// Creates a new <see cref="SliderPath"/> initialised with a list of control points.
         /// </summary>
         /// <param name="controlPoints">An optional set of <see cref="PathControlPoint"/>s to initialise the path with.</param>
         /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all control points.
@@ -101,13 +99,8 @@ namespace osu.Game.Rulesets.Objects
         }
 
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
-            : this()
+            : this(controlPoints.Select((c, i) => new PathControlPoint(c, i == 0 ? (PathType?)type : null)).ToArray(), expectedDistance)
         {
-            foreach (var c in controlPoints)
-                ControlPoints.Add(new PathControlPoint { Position = { Value = c } });
-            ControlPoints[0].Type.Value = type;
-
-            ExpectedDistance.Value = expectedDistance;
         }
 
         /// <summary>
