@@ -41,6 +41,9 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="type">The initial type.</param>
         public PathControlPoint(Vector2 position, PathType? type = null)
         {
+            Position.Value = position;
+            Type.Value = type;
+
             Position.ValueChanged += _ => Changed?.Invoke();
             Type.ValueChanged += _ => Changed?.Invoke();
         }
