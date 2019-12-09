@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         }
 
         private NonPlayfieldSprite cursor;
-        private bool rotate;
+        private readonly bool rotate;
 
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
