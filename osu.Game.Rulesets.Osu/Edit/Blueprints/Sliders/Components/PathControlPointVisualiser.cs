@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool deleteSelected()
         {
-            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.Index).Select(i => slider.Path.ControlPoints[i]).ToList();
+            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => slider.Path.ControlPoints[p.Index]).ToList();
 
             // Ensure that there are any points to be deleted
             if (toRemove.Count == 0)

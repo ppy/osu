@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             RelativeSizeAxes = Axes.Both;
 
             segmentStart = HitObject.Path.ControlPoints[0];
-
         }
 
         [BackgroundDependencyLoader]
@@ -150,9 +149,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 case 2:
                     segmentStart.Type.Value = PathType.Linear;
                     break;
+
                 case 3:
                     segmentStart.Type.Value = PathType.PerfectCurve;
                     break;
+
                 default:
                     segmentStart.Type.Value = PathType.Bezier;
                     break;
