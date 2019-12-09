@@ -81,7 +81,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                 case OsuSkinComponents.Cursor:
                     if (source.GetTexture("cursor") != null)
-                        return new LegacyCursor();
+                    {
+                        return new LegacyCursor(GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorRotate)?.Value ?? true);
+                    }
 
                     return null;
 
