@@ -196,9 +196,6 @@ namespace osu.Game.Rulesets.Objects
             if (ControlPoints.Count == 0)
                 return;
 
-            if (ControlPoints[0].Type.Value == null)
-                throw new InvalidOperationException($"The first control point in a {nameof(SliderPath)} must have a non-null type.");
-
             Vector2[] vertices = new Vector2[ControlPoints.Count];
             for (int i = 0; i < ControlPoints.Count; i++)
                 vertices[i] = ControlPoints[i].Position.Value;
@@ -214,7 +211,7 @@ namespace osu.Game.Rulesets.Objects
 
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = ControlPoints[start].Type.Value.Value;
+                var segmentType = ControlPoints[start].Type.Value ?? PathType.Linear;
 
                 foreach (Vector2 t in computeSubPath(segmentVertices, segmentType))
                 {
