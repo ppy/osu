@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToTrack(Track track)
         {
-            track.TempoAdjust *= RateAdjust;
+            track.Tempo.Value *= RateAdjust;
         }
     }
 }
