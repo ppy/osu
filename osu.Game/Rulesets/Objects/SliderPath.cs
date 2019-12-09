@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The current version of this <see cref="SliderPath"/>. Updated when any change to the path occurs.
         /// </summary>
+        [JsonIgnore]
         public IBindable<int> Version => version;
 
         private readonly Bindable<int> version = new Bindable<int>();
