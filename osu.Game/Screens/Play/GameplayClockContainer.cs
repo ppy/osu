@@ -245,7 +245,7 @@ namespace osu.Game.Screens.Play
                 speedAdjustmentsApplied = false;
             }
 
-            (track as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
         }
     }
 }
