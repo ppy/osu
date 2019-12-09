@@ -190,7 +190,7 @@ namespace osu.Game.Rulesets.Objects
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = ControlPoints[start].Type.Value ?? PathType.Linear;
 
-                foreach (Vector2 t in computeSubPath(segmentVertices, segmentType))
+                foreach (Vector2 t in calculateSubPath(segmentVertices, segmentType))
                 {
                     if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                         calculatedPath.Add(t);
@@ -199,32 +199,32 @@ namespace osu.Game.Rulesets.Objects
                 // Start the new segment at the current vertex
                 start = i;
             }
+        }
 
-            static List<Vector2> computeSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
+        private List<Vector2> calculateSubPath(ReadOnlySpan<Vector2> subControlPoints, PathType type)
+        {
+            switch (type)
             {
-                switch (type)
-                {
-                    case PathType.Linear:
-                        return PathApproximator.ApproximateLinear(subControlPoints);
+                case PathType.Linear:
+                    return PathApproximator.ApproximateLinear(subControlPoints);
 
-                    case PathType.PerfectCurve:
-                        if (subControlPoints.Length != 3)
-                            break;
+                case PathType.PerfectCurve:
+                    if (subControlPoints.Length != 3)
+                        break;
 
-                        List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
+                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
 
-                        // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
-                        if (subpath.Count == 0)
-                            break;
+                    // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
+                    if (subpath.Count == 0)
+                        break;
 
-                        return subpath;
+                    return subpath;
 
-                    case PathType.Catmull:
-                        return PathApproximator.ApproximateCatmull(subControlPoints);
-                }
-
-                return PathApproximator.ApproximateBezier(subControlPoints);
+                case PathType.Catmull:
+                    return PathApproximator.ApproximateCatmull(subControlPoints);
             }
+
+            return PathApproximator.ApproximateBezier(subControlPoints);
         }
 
         private void calculateLength()
