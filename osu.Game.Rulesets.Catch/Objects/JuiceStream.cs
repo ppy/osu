@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Duration => EndTime - StartTime;
 
-        private readonly SliderPath path = new SliderPath(new[] { new PathControlPoint { Type = { Value = PathType.Linear } } });
+        private readonly SliderPath path = new SliderPath();
 
         public SliderPath Path
         {
