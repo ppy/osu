@@ -326,7 +326,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             if (obj1InTheMiddle && obj2InTheMiddle)
             {
                 double gap = (s12 - s23 / 2 - s01 / 2).L2Norm() / (d12 + 0.1);
-                patternCorrection = (SpecialFunctions.Logistic((gap - 0.75) * 8) - SpecialFunctions.Logistic(-6)) *
+                patternCorrection = (SpecialFunctions.Logistic((gap - 1) * 8) - SpecialFunctions.Logistic(-6)) *
                                     SpecialFunctions.Logistic((d01 - 0.7) * 10) * SpecialFunctions.Logistic((d23 - 0.7) * 10) *
                                     Mean.PowerMean(flowiness012, flowiness123, 2) * 0.6;
                 //patternCorrection = 0;
