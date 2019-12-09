@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private PlacementState state;
         private PathControlPoint segmentStart;
         private PathControlPoint cursor;
-        private int currentSegmentLength = 1;
+        private int currentSegmentLength;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
@@ -40,7 +40,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             RelativeSizeAxes = Axes.Both;
 
-            segmentStart = HitObject.Path.ControlPoints[0];
+            HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.Linear));
+            currentSegmentLength = 1;
         }
 
         [BackgroundDependencyLoader]
