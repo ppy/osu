@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,17 +12,18 @@ using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : CompositeDrawable
+    public class TimelineArea : Container
     {
-        private readonly Timeline timeline;
+        private readonly Timeline timeline = new Timeline { RelativeSizeAxes = Axes.Both };
 
-        public TimelineArea()
+        protected override Container<Drawable> Content => timeline;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Masking = true;
             CornerRadius = 5;
 
-            OsuCheckbox hitObjectsCheckbox;
-            OsuCheckbox hitSoundsCheckbox;
             OsuCheckbox waveformCheckbox;
 
             InternalChildren = new Drawable[]
@@ -60,8 +62,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            hitObjectsCheckbox = new OsuCheckbox { LabelText = "Hit objects" },
-                                            hitSoundsCheckbox = new OsuCheckbox { LabelText = "Hit sounds" },
                                             waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
                                         }
                                     }
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                     }
                                 }
                             },
-                            timeline = new Timeline { RelativeSizeAxes = Axes.Both }
+                            timeline
                         },
                     },
                     ColumnDimensions = new[]
@@ -119,8 +119,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            hitObjectsCheckbox.Current.Value = true;
-            hitSoundsCheckbox.Current.Value = true;
             waveformCheckbox.Current.Value = true;
 
             timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
