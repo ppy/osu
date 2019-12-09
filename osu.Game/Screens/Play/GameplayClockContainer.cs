@@ -214,10 +214,13 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
+        private bool speedAdjustmentsApplied;
+
         private void updateRate()
         {
             if (sourceClock == null) return;
 
+            speedAdjustmentsApplied = true;
             sourceClock.ResetSpeedAdjustments();
 
             if (sourceClock is IHasTempoAdjust tempo)
@@ -239,7 +242,12 @@ namespace osu.Game.Screens.Play
 
         private void removeSourceClockAdjustments()
         {
-            sourceClock.ResetSpeedAdjustments();
+            if (speedAdjustmentsApplied)
+            {
+                sourceClock.ResetSpeedAdjustments();
+                speedAdjustmentsApplied = false;
+            }
+
             (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
         }
     }
