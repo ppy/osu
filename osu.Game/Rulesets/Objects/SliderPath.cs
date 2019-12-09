@@ -187,8 +187,6 @@ namespace osu.Game.Rulesets.Objects
                 if (ControlPoints[i].Type.Value == null && i < ControlPoints.Count - 1)
                     continue;
 
-                Debug.Assert(ControlPoints[start].Type.Value.HasValue);
-
                 // The current vertex ends the segment
                 var segmentVertices = vertices.AsSpan().Slice(start, i - start + 1);
                 var segmentType = ControlPoints[start].Type.Value ?? PathType.Linear;
