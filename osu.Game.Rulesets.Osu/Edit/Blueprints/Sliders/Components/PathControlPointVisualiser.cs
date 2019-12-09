@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -15,6 +16,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -161,9 +163,50 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints)}", MenuItemType.Destructive, () => deleteSelected())
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem("Type")
+                    {
+                        Items = new[]
+                        {
+                            createMenuItemForPathType(null),
+                            createMenuItemForPathType(PathType.Linear),
+                            createMenuItemForPathType(PathType.PerfectCurve),
+                            createMenuItemForPathType(PathType.Catmull)
+                        }
+                    }
                 };
             }
+        }
+
+        private MenuItem createMenuItemForPathType(PathType? type)
+        {
+            int totalCount = Pieces.Count(p => p.IsSelected.Value);
+            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type.Value == type);
+
+            var item = new PathTypeMenuItem(type, () =>
+            {
+                foreach (var p in Pieces.Where(p => p.IsSelected.Value))
+                    p.ControlPoint.Type.Value = type;
+            });
+
+            if (countOfState == totalCount)
+                item.State.Value = TernaryState.True;
+            else if (countOfState > 0)
+                item.State.Value = TernaryState.Indeterminate;
+            else
+                item.State.Value = TernaryState.False;
+
+            return item;
+        }
+
+        private class PathTypeMenuItem : TernaryStateMenuItem
+        {
+            public PathTypeMenuItem(PathType? type, Action action)
+                : base(type == null ? "Inherit" : type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
+            {
+            }
+
+            private static TernaryState changeState(TernaryState state) => TernaryState.True;
         }
     }
 }
