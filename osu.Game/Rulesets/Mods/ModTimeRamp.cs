@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
 
@@ -21,7 +22,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust) };
 
-        protected abstract double FinalRateAdjustment { get; }
+        [SettingSource("Final rate", "The final speed to ramp to")]
+        public abstract BindableNumber<double> FinalRate { get; }
 
         private double finalRateTime;
         private double beginRampTime;
@@ -45,6 +47,8 @@ namespace osu.Game.Rulesets.Mods
         {
             HitObject lastObject = beatmap.HitObjects.LastOrDefault();
 
+            SpeedChange.SetDefault();
+
             beginRampTime = beatmap.HitObjects.FirstOrDefault()?.StartTime ?? 0;
             finalRateTime = final_rate_progress * (lastObject?.GetEndTime() ?? 0);
         }
@@ -59,6 +63,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
         private void applyAdjustment(double amount) =>
-            SpeedChange.Value = 1 + (Math.Sign(FinalRateAdjustment) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
+            SpeedChange.Value = 1 + (Math.Sign(FinalRate.Value) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRate.Value));
     }
 }
