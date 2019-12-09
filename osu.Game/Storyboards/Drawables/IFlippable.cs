@@ -41,7 +41,7 @@ namespace osu.Game.Storyboards.Drawables
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public static TransformSequence<T> TransformFlipH<T>(this T flippable, bool newValue, double delay = 0)
-            where T : IFlippable
+            where T : class, IFlippable
             => flippable.TransformTo(flippable.PopulateTransform(new TransformFlipH(), newValue, delay));
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace osu.Game.Storyboards.Drawables
         /// </summary>
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public static TransformSequence<T> TransformFlipV<T>(this T flippable, bool newValue, double delay = 0)
-            where T : IFlippable
+            where T : class, IFlippable
             => flippable.TransformTo(flippable.PopulateTransform(new TransformFlipV(), newValue, delay));
     }
 }
