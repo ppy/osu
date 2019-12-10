@@ -10,6 +10,7 @@ using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.IO;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -358,9 +359,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (split.Length >= 8)
             {
-                EffectFlags effectFlags = (EffectFlags)Parsing.ParseInt(split[7]);
-                kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
-                omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
+                LegacyEffectFlags effectFlags = (LegacyEffectFlags)Parsing.ParseInt(split[7]);
+                kiaiMode = effectFlags.HasFlag(LegacyEffectFlags.Kiai);
+                omitFirstBarSignature = effectFlags.HasFlag(LegacyEffectFlags.OmitFirstBarLine);
             }
 
             string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
@@ -448,13 +449,5 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
 
         protected virtual TimingControlPoint CreateTimingControlPoint() => new TimingControlPoint();
-
-        [Flags]
-        internal enum EffectFlags
-        {
-            None = 0,
-            Kiai = 1,
-            OmitFirstBarLine = 8
-        }
     }
 }
