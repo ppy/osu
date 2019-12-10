@@ -116,7 +116,23 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Duration => EndTime - StartTime;
 
-        public SliderPath Path { get; set; }
+        private readonly SliderPath path = new SliderPath();
+
+        public SliderPath Path
+        {
+            get => path;
+            set
+            {
+                path.ControlPoints.Clear();
+                path.ExpectedDistance.Value = null;
+
+                if (value != null)
+                {
+                    path.ControlPoints.AddRange(value.ControlPoints);
+                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
+                }
+            }
+        }
 
         public double Distance => Path.Distance;
 

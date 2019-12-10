@@ -26,7 +26,7 @@ namespace osu.Game.Online
         /// </summary>
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
-        protected readonly Bindable<double> Progress = new Bindable<double>();
+        protected readonly BindableNumber<double> Progress = new BindableNumber<double> { MinValue = 0, MaxValue = 1 };
 
         protected DownloadTrackingComposite(TModel model = null)
         {
