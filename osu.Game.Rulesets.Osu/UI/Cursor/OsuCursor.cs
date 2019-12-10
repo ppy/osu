@@ -20,7 +20,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private bool cursorExpand;
 
-        private OsuCursorSprite cursorSprite;
+        private SkinnableDrawable cursorSprite;
+
+        private Drawable ExpandTarget => (cursorSprite.Drawable as OsuCursorSprite)?.ExpandTarget ?? cursorSprite;
 
         public OsuCursor()
         {
@@ -37,19 +39,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load()
         {
-            SkinnableDrawable cursor;
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = cursor = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+                Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                 }
             };
-            cursorSprite = cursor.Drawable as OsuCursorSprite;
         }
 
         private const float pressed_scale = 1.2f;
@@ -59,10 +59,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             if (!cursorExpand) return;
 
-            cursorSprite.ExpandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
+            ExpandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
         }
 
-        public void Contract() => cursorSprite.ExpandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
+        public void Contract() => ExpandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
 
         private class DefaultCursor : OsuCursorSprite
         {
