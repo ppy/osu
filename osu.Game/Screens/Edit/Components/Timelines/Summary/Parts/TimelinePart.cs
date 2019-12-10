@@ -14,11 +14,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// Represents a part of the summary timeline..
     /// </summary>
-    public abstract class TimelinePart : CompositeDrawable
+    public abstract class TimelinePart : Container
     {
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly Container timeline;
+
+        protected override Container<Drawable> Content => timeline;
 
         protected TimelinePart()
         {
@@ -49,8 +51,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             timeline.RelativeChildSize = new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
         }
-
-        protected void Add(Drawable visualisation) => timeline.Add(visualisation);
 
         protected virtual void LoadBeatmap(WorkingBeatmap beatmap)
         {
