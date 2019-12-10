@@ -11,6 +11,9 @@ namespace osu.Game.Rulesets.Osu.Skinning
 {
     public class LegacyCursor : CompositeDrawable
     {
+        private NonPlayfieldSprite cursor;
+        private bool spin;
+
         public LegacyCursor()
         {
             Size = new Vector2(50);
@@ -22,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(ISkinSource skin)
         {
+            spin = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorRotate)?.Value ?? true;
+
             InternalChildren = new Drawable[]
             {
                 new NonPlayfieldSprite
@@ -30,13 +35,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                new NonPlayfieldSprite
+                cursor = new NonPlayfieldSprite
                 {
                     Texture = skin.GetTexture("cursor"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 }
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            if (spin)
+                cursor.Spin(10000, RotationDirection.Clockwise);
         }
     }
 }

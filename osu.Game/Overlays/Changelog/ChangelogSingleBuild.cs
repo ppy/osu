@@ -4,7 +4,6 @@
 using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -43,18 +42,7 @@ namespace osu.Game.Overlays.Changelog
             };
             req.Failure += _ => complete = true;
 
-            // This is done on a separate thread to support cancellation below
-            Task.Run(() =>
-            {
-                try
-                {
-                    req.Perform(api);
-                }
-                catch
-                {
-                    complete = true;
-                }
-            });
+            api.PerformAsync(req);
 
             while (!complete)
             {

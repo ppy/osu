@@ -34,6 +34,7 @@ using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -331,6 +332,9 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool OnHover(HoverEvent e) => true; // required for IProvideCursor
 
+        // only show the cursor when within the playfield, by default.
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Playfield.ReceivePositionalInputAt(screenSpacePos);
+
         CursorContainer IProvideCursor.Cursor => Playfield.Cursor;
 
         public override GameplayCursorContainer Cursor => Playfield.Cursor;
@@ -507,21 +511,27 @@ namespace osu.Game.Rulesets.UI
 
         public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
 
-        public BindableDouble Volume => throw new NotImplementedException();
+        public BindableNumber<double> Volume => throw new NotImplementedException();
 
-        public BindableDouble Balance => throw new NotImplementedException();
+        public BindableNumber<double> Balance => throw new NotImplementedException();
 
-        public BindableDouble Frequency => throw new NotImplementedException();
+        public BindableNumber<double> Frequency => throw new NotImplementedException();
+
+        public BindableNumber<double> Tempo => throw new NotImplementedException();
+
+        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotImplementedException();
 
         public IBindable<double> AggregateVolume => throw new NotImplementedException();
 
         public IBindable<double> AggregateBalance => throw new NotImplementedException();
 
         public IBindable<double> AggregateFrequency => throw new NotImplementedException();
+
+        public IBindable<double> AggregateTempo => throw new NotImplementedException();
 
         public int PlaybackConcurrency
         {

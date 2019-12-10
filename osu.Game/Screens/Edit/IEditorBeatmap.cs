@@ -23,6 +23,11 @@ namespace osu.Game.Screens.Edit
         /// Invoked when a <see cref="HitObject"/> is removed from this <see cref="IEditorBeatmap"/>.
         /// </summary>
         event Action<HitObject> HitObjectRemoved;
+
+        /// <summary>
+        /// Invoked when the start time of a <see cref="HitObject"/> in this <see cref="EditorBeatmap{T}"/> was changed.
+        /// </summary>
+        event Action<HitObject> StartTimeChanged;
     }
 
     /// <summary>

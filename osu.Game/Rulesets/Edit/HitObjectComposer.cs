@@ -34,7 +34,9 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         protected IRulesetConfigManager Config { get; private set; }
-        protected EditorBeatmap<TObject> EditorBeatmap { get; private set; }
+
+        protected new EditorBeatmap<TObject> EditorBeatmap { get; private set; }
+
         protected readonly Ruleset Ruleset;
 
         [Resolved]
@@ -148,7 +150,7 @@ namespace osu.Game.Rulesets.Edit
 
             beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
-            EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+            base.EditorBeatmap = EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
             EditorBeatmap.StartTimeChanged += UpdateHitObject;
@@ -332,6 +334,11 @@ namespace osu.Game.Rulesets.Edit
         /// All the <see cref="DrawableHitObject"/>s.
         /// </summary>
         public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
+
+        /// <summary>
+        /// An editor-specific beatmap, exposing mutation events.
+        /// </summary>
+        public IEditorBeatmap EditorBeatmap { get; protected set; }
 
         /// <summary>
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.

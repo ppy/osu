@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
-using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -28,17 +27,21 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
 
-        public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
+        private readonly SliderPath path = new SliderPath();
 
         public SliderPath Path
         {
-            get => PathBindable.Value;
+            get => path;
             set
             {
-                PathBindable.Value = value;
-                endPositionCache.Invalidate();
+                path.ControlPoints.Clear();
+                path.ExpectedDistance.Value = null;
 
-                updateNestedPositions();
+                if (value != null)
+                {
+                    path.ControlPoints.AddRange(value.ControlPoints);
+                    path.ExpectedDistance.Value = value.ExpectedDistance.Value;
+                }
             }
         }
 
@@ -50,8 +53,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             set
             {
                 base.Position = value;
-                endPositionCache.Invalidate();
-
                 updateNestedPositions();
             }
         }
@@ -112,6 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             SamplesBindable.ItemsAdded += _ => updateNestedSamples();
             SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+            Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -189,6 +191,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void updateNestedPositions()
         {
+            endPositionCache.Invalidate();
+
             if (HeadCircle != null)
                 HeadCircle.Position = Position;
 

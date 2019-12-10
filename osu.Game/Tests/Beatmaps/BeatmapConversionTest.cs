@@ -240,6 +240,6 @@ namespace osu.Game.Tests.Beatmaps
             set => Objects = value;
         }
 
-        public virtual bool Equals(ConvertMapping<TConvertValue> other) => StartTime.Equals(other?.StartTime);
+        public virtual bool Equals(ConvertMapping<TConvertValue> other) => StartTime == other?.StartTime;
     }
 }

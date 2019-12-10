@@ -54,8 +54,8 @@ namespace osu.Game.Tournament
         {
             Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
 
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
@@ -228,7 +228,7 @@ namespace osu.Game.Tournament
                     if (b.BeatmapInfo == null && b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                        req.Perform(API);
+                        API.Perform(req);
                         b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                         addedInfo = true;
