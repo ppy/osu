@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private SkinnableDrawable cursorSprite;
 
-        private Drawable ExpandTarget => (cursorSprite.Drawable as OsuCursorSprite)?.ExpandTarget ?? cursorSprite;
+        private Drawable expandTarget => (cursorSprite.Drawable as OsuCursorSprite)?.ExpandTarget ?? cursorSprite;
 
         public OsuCursor()
         {
@@ -59,10 +59,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             if (!cursorExpand) return;
 
-            ExpandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
+            expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
         }
 
-        public void Contract() => ExpandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
+        public void Contract() => expandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
 
         private class DefaultCursor : OsuCursorSprite
         {
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                InternalChildren = new Drawable[]
+                InternalChildren = new[]
                 {
                     ExpandTarget = new CircularContainer
                     {
