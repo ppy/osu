@@ -30,8 +30,9 @@ namespace osu.Game.Rulesets.Objects
         /// Creates a new <see cref="PathControlPoint"/>.
         /// </summary>
         public PathControlPoint()
-            : this(Vector2.Zero, null)
         {
+            Position.ValueChanged += _ => Changed?.Invoke();
+            Type.ValueChanged += _ => Changed?.Invoke();
         }
 
         /// <summary>
@@ -40,12 +41,10 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="position">The initial position.</param>
         /// <param name="type">The initial type.</param>
         public PathControlPoint(Vector2 position, PathType? type = null)
+            : this()
         {
             Position.Value = position;
             Type.Value = type;
-
-            Position.ValueChanged += _ => Changed?.Invoke();
-            Type.ValueChanged += _ => Changed?.Invoke();
         }
 
         public bool Equals(PathControlPoint other) => Position.Value == other?.Position.Value && Type.Value == other.Type.Value;
