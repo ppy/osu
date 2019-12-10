@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
             type &= ~ConvertHitObjectType.NewCombo;
 
-            var soundType = (LegacySoundType)Parsing.ParseInt(split[4]);
+            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split[4]);
             var bankInfo = new SampleBankInfo();
 
             HitObject result = null;
@@ -157,7 +157,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // Populate node sound types with the default hit object sound type
-                var nodeSoundTypes = new List<LegacySoundType>();
+                var nodeSoundTypes = new List<LegacyHitSoundType>();
                 for (int i = 0; i < nodes; i++)
                     nodeSoundTypes.Add(soundType);
 
@@ -172,7 +172,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                             break;
 
                         int.TryParse(adds[i], out var sound);
-                        nodeSoundTypes[i] = (LegacySoundType)sound;
+                        nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                     }
                 }
 
@@ -333,7 +333,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="endTime">The hold end time.</param>
         protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime);
 
-        private List<HitSampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
+        private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
@@ -359,7 +359,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
             };
 
-            if (type.HasFlag(LegacySoundType.Finish))
+            if (type.HasFlag(LegacyHitSoundType.Finish))
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
@@ -370,7 +370,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 });
             }
 
-            if (type.HasFlag(LegacySoundType.Whistle))
+            if (type.HasFlag(LegacyHitSoundType.Whistle))
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
@@ -381,7 +381,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 });
             }
 
-            if (type.HasFlag(LegacySoundType.Clap))
+            if (type.HasFlag(LegacyHitSoundType.Clap))
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
@@ -429,16 +429,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Filename,
                 Path.ChangeExtension(Filename, null)
             };
-        }
-
-        [Flags]
-        private enum LegacySoundType
-        {
-            None = 0,
-            Normal = 1,
-            Whistle = 2,
-            Finish = 4,
-            Clap = 8
         }
     }
 }
