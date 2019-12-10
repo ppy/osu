@@ -314,7 +314,7 @@ namespace osu.Game.Tests.Visual.Background
                 config.BindWith(OsuSetting.BlurLevel, BlurLevel);
             }
 
-            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
+            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1f - ((FadeAccessibleBackground)Background).CurrentDim);
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
@@ -404,6 +404,8 @@ namespace osu.Game.Tests.Visual.Background
 
             public float CurrentAlpha => dimmable.CurrentAlpha;
 
+            public float CurrentDim => dimmable.DimLevel;
+
             public Vector2 CurrentBlur => Background.BlurSigma;
 
             private TestDimmableBackground dimmable;
@@ -418,6 +420,8 @@ namespace osu.Game.Tests.Visual.Background
         {
             public Color4 CurrentColour => Content.Colour;
             public float CurrentAlpha => Content.Alpha;
+
+            public new float DimLevel => base.DimLevel;
         }
     }
 }
