@@ -166,6 +166,21 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
+        /// Ensure <see cref="UserDimContainer"/> is able to disable user-defined display settings.
+        /// </summary>
+        [Test]
+        public void DisableUserDisplaySettingsTest()
+        {
+            performFullSetup();
+            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
+            AddStep("Set user dim to max", () => player.DimmableStoryboard.)
+            waitForDim();
+            AddStep("Turn on IgnoreUserSettings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
+            waitForDim();
+            AddAssert("Check the background is undimmed", () => player.IsBackgroundUndimmed());
+        }
+
+        /// <summary>
         /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a storyboard.
         /// </summary>
         [Test]
@@ -351,6 +366,8 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
+
+            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).Colour == Color4.White;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;

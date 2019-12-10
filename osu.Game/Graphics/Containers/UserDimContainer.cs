@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Graphics.Containers
         public readonly Bindable<bool> EnableUserDim = new Bindable<bool>(true);
 
         /// <summary>
-        /// Whether or not user-configured settings relating to visibility of elements should be ignored
+        /// Whether or not user-configured settings relating to brightness of elements should be ignored
         /// </summary>
         public readonly Bindable<bool> IgnoreUserSettings = new Bindable<bool>();
 
@@ -36,13 +37,13 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool ContentDisplayed { get; private set; }
 
+        public double DimLevel => EnableUserDim.Value && !IgnoreUserSettings.Value ? UserDimLevel.Value : 0;
+
         protected Bindable<double> UserDimLevel { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
 
         protected Bindable<bool> ShowVideo { get; private set; }
-
-        protected double DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0;
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -90,7 +91,7 @@ namespace osu.Game.Graphics.Containers
             ContentDisplayed = ShowDimContent;
 
             dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            dimContent.FadeColour(OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(IgnoreUserSettings.Value ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
