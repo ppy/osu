@@ -232,8 +232,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[0]);
-            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[1]);
+            var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
+            var addbank = (LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
