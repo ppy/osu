@@ -12,7 +12,7 @@ namespace osu.Game.Overlays
             AccentColour = AccentColour,
         };
 
-        private class OverlayHeaderTabItem : OverlayTabItem<string>
+        private class OverlayHeaderTabItem : OverlayTabItem
         {
             public OverlayHeaderTabItem(string value)
                 : base(value)
