@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -14,6 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -23,8 +23,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
-        public Action<Vector2[]> ControlPointsChanged;
-
         internal readonly Container<PathControlPointPiece> Pieces;
         private readonly Slider slider;
         private readonly bool allowSelection;
@@ -55,12 +53,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            while (slider.Path.ControlPoints.Length > Pieces.Count)
+            while (slider.Path.ControlPoints.Count > Pieces.Count)
             {
-                var piece = new PathControlPointPiece(slider, Pieces.Count)
-                {
-                    ControlPointsChanged = c => ControlPointsChanged?.Invoke(c),
-                };
+                var piece = new PathControlPointPiece(slider, Pieces.Count);
 
                 if (allowSelection)
                     piece.RequestSelection = selectPiece;
@@ -68,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 Pieces.Add(piece);
             }
 
-            while (slider.Path.ControlPoints.Length < Pieces.Count)
+            while (slider.Path.ControlPoints.Count < Pieces.Count)
                 Pieces.Remove(Pieces[Pieces.Count - 1]);
         }
 
@@ -105,38 +100,40 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool deleteSelected()
         {
-            var newControlPoints = new List<Vector2>();
-
-            foreach (var piece in Pieces)
-            {
-                if (!piece.IsSelected.Value)
-                    newControlPoints.Add(slider.Path.ControlPoints[piece.Index]);
-            }
+            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => slider.Path.ControlPoints[p.Index]).ToList();
 
             // Ensure that there are any points to be deleted
-            if (newControlPoints.Count == slider.Path.ControlPoints.Length)
+            if (toRemove.Count == 0)
                 return false;
 
-            // If there are 0 remaining control points, treat the slider as being deleted
-            if (newControlPoints.Count == 0)
+            foreach (var c in toRemove)
+            {
+                // The first control point in the slider must have a type, so take it from the previous "first" one
+                // Todo: Should be handled within SliderPath itself
+                if (c == slider.Path.ControlPoints[0] && slider.Path.ControlPoints.Count > 1 && slider.Path.ControlPoints[1].Type.Value == null)
+                    slider.Path.ControlPoints[1].Type.Value = slider.Path.ControlPoints[0].Type.Value;
+
+                slider.Path.ControlPoints.Remove(c);
+            }
+
+            // If there are 0 or 1 remaining control points, the slider is in a degenerate (single point) form and should be deleted
+            if (slider.Path.ControlPoints.Count <= 1)
             {
                 placementHandler?.Delete(slider);
                 return true;
             }
 
-            // Make control points relative
-            Vector2 first = newControlPoints[0];
-            for (int i = 0; i < newControlPoints.Count; i++)
-                newControlPoints[i] = newControlPoints[i] - first;
-
-            // The slider's position defines the position of the first control point, and all further control points are relative to that point
+            // The path will have a non-zero offset if the head is removed, but sliders don't support this behaviour since the head is positioned at the slider's position
+            // So the slider needs to be offset by this amount instead, and all control points offset backwards such that the path is re-positioned at (0, 0)
+            Vector2 first = slider.Path.ControlPoints[0].Position.Value;
+            foreach (var c in slider.Path.ControlPoints)
+                c.Position.Value -= first;
             slider.Position += first;
 
             // Since pieces are re-used, they will not point to the deleted control points while remaining selected
             foreach (var piece in Pieces)
                 piece.IsSelected.Value = false;
 
-            ControlPointsChanged?.Invoke(newControlPoints.ToArray());
             return true;
         }
 
@@ -154,7 +151,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints)}", MenuItemType.Destructive, () => deleteSelected())
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints, selectedPoints > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected())
                 };
             }
         }

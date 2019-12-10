@@ -83,7 +83,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private class TestMatchLeaderboard : RoomLeaderboardPage.ResultsMatchLeaderboard
         {
-            protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
+            protected override APIRequest FetchScores(Action<IEnumerable<APIUserScoreAggregate>> scoresCallback)
             {
                 var scores = Enumerable.Range(0, 50).Select(createRoomScore).ToArray();
 
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 return null;
             }
 
-            private APIRoomScoreInfo createRoomScore(int id) => new APIRoomScoreInfo
+            private APIUserScoreAggregate createRoomScore(int id) => new APIUserScoreAggregate
             {
                 User = new User { Id = id, Username = $"User {id}" },
                 Accuracy = 0.98,

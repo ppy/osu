@@ -13,6 +13,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK;
 using osuTK.Graphics;
@@ -25,6 +27,7 @@ namespace osu.Game.Tests.Visual.Editor
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TimelineArea),
+            typeof(TimelineHitObjectDisplay),
             typeof(Timeline),
             typeof(TimelineButton),
             typeof(CentreMarker)
@@ -34,6 +37,8 @@ namespace osu.Game.Tests.Visual.Editor
         private void load(AudioManager audio)
         {
             Beatmap.Value = new WaveformTestBeatmap(audio);
+
+            var editorBeatmap = new EditorBeatmap<HitObject>((Beatmap<HitObject>)Beatmap.Value.Beatmap);
 
             Children = new Drawable[]
             {
@@ -50,6 +55,7 @@ namespace osu.Game.Tests.Visual.Editor
                 },
                 new TimelineArea
                 {
+                    Child = new TimelineHitObjectDisplay(editorBeatmap),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,

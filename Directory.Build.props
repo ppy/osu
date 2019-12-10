@@ -16,7 +16,7 @@
     <EmbeddedResource Include="Resources\**\*.*" />
   </ItemGroup>
   <ItemGroup Label="Code Analysis">
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.7" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.8" PrivateAssets="All" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
   </ItemGroup>
   <PropertyGroup Label="Documentation">

@@ -115,8 +115,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitTooSoon()
         {
-            pauseAndConfirm();
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
 
+            pauseAndConfirm();
             resume();
 
             AddStep("exit too soon", () => Player.Exit());
@@ -176,7 +177,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestExitFromGameplay()
         {
             AddStep("exit", () => Player.Exit());
+            confirmPaused();
 
+            AddStep("exit", () => Player.Exit());
             confirmExited();
         }
 
@@ -214,6 +217,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestRestartAfterResume()
         {
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+
             pauseAndConfirm();
             resumeAndConfirm();
             restart();

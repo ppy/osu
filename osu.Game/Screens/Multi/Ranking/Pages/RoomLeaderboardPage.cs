@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             leaderboard.ScoresLoaded = scoresLoaded;
         }
 
-        private void scoresLoaded(IEnumerable<APIRoomScoreInfo> scores)
+        private void scoresLoaded(IEnumerable<APIUserScoreAggregate> scores)
         {
             void gray(SpriteText s) => s.Colour = colours.GrayC;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             rankText.AddText(name + "\n", white);
             rankText.AddText("You are placed ", gray);
 
-            int index = scores.IndexOf(new APIRoomScoreInfo { User = Score.User }, new FuncEqualityComparer<APIRoomScoreInfo>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
+            int index = scores.IndexOf(new APIUserScoreAggregate { User = Score.User }, new FuncEqualityComparer<APIUserScoreAggregate>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
 
             rankText.AddText($"#{index + 1} ", s =>
             {
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
         {
             protected override bool FadeTop => true;
 
-            protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index)
+            protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index)
                 => new ResultsMatchLeaderboardScore(model, index);
 
             protected override FillFlowContainer<LeaderboardScore> CreateScoreFlow()
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
             private class ResultsMatchLeaderboardScore : MatchLeaderboardScore
             {
-                public ResultsMatchLeaderboardScore(APIRoomScoreInfo score, int rank)
+                public ResultsMatchLeaderboardScore(APIUserScoreAggregate score, int rank)
                     : base(score, rank)
                 {
                 }

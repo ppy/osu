@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModHalfTime : ModTimeAdjust, IApplicableToClock
+    public abstract class ModHalfTime : ModTimeAdjust
     {
         public override string Name => "Half Time";
         public override string Acronym => "HT";

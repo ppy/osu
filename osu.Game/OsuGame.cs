@@ -406,11 +406,11 @@ namespace osu.Game
             nextBeatmap?.LoadBeatmapAsync();
         }
 
-        private void currentTrackCompleted()
+        private void currentTrackCompleted() => Schedule(() =>
         {
             if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
                 musicController.NextTrack();
-        }
+        });
 
         #endregion
 
