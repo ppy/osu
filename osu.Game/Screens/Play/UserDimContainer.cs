@@ -6,8 +6,9 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 
-namespace osu.Game.Graphics.Containers
+namespace osu.Game.Screens.Play
 {
     /// <summary>
     /// A container that applies user-configured visual settings to its contents.

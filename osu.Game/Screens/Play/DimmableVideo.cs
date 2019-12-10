@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
-using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
