@@ -165,7 +165,7 @@ namespace osu.Game.Overlays
                 AccentColour = colours.Seafoam;
             }
 
-            private class ProfileTabItem : OverlayTabItem<ProfileSection>
+            private class ProfileTabItem : OverlayTabItem
             {
                 public ProfileTabItem(ProfileSection value)
                     : base(value)
