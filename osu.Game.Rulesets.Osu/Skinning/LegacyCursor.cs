@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osuTK;
