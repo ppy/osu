@@ -96,6 +96,42 @@ namespace osu.Game.Tests.Visual.SongSelect
         }
 
         [Test]
+        public void TestNoFilterOnSimpleResume()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
+
+        [Test]
+        public void TestFilterOnResumeAfterChange()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("filter count is 2", () => songSelect.FilterCount == 2);
+        }
+
+        [Test]
         public void TestAudioResuming()
         {
             createSongSelect();

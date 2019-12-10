@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
-        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+        private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
@@ -84,9 +84,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
             stackHeightBindable.BindTo(HitObject.StackHeightBindable);
             scaleBindable.BindTo(HitObject.ScaleBindable);
-            pathBindable.BindTo(slider.PathBindable);
+            pathVersion.BindTo(slider.Path.Version);
 
-            pathBindable.BindValueChanged(_ => Body.Refresh());
+            pathVersion.BindValueChanged(_ => Body.Refresh());
 
             AccentColour.BindValueChanged(colour =>
             {
