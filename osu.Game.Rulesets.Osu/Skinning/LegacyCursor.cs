@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             spin = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorRotate)?.Value ?? true;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new NonPlayfieldSprite
                 {
