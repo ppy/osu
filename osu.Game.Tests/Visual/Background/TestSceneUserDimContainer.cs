@@ -149,6 +149,20 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
+        /// Ensure <see cref="UserDimContainer"/> is able to disable user-defined display settings.
+        /// </summary>
+        [Test]
+        public void DisableUserDisplaySettingsTest()
+        {
+            performFullSetup();
+            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
+            waitForDim();
+            AddStep("Turn on IgnoreUserSettings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
+            waitForDim();
+            AddAssert("Check the background is undimmed", () => player.IsBackgroundUndimmed());
+        }
+
+        /// <summary>
         /// Ensure <see cref="UserDimContainer"/> is properly accepting user-defined visual changes for a background.
         /// </summary>
         [Test]
@@ -163,20 +177,6 @@ namespace osu.Game.Tests.Visual.Background
             AddStep("Disable user dim", () => songSelect.DimEnabled.Value = true);
             waitForDim();
             AddAssert("Screen is dimmed and blur applied", () => songSelect.IsBackgroundDimmed() && songSelect.IsUserBlurApplied());
-        }
-
-        /// <summary>
-        /// Ensure <see cref="UserDimContainer"/> is able to disable user-defined display settings.
-        /// </summary>
-        [Test]
-        public void DisableUserDisplaySettingsTest()
-        {
-            performFullSetup();
-            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
-            waitForDim();
-            AddStep("Turn on IgnoreUserSettings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
-            waitForDim();
-            AddAssert("Check the background is undimmed", () => player.IsBackgroundUndimmed());
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
-            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).Colour == Color4.White;
+            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
