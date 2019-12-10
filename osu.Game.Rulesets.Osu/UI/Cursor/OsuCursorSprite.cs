@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
-    public class OsuCursorSprite : CompositeDrawable
+    public abstract class OsuCursorSprite : CompositeDrawable
     {
         public Drawable ExpandTarget { get; protected set; }
     }
