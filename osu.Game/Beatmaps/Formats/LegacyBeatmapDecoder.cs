@@ -294,22 +294,22 @@ namespace osu.Game.Beatmaps.Formats
         {
             string[] split = line.Split(',');
 
-            if (!Enum.TryParse(split[0], out EventType type))
+            if (!Enum.TryParse(split[0], out LegacyEventType type))
                 throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
             switch (type)
             {
-                case EventType.Background:
+                case LegacyEventType.Background:
                     string bgFilename = split[2].Trim('"');
                     beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(bgFilename);
                     break;
 
-                case EventType.Video:
+                case LegacyEventType.Video:
                     string videoFilename = split[2].Trim('"');
                     beatmap.BeatmapInfo.Metadata.VideoFile = FileSafety.PathStandardise(videoFilename);
                     break;
 
-                case EventType.Break:
+                case LegacyEventType.Break:
                     double start = getOffsetTime(Parsing.ParseDouble(split[1]));
 
                     var breakEvent = new BreakPeriod
