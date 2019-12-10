@@ -257,14 +257,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
         {
             if (type == PathType.PerfectCurve)
             {
-                if (vertices.Length == 3)
+                if (vertices.Length != 3)
+                    type = PathType.Bezier;
+                else if (isLinear(vertices))
                 {
                     // osu-stable special-cased colinear perfect curves to a linear path
-                    if (isLinear(vertices))
-                        type = PathType.Linear;
+                    type = PathType.Linear;
                 }
-                else
-                    type = PathType.Bezier;
             }
 
             var points = new List<PathControlPoint>(vertices.Length)
