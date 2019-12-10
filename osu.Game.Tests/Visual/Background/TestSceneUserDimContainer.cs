@@ -173,7 +173,6 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup();
             AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
-            AddStep("Set user dim to max", () => player.DimmableStoryboard.)
             waitForDim();
             AddStep("Turn on IgnoreUserSettings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
             waitForDim();
