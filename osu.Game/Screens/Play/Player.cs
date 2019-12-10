@@ -140,6 +140,11 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
+            // bind break into components that require it.
+            Background.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+            DimmableStoryboard.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+            DimmableVideo.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
             ScoreProcessor.Failed += onFail;
