@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModDoubleTime : ModTimeAdjust, IApplicableToClock
+    public abstract class ModDoubleTime : ModTimeAdjust
     {
         public override string Name => "Double Time";
         public override string Acronym => "DT";
