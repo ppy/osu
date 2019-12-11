@@ -216,14 +216,14 @@ namespace osu.Game.Screens.Play
                         if (selectionIndex == -1 || selectionIndex == 0)
                             setSelected(InternalButtons.Count - 1);
                         else
-                            setSelected(selectionIndex--);
+                            setSelected(selectionIndex - 1);
                         return true;
 
                     case Key.Down:
                         if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
                             setSelected(0);
                         else
-                            setSelected(selectionIndex++);
+                            setSelected(selectionIndex + 1);
                         return true;
                 }
             }
@@ -262,9 +262,9 @@ namespace osu.Game.Screens.Play
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {
             if (!isSelected)
-                selectionIndex = -1;
+                setSelected(-1);
             else
-                selectionIndex = InternalButtons.IndexOf(button);
+                setSelected(InternalButtons.IndexOf(button));
         }
 
         private void updateRetryCount()
