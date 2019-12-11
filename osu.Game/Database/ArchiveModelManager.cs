@@ -492,7 +492,7 @@ namespace osu.Game.Database
                 {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = file.Substring(prefix.Length).PathStandardise(),
+                        Filename = file.Substring(prefix.Length).ToStandardisedPath(),
                         FileInfo = files.Add(s)
                     });
                 }
