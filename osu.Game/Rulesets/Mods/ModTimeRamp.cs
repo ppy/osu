@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
-        public override Type[] IncompatibleMods => new[] { typeof(ModRateAdjust) };
-
         [SettingSource("Final rate", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
 
