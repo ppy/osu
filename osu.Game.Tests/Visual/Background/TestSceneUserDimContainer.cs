@@ -155,9 +155,7 @@ namespace osu.Game.Tests.Visual.Background
         public void DisableUserDisplaySettingsTest()
         {
             performFullSetup();
-            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
-            waitForDim();
-            AddStep("Turn on IgnoreUserSettings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
+            AddStep("Start ignoring user settings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
             waitForDim();
             AddAssert("Check the background is undimmed", () => player.IsBackgroundUndimmed());
         }
@@ -367,7 +365,7 @@ namespace osu.Game.Tests.Visual.Background
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
 
-            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
+            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1);
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;

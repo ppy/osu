@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.Containers
             ContentDisplayed = ShowDimContent;
 
             dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            dimContent.FadeColour(IgnoreUserSettings.Value ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(IgnoreUserSettings.Value ? Color4.White : OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }
