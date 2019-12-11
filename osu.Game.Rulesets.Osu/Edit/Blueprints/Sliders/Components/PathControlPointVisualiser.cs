@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -32,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [Resolved(CanBeNull = true)]
         private IPlacementHandler placementHandler { get; set; }
 
+        private IBindableList<PathControlPoint> controlPoints;
+
         public PathControlPointVisualiser(Slider slider, bool allowSelection)
         {
             this.slider = slider;
@@ -47,24 +50,31 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+
+            controlPoints = slider.Path.ControlPoints.GetBoundCopy();
+            controlPoints.ItemsAdded += addControlPoints;
+            controlPoints.ItemsRemoved += removeControlPoints;
+
+            addControlPoints(controlPoints);
         }
 
-        protected override void Update()
+        private void addControlPoints(IEnumerable<PathControlPoint> controlPoints)
         {
-            base.Update();
-
-            while (slider.Path.ControlPoints.Count > Pieces.Count)
+            foreach (var point in controlPoints)
             {
-                var piece = new PathControlPointPiece(slider, Pieces.Count);
+                var piece = new PathControlPointPiece(slider, point);
 
                 if (allowSelection)
                     piece.RequestSelection = selectPiece;
 
                 Pieces.Add(piece);
             }
+        }
 
-            while (slider.Path.ControlPoints.Count < Pieces.Count)
-                Pieces.Remove(Pieces[Pieces.Count - 1]);
+        private void removeControlPoints(IEnumerable<PathControlPoint> controlPoints)
+        {
+            foreach (var point in controlPoints)
+                Pieces.RemoveAll(p => p.ControlPoint == point);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -87,20 +97,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
 
-        private void selectPiece(int index, MouseButtonEvent e)
+        private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
         {
             if (e.Button == MouseButton.Left && inputManager.CurrentState.Keyboard.ControlPressed)
-                Pieces[index].IsSelected.Toggle();
+                piece.IsSelected.Toggle();
             else
             {
-                foreach (var piece in Pieces)
-                    piece.IsSelected.Value = piece.Index == index;
+                foreach (var p in Pieces)
+                    p.IsSelected.Value = p == piece;
             }
         }
 
         private bool deleteSelected()
         {
-            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => slider.Path.ControlPoints[p.Index]).ToList();
+            List<PathControlPoint> toRemove = Pieces.Where(p => p.IsSelected.Value).Select(p => p.ControlPoint).ToList();
 
             // Ensure that there are any points to be deleted
             if (toRemove.Count == 0)
