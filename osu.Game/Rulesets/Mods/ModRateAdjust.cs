@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModRateAdjust : Mod, IApplicableToTrack
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp) };
-
         public abstract BindableNumber<double> SpeedChange { get; }
 
         public virtual void ApplyToTrack(Track track)
