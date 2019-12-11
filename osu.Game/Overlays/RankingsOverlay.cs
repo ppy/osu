@@ -106,6 +106,7 @@ namespace osu.Game.Overlays
 
                 Scheduler.AddOnce(loadNewContent);
             }, true);
+
             Scope.BindValueChanged(_ =>
             {
                 // country filtering is only valid for performance scope.
