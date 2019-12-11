@@ -41,11 +41,11 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         [SetUp]
-        public void SetUp()
+        public void SetUp() => Schedule(() =>
         {
             isBreakTime.Value = false;
             lightenDuringBreaks.Value = false;
-        }
+        });
 
         [TestCase(0.6f, 0.3f)]
         [TestCase(0.2f, 0.0f)]
