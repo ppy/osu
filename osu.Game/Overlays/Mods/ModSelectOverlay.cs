@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.Mods
                                             CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Customization",
+                                                Text = "Customisation",
                                                 Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
                                                 Enabled = { Value = false },
                                                 Margin = new MarginPadding
