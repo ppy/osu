@@ -115,12 +115,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
                 }
 
-                // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                static bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-
-                if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
-                    pathType = PathType.Linear;
-
                 int repeatCount = Parsing.ParseInt(split[6]);
 
                 if (repeatCount > 9000)
@@ -187,7 +181,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
+                result = CreateSlider(pos, combo, comboOffset, convertControlPoints(points, pathType), length, repeatCount, nodeSamples);
 
                 // The samples are played when the slider ends, which is the last node
                 result.Samples = nodeSamples[nodeSamples.Count - 1];
@@ -259,6 +253,44 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
+        private PathControlPoint[] convertControlPoints(Vector2[] vertices, PathType type)
+        {
+            if (type == PathType.PerfectCurve)
+            {
+                if (vertices.Length != 3)
+                    type = PathType.Bezier;
+                else if (isLinear(vertices))
+                {
+                    // osu-stable special-cased colinear perfect curves to a linear path
+                    type = PathType.Linear;
+                }
+            }
+
+            var points = new List<PathControlPoint>(vertices.Length)
+            {
+                new PathControlPoint
+                {
+                    Position = { Value = vertices[0] },
+                    Type = { Value = type }
+                }
+            };
+
+            for (int i = 1; i < vertices.Length; i++)
+            {
+                if (vertices[i] == vertices[i - 1])
+                {
+                    points[points.Count - 1].Type.Value = type;
+                    continue;
+                }
+
+                points.Add(new PathControlPoint { Position = { Value = vertices[i] } });
+            }
+
+            return points.ToArray();
+
+            static bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+        }
+
         /// <summary>
         /// Creates a legacy Hit-type hit object.
         /// </summary>
@@ -276,11 +308,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="controlPoints">The slider control points.</param>
         /// <param name="length">The slider length.</param>
-        /// <param name="pathType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
                                                   List<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>

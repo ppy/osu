@@ -523,6 +523,8 @@ namespace osu.Game.Rulesets.UI
 
         public BindableNumber<double> Tempo => throw new NotImplementedException();
 
+        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotImplementedException();
+
         public IBindable<double> AggregateVolume => throw new NotImplementedException();
 
         public IBindable<double> AggregateBalance => throw new NotImplementedException();

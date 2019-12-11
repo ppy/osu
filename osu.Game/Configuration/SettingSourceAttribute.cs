@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
@@ -36,11 +35,13 @@ namespace osu.Game.Configuration
     {
         public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
-            var configProperties = obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetCustomAttribute<SettingSourceAttribute>(true) != null);
-
-            foreach (var property in configProperties)
+            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
             {
                 var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
+
+                if (attr == null)
+                    continue;
+
                 var prop = property.GetValue(obj);
 
                 switch (prop)
@@ -91,9 +92,7 @@ namespace osu.Game.Configuration
                         break;
 
                     case IBindable bindable:
-
                         var dropdownType = typeof(SettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
-
                         var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
 
                         dropdown.GetType().GetProperty(nameof(IHasCurrentValue<object>.Current))?.SetValue(dropdown, obj);
