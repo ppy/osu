@@ -55,20 +55,20 @@ namespace osu.Game.Tests.Visual.Background
             AddStep($"set dim level {userDim}", () => container.UserDimLevel.Value = userDim);
 
             AddStep("set break", () => isBreakTime.Value = true);
-            AddWaitStep("wait for dim", 3);
+            AddWaitStep("wait for dim", 5);
             AddAssert($"is current dim {userDim}", () => container.DimEqual(userDim));
 
             AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
-            AddWaitStep("wait for dim", 3);
+            AddWaitStep("wait for dim", 5);
             AddAssert($"is current dim {expectedBreakDim}", () => container.DimEqual(expectedBreakDim));
 
             AddStep("clear lighten during break", () => lightenDuringBreaks.Value = false);
-            AddWaitStep("wait for dim", 3);
+            AddWaitStep("wait for dim", 5);
             AddAssert($"is current dim {userDim}", () => container.DimEqual(userDim));
 
             AddStep("clear break", () => isBreakTime.Value = false);
             AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
-            AddWaitStep("wait for dim", 3);
+            AddWaitStep("wait for dim", 5);
             AddAssert($"is current dim {userDim}", () => container.DimEqual(userDim));
         }
 
