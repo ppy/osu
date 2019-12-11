@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Select
         }
 
         private static void updateCriteriaRange<T>(ref FilterCriteria.OptionalRange<T> range, string op, T value)
-            where T : struct, IComparable
+            where T : struct
         {
             switch (op)
             {
