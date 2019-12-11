@@ -112,7 +112,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"AudioFilename":
-                    metadata.AudioFile = pair.Value.PathStandardise();
+                    metadata.AudioFile = pair.Value.ToStandardisedPath();
                     break;
 
                 case @"AudioLeadIn":
@@ -300,12 +300,12 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case EventType.Background:
                     string bgFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = bgFilename.PathStandardise();
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = bgFilename.ToStandardisedPath();
                     break;
 
                 case EventType.Video:
                     string videoFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.VideoFile = videoFilename.PathStandardise();
+                    beatmap.BeatmapInfo.Metadata.VideoFile = videoFilename.ToStandardisedPath();
                     break;
 
                 case EventType.Break:
