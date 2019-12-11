@@ -18,16 +18,20 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
-        public override void ApplyToTrack(Track track)
+        public ModDaycore()
         {
-            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
-            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
-
             SpeedChange.BindValueChanged(val =>
             {
                 freqAdjust.Value = SpeedChange.Default;
                 tempoAdjust.Value = val.NewValue / SpeedChange.Default;
             }, true);
+        }
+
+        public override void ApplyToTrack(Track track)
+        {
+            // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
+            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
     }
 }
