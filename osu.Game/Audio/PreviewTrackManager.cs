@@ -22,7 +22,7 @@ namespace osu.Game.Audio
         private AudioManager audio;
         private PreviewTrackStore trackStore;
 
-        private TrackManagerPreviewTrack current;
+        protected TrackManagerPreviewTrack CurrentTrack;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -46,18 +46,21 @@ namespace osu.Game.Audio
         {
             var track = CreatePreviewTrack(beatmapSetInfo, trackStore);
 
-            track.Started += () =>
+            track.Started += () => Schedule(() =>
             {
-                current?.Stop();
-                current = track;
+                CurrentTrack?.Stop();
+                CurrentTrack = track;
                 audio.Tracks.AddAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
-            track.Stopped += () =>
+            track.Stopped += () => Schedule(() =>
             {
-                current = null;
+                if (CurrentTrack != track)
+                    return;
+
+                CurrentTrack = null;
                 audio.Tracks.RemoveAdjustment(AdjustableProperty.Volume, muteBindable);
-            };
+            });
 
             return track;
         }
@@ -73,11 +76,11 @@ namespace osu.Game.Audio
         /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
         public void StopAnyPlaying(IPreviewTrackOwner source)
         {
-            if (current == null || current.Owner != source)
+            if (CurrentTrack == null || CurrentTrack.Owner != source)
                 return;
 
-            current.Stop();
-            current = null;
+            CurrentTrack.Stop();
+            // CurrentTrack should not be set to null here as it will result in incorrect handling in the track.Stopped callback above.
         }
 
         /// <summary>
@@ -85,7 +88,7 @@ namespace osu.Game.Audio
         /// </summary>
         protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, ITrackStore trackStore) => new TrackManagerPreviewTrack(beatmapSetInfo, trackStore);
 
-        protected class TrackManagerPreviewTrack : PreviewTrack
+        public class TrackManagerPreviewTrack : PreviewTrack
         {
             public IPreviewTrackOwner Owner { get; private set; }
 

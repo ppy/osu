@@ -3,17 +3,14 @@
 
 using System;
 using System.Linq;
-using osu.Framework.Audio;
-using osu.Framework.Timing;
+using osu.Framework.Audio.Track;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToClock, IApplicableToBeatmap
+    public abstract class ModTimeRamp : Mod, IUpdatableByPlayfield, IApplicableToTrack, IApplicableToBeatmap
     {
         /// <summary>
         /// The point in the beatmap at which the final ramping rate should be reached.
@@ -26,11 +23,11 @@ namespace osu.Game.Rulesets.Mods
 
         private double finalRateTime;
         private double beginRampTime;
-        private IAdjustableClock clock;
+        private Track track;
 
-        public virtual void ApplyToClock(IAdjustableClock clock)
+        public virtual void ApplyToTrack(Track track)
         {
-            this.clock = clock;
+            this.track = track;
 
             lastAdjust = 1;
 
@@ -43,12 +40,12 @@ namespace osu.Game.Rulesets.Mods
             HitObject lastObject = beatmap.HitObjects.LastOrDefault();
 
             beginRampTime = beatmap.HitObjects.FirstOrDefault()?.StartTime ?? 0;
-            finalRateTime = final_rate_progress * ((lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0);
+            finalRateTime = final_rate_progress * (lastObject?.GetEndTime() ?? 0);
         }
 
         public virtual void Update(Playfield playfield)
         {
-            applyAdjustment((clock.CurrentTime - beginRampTime) / finalRateTime);
+            applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
         }
 
         private double lastAdjust = 1;
@@ -59,25 +56,10 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
         private void applyAdjustment(double amount)
         {
-            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * MathHelper.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
+            double adjust = 1 + (Math.Sign(FinalRateAdjustment) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRateAdjustment));
 
-            switch (clock)
-            {
-                case IHasPitchAdjust pitch:
-                    pitch.PitchAdjust /= lastAdjust;
-                    pitch.PitchAdjust *= adjust;
-                    break;
-
-                case IHasTempoAdjust tempo:
-                    tempo.TempoAdjust /= lastAdjust;
-                    tempo.TempoAdjust *= adjust;
-                    break;
-
-                default:
-                    clock.Rate /= lastAdjust;
-                    clock.Rate *= adjust;
-                    break;
-            }
+            track.Tempo.Value /= lastAdjust;
+            track.Tempo.Value *= adjust;
 
             lastAdjust = adjust;
         }

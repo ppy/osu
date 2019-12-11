@@ -21,6 +21,7 @@ using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using Humanizer;
+using osu.Game.Online.API;
 
 namespace osu.Game.Online.Leaderboards
 {
@@ -37,6 +38,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly ScoreInfo score;
         private readonly int rank;
+        private readonly bool allowHighlight;
 
         private Box background;
         private Container content;
@@ -49,17 +51,18 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        public LeaderboardScore(ScoreInfo score, int rank)
+        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
         {
             this.score = score;
             this.rank = rank;
+            this.allowHighlight = allowHighlight;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = score.User;
 
@@ -100,7 +103,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
+                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -285,17 +288,15 @@ namespace osu.Game.Online.Leaderboards
         private class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
-
-            private readonly string name;
             private readonly FillFlowContainer content;
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText => name;
+            public string TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
-                name = statistic.Name;
+                TooltipText = statistic.Name;
                 AutoSizeAxes = Axes.Both;
 
                 Child = content = new FillFlowContainer

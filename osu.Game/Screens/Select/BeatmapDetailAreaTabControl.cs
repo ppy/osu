@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailAreaTabControl : Container
     {
-        public static readonly float HEIGHT = 24;
+        public const float HEIGHT = 24;
         private readonly OsuTabControlCheckbox modsCheckbox;
         private readonly OsuTabControl<BeatmapDetailTab> tabs;
         private readonly Container tabsContainer;

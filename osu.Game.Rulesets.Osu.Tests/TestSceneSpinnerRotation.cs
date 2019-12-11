@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -32,9 +33,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override Player CreatePlayer(Ruleset ruleset) => new ScoreExposedPlayer();
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
+            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
             track = (TrackVirtualManual)working.Track;
             return working;
         }

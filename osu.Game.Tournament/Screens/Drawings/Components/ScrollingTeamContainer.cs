@@ -83,90 +83,81 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             };
         }
 
-        private ScrollState _scrollState;
+        private ScrollState scrollState;
 
-        private ScrollState scrollState
+        private void setScrollState(ScrollState newstate)
         {
-            get => _scrollState;
+            if (scrollState == newstate)
+                return;
 
-            set
+            delayedStateChangeDelegate?.Cancel();
+
+            switch (scrollState = newstate)
             {
-                if (_scrollState == value)
-                    return;
+                case ScrollState.Scrolling:
+                    resetSelected();
 
-                _scrollState = value;
+                    OnScrollStarted?.Invoke();
 
-                delayedStateChangeDelegate?.Cancel();
+                    speedTo(1000f, 200);
+                    tracker.FadeOut(100);
+                    break;
 
-                switch (value)
-                {
-                    case ScrollState.Scrolling:
-                        resetSelected();
+                case ScrollState.Stopping:
+                    speedTo(0f, 2000);
+                    tracker.FadeIn(200);
 
-                        OnScrollStarted?.Invoke();
+                    delayedStateChangeDelegate = Scheduler.AddDelayed(() => setScrollState(ScrollState.Stopped), 2300);
+                    break;
 
-                        speedTo(1000f, 200);
-                        tracker.FadeOut(100);
+                case ScrollState.Stopped:
+                    // Find closest to center
+                    if (!Children.Any())
                         break;
 
-                    case ScrollState.Stopping:
-                        speedTo(0f, 2000);
-                        tracker.FadeIn(200);
+                    ScrollingTeam closest = null;
 
-                        delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Stopped, 2300);
-                        break;
+                    foreach (var c in Children)
+                    {
+                        if (!(c is ScrollingTeam stc))
+                            continue;
 
-                    case ScrollState.Stopped:
-                        // Find closest to center
-                        if (!Children.Any())
-                            break;
-
-                        ScrollingTeam closest = null;
-
-                        foreach (var c in Children)
+                        if (closest == null)
                         {
-                            var stc = c as ScrollingTeam;
-
-                            if (stc == null)
-                                continue;
-
-                            if (closest == null)
-                            {
-                                closest = stc;
-                                continue;
-                            }
-
-                            float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
-                            float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
-
-                            if (o < lastOffset)
-                                closest = stc;
+                            closest = stc;
+                            continue;
                         }
 
-                        Trace.Assert(closest != null, "closest != null");
+                        float o = Math.Abs(c.Position.X + c.DrawWidth / 2f - DrawWidth / 2f);
+                        float lastOffset = Math.Abs(closest.Position.X + closest.DrawWidth / 2f - DrawWidth / 2f);
 
-                        // ReSharper disable once PossibleNullReferenceException
-                        offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
+                        if (o < lastOffset)
+                            closest = stc;
+                    }
 
-                        ScrollingTeam st = closest;
+                    Trace.Assert(closest != null, "closest != null");
 
-                        availableTeams.RemoveAll(at => at == st.Team);
+                    // ReSharper disable once PossibleNullReferenceException
+                    offset += DrawWidth / 2f - (closest.Position.X + closest.DrawWidth / 2f);
 
-                        st.Selected = true;
-                        OnSelected?.Invoke(st.Team);
+                    ScrollingTeam st = closest;
 
-                        delayedStateChangeDelegate = Scheduler.AddDelayed(() => scrollState = ScrollState.Idle, 10000);
-                        break;
+                    availableTeams.RemoveAll(at => at == st.Team);
 
-                    case ScrollState.Idle:
-                        resetSelected();
+                    st.Selected = true;
+                    OnSelected?.Invoke(st.Team);
 
-                        OnScrollStarted?.Invoke();
+                    delayedStateChangeDelegate = Scheduler.AddDelayed(() => setScrollState(ScrollState.Idle), 10000);
+                    break;
 
-                        speedTo(40f, 200);
-                        tracker.FadeOut(100);
-                        break;
-                }
+                case ScrollState.Idle:
+                    resetSelected();
+
+                    OnScrollStarted?.Invoke();
+
+                    speedTo(40f, 200);
+                    tracker.FadeOut(100);
+                    break;
             }
         }
 
@@ -178,7 +169,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             availableTeams.Add(team);
 
             RemoveAll(c => c is ScrollingTeam);
-            scrollState = ScrollState.Idle;
+            setScrollState(ScrollState.Idle);
         }
 
         public void AddTeams(IEnumerable<TournamentTeam> teams)
@@ -194,7 +185,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             availableTeams.Clear();
             RemoveAll(c => c is ScrollingTeam);
-            scrollState = ScrollState.Idle;
+            setScrollState(ScrollState.Idle);
         }
 
         public void RemoveTeam(TournamentTeam team)
@@ -203,15 +194,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
             foreach (var c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-
-                if (st == null)
-                    continue;
-
-                if (st.Team == team)
+                if (c is ScrollingTeam st)
                 {
-                    st.FadeOut(200);
-                    st.Expire();
+                    if (st.Team == team)
+                    {
+                        st.FadeOut(200);
+                        st.Expire();
+                    }
                 }
             }
         }
@@ -221,7 +210,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             if (availableTeams.Count == 0)
                 return;
 
-            scrollState = ScrollState.Scrolling;
+            setScrollState(ScrollState.Scrolling);
         }
 
         public void StopScrolling()
@@ -236,13 +225,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     return;
             }
 
-            scrollState = ScrollState.Stopping;
+            setScrollState(ScrollState.Stopping);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            scrollState = ScrollState.Idle;
+            setScrollState(ScrollState.Idle);
         }
 
         protected override void UpdateAfterChildren()
@@ -295,14 +284,13 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         {
             foreach (var c in Children)
             {
-                ScrollingTeam st = c as ScrollingTeam;
-                if (st == null)
-                    continue;
-
-                if (st.Selected)
+                if (c is ScrollingTeam st)
                 {
-                    st.Selected = false;
-                    RemoveTeam(st.Team);
+                    if (st.Selected)
+                    {
+                        st.Selected = false;
+                        RemoveTeam(st.Team);
+                    }
                 }
             }
         }
@@ -310,7 +298,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
         private void speedTo(float value, double duration = 0, Easing easing = Easing.None) =>
             this.TransformTo(nameof(speed), value, duration, easing);
 
-        private enum ScrollState
+        protected enum ScrollState
         {
             None,
             Idle,

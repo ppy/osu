@@ -168,12 +168,13 @@ namespace osu.Game.Overlays
                                         },
                                     }
                                 },
-                                progressBar = new ProgressBar
+                                progressBar = new HoverableProgressBar
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
-                                    Height = progress_height,
+                                    Height = progress_height / 2,
                                     FillColour = colours.Yellow,
+                                    BackgroundColour = colours.YellowDarker.Opacity(0.5f),
                                     OnSeek = musicController.SeekTo
                                 }
                             },
@@ -389,7 +390,7 @@ namespace osu.Game.Overlays
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.7f) / change.Length;
 
                 this.MoveTo(change);
                 return true;
@@ -399,6 +400,21 @@ namespace osu.Game.Overlays
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
                 return base.OnDragEnd(e);
+            }
+        }
+
+        private class HoverableProgressBar : ProgressBar
+        {
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.ResizeHeightTo(progress_height, 500, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                this.ResizeHeightTo(progress_height / 2, 500, Easing.OutQuint);
+                base.OnHoverLost(e);
             }
         }
     }
