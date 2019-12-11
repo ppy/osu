@@ -27,7 +27,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         internal readonly Container<PathControlPointPiece> Pieces;
+
         private readonly Slider slider;
+
         private readonly bool allowSelection;
 
         private InputManager inputManager;
@@ -82,7 +84,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnClick(ClickEvent e)
         {
             foreach (var piece in Pieces)
+            {
                 piece.IsSelected.Value = false;
+            }
+
             return false;
         }
 
@@ -156,24 +161,29 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (!Pieces.Any(p => p.IsHovered))
                     return null;
 
-                int selectedPoints = Pieces.Count(p => p.IsSelected.Value);
+                var selectedPieces = Pieces.Where(p => p.IsSelected.Value).ToList();
+                int count = selectedPieces.Count;
 
-                if (selectedPoints == 0)
+                if (count == 0)
                     return null;
+
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (!selectedPieces.Contains(Pieces[0]))
+                    items.Add(createMenuItemForPathType(null));
+
+                // todo: hide/disable items which aren't valid for selected points
+                items.Add(createMenuItemForPathType(PathType.Linear));
+                items.Add(createMenuItemForPathType(PathType.PerfectCurve));
+                items.Add(createMenuItemForPathType(PathType.Bezier));
+                items.Add(createMenuItemForPathType(PathType.Catmull));
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints, selectedPoints > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
                     new OsuMenuItem("Type")
                     {
-                        Items = new[]
-                        {
-                            createMenuItemForPathType(null),
-                            createMenuItemForPathType(PathType.Linear),
-                            createMenuItemForPathType(PathType.PerfectCurve),
-                            createMenuItemForPathType(PathType.Bezier),
-                            createMenuItemForPathType(PathType.Catmull)
-                        }
+                        Items = items
                     }
                 };
             }
