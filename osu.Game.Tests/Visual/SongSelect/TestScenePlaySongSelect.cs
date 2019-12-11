@@ -57,23 +57,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             typeof(DrawableCarouselBeatmapSet),
         };
 
-        private class TestSongSelect : PlaySongSelect
-        {
-            public Action StartRequested;
-
-            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
-
-            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
-            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
-            public new BeatmapCarousel Carousel => base.Carousel;
-
-            protected override bool OnStart()
-            {
-                StartRequested?.Invoke();
-                return base.OnStart();
-            }
-        }
-
         private TestSongSelect songSelect;
 
         [BackgroundDependencyLoader]
@@ -100,6 +83,53 @@ namespace osu.Game.Tests.Visual.SongSelect
             Ruleset.Value = new OsuRuleset().RulesetInfo;
             manager?.Delete(manager.GetAllUsableBeatmapSets());
         });
+
+        [Test]
+        public void TestSingleFilterOnEnter()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
+
+        [Test]
+        public void TestNoFilterOnSimpleResume()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
+
+        [Test]
+        public void TestFilterOnResumeAfterChange()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("filter count is 2", () => songSelect.FilterCount == 2);
+        }
 
         [Test]
         public void TestAudioResuming()
@@ -132,11 +162,13 @@ namespace osu.Game.Tests.Visual.SongSelect
             changeRuleset(1);
 
             if (rulesetsInSameBeatmap)
+            {
                 AddStep("import multi-ruleset map", () =>
                 {
                     var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
                     manager.Import(createTestBeatmapSet(0, usableRulesets)).Wait();
                 });
+            }
             else
             {
                 addRulesetImportStep(1);
@@ -238,6 +270,22 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             void onModChange(ValueChangedEvent<IReadOnlyList<Mod>> e) => modChangeIndex = actionIndex++;
             void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex++;
+        }
+
+        [Test]
+        public void TestModsRetainedBetweenSongSelect()
+        {
+            AddAssert("empty mods", () => !Mods.Value.Any());
+
+            createSongSelect();
+
+            addRulesetImportStep(0);
+
+            changeMods(new OsuModHardRock());
+
+            createSongSelect();
+
+            AddAssert("mods retained", () => Mods.Value.Any());
         }
 
         [Test]
@@ -348,6 +396,37 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmaps = beatmaps,
                 DateAdded = DateTimeOffset.UtcNow,
             };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            rulesets?.Dispose();
+        }
+
+        private class TestSongSelect : PlaySongSelect
+        {
+            public Action StartRequested;
+
+            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
+            public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
+            public new BeatmapCarousel Carousel => base.Carousel;
+
+            protected override bool OnStart()
+            {
+                StartRequested?.Invoke();
+                return base.OnStart();
+            }
+
+            public int FilterCount;
+
+            protected override void ApplyFilterToCarousel(FilterCriteria criteria)
+            {
+                FilterCount++;
+                base.ApplyFilterToCarousel(criteria);
+            }
         }
     }
 }

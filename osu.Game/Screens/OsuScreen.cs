@@ -91,6 +91,8 @@ namespace osu.Game.Screens
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }
 
+        public virtual bool AllowRateAdjustments => true;
+
         public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)

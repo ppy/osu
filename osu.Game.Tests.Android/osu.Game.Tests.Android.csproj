@@ -24,6 +24,7 @@
     <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
+    <Compile Remove="..\osu.Game.Tests\Beatmaps\Formats\OsuJsonDecoderTest.cs" />
     <Compile Include="..\osu.Game.Tests\**\Chat\**\*.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
@@ -67,11 +68,6 @@
       <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="DeepEqual">
-      <Version>2.0.0</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -14,7 +15,15 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
+        /// <summary>
+        /// The radius of hit objects (ie. the radius of a <see cref="HitCircle"/>).
+        /// </summary>
         public const float OBJECT_RADIUS = 64;
+
+        /// <summary>
+        /// Scoring distance with a speed-adjusted beat length of 1 second (ie. the speed slider balls move through their track).
+        /// </summary>
+        internal const float BASE_SCORING_DISTANCE = 100;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -88,6 +97,15 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             get => LastInComboBindable.Value;
             set => LastInComboBindable.Value = value;
+        }
+
+        protected OsuHitObject()
+        {
+            StackHeightBindable.BindValueChanged(height =>
+            {
+                foreach (var nested in NestedHitObjects.OfType<OsuHitObject>())
+                    nested.StackHeight = height.NewValue;
+            });
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
