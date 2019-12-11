@@ -18,6 +18,9 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
+    /// <summary>
+    /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
+    /// </summary>
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;

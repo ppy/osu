@@ -11,6 +11,9 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
+    /// <summary>
+    /// A visualisation of the line between two <see cref="PathControlPointPiece"/>s.
+    /// </summary>
     public class PathControlPointConnectionPiece : CompositeDrawable
     {
         public PathControlPoint ControlPoint;
