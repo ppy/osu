@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -190,16 +189,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Initial,
             Body,
-        }
-
-        private class Segment
-        {
-            public readonly List<Vector2> ControlPoints = new List<Vector2>();
-
-            public Segment(Vector2 offset)
-            {
-                ControlPoints.Add(offset);
-            }
         }
     }
 }
