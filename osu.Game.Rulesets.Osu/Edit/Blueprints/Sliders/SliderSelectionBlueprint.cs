@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             int insertionIndex = 0;
             float minDistance = float.MaxValue;
 
-            for (int i = 0; i < HitObject.Path.ControlPoints.Count - 2; i++)
+            for (int i = 0; i < HitObject.Path.ControlPoints.Count - 1; i++)
             {
                 float dist = new Line(HitObject.Path.ControlPoints[i].Position.Value, HitObject.Path.ControlPoints[i + 1].Position.Value).DistanceToPoint(position);
 
