@@ -39,7 +39,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestDoesntPauseDuringIntro()
         {
             AddStep("set inactive", () => ((Bindable<bool>)host.IsActive).Value = false);
+
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
+            AddAssert("ensure not paused", () => !Player.GameplayClockContainer.IsPaused.Value);
             AddUntilStep("wait for pause", () => Player.GameplayClockContainer.IsPaused.Value);
             AddAssert("time of pause is after gameplay start time", () => Player.GameplayClockContainer.GameplayClock.CurrentTime >= Player.DrawableRuleset.GameplayStartTime);
         }
