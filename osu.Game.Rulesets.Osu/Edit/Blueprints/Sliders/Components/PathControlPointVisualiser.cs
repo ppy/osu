@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         internal readonly Container<PathControlPointPiece> Pieces;
 
-        private readonly Container<PathControlPointConnection> connections;
+        private readonly Container<PathControlPointConnectionPiece> connections;
 
         private readonly Slider slider;
 
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             InternalChildren = new Drawable[]
             {
-                connections = new Container<PathControlPointConnection> { RelativeSizeAxes = Axes.Both },
+                connections = new Container<PathControlPointConnectionPiece> { RelativeSizeAxes = Axes.Both },
                 Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both }
             };
         }
@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                         d.RequestSelection = selectPiece;
                 }));
 
-                connections.Add(new PathControlPointConnection(slider, point));
+                connections.Add(new PathControlPointConnectionPiece(slider, point));
             }
         }
 
