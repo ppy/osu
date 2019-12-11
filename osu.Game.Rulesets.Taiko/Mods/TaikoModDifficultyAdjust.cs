@@ -19,16 +19,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
             Precision = 0.1F,
         };
 
-        [SettingSource("Approach Rate", "Override the beatmap's set AR")]
-        public override BindableNumber<float> ApproachRate { get; } = new BindableFloat
-        {
-            MinValue = 1,
-            MaxValue = 10,
-            Default = 5,
-            Value = 5,
-            Precision = 0.1F,
-        };
-
         [SettingSource("Overall Difficulty", "Override the beatmap's set OD")]
         public override BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
