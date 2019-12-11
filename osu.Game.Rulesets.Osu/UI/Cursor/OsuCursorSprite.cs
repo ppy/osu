@@ -8,6 +8,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
     public abstract class OsuCursorSprite : CompositeDrawable
     {
+        /// <summary>
+        /// The an optional piece of the cursor to expand when in a clicked state.
+        /// If null, the whole cursor will be affected by expansion.
+        /// </summary>
         public Drawable ExpandTarget { get; protected set; }
     }
 }
