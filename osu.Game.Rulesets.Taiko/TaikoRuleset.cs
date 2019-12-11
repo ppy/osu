@@ -97,6 +97,12 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModFlashlight(),
                     };
 
+                case ModType.Conversion:
+                    return new Mod[]
+                    {
+                        new TaikoModDifficultyAdjust(),
+                    };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
