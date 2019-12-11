@@ -119,11 +119,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup();
             createFakeStoryboard();
-            AddStep("Enable Storyboard", () =>
-            {
-                player.ReplacesBackground.Value = true;
-                player.StoryboardEnabled.Value = true;
-            });
+            enableStoryboard();
             waitForDim();
             AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible);
             AddStep("Disable Storyboard", () =>
@@ -149,22 +145,17 @@ namespace osu.Game.Tests.Visual.Background
         }
 
         /// <summary>
-        /// Ensure <see cref="UserDimContainer"/> is able to disable user-defined display settings.
+        /// Ensure <see cref="UserDimContainer"/> can disable user-defined display settings.
         /// </summary>
         [Test]
         public void DisableUserDisplaySettingsTest()
         {
             performFullSetup();
             createFakeStoryboard();
-            AddStep("Enable Storyboard", () =>
-            {
-                player.ReplacesBackground.Value = true;
-                player.StoryboardEnabled.Value = true;
-            });
+            enableStoryboard();
             AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
-            AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
             waitForDim();
-            AddAssert("Ignore User Settings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
+            AddAssert("Ignore user settings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
             waitForDim();
             AddAssert("User dim settings ignored", () => !player.DimmableStoryboard.EnableUserDim.Value && player.DimmableStoryboard.DimLevel == 0);
         }
@@ -194,11 +185,7 @@ namespace osu.Game.Tests.Visual.Background
         {
             performFullSetup();
             createFakeStoryboard();
-            AddStep("Enable Storyboard", () =>
-            {
-                player.ReplacesBackground.Value = true;
-                player.StoryboardEnabled.Value = true;
-            });
+            enableStoryboard();
             AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
             AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
             waitForDim();
@@ -283,6 +270,12 @@ namespace osu.Game.Tests.Visual.Background
                 Text = "THIS IS A STORYBOARD",
                 Font = new FontUsage(size: 50)
             });
+        });
+
+        private void enableStoryboard() => AddStep("Enable Storyboard", () =>
+        {
+            player.ReplacesBackground.Value = true;
+            player.StoryboardEnabled.Value = true;
         });
 
         private void performFullSetup(bool allowPause = false)
