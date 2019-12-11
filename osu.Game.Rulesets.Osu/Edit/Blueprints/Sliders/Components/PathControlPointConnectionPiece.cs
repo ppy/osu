@@ -11,7 +11,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointConnection : CompositeDrawable
+    public class PathControlPointConnectionPiece : CompositeDrawable
     {
         public PathControlPoint ControlPoint;
 
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private IBindable<Vector2> sliderPosition;
         private IBindable<int> pathVersion;
 
-        public PathControlPointConnection(Slider slider, PathControlPoint controlPoint)
+        public PathControlPointConnectionPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
             ControlPoint = controlPoint;
