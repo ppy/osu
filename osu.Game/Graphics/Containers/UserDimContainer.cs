@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public bool ContentDisplayed { get; private set; }
 
-        public double DimLevel => EnableUserDim.Value && !IgnoreUserSettings.Value ? UserDimLevel.Value : 0;
+        public double DimLevel => EnableUserDim.Value ? UserDimLevel.Value : 0;
 
         protected Bindable<double> UserDimLevel { get; private set; }
 
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.Containers
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             ShowVideo.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
-            IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
+            IgnoreUserSettings.ValueChanged += _ => updateSettings();
         }
 
         protected override void LoadComplete()
@@ -91,7 +91,15 @@ namespace osu.Game.Graphics.Containers
             ContentDisplayed = ShowDimContent;
 
             dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            dimContent.FadeColour(IgnoreUserSettings.Value ? Color4.White : OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            dimContent.FadeColour(OsuColour.Gray(1 - (float)DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+        }
+
+        /// <summary>
+        /// Invoked when the IgnoreUserSettings bindable is changed
+        /// </summary>
+        private void updateSettings()
+        {
+            EnableUserDim.Value = !IgnoreUserSettings.Value;
         }
     }
 }
