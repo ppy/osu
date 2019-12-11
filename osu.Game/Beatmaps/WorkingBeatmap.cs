@@ -82,7 +82,6 @@ namespace osu.Game.Beatmaps
         /// <returns>The absolute path of the output file.</returns>
         public string Save()
         {
-            // copied from osu.Framework.IO.File.FileSafety.GetTempPath
             string directory = Path.Combine(Path.GetTempPath(), @"osu!");
             Directory.CreateDirectory(directory);
 
