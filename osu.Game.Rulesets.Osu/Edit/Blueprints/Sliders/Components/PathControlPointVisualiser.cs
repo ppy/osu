@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -15,6 +16,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -25,7 +27,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     public class PathControlPointVisualiser : CompositeDrawable, IKeyBindingHandler<PlatformAction>, IHasContextMenu
     {
         internal readonly Container<PathControlPointPiece> Pieces;
+
         private readonly Slider slider;
+
         private readonly bool allowSelection;
 
         private InputManager inputManager;
@@ -80,7 +84,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override bool OnClick(ClickEvent e)
         {
             foreach (var piece in Pieces)
+            {
                 piece.IsSelected.Value = false;
+            }
+
             return false;
         }
 
@@ -154,16 +161,63 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 if (!Pieces.Any(p => p.IsHovered))
                     return null;
 
-                int selectedPoints = Pieces.Count(p => p.IsSelected.Value);
+                var selectedPieces = Pieces.Where(p => p.IsSelected.Value).ToList();
+                int count = selectedPieces.Count;
 
-                if (selectedPoints == 0)
+                if (count == 0)
                     return null;
+
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (!selectedPieces.Contains(Pieces[0]))
+                    items.Add(createMenuItemForPathType(null));
+
+                // todo: hide/disable items which aren't valid for selected points
+                items.Add(createMenuItemForPathType(PathType.Linear));
+                items.Add(createMenuItemForPathType(PathType.PerfectCurve));
+                items.Add(createMenuItemForPathType(PathType.Bezier));
+                items.Add(createMenuItemForPathType(PathType.Catmull));
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(selectedPoints, selectedPoints > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected())
+                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem("Curve type")
+                    {
+                        Items = items
+                    }
                 };
             }
+        }
+
+        private MenuItem createMenuItemForPathType(PathType? type)
+        {
+            int totalCount = Pieces.Count(p => p.IsSelected.Value);
+            int countOfState = Pieces.Where(p => p.IsSelected.Value).Count(p => p.ControlPoint.Type.Value == type);
+
+            var item = new PathTypeMenuItem(type, () =>
+            {
+                foreach (var p in Pieces.Where(p => p.IsSelected.Value))
+                    p.ControlPoint.Type.Value = type;
+            });
+
+            if (countOfState == totalCount)
+                item.State.Value = TernaryState.True;
+            else if (countOfState > 0)
+                item.State.Value = TernaryState.Indeterminate;
+            else
+                item.State.Value = TernaryState.False;
+
+            return item;
+        }
+
+        private class PathTypeMenuItem : TernaryStateMenuItem
+        {
+            public PathTypeMenuItem(PathType? type, Action action)
+                : base(type == null ? "Inherit" : type.ToString().Humanize(), changeState, MenuItemType.Standard, _ => action?.Invoke())
+            {
+            }
+
+            private static TernaryState changeState(TernaryState state) => TernaryState.True;
         }
     }
 }
