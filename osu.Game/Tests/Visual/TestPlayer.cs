@@ -8,13 +8,16 @@ namespace osu.Game.Tests.Visual
 {
     public class TestPlayer : Player
     {
-        protected override bool PauseOnFocusLost => false;
+        protected override bool PauseOnFocusLost { get; }
 
         public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
 
-        public TestPlayer(bool allowPause = true, bool showResults = true)
+        public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
+
+        public TestPlayer(bool allowPause = true, bool showResults = true, bool pauseOnFocusLost = false)
             : base(allowPause, showResults)
         {
+            PauseOnFocusLost = pauseOnFocusLost;
         }
     }
 }
