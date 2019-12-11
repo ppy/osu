@@ -3,13 +3,11 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Scoring
 {
-    internal class ManiaScoreProcessor : ScoreProcessor<ManiaHitObject>
+    internal class ManiaScoreProcessor : ScoreProcessor
     {
         /// <summary>
         /// The hit HP multiplier at OD = 0.
@@ -51,12 +49,12 @@ namespace osu.Game.Rulesets.Mania.Scoring
         /// </summary>
         private double hpMultiplier = 1;
 
-        public ManiaScoreProcessor(DrawableRuleset<ManiaHitObject> drawableRuleset)
-            : base(drawableRuleset)
+        public ManiaScoreProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
         }
 
-        protected override void ApplyBeatmap(Beatmap<ManiaHitObject> beatmap)
+        protected override void ApplyBeatmap(IBeatmap beatmap)
         {
             base.ApplyBeatmap(beatmap);
 
@@ -65,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
             hpMissMultiplier = BeatmapDifficulty.DifficultyRange(difficulty.DrainRate, hp_multiplier_miss_min, hp_multiplier_miss_mid, hp_multiplier_miss_max);
         }
 
-        protected override void SimulateAutoplay(Beatmap<ManiaHitObject> beatmap)
+        protected override void SimulateAutoplay(IBeatmap beatmap)
         {
             while (true)
             {

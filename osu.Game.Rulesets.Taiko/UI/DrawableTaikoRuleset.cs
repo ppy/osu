@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
         }
 
-        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(Beatmap);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 
