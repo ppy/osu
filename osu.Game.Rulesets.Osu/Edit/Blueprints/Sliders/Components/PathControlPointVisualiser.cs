@@ -171,6 +171,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                             createMenuItemForPathType(null),
                             createMenuItemForPathType(PathType.Linear),
                             createMenuItemForPathType(PathType.PerfectCurve),
+                            createMenuItemForPathType(PathType.Bezier),
                             createMenuItemForPathType(PathType.Catmull)
                         }
                     }
