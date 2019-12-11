@@ -140,6 +140,9 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
+            DrawableRuleset.OnNewResult += ScoreProcessor.ApplyResult;
+            DrawableRuleset.OnRevertResult += ScoreProcessor.RevertResult;
+
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
             ScoreProcessor.Failed += onFail;
