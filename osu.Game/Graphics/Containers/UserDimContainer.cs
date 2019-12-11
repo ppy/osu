@@ -16,6 +16,9 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public abstract class UserDimContainer : Container
     {
+        /// <summary>
+        /// Amount of lightening to apply to current dim level during break times.
+        /// </summary>
         private const float break_lighten_amount = 0.3f;
 
         protected const double BACKGROUND_FADE_DURATION = 800;
@@ -34,7 +37,7 @@ namespace osu.Game.Graphics.Containers
         /// Whether player is in break time.
         /// Must be bound to <see cref="BreakOverlay.IsBreakTime"/> to allow for dim adjustments in gameplay.
         /// </summary>
-        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+        public readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
         /// <summary>
         /// Whether the content of this container is currently being displayed.
