@@ -20,7 +20,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private bool cursorExpand;
 
-        private Container expandTarget;
+        private SkinnableDrawable cursorSprite;
+
+        private Drawable expandTarget => (cursorSprite.Drawable as OsuCursorSprite)?.ExpandTarget ?? cursorSprite;
 
         public OsuCursor()
         {
@@ -37,12 +39,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = expandTarget = new Container
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
+                Child = cursorSprite = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.Cursor), _ => new DefaultCursor(), confineMode: ConfineMode.NoScaling)
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public void Contract() => expandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
 
-        private class DefaultCursor : CompositeDrawable
+        private class DefaultCursor : OsuCursorSprite
         {
             public DefaultCursor()
             {
@@ -71,10 +73,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                InternalChildren = new Drawable[]
+                InternalChildren = new[]
                 {
-                    new CircularContainer
+                    ExpandTarget = new CircularContainer
                     {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
                         BorderThickness = size / 6,
