@@ -155,9 +155,18 @@ namespace osu.Game.Tests.Visual.Background
         public void DisableUserDisplaySettingsTest()
         {
             performFullSetup();
-            AddStep("Start ignoring user settings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
+            createFakeStoryboard();
+            AddStep("Enable Storyboard", () =>
+            {
+                player.ReplacesBackground.Value = true;
+                player.StoryboardEnabled.Value = true;
+            });
+            AddStep("Enable user dim", () => player.DimmableStoryboard.EnableUserDim.Value = true);
+            AddStep("Set dim level to 1", () => songSelect.DimLevel.Value = 1f);
             waitForDim();
-            AddAssert("Check the background is undimmed", () => player.IsBackgroundUndimmed());
+            AddAssert("Ignore User Settings", () => player.DimmableStoryboard.IgnoreUserSettings.Value = true);
+            waitForDim();
+            AddAssert("User dim settings ignored", () => !player.DimmableStoryboard.EnableUserDim.Value && player.DimmableStoryboard.DimLevel == 0);
         }
 
         /// <summary>
@@ -364,8 +373,6 @@ namespace osu.Game.Tests.Visual.Background
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
             public new DimmableStoryboard DimmableStoryboard => base.DimmableStoryboard;
-
-            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1);
 
             // Whether or not the player should be allowed to load.
             public bool BlockLoad;
