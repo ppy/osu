@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mods
             difficulty.DrainRate = DrainRate != null ? DrainRate.Value : difficulty.DrainRate;
             difficulty.CircleSize = CircleSize != null ? CircleSize.Value : difficulty.CircleSize;
             difficulty.ApproachRate = ApproachRate != null ? ApproachRate.Value : difficulty.ApproachRate;
-            difficulty.OverallDifficulty = OverallDifficulty != null ? OverallDifficulty.Value: difficulty.OverallDifficulty;
+            difficulty.OverallDifficulty = OverallDifficulty != null ? OverallDifficulty.Value : difficulty.OverallDifficulty;
         }
     }
 }
