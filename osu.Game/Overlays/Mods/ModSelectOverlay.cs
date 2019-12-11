@@ -235,7 +235,7 @@ namespace osu.Game.Overlays.Mods
                                             CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Customization",
+                                                Text = "Customisation",
                                                 Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
                                                 Enabled = { Value = false },
                                                 Margin = new MarginPadding
@@ -331,30 +331,8 @@ namespace osu.Game.Overlays.Mods
             Ruleset.BindTo(ruleset);
             if (mods != null) SelectedMods.BindTo(mods);
 
-            SelectedMods.ValueChanged += updateModSettings;
-            Ruleset.ValueChanged += _ => ModSettingsContent.Clear();
-
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");
-        }
-
-        private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
-        {
-            foreach (var added in selectedMods.NewValue.Except(selectedMods.OldValue))
-            {
-                var controls = added.CreateSettingsControls().ToList();
-                if (controls.Count > 0)
-                    ModSettingsContent.Add(new ModControlSection(added) { Children = controls });
-            }
-
-            foreach (var removed in selectedMods.OldValue.Except(selectedMods.NewValue))
-                ModSettingsContent.RemoveAll(section => section.Mod == removed);
-
-            bool hasSettings = ModSettingsContent.Children.Count > 0;
-            CustomiseButton.Enabled.Value = hasSettings;
-
-            if (!hasSettings)
-                ModSettingsContainer.Hide();
         }
 
         public void DeselectAll()
@@ -450,12 +428,14 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> e)
+        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.SelectTypes(e.NewValue.Select(m => m.GetType()).ToList());
+                section.SelectTypes(mods.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
+
+            updateModSettings(mods);
         }
 
         private void updateMods()
@@ -478,6 +458,25 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(Color4.White, 200);
 
             UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
+        }
+
+        private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
+        {
+            foreach (var added in selectedMods.NewValue.Except(selectedMods.OldValue))
+            {
+                var controls = added.CreateSettingsControls().ToList();
+                if (controls.Count > 0)
+                    ModSettingsContent.Add(new ModControlSection(added) { Children = controls });
+            }
+
+            foreach (var removed in selectedMods.OldValue.Except(selectedMods.NewValue))
+                ModSettingsContent.RemoveAll(section => section.Mod == removed);
+
+            bool hasSettings = ModSettingsContent.Children.Count > 0;
+            CustomiseButton.Enabled.Value = hasSettings;
+
+            if (!hasSettings)
+                ModSettingsContainer.Hide();
         }
 
         private void modButtonPressed(Mod selectedMod)
