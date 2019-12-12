@@ -13,6 +13,7 @@ namespace osu.Game.Tests.Skins
     [TestFixture]
     public class LegacySkinDecoderTest
     {
+        [Test]
         public void TestDecodeSkinColours()
         {
             var decoder = new LegacySkinDecoder();
@@ -35,6 +36,7 @@ namespace osu.Game.Tests.Skins
             }
         }
 
+        [Test]
         public void TestDecodeEmptySkinColours()
         {
             var decoder = new LegacySkinDecoder();
@@ -51,6 +53,7 @@ namespace osu.Game.Tests.Skins
             }
         }
 
+        [Test]
         public void TestDecodeEmptySkinColoursNoFallback()
         {
             var decoder = new LegacySkinDecoder();
