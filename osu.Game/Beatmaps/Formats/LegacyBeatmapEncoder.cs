@@ -129,6 +129,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(TextWriter writer)
         {
+            writer.WriteLine("[Events]");
+
             writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,{beatmap.BeatmapInfo.Metadata.BackgroundFile}"));
             writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Video},0,{beatmap.BeatmapInfo.Metadata.VideoFile}"));
 
