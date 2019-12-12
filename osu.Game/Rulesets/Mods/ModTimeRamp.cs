@@ -45,6 +45,8 @@ namespace osu.Game.Rulesets.Mods
         {
             this.track = track;
             track.AddAdjustment(AdjustableProperty.Frequency, SpeedChange);
+
+            FinalRate.TriggerChange();
         }
 
         public virtual void ApplyToBeatmap(IBeatmap beatmap)
@@ -67,6 +69,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
         private void applyAdjustment(double amount) =>
-            SpeedChange.Value = 1 + (Math.Sign(FinalRate.Value) * Math.Clamp(amount, 0, 1) * Math.Abs(FinalRate.Value));
+            SpeedChange.Value = 1 + (FinalRate.Value - 1) * Math.Clamp(amount, 0, 1);
     }
 }
