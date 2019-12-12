@@ -118,13 +118,18 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
-            BindProcessor(scoreProcessor);
-            BindDrawableRuleset(drawableRuleset);
+            if (scoreProcessor != null)
+                BindProcessor(scoreProcessor);
 
-            Progress.Objects = drawableRuleset.Objects;
-            Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
-            Progress.RequestSeek = time => RequestSeek(time);
-            Progress.ReferenceClock = drawableRuleset.FrameStableClock;
+            if (drawableRuleset != null)
+            {
+                BindDrawableRuleset(drawableRuleset);
+
+                Progress.Objects = drawableRuleset.Objects;
+                Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
+                Progress.RequestSeek = time => RequestSeek(time);
+                Progress.ReferenceClock = drawableRuleset.FrameStableClock;
+            }
 
             ModDisplay.Current.Value = mods;
 
@@ -279,7 +284,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset.FirstAvailableHitWindows);
+        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
