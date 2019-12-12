@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Mods
 
             player.DimmableVideo.IgnoreUserSettings.Value = true;
             player.DimmableStoryboard.IgnoreUserSettings.Value = true;
+
+            player.BreakOverlay.Hide();
         }
     }
 }
