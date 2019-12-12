@@ -131,8 +131,11 @@ namespace osu.Game.Beatmaps.Formats
         {
             writer.WriteLine("[Events]");
 
-            writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,{beatmap.BeatmapInfo.Metadata.BackgroundFile}"));
-            writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Video},0,{beatmap.BeatmapInfo.Metadata.VideoFile}"));
+            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.BackgroundFile))
+                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,{beatmap.BeatmapInfo.Metadata.BackgroundFile}"));
+
+            if (!string.IsNullOrEmpty(beatmap.BeatmapInfo.Metadata.VideoFile))
+                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Video},0,{beatmap.BeatmapInfo.Metadata.VideoFile}"));
 
             foreach (var b in beatmap.Breaks)
                 writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
