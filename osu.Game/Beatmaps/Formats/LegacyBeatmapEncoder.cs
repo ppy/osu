@@ -246,27 +246,42 @@ namespace osu.Game.Beatmaps.Formats
 
             if (hitObject is IHasCurve curveData)
             {
+                PathType? lastType = null;
+
                 for (int i = 0; i < curveData.Path.ControlPoints.Count; i++)
                 {
                     PathControlPoint point = curveData.Path.ControlPoints[i];
 
-                    switch (point.Type.Value)
+                    if (point.Type.Value != null)
                     {
-                        case PathType.Bezier:
-                            writer.Write("B|");
-                            break;
+                        if (point.Type.Value != lastType)
+                        {
+                            switch (point.Type.Value)
+                            {
+                                case PathType.Bezier:
+                                    writer.Write("B|");
+                                    break;
 
-                        case PathType.Catmull:
-                            writer.Write("C|");
-                            break;
+                                case PathType.Catmull:
+                                    writer.Write("C|");
+                                    break;
 
-                        case PathType.PerfectCurve:
-                            writer.Write("P|");
-                            break;
+                                case PathType.PerfectCurve:
+                                    writer.Write("P|");
+                                    break;
 
-                        case PathType.Linear:
-                            writer.Write("L|");
-                            break;
+                                case PathType.Linear:
+                                    writer.Write("L|");
+                                    break;
+                            }
+
+                            lastType = point.Type.Value;
+                        }
+                        else
+                        {
+                            // New segment with the same type - duplicate the control point
+                            writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}|"));
+                        }
                     }
 
                     if (i != 0)
