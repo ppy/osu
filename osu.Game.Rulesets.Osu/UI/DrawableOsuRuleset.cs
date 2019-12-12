@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
 
-        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(Beatmap);
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 

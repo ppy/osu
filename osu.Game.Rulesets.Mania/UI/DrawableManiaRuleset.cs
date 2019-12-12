@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 
-        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
+        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(Beatmap);
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
 
