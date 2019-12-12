@@ -4,7 +4,6 @@
 using System;
 using osuTK.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -29,14 +28,13 @@ using osu.Game.Input.Bindings;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
+using osu.Game.Screens.Play;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
-
         public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
@@ -250,7 +248,11 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(last);
 
+            // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
             Background.FadeColour(Color4.DarkGray, 500);
+
+            Background.EnableUserDim.Value = false;
+            Background.BlurAmount.Value = 0;
 
             resetTrack(true);
         }
