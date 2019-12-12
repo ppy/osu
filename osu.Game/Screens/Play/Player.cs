@@ -511,6 +511,11 @@ namespace osu.Game.Screens.Play
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
 
+            // bind component bindables.
+            Background.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+            DimmableStoryboard.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+            DimmableVideo.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
 
