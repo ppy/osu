@@ -260,7 +260,7 @@ namespace osu.Game.Beatmaps.Formats
                             break;
                     }
 
-                    writer.Write(FormattableString.Invariant($"{point.Position.Value.X}:{point.Position.Value.Y}"));
+                    writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}"));
                     writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
                 }
 
