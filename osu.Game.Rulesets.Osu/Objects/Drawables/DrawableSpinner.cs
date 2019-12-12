@@ -15,6 +15,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -131,14 +132,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0,
                 }
             };
+        }
 
-            foreach (var tick in Spinner.NestedHitObjects.OfType<SpinnerTick>())
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
             {
-                var drawableTick = new DrawableSpinnerTick(tick);
-
-                ticks.Add(drawableTick);
-                AddNestedHitObject(drawableTick);
+                case DrawableSpinnerTick tick:
+                    ticks.Add(tick);
+                    break;
             }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            ticks.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case SpinnerTick tick:
+                    return new DrawableSpinnerTick(tick);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         [BackgroundDependencyLoader]
