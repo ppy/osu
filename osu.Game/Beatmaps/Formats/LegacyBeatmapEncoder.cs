@@ -236,6 +236,10 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{positionData.Y},"));
             writer.Write(FormattableString.Invariant($"{hitObject.StartTime},"));
             writer.Write(FormattableString.Invariant($"{(int)hitObjectType},"));
+
+            if (hitObject is IHasCurve _)
+                writer.Write(FormattableString.Invariant($"0,")); // A sound type of "none" is written since it's stored per-node
+            else
                 writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
             if (hitObject is IHasCurve curveData)
@@ -303,7 +307,11 @@ namespace osu.Game.Beatmaps.Formats
             else if (hitObject is IHasEndTime endTimeData)
                 writer.Write(FormattableString.Invariant($"{endTimeData.EndTime},"));
 
-            writer.Write(getSampleBank(hitObject.Samples));
+            if (hitObject is IHasCurve _)
+                writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true)); // A bank of "none" is written since it's stored per-node
+            else
+                writer.Write(getSampleBank(hitObject.Samples));
+
             writer.Write(Environment.NewLine);
         }
 
@@ -319,13 +327,10 @@ namespace osu.Game.Beatmaps.Formats
         {
         }
 
-        private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false)
+        private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
         {
             LegacySampleBank normalBank = toLegacySampleBank(samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
             LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
-
-            if (addBank == LegacySampleBank.None)
-                addBank = normalBank;
 
             string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault()?.Suffix);
             string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
@@ -334,8 +339,8 @@ namespace osu.Game.Beatmaps.Formats
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
-            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
+            sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)normalBank)}:"));
+            sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)addBank)}"));
 
             if (!banksOnly)
             {
