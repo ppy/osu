@@ -94,9 +94,9 @@ namespace osu.Game.Screens.Play
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
-                PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
