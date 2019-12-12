@@ -117,9 +117,8 @@ namespace osu.Game.Tests.Skins
             });
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void TestEmptyComboColours(bool allowFallback)
+        [Test]
+        public void TestEmptyComboColours()
         {
             AddStep("Add custom combo colours to source1", () => source1.Configuration.ComboColours = new List<Color4>
             {
@@ -127,11 +126,25 @@ namespace osu.Game.Tests.Skins
                 new Color4(55, 110, 166, 255),
                 new Color4(75, 125, 175, 255),
             });
-            AddStep("Disallow default colours fallback in source2", () => source2.Configuration.AllowDefaultComboColoursFallback = allowFallback);
 
-            AddAssert($"Check retrieved combo colours from {(allowFallback ? "source1" : "fallback source")}", () =>
+            AddAssert("Check retrieved combo colours is skin default colours", () =>
+                requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DefaultComboColours) ?? false);
+        }
+
+        [Test]
+        public void TestEmptyComboColoursNoFallback()
+        {
+            AddStep("Add custom combo colours to source1", () => source1.Configuration.ComboColours = new List<Color4>
             {
-                var expectedColours = allowFallback ? SkinConfiguration.DefaultComboColours : source1.Configuration.ComboColours;
+                new Color4(100, 150, 200, 255),
+                new Color4(55, 110, 166, 255),
+                new Color4(75, 125, 175, 255),
+            });
+            AddStep("Disallow default colours fallback in source2", () => source2.Configuration.AllowDefaultComboColoursFallback = false);
+
+            AddAssert("Check retrieved combo colours from source1", () =>
+            {
+                var expectedColours = source1.Configuration.ComboColours;
                 return requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(expectedColours) ?? false;
             });
         }
