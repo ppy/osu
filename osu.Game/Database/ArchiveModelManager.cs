@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -493,7 +492,7 @@ namespace osu.Game.Database
                 {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
+                        Filename = file.Substring(prefix.Length).ToStandardisedPath(),
                         FileInfo = files.Add(s)
                     });
                 }
