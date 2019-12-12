@@ -360,8 +360,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.LoadComplete();
 
+            SelectedMods.BindValueChanged(selectedModsChanged);
             Ruleset.BindValueChanged(rulesetChanged, true);
-            SelectedMods.BindValueChanged(selectedModsChanged, true);
         }
 
         protected override void PopOut()
