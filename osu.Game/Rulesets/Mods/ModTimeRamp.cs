@@ -35,6 +35,12 @@ namespace osu.Game.Rulesets.Mods
 
         private Track track;
 
+        public ModTimeRamp()
+        {
+            // for preview purpose at song select. eventually we'll want to be able to update every frame.
+            FinalRate.BindValueChanged(val => applyAdjustment(1), true);
+        }
+
         public void ApplyToTrack(Track track)
         {
             this.track = track;
