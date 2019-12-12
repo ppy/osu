@@ -45,6 +45,10 @@ namespace osu.Game.Rulesets.UI
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
         where TObject : HitObject
     {
+        public override event Action<JudgementResult> OnNewResult;
+
+        public override event Action<JudgementResult> OnRevertResult;
+
         /// <summary>
         /// The selected variant.
         /// </summary>
@@ -90,16 +94,6 @@ namespace osu.Game.Rulesets.UI
                     frameStabilityContainer.FrameStablePlayback = value;
             }
         }
-
-        /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public event Action<JudgementResult> OnNewResult;
-
-        /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public event Action<JudgementResult> OnRevertResult;
 
         /// <summary>
         /// The beatmap.
@@ -309,7 +303,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
+        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(Beatmap);
 
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
@@ -366,6 +360,16 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public abstract class DrawableRuleset : CompositeDrawable
     {
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public abstract event Action<JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public abstract event Action<JudgementResult> OnRevertResult;
+
         /// <summary>
         /// Whether a replay is currently loaded.
         /// </summary>
