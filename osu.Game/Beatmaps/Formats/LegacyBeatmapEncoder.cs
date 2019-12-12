@@ -225,7 +225,6 @@ namespace osu.Game.Beatmaps.Formats
             LegacyHitObjectType hitObjectType = (LegacyHitObjectType)(comboData.ComboOffset << 4);
             if (comboData.NewCombo)
                 hitObjectType |= LegacyHitObjectType.NewCombo;
-
             if (hitObject is IHasCurve _)
                 hitObjectType |= LegacyHitObjectType.Slider;
             else if (hitObject is IHasEndTime _)
@@ -233,16 +232,11 @@ namespace osu.Game.Beatmaps.Formats
             else
                 hitObjectType |= LegacyHitObjectType.Circle;
 
-            LegacyHitSoundType soundType = LegacyHitSoundType.Normal;
-            HitSampleInfo firstAdditionSound = hitObject.Samples.FirstOrDefault(s => s.Name != HitSampleInfo.HIT_NORMAL);
-            if (firstAdditionSound != null)
-                soundType |= toLegacyHitSound(firstAdditionSound.Name);
-
             writer.Write(FormattableString.Invariant($"{positionData.X},"));
             writer.Write(FormattableString.Invariant($"{positionData.Y},"));
             writer.Write(FormattableString.Invariant($"{hitObject.StartTime},"));
             writer.Write(FormattableString.Invariant($"{(int)hitObjectType},"));
-            writer.Write(FormattableString.Invariant($"{(int)soundType},"));
+                writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
             if (hitObject is IHasCurve curveData)
             {
@@ -296,12 +290,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 for (int i = 0; i < curveData.NodeSamples.Count; i++)
                 {
-                    LegacyHitSoundType type = LegacyHitSoundType.None;
-
-                    foreach (var sample in curveData.NodeSamples[i])
-                        type |= toLegacyHitSound(sample.Name);
-
-                    writer.Write(FormattableString.Invariant($"{(int)type}"));
+                    writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
                     writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
                 }
 
@@ -359,25 +348,29 @@ namespace osu.Game.Beatmaps.Formats
             return sb.ToString();
         }
 
-        private LegacyHitSoundType toLegacyHitSound(string hitSoundName)
+        private LegacyHitSoundType toLegacyHitSoundType(IList<HitSampleInfo> samples)
         {
-            switch (hitSoundName)
+            LegacyHitSoundType type = LegacyHitSoundType.None;
+
+            foreach (var sample in samples)
             {
-                case HitSampleInfo.HIT_NORMAL:
-                    return LegacyHitSoundType.Normal;
+                switch (sample.Name)
+                {
+                    case HitSampleInfo.HIT_WHISTLE:
+                        type |= LegacyHitSoundType.Whistle;
+                        break;
 
-                case HitSampleInfo.HIT_WHISTLE:
-                    return LegacyHitSoundType.Whistle;
+                    case HitSampleInfo.HIT_FINISH:
+                        type |= LegacyHitSoundType.Finish;
+                        break;
 
-                case HitSampleInfo.HIT_FINISH:
-                    return LegacyHitSoundType.Finish;
-
-                case HitSampleInfo.HIT_CLAP:
-                    return LegacyHitSoundType.Clap;
-
-                default:
-                    return LegacyHitSoundType.None;
+                    case HitSampleInfo.HIT_CLAP:
+                        type |= LegacyHitSoundType.Clap;
+                        break;
+                }
             }
+
+            return type;
         }
 
         private LegacySampleBank toLegacySampleBank(string sampleBank)
