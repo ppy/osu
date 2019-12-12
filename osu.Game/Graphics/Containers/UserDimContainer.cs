@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Amount of lightening to apply to current dim level during break times.
         /// </summary>
-        private const float break_lighten_amount = 0.3f;
+        public const float BREAK_LIGHTEN_AMOUNT = 0.3f;
 
         protected const double BACKGROUND_FADE_DURATION = 800;
 
@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.Containers
 
         protected Bindable<bool> ShowVideo { get; private set; }
 
-        private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? break_lighten_amount : 0;
+        private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
         protected float DimLevel => Math.Max(EnableUserDim.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
 
         protected override Container<Drawable> Content => dimContent;
