@@ -5,22 +5,20 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
+    internal class OsuScoreProcessor : ScoreProcessor
     {
-        public OsuScoreProcessor(DrawableRuleset<OsuHitObject> drawableRuleset)
-            : base(drawableRuleset)
+        public OsuScoreProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
         }
 
         private float hpDrainRate;
 
-        protected override void ApplyBeatmap(Beatmap<OsuHitObject> beatmap)
+        protected override void ApplyBeatmap(IBeatmap beatmap)
         {
             base.ApplyBeatmap(beatmap);
 

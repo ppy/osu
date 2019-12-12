@@ -17,6 +17,8 @@ namespace osu.Game.Storyboards
 
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
 
+        public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
+
         public Storyboard()
         {
             layers.Add("Background", new StoryboardLayer("Background", 3));
@@ -27,8 +29,7 @@ namespace osu.Game.Storyboards
 
         public StoryboardLayer GetLayer(string name)
         {
-            StoryboardLayer layer;
-            if (!layers.TryGetValue(name, out layer))
+            if (!layers.TryGetValue(name, out var layer))
                 layers[name] = layer = new StoryboardLayer(name, layers.Values.Min(l => l.Depth) - 1);
 
             return layer;

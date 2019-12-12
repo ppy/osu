@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Timing;
-using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
                 }
             }
 
-            i = MathHelper.Clamp(i, 0, controlPoints.Count - 1);
+            i = Math.Clamp(i, 0, controlPoints.Count - 1);
 
             return controlPoints[i].StartTime + (position - pos) * timeRange / controlPoints[i].Multiplier / scrollLength;
         }

@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -28,7 +27,7 @@ namespace osu.Game.Rulesets.Objects
                 return;
 
             HitObject lastObject = beatmap.HitObjects.Last();
-            double lastHitTime = 1 + ((lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime);
+            double lastHitTime = 1 + lastObject.GetEndTime();
 
             var timingPoints = beatmap.ControlPointInfo.TimingPoints;
 

@@ -135,10 +135,13 @@ namespace osu.Game.Screens.Play
             addGameplayComponents(GameplayClockContainer, working);
             addOverlayComponents(GameplayClockContainer, working);
 
-            DrawableRuleset.HasReplayLoaded.BindValueChanged(e => HUDOverlay.HoldToQuit.PauseOnFocusLost = !e.NewValue && PauseOnFocusLost, true);
+            DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
+
+            DrawableRuleset.OnNewResult += ScoreProcessor.ApplyResult;
+            DrawableRuleset.OnRevertResult += ScoreProcessor.RevertResult;
 
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
@@ -146,6 +149,7 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+            breakOverlay.IsBreakTime.ValueChanged += _ => updatePauseOnFocusLostState();
         }
 
         private void addUnderlayComponents(Container target)
@@ -179,7 +183,7 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -203,7 +207,7 @@ namespace osu.Game.Screens.Play
                 },
                 new SkipOverlay(DrawableRuleset.GameplayStartTime)
                 {
-                    RequestSeek = GameplayClockContainer.Seek
+                    RequestSkip = GameplayClockContainer.Skip
                 },
                 FailOverlay = new FailOverlay
                 {
@@ -240,6 +244,11 @@ namespace osu.Game.Screens.Play
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             });
         }
+
+        private void updatePauseOnFocusLostState() =>
+            HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
+                                                     && !DrawableRuleset.HasReplayLoaded.Value
+                                                     && !breakOverlay.IsBreakTime.Value;
 
         private WorkingBeatmap loadBeatmap()
         {
@@ -468,7 +477,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (breakOverlay.IsBreakTime.Value || GameplayClockContainer.GameplayClock.CurrentTime < Beatmap.Value.Beatmap.HitObjects.First().StartTime)
+            if (breakOverlay.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -534,6 +543,12 @@ namespace osu.Game.Screens.Play
                 if (pauseCooldownActive && !GameplayClockContainer.IsPaused.Value)
                     // still want to block if we are within the cooldown period and not already paused.
                     return true;
+            }
+
+            if (canPause)
+            {
+                Pause();
+                return true;
             }
 
             // GameplayClockContainer performs seeks / start / stop operations on the beatmap's track.

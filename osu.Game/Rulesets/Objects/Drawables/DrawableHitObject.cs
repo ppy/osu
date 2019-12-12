@@ -382,7 +382,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (Result != null && Result.HasResult)
             {
-                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+                var endTime = HitObject.GetEndTime();
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {
@@ -460,7 +460,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            var endTime = HitObject.GetEndTime();
 
             Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
@@ -495,7 +495,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Judged)
                 return false;
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            var endTime = HitObject.GetEndTime();
             CheckForResult(userTriggered, Time.Current - endTime);
 
             return Judged;
