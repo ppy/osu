@@ -20,10 +20,10 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Final rate", "The speed increase to ramp towards")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
-            MinValue = -0.5,
-            MaxValue = -0.01,
-            Default = -0.25,
-            Value = -0.25,
+            MinValue = 0.5,
+            MaxValue = 0.99,
+            Default = 0.75,
+            Value = 0.75,
             Precision = 0.01,
         };
 
