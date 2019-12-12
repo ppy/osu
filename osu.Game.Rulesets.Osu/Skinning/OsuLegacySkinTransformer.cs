@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osuTK;
+using static osu.Game.Skinning.LegacySkinConfiguration;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
@@ -125,8 +126,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             break;
 
                         case OsuSkinConfiguration.ExpandNumberPiece:
-                            double legacyVersion = source.GetConfig<LegacySkinConfiguration, double>(LegacySkinConfiguration.LegacyVersion)?.Value ?? 1.0;
-                            return SkinUtils.As<TValue>(new BindableBool(legacyVersion < 2.0));
+                            decimal legacyVersion = source.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value ?? 1.0m;
+                            return SkinUtils.As<TValue>(new BindableBool(legacyVersion < 2.0m));
                     }
 
                     break;
