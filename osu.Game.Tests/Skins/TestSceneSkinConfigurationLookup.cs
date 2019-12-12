@@ -120,13 +120,6 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestEmptyComboColours()
         {
-            AddStep("Add custom combo colours to source1", () => source1.Configuration.ComboColours = new List<Color4>
-            {
-                new Color4(100, 150, 200, 255),
-                new Color4(55, 110, 166, 255),
-                new Color4(75, 125, 175, 255),
-            });
-
             AddAssert("Check retrieved combo colours is skin default colours", () =>
                 requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DefaultComboColours) ?? false);
         }
@@ -134,19 +127,16 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestEmptyComboColoursNoFallback()
         {
-            AddStep("Add custom combo colours to source1", () => source1.Configuration.ComboColours = new List<Color4>
-            {
+            AddStep("Add custom combo colours to source1", () => source1.Configuration.AddComboColours(
                 new Color4(100, 150, 200, 255),
                 new Color4(55, 110, 166, 255),
-                new Color4(75, 125, 175, 255),
-            });
+                new Color4(75, 125, 175, 255)
+            ));
+
             AddStep("Disallow default colours fallback in source2", () => source2.Configuration.AllowDefaultComboColoursFallback = false);
 
             AddAssert("Check retrieved combo colours from source1", () =>
-            {
-                var expectedColours = source1.Configuration.ComboColours;
-                return requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(expectedColours) ?? false;
-            });
+                requester.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.SequenceEqual(source1.Configuration.ComboColours) ?? false);
         }
 
         [Test]
