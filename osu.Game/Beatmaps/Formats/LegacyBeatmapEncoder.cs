@@ -269,8 +269,11 @@ namespace osu.Game.Beatmaps.Formats
                             break;
                     }
 
-                    writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}"));
-                    writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
+                    if (i != 0)
+                    {
+                        writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}"));
+                        writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
+                    }
                 }
 
                 writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
