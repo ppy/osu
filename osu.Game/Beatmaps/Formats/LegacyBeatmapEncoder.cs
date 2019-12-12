@@ -129,7 +129,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleEvents(TextWriter writer)
         {
-            // Todo: Storyboard events
+            writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Background},0,{beatmap.BeatmapInfo.Metadata.BackgroundFile}"));
+            writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Video},0,{beatmap.BeatmapInfo.Metadata.VideoFile}"));
+
+            foreach (var b in beatmap.Breaks)
+                writer.WriteLine(FormattableString.Invariant($"{(int)LegacyEventType.Break},{b.StartTime},{b.EndTime}"));
         }
 
         private void handleTimingPoints(TextWriter writer)
