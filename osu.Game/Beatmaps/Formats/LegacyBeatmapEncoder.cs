@@ -264,7 +264,7 @@ namespace osu.Game.Beatmaps.Formats
                     writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
                 }
 
-                writer.Write(FormattableString.Invariant($"{curveData.RepeatCount - 1},"));
+                writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
                 writer.Write(FormattableString.Invariant($"{curveData.Path.Distance},"));
 
                 for (int i = 0; i < curveData.NodeSamples.Count; i++)
