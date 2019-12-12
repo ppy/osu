@@ -24,8 +24,8 @@ namespace osu.Game.Screens.Play
 {
     public class HUDOverlay : Container
     {
-        private const int duration = 250;
-        private const Easing easing = Easing.OutQuint;
+        private const int fade_duration = 400;
+        private const Easing fade_easing = Easing.Out;
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
@@ -103,8 +103,8 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
                     AutoSizeAxes = Axes.Both,
-                    AutoSizeDuration = 150,
-                    AutoSizeEasing = Easing.OutQuint,
+                    AutoSizeDuration = fade_duration,
+                    AutoSizeEasing = fade_easing,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -155,19 +155,19 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, duration, easing)));
+            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, fade_duration, fade_easing)));
 
             ShowHealthbar.BindValueChanged(healthBar =>
             {
                 if (healthBar.NewValue)
                 {
-                    HealthDisplay.FadeIn(duration, easing);
-                    topScoreContainer.MoveToY(30, duration, easing);
+                    HealthDisplay.FadeIn(fade_duration, fade_easing);
+                    topScoreContainer.MoveToY(30, fade_duration, fade_easing);
                 }
                 else
                 {
-                    HealthDisplay.FadeOut(duration, easing);
-                    topScoreContainer.MoveToY(0, duration, easing);
+                    HealthDisplay.FadeOut(fade_duration, fade_easing);
+                    topScoreContainer.MoveToY(0, fade_duration, fade_easing);
                 }
             }, true);
 
