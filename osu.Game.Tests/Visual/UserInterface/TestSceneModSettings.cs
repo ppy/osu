@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private TestModSelectOverlay modSelect;
 
-        Mod testCustomisableMod = new TestModCustomisable1();
+        private readonly Mod testCustomisableMod = new TestModCustomisable1();
 
         [Test]
         public void TestButtonShowsOnCustomisableMod()
@@ -106,8 +106,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
 
-                public override string Description { get; }
-                public override string ShortName { get; }
+                public override string Description { get; } = "test";
+                public override string ShortName { get; } = "tst";
             }
         }
 
