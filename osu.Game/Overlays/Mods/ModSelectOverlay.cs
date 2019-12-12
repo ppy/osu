@@ -491,8 +491,8 @@ namespace osu.Game.Overlays.Mods
         {
             base.Dispose(isDisposing);
 
-            availableMods.UnbindAll();
-            SelectedMods.UnbindAll();
+            availableMods?.UnbindAll();
+            SelectedMods?.UnbindAll();
         }
 
         #endregion
