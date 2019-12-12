@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var ruleset = new TestScrollingRuleset();
 
-            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(beatmap);
+            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
             drawableRuleset.FrameStablePlayback = false;
 
             overrideAction?.Invoke(drawableRuleset);
