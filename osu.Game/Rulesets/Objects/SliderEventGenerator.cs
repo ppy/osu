@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osuTK;
 
 namespace osu.Game.Rulesets.Objects
 {
@@ -18,7 +17,7 @@ namespace osu.Game.Rulesets.Objects
             const double max_length = 100000;
 
             var length = Math.Min(max_length, totalDistance);
-            tickDistance = MathHelper.Clamp(tickDistance, 0, length);
+            tickDistance = Math.Clamp(tickDistance, 0, length);
 
             var minDistanceFromEnd = velocity * 10;
 

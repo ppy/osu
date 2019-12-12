@@ -218,7 +218,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         }
 
         /// <summary>
-        /// Check whether <see cref="newPoint"/> should be added.
+        /// Check whether <paramref name="newPoint"/> should be added.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <param name="newPoint">A point to be added.</param>

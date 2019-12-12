@@ -8,8 +8,8 @@ using System.IO;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.IO.File;
 using osu.Game.IO;
 using osu.Game.Storyboards;
 
@@ -83,9 +83,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 storyboardSprite = null;
 
-                EventType type;
-
-                if (!Enum.TryParse(split[0], out type))
+                if (!Enum.TryParse(split[0], out EventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
@@ -337,6 +335,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
+        private string cleanFilename(string path) => path.Trim('"').ToStandardisedPath();
     }
 }

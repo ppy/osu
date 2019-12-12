@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -54,13 +53,13 @@ namespace osu.Game.Database
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Fired when a new <see cref="TModel"/> becomes available in the database.
+        /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemAdded;
 
         /// <summary>
-        /// Fired when a <see cref="TModel"/> is removed from the database.
+        /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemRemoved;
@@ -95,7 +94,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import one or more <see cref="TModel"/> items from filesystem <paramref name="paths"/>.
+        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
         /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more archive locations on disk.</param>
@@ -173,7 +172,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// </summary>
         /// <param name="path">The archive location on disk.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
@@ -275,7 +274,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import an item from a <see cref="TModel"/>.
+        /// Import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
@@ -493,7 +492,7 @@ namespace osu.Game.Database
                 {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
+                        Filename = file.Substring(prefix.Length).ToStandardisedPath(),
                         FileInfo = files.Add(s)
                     });
                 }
@@ -589,7 +588,7 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// After an existing <see cref="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to restore the existing
         /// item and skip the import. This method allows changing that behaviour.
         /// </summary>
         /// <param name="existing">The existing model.</param>

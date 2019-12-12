@@ -95,6 +95,19 @@ namespace osu.Game.Tests.Visual.Gameplay
             seekAndAssertBreak("seek to break after end", testBreaks[1].EndTime + 500, false);
         }
 
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestBeforeGameplayStart(bool withBreaks)
+        {
+            setClock(true);
+
+            if (withBreaks)
+                loadBreaksStep("multiple breaks", testBreaks);
+
+            seekAndAssertBreak("seek to break intro time", -100, true);
+            seekAndAssertBreak("seek to break intro time", 0, false);
+        }
+
         private void addShowBreakStep(double seconds)
         {
             AddStep($"show '{seconds}s' break", () => breakOverlay.Breaks = new List<BreakPeriod>

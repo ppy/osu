@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Show health display even when you can't fail",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
+                    Keywords = new[] { "hp", "bar" }
                 },
                 new SettingsCheckbox
                 {

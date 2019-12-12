@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -31,6 +32,7 @@ namespace osu.Game.Overlays.Mods
     public class ModSelectOverlay : WaveOverlayContainer
     {
         protected readonly TriangleButton DeselectAllButton;
+        protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
 
         protected readonly OsuSpriteText MultiplierLabel;
@@ -41,6 +43,10 @@ namespace osu.Game.Overlays.Mods
         protected override bool DimMainContent => false;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
+
+        protected readonly FillFlowContainer<ModControlSection> ModSettingsContent;
+
+        protected readonly Container ModSettingsContainer;
 
         protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
@@ -226,6 +232,17 @@ namespace osu.Game.Overlays.Mods
                                                     Right = 20
                                                 }
                                             },
+                                            CustomiseButton = new TriangleButton
+                                            {
+                                                Width = 180,
+                                                Text = "Customisation",
+                                                Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
+                                                Enabled = { Value = false },
+                                                Margin = new MarginPadding
+                                                {
+                                                    Right = 20
+                                                }
+                                            },
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
@@ -271,6 +288,36 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
+                ModSettingsContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Width = 0.25f,
+                    Alpha = 0,
+                    X = -100,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = new Color4(0, 0, 0, 192)
+                        },
+                        new OsuScrollContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = ModSettingsContent = new FillFlowContainer<ModControlSection>
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Spacing = new Vector2(0f, 10f),
+                                Padding = new MarginPadding(20),
+                            }
+                        }
+                    }
+                }
             };
         }
 
@@ -381,12 +428,14 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> e)
+        private void selectedModsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
         {
             foreach (var section in ModSectionsContainer.Children)
-                section.SelectTypes(e.NewValue.Select(m => m.GetType()).ToList());
+                section.SelectTypes(mods.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
+
+            updateModSettings(mods);
         }
 
         private void updateMods()
@@ -409,6 +458,25 @@ namespace osu.Game.Overlays.Mods
                 MultiplierLabel.FadeColour(Color4.White, 200);
 
             UnrankedLabel.FadeTo(ranked ? 0 : 1, 200);
+        }
+
+        private void updateModSettings(ValueChangedEvent<IReadOnlyList<Mod>> selectedMods)
+        {
+            foreach (var added in selectedMods.NewValue.Except(selectedMods.OldValue))
+            {
+                var controls = added.CreateSettingsControls().ToList();
+                if (controls.Count > 0)
+                    ModSettingsContent.Add(new ModControlSection(added) { Children = controls });
+            }
+
+            foreach (var removed in selectedMods.OldValue.Except(selectedMods.NewValue))
+                ModSettingsContent.RemoveAll(section => section.Mod == removed);
+
+            bool hasSettings = ModSettingsContent.Children.Count > 0;
+            CustomiseButton.Enabled.Value = hasSettings;
+
+            if (!hasSettings)
+                ModSettingsContainer.Hide();
         }
 
         private void modButtonPressed(Mod selectedMod)

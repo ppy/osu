@@ -19,6 +19,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.MathUtils;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
@@ -27,13 +28,16 @@ namespace osu.Game.Screens.Play
     {
         private readonly double startTime;
 
-        public Action<double> RequestSeek;
+        public Action RequestSkip;
 
         private Button button;
         private Box remainingTimeBox;
 
         private FadeContainer fadeContainer;
         private double displayTime;
+
+        [Resolved]
+        private GameplayClock gameplayClock { get; set; }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -45,8 +49,6 @@ namespace osu.Game.Screens.Play
         {
             this.startTime = startTime;
 
-            Show();
-
             RelativePositionAxes = Axes.Both;
             RelativeSizeAxes = Axes.X;
 
@@ -57,13 +59,8 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, GameplayClock clock)
+        private void load(OsuColour colours)
         {
-            var baseClock = Clock;
-
-            if (clock != null)
-                Clock = clock;
-
             Children = new Drawable[]
             {
                 fadeContainer = new FadeContainer
@@ -73,7 +70,6 @@ namespace osu.Game.Screens.Play
                     {
                         button = new Button
                         {
-                            Clock = baseClock,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
@@ -90,46 +86,42 @@ namespace osu.Game.Screens.Play
             };
         }
 
-        /// <summary>
-        /// Duration before gameplay start time required before skip button displays.
-        /// </summary>
-        private const double skip_buffer = 1000;
-
         private const double fade_time = 300;
 
-        private double beginFadeTime => startTime - fade_time;
+        private double fadeOutBeginTime => startTime - GameplayClockContainer.MINIMUM_SKIP_TIME;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             // skip is not required if there is no extra "empty" time to skip.
-            if (Clock.CurrentTime > beginFadeTime - skip_buffer)
+            // we may need to remove this if rewinding before the initial player load position becomes a thing.
+            if (fadeOutBeginTime < gameplayClock.CurrentTime)
             {
-                Alpha = 0;
                 Expire();
                 return;
             }
 
-            this.FadeInFromZero(fade_time);
-            using (BeginAbsoluteSequence(beginFadeTime))
-                this.FadeOut(fade_time);
+            button.Action = () => RequestSkip?.Invoke();
+            displayTime = gameplayClock.CurrentTime;
 
-            button.Action = () => RequestSeek?.Invoke(beginFadeTime);
-
-            displayTime = Time.Current;
-
-            Expire();
+            Show();
         }
 
-        protected override void PopIn() => this.FadeIn();
+        protected override void PopIn() => this.FadeIn(fade_time);
 
-        protected override void PopOut() => this.FadeOut();
+        protected override void PopOut() => this.FadeOut(fade_time);
 
         protected override void Update()
         {
             base.Update();
-            remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
+
+            var progress = Math.Max(0, 1 - (gameplayClock.CurrentTime - displayTime) / (fadeOutBeginTime - displayTime));
+
+            remainingTimeBox.Width = (float)Interpolation.Lerp(remainingTimeBox.Width, progress, Math.Clamp(Time.Elapsed / 40, 0, 1));
+
+            button.Enabled.Value = progress > 0;
+            State.Value = progress > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -335,13 +327,7 @@ namespace osu.Game.Screens.Play
                 box.FlashColour(Color4.White, 500, Easing.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);
 
-                bool result = base.OnClick(e);
-
-                // for now, let's disable the skip button after the first press.
-                // this will likely need to be contextual in the future (bound from external components).
-                Enabled.Value = false;
-
-                return result;
+                return base.OnClick(e);
             }
         }
     }
