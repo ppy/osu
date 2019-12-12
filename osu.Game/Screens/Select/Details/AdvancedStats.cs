@@ -12,11 +12,21 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System;
 using osu.Game.Beatmaps;
+using osu.Framework.Bindables;
+using System.Collections.Generic;
+using osu.Game.Rulesets.Mods;
+using System.Linq;
 
 namespace osu.Game.Screens.Select.Details
 {
     public class AdvancedStats : Container
     {
+        [Resolved]
+        private IBindable<IReadOnlyList<Mod>> mods { get; set; }
+
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private readonly StatisticRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
 
         private BeatmapInfo beatmap;
@@ -30,22 +40,7 @@ namespace osu.Game.Screens.Select.Details
 
                 beatmap = value;
 
-                //mania specific
-                if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
-                {
-                    firstValue.Title = "Key Amount";
-                    firstValue.Value = (int)MathF.Round(Beatmap?.BaseDifficulty?.CircleSize ?? 0);
-                }
-                else
-                {
-                    firstValue.Title = "Circle Size";
-                    firstValue.Value = Beatmap?.BaseDifficulty?.CircleSize ?? 0;
-                }
-
-                hpDrain.Value = Beatmap?.BaseDifficulty?.DrainRate ?? 0;
-                accuracy.Value = Beatmap?.BaseDifficulty?.OverallDifficulty ?? 0;
-                approachRate.Value = Beatmap?.BaseDifficulty?.ApproachRate ?? 0;
-                starDifficulty.Value = (float)(Beatmap?.StarDifficulty ?? 0);
+                updateStatistics();
             }
         }
 
@@ -65,12 +60,60 @@ namespace osu.Game.Screens.Select.Details
                     starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
                 },
             };
+            
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             starDifficulty.AccentColour = colours.Yellow;
+            mods.ValueChanged += _ => updateStatistics();
+        }
+
+        private void updateStatistics()
+        {
+            BeatmapInfo processed = Beatmap?.Clone();
+
+            if (processed != null && mods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                processed.BaseDifficulty = processed.BaseDifficulty.Clone();
+
+                foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ApplyToDifficulty(processed.BaseDifficulty);
+            }
+
+            BeatmapDifficulty baseDifficulty = Beatmap?.BaseDifficulty;
+            BeatmapDifficulty moddedDifficulty = processed?.BaseDifficulty;
+
+            //mania specific
+            if ((processed?.Ruleset?.ID ?? 0) == 3)
+            {
+                firstValue.Title = "Key Amount";
+                firstValue.Value = (int)MathF.Round(moddedDifficulty?.CircleSize ?? 0);
+            }
+            else
+            {
+                firstValue.Title = "Circle Size";
+                firstValue.Value = moddedDifficulty?.CircleSize ?? 0;
+            }
+
+            hpDrain.Value = moddedDifficulty?.DrainRate ?? 0;
+            accuracy.Value = moddedDifficulty?.OverallDifficulty ?? 0;
+            approachRate.Value = moddedDifficulty?.ApproachRate ?? 0;
+            starDifficulty.Value = (float)(processed?.StarDifficulty ?? 0);
+
+            hpDrain.AccentColour = (moddedDifficulty?.DrainRate ?? 0) == (baseDifficulty?.DrainRate ?? 0) ?
+                Color4.White : (moddedDifficulty?.DrainRate ?? 0) < (baseDifficulty?.DrainRate ?? 0) ?
+                    colours.BlueLight : colours.RedLight;            
+            accuracy.AccentColour = (moddedDifficulty?.OverallDifficulty ?? 0) == (baseDifficulty?.OverallDifficulty ?? 0) ?
+                Color4.White : (moddedDifficulty?.OverallDifficulty ?? 0) < (baseDifficulty?.OverallDifficulty ?? 0) ?
+                    colours.BlueLight : colours.RedLight;            
+            approachRate.AccentColour = (moddedDifficulty?.ApproachRate ?? 0) == (baseDifficulty?.ApproachRate ?? 0) ?
+                Color4.White : (moddedDifficulty?.ApproachRate ?? 0) < (baseDifficulty?.ApproachRate ?? 0) ?
+                    colours.BlueLight : colours.RedLight;            
+            firstValue.AccentColour = (moddedDifficulty?.CircleSize ?? 0) == (baseDifficulty?.CircleSize ?? 0) ?
+                Color4.White : (moddedDifficulty?.CircleSize ?? 0) < (baseDifficulty?.CircleSize ?? 0) ?
+                    colours.BlueLight : colours.RedLight;
         }
 
         private class StatisticRow : Container, IHasAccentColour
