@@ -3,15 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Skinning;
+using osu.Game.Rulesets.Osu.UI.Cursor;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Skinning
 {
-    public class LegacyCursor : CompositeDrawable
+    public class LegacyCursor : OsuCursorSprite
     {
-        private NonPlayfieldSprite cursor;
         private bool spin;
 
         public LegacyCursor()
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         {
             spin = skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.CursorRotate)?.Value ?? true;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 new NonPlayfieldSprite
                 {
@@ -35,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                cursor = new NonPlayfieldSprite
+                ExpandTarget = new NonPlayfieldSprite
                 {
                     Texture = skin.GetTexture("cursor"),
                     Anchor = Anchor.Centre,
@@ -47,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         protected override void LoadComplete()
         {
             if (spin)
-                cursor.Spin(10000, RotationDirection.Clockwise);
+                ExpandTarget.Spin(10000, RotationDirection.Clockwise);
         }
     }
 }

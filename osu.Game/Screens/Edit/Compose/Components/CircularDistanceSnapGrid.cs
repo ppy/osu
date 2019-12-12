@@ -5,19 +5,18 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     public abstract class CircularDistanceSnapGrid : DistanceSnapGrid
     {
-        protected CircularDistanceSnapGrid(HitObject hitObject, HitObject nextHitObject, Vector2 centrePosition)
-            : base(hitObject, nextHitObject, centrePosition)
+        protected CircularDistanceSnapGrid(Vector2 startPosition, double startTime, double? endTime = null)
+            : base(startPosition, startTime, endTime)
         {
         }
 
-        protected override void CreateContent(Vector2 centrePosition)
+        protected override void CreateContent(Vector2 startPosition)
         {
             const float crosshair_thickness = 1;
             const float crosshair_max_size = 10;
@@ -27,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 new Box
                 {
                     Origin = Anchor.Centre,
-                    Position = centrePosition,
+                    Position = startPosition,
                     Width = crosshair_thickness,
                     EdgeSmoothness = new Vector2(1),
                     Height = Math.Min(crosshair_max_size, DistanceSpacing * 2),
@@ -35,15 +34,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 new Box
                 {
                     Origin = Anchor.Centre,
-                    Position = centrePosition,
+                    Position = startPosition,
                     EdgeSmoothness = new Vector2(1),
                     Width = Math.Min(crosshair_max_size, DistanceSpacing * 2),
                     Height = crosshair_thickness,
                 }
             });
 
-            float dx = Math.Max(centrePosition.X, DrawWidth - centrePosition.X);
-            float dy = Math.Max(centrePosition.Y, DrawHeight - centrePosition.Y);
+            float dx = Math.Max(startPosition.X, DrawWidth - startPosition.X);
+            float dy = Math.Max(startPosition.Y, DrawHeight - startPosition.Y);
             float maxDistance = new Vector2(dx, dy).Length;
             int requiredCircles = Math.Min(MaxIntervals, (int)(maxDistance / DistanceSpacing));
 
@@ -54,7 +53,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 AddInternal(new CircularProgress
                 {
                     Origin = Anchor.Centre,
-                    Position = centrePosition,
+                    Position = startPosition,
                     Current = { Value = 1 },
                     Size = new Vector2(radius),
                     InnerRadius = 4 * 1f / radius,
@@ -66,9 +65,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public override (Vector2 position, double time) GetSnappedPosition(Vector2 position)
         {
             if (MaxIntervals == 0)
-                return (CentrePosition, StartTime);
+                return (StartPosition, StartTime);
 
-            Vector2 direction = position - CentrePosition;
+            Vector2 direction = position - StartPosition;
             if (direction == Vector2.Zero)
                 direction = new Vector2(0.001f, 0.001f);
 
@@ -78,9 +77,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             int radialCount = Math.Clamp((int)MathF.Round(distance / radius), 1, MaxIntervals);
 
             Vector2 normalisedDirection = direction * new Vector2(1f / distance);
-            Vector2 snappedPosition = CentrePosition + normalisedDirection * radialCount * radius;
+            Vector2 snappedPosition = StartPosition + normalisedDirection * radialCount * radius;
 
-            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(StartTime, (snappedPosition - CentrePosition).Length));
+            return (snappedPosition, StartTime + SnapProvider.GetSnappedDurationFromDistance(StartTime, (snappedPosition - StartPosition).Length));
         }
     }
 }
