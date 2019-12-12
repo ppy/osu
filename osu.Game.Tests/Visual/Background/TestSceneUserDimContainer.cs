@@ -15,13 +15,22 @@ namespace osu.Game.Tests.Visual.Background
 {
     public class TestSceneUserDimContainer : OsuTestScene
     {
-        private readonly TestUserDimContainer container;
-        private readonly BindableBool isBreakTime = new BindableBool();
-        private readonly Bindable<bool> lightenDuringBreaks = new Bindable<bool>();
+        private TestUserDimContainer userDimContainer;
 
-        public TestSceneUserDimContainer()
+        private readonly BindableBool isBreakTime = new BindableBool();
+
+        private Bindable<bool> lightenDuringBreaks = new Bindable<bool>();
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
         {
-            Add(container = new TestUserDimContainer
+            lightenDuringBreaks = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks);
+        }
+
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            Child = userDimContainer = new TestUserDimContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = new Box
@@ -29,21 +38,11 @@ namespace osu.Game.Tests.Visual.Background
                     Colour = Color4.White,
                     RelativeSizeAxes = Axes.Both,
                 },
-            });
+            };
 
-            container.IsBreakTime.BindTo(isBreakTime);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.LightenDuringBreaks, lightenDuringBreaks);
-        }
-
-        [SetUp]
-        public void SetUp() => Schedule(() =>
-        {
+            userDimContainer.IsBreakTime.BindTo(isBreakTime);
             isBreakTime.Value = false;
+
             lightenDuringBreaks.Value = false;
         });
 
@@ -55,38 +54,38 @@ namespace osu.Game.Tests.Visual.Background
         [TestCase(0.0f, 0.0f)]
         public void TestBreakLightening(float userDim, float expectedBreakDim)
         {
-            AddStep($"set dim level {userDim}", () => container.UserDimLevel.Value = userDim);
+            AddStep($"set dim level {userDim}", () => userDimContainer.UserDimLevel.Value = userDim);
             AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
 
             AddStep("set break", () => isBreakTime.Value = true);
-            AddUntilStep("has lightened", () => container.DimEqual(expectedBreakDim));
+            AddUntilStep("has lightened", () => userDimContainer.DimEqual(expectedBreakDim));
             AddStep("clear break", () => isBreakTime.Value = false);
-            AddUntilStep("not lightened", () => container.DimEqual(userDim));
+            AddUntilStep("not lightened", () => userDimContainer.DimEqual(userDim));
         }
 
         [Test]
         public void TestEnableSettingDuringBreak()
         {
-            AddStep("set dim level 0.6", () => container.UserDimLevel.Value = test_user_dim);
+            AddStep("set dim level 0.6", () => userDimContainer.UserDimLevel.Value = test_user_dim);
 
             AddStep("set break", () => isBreakTime.Value = true);
-            AddUntilStep("not lightened", () => container.DimEqual(test_user_dim));
+            AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));
             AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
-            AddUntilStep("has lightened", () => container.DimEqual(test_user_dim_lightened));
+            AddUntilStep("has lightened", () => userDimContainer.DimEqual(test_user_dim_lightened));
         }
 
         [Test]
         public void TestDisableSettingDuringBreak()
         {
-            AddStep("set dim level 0.6", () => container.UserDimLevel.Value = test_user_dim);
+            AddStep("set dim level 0.6", () => userDimContainer.UserDimLevel.Value = test_user_dim);
             AddStep("set lighten during break", () => lightenDuringBreaks.Value = true);
 
             AddStep("set break", () => isBreakTime.Value = true);
-            AddUntilStep("has lightened", () => container.DimEqual(test_user_dim_lightened));
+            AddUntilStep("has lightened", () => userDimContainer.DimEqual(test_user_dim_lightened));
             AddStep("clear lighten during break", () => lightenDuringBreaks.Value = false);
-            AddUntilStep("not lightened", () => container.DimEqual(test_user_dim));
+            AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));
             AddStep("clear break", () => isBreakTime.Value = false);
-            AddUntilStep("not lightened", () => container.DimEqual(test_user_dim));
+            AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));
         }
 
         private class TestUserDimContainer : UserDimContainer
