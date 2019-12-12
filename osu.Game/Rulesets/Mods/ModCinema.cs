@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Mods
         {
             drawableRuleset.SetReplayScore(CreateReplayScore(drawableRuleset.Beatmap));
 
+            // AlwaysPresent required for hitsounds
             drawableRuleset.Playfield.AlwaysPresent = true;
             drawableRuleset.Playfield.Hide();
         }
