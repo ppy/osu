@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
 
-        public ModDaycore()
+        protected ModDaycore()
         {
             SpeedChange.BindValueChanged(val =>
             {
