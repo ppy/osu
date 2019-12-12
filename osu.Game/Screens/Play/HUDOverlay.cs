@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -43,8 +44,15 @@ namespace osu.Game.Screens.Play
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
-        private Bindable<bool> showHud;
+        /// <summary>
+        /// Whether the elements that can optionally be hidden should be visible.
+        /// </summary>
+        public Bindable<bool> ShowHud { get; } = new BindableBool();
+
+        private Bindable<bool> configShowHud;
+
         private readonly Container visibilityContainer;
+
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
@@ -52,6 +60,8 @@ namespace osu.Game.Screens.Play
         public Action<double> RequestSeek;
 
         private readonly Container topScoreContainer;
+
+        private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
         public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
@@ -73,8 +83,6 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            AutoSizeDuration = 200,
-                            AutoSizeEasing = Easing.Out,
                             Children = new Drawable[]
                             {
                                 AccuracyCounter = CreateAccuracyCounter(),
@@ -95,6 +103,8 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
                     AutoSizeAxes = Axes.Both,
+                    AutoSizeDuration = 150,
+                    AutoSizeEasing = Easing.OutQuint,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -118,8 +128,29 @@ namespace osu.Game.Screens.Play
 
             ModDisplay.Current.Value = mods;
 
-            showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
+            configShowHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
+
+            if (!configShowHud.Value && !hasShownNotificationOnce)
+            {
+                hasShownNotificationOnce = true;
+
+                notificationOverlay?.Post(new SimpleNotification
+                {
+                    Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
+                });
+            }
+
+            // start all elements hidden
+            hideTargets.ForEach(d => d.Hide());
+        }
+
+        public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, duration, easing)));
 
             ShowHealthbar.BindValueChanged(healthBar =>
             {
@@ -135,20 +166,11 @@ namespace osu.Game.Screens.Play
                 }
             }, true);
 
-            if (!showHud.Value && !hasShownNotificationOnce)
+            configShowHud.BindValueChanged(visible =>
             {
-                hasShownNotificationOnce = true;
-
-                notificationOverlay?.Post(new SimpleNotification
-                {
-                    Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
-                });
-            }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
+                if (!ShowHud.Disabled)
+                    ShowHud.Value = visible.NewValue;
+            }, true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
@@ -189,7 +211,7 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        showHud.Value = !showHud.Value;
+                        configShowHud.Value = !configShowHud.Value;
                         return true;
                 }
             }
