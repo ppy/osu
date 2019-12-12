@@ -331,10 +331,11 @@ namespace osu.Game.Beatmaps.Formats
             StringBuilder sb = new StringBuilder();
 
             sb.Append(FormattableString.Invariant($"{(int)normalBank}:"));
-            sb.Append(FormattableString.Invariant($"{(int)addBank}:"));
+            sb.Append(FormattableString.Invariant($"{(int)addBank}"));
 
             if (!banksOnly)
             {
+                sb.Append(":");
                 sb.Append(FormattableString.Invariant($"{customSampleBank}:"));
                 sb.Append(FormattableString.Invariant($"{volume}:"));
                 sb.Append(FormattableString.Invariant($"{sampleFilename}"));
