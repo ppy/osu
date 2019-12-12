@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Mods
 
         public void ApplyToHUD(HUDOverlay overlay)
         {
-            overlay.AlwaysPresent = true;
-            overlay.Hide();
+            overlay.ShowHud.Value = false;
+            overlay.ShowHud.Disabled = true;
         }
 
         public void ApplyToPlayer(Player player)
