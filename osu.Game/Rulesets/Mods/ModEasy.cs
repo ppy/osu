@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
 
         private int retries = 2;
 
