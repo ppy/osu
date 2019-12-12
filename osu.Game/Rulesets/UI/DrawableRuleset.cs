@@ -98,7 +98,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The beatmap.
         /// </summary>
-        public Beatmap<TObject> Beatmap;
+        public readonly Beatmap<TObject> Beatmap;
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
 
@@ -118,19 +118,21 @@ namespace osu.Game.Rulesets.UI
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
-        /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (workingBeatmap == null)
-                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
 
-            this.mods = mods.ToArray();
+            if (!(beatmap is Beatmap<TObject> tBeatmap))
+                throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
+
+            Beatmap = tBeatmap;
+            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
 
             RelativeSizeAxes = Axes.Both;
-
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
