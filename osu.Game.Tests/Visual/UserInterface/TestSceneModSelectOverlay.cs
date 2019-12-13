@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var noFailMod = new OsuRuleset().GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
 
-            AddStep("set mods externally", () => { Mods.Value = new[] { noFailMod }; });
+            AddStep("set mods externally", () => { SelectedMods.Value = new[] { noFailMod }; });
 
             changeRuleset(0);
 
