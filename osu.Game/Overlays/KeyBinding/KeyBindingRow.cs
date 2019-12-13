@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,6 +13,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -150,6 +152,9 @@ namespace osu.Game.Overlays.KeyBinding
 
         private KeyButton bindTarget;
 
+        private ICollection<InputKey> previouslyHeldKeys;
+        private bool canHandleRelease;
+
         public bool AllowMainMouseButtons;
 
         public IEnumerable<KeyCombination> Defaults;
@@ -173,7 +178,8 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(keyCombinationSinceFocused(e.CurrentState));
+            canHandleRelease = true;
             return true;
         }
 
@@ -196,7 +202,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta));
+                    bindTarget.UpdateKeyCombination(keyCombinationSinceFocused(e.CurrentState, e.ScrollDelta));
                     finalise();
                     return true;
                 }
@@ -210,7 +216,8 @@ namespace osu.Game.Overlays.KeyBinding
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(keyCombinationSinceFocused(e.CurrentState));
+            canHandleRelease = true;
             if (!isModifier(e.Key)) finalise();
 
             return true;
@@ -218,7 +225,14 @@ namespace osu.Game.Overlays.KeyBinding
 
         protected override bool OnKeyUp(KeyUpEvent e)
         {
-            if (!HasFocus) return base.OnKeyUp(e);
+            if (!HasFocus)
+                return base.OnKeyUp(e);
+
+            if (!canHandleRelease)
+            {
+                previouslyHeldKeys = KeyCombination.FromInputState(e.CurrentState).Keys;
+                return true;
+            }
 
             finalise();
             return true;
@@ -229,7 +243,8 @@ namespace osu.Game.Overlays.KeyBinding
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+            bindTarget.UpdateKeyCombination(keyCombinationSinceFocused(e.CurrentState));
+            canHandleRelease = true;
             finalise();
 
             return true;
@@ -239,6 +254,12 @@ namespace osu.Game.Overlays.KeyBinding
         {
             if (!HasFocus)
                 return base.OnJoystickRelease(e);
+
+            if (!canHandleRelease)
+            {
+                previouslyHeldKeys = KeyCombination.FromInputState(e.CurrentState).Keys;
+                return true;
+            }
 
             finalise();
             return true;
@@ -279,6 +300,9 @@ namespace osu.Game.Overlays.KeyBinding
             pressAKey.FadeIn(300, Easing.OutQuint);
             pressAKey.BypassAutoSizeAxes &= ~Axes.Y;
 
+            previouslyHeldKeys = KeyCombination.FromInputState(e.CurrentState).Keys;
+            canHandleRelease = false;
+
             updateBindTarget();
             base.OnFocus(e);
         }
@@ -287,6 +311,12 @@ namespace osu.Game.Overlays.KeyBinding
         {
             finalise();
             base.OnFocusLost(e);
+        }
+
+        private KeyCombination keyCombinationSinceFocused(InputState inputState, Vector2? scrollDelta = null)
+        {
+            var currentKeys = KeyCombination.FromInputState(inputState, scrollDelta).Keys;
+            return new KeyCombination(currentKeys.Except(previouslyHeldKeys));
         }
 
         private void updateBindTarget()
