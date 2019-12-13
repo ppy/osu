@@ -239,7 +239,7 @@ namespace osu.Game.Beatmaps.ControlPoints
                     break;
 
                 case SampleControlPoint _:
-                    existing = SamplePointAt(time);
+                    existing = binarySearch(SamplePoints, time);
                     break;
 
                 case DifficultyControlPoint _:
