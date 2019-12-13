@@ -2,23 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Scoring
 {
-    public class CatchScoreProcessor : ScoreProcessor<CatchHitObject>
+    public class CatchScoreProcessor : ScoreProcessor
     {
-        public CatchScoreProcessor(DrawableRuleset<CatchHitObject> drawableRuleset)
-            : base(drawableRuleset)
+        public CatchScoreProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
         }
 
         private float hpDrainRate;
 
-        protected override void ApplyBeatmap(Beatmap<CatchHitObject> beatmap)
+        protected override void ApplyBeatmap(IBeatmap beatmap)
         {
             base.ApplyBeatmap(beatmap);
 

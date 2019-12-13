@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private IWorkingBeatmap workingBeatmap;
         private Beatmap<TObject> playableBeatmap;
         private IBeatmapProcessor beatmapProcessor;
 
@@ -71,7 +70,7 @@ namespace osu.Game.Rulesets.Edit
         {
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap, Array.Empty<Mod>()))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, playableBeatmap))
                 {
                     Clock = framedClock,
                     ProcessCustomClock = false
@@ -145,8 +144,7 @@ namespace osu.Game.Rulesets.Edit
         {
             var parentWorkingBeatmap = parent.Get<IBindable<WorkingBeatmap>>().Value;
 
-            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
-            workingBeatmap = new EditorWorkingBeatmap<TObject>(playableBeatmap, parentWorkingBeatmap);
+            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo);
 
             beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
@@ -250,7 +248,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         public void BeginPlacement(HitObject hitObject)
         {
