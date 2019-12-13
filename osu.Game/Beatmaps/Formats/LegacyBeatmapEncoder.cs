@@ -228,7 +228,7 @@ namespace osu.Game.Beatmaps.Formats
             if (hitObject is IHasCurve _)
                 hitObjectType |= LegacyHitObjectType.Slider;
             else if (hitObject is IHasEndTime _)
-                hitObjectType |= LegacyHitObjectType.Spinner;
+                hitObjectType |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
             else
                 hitObjectType |= LegacyHitObjectType.Circle;
 
