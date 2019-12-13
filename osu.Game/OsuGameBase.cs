@@ -80,7 +80,7 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
         protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
