@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            Mods.Value = new[] { new CatchModHidden() };
+            SelectedMods.Value = new[] { new CatchModHidden() };
         });
     }
 }

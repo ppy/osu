@@ -53,14 +53,14 @@ namespace osu.Game.Tests.Visual
             {
                 var noFailMod = ruleset.GetAllMods().FirstOrDefault(m => m is ModNoFail);
                 if (noFailMod != null)
-                    Mods.Value = new[] { noFailMod };
+                    SelectedMods.Value = new[] { noFailMod };
             }
 
             if (Autoplay)
             {
                 var mod = ruleset.GetAutoplayMod();
                 if (mod != null)
-                    Mods.Value = Mods.Value.Concat(mod.Yield()).ToArray();
+                    SelectedMods.Value = SelectedMods.Value.Concat(mod.Yield()).ToArray();
             }
 
             Player = CreatePlayer(ruleset);
