@@ -285,8 +285,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected class PausePlayer : TestPlayer
         {
-            public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
-
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;

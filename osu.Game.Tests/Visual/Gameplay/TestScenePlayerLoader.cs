@@ -57,8 +57,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             beforeLoadAction?.Invoke();
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(Beatmap.Value.Track);
+            foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(Beatmap.Value.Track);
 
             InputManager.Child = container = new TestPlayerLoaderContainer(
                 loader = new TestPlayerLoader(() =>

@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap, Array.Empty<Mod>())
+                    drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap.GetPlayableBeatmap(new CatchRuleset().RulesetInfo))
                 }
             });
 

@@ -8,8 +8,8 @@ using System.IO;
 using System.Linq;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.IO.File;
 using osu.Game.IO;
 using osu.Game.Storyboards;
 using osu.Game.Beatmaps.Legacy;
@@ -336,6 +336,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
+        private string cleanFilename(string path) => path.Trim('"').ToStandardisedPath();
     }
 }

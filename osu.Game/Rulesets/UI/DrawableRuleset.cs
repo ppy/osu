@@ -45,6 +45,10 @@ namespace osu.Game.Rulesets.UI
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
         where TObject : HitObject
     {
+        public override event Action<JudgementResult> OnNewResult;
+
+        public override event Action<JudgementResult> OnRevertResult;
+
         /// <summary>
         /// The selected variant.
         /// </summary>
@@ -92,19 +96,9 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public event Action<JudgementResult> OnNewResult;
-
-        /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public event Action<JudgementResult> OnRevertResult;
-
-        /// <summary>
         /// The beatmap.
         /// </summary>
-        public Beatmap<TObject> Beatmap;
+        public readonly Beatmap<TObject> Beatmap;
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
 
@@ -124,19 +118,21 @@ namespace osu.Game.Rulesets.UI
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
-        /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (workingBeatmap == null)
-                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
 
-            this.mods = mods.ToArray();
+            if (!(beatmap is Beatmap<TObject> tBeatmap))
+                throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
+
+            Beatmap = tBeatmap;
+            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
 
             RelativeSizeAxes = Axes.Both;
-
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
@@ -309,7 +305,7 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
+        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(Beatmap);
 
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
@@ -366,6 +362,16 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public abstract class DrawableRuleset : CompositeDrawable
     {
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public abstract event Action<JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public abstract event Action<JudgementResult> OnRevertResult;
+
         /// <summary>
         /// Whether a replay is currently loaded.
         /// </summary>
@@ -511,21 +517,27 @@ namespace osu.Game.Rulesets.UI
 
         public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
 
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
 
-        public BindableDouble Volume => throw new NotImplementedException();
+        public BindableNumber<double> Volume => throw new NotImplementedException();
 
-        public BindableDouble Balance => throw new NotImplementedException();
+        public BindableNumber<double> Balance => throw new NotImplementedException();
 
-        public BindableDouble Frequency => throw new NotImplementedException();
+        public BindableNumber<double> Frequency => throw new NotImplementedException();
+
+        public BindableNumber<double> Tempo => throw new NotImplementedException();
+
+        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotImplementedException();
 
         public IBindable<double> AggregateVolume => throw new NotImplementedException();
 
         public IBindable<double> AggregateBalance => throw new NotImplementedException();
 
         public IBindable<double> AggregateFrequency => throw new NotImplementedException();
+
+        public IBindable<double> AggregateTempo => throw new NotImplementedException();
 
         public int PlaybackConcurrency
         {
