@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.News;
 
@@ -37,10 +36,10 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Spacing = new osuTK.Vector2(0, 10);
 
-                var article = new NewsArticleCover.ArticleInfo()
+                var article = new NewsArticleCover.ArticleInfo
                 {
                     Author = "Ephemeral",
-                    CoverURL = "https://assets.ppy.sh/artists/58/header.jpg",
+                    CoverUrl = "https://assets.ppy.sh/artists/58/header.jpg",
                     Time = new DateTime(2019, 12, 4),
                     Title = "New Featured Artist: Kurokotei"
                 };

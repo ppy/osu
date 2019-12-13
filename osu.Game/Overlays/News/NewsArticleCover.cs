@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -31,7 +34,7 @@ namespace osu.Game.Overlays.News
                     RelativeSizeAxes = Axes.Both,
                     Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.1f))
                 },
-                new DelayedLoadWrapper(bg = new NewsBackground(info.CoverURL)
+                new DelayedLoadWrapper(bg = new NewsBackground(info.CoverUrl)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -52,7 +55,7 @@ namespace osu.Game.Overlays.News
                 },
                 new DateContainer(info.Time)
                 {
-                    Margin = new MarginPadding()
+                    Margin = new MarginPadding
                     {
                         Right = 20,
                         Top = 20,
@@ -62,7 +65,7 @@ namespace osu.Game.Overlays.News
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Margin = new MarginPadding()
+                    Margin = new MarginPadding
                     {
                         Left = 25,
                         Bottom = 50,
@@ -74,7 +77,7 @@ namespace osu.Game.Overlays.News
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Margin = new MarginPadding()
+                    Margin = new MarginPadding
                     {
                         Left = 25,
                         Bottom = 30,
@@ -132,7 +135,7 @@ namespace osu.Game.Overlays.News
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(Typeface.Exo, 12, FontWeight.Black, false, false),
                         Text = date.ToString("dd MMM yyy"),
-                        Margin = new MarginPadding()
+                        Margin = new MarginPadding
                         {
                             Vertical = 4,
                             Horizontal = 8,
@@ -148,7 +151,7 @@ namespace osu.Game.Overlays.News
         public class ArticleInfo
         {
             public string Title { get; set; }
-            public string CoverURL { get; set; }
+            public string CoverUrl { get; set; }
             public DateTime Time { get; set; }
             public string Author { get; set; }
         }
