@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"Artist: {beatmap.Metadata.Artist}"));
             writer.WriteLine(FormattableString.Invariant($"ArtistUnicode: {beatmap.Metadata.ArtistUnicode}"));
             writer.WriteLine(FormattableString.Invariant($"Creator: {beatmap.Metadata.AuthorString}"));
-            writer.WriteLine(FormattableString.Invariant($"Version: {beatmap.Metadata.Artist}"));
+            writer.WriteLine(FormattableString.Invariant($"Version: {beatmap.BeatmapInfo.Version}"));
             writer.WriteLine(FormattableString.Invariant($"Source: {beatmap.Metadata.Source}"));
             writer.WriteLine(FormattableString.Invariant($"Tags: {beatmap.Metadata.Tags}"));
             writer.WriteLine(FormattableString.Invariant($"BeatmapID: {beatmap.BeatmapInfo.OnlineBeatmapID ?? 0}"));
