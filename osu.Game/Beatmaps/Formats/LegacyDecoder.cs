@@ -148,10 +148,6 @@ namespace osu.Game.Beatmaps.Formats
             Fonts
         }
 
-
-
-
-
         internal class LegacyDifficultyControlPoint : DifficultyControlPoint
         {
             public LegacyDifficultyControlPoint()
