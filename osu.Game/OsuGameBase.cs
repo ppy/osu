@@ -246,7 +246,8 @@ namespace osu.Game
         {
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            foreach (ModType type in Enum.GetValues(typeof(ModType))) dict[type] = r.NewValue?.CreateInstance().GetModsFor(type).ToList();
+            foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                dict[type] = r.NewValue?.CreateInstance().GetModsFor(type).ToList();
 
             SelectedMods.Value = Array.Empty<Mod>();
             AvailableMods.Value = dict;
