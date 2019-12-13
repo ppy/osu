@@ -17,7 +17,7 @@ namespace osu.Game.Beatmaps.Formats
 {
     public class LegacyBeatmapEncoder
     {
-        public const int LATEST_VERSION = 14234;
+        public const int LATEST_VERSION = 128;
 
         private readonly IBeatmap beatmap;
 
