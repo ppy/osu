@@ -2,15 +2,20 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
+using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -18,26 +23,49 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private TestModSelectOverlay modSelect;
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private readonly Mod testCustomisableMod = new TestModCustomisable1();
+
+        [Test]
+        public void TestButtonShowsOnCustomisableMod()
         {
-            Add(modSelect = new TestModSelectOverlay
-            {
-                RelativeSizeAxes = Axes.X,
-                Origin = Anchor.BottomCentre,
-                Anchor = Anchor.BottomCentre,
-            });
+            createModSelect();
 
-            var testMod = new TestModCustomisable1();
-
-            AddStep("open", modSelect.Show);
+            AddStep("open", () => modSelect.Show());
             AddAssert("button disabled", () => !modSelect.CustomiseButton.Enabled.Value);
             AddUntilStep("wait for button load", () => modSelect.ButtonsLoaded);
-            AddStep("select mod", () => modSelect.SelectMod(testMod));
+            AddStep("select mod", () => modSelect.SelectMod(testCustomisableMod));
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
             AddStep("open Customisation", () => modSelect.CustomiseButton.Click());
-            AddStep("deselect mod", () => modSelect.SelectMod(testMod));
+            AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableMod));
             AddAssert("controls hidden", () => modSelect.ModSettingsContainer.Alpha == 0);
+        }
+
+        [Test]
+        public void TestButtonShowsOnModAlreadyAdded()
+        {
+            AddStep("set active mods", () => SelectedMods.Value = new List<Mod> { testCustomisableMod });
+
+            createModSelect();
+
+            AddAssert("mods still active", () => SelectedMods.Value.Count == 1);
+
+            AddStep("open", () => modSelect.Show());
+            AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
+        }
+
+        private void createModSelect()
+        {
+            AddStep("create mod select", () =>
+            {
+                Ruleset.Value = new TestRulesetInfo();
+
+                Child = modSelect = new TestModSelectOverlay
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                };
+            });
         }
 
         private class TestModSelectOverlay : ModSelectOverlay
@@ -50,24 +78,36 @@ namespace osu.Game.Tests.Visual.UserInterface
             public void SelectMod(Mod mod) =>
                 ModSectionsContainer.Children.Single(s => s.ModType == mod.Type)
                                     .ButtonsContainer.OfType<ModButton>().Single(b => b.Mods.Any(m => m.GetType() == mod.GetType())).SelectNext(1);
+        }
 
-            protected override void LoadComplete()
+        public class TestRulesetInfo : RulesetInfo
+        {
+            public override Ruleset CreateInstance() => new TestCustomisableModRuleset();
+
+            public class TestCustomisableModRuleset : Ruleset
             {
-                base.LoadComplete();
-
-                foreach (var section in ModSectionsContainer)
+                public override IEnumerable<Mod> GetModsFor(ModType type)
                 {
-                    if (section.ModType == ModType.Conversion)
+                    if (type == ModType.Conversion)
                     {
-                        section.Mods = new Mod[]
+                        return new Mod[]
                         {
                             new TestModCustomisable1(),
                             new TestModCustomisable2()
                         };
                     }
-                    else
-                        section.Mods = Array.Empty<Mod>();
+
+                    return Array.Empty<Mod>();
                 }
+
+                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
+
+                public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
+
+                public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
+
+                public override string Description { get; } = "test";
+                public override string ShortName { get; } = "tst";
             }
         }
 
