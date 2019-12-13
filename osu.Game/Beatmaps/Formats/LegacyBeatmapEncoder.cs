@@ -225,9 +225,9 @@ namespace osu.Game.Beatmaps.Formats
             LegacyHitObjectType hitObjectType = (LegacyHitObjectType)(comboData.ComboOffset << 4);
             if (comboData.NewCombo)
                 hitObjectType |= LegacyHitObjectType.NewCombo;
-            if (hitObject is IHasCurve _)
+            if (hitObject is IHasCurve)
                 hitObjectType |= LegacyHitObjectType.Slider;
-            else if (hitObject is IHasEndTime _)
+            else if (hitObject is IHasEndTime)
                 hitObjectType |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
             else
                 hitObjectType |= LegacyHitObjectType.Circle;
@@ -237,10 +237,9 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(FormattableString.Invariant($"{hitObject.StartTime},"));
             writer.Write(FormattableString.Invariant($"{(int)hitObjectType},"));
 
-            if (hitObject is IHasCurve _)
-                writer.Write(FormattableString.Invariant($"0,")); // A sound type of "none" is written since it's stored per-node
-            else
-                writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
+            writer.Write(hitObject is IHasCurve
+                ? FormattableString.Invariant($"0,")
+                : FormattableString.Invariant($"{(int)toLegacyHitSoundType(hitObject.Samples)},"));
 
             if (hitObject is IHasCurve curveData)
             {
@@ -307,10 +306,9 @@ namespace osu.Game.Beatmaps.Formats
             else if (hitObject is IHasEndTime endTimeData)
                 writer.Write(FormattableString.Invariant($"{endTimeData.EndTime},"));
 
-            if (hitObject is IHasCurve _)
-                writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true)); // A bank of "none" is written since it's stored per-node
-            else
-                writer.Write(getSampleBank(hitObject.Samples));
+            writer.Write(hitObject is IHasCurve
+                ? getSampleBank(hitObject.Samples, zeroBanks: true)
+                : getSampleBank(hitObject.Samples));
 
             writer.Write(Environment.NewLine);
         }
