@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
 
         private readonly double firstHitObjectTime;
 
-        public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
+        public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
             MinValue = 0.5,
@@ -73,7 +73,6 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.Both;
 
             track = beatmap.Track;
-            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
@@ -120,7 +119,6 @@ namespace osu.Game.Screens.Play
             Seek(startTime);
 
             adjustableClock.ProcessFrame();
-            UserPlaybackRate.ValueChanged += _ => updateRate();
         }
 
         public void Restart()
@@ -223,7 +221,8 @@ namespace osu.Game.Screens.Play
             speedAdjustmentsApplied = true;
             track.ResetSpeedAdjustments();
 
-            track.Tempo.Value = UserPlaybackRate.Value;
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
             foreach (var mod in mods.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(track);
@@ -244,8 +243,6 @@ namespace osu.Game.Screens.Play
                 track.ResetSpeedAdjustments();
                 speedAdjustmentsApplied = false;
             }
-
-            track.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
         }
     }
 }
