@@ -76,7 +76,8 @@ namespace osu.Game.Rulesets.Mods
                 CircleSize.Value = CircleSize.Default = difficulty.CircleSize;
                 ApproachRate.Value = ApproachRate.Default = difficulty.ApproachRate;
                 OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
-            } else
+            } 
+            else
             {
                 difficulty.DrainRate = DrainRate.Value;
                 difficulty.CircleSize = CircleSize.Value;
