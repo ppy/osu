@@ -43,11 +43,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestButtonShowsOnModAlreadyAdded()
         {
-            AddStep("set active mods", () => Mods.Value = new List<Mod> { testCustomisableMod });
+            AddStep("set active mods", () => SelectedMods.Value = new List<Mod> { testCustomisableMod });
 
             createModSelect();
 
-            AddAssert("mods still active", () => Mods.Value.Count == 1);
+            AddAssert("mods still active", () => SelectedMods.Value.Count == 1);
 
             AddStep("open", () => modSelect.Show());
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     return Array.Empty<Mod>();
                 }
 
-                public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => throw new NotImplementedException();
+                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => throw new NotImplementedException();
 
                 public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => throw new NotImplementedException();
 

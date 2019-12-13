@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual
 
         protected Bindable<RulesetInfo> Ruleset;
 
-        protected Bindable<IReadOnlyList<Mod>> Mods;
+        protected Bindable<IReadOnlyList<Mod>> SelectedMods;
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
 
@@ -72,8 +72,8 @@ namespace osu.Game.Tests.Visual
             Ruleset = Dependencies.Ruleset;
             Ruleset.SetDefault();
 
-            Mods = Dependencies.Mods;
-            Mods.SetDefault();
+            SelectedMods = Dependencies.Mods;
+            SelectedMods.SetDefault();
 
             if (!UseOnlineAPI)
             {

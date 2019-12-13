@@ -81,7 +81,7 @@ namespace osu.Game
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
         [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         /// <summary>
         /// Mods available for the current <see cref="Ruleset"/>.
