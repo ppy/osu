@@ -240,7 +240,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void changeRuleset(int? id)
         {
-            AddStep($"change ruleset to {(id.ToString() ?? "none")}", () => { Ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == id); });
+            AddStep($"change ruleset to {(id?.ToString() ?? "none")}", () => { Ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == id); });
             waitForLoad();
         }
 
