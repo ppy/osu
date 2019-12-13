@@ -65,12 +65,24 @@ namespace osu.Game.Rulesets.Mods
             Precision = 0.1F,
         };
 
+        private BeatmapDifficulty difficulty;
+
         public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
-            difficulty.DrainRate = DrainRate.Value;
-            difficulty.CircleSize = CircleSize.Value;
-            difficulty.ApproachRate = ApproachRate.Value;
-            difficulty.OverallDifficulty = OverallDifficulty.Value;
+            if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
+            {
+                this.difficulty = difficulty;
+                DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
+                CircleSize.Value = CircleSize.Default = difficulty.CircleSize;
+                ApproachRate.Value = ApproachRate.Default = difficulty.ApproachRate;
+                OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
+            } else
+            {
+                difficulty.DrainRate = DrainRate.Value;
+                difficulty.CircleSize = CircleSize.Value;
+                difficulty.ApproachRate = ApproachRate.Value;
+                difficulty.OverallDifficulty = OverallDifficulty.Value;
+            }
         }
     }
 }
