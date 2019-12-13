@@ -179,6 +179,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("null beatmap", () => detailsArea.Beatmap = null);
 
+            Ruleset ruleset = rulesets.AvailableRulesets.First().CreateInstance();
+
             AddStep("with EZ mod", () =>
             {
                 detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
@@ -202,7 +204,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 });
 
-                Mods.Value = new[] { rulesets.AvailableRulesets.First().CreateInstance().GetAllMods().First(m => m is ModEasy) };
+                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) };
             });
 
             AddStep("with HR mod", () =>
@@ -228,7 +230,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 });
 
-                Mods.Value = new[] { rulesets.AvailableRulesets.First().CreateInstance().GetAllMods().First(m => m is ModHardRock) };
+                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) };
             });
         }
     }

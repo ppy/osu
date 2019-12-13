@@ -24,9 +24,6 @@ namespace osu.Game.Screens.Select.Details
         [Resolved]
         private IBindable<IReadOnlyList<Mod>> mods { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private readonly StatisticRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
 
         private BeatmapInfo beatmap;
@@ -60,11 +57,10 @@ namespace osu.Game.Screens.Select.Details
                     starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
                 },
             };
-            
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
             starDifficulty.AccentColour = colours.Yellow;
             mods.ValueChanged += _ => updateStatistics();
@@ -89,31 +85,24 @@ namespace osu.Game.Screens.Select.Details
             if ((processed?.Ruleset?.ID ?? 0) == 3)
             {
                 firstValue.Title = "Key Amount";
-                firstValue.Value = (int)MathF.Round(moddedDifficulty?.CircleSize ?? 0);
+                firstValue.BaseValue = (int)MathF.Round(baseDifficulty?.CircleSize ?? 0);
+                firstValue.ModdedValue = (int)MathF.Round(moddedDifficulty?.CircleSize ?? 0);
             }
             else
             {
                 firstValue.Title = "Circle Size";
-                firstValue.Value = moddedDifficulty?.CircleSize ?? 0;
+                firstValue.BaseValue = baseDifficulty?.CircleSize ?? 0;
+                firstValue.ModdedValue = moddedDifficulty?.CircleSize ?? 0;
             }
 
-            hpDrain.Value = moddedDifficulty?.DrainRate ?? 0;
-            accuracy.Value = moddedDifficulty?.OverallDifficulty ?? 0;
-            approachRate.Value = moddedDifficulty?.ApproachRate ?? 0;
-            starDifficulty.Value = (float)(processed?.StarDifficulty ?? 0);
+            hpDrain.BaseValue = baseDifficulty?.DrainRate ?? 0;
+            accuracy.BaseValue = baseDifficulty?.OverallDifficulty ?? 0;
+            approachRate.BaseValue = baseDifficulty?.ApproachRate ?? 0;
+            starDifficulty.BaseValue = (float)(processed?.StarDifficulty ?? 0);
 
-            hpDrain.AccentColour = (moddedDifficulty?.DrainRate ?? 0) == (baseDifficulty?.DrainRate ?? 0) ?
-                Color4.White : (moddedDifficulty?.DrainRate ?? 0) < (baseDifficulty?.DrainRate ?? 0) ?
-                    colours.BlueLight : colours.RedLight;            
-            accuracy.AccentColour = (moddedDifficulty?.OverallDifficulty ?? 0) == (baseDifficulty?.OverallDifficulty ?? 0) ?
-                Color4.White : (moddedDifficulty?.OverallDifficulty ?? 0) < (baseDifficulty?.OverallDifficulty ?? 0) ?
-                    colours.BlueLight : colours.RedLight;            
-            approachRate.AccentColour = (moddedDifficulty?.ApproachRate ?? 0) == (baseDifficulty?.ApproachRate ?? 0) ?
-                Color4.White : (moddedDifficulty?.ApproachRate ?? 0) < (baseDifficulty?.ApproachRate ?? 0) ?
-                    colours.BlueLight : colours.RedLight;            
-            firstValue.AccentColour = (moddedDifficulty?.CircleSize ?? 0) == (baseDifficulty?.CircleSize ?? 0) ?
-                Color4.White : (moddedDifficulty?.CircleSize ?? 0) < (baseDifficulty?.CircleSize ?? 0) ?
-                    colours.BlueLight : colours.RedLight;
+            hpDrain.ModdedValue = moddedDifficulty?.DrainRate ?? 0;
+            accuracy.ModdedValue = moddedDifficulty?.OverallDifficulty ?? 0;
+            approachRate.ModdedValue = moddedDifficulty?.ApproachRate ?? 0;
         }
 
         private class StatisticRow : Container, IHasAccentColour
@@ -124,7 +113,10 @@ namespace osu.Game.Screens.Select.Details
             private readonly float maxValue;
             private readonly bool forceDecimalPlaces;
             private readonly OsuSpriteText name, value;
-            private readonly Bar bar;
+            private readonly Bar bar, modBar;
+
+            [Resolved]
+            private OsuColour colours { get; set; }
 
             public string Title
             {
@@ -132,16 +124,36 @@ namespace osu.Game.Screens.Select.Details
                 set => name.Text = value;
             }
 
-            private float difficultyValue;
+            private float baseValue;
 
-            public float Value
+            private float moddedValue;
+
+            public float BaseValue
             {
-                get => difficultyValue;
+                get => baseValue;
                 set
                 {
-                    difficultyValue = value;
+                    baseValue = value;
                     bar.Length = value / maxValue;
                     this.value.Text = value.ToString(forceDecimalPlaces ? "0.00" : "0.##");
+                }
+            }
+
+            public float ModdedValue
+            {
+                get => moddedValue;
+                set
+                {
+                    moddedValue = value;
+                    modBar.Length = value / maxValue;
+                    this.value.Text = value.ToString(forceDecimalPlaces ? "0.00" : "0.##");
+
+                    if (moddedValue > baseValue)
+                        modBar.AccentColour = this.value.Colour = colours.Red;
+                    else if (moddedValue < baseValue)
+                        modBar.AccentColour = this.value.Colour = colours.BlueDark;
+                    else
+                        modBar.AccentColour = this.value.Colour = Color4.White;
                 }
             }
 
@@ -176,6 +188,15 @@ namespace osu.Game.Screens.Select.Details
                         RelativeSizeAxes = Axes.X,
                         Height = 5,
                         BackgroundColour = Color4.White.Opacity(0.5f),
+                        Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
+                    },
+                    modBar = new Bar
+                    {
+                        Origin = Anchor.CentreLeft,
+                        Anchor = Anchor.CentreLeft,
+                        RelativeSizeAxes = Axes.X,
+                        Alpha = 0.5f,
+                        Height = 5,
                         Padding = new MarginPadding { Left = name_width + 10, Right = value_width + 10 },
                     },
                     new Container
