@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestNewsOverlay : NewsOverlay
         {
-            public new void LoadAndShowChild(NewsContent content) => base.LoadAndShowChild(content);
+            public new void LoadAndShowChild(NewsContent content) => base.LoadAndShowContent(content);
         }
 
         private class NewsCoverTest : NewsContent
