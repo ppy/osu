@@ -587,13 +587,16 @@ namespace osu.Game.Screens.Select
                     switch (d)
                     {
                         case DrawableCarouselBeatmapSet set:
+                        {
                             lastSet = set;
 
                             set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
                             set.MoveToY(currentY, 750, Easing.OutExpo);
                             break;
+                        }
 
                         case DrawableCarouselBeatmap beatmap:
+                        {
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
                                 scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
 
@@ -619,6 +622,7 @@ namespace osu.Game.Screens.Select
                             }
 
                             break;
+                        }
                     }
                 }
 
