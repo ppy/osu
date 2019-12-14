@@ -90,7 +90,6 @@ namespace osu.Game.Overlays.News
             bg.OnLoadComplete += d => d.FadeIn(250, Easing.In);
         }
 
-        //news article cover background
         [LongRunningLoad]
         private class NewsBackground : Sprite
         {
@@ -108,7 +107,6 @@ namespace osu.Game.Overlays.News
             }
         }
 
-        //date container
         private class DateContainer : Container, IHasTooltip
         {
             private readonly DateTime date;
@@ -134,7 +132,7 @@ namespace osu.Game.Overlays.News
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(Typeface.Exo, 12, FontWeight.Black, false, false),
-                        Text = date.ToString("dd MMM yyy"),
+                        Text = date.ToString("d MMM yyy").ToUpper(),
                         Margin = new MarginPadding
                         {
                             Vertical = 4,
@@ -144,7 +142,7 @@ namespace osu.Game.Overlays.News
                 };
             }
 
-            public string TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz");
+            public string TooltipText => date.ToString("dddd dd MMMM yyyy hh:mm:ss UTCz").ToUpper();
         }
 
         //fake API data struct to use for now as a skeleton for data, as there is no API struct for news article info for now

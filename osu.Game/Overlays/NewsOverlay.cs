@@ -59,19 +59,19 @@ namespace osu.Game.Overlays
             Current.TriggerChange();
         }
 
-        private CancellationTokenSource loadChildCancellation;
+        private CancellationTokenSource loadContentCancellation;
 
-        protected void LoadAndShowChild(NewsContent newContent)
+        protected void LoadAndShowContent(NewsContent newContent)
         {
             content.FadeTo(0.2f, 300, Easing.OutQuint);
 
-            loadChildCancellation?.Cancel();
+            loadContentCancellation?.Cancel();
 
             LoadComponentAsync(newContent, c =>
             {
                 content.Child = c;
                 content.FadeIn(300, Easing.OutQuint);
-            }, (loadChildCancellation = new CancellationTokenSource()).Token);
+            }, (loadContentCancellation = new CancellationTokenSource()).Token);
         }
 
         public void ShowFrontPage()
