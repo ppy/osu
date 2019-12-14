@@ -83,6 +83,13 @@ namespace osu.Game.Graphics.Containers
             return base.OnDragEnd(e);
         }
 
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            if (e.AltPressed) return false;
+
+            return base.OnScroll(e);
+        }
+
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
 
         protected class OsuScrollbar : ScrollbarContainer
