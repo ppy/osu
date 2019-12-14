@@ -103,6 +103,11 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Scale = new Vector2(0.8f),
                             Spacing = new Vector2(-overlap, 0)
                         };
+                
+                case OsuSkinComponents.SliderTail:
+                    if (hasHitCircle.Value)
+                        return new LegacySliderTail();
+                    return null;
             }
 
             return null;
