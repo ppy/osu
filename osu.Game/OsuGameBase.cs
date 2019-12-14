@@ -246,8 +246,11 @@ namespace osu.Game
         {
             var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
 
-            foreach (ModType type in Enum.GetValues(typeof(ModType)))
-                dict[type] = r.NewValue?.CreateInstance().GetModsFor(type).ToList();
+            if (r.NewValue?.Available == true)
+            {
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            }
 
             if (!SelectedMods.Disabled)
                 SelectedMods.Value = Array.Empty<Mod>();
