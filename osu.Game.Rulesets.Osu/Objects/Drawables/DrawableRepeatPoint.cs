@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,10 +20,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
+        private readonly Drawable circle;
 
         private double animDuration;
 
-        private readonly SkinnableDrawable scaleContainer;
+        private readonly Container scaleContainer;
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
@@ -35,15 +37,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+            InternalChild = scaleContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Icon = FontAwesome.Solid.ChevronRight,
-                Size = new Vector2(0.35f)
-            }, confineMode: ConfineMode.NoScaling)
-            {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                Children = new Drawable[]
+                {
+                    circle = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTail), _ => null)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Icon = FontAwesome.Solid.ChevronRight,
+                        Size = new Vector2(0.35f)
+                    }, confineMode: ConfineMode.NoScaling)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                }
             };
         }
 
@@ -134,6 +150,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
                 Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
+
+            circle.Rotation = -Rotation;
         }
     }
 }
