@@ -92,8 +92,8 @@ namespace osu.Game.Rulesets.Objects
             {
                 Type = SliderEventType.Tail,
                 SpanIndex = finalSpanIndex,
-                SpanStartTime = startTime + (spanCount - 1) * spanDuration,
-                Time = startTime + totalDuration,
+                SpanStartTime = finalSpanStartTime,
+                Time = finalSpanStartTime + spanDuration,
                 PathProgress = spanCount % 2,
             };
         }

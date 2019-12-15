@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
-        private readonly Drawable circle;
+        private readonly SkinnableDrawable tail;
 
         private double animDuration;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Origin = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    circle = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTail), _ => null)
+                    tail = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTail), _ => null)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
@@ -151,7 +151,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
 
-            circle.Rotation = -Rotation;
+            // Make tail underneath look upright.
+            tail.Rotation = -Rotation;
         }
     }
 }

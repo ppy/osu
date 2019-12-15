@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,8 +15,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         private readonly Slider slider;
 
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
-
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
         /// </summary>
@@ -23,9 +22,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<int> pathVersion = new Bindable<int>();
-        public readonly SkinnableDrawable CirclePiece;
+        private readonly SkinnableDrawable circlePiece;
         private readonly Container scaleContainer;
 
         public DrawableSliderTail(Slider slider, SliderTailCircle hitCircle)
@@ -55,25 +55,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Children = new Drawable[]
                     {
-                        CirclePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTail), _ => null),
+                        circlePiece = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderTail), _ => null),
                     }
                 },
             };
         }
 
-        [osu.Framework.Allocation.BackgroundDependencyLoader]
+        [BackgroundDependencyLoader]
         private void load()
         {
             scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
 
-            scaleBindable.BindTo(slider.ScaleBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
         }
 
         protected override void UpdateInitialTransforms()
         {
             base.UpdateInitialTransforms();
 
-            CirclePiece.FadeInFromZero(HitObject.TimeFadeIn);
+            circlePiece.FadeInFromZero(HitObject.TimeFadeIn);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
