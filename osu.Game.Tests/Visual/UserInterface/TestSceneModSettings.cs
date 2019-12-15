@@ -84,6 +84,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             public override Ruleset CreateInstance() => new TestCustomisableModRuleset();
 
+            public TestRulesetInfo()
+            {
+                Available = true;
+            }
+
             public class TestCustomisableModRuleset : Ruleset
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type)
