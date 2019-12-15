@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Mods
             private SkinnableSound finishSample;
 
             [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
+            private void load()
             {
                 InternalChildren = new Drawable[]
                 {
