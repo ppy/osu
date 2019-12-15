@@ -22,12 +22,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSlider : DrawableOsuHitObject, IDrawableHitObjectWithProxiedApproach
     {
         public DrawableSliderHead HeadCircle => headContainer.Child;
-        public DrawableSliderTail TailCircle => tailContainer.Child;
+        public DrawableSliderLegacyLastTick TailCircle => lastTickContainer.Child;
 
         public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
 
         private readonly Container<DrawableSliderHead> headContainer;
+        private readonly Container<DrawableSliderLegacyLastTick> lastTickContainer;
         private readonly Container<DrawableSliderTail> tailContainer;
         private readonly Container<DrawableSliderTick> tickContainer;
         private readonly Container<DrawableRepeatPoint> repeatContainer;
@@ -54,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Body = new SnakingSliderBody(s),
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
+                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)
                 {
                     GetInitialHitAction = () => HeadCircle.HitAction,
@@ -63,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 },
                 headContainer = new Container<DrawableSliderHead> { RelativeSizeAxes = Axes.Both },
-                tailContainer = new Container<DrawableSliderTail> { RelativeSizeAxes = Axes.Both },
+                lastTickContainer = new Container<DrawableSliderLegacyLastTick> { RelativeSizeAxes = Axes.Both },
             };
         }
 
@@ -107,6 +109,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     headContainer.Child = head;
                     break;
 
+                case DrawableSliderLegacyLastTick lastTick:
+                    lastTickContainer.Child = lastTick;
+                    break;
+
                 case DrawableSliderTail tail:
                     tailContainer.Child = tail;
                     break;
@@ -126,6 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.ClearNestedHitObjects();
 
             headContainer.Clear();
+            lastTickContainer.Clear();
             tailContainer.Clear();
             repeatContainer.Clear();
             tickContainer.Clear();
@@ -135,6 +142,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             switch (hitObject)
             {
+                case SliderLegacyLastTick lastTick:
+                    return new DrawableSliderLegacyLastTick(slider, lastTick);
+
                 case SliderTailCircle tail:
                     return new DrawableSliderTail(slider, tail);
 

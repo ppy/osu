@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistanceMultiplier = 1;
 
         public HitCircle HeadCircle;
-        public SliderTailCircle TailCircle;
+        public SliderLegacyLastTick LastTick;
 
         public Slider()
         {
@@ -162,9 +162,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                     case SliderEventType.LegacyLastTick:
                         // we need to use the LegacyLastTick here for compatibility reasons (difficulty).
-                        // it is *okay* to use this because the TailCircle is not used for any meaningful purpose in gameplay.
-                        // if this is to change, we should revisit this.
-                        AddNested(TailCircle = new SliderTailCircle(this)
+                        AddNested(LastTick = new SliderLegacyLastTick(this)
+                        {
+                            StartTime = e.Time,
+                            Position = EndPosition,
+                            StackHeight = StackHeight
+                        });
+                        break;
+
+                    case SliderEventType.Tail:
+                        AddNested(new SliderTailCircle(this)
                         {
                             StartTime = e.Time,
                             Position = EndPosition,
@@ -196,8 +203,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             if (HeadCircle != null)
                 HeadCircle.Position = Position;
 
-            if (TailCircle != null)
-                TailCircle.Position = EndPosition;
+            if (LastTick != null)
+                LastTick.Position = EndPosition;
         }
 
         private void updateNestedSamples()

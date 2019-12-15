@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             switch (drawable)
             {
                 case DrawableSliderHead _:
-                case DrawableSliderTail _:
+                case DrawableSliderLegacyLastTick _:
                     // special cases we should *not* be scaling.
                     break;
 

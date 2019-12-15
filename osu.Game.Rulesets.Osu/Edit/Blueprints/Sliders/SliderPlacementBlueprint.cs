@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
-            tailCirclePiece.UpdateFrom(HitObject.TailCircle);
+            tailCirclePiece.UpdateFrom(HitObject.LastTick);
         }
 
         private void setState(PlacementState newState)

@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.Replays
                     break;
 
                 case Slider slider:
-                    hitWindows = slider.TailCircle.HitWindows;
+                    hitWindows = slider.LastTick.HitWindows;
                     break;
 
                 case Spinner _:

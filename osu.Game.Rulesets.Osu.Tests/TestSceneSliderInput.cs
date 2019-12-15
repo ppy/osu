@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject),
             typeof(DrawableSliderHead),
-            typeof(DrawableSliderTail),
+            typeof(DrawableSliderLegacyLastTick),
         };
 
         private const double time_before_slider = 250;
