@@ -49,6 +49,12 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ExternalLinkWarning, true);
 
+            Set(OsuSetting.ChatHighlightName, true);
+            Set(OsuSetting.ChatMessageNotification, true);
+
+            Set(OsuSetting.HighlightWords, string.Empty);
+            Set(OsuSetting.IgnoreList, string.Empty);
+
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
@@ -180,6 +186,10 @@ namespace osu.Game.Configuration
         ScalingSizeX,
         ScalingSizeY,
         UIScale,
-        IntroSequence
+        IntroSequence,
+        ChatHighlightName,
+        ChatMessageNotification,
+        HighlightWords,
+        IgnoreList
     }
 }
