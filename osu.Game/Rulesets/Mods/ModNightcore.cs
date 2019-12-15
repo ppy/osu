@@ -55,6 +55,7 @@ namespace osu.Game.Rulesets.Mods
             private SkinnableSound clapSample;
             private SkinnableSound kickSample;
             private SkinnableSound finishSample;
+            private bool started;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -72,7 +73,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (beatIndex > -1)
+                if (!started && beatIndex == 0)
+                    started = true;
+
+                if (started && beatIndex > -1)
                 {
                     if (beatIndex % 16 == 0)
                         finishSample?.Play();
