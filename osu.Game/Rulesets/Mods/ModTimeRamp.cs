@@ -23,6 +23,9 @@ namespace osu.Game.Rulesets.Mods
         [SettingSource("Final rate", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
 
+        [SettingSource("Start wounded", "Start at 100% of the final rate")]
+        public BindableBool Reverse { get; } = new BindableBool();
+
         private double finalRateTime;
         private double beginRampTime;
 
@@ -61,7 +64,10 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
+            if (!Reverse.Value)
+                applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
+            else
+                applyAdjustment(1 - ((track.CurrentTime - beginRampTime) / finalRateTime));
         }
 
         /// <summary>
