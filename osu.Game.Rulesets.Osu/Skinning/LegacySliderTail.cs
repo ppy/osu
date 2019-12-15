@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Skinning
         [BackgroundDependencyLoader]
         private void load(DrawableHitObject drawableObject, ISkinSource skin)
         {
-            OsuHitObject osuObject = (OsuHitObject)drawableObject.HitObject;
-
             Sprite tailCircleSprite;
 
             InternalChildren = new Drawable[]

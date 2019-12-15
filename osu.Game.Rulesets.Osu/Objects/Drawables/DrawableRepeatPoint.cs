@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
         private readonly SkinnableDrawable tail;
+        private readonly SkinnableDrawable arrow;
 
         private double animDuration;
 
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+                    arrow = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
                     {
                         RelativeSizeAxes = Axes.Both,
                         Icon = FontAwesome.Solid.ChevronRight,
@@ -82,10 +83,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
-            this.Animate(
+            arrow.Animate(
                 d => d.FadeIn(animDuration),
                 d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
             );
+            this.FadeIn(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)

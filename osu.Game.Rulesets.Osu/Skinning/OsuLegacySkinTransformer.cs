@@ -107,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                 case OsuSkinComponents.SliderTail:
                     if (hasHitCircle.Value)
                         return new LegacySliderTail();
+
                     return null;
             }
 
