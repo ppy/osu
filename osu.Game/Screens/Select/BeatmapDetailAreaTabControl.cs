@@ -48,6 +48,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         RelativeSizeAxes = Axes.Both,
+                        Tabbable = true,
                     },
                 },
                 modsCheckbox = new OsuTabControlCheckbox
