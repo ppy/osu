@@ -22,6 +22,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public TestSceneBackButton()
         {
             BackButton button;
+            BackButton.Receptor receptor = new BackButton.Receptor();
 
             Child = new Container
             {
@@ -31,12 +32,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Masking = true,
                 Children = new Drawable[]
                 {
+                    receptor,
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    button = new BackButton
+                    button = new BackButton(receptor)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,

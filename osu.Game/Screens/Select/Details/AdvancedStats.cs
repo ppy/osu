@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select.Details
                 if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
                 {
                     firstValue.Title = "Key Amount";
-                    firstValue.Value = (int)Math.Round(Beatmap?.BaseDifficulty?.CircleSize ?? 0);
+                    firstValue.Value = (int)MathF.Round(Beatmap?.BaseDifficulty?.CircleSize ?? 0);
                 }
                 else
                 {

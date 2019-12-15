@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch
 {
     public class CatchRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableCatchRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
@@ -46,6 +46,11 @@ namespace osu.Game.Rulesets.Catch
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new CatchModDoubleTime();
 
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new CatchModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new CatchModSuddenDeath();
+
             if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
@@ -67,14 +72,8 @@ namespace osu.Game.Rulesets.Catch
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new CatchModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new CatchModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new CatchModRelax();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new CatchModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

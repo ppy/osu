@@ -20,7 +20,7 @@ namespace osu.Game.Online.Chat
         private static readonly Regex new_link_regex = new Regex(@"\[(?<url>[a-z]+://[^ ]+) (?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]");
 
         // [test](https://osu.ppy.sh/b/1234) -> test (https://osu.ppy.sh/b/1234) aka correct markdown format
-        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)\)");
+        private static readonly Regex markdown_link_regex = new Regex(@"\[(?<text>(((?<=\\)[\[\]])|[^\[\]])*(((?<open>\[)(((?<=\\)[\[\]])|[^\[\]])*)+((?<close-open>\])(((?<=\\)[\[\]])|[^\[\]])*)+)*(?(open)(?!)))\]\((?<url>[a-z]+://[^ ]+)(\s+(?<title>""([^""]|(?<=\\)"")*""))?\)");
 
         // advanced, RFC-compatible regular expression that matches any possible URL, *but* allows certain invalid characters that are widely used
         // This is in the format (<required>, [optional]):
@@ -81,7 +81,7 @@ namespace osu.Game.Online.Chat
                     //since we just changed the line display text, offset any already processed links.
                     result.Links.ForEach(l => l.Index -= l.Index > index ? m.Length - displayText.Length : 0);
 
-                    var details = getLinkDetails(linkText);
+                    var details = GetLinkDetails(linkText);
                     result.Links.Add(new Link(linkText, index, displayText.Length, linkActionOverride ?? details.Action, details.Argument));
 
                     //adjust the offset for processing the current matches group.
@@ -95,15 +95,21 @@ namespace osu.Game.Online.Chat
             foreach (Match m in regex.Matches(result.Text, startIndex))
             {
                 var index = m.Index;
-                var link = m.Groups["link"].Value;
-                var indexLength = link.Length;
+                var linkText = m.Groups["link"].Value;
+                var indexLength = linkText.Length;
 
-                var details = getLinkDetails(link);
-                result.Links.Add(new Link(link, index, indexLength, details.Action, details.Argument));
+                var details = GetLinkDetails(linkText);
+                var link = new Link(linkText, index, indexLength, details.Action, details.Argument);
+
+                // sometimes an already-processed formatted link can reduce to a simple URL, too
+                // (example: [mean example - https://osu.ppy.sh](https://osu.ppy.sh))
+                // therefore we need to check if any of the pre-existing links contains the raw one we found
+                if (result.Links.All(existingLink => !existingLink.Overlaps(link)))
+                    result.Links.Add(link);
             }
         }
 
-        private static LinkDetails getLinkDetails(string url)
+        public static LinkDetails GetLinkDetails(string url)
         {
             var args = url.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             args[0] = args[0].TrimEnd(':');
@@ -249,17 +255,17 @@ namespace osu.Game.Online.Chat
                 OriginalText = Text = text;
             }
         }
+    }
 
-        public class LinkDetails
+    public class LinkDetails
+    {
+        public LinkAction Action;
+        public string Argument;
+
+        public LinkDetails(LinkAction action, string argument)
         {
-            public LinkAction Action;
-            public string Argument;
-
-            public LinkDetails(LinkAction action, string argument)
-            {
-                Action = action;
-                Argument = argument;
-            }
+            Action = action;
+            Argument = argument;
         }
     }
 
@@ -273,6 +279,7 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
+        Custom
     }
 
     public class Link : IComparable<Link>
@@ -291,6 +298,8 @@ namespace osu.Game.Online.Chat
             Action = action;
             Argument = argument;
         }
+
+        public bool Overlaps(Link otherLink) => Index < otherLink.Index + otherLink.Length && otherLink.Index < Index + Length;
 
         public int CompareTo(Link otherLink) => Index > otherLink.Index ? 1 : -1;
     }

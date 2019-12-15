@@ -111,6 +111,83 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Distance Overflow 1 Repeat", () => SetContents(() => testDistanceOverflow(1)));
         }
 
+        [Test]
+        public void TestChangeStackHeight()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+                Add(slider);
+            });
+
+            AddStep("change stack height", () => slider.HitObject.StackHeight = 10);
+            AddAssert("body positioned correctly", () => slider.Position == slider.HitObject.StackedPosition);
+        }
+
+        [Test]
+        public void TestChangeSamplesWithNoNodeSamples()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+                Add(slider);
+            });
+
+            AddStep("change samples", () => slider.HitObject.Samples = new[]
+            {
+                new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP },
+                new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE },
+            });
+
+            AddAssert("head samples updated", () => assertSamples(((Slider)slider.HitObject).HeadCircle));
+            AddAssert("tick samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
+            AddAssert("repeat samples updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<RepeatPoint>().All(assertSamples));
+            AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
+
+            static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
+
+            static bool assertSamples(HitObject hitObject)
+            {
+                return hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP)
+                       && hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE);
+            }
+        }
+
+        [Test]
+        public void TestChangeSamplesWithNodeSamples()
+        {
+            DrawableSlider slider = null;
+
+            AddStep("create slider", () =>
+            {
+                slider = (DrawableSlider)createSlider(repeats: 1);
+
+                for (int i = 0; i < 2; i++)
+                    ((Slider)slider.HitObject).NodeSamples.Add(new List<HitSampleInfo> { new HitSampleInfo { Name = HitSampleInfo.HIT_FINISH } });
+
+                Add(slider);
+            });
+
+            AddStep("change samples", () => slider.HitObject.Samples = new[]
+            {
+                new HitSampleInfo { Name = HitSampleInfo.HIT_CLAP },
+                new HitSampleInfo { Name = HitSampleInfo.HIT_WHISTLE },
+            });
+
+            AddAssert("head samples not updated", () => assertSamples(((Slider)slider.HitObject).HeadCircle));
+            AddAssert("tick samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<SliderTick>().All(assertTickSamples));
+            AddAssert("repeat samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<RepeatPoint>().All(assertSamples));
+            AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
+
+            static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
+
+            static bool assertSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name != HitSampleInfo.HIT_CLAP && s.Name != HitSampleInfo.HIT_WHISTLE);
+        }
+
         private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
 
         private Drawable testSimpleBigLargeStackOffset(int repeats = 0) => createSlider(2, repeats: repeats, stackHeight: 10);
@@ -128,7 +205,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(52, -34)
                 }, 700),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats),
                 StackHeight = 10
             };
 
@@ -159,7 +235,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(distance, 0),
                 }, distance),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats),
                 StackHeight = stackHeight
             };
 
@@ -179,7 +254,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(400, 0)
                 }, 600),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -203,7 +277,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(430, 0)
                 }),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -226,7 +299,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(430, 0)
                 }),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -250,7 +322,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(0, -200)
                 }),
                 RepeatCount = repeats,
-                NodeSamples = createEmptySamples(repeats)
             };
 
             return createDrawable(slider, 2, 3);
@@ -260,7 +331,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable createCatmull(int repeats = 0)
         {
-            var repeatSamples = new List<List<HitSampleInfo>>();
+            var repeatSamples = new List<IList<HitSampleInfo>>();
             for (int i = 0; i < repeats; i++)
                 repeatSamples.Add(new List<HitSampleInfo>());
 
@@ -282,28 +353,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             return createDrawable(slider, 3, 1);
         }
 
-        private List<List<HitSampleInfo>> createEmptySamples(int repeats)
-        {
-            var repeatSamples = new List<List<HitSampleInfo>>();
-            for (int i = 0; i < repeats; i++)
-                repeatSamples.Add(new List<HitSampleInfo>());
-            return repeatSamples;
-        }
-
         private Drawable createDrawable(Slider slider, float circleSize, double speedMultiplier)
         {
             var cpi = new ControlPointInfo();
-            cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
+            cpi.Add(0, new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
 
             slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
 
-            var drawable = new DrawableSlider(slider)
-            {
-                Anchor = Anchor.Centre,
-                Depth = depthIndex++
-            };
+            var drawable = CreateDrawableSlider(slider);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;
@@ -311,12 +370,17 @@ namespace osu.Game.Rulesets.Osu.Tests
             return drawable;
         }
 
+        protected virtual DrawableSlider CreateDrawableSlider(Slider slider) => new DrawableSlider(slider)
+        {
+            Anchor = Anchor.Centre,
+            Depth = depthIndex++
+        };
+
         private float judgementOffsetDirection = 1;
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            var osuObject = judgedObject as DrawableOsuHitObject;
-            if (osuObject == null)
+            if (!(judgedObject is DrawableOsuHitObject osuObject))
                 return;
 
             OsuSpriteText text;

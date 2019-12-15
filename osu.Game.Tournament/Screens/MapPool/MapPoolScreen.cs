@@ -60,32 +60,32 @@ namespace osu.Game.Tournament.Screens.MapPool
                         {
                             Text = "Current Mode"
                         },
-                        buttonRedBan = new OsuButton
+                        buttonRedBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Ban",
                             Action = () => setMode(TeamColour.Red, ChoiceType.Ban)
                         },
-                        buttonBlueBan = new OsuButton
+                        buttonBlueBan = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Ban",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Ban)
                         },
-                        buttonRedPick = new OsuButton
+                        buttonRedPick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Red Pick",
                             Action = () => setMode(TeamColour.Red, ChoiceType.Pick)
                         },
-                        buttonBluePick = new OsuButton
+                        buttonBluePick = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Pick",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
                         },
                         new ControlPanel.Spacer(),
-                        new OsuButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Reset",
@@ -120,7 +120,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             pickColour = colour;
             pickType = choiceType;
 
-            Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
+            static Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
             buttonRedBan.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Ban);
             buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
@@ -196,7 +196,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             setNextMode();
 
-            if (pickType == ChoiceType.Pick)
+            if (pickType == ChoiceType.Pick && currentMatch.Value.PicksBans.Any(i => i.Type == ChoiceType.Pick))
             {
                 scheduledChange?.Cancel();
                 scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);

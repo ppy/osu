@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu
 {
     public class OsuRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableOsuRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
@@ -51,6 +51,11 @@ namespace osu.Game.Rulesets.Osu
                 yield return new OsuModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new OsuModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
@@ -76,17 +81,11 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new OsuModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
             if (mods.HasFlag(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
@@ -140,6 +139,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModSpinIn(),
                         new MultiMod(new OsuModGrow(), new OsuModDeflate()),
                         new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new OsuModTraceable(),
                     };
 
                 case ModType.System:
