@@ -11,10 +11,13 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
@@ -227,9 +230,28 @@ namespace osu.Game.Online.Leaderboards
                 },
             };
 
+            Add(
+                new OsuContextMenuContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[] {
+                        new ContextMenuArea{
+                            RelativeSizeAxes = Axes.Both
+                        }
+                    }
+                }
+            );
+
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
+        private class ContextMenuArea : Drawable, IHasContextMenu
+        {
+            public MenuItem[] ContextMenuItems => new MenuItem[]
+            {
+                new OsuMenuItem("Delete", MenuItemType.Destructive),
+            };
+        }
         public override void Show()
         {
             foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
