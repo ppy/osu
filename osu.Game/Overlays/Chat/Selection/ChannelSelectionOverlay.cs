@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSelectionOverlay : WaveOverlayContainer
     {
-        public static readonly float WIDTH_PADDING = 170;
+        public const float WIDTH_PADDING = 170;
 
         private const float transition_duration = 500;
 
@@ -119,7 +119,6 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     PlaceholderText = @"Search",
-                                    Exit = Hide,
                                 },
                             },
                         },

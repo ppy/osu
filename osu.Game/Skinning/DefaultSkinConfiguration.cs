@@ -14,10 +14,10 @@ namespace osu.Game.Skinning
         {
             ComboColours.AddRange(new[]
             {
-                new Color4(17, 136, 170, 255),
-                new Color4(102, 136, 0, 255),
-                new Color4(204, 102, 0, 255),
-                new Color4(121, 9, 13, 255)
+                new Color4(255, 192, 0, 255),
+                new Color4(0, 202, 0, 255),
+                new Color4(18, 124, 255, 255),
+                new Color4(242, 24, 57, 255),
             });
         }
     }

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableManiaRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModNightcore();
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new ManiaModDoubleTime();
+
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new ManiaModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new ManiaModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
@@ -97,14 +102,8 @@ namespace osu.Game.Rulesets.Mania
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new ManiaModPerfect();
-
             if (mods.HasFlag(LegacyMods.Random))
                 yield return new ManiaModRandom();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new ManiaModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

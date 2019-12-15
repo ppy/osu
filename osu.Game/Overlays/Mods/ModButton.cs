@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Mods
                 }
             }
 
-            foregroundIcon.Highlighted.Value = Selected;
+            foregroundIcon.Selected.Value = Selected;
 
             SelectionChanged?.Invoke(SelectedMod);
             return true;
@@ -167,15 +167,18 @@ namespace osu.Game.Overlays.Mods
             {
                 switch (e.Button)
                 {
-                    case MouseButton.Left:
-                        SelectNext(1);
-                        break;
-
                     case MouseButton.Right:
                         SelectNext(-1);
                         break;
                 }
             }
+
+            return true;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            SelectNext(1);
 
             return true;
         }
@@ -194,8 +197,10 @@ namespace osu.Game.Overlays.Mods
                 start = Mods.Length - 1;
 
             for (int i = start; i < Mods.Length && i >= 0; i += direction)
+            {
                 if (SelectAt(i))
                     return;
+            }
 
             Deselect();
         }

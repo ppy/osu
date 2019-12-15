@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -14,11 +16,14 @@ using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.HUD;
@@ -50,11 +55,23 @@ namespace osu.Game.Screens.Play
 
         protected override bool PlayResumeSound => false;
 
-        private Task loadTask;
+        protected Task LoadTask { get; private set; }
+
+        protected Task DisposalTask { get; private set; }
 
         private InputManager inputManager;
-
         private IdleTracker idleTracker;
+
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notificationOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private VolumeOverlay volumeOverlay { get; set; }
+
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        private Bindable<bool> muteWarningShownOnce;
 
         public PlayerLoader(Func<Player> createPlayer)
         {
@@ -68,8 +85,10 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SessionStatics sessionStatics)
         {
+            muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+
             InternalChild = (content = new LogoTrackingContainer
             {
                 Anchor = Anchor.Centre,
@@ -103,7 +122,22 @@ namespace osu.Game.Screens.Play
             loadNewPlayer();
         }
 
-        private void playerLoaded(Player player) => info.Loading = false;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+
+            if (!muteWarningShownOnce.Value)
+            {
+                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
+                {
+                    notificationOverlay?.Post(new MutedNotification());
+                    muteWarningShownOnce.Value = true;
+                }
+            }
+        }
 
         public override void OnResuming(IScreen last)
         {
@@ -127,7 +161,7 @@ namespace osu.Game.Screens.Play
             player.RestartCount = restartCount;
             player.RestartRequested = restartRequested;
 
-            loadTask = LoadComponentAsync(player, playerLoaded);
+            LoadTask = LoadComponentAsync(player, _ => info.Loading = false);
         }
 
         private void contentIn()
@@ -185,12 +219,6 @@ namespace osu.Game.Screens.Play
             content.StopTracking();
         }
 
-        protected override void LoadComplete()
-        {
-            inputManager = GetContainingInputManager();
-            base.LoadComplete();
-        }
-
         private ScheduledDelegate pushDebounce;
         protected VisualSettings VisualSettings;
 
@@ -224,7 +252,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        loadTask = null;
+                        LoadTask = null;
 
                         //By default, we want to load the player and never be returned to.
                         //Note that this may change if the player we load requested a re-run.
@@ -275,7 +303,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                loadTask?.ContinueWith(_ => player.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
             }
         }
 
@@ -471,6 +499,34 @@ namespace osu.Game.Screens.Play
                 };
 
                 Loading = true;
+            }
+        }
+
+        private class MutedNotification : SimpleNotification
+        {
+            public MutedNotification()
+            {
+                Text = "Your music volume is set to 0%! Click here to restore it.";
+            }
+
+            public override bool IsImportant => true;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
+            {
+                Icon = FontAwesome.Solid.VolumeMute;
+                IconBackgound.Colour = colours.RedDark;
+
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
+
+                    volumeOverlay.IsMuted.Value = false;
+                    audioManager.Volume.SetDefault();
+                    audioManager.VolumeTrack.SetDefault();
+
+                    return true;
+                };
             }
         }
     }

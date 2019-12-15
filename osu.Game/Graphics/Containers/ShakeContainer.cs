@@ -43,9 +43,11 @@ namespace osu.Game.Graphics.Containers
 
             // if we don't have enough time for the second shake, skip it.
             if (!maximumLength.HasValue || maximumLength >= ShakeDuration * 4)
+            {
                 sequence = sequence
                            .MoveToX(shake_amount, ShakeDuration, Easing.InOutSine).Then()
                            .MoveToX(-shake_amount, ShakeDuration, Easing.InOutSine).Then();
+            }
 
             sequence.MoveToX(0, ShakeDuration / 2, Easing.InSine);
         }
