@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show chat message notifications",
+                    LabelText = "Show private message notifications",
                     Bindable = config.GetBindable<bool>(OsuSetting.ChatMessageNotification)
                 },
             };
