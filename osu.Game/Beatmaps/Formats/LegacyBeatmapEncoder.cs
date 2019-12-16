@@ -314,17 +314,11 @@ namespace osu.Game.Beatmaps.Formats
             writer.Write(Environment.NewLine);
         }
 
-        private void handleTaikoHitObject(TextWriter writer, HitObject hitObject)
-        {
-        }
+        private void handleTaikoHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
 
-        private void handleCatchHitObject(TextWriter writer, HitObject hitObject)
-        {
-        }
+        private void handleCatchHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
 
-        private void handleManiaHitObject(TextWriter writer, HitObject hitObject)
-        {
-        }
+        private void handleManiaHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
         {
