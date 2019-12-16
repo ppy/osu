@@ -84,17 +84,25 @@ namespace osu.Game.Rulesets.Mods
                 if (!firstBeat.HasValue || beatIndex < firstBeat)
                     firstBeat = Math.Max(0, (beatIndex / 16 + 1) * 16);
 
-                if (beatIndex > firstBeat)
+                if (beatIndex >= firstBeat)
                 {
-                    if (beatIndex % 16 == 0)
+                    if (beatIndex % 16 == 0 && (beatIndex > firstBeat || !effectPoint.OmitFirstBarLine))
                         finishSample?.Play();
 
-                    if (beatIndex % 2 == 0)
-                        kickSample?.Play();
-                    else if (beatIndex % 2 == 1)
-                        clapSample?.Play();
-                    else
-                        hatSample?.Play();
+                    switch (beatIndex % (int)timingPoint.TimeSignature)
+                    {
+                        case 0:
+                            kickSample?.Play();
+                            break;
+
+                        case 2:
+                            clapSample?.Play();
+                            break;
+
+                        default:
+                            hatSample?.Play();
+                            break;
+                    }
                 }
             }
         }
