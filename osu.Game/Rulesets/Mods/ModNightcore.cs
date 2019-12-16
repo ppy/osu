@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mods
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
                 if (beatIndex < firstBeat || !firstBeat.HasValue)
-                    firstBeat = Math.Max(0, beatIndex / 16 * 16);
+                    firstBeat = Math.Max(0, (beatIndex / 16 + 1) * 16);
 
                 if (beatIndex > firstBeat)
                 {
