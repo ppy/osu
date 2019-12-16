@@ -5,7 +5,7 @@ using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mania.Difficulty.Preprocessing;
-using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Mania.Difficulty.Skills
 {
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var maniaCurrent = (ManiaDifficultyHitObject)current;
-            var endTime = (maniaCurrent.BaseObject as HoldNote)?.EndTime ?? maniaCurrent.BaseObject.StartTime;
+            var endTime = maniaCurrent.BaseObject.GetEndTime();
 
             try
             {
