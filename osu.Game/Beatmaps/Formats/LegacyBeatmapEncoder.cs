@@ -322,13 +322,13 @@ namespace osu.Game.Beatmaps.Formats
 
         private string getSampleBank(IList<HitSampleInfo> samples, bool banksOnly = false, bool zeroBanks = false)
         {
-            LegacySampleBank normalBank = toLegacySampleBank(samples.FirstOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
+            LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
             LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
 
             string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault()?.Suffix);
             string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
 
-            int volume = samples.First().Volume;
+            int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
             StringBuilder sb = new StringBuilder();
 
