@@ -180,7 +180,7 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
                 writer.Write(FormattableString.Invariant($"{(timingPoint != null ? '1' : '0')},"));
                 writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
-                writer.Write("\n");
+                writer.WriteLine();
             }
         }
 
@@ -311,7 +311,7 @@ namespace osu.Game.Beatmaps.Formats
                 ? getSampleBank(hitObject.Samples, zeroBanks: true)
                 : getSampleBank(hitObject.Samples));
 
-            writer.Write(Environment.NewLine);
+            writer.WriteLine();
         }
 
         private void handleTaikoHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
