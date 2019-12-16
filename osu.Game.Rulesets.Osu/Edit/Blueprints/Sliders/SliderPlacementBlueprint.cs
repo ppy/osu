@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
             // Todo: This should all not occur on double click, but rather if the previous control point is hovered.
-            segmentStart = HitObject.Path.ControlPoints[HitObject.Path.ControlPoints.Count - 1];
+            segmentStart = HitObject.Path.ControlPoints[^1];
             segmentStart.Type.Value = PathType.Linear;
 
             currentSegmentLength = 1;
