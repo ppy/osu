@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        HealthDisplay = CreateHealthDisplay(),
                         topScoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
@@ -90,7 +91,6 @@ namespace osu.Game.Screens.Play
                                 ComboCounter = CreateComboCounter(),
                             },
                         },
-                        HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
