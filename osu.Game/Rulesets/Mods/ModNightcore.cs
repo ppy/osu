@@ -82,7 +82,8 @@ namespace osu.Game.Rulesets.Mods
                 {
                     if (beatIndex % 16 == 0)
                         finishSample?.Play();
-                    else if (beatIndex % 2 == 0)
+
+                    if (beatIndex % 2 == 0)
                         kickSample?.Play();
                     else if (beatIndex % 2 == 1)
                         clapSample?.Play();
