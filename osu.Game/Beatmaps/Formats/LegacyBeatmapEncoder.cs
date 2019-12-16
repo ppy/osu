@@ -191,26 +191,27 @@ namespace osu.Game.Beatmaps.Formats
 
             writer.WriteLine("[HitObjects]");
 
-            foreach (var h in beatmap.HitObjects)
+            switch (beatmap.BeatmapInfo.RulesetID)
             {
-                switch (beatmap.BeatmapInfo.RulesetID)
-                {
-                    case 0:
+                case 0:
+                    foreach (var h in beatmap.HitObjects)
                         handleOsuHitObject(writer, h);
-                        break;
+                    break;
 
-                    case 1:
+                case 1:
+                    foreach (var h in beatmap.HitObjects)
                         handleTaikoHitObject(writer, h);
-                        break;
+                    break;
 
-                    case 2:
+                case 2:
+                    foreach (var h in beatmap.HitObjects)
                         handleCatchHitObject(writer, h);
-                        break;
+                    break;
 
-                    case 3:
+                case 3:
+                    foreach (var h in beatmap.HitObjects)
                         handleManiaHitObject(writer, h);
-                        break;
-                }
+                    break;
             }
         }
 
