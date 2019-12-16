@@ -99,8 +99,10 @@ namespace osu.Game.Beatmaps
         /// <returns>The applicable <see cref="IBeatmapConverter"/>.</returns>
         protected virtual IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap, Ruleset ruleset) => ruleset.CreateBeatmapConverter(beatmap);
 
-        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods)
+        public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset, IReadOnlyList<Mod> mods = null)
         {
+            mods ??= Array.Empty<Mod>();
+
             var rulesetInstance = ruleset.CreateInstance();
 
             IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
