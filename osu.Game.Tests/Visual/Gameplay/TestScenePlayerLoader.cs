@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             beforeLoadAction?.Invoke();
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToTrack>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
                 mod.ApplyToTrack(Beatmap.Value.Track);
 
             InputManager.Child = container = new TestPlayerLoaderContainer(
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestEarlyExit()
         {
-            AddStep("load dummy beatmap", () => ResetPlayer(false, () => Mods.Value = new[] { new OsuModNightcore() }));
+            AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
             AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
             AddStep("exit loader", () => loader.Exit());
@@ -123,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             TestMod playerMod1 = null;
             TestMod playerMod2 = null;
 
-            AddStep("load player", () => { ResetPlayer(true, () => Mods.Value = new[] { gameMod = new TestMod() }); });
+            AddStep("load player", () => { ResetPlayer(true, () => SelectedMods.Value = new[] { gameMod = new TestMod() }); });
 
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
