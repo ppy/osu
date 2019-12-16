@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void addToPlayfield(DrawableCatchHitObject drawable)
         {
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawableRuleset.Playfield.Add(drawable);

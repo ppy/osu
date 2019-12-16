@@ -28,18 +28,18 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
             InternalChildren = new[]
             {
+                ExpandTarget = new NonPlayfieldSprite
+                {
+                    Texture = skin.GetTexture("cursor"),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
                 new NonPlayfieldSprite
                 {
                     Texture = skin.GetTexture("cursormiddle"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
-                ExpandTarget = new NonPlayfieldSprite
-                {
-                    Texture = skin.GetTexture("cursor"),
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                }
             };
         }
 
