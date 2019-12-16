@@ -239,6 +239,9 @@ namespace osu.Game.Overlays.Chat
 
         public void ScrollToAndHighlightMessage(Message message)
         {
+            if (message is null)
+                return;
+
             var chatLine = findChatLine(message);
             scroll.ScrollTo(chatLine);
             chatLine.FlashColour(HighlightColour, 5000, Easing.InExpo);
