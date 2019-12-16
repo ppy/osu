@@ -183,7 +183,7 @@ namespace osu.Game.Overlays.Chat
 
                 if (notifyOnChat.Value && Channel.Type == ChannelType.PM)
                 {
-                    var notification = new MentionNotification(Channel, message.Sender.Username, () =>
+                    var notification = new MentionNotification(message.Sender.Username, () =>
                     {
                         channelManager.CurrentChannel.Value = Channel;
                         HighlightMessage(message);
@@ -195,7 +195,7 @@ namespace osu.Game.Overlays.Chat
 
                 if (notifyOnMention.Value && anyCaseInsensitive(words, username))
                 {
-                    var notification = new MentionNotification(Channel, message.Sender.Username, () =>
+                    var notification = new MentionNotification(message.Sender.Username, () =>
                     {
                         channelManager.CurrentChannel.Value = Channel;
                         HighlightMessage(message);
@@ -211,7 +211,7 @@ namespace osu.Game.Overlays.Chat
 
                     if (matchedWord != null)
                     {
-                        var notification = new MentionNotification(Channel, message.Sender.Username, matchedWord, () =>
+                        var notification = new MentionNotification(message.Sender.Username, matchedWord, () =>
                         {
                             channelManager.CurrentChannel.Value = Channel;
                             HighlightMessage(message);
@@ -330,8 +330,8 @@ namespace osu.Game.Overlays.Chat
 
         private class MentionNotification : SimpleNotification
         {
-            public MentionNotification(Channel channel, string username, Action onClick, bool isPm)
-                : this(channel, onClick)
+            public MentionNotification(string username, Action onClick, bool isPm)
+                : this(onClick)
             {
                 if (isPm)
                 {
@@ -345,22 +345,19 @@ namespace osu.Game.Overlays.Chat
                 }
             }
 
-            public MentionNotification(Channel channel, string highlighter, string word, Action onClick)
-                : this(channel, onClick)
+            public MentionNotification(string highlighter, string word, Action onClick)
+                : this(onClick)
             {
                 Icon = FontAwesome.Solid.Highlighter;
                 Text = $"'{word}' was mentioned in chat by '{highlighter}'. Click to find out why!";
             }
 
-            private MentionNotification(Channel channel, Action onClick)
+            private MentionNotification(Action onClick)
             {
-                this.channel = channel;
                 this.onClick = onClick;
             }
 
             private readonly Action onClick;
-
-            private readonly Channel channel;
 
             public override bool IsImportant => false;
 
