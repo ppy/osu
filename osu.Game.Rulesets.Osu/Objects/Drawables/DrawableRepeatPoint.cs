@@ -83,11 +83,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
 
-            arrow.Animate(
+            this.Animate(
                 d => d.FadeIn(animDuration),
                 d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
             );
-            this.FadeIn(HitObject.TimeFadeIn);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
