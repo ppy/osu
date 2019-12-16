@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Beatmaps;
@@ -39,9 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 TaikoHitObject h = Beatmap.HitObjects[i];
-
-                IHasEndTime endTimeData = h as IHasEndTime;
-                double endTime = endTimeData?.EndTime ?? h.StartTime;
+                double endTime = h.GetEndTime();
 
                 switch (h)
                 {

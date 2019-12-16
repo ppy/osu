@@ -1,20 +1,19 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModTimeAdjust : Mod, IApplicableToTrack
+    public abstract class ModRateAdjust : Mod, IApplicableToTrack
     {
-        public override Type[] IncompatibleMods => new[] { typeof(ModTimeRamp) };
-
-        protected abstract double RateAdjust { get; }
+        public abstract BindableNumber<double> SpeedChange { get; }
 
         public virtual void ApplyToTrack(Track track)
         {
-            track.Tempo.Value *= RateAdjust;
+            track.AddAdjustment(AdjustableProperty.Tempo, SpeedChange);
         }
     }
 }

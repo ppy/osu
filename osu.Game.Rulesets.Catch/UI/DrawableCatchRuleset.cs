@@ -25,14 +25,14 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableCatchRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableCatchRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Down;
-            TimeRange.Value = BeatmapDifficulty.DifficultyRange(beatmap.Beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
+            TimeRange.Value = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
         }
 
-        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
+        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(Beatmap);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 
