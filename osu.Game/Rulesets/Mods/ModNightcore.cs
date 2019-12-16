@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Beatmaps.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
@@ -59,6 +60,11 @@ namespace osu.Game.Rulesets.Mods
 
             private int? firstBeat;
 
+            public NightcoreBeatContainer()
+            {
+                Divisor = 2;
+            }
+
             [BackgroundDependencyLoader]
             private void load()
             {
@@ -71,9 +77,14 @@ namespace osu.Game.Rulesets.Mods
                 };
             }
 
+            private const int segment_bar_length = 4;
+
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+                int beatsPerBar = (int)timingPoint.TimeSignature;
+                int segmentLength = beatsPerBar * Divisor * segment_bar_length;
 
                 if (!IsBeatSyncedWithTrack)
                 {
@@ -82,25 +93,49 @@ namespace osu.Game.Rulesets.Mods
                 }
 
                 if (!firstBeat.HasValue || beatIndex < firstBeat)
-                    firstBeat = Math.Max(0, (beatIndex / 16 + 1) * 16);
+                    firstBeat = Math.Max(0, (beatIndex / segmentLength + 1) * segmentLength);
 
                 if (beatIndex >= firstBeat)
                 {
-                    if (beatIndex % 16 == 0 && (beatIndex > firstBeat || !effectPoint.OmitFirstBarLine))
+                    if (beatIndex % segmentLength == 0 && (beatIndex > firstBeat || !effectPoint.OmitFirstBarLine))
                         finishSample?.Play();
 
-                    switch (beatIndex % (int)timingPoint.TimeSignature)
+                    switch (timingPoint.TimeSignature)
                     {
-                        case 0:
-                            kickSample?.Play();
+                        case TimeSignatures.SimpleTriple:
+                            switch (beatIndex % 6)
+                            {
+                                case 0:
+                                    kickSample?.Play();
+                                    break;
+
+                                case 3:
+                                    clapSample?.Play();
+                                    break;
+
+                                default:
+                                    hatSample?.Play();
+                                    break;
+                            }
+
                             break;
 
-                        case 2:
-                            clapSample?.Play();
-                            break;
+                        case TimeSignatures.SimpleQuadruple:
+                            switch (beatIndex % 4)
+                            {
+                                case 0:
+                                    kickSample?.Play();
+                                    break;
 
-                        default:
-                            hatSample?.Play();
+                                case 2:
+                                    clapSample?.Play();
+                                    break;
+
+                                default:
+                                    hatSample?.Play();
+                                    break;
+                            }
+
                             break;
                     }
                 }
