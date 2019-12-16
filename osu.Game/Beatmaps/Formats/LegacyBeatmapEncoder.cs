@@ -372,7 +372,7 @@ namespace osu.Game.Beatmaps.Formats
 
         private LegacySampleBank toLegacySampleBank(string sampleBank)
         {
-            switch (sampleBank?.ToLower())
+            switch (sampleBank?.ToLowerInvariant())
             {
                 case "normal":
                     return LegacySampleBank.Normal;
