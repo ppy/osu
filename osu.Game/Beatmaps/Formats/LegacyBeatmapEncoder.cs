@@ -63,11 +63,11 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"AudioLeadIn: {beatmap.BeatmapInfo.AudioLeadIn}"));
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             // Todo: Not all countdown types are supported by lazer yet
-            writer.WriteLine(FormattableString.Invariant($"Countdown: {(beatmap.BeatmapInfo.Countdown ? "1" : "0")}"));
+            writer.WriteLine(FormattableString.Invariant($"Countdown: {(beatmap.BeatmapInfo.Countdown ? '1' : '0')}"));
             writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank(beatmap.ControlPointInfo.SamplePoints[0].SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {beatmap.BeatmapInfo.RulesetID}"));
-            writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? "1" : "0")}"));
+            writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
             // if (beatmap.BeatmapInfo.UseSkinSprites)
             //     writer.WriteLine(@"UseSkinSprites: 1");
             // if (b.AlwaysShowPlayfield)
@@ -81,8 +81,8 @@ namespace osu.Game.Beatmaps.Formats
             // if (b.CountdownOffset > 0)
             //     writer.WriteLine(@"CountdownOffset: " + b.CountdownOffset.ToString());
             if (beatmap.BeatmapInfo.RulesetID == 3)
-                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.BeatmapInfo.SpecialStyle ? "1" : "0")}"));
-            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.BeatmapInfo.WidescreenStoryboard ? "1" : "0")}"));
+                writer.WriteLine(FormattableString.Invariant($"SpecialStyle: {(beatmap.BeatmapInfo.SpecialStyle ? '1' : '0')}"));
+            writer.WriteLine(FormattableString.Invariant($"WidescreenStoryboard: {(beatmap.BeatmapInfo.WidescreenStoryboard ? '1' : '0')}"));
             // if (b.SamplesMatchPlaybackRate)
             //     writer.WriteLine(@"SamplesMatchPlaybackRate: 1");
         }
@@ -178,7 +178,7 @@ namespace osu.Game.Beatmaps.Formats
                 writer.Write(FormattableString.Invariant($"{(int)toLegacySampleBank(tempHitSample.Bank)},"));
                 writer.Write(FormattableString.Invariant($"{toLegacyCustomSampleBank(tempHitSample.Suffix)},"));
                 writer.Write(FormattableString.Invariant($"{tempHitSample.Volume},"));
-                writer.Write(FormattableString.Invariant($"{(timingPoint != null ? "1" : "0")},"));
+                writer.Write(FormattableString.Invariant($"{(timingPoint != null ? '1' : '0')},"));
                 writer.Write(FormattableString.Invariant($"{(int)effectFlags}"));
                 writer.Write("\n");
             }
