@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.Chat
                     var notification = new PrivateMessageNotification(message.Sender.Username, () =>
                     {
                         channelManager.CurrentChannel.Value = Channel;
-                        HighlightMessage(message);
+                        ScrollToAndHighlightMessage(message);
                     });
 
                     notificationOverlay?.Post(notification);
@@ -198,7 +198,7 @@ namespace osu.Game.Overlays.Chat
                     var notification = new MentionNotification(message.Sender.Username, () =>
                     {
                         channelManager.CurrentChannel.Value = Channel;
-                        HighlightMessage(message);
+                        ScrollToAndHighlightMessage(message);
                     });
 
                     notificationOverlay?.Post(notification);
@@ -214,7 +214,7 @@ namespace osu.Game.Overlays.Chat
                         var notification = new HighlightNotification(message.Sender.Username, matchedWord, () =>
                         {
                             channelManager.CurrentChannel.Value = Channel;
-                            HighlightMessage(message);
+                            ScrollToAndHighlightMessage(message);
                         });
 
                         notificationOverlay?.Post(notification);
@@ -237,7 +237,7 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        public void HighlightMessage(Message message)
+        public void ScrollToAndHighlightMessage(Message message)
         {
             var chatLine = findChatLine(message);
             scroll.ScrollTo(chatLine);
