@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Chat
 
         private void checkForMentions(IEnumerable<Message> messages)
         {
-            // only send notifications when chat overlay is **closed**
+            // only send notifications when the chat overlay is **closed** and the channel is not visible.
             if (chatOverlay?.IsPresent == true && channelManager?.CurrentChannel.Value == Channel)
                 return;
 
@@ -183,11 +183,11 @@ namespace osu.Game.Overlays.Chat
 
                 if (notifyOnChat.Value && Channel.Type == ChannelType.PM)
                 {
-                    var notification = new MentionNotification(message.Sender.Username, () =>
+                    var notification = new PrivateMessageNotification(message.Sender.Username, () =>
                     {
                         channelManager.CurrentChannel.Value = Channel;
                         HighlightMessage(message);
-                    }, true);
+                    });
 
                     notificationOverlay?.Post(notification);
                     continue;
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Chat
                     {
                         channelManager.CurrentChannel.Value = Channel;
                         HighlightMessage(message);
-                    }, false);
+                    });
 
                     notificationOverlay?.Post(notification);
                     continue;
@@ -211,7 +211,7 @@ namespace osu.Game.Overlays.Chat
 
                     if (matchedWord != null)
                     {
-                        var notification = new MentionNotification(message.Sender.Username, matchedWord, () =>
+                        var notification = new HighlightNotification(message.Sender.Username, matchedWord, () =>
                         {
                             channelManager.CurrentChannel.Value = Channel;
                             HighlightMessage(message);
@@ -328,32 +328,68 @@ namespace osu.Game.Overlays.Chat
             }
         }
 
-        private class MentionNotification : SimpleNotification
+        private class HighlightNotification : SimpleNotification
         {
-            public MentionNotification(string username, Action onClick, bool isPm)
-                : this(onClick)
-            {
-                if (isPm)
-                {
-                    Icon = FontAwesome.Solid.Envelope;
-                    Text = $"You received a private message from '{username}'. Click to read it!";
-                }
-                else
-                {
-                    Icon = FontAwesome.Solid.At;
-                    Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
-                }
-            }
-
-            public MentionNotification(string highlighter, string word, Action onClick)
-                : this(onClick)
+            public HighlightNotification(string highlighter, string word, Action onClick)
             {
                 Icon = FontAwesome.Solid.Highlighter;
                 Text = $"'{word}' was mentioned in chat by '{highlighter}'. Click to find out why!";
+                this.onClick = onClick;
             }
 
-            private MentionNotification(Action onClick)
+            private readonly Action onClick;
+
+            public override bool IsImportant => false;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
             {
+                IconBackgound.Colour = colours.PurpleDark;
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
+                    chatOverlay.Show();
+                    onClick?.Invoke();
+
+                    return true;
+                };
+            }
+        }
+
+        private class PrivateMessageNotification : SimpleNotification
+        {
+            public PrivateMessageNotification(string username, Action onClick)
+            {
+                Icon = FontAwesome.Solid.Envelope;
+                Text = $"You received a private message from '{username}'. Click to read it!";
+                this.onClick = onClick;
+            }
+
+            private readonly Action onClick;
+
+            public override bool IsImportant => false;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
+            {
+                IconBackgound.Colour = colours.PurpleDark;
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
+                    chatOverlay.Show();
+                    onClick?.Invoke();
+
+                    return true;
+                };
+            }
+        }
+
+        private class MentionNotification : SimpleNotification
+        {
+            public MentionNotification(string username, Action onClick)
+            {
+                Icon = FontAwesome.Solid.At;
+                Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
                 this.onClick = onClick;
             }
 
