@@ -22,10 +22,8 @@ namespace osu.Game.Skinning
             if (source.Files == null)
                 return null;
 
-            bool hasExtension = filename.Contains('.');
-
             var file = source.Files.Find(f =>
-                string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), filename, StringComparison.InvariantCultureIgnoreCase));
+                string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase));
             return file?.FileInfo.StoragePath;
         }
 
