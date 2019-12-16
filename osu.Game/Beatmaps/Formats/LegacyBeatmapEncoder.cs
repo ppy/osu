@@ -332,7 +332,7 @@ namespace osu.Game.Beatmaps.Formats
 
             if (!banksOnly)
             {
-                string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault()?.Suffix);
+                string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name))?.Suffix);
                 string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
                 int volume = samples.FirstOrDefault()?.Volume ?? 100;
 
