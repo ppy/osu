@@ -42,6 +42,8 @@ namespace osu.Game.Graphics.Containers
         private EffectControlPoint defaultEffect;
         private TrackAmplitudes defaultAmplitudes;
 
+        protected bool IsBeatSyncedWithTrack { get; private set; }
+
         protected override void Update()
         {
             Track track = null;
@@ -65,10 +67,16 @@ namespace osu.Game.Graphics.Containers
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
 
                 if (timingPoint.BeatLength == 0)
+                {
+                    IsBeatSyncedWithTrack = false;
                     return;
+                }
+
+                IsBeatSyncedWithTrack = true;
             }
             else
             {
+                IsBeatSyncedWithTrack = false;
                 currentTrackTime = Clock.CurrentTime;
                 timingPoint = defaultTiming;
                 effectPoint = defaultEffect;
