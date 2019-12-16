@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -55,7 +56,8 @@ namespace osu.Game.Rulesets.Mods
             private SkinnableSound clapSample;
             private SkinnableSound kickSample;
             private SkinnableSound finishSample;
-            private bool started;
+
+            private int? firstBeat;
 
             [BackgroundDependencyLoader]
             private void load()
@@ -73,10 +75,10 @@ namespace osu.Game.Rulesets.Mods
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
-                if (!started && beatIndex == 0)
-                    started = true;
+                if (beatIndex < firstBeat || !firstBeat.HasValue)
+                    firstBeat = Math.Max(0, beatIndex / 16 * 16);
 
-                if (started && beatIndex > -1)
+                if (beatIndex > firstBeat)
                 {
                     if (beatIndex % 16 == 0)
                         finishSample?.Play();
