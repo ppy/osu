@@ -325,11 +325,6 @@ namespace osu.Game.Beatmaps.Formats
             LegacySampleBank normalBank = toLegacySampleBank(samples.SingleOrDefault(s => s.Name == HitSampleInfo.HIT_NORMAL)?.Bank);
             LegacySampleBank addBank = toLegacySampleBank(samples.FirstOrDefault(s => !string.IsNullOrEmpty(s.Name) && s.Name != HitSampleInfo.HIT_NORMAL)?.Bank);
 
-            string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault()?.Suffix);
-            string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
-
-            int volume = samples.FirstOrDefault()?.Volume ?? 100;
-
             StringBuilder sb = new StringBuilder();
 
             sb.Append(FormattableString.Invariant($"{(zeroBanks ? 0 : (int)normalBank)}:"));
@@ -337,6 +332,10 @@ namespace osu.Game.Beatmaps.Formats
 
             if (!banksOnly)
             {
+                string customSampleBank = toLegacyCustomSampleBank(samples.FirstOrDefault()?.Suffix);
+                string sampleFilename = samples.FirstOrDefault(s => string.IsNullOrEmpty(s.Name))?.LookupNames.First() ?? string.Empty;
+                int volume = samples.FirstOrDefault()?.Volume ?? 100;
+
                 sb.Append(":");
                 sb.Append(FormattableString.Invariant($"{customSampleBank}:"));
                 sb.Append(FormattableString.Invariant($"{volume}:"));
