@@ -362,7 +362,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableSlider(slider);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;
