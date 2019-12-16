@@ -76,14 +76,14 @@ namespace osu.Game.Rulesets.Mods
                 };
             }
 
-            private const int segment_bar_length = 4;
+            private const int bars_per_segment = 4;
 
             protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
             {
                 base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
                 int beatsPerBar = (int)timingPoint.TimeSignature;
-                int segmentLength = beatsPerBar * Divisor * segment_bar_length;
+                int segmentLength = beatsPerBar * Divisor * bars_per_segment;
 
                 if (!IsBeatSyncedWithTrack)
                 {
