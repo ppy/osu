@@ -218,7 +218,6 @@ namespace osu.Game.Overlays.Chat
                         });
 
                         notificationOverlay?.Post(notification);
-                        continue;
                     }
                 }
             }
@@ -331,7 +330,8 @@ namespace osu.Game.Overlays.Chat
 
         private class MentionNotification : SimpleNotification
         {
-            public MentionNotification(Channel channel, string username, Action onClick, bool isPm) : this(channel, onClick)
+            public MentionNotification(Channel channel, string username, Action onClick, bool isPm)
+                : this(channel, onClick)
             {
                 if (isPm)
                 {
@@ -345,7 +345,8 @@ namespace osu.Game.Overlays.Chat
                 }
             }
 
-            public MentionNotification(Channel channel, string highlighter, string word, Action onClick) : this(channel, onClick)
+            public MentionNotification(Channel channel, string highlighter, string word, Action onClick)
+                : this(channel, onClick)
             {
                 Icon = FontAwesome.Solid.Highlighter;
                 Text = $"'{word}' was mentioned in chat by '{highlighter}'. Click to find out why!";
@@ -353,13 +354,13 @@ namespace osu.Game.Overlays.Chat
 
             private MentionNotification(Channel channel, Action onClick)
             {
-                Channel = channel;
+                this.channel = channel;
                 this.onClick = onClick;
             }
 
             private readonly Action onClick;
 
-            public Channel Channel { get; }
+            private readonly Channel channel;
 
             public override bool IsImportant => false;
 
