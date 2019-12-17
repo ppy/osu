@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.Containers
 
         private float breakLightening => LightenDuringBreaks.Value && IsBreakTime.Value ? BREAK_LIGHTEN_AMOUNT : 0;
 
-        protected float DimLevel => Math.Max(EnableUserDim.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
+        protected float DimLevel => Math.Max(EnableUserDim.Value && !IgnoreUserSettings.Value ? (float)UserDimLevel.Value - breakLightening : 0, 0);
 
         protected override Container<Drawable> Content => dimContent;
 
@@ -88,7 +88,7 @@ namespace osu.Game.Graphics.Containers
             ShowStoryboard.ValueChanged += _ => UpdateVisuals();
             ShowVideo.ValueChanged += _ => UpdateVisuals();
             StoryboardReplacesBackground.ValueChanged += _ => UpdateVisuals();
-            IgnoreUserSettings.ValueChanged += _ => updateSettings();
+            IgnoreUserSettings.ValueChanged += _ => UpdateVisuals();
         }
 
         protected override void LoadComplete()
@@ -111,14 +111,6 @@ namespace osu.Game.Graphics.Containers
 
             dimContent.FadeTo(ContentDisplayed ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             dimContent.FadeColour(OsuColour.Gray(1f - DimLevel), BACKGROUND_FADE_DURATION, Easing.OutQuint);
-        }
-
-        /// <summary>
-        /// Invoked when the IgnoreUserSettings bindable is changed
-        /// </summary>
-        private void updateSettings()
-        {
-            EnableUserDim.Value = !IgnoreUserSettings.Value;
         }
     }
 }
