@@ -50,6 +50,9 @@ namespace osu.Game.Online.Chat
 
         private IAPIProvider api;
 
+        [Resolved]
+        private MessageNotifier messageNotifier { get; set; }
+
         public readonly BindableBool HighPollRate = new BindableBool();
 
         public ChannelManager()
@@ -247,7 +250,16 @@ namespace osu.Game.Online.Chat
             var channels = JoinedChannels.ToList();
 
             foreach (var group in messages.GroupBy(m => m.ChannelId))
-                channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+            {
+                var channel = channels.Find(c => c.Id == group.Key);
+
+                if (channel == null)
+                    continue;
+
+                var groupArray = group.ToArray();
+                channel.AddNewMessages(groupArray);
+                messageNotifier.HandleMessages(channel, groupArray);
+            }
         }
 
         private void initializeChannels()

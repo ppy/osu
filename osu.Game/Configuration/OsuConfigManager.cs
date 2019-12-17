@@ -53,7 +53,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ChatMessageNotification, true);
 
             Set(OsuSetting.HighlightWords, string.Empty);
-            Set(OsuSetting.IgnoreList, string.Empty);
 
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
@@ -198,7 +197,6 @@ namespace osu.Game.Configuration
         ChatHighlightName,
         ChatMessageNotification,
         HighlightWords,
-        IgnoreList,
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource
