@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableTaikoRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableTaikoRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
         }
 
-        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(Beatmap);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 

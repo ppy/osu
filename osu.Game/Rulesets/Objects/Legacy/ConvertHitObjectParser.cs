@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 result = CreateSlider(pos, combo, comboOffset, convertControlPoints(points, pathType), length, repeatCount, nodeSamples);
 
                 // The samples are played when the slider ends, which is the last node
-                result.Samples = nodeSamples[nodeSamples.Count - 1];
+                result.Samples = nodeSamples[^1];
             }
             else if (type.HasFlag(ConvertHitObjectType.Spinner))
             {
@@ -279,7 +279,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 if (vertices[i] == vertices[i - 1])
                 {
-                    points[points.Count - 1].Type.Value = type;
+                    points[^1].Type.Value = type;
                     continue;
                 }
 
