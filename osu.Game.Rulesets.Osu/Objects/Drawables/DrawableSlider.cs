@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly SliderBall Ball;
         public readonly SkinnableDrawable Body;
 
-        private PlaySliderBody sliderBody => (PlaySliderBody)Body.Drawable;
+        private PlaySliderBody sliderBody => Body.Drawable as PlaySliderBody;
 
         private readonly Container<DrawableSliderHead> headContainer;
         private readonly Container<DrawableSliderTail> tailContainer;
@@ -154,16 +154,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             Ball.UpdateProgress(completionProgress);
-            sliderBody.UpdateProgress(completionProgress);
+            sliderBody?.UpdateProgress(completionProgress);
 
             foreach (DrawableHitObject hitObject in NestedHitObjects)
             {
-                if (hitObject is ITrackSnaking s) s.UpdateSnakingPosition(slider.Path.PositionAt(sliderBody.SnakedStart ?? 0), slider.Path.PositionAt(sliderBody.SnakedEnd ?? 0));
+                if (hitObject is ITrackSnaking s) s.UpdateSnakingPosition(slider.Path.PositionAt(sliderBody?.SnakedStart ?? 0), slider.Path.PositionAt(sliderBody?.SnakedEnd ?? 0));
                 if (hitObject is IRequireTracking t) t.Tracking = Ball.Tracking;
             }
 
-            Size = sliderBody.Size;
-            OriginPosition = sliderBody.PathOffset;
+            Size = sliderBody?.Size ?? Vector2.Zero;
+            OriginPosition = sliderBody?.PathOffset ?? Vector2.Zero;
 
             if (DrawSize != Vector2.Zero)
             {
@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public override void OnKilled()
         {
             base.OnKilled();
-            sliderBody.RecyclePath();
+            sliderBody?.RecyclePath();
         }
 
         protected override void ApplySkin(ISkinSource skin, bool allowFallback)
@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => HeadCircle.ProxiedLayer;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody.ReceivePositionalInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => sliderBody?.ReceivePositionalInputAt(screenSpacePos) ?? base.ReceivePositionalInputAt(screenSpacePos);
 
         private class DefaultSliderBody : PlaySliderBody
         {
