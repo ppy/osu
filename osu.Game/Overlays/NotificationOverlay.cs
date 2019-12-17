@@ -13,6 +13,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Overlays
         private const float width = 320;
 
         public const float TRANSITION_LENGTH = 600;
+
+        public IEnumerable<Notification> Notifications => sections.Children.SelectMany(s => s.Notifications);
 
         private FlowContainer<NotificationSection> sections;
 
