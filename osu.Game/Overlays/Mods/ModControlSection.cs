@@ -1,10 +1,10 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
@@ -12,14 +12,13 @@ using osuTK;
 
 namespace osu.Game.Overlays.Mods
 {
-    public class ModControlSection : Container
+    public class ModControlSection : CompositeDrawable
     {
         protected FillFlowContainer FlowContent;
-        protected override Container<Drawable> Content => FlowContent;
 
         public readonly Mod Mod;
 
-        public ModControlSection(Mod mod)
+        public ModControlSection(Mod mod, IEnumerable<Drawable> modControls)
         {
             Mod = mod;
 
@@ -33,9 +32,8 @@ namespace osu.Game.Overlays.Mods
                 Direction = FillDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
+                ChildrenEnumerable = modControls
             };
-
-            AddRange(Mod.CreateSettingsControls());
         }
 
         [BackgroundDependencyLoader]
