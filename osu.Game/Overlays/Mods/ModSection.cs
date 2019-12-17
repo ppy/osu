@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Mods
             }
         }
 
-        private ModButton[] buttons = { };
+        private ModButton[] buttons = Array.Empty<ModButton>();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
