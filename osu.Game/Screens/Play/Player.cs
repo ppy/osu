@@ -114,14 +114,19 @@ namespace osu.Game.Screens.Play
 
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
-            WorkingBeatmap working = loadBeatmap();
+            if (Beatmap.Value is DummyWorkingBeatmap)
+                return;
 
-            if (working == null)
+            IBeatmap playableBeatmap = loadPlayableBeatmap();
+
+            if (playableBeatmap == null)
                 return;
 
             sampleRestart = audio.Samples.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+
+            DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
             ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
             ScoreProcessor.Mods.BindTo(Mods);
@@ -129,11 +134,11 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            InternalChild = GameplayClockContainer = new GameplayClockContainer(working, Mods.Value, DrawableRuleset.GameplayStartTime);
+            InternalChild = GameplayClockContainer = new GameplayClockContainer(Beatmap.Value, Mods.Value, DrawableRuleset.GameplayStartTime);
 
             addUnderlayComponents(GameplayClockContainer);
-            addGameplayComponents(GameplayClockContainer, working);
-            addOverlayComponents(GameplayClockContainer, working);
+            addGameplayComponents(GameplayClockContainer, Beatmap.Value);
+            addOverlayComponents(GameplayClockContainer, Beatmap.Value);
 
             DrawableRuleset.HasReplayLoaded.BindValueChanged(_ => updatePauseOnFocusLostState(), true);
 
@@ -250,36 +255,32 @@ namespace osu.Game.Screens.Play
                                                      && !DrawableRuleset.HasReplayLoaded.Value
                                                      && !BreakOverlay.IsBreakTime.Value;
 
-        private WorkingBeatmap loadBeatmap()
+        private IBeatmap loadPlayableBeatmap()
         {
-            WorkingBeatmap working = Beatmap.Value;
-            if (working is DummyWorkingBeatmap)
-                return null;
+            IBeatmap playable;
 
             try
             {
-                var beatmap = working.Beatmap;
-
-                if (beatmap == null)
+                if (Beatmap.Value.Beatmap == null)
                     throw new InvalidOperationException("Beatmap was not loaded");
 
-                rulesetInfo = Ruleset.Value ?? beatmap.BeatmapInfo.Ruleset;
+                rulesetInfo = Ruleset.Value ?? Beatmap.Value.BeatmapInfo.Ruleset;
                 ruleset = rulesetInfo.CreateInstance();
 
                 try
                 {
-                    DrawableRuleset = ruleset.CreateDrawableRulesetWith(working, Mods.Value);
+                    playable = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Mods.Value);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
-                    // we may fail to create a DrawableRuleset if the beatmap cannot be loaded with the user's preferred ruleset
-                    // let's try again forcing the beatmap's ruleset.
-                    rulesetInfo = beatmap.BeatmapInfo.Ruleset;
+                    // A playable beatmap may not be creatable with the user's preferred ruleset, so try using the beatmap's default ruleset
+                    rulesetInfo = Beatmap.Value.BeatmapInfo.Ruleset;
                     ruleset = rulesetInfo.CreateInstance();
-                    DrawableRuleset = ruleset.CreateDrawableRulesetWith(Beatmap.Value, Mods.Value);
+
+                    playable = Beatmap.Value.GetPlayableBeatmap(rulesetInfo, Mods.Value);
                 }
 
-                if (!DrawableRuleset.Objects.Any())
+                if (playable.HitObjects.Count == 0)
                 {
                     Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Error);
                     return null;
@@ -292,7 +293,7 @@ namespace osu.Game.Screens.Play
                 return null;
             }
 
-            return working;
+            return playable;
         }
 
         private void performImmediateExit()
@@ -509,6 +510,11 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
             Background.BlurAmount.Value = 0;
+
+            // bind component bindables.
+            Background.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+            DimmableStoryboard.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+            DimmableVideo.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);

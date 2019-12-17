@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                 if (value != null)
                 {
-                    path.ControlPoints.AddRange(value.ControlPoints);
+                    path.ControlPoints.AddRange(value.ControlPoints.Select(c => new PathControlPoint(c.Position.Value, c.Type.Value)));
                     path.ExpectedDistance.Value = value.ExpectedDistance.Value;
                 }
             }

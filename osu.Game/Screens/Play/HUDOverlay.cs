@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
 {
     public class HUDOverlay : Container
     {
-        private const int fade_duration = 400;
+        private const float fade_duration = 400;
         private const Easing fade_easing = Easing.Out;
 
         public readonly KeyCounterDisplay KeyCounter;
@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        HealthDisplay = CreateHealthDisplay(),
                         topScoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
@@ -90,7 +91,6 @@ namespace osu.Game.Screens.Play
                                 ComboCounter = CreateComboCounter(),
                             },
                         },
-                        HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
@@ -103,8 +103,8 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomRight,
                     Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
                     AutoSizeAxes = Axes.Both,
-                    AutoSizeDuration = fade_duration,
-                    AutoSizeEasing = fade_easing,
+                    LayoutDuration = fade_duration / 2,
+                    LayoutEasing = fade_easing,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
