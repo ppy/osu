@@ -39,26 +39,14 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 Origin = Anchor.TopCentre,
             };
 
-        protected override int GetCount(User user)
+        protected override int GetCount(User user) => type switch
         {
-            switch (type)
-            {
-                default:
-                case BeatmapSetType.Favourite:
-                    return user.FavouriteBeatmapsetCount;
-
-                case BeatmapSetType.Graveyard:
-                    return user.GraveyardBeatmapsetCount;
-
-                case BeatmapSetType.Loved:
-                    return user.LovedBeatmapsetCount;
-
-                case BeatmapSetType.RankedAndApproved:
-                    return user.RankedAndApprovedBeatmapsetCount;
-
-                case BeatmapSetType.Unranked:
-                    return user.UnrankedBeatmapsetCount;
-            }
-        }
+            BeatmapSetType.Favourite => user.FavouriteBeatmapsetCount,
+            BeatmapSetType.Graveyard => user.GraveyardBeatmapsetCount,
+            BeatmapSetType.Loved => user.LovedBeatmapsetCount,
+            BeatmapSetType.RankedAndApproved => user.RankedAndApprovedBeatmapsetCount,
+            BeatmapSetType.Unranked => user.UnrankedBeatmapsetCount,
+            _ => 0
+        };
     }
 }
