@@ -108,10 +108,11 @@ namespace osu.Game.Overlays.Profile.Sections
             VisiblePages = 0;
             ItemsContainer.Clear();
 
-            count.Value = GetCount(e.NewValue);
-
             if (e.NewValue != null)
+            {
                 showMore();
+                count.Value = GetCount(e.NewValue);
+            }
         }
 
         private void showMore()
