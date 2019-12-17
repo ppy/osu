@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
-                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
+                    if (!Enum.TryParse(line[1..^1], out section))
                     {
                         Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
                         section = Section.None;
