@@ -25,6 +25,8 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Edit;
+using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania
@@ -32,7 +34,11 @@ namespace osu.Game.Rulesets.Mania
     public class ManiaRuleset : Ruleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ManiaScoreProcessor(beatmap);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
+
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
         public const string SHORT_NAME = "mania";
