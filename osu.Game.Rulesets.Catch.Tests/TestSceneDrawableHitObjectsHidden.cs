@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Game.Rulesets.Catch.Mods;
 
 namespace osu.Game.Rulesets.Catch.Tests
@@ -12,9 +13,10 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[] { typeof(CatchModHidden) }).ToList();
 
-        public TestSceneDrawableHitObjectsHidden()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            Mods.Value = new[] { new CatchModHidden() };
-        }
+            SelectedMods.Value = new[] { new CatchModHidden() };
+        });
     }
 }

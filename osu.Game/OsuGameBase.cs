@@ -80,8 +80,13 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
+        /// Mods available for the current <see cref="Ruleset"/>.
+        /// </summary>
+        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
@@ -233,6 +238,23 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
+
+            if (r.NewValue?.Available == true)
+            {
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            }
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = Array.Empty<Mod>();
+            AvailableMods.Value = dict;
         }
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();
