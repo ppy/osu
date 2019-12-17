@@ -52,11 +52,7 @@ namespace osu.Game.Screens.Select
                 new PopupDialogOkButton
                 {
                     Text = @"Yes. Please.",
-                    Action = () =>
-                    {
-                        Task.Run(() => scoreManager.Delete(score))
-                            .ContinueWith(_ => onCompletion);
-                    }
+                    Action = (() => scoreManager.Delete(score)) + onCompletion
                 },
                 new PopupDialogCancelButton
                 {
