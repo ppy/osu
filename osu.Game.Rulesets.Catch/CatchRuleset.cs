@@ -52,7 +52,9 @@ namespace osu.Game.Rulesets.Catch
             else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new CatchModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new CatchModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -102,7 +104,7 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new CatchModAutoplay(), new ModCinema()),
+                        new MultiMod(new CatchModAutoplay(), new CatchModCinema()),
                         new CatchModRelax(),
                     };
 
