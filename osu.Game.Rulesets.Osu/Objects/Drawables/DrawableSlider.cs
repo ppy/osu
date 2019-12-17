@@ -24,9 +24,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderHead HeadCircle => headContainer.Child;
         public DrawableSliderTail TailCircle => tailContainer.Child;
 
-        public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
 
+        public SnakingSliderBody Body => (SnakingSliderBody)skinnedBody.Drawable;
+
+        private readonly SkinnableDrawable skinnedBody;
         private readonly Container<DrawableSliderHead> headContainer;
         private readonly Container<DrawableSliderTail> tailContainer;
         private readonly Container<DrawableSliderTick> tickContainer;
@@ -51,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SnakingSliderBody(s),
+                skinnedBody = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBody), _ => new SnakingSliderBody(), confineMode: ConfineMode.NoScaling),
                 tickContainer = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatContainer = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
                 Ball = new SliderBall(s, this)

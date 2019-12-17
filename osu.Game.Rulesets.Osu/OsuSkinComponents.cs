@@ -14,6 +14,7 @@ namespace osu.Game.Rulesets.Osu
         ReverseArrow,
         HitCircleText,
         SliderFollowCircle,
-        SliderBall
+        SliderBall,
+        SliderBody,
     }
 }
