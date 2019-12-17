@@ -92,51 +92,55 @@ namespace osu.Game.Rulesets.Mods
                 }
 
                 if (!firstBeat.HasValue || beatIndex < firstBeat)
+                    // decide on a good starting beat index if once has not yet been decided.
                     firstBeat = beatIndex < 0 ? 0 : (beatIndex / segmentLength + 1) * segmentLength;
 
                 if (beatIndex >= firstBeat)
+                    playBeatFor(beatIndex % segmentLength, timingPoint.TimeSignature);
+            }
+
+            private void playBeatFor(int beatIndex, TimeSignatures signature)
+            {
+                if (beatIndex == 0)
+                    finishSample?.Play();
+
+                switch (signature)
                 {
-                    if (beatIndex % segmentLength == 0 && (beatIndex > firstBeat || !effectPoint.OmitFirstBarLine))
-                        finishSample?.Play();
+                    case TimeSignatures.SimpleTriple:
+                        switch (beatIndex % 6)
+                        {
+                            case 0:
+                                kickSample?.Play();
+                                break;
 
-                    switch (timingPoint.TimeSignature)
-                    {
-                        case TimeSignatures.SimpleTriple:
-                            switch (beatIndex % 6)
-                            {
-                                case 0:
-                                    kickSample?.Play();
-                                    break;
+                            case 3:
+                                clapSample?.Play();
+                                break;
 
-                                case 3:
-                                    clapSample?.Play();
-                                    break;
+                            default:
+                                hatSample?.Play();
+                                break;
+                        }
 
-                                default:
-                                    hatSample?.Play();
-                                    break;
-                            }
+                        break;
 
-                            break;
+                    case TimeSignatures.SimpleQuadruple:
+                        switch (beatIndex % 4)
+                        {
+                            case 0:
+                                kickSample?.Play();
+                                break;
 
-                        case TimeSignatures.SimpleQuadruple:
-                            switch (beatIndex % 4)
-                            {
-                                case 0:
-                                    kickSample?.Play();
-                                    break;
+                            case 2:
+                                clapSample?.Play();
+                                break;
 
-                                case 2:
-                                    clapSample?.Play();
-                                    break;
+                            default:
+                                hatSample?.Play();
+                                break;
+                        }
 
-                                default:
-                                    hatSample?.Play();
-                                    break;
-                            }
-
-                            break;
-                    }
+                        break;
                 }
             }
         }
