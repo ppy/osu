@@ -38,5 +38,27 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
             };
+
+        protected override int GetCount(User user)
+        {
+            switch (type)
+            {
+                default:
+                case BeatmapSetType.Favourite:
+                    return user.FavouriteBeatmapsetCount;
+
+                case BeatmapSetType.Graveyard:
+                    return user.GraveyardBeatmapsetCount;
+
+                case BeatmapSetType.Loved:
+                    return user.LovedBeatmapsetCount;
+
+                case BeatmapSetType.RankedAndApproved:
+                    return user.RankedAndApprovedBeatmapsetCount;
+
+                case BeatmapSetType.Unranked:
+                    return user.UnrankedBeatmapsetCount;
+            }
+        }
     }
 }

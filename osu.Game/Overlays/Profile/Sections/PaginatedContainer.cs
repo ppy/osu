@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly OsuSpriteText missingText;
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
+        private readonly BindableInt count = new BindableInt();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -44,11 +45,28 @@ namespace osu.Game.Overlays.Profile.Sections
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
+                new FillFlowContainer
                 {
-                    Text = header,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5, 0),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Text = header,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        },
+                        new CounterPill
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Current = { BindTarget = count }
+                        }
+                    }
                 },
                 ItemsContainer = new FillFlowContainer
                 {
@@ -90,6 +108,8 @@ namespace osu.Game.Overlays.Profile.Sections
             VisiblePages = 0;
             ItemsContainer.Clear();
 
+            count.Value = GetCount(e.NewValue);
+
             if (e.NewValue != null)
                 showMore();
         }
@@ -123,6 +143,8 @@ namespace osu.Game.Overlays.Profile.Sections
                 ItemsContainer.AddRange(drawables);
             }, loadCancellation.Token);
         });
+
+        protected virtual int GetCount(User user) => 0;
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 
