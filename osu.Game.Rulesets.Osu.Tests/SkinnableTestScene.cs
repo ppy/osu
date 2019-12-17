@@ -19,9 +19,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         private Skin metricsSkin;
         private Skin defaultSkin;
         private Skin specialSkin;
+        private Skin oldSkin;
 
         protected SkinnableTestScene()
-            : base(2, 2)
+            : base(2, 3)
         {
         }
 
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             metricsSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
             defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
             specialSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
+            oldSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
         }
 
         public void SetContents(Func<Drawable> creationFunction)
@@ -41,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             Cell(1).Child = createProvider(metricsSkin, creationFunction);
             Cell(2).Child = createProvider(defaultSkin, creationFunction);
             Cell(3).Child = createProvider(specialSkin, creationFunction);
+            Cell(4).Child = createProvider(oldSkin, creationFunction);
         }
 
         private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
