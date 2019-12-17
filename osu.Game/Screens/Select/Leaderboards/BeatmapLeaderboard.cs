@@ -15,6 +15,8 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
+using osu.Framework.Graphics.UserInterface;
+
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
@@ -182,12 +184,14 @@ namespace osu.Game.Screens.Select.Leaderboards
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index){
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index)
+        {
             model.Beatmap = beatmap;
-            
+
             return new LeaderboardScore(model, index, IsOnlineScope)
             {
-                Action = () => ScoreSelected?.Invoke(model)
+                Action = () => ScoreSelected?.Invoke(model),
+                RefreshAction = () => this.RefreshScores()
             };
         }
     }

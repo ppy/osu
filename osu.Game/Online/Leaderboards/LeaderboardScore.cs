@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -54,8 +55,10 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<ModIcon> modsContainer;
 
         private List<ScoreComponentLabel> statisticsLabels;
-        
+
         private DialogOverlay dialogOverlay;
+
+        public Action RefreshAction { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
         {
@@ -367,9 +370,15 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(this.score, null)))
-        };
+            get
+            {
+                return (this.allowHighlight) ? null : new MenuItem[]
+                {
+                    new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(this.score, () => Schedule(this.RefreshAction))))
+                };
+            }
+        }
     }
 }
