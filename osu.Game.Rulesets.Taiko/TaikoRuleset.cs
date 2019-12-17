@@ -15,8 +15,10 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Difficulty;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
 
@@ -25,6 +27,9 @@ namespace osu.Game.Rulesets.Taiko
     public class TaikoRuleset : Ruleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new TaikoScoreProcessor(beatmap);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
 
         public const string SHORT_NAME = "taiko";
