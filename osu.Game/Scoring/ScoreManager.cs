@@ -69,6 +69,8 @@ namespace osu.Game.Scoring
 
         protected override ArchiveDownloadRequest<ScoreInfo> CreateDownloadRequest(ScoreInfo score, bool minimiseDownload) => new DownloadReplayRequest(score);
 
-        protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items) => items.Any(s => s.Equals(model) && s.Files.Any());
+        protected override bool CheckLocalAvailability(ScoreInfo model, IQueryable<ScoreInfo> items)
+            => base.CheckLocalAvailability(model, items)
+               || (model.OnlineScoreID != null && items.Any(i => i.OnlineScoreID == model.OnlineScoreID));
     }
 }
