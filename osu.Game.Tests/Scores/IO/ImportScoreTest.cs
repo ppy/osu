@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Scores.IO
         [Test]
         public async Task TestOnlineScoreIsAvailableLocally()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestImportWithDeletedBeatmapSet"))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestOnlineScoreIsAvailableLocally"))
             {
                 try
                 {
