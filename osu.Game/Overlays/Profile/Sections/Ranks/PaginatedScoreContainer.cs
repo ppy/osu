@@ -32,6 +32,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
+        protected override int GetCount(User user)
+        {
+            switch (type)
+            {
+                default:
+                    return 0;
+
+                case ScoreType.Firsts:
+                    return user.ScoresFirstCount;
+            }
+        }
+
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {
             switch (type)
