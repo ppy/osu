@@ -14,11 +14,12 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Select;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
@@ -28,7 +29,7 @@ using osu.Game.Online.API;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer
+    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu
     {
         public const float HEIGHT = 60;
 
@@ -53,6 +54,8 @@ namespace osu.Game.Online.Leaderboards
         private FillFlowContainer<ModIcon> modsContainer;
 
         private List<ScoreComponentLabel> statisticsLabels;
+        
+        private DialogOverlay dialogOverlay;
 
         public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
         {
@@ -65,9 +68,10 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour)
+        private void load(IAPIProvider api, OsuColour colour, DialogOverlay overlay)
         {
             var user = score.User;
+            dialogOverlay = overlay;
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
@@ -230,28 +234,9 @@ namespace osu.Game.Online.Leaderboards
                 },
             };
 
-            Add(
-                new OsuContextMenuContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[] {
-                        new ContextMenuArea{
-                            RelativeSizeAxes = Axes.Both
-                        }
-                    }
-                }
-            );
-
             innerAvatar.OnLoadComplete += d => d.FadeInFromZero(200);
         }
 
-        private class ContextMenuArea : Drawable, IHasContextMenu
-        {
-            public MenuItem[] ContextMenuItems => new MenuItem[]
-            {
-                new OsuMenuItem("Delete", MenuItemType.Destructive),
-            };
-        }
         public override void Show()
         {
             foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
@@ -381,5 +366,10 @@ namespace osu.Game.Online.Leaderboards
                 Value = value;
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(this.score, null)))
+        };
     }
 }
