@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private class LegacyDrawableSliderPath : DrawableSliderPath
         {
-            public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, 0.70f);
+            public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, base.AccentColour.A * 0.70f);
 
             protected override Color4 ColourAt(float position)
             {
