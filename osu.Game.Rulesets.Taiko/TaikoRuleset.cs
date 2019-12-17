@@ -51,7 +51,9 @@ namespace osu.Game.Rulesets.Taiko
             else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new TaikoModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new TaikoModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new TaikoModAutoplay(), new ModCinema()),
+                        new MultiMod(new TaikoModAutoplay(), new TaikoModCinema()),
                         new TaikoModRelax(),
                     };
 

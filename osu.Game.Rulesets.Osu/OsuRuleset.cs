@@ -61,7 +61,9 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new OsuModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new OsuModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -127,7 +129,7 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
+                        new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                     };
