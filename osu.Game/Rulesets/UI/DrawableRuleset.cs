@@ -305,8 +305,6 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(Beatmap);
-
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
@@ -475,13 +473,6 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
-
-        /// <summary>
-        /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
-        /// <see cref="DrawableRuleset"/>.
-        /// </summary>
-        /// <returns>A score processor.</returns>
-        public abstract ScoreProcessor CreateScoreProcessor();
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException

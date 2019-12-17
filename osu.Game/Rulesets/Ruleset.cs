@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
 
@@ -61,6 +62,12 @@ namespace osu.Game.Rulesets
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+
+        /// <summary>
+        /// Creates a <see cref="ScoreProcessor"/> for a beatmap converted to this ruleset.
+        /// </summary>
+        /// <returns>The score processor.</returns>
+        public virtual ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ScoreProcessor(beatmap);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
