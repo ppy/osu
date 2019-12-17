@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Rulesets.Catch
 {
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Catch
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 

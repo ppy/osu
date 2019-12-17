@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="mods">The legacy enum which will be converted</param>
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
-        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
+        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
 
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">A variant.</param>
         /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
-        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
+        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => Array.Empty<KeyBinding>();
 
         /// <summary>
         /// Gets the name for a key binding variant. This is used for display in the settings overlay.

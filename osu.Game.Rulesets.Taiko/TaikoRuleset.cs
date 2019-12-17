@@ -18,6 +18,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -113,7 +114,7 @@ namespace osu.Game.Rulesets.Taiko
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
