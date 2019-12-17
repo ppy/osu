@@ -73,6 +73,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
                     return null;
 
+                case OsuSkinComponents.SliderBody:
+                    if (hasHitCircle.Value)
+                        return new LegacySliderBody();
+
+                    return null;
+
                 case OsuSkinComponents.HitCircle:
                     if (hasHitCircle.Value)
                         return new LegacyMainCirclePiece();
