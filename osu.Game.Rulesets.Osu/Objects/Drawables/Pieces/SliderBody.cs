@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
 
-        protected class DefaultDrawableSliderPath : DrawableSliderPath
+        private class DefaultDrawableSliderPath : DrawableSliderPath
         {
             private const float opacity_at_centre = 0.3f;
             private const float opacity_at_edge = 0.8f;
