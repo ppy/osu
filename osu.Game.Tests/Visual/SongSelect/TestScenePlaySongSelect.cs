@@ -256,17 +256,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("change ruleset", () =>
             {
-                Mods.ValueChanged += onModChange;
+                SelectedMods.ValueChanged += onModChange;
                 songSelect.Ruleset.ValueChanged += onRulesetChange;
 
                 Ruleset.Value = new TaikoRuleset().RulesetInfo;
 
-                Mods.ValueChanged -= onModChange;
+                SelectedMods.ValueChanged -= onModChange;
                 songSelect.Ruleset.ValueChanged -= onRulesetChange;
             });
 
             AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
-            AddAssert("empty mods", () => !Mods.Value.Any());
+            AddAssert("empty mods", () => !SelectedMods.Value.Any());
 
             void onModChange(ValueChangedEvent<IReadOnlyList<Mod>> e) => modChangeIndex = actionIndex++;
             void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex++;
@@ -275,7 +275,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestModsRetainedBetweenSongSelect()
         {
-            AddAssert("empty mods", () => !Mods.Value.Any());
+            AddAssert("empty mods", () => !SelectedMods.Value.Any());
 
             createSongSelect();
 
@@ -285,7 +285,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddAssert("mods retained", () => Mods.Value.Any());
+            AddAssert("mods retained", () => SelectedMods.Value.Any());
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void checkMusicPlaying(bool playing) =>
             AddUntilStep($"music {(playing ? "" : "not ")}playing", () => music.IsPlaying == playing);
 
-        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => Mods.Value = mods);
+        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => SelectedMods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
 

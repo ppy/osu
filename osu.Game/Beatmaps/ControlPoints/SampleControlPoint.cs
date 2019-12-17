@@ -70,6 +70,6 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         public override bool EquivalentTo(ControlPoint other) =>
             other is SampleControlPoint otherTyped &&
-            string.Equals(SampleBank, otherTyped.SampleBank) && SampleVolume == otherTyped.SampleVolume;
+            SampleBank == otherTyped.SampleBank && SampleVolume == otherTyped.SampleVolume;
     }
 }

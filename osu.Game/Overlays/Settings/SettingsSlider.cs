@@ -12,11 +12,11 @@ namespace osu.Game.Overlays.Settings
     {
     }
 
-    public class SettingsSlider<T, U> : SettingsItem<T>
-        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
-        where U : OsuSliderBar<T>, new()
+    public class SettingsSlider<TValue, TSlider> : SettingsItem<TValue>
+        where TValue : struct, IEquatable<TValue>, IComparable<TValue>, IConvertible
+        where TSlider : OsuSliderBar<TValue>, new()
     {
-        protected override Drawable CreateControl() => new U
+        protected override Drawable CreateControl() => new TSlider
         {
             Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X
@@ -24,14 +24,14 @@ namespace osu.Game.Overlays.Settings
 
         public bool TransferValueOnCommit
         {
-            get => ((U)Control).TransferValueOnCommit;
-            set => ((U)Control).TransferValueOnCommit = value;
+            get => ((TSlider)Control).TransferValueOnCommit;
+            set => ((TSlider)Control).TransferValueOnCommit = value;
         }
 
         public float KeyboardStep
         {
-            get => ((U)Control).KeyboardStep;
-            set => ((U)Control).KeyboardStep = value;
+            get => ((TSlider)Control).KeyboardStep;
+            set => ((TSlider)Control).KeyboardStep = value;
         }
     }
 }

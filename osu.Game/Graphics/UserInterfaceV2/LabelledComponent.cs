@@ -7,15 +7,15 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public abstract class LabelledComponent<T, U> : LabelledDrawable<T>, IHasCurrentValue<U>
-        where T : Drawable, IHasCurrentValue<U>
+    public abstract class LabelledComponent<TDrawable, TValue> : LabelledDrawable<TDrawable>, IHasCurrentValue<TValue>
+        where TDrawable : Drawable, IHasCurrentValue<TValue>
     {
         protected LabelledComponent(bool padded)
             : base(padded)
         {
         }
 
-        public Bindable<U> Current
+        public Bindable<TValue> Current
         {
             get => Component.Current;
             set => Component.Current = value;

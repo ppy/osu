@@ -195,8 +195,8 @@ namespace osu.Game.Beatmaps.ControlPoints
             if (time < list[0].Time)
                 return null;
 
-            if (time >= list[list.Count - 1].Time)
-                return list[list.Count - 1];
+            if (time >= list[^1].Time)
+                return list[^1];
 
             int l = 0;
             int r = list.Count - 2;
