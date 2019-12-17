@@ -438,6 +438,11 @@ namespace osu.Game.Overlays
             textbox.Text = string.Empty;
         }
 
+        /// <summary>
+        /// Returns the loaded drawable for a channel. Returns null if not found.
+        /// </summary>
+        public DrawableChannel GetChannelDrawable(Channel channel) => loadedChannels.Find(drawable => drawable.Channel == channel);
+
         private class TabsArea : Container
         {
             // IsHovered is used
