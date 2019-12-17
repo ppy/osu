@@ -71,7 +71,7 @@ namespace osu.Game.Storyboards.Drawables
             {
                 var framePath = Animation.Path.Replace(".", frame + ".");
 
-                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.Equals(framePath, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.Equals(framePath, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
                 if (path == null)
                     continue;
 
