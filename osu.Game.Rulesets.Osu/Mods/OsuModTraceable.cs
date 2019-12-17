@@ -55,13 +55,8 @@ namespace osu.Game.Rulesets.Osu.Mods
                     break;
 
                 case DrawableSlider slider:
-                    slider.AccentColour.BindValueChanged(_ =>
-                    {
-                        //will trigger on skin change.
-                        ((PlaySliderBody)slider.Body.Drawable).AccentColour = slider.AccentColour.Value.Opacity(0);
-                        ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
-                    }, true);
-
+                    slider.Body.OnSkinChanged += () => applySliderState(slider);
+                    applySliderState(slider);
                     break;
 
                 case DrawableSpinner spinner:
@@ -69,6 +64,12 @@ namespace osu.Game.Rulesets.Osu.Mods
                     spinner.Background.Hide();
                     break;
             }
+        }
+
+        private void applySliderState(DrawableSlider slider)
+        {
+            ((PlaySliderBody)slider.Body.Drawable).AccentColour = slider.AccentColour.Value.Opacity(0);
+            ((PlaySliderBody)slider.Body.Drawable).BorderColour = slider.AccentColour.Value;
         }
     }
 }
