@@ -15,8 +15,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 
-using osu.Framework.Graphics.UserInterface;
-
 namespace osu.Game.Screens.Select.Leaderboards
 {
     public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
