@@ -18,14 +18,9 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsTextBox
                 {
-                    LabelText = "Chat ignore list (space-separated list)",
-                    Bindable = config.GetBindable<string>(OsuSetting.IgnoreList)
-                },
-                new SettingsTextBox
-                {
                     LabelText = "Chat highlight words (space-separated list)",
                     Bindable = config.GetBindable<string>(OsuSetting.HighlightWords)
-                },
+                }
             };
         }
     }

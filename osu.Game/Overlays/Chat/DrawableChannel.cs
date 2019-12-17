@@ -33,21 +33,6 @@ namespace osu.Game.Overlays.Chat
         private OsuScrollContainer scroll;
         public ColourInfo HighlightColour { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private NotificationOverlay notificationOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ChatOverlay chatOverlay { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private ChannelManager channelManager { get; set; }
-
-        private Bindable<bool> notifyOnMention;
-        private Bindable<bool> notifyOnChat;
-        private Bindable<string> highlightWords;
-        private Bindable<string> ignoreList;
-        private Bindable<User> localUser;
-
         [Resolved]
         private OsuColour colours { get; set; }
 
@@ -58,13 +43,8 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config, IAPIProvider api)
+        private void load(OsuColour colours)
         {
-            notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
-            notifyOnChat = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
-            highlightWords = config.GetBindable<string>(OsuSetting.HighlightWords);
-            ignoreList = config.GetBindable<string>(OsuSetting.IgnoreList);
-            localUser = api.LocalUser;
             HighlightColour = colours.Blue;
 
             Child = new OsuContextMenuContainer
@@ -122,13 +102,9 @@ namespace osu.Game.Overlays.Chat
             bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
 
             // Add up to last Channel.MAX_HISTORY messages
-            var ignoredWords = getWords(ignoreList.Value);
-            var displayMessages = newMessages.Where(m => hasCaseInsensitive(getWords(m.Content), ignoredWords) == null);
-            displayMessages = displayMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
             Message lastMessage = chatLines.LastOrDefault()?.Message;
-
-            checkForMentions(displayMessages);
 
             foreach (var message in displayMessages)
             {
@@ -167,62 +143,6 @@ namespace osu.Game.Overlays.Chat
                 scrollToEnd();
         }
 
-        private void checkForMentions(IEnumerable<Message> messages)
-        {
-            // only send notifications when the chat overlay is **closed** and the channel is not visible.
-            if (chatOverlay?.IsPresent == true && channelManager?.CurrentChannel.Value == Channel)
-                return;
-
-            foreach (var message in messages)
-            {
-                var words = getWords(message.Content);
-                var username = localUser.Value.Username;
-
-                if (message.Sender.Username == username)
-                    continue;
-
-                if (notifyOnChat.Value && Channel.Type == ChannelType.PM)
-                {
-                    var notification = new PrivateMessageNotification(message.Sender.Username, () =>
-                    {
-                        channelManager.CurrentChannel.Value = Channel;
-                        ScrollToAndHighlightMessage(message);
-                    });
-
-                    notificationOverlay?.Post(notification);
-                    continue;
-                }
-
-                if (notifyOnMention.Value && anyCaseInsensitive(words, username))
-                {
-                    var notification = new MentionNotification(message.Sender.Username, () =>
-                    {
-                        channelManager.CurrentChannel.Value = Channel;
-                        ScrollToAndHighlightMessage(message);
-                    });
-
-                    notificationOverlay?.Post(notification);
-                    continue;
-                }
-
-                if (!string.IsNullOrWhiteSpace(highlightWords.Value))
-                {
-                    var matchedWord = hasCaseInsensitive(words, getWords(highlightWords.Value));
-
-                    if (matchedWord != null)
-                    {
-                        var notification = new HighlightNotification(message.Sender.Username, matchedWord, () =>
-                        {
-                            channelManager.CurrentChannel.Value = Channel;
-                            ScrollToAndHighlightMessage(message);
-                        });
-
-                        notificationOverlay?.Post(notification);
-                    }
-                }
-            }
-        }
-
         private void pendingMessageResolved(Message existing, Message updated)
         {
             var found = chatLines.LastOrDefault(c => c.Message == existing);
@@ -255,15 +175,6 @@ namespace osu.Game.Overlays.Chat
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
-
-        private string[] getWords(string input) => input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-        /// <summary>
-        /// Finds the first matching string/word in both <paramref name="x"/> and <paramref name="y"/> (case-insensitive)
-        /// </summary>
-        private string hasCaseInsensitive(IEnumerable<string> x, IEnumerable<string> y) => x.FirstOrDefault(x2 => anyCaseInsensitive(y, x2));
-
-        private bool anyCaseInsensitive(IEnumerable<string> x, string y) => x.Any(x2 => x2.Equals(y, StringComparison.InvariantCultureIgnoreCase));
 
         private ChatLine findChatLine(Message message) => chatLines.FirstOrDefault(c => c.Message == message);
 
@@ -327,90 +238,6 @@ namespace osu.Game.Overlays.Chat
                             },
                         }
                     }
-                };
-            }
-        }
-
-        private class HighlightNotification : SimpleNotification
-        {
-            public HighlightNotification(string highlighter, string word, Action onClick)
-            {
-                Icon = FontAwesome.Solid.Highlighter;
-                Text = $"'{word}' was mentioned in chat by '{highlighter}'. Click to find out why!";
-                this.onClick = onClick;
-            }
-
-            private readonly Action onClick;
-
-            public override bool IsImportant => false;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
-            {
-                IconBackgound.Colour = colours.PurpleDark;
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
-                    onClick?.Invoke();
-
-                    return true;
-                };
-            }
-        }
-
-        private class PrivateMessageNotification : SimpleNotification
-        {
-            public PrivateMessageNotification(string username, Action onClick)
-            {
-                Icon = FontAwesome.Solid.Envelope;
-                Text = $"You received a private message from '{username}'. Click to read it!";
-                this.onClick = onClick;
-            }
-
-            private readonly Action onClick;
-
-            public override bool IsImportant => false;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
-            {
-                IconBackgound.Colour = colours.PurpleDark;
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
-                    onClick?.Invoke();
-
-                    return true;
-                };
-            }
-        }
-
-        private class MentionNotification : SimpleNotification
-        {
-            public MentionNotification(string username, Action onClick)
-            {
-                Icon = FontAwesome.Solid.At;
-                Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
-                this.onClick = onClick;
-            }
-
-            private readonly Action onClick;
-
-            public override bool IsImportant => false;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
-            {
-                IconBackgound.Colour = colours.PurpleDark;
-                Activated = delegate
-                {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
-                    onClick?.Invoke();
-
-                    return true;
                 };
             }
         }
