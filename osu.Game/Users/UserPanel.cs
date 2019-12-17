@@ -63,7 +63,7 @@ namespace osu.Game.Users
         private void load(UserProfileOverlay profile)
         {
             if (colours == null)
-                throw new ArgumentNullException(nameof(colours));
+                throw new InvalidOperationException($"{nameof(colours)} not initialized!");
 
             FillFlowContainer infoContainer;
 

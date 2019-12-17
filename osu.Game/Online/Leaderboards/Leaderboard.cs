@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, ScoreInfo> : Container, IOnlineComponent
+    public abstract class Leaderboard<TScope, TScoreInfo> : Container, IOnlineComponent
     {
         private const double fade_duration = 300;
 
@@ -39,9 +39,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Container<Drawable> Content => content;
 
-        private IEnumerable<ScoreInfo> scores;
+        private IEnumerable<TScoreInfo> scores;
 
-        public IEnumerable<ScoreInfo> Scores
+        public IEnumerable<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -288,7 +288,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
+        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;
 
@@ -359,6 +359,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected abstract LeaderboardScore CreateDrawableScore(ScoreInfo model, int index);
+        protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
     }
 }
