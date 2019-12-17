@@ -89,7 +89,7 @@ namespace osu.Game.Graphics.Containers
 
             double beatLength = timingPoint.BeatLength / Divisor;
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength);
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)
