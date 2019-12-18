@@ -25,14 +25,20 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Edit;
+using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania
 {
     public class ManiaRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableManiaRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ManiaScoreProcessor(beatmap);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
+
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
 
         public const string SHORT_NAME = "mania";
@@ -51,7 +57,9 @@ namespace osu.Game.Rulesets.Mania
             else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new ManiaModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new ManiaModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new ManiaModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -149,7 +157,7 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new ManiaModAutoplay(), new ModCinema()),
+                        new MultiMod(new ManiaModAutoplay(), new ManiaModCinema()),
                     };
 
                 case ModType.Fun:
@@ -159,7 +167,7 @@ namespace osu.Game.Rulesets.Mania
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -178,11 +186,6 @@ namespace osu.Game.Rulesets.Mania
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaRulesetConfigManager(settings, RulesetInfo);
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
-
-        public ManiaRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
 
         public override IEnumerable<int> AvailableVariants
         {
@@ -269,7 +272,7 @@ namespace osu.Game.Rulesets.Mania
                     return stage1Bindings.Concat(stage2Bindings);
             }
 
-            return new KeyBinding[0];
+            return Array.Empty<KeyBinding>();
         }
 
         public override string GetVariantName(int variant)

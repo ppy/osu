@@ -14,8 +14,6 @@ using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Osu.Scoring;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK;
@@ -26,14 +24,12 @@ namespace osu.Game.Rulesets.Osu.UI
     {
         protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
-        public DrawableOsuRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true; // always show the gameplay cursor
-
-        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
