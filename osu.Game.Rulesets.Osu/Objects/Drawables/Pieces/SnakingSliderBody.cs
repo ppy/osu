@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -50,16 +51,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// </summary>
         private Vector2 snakedPathOffset;
 
-        private readonly Slider slider;
-
-        public SnakingSliderBody(Slider slider)
-        {
-            this.slider = slider;
-        }
+        private Slider slider;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject drawableObject)
         {
+            slider = (Slider)drawableObject.HitObject;
+
             Refresh();
         }
 
