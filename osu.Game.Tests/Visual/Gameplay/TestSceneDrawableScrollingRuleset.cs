@@ -194,11 +194,6 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScrollingRuleset : Ruleset
         {
-            public TestScrollingRuleset(RulesetInfo rulesetInfo = null)
-                : base(rulesetInfo)
-            {
-            }
-
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new TestDrawableScrollingRuleset(this, beatmap, mods);
