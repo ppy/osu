@@ -84,7 +84,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new Spinner
                 {
                     Position = new Vector2(256, 192),
-                    EndTime = 5000,
+                    EndTime = 6000,
                 },
                 // placeholder object to avoid hitting the results screen
                 new HitObject
