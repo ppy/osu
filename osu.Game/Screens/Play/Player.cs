@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
-            ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
+            ScoreProcessor = ruleset.CreateScoreProcessor(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
             if (!ScoreProcessor.Mode.Disabled)
