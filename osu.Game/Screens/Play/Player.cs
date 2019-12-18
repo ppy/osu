@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
-        private BreakOverlay breakOverlay;
+        public BreakOverlay BreakOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
         protected DrawableRuleset DrawableRuleset { get; private set; }
@@ -80,8 +80,8 @@ namespace osu.Game.Screens.Play
 
         protected GameplayClockContainer GameplayClockContainer { get; private set; }
 
-        protected DimmableStoryboard DimmableStoryboard { get; private set; }
-        protected DimmableVideo DimmableVideo { get; private set; }
+        public DimmableStoryboard DimmableStoryboard { get; private set; }
+        public DimmableVideo DimmableVideo { get; private set; }
 
         [Cached]
         [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
-            ScoreProcessor = DrawableRuleset.CreateScoreProcessor();
+            ScoreProcessor = ruleset.CreateScoreProcessor(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
             if (!ScoreProcessor.Mode.Disabled)
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
-            breakOverlay.IsBreakTime.ValueChanged += _ => updatePauseOnFocusLostState();
+            BreakOverlay.IsBreakTime.ValueChanged += _ => updatePauseOnFocusLostState();
         }
 
         private void addUnderlayComponents(Container target)
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                breakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
+                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Play
         private void updatePauseOnFocusLostState() =>
             HUDOverlay.HoldToQuit.PauseOnFocusLost = PauseOnFocusLost
                                                      && !DrawableRuleset.HasReplayLoaded.Value
-                                                     && !breakOverlay.IsBreakTime.Value;
+                                                     && !BreakOverlay.IsBreakTime.Value;
 
         private IBeatmap loadPlayableBeatmap()
         {
@@ -478,7 +478,7 @@ namespace osu.Game.Screens.Play
             PauseOverlay.Hide();
 
             // breaks and time-based conditions may allow instant resume.
-            if (breakOverlay.IsBreakTime.Value)
+            if (BreakOverlay.IsBreakTime.Value)
                 completeResume();
             else
                 DrawableRuleset.RequestResume(completeResume);
@@ -512,9 +512,9 @@ namespace osu.Game.Screens.Play
             Background.BlurAmount.Value = 0;
 
             // bind component bindables.
-            Background.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
-            DimmableStoryboard.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
-            DimmableVideo.IsBreakTime.BindTo(breakOverlay.IsBreakTime);
+            Background.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+            DimmableStoryboard.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
+            DimmableVideo.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             DimmableStoryboard.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
@@ -523,6 +523,9 @@ namespace osu.Game.Screens.Play
 
             GameplayClockContainer.Restart();
             GameplayClockContainer.FadeInFromZero(750, Easing.OutQuint);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToPlayer>())
+                mod.ApplyToPlayer(this);
 
             foreach (var mod in Mods.Value.OfType<IApplicableToHUD>())
                 mod.ApplyToHUD(HUDOverlay);

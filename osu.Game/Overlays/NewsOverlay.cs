@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -16,7 +17,6 @@ namespace osu.Game.Overlays
     {
         private NewsHeader header;
 
-        //ReSharper disable NotAccessedField.Local
         private Container<NewsContent> content;
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
@@ -57,6 +57,21 @@ namespace osu.Game.Overlays
 
             header.Current.BindTo(Current);
             Current.TriggerChange();
+        }
+
+        private CancellationTokenSource loadContentCancellation;
+
+        protected void LoadAndShowContent(NewsContent newContent)
+        {
+            content.FadeTo(0.2f, 300, Easing.OutQuint);
+
+            loadContentCancellation?.Cancel();
+
+            LoadComponentAsync(newContent, c =>
+            {
+                content.Child = c;
+                content.FadeIn(300, Easing.OutQuint);
+            }, (loadContentCancellation = new CancellationTokenSource()).Token);
         }
 
         public void ShowFrontPage()
