@@ -8,21 +8,44 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable
+    public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
         public StoryboardAnimation Animation { get; private set; }
 
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
 
+        private Vector2 vectorScale = Vector2.One;
+
+        public Vector2 VectorScale
+        {
+            get => vectorScale;
+            set
+            {
+                if (Math.Abs(value.X) < Precision.FLOAT_EPSILON)
+                    value.X = Precision.FLOAT_EPSILON;
+                if (Math.Abs(value.Y) < Precision.FLOAT_EPSILON)
+                    value.Y = Precision.FLOAT_EPSILON;
+
+                if (vectorScale == value)
+                    return;
+
+                if (!Validation.IsFinite(value)) throw new ArgumentException($@"{nameof(VectorScale)} must be finite, but is {value}.");
+
+                vectorScale = value;
+                Invalidate(Invalidation.MiscGeometry);
+            }
+        }
+
         public override bool RemoveWhenNotAlive => false;
 
         protected override Vector2 DrawScale
-            => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y);
+            => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y) * VectorScale;
 
         public override Anchor Origin
         {
