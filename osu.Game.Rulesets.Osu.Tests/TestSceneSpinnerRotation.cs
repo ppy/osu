@@ -70,6 +70,19 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is rotation absolute almost same", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, estimatedRotation, 100));
         }
 
+        [Test]
+        public void TestSpinPerMinuteOnRewind()
+        {
+            double estimatedSpm = 0;
+
+            addSeekStep(2500);
+            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
+
+            addSeekStep(5000);
+            addSeekStep(2500);
+            AddAssert("is spm almost same", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+        }
+
         private void addSeekStep(double time)
         {
             AddStep($"seek to {time}", () => track.Seek(time));
