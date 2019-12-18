@@ -93,21 +93,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         private TestStates getNextState(TestStates state)
-        {
-            switch (state)
+            => state switch
             {
-                case TestStates.State1:
-                    return TestStates.State2;
-
-                case TestStates.State2:
-                    return TestStates.State3;
-
-                case TestStates.State3:
-                    return TestStates.State1;
-            }
-
-            return TestStates.State1;
-        }
+                TestStates.State1 => TestStates.State2,
+                TestStates.State2 => TestStates.State3,
+                TestStates.State3 => TestStates.State1,
+                _ => TestStates.State1,
+            };
 
         private class TestMenuItem : StatefulMenuItem<TestStates>
         {
@@ -117,22 +109,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             public override IconUsage? GetIconForState(TestStates state)
-            {
-                switch (state)
+                => state switch
                 {
-                    case TestStates.State1:
-                        return FontAwesome.Solid.DiceOne;
-
-                    case TestStates.State2:
-                        return FontAwesome.Solid.DiceTwo;
-
-                    case TestStates.State3:
-                        return FontAwesome.Solid.DiceThree;
-
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(state), state, null);
-                }
-            }
+                    TestStates.State1 => FontAwesome.Solid.DiceOne,
+                    TestStates.State2 => FontAwesome.Solid.DiceTwo,
+                    TestStates.State3 => FontAwesome.Solid.DiceThree,
+                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, null),
+                };
         }
 
         private enum TestStates

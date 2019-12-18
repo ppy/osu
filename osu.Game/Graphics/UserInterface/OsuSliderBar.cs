@@ -138,12 +138,12 @@ namespace osu.Game.Graphics.UserInterface
             lastSampleValue = value;
 
             lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
-
-            if (NormalizedValue == 0)
-                sample.Frequency.Value -= 0.4f;
-            else if (NormalizedValue == 1)
-                sample.Frequency.Value += 0.4f;
+            sample.Frequency.Value = NormalizedValue switch
+            {
+                0 => 0.6f,
+                1 => 1.4f,
+                var other => 1 + other * 0.2f,
+            };
 
             sample.Play();
         }

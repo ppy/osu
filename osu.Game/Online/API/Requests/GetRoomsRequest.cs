@@ -24,7 +24,7 @@ namespace osu.Game.Online.API.Requests
                 PrimaryFilter.Owned => "rooms/owned",
                 PrimaryFilter.Participated => "rooms/participated",
                 PrimaryFilter.RecentlyEnded => "rooms/ended",
-                _ => throw new ArgumentException($"Unknown enum member {nameof(PrimaryFilter)} {primaryFilter}"),
+                _ => throw new InvalidOperationException($"Unknown enum member {nameof(PrimaryFilter)} {primaryFilter}"),
             };
     }
 }

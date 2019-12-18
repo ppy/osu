@@ -189,36 +189,30 @@ namespace osu.Game.Tournament.Components
                 srExtra = "*";
             }
 
-            (string heading, string content)[] stats;
-
-            switch (ruleset.Value.ID)
+            (string heading, string content)[] stats = ruleset.Value.ID switch
             {
-                default:
-                    stats = new (string heading, string content)[]
-                    {
-                        ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
-                        ("AR", $"{ar:0.#}{hardRockExtra}"),
-                        ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                    };
-                    break;
-
-                case 1:
-                case 3:
-                    stats = new (string heading, string content)[]
-                    {
-                        ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
-                        ("HP", $"{beatmap.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
-                    };
-                    break;
-
-                case 2:
-                    stats = new (string heading, string content)[]
-                    {
-                        ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
-                        ("AR", $"{ar:0.#}"),
-                    };
-                    break;
-            }
+                1 => new[]
+                {
+                    ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                    ("HP", $"{beatmap.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
+                },
+                2 => new[]
+                {
+                    ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                    ("AR", $"{ar:0.#}"),
+                },
+                3 => new[]
+                {
+                    ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                    ("HP", $"{beatmap.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
+                },
+                _ => new[]
+                {
+                    ("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                    ("AR", $"{ar:0.#}{hardRockExtra}"),
+                    ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                },
+            };
 
             panelContents.Children = new Drawable[]
             {

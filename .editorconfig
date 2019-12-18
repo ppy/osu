@@ -178,7 +178,7 @@ csharp_prefer_static_local_function = true:warning
 csharp_prefer_simple_using_statement = true:silent
 csharp_style_prefer_index_operator = true:warning
 csharp_style_prefer_range_operator = true:warning
-csharp_style_prefer_switch_expression = false:none
+csharp_style_prefer_switch_expression = true:warning
 
 #Supressing roslyn built-in analyzers
 # Suppress: EC112

@@ -94,13 +94,12 @@ namespace osu.Game.Screens.Select
 
         private static void updateCriteriaText(ref FilterCriteria.OptionalTextFilter textFilter, string op, string value)
         {
-            switch (op)
+            textFilter.SearchTerm = op switch
             {
-                case "=":
-                case ":":
-                    textFilter.SearchTerm = value.Trim('"');
-                    break;
-            }
+                "=" => value.Trim('"'),
+                ":" => value.Trim('"'),
+                _ => textFilter.SearchTerm,
+            };
         }
 
         private static void updateCriteriaRange(ref FilterCriteria.OptionalRange<float> range, string op, float value, float tolerance = 0.05f)

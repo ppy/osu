@@ -74,17 +74,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 foreach (var cached in hitObjectInitialStateCache.Values)
                     cached.Invalidate();
 
-                switch (direction.Value)
+                scrollLength = direction.Value switch
                 {
-                    case ScrollingDirection.Up:
-                    case ScrollingDirection.Down:
-                        scrollLength = DrawSize.Y;
-                        break;
-
-                    default:
-                        scrollLength = DrawSize.X;
-                        break;
-                }
+                    ScrollingDirection.Up => DrawSize.Y,
+                    ScrollingDirection.Down => DrawSize.Y,
+                    _ => DrawSize.X,
+                };
 
                 scrollingInfo.Algorithm.Reset();
 

@@ -97,19 +97,13 @@ namespace osu.Desktop
             client.SetPresence(presence);
         }
 
-        private string getDetails(UserActivity activity)
-        {
-            switch (activity)
+        private string getDetails(UserActivity activity) =>
+            activity switch
             {
-                case UserActivity.SoloGame solo:
-                    return solo.Beatmap.ToString();
-
-                case UserActivity.Editing edit:
-                    return edit.Beatmap.ToString();
-            }
-
-            return string.Empty;
-        }
+                UserActivity.SoloGame solo => solo.Beatmap.ToString(),
+                UserActivity.Editing edit => edit.Beatmap.ToString(),
+                _ => string.Empty
+            };
 
         protected override void Dispose(bool isDisposing)
         {

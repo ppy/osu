@@ -250,21 +250,12 @@ namespace osu.Game.Beatmaps.Formats
 
             if (comboData.NewCombo) type |= LegacyHitObjectType.NewCombo;
 
-            switch (hitObject)
+            type |= hitObject switch
             {
-                case IHasCurve _:
-                    type |= LegacyHitObjectType.Slider;
-                    break;
-
-                case IHasEndTime _:
-                    type |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
-                    break;
-
-                default:
-                    type |= LegacyHitObjectType.Circle;
-                    break;
-            }
-
+                IHasCurve _ => LegacyHitObjectType.Slider,
+                IHasEndTime _ => LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo,
+                _ => LegacyHitObjectType.Circle,
+            };
             return type;
         }
 
@@ -389,20 +380,13 @@ namespace osu.Game.Beatmaps.Formats
 
         private LegacySampleBank toLegacySampleBank(string sampleBank)
         {
-            switch (sampleBank?.ToLowerInvariant())
+            return (sampleBank?.ToLowerInvariant()) switch
             {
-                case "normal":
-                    return LegacySampleBank.Normal;
-
-                case "soft":
-                    return LegacySampleBank.Soft;
-
-                case "drum":
-                    return LegacySampleBank.Drum;
-
-                default:
-                    return LegacySampleBank.None;
-            }
+                "normal" => LegacySampleBank.Normal,
+                "soft" => LegacySampleBank.Soft,
+                "drum" => LegacySampleBank.Drum,
+                _ => LegacySampleBank.None,
+            };
         }
 
         private string toLegacyCustomSampleBank(string sampleSuffix) => string.IsNullOrEmpty(sampleSuffix) ? "0" : sampleSuffix;

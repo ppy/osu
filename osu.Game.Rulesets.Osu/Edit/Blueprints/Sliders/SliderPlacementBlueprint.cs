@@ -143,21 +143,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updatePathType()
         {
-            switch (currentSegmentLength)
+            segmentStart.Type.Value = currentSegmentLength switch
             {
-                case 1:
-                case 2:
-                    segmentStart.Type.Value = PathType.Linear;
-                    break;
-
-                case 3:
-                    segmentStart.Type.Value = PathType.PerfectCurve;
-                    break;
-
-                default:
-                    segmentStart.Type.Value = PathType.Bezier;
-                    break;
-            }
+                1 => PathType.Linear,
+                2 => PathType.Linear,
+                3 => PathType.PerfectCurve,
+                _ => PathType.Bezier,
+            };
         }
 
         private void ensureCursor()
