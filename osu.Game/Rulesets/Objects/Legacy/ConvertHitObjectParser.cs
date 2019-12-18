@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 int repeatCount = Parsing.ParseInt(split[6]);
 
                 if (repeatCount > 9000)
-                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+                    throw new FormatException(@"Repeat count is way too high");
 
                 // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                 repeatCount = Math.Max(0, repeatCount - 1);
