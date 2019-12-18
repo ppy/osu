@@ -29,26 +29,24 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override void UpdateItems(List<APILegacyScoreInfo> items)
-        {
-            foreach (var item in items)
-                item.Ruleset = Rulesets.GetRuleset(item.RulesetID);
-
-            base.UpdateItems(items);
-        }
-
         protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
             new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
+
+        protected override int GetCount(User user) => type switch
+        {
+            ScoreType.Firsts => user.ScoresFirstCount,
+            _ => 0
+        };
 
         protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
         {
             switch (type)
             {
                 default:
-                    return new DrawablePerformanceScore(model, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
+                    return new DrawablePerformanceScore(model.CreateScoreInfo(Rulesets), includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
 
                 case ScoreType.Recent:
-                    return new DrawableTotalScore(model);
+                    return new DrawableTotalScore(model.CreateScoreInfo(Rulesets));
             }
         }
     }

@@ -80,8 +80,13 @@ namespace osu.Game
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+
+        /// <summary>
+        /// Mods available for the current <see cref="Ruleset"/>.
+        /// </summary>
+        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
 
         protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
@@ -131,29 +136,29 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+            AddFont(Resources, @"Fonts/osuFont");
+            AddFont(Resources, @"Fonts/Exo2.0-Medium");
+            AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Hangul"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Compatibility"));
+            AddFont(Resources, @"Fonts/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Bold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+            AddFont(Resources, @"Fonts/Exo2.0-Regular");
+            AddFont(Resources, @"Fonts/Exo2.0-RegularItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-SemiBold");
+            AddFont(Resources, @"Fonts/Exo2.0-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Bold");
+            AddFont(Resources, @"Fonts/Exo2.0-BoldItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Light");
+            AddFont(Resources, @"Fonts/Exo2.0-LightItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Black");
+            AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Medium"));
+            AddFont(Resources, @"Fonts/Venera");
+            AddFont(Resources, @"Fonts/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera-Medium");
 
             runMigrations();
 
@@ -233,6 +238,23 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
+
+            if (r.NewValue?.Available == true)
+            {
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            }
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = Array.Empty<Mod>();
+            AvailableMods.Value = dict;
         }
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();

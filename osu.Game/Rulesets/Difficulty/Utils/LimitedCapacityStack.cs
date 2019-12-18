@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         public LimitedCapacityStack(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(capacity));
 
             this.capacity = capacity;
             array = new T[capacity];
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Difficulty.Utils
             get
             {
                 if (i < 0 || i > Count - 1)
-                    throw new IndexOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(i));
 
                 i += marker;
                 if (i > capacity - 1)

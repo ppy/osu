@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap, Array.Empty<Mod>())
+                    drawableRuleset = new DrawableCatchRuleset(new CatchRuleset(), beatmap.GetPlayableBeatmap(new CatchRuleset().RulesetInfo))
                 }
             });
 
@@ -151,7 +151,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         private void addToPlayfield(DrawableCatchHitObject drawable)
         {
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawableRuleset.Playfield.Add(drawable);

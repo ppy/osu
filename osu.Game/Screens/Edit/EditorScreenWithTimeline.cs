@@ -20,6 +20,8 @@ namespace osu.Game.Screens.Edit
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
+        private TimelineArea timelineArea;
+
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
@@ -64,7 +66,7 @@ namespace osu.Game.Screens.Edit
                                                     {
                                                         RelativeSizeAxes = Axes.Both,
                                                         Padding = new MarginPadding { Right = 5 },
-                                                        Child = CreateTimeline()
+                                                        Child = timelineArea = CreateTimelineArea()
                                                     },
                                                     new BeatDivisorControl(beatDivisor) { RelativeSizeAxes = Axes.Both }
                                                 },
@@ -97,11 +99,15 @@ namespace osu.Game.Screens.Edit
             {
                 mainContent.Add(content);
                 content.FadeInFromZero(300, Easing.OutQuint);
+
+                LoadComponentAsync(CreateTimelineContent(), timelineArea.Add);
             });
         }
 
         protected abstract Drawable CreateMainContent();
 
-        protected virtual Drawable CreateTimeline() => new TimelineArea { RelativeSizeAxes = Axes.Both };
+        protected virtual Drawable CreateTimelineContent() => new Container();
+
+        protected TimelineArea CreateTimelineArea() => new TimelineArea { RelativeSizeAxes = Axes.Both };
     }
 }
