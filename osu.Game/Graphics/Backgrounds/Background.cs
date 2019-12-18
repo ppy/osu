@@ -16,7 +16,9 @@ namespace osu.Game.Graphics.Backgrounds
     /// </summary>
     public class Background : CompositeDrawable
     {
-        public Sprite Sprite;
+        private const float blur_scale = 0.5f;
+
+        public readonly Sprite Sprite;
 
         private readonly string textureName;
 
@@ -43,7 +45,7 @@ namespace osu.Game.Graphics.Backgrounds
                 Sprite.Texture = textures.Get(textureName);
         }
 
-        public Vector2 BlurSigma => bufferedContainer?.BlurSigma ?? Vector2.Zero;
+        public Vector2 BlurSigma => bufferedContainer?.BlurSigma / blur_scale ?? Vector2.Zero;
 
         /// <summary>
         /// Smoothly adjusts <see cref="IBufferedContainer.BlurSigma"/> over time.
@@ -51,19 +53,23 @@ namespace osu.Game.Graphics.Backgrounds
         /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
         public void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
         {
-            if (bufferedContainer == null)
+            if (bufferedContainer == null && newBlurSigma != Vector2.Zero)
             {
                 RemoveInternal(Sprite);
 
                 AddInternal(bufferedContainer = new BufferedContainer
                 {
-                    CacheDrawnFrameBuffer = true,
                     RelativeSizeAxes = Axes.Both,
+                    CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
                     Child = Sprite
                 });
             }
 
-            bufferedContainer.BlurTo(newBlurSigma, duration, easing);
+            if (bufferedContainer != null)
+                bufferedContainer.FrameBufferScale = newBlurSigma == Vector2.Zero ? Vector2.One : new Vector2(blur_scale);
+
+            bufferedContainer?.BlurTo(newBlurSigma * blur_scale, duration, easing);
         }
     }
 }

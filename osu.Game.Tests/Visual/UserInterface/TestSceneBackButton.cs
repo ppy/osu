@@ -14,8 +14,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneBackButton : OsuTestScene
     {
-        private readonly BackButton button;
-
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TwoLayerButton)
@@ -23,6 +21,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestSceneBackButton()
         {
+            BackButton button;
+            BackButton.Receptor receptor = new BackButton.Receptor();
+
             Child = new Container
             {
                 Anchor = Anchor.Centre,
@@ -31,19 +32,21 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Masking = true,
                 Children = new Drawable[]
                 {
+                    receptor,
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    button = new BackButton
+                    button = new BackButton(receptor)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Action = () => button.Hide(),
                     }
                 }
             };
+
+            button.Action = () => button.Hide();
 
             AddStep("show button", () => button.Show());
             AddStep("hide button", () => button.Hide());

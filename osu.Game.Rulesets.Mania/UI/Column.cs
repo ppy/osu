@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -11,6 +11,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -19,7 +21,7 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
-        private const float column_width = 45;
+        public const float COLUMN_WIDTH = 80;
         private const float special_column_width = 70;
 
         /// <summary>
@@ -41,10 +43,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Index = index;
 
             RelativeSizeAxes = Axes.Y;
-            Width = column_width;
-
-            Masking = true;
-            CornerRadius = 5;
+            Width = COLUMN_WIDTH;
 
             background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
@@ -67,7 +66,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",
-                            RelativeSizeAxes = Axes.Both
+                            RelativeSizeAxes = Axes.Both,
                         }
                     }
                 },
@@ -90,6 +89,12 @@ namespace osu.Game.Rulesets.Mania.UI
                     Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
+                explosionContainer.Padding = new MarginPadding
+                {
+                    Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
+                };
+
                 keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
@@ -108,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 isSpecial = value;
 
-                Width = isSpecial ? special_column_width : column_width;
+                Width = isSpecial ? special_column_width : COLUMN_WIDTH;
             }
         }
 
@@ -143,7 +148,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// <param name="hitObject">The DrawableHitObject to add.</param>
         public override void Add(DrawableHitObject hitObject)
         {
-            hitObject.AccentColour = AccentColour;
+            hitObject.AccentColour.Value = AccentColour;
             hitObject.OnNewResult += OnNewResult;
 
             HitObjectContainer.Add(hitObject);
@@ -163,9 +168,10 @@ namespace osu.Game.Rulesets.Mania.UI
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
-            explosionContainer.Add(new HitExplosion(judgedObject)
+            explosionContainer.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
             {
-                Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
+                Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
+                Origin = Anchor.Centre
             });
         }
 

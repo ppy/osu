@@ -13,13 +13,16 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract class ScoreProcessor
+    public class ScoreProcessor
     {
+        private const double base_portion = 0.3;
+        private const double combo_portion = 0.7;
+        private const double max_score = 1000000;
+
         /// <summary>
         /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
         /// This may occur regardless of whether an <see cref="AllJudged"/> event is invoked.
@@ -55,7 +58,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// The current health.
         /// </summary>
-        public readonly BindableDouble Health = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
         /// The current combo.
@@ -66,11 +69,6 @@ namespace osu.Game.Rulesets.Scoring
         /// The current selected mods
         /// </summary>
         public readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        /// <summary>
-        /// Create a <see cref="HitWindows"/> for this processor.
-        /// </summary>
-        public virtual HitWindows CreateHitWindows() => new HitWindows();
 
         /// <summary>
         /// The current rank.
@@ -90,125 +88,22 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
-        protected virtual bool HasCompleted => false;
+        public bool HasCompleted => JudgedHits == MaxHits;
 
         /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
-        public virtual bool HasFailed { get; private set; }
+        public bool HasFailed { get; private set; }
 
         /// <summary>
-        /// The default conditions for failing.
+        /// The maximum number of hits that can be judged.
         /// </summary>
-        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
-
-        protected ScoreProcessor()
-        {
-            Combo.ValueChanged += delegate { HighestCombo.Value = Math.Max(HighestCombo.Value, Combo.Value); };
-            Accuracy.ValueChanged += delegate
-            {
-                Rank.Value = rankFrom(Accuracy.Value);
-                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                    Rank.Value = mod.AdjustRank(Rank.Value, Accuracy.Value);
-            };
-        }
-
-        private ScoreRank rankFrom(double acc)
-        {
-            if (acc == 1)
-                return ScoreRank.X;
-            if (acc > 0.95)
-                return ScoreRank.S;
-            if (acc > 0.9)
-                return ScoreRank.A;
-            if (acc > 0.8)
-                return ScoreRank.B;
-            if (acc > 0.7)
-                return ScoreRank.C;
-
-            return ScoreRank.D;
-        }
-
-        /// <summary>
-        /// Resets this ScoreProcessor to a default state.
-        /// </summary>
-        /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
-        protected virtual void Reset(bool storeResults)
-        {
-            TotalScore.Value = 0;
-            Accuracy.Value = 1;
-            Health.Value = 1;
-            Combo.Value = 0;
-            Rank.Value = ScoreRank.X;
-            HighestCombo.Value = 0;
-
-            HasFailed = false;
-        }
-
-        /// <summary>
-        /// Checks if the score is in a failed state and notifies subscribers.
-        /// <para>
-        /// This can only ever notify subscribers once.
-        /// </para>
-        /// </summary>
-        protected void UpdateFailed(JudgementResult result)
-        {
-            if (HasFailed)
-                return;
-
-            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
-                return;
-
-            if (Failed?.Invoke() != false)
-                HasFailed = true;
-        }
-
-        /// <summary>
-        /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
-        /// </summary>
-        /// <param name="result">The judgement scoring result to notify subscribers of.</param>
-        protected void NotifyNewJudgement(JudgementResult result)
-        {
-            NewJudgement?.Invoke(result);
-
-            if (HasCompleted)
-                AllJudged?.Invoke();
-        }
-
-        /// <summary>
-        /// Retrieve a score populated with data for the current play this processor is responsible for.
-        /// </summary>
-        public virtual void PopulateScore(ScoreInfo score)
-        {
-            score.TotalScore = (long)Math.Round(TotalScore.Value);
-            score.Combo = Combo.Value;
-            score.MaxCombo = HighestCombo.Value;
-            score.Accuracy = Math.Round(Accuracy.Value, 4);
-            score.Rank = Rank.Value;
-            score.Date = DateTimeOffset.Now;
-
-            var hitWindows = CreateHitWindows();
-
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                score.Statistics[result] = GetStatistic(result);
-        }
-
-        protected abstract int GetStatistic(HitResult result);
-
-        public abstract double GetStandardisedScore();
-    }
-
-    public class ScoreProcessor<TObject> : ScoreProcessor
-        where TObject : HitObject
-    {
-        private const double base_portion = 0.3;
-        private const double combo_portion = 0.7;
-        private const double max_score = 1000000;
-
-        protected sealed override bool HasCompleted => JudgedHits == MaxHits;
-
         protected int MaxHits { get; private set; }
-        protected int JudgedHits { get; private set; }
+
+        /// <summary>
+        /// The total number of judged <see cref="HitObject"/>s at the current point in time.
+        /// </summary>
+        public int JudgedHits { get; private set; }
 
         private double maxHighestCombo;
 
@@ -217,19 +112,24 @@ namespace osu.Game.Rulesets.Scoring
         private double baseScore;
         private double bonusScore;
 
-        protected ScoreProcessor()
-        {
-        }
+        private double scoreMultiplier = 1;
 
-        public ScoreProcessor(DrawableRuleset<TObject> drawableRuleset)
+        public ScoreProcessor(IBeatmap beatmap)
         {
             Debug.Assert(base_portion + combo_portion == 1.0);
 
-            drawableRuleset.OnNewResult += applyResult;
-            drawableRuleset.OnRevertResult += revertResult;
+            Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
+            Accuracy.ValueChanged += accuracy =>
+            {
+                Rank.Value = rankFrom(accuracy.NewValue);
+                foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
+                    Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
+            };
 
-            ApplyBeatmap(drawableRuleset.Beatmap);
-            SimulateAutoplay(drawableRuleset.Beatmap);
+            ApplyBeatmap(beatmap);
+
+            Reset(false);
+            SimulateAutoplay(beatmap);
             Reset(true);
 
             if (maxBaseScore == 0 || maxHighestCombo == 0)
@@ -239,22 +139,31 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             Mode.ValueChanged += _ => updateScore();
+            Mods.ValueChanged += mods =>
+            {
+                scoreMultiplier = 1;
+
+                foreach (var m in mods.NewValue)
+                    scoreMultiplier *= m.ScoreMultiplier;
+
+                updateScore();
+            };
         }
 
         /// <summary>
-        /// Applies any properties of the <see cref="Beatmap{TObject}"/> which affect scoring to this <see cref="ScoreProcessor{TObject}"/>.
+        /// Applies any properties of the <see cref="IBeatmap"/> which affect scoring to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to read properties from.</param>
-        protected virtual void ApplyBeatmap(Beatmap<TObject> beatmap)
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to read properties from.</param>
+        protected virtual void ApplyBeatmap(IBeatmap beatmap)
         {
         }
 
         /// <summary>
-        /// Simulates an autoplay of the <see cref="Beatmap{TObject}"/> to determine scoring values.
+        /// Simulates an autoplay of the <see cref="IBeatmap"/> to determine scoring values.
         /// </summary>
         /// <remarks>This provided temporarily. DO NOT USE.</remarks>
-        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to simulate.</param>
-        protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap)
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to simulate.</param>
+        protected virtual void SimulateAutoplay(IBeatmap beatmap)
         {
             foreach (var obj in beatmap.HitObjects)
                 simulate(obj);
@@ -268,13 +177,13 @@ namespace osu.Game.Rulesets.Scoring
                 if (judgement == null)
                     return;
 
-                var result = CreateResult(judgement);
+                var result = CreateResult(obj, judgement);
                 if (result == null)
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
                 result.Type = judgement.MaxResult;
 
-                applyResult(result);
+                ApplyResult(result);
             }
         }
 
@@ -282,22 +191,26 @@ namespace osu.Game.Rulesets.Scoring
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
-        private void applyResult(JudgementResult result)
+        public void ApplyResult(JudgementResult result)
         {
-            ApplyResult(result);
-            updateScore();
+            ApplyResultInternal(result);
 
-            UpdateFailed(result);
-            NotifyNewJudgement(result);
+            updateScore();
+            updateFailed(result);
+
+            NewJudgement?.Invoke(result);
+
+            if (HasCompleted)
+                AllJudged?.Invoke();
         }
 
         /// <summary>
         /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="result">The judgement scoring result.</param>
-        private void revertResult(JudgementResult result)
+        public void RevertResult(JudgementResult result)
         {
-            RevertResult(result);
+            RevertResultInternal(result);
             updateScore();
         }
 
@@ -306,17 +219,21 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
+        /// <remarks>
+        /// Any changes applied via this method can be reverted via <see cref="RevertResultInternal"/>.
+        /// </remarks>
         /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
-        protected virtual void ApplyResult(JudgementResult result)
+        protected virtual void ApplyResultInternal(JudgementResult result)
         {
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
             result.HealthAtJudgement = Health.Value;
+            result.FailedAtJudgement = HasFailed;
+
+            if (HasFailed)
+                return;
 
             JudgedHits++;
-
-            if (result.Type != HitResult.None)
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
 
             if (result.Judgement.AffectsCombo)
             {
@@ -342,6 +259,9 @@ namespace osu.Game.Rulesets.Scoring
             }
             else
             {
+                if (result.HasResult)
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+
                 baseScore += result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
@@ -350,19 +270,21 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
+        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/> via <see cref="ApplyResultInternal"/>.
         /// </summary>
         /// <param name="result">The judgement scoring result.</param>
-        protected virtual void RevertResult(JudgementResult result)
+        protected virtual void RevertResultInternal(JudgementResult result)
         {
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
             Health.Value = result.HealthAtJudgement;
 
-            JudgedHits--;
+            // Todo: Revert HasFailed state with proper player support
 
-            if (result.Type != HitResult.None)
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+            if (result.FailedAtJudgement)
+                return;
+
+            JudgedHits--;
 
             if (result.Judgement.IsBonus)
             {
@@ -371,6 +293,9 @@ namespace osu.Game.Rulesets.Scoring
             }
             else
             {
+                if (result.HasResult)
+                    scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) - 1;
+
                 baseScore -= result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
@@ -397,19 +322,57 @@ namespace osu.Game.Rulesets.Scoring
             {
                 default:
                 case ScoringMode.Standardised:
-                    return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore;
+                    return (max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo.Value / maxHighestCombo) + bonusScore) * scoreMultiplier;
 
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo.Value - 1) / 25);
+                    return bonusScore + baseScore * ((1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier) / 25);
             }
         }
 
-        protected override int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
+        /// <summary>
+        /// Checks if the score is in a failed state and notifies subscribers.
+        /// <para>
+        /// This can only ever notify subscribers once.
+        /// </para>
+        /// </summary>
+        private void updateFailed(JudgementResult result)
+        {
+            if (HasFailed)
+                return;
 
-        public override double GetStandardisedScore() => getScore(ScoringMode.Standardised);
+            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
+                return;
 
-        protected override void Reset(bool storeResults)
+            if (Failed?.Invoke() != false)
+                HasFailed = true;
+        }
+
+        private ScoreRank rankFrom(double acc)
+        {
+            if (acc == 1)
+                return ScoreRank.X;
+            if (acc > 0.95)
+                return ScoreRank.S;
+            if (acc > 0.9)
+                return ScoreRank.A;
+            if (acc > 0.8)
+                return ScoreRank.B;
+            if (acc > 0.7)
+                return ScoreRank.C;
+
+            return ScoreRank.D;
+        }
+
+        public int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
+
+        public double GetStandardisedScore() => getScore(ScoringMode.Standardised);
+
+        /// <summary>
+        /// Resets this ScoreProcessor to a default state.
+        /// </summary>
+        /// <param name="storeResults">Whether to store the current state of the <see cref="ScoreProcessor"/> for future use.</param>
+        protected virtual void Reset(bool storeResults)
         {
             scoreResultCounts.Clear();
 
@@ -420,19 +383,55 @@ namespace osu.Game.Rulesets.Scoring
                 maxBaseScore = baseScore;
             }
 
-            base.Reset(storeResults);
-
             JudgedHits = 0;
             baseScore = 0;
             rollingMaxBaseScore = 0;
             bonusScore = 0;
+
+            TotalScore.Value = 0;
+            Accuracy.Value = 1;
+            Health.Value = 1;
+            Combo.Value = 0;
+            Rank.Value = ScoreRank.X;
+            HighestCombo.Value = 0;
+
+            HasFailed = false;
         }
+
+        /// <summary>
+        /// Retrieve a score populated with data for the current play this processor is responsible for.
+        /// </summary>
+        public virtual void PopulateScore(ScoreInfo score)
+        {
+            score.TotalScore = (long)Math.Round(TotalScore.Value);
+            score.Combo = Combo.Value;
+            score.MaxCombo = HighestCombo.Value;
+            score.Accuracy = Math.Round(Accuracy.Value, 4);
+            score.Rank = Rank.Value;
+            score.Date = DateTimeOffset.Now;
+
+            var hitWindows = CreateHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+                score.Statistics[result] = GetStatistic(result);
+        }
+
+        /// <summary>
+        /// The default conditions for failing.
+        /// </summary>
+        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
+
+        /// <summary>
+        /// Create a <see cref="HitWindows"/> for this processor.
+        /// </summary>
+        public virtual HitWindows CreateHitWindows() => new HitWindows();
 
         /// <summary>
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
         /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> which was judged.</param>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new JudgementResult(hitObject, judgement);
     }
 
     public enum ScoringMode

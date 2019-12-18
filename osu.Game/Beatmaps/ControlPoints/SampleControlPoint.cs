@@ -1,24 +1,47 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Framework.Bindables;
 using osu.Game.Audio;
 
 namespace osu.Game.Beatmaps.ControlPoints
 {
-    public class SampleControlPoint : ControlPoint, IEquatable<SampleControlPoint>
+    public class SampleControlPoint : ControlPoint
     {
         public const string DEFAULT_BANK = "normal";
 
         /// <summary>
         /// The default sample bank at this control point.
         /// </summary>
-        public string SampleBank = DEFAULT_BANK;
+        public readonly Bindable<string> SampleBankBindable = new Bindable<string>(DEFAULT_BANK) { Default = DEFAULT_BANK };
+
+        /// <summary>
+        /// The speed multiplier at this control point.
+        /// </summary>
+        public string SampleBank
+        {
+            get => SampleBankBindable.Value;
+            set => SampleBankBindable.Value = value;
+        }
+
+        /// <summary>
+        /// The default sample bank at this control point.
+        /// </summary>
+        public readonly BindableInt SampleVolumeBindable = new BindableInt(100)
+        {
+            MinValue = 0,
+            MaxValue = 100,
+            Default = 100
+        };
 
         /// <summary>
         /// The default sample volume at this control point.
         /// </summary>
-        public int SampleVolume = 100;
+        public int SampleVolume
+        {
+            get => SampleVolumeBindable.Value;
+            set => SampleVolumeBindable.Value = value;
+        }
 
         /// <summary>
         /// Create a SampleInfo based on the sample settings in this control point.
@@ -45,8 +68,8 @@ namespace osu.Game.Beatmaps.ControlPoints
             return newSampleInfo;
         }
 
-        public bool Equals(SampleControlPoint other)
-            => base.Equals(other)
-               && string.Equals(SampleBank, other?.SampleBank) && SampleVolume == other?.SampleVolume;
+        public override bool EquivalentTo(ControlPoint other) =>
+            other is SampleControlPoint otherTyped &&
+            SampleBank == otherTyped.SampleBank && SampleVolume == otherTyped.SampleVolume;
     }
 }

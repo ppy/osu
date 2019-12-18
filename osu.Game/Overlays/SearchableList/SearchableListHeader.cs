@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Sprites;
 namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListHeader<T> : Container
+        where T : struct, Enum
     {
         public readonly HeaderTabControl<T> Tabs;
 
@@ -24,9 +25,6 @@ namespace osu.Game.Overlays.SearchableList
 
         protected SearchableListHeader()
         {
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("BrowseHeader only supports enums as the generic type argument");
-
             RelativeSizeAxes = Axes.X;
             Height = 90;
 

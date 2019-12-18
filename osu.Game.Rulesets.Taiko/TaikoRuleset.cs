@@ -12,20 +12,27 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Difficulty;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Rulesets.Taiko
 {
     public class TaikoRuleset : Ruleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableTaikoRuleset(this, beatmap, mods);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new TaikoScoreProcessor(beatmap);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
+
+        public const string SHORT_NAME = "taiko";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -44,7 +51,14 @@ namespace osu.Game.Rulesets.Taiko
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new TaikoModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new TaikoModSuddenDeath();
+
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new TaikoModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -65,14 +79,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new TaikoModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new TaikoModRelax();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new TaikoModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -100,24 +108,24 @@ namespace osu.Game.Rulesets.Taiko
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new TaikoModAutoplay(), new ModCinema()),
+                        new MultiMod(new TaikoModAutoplay(), new TaikoModCinema()),
                         new TaikoModRelax(),
                     };
 
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new MultiMod(new ModWindUp<TaikoHitObject>(), new ModWindDown<TaikoHitObject>())
+                        new MultiMod(new ModWindUp(), new ModWindDown())
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
         public override string Description => "osu!taiko";
 
-        public override string ShortName => "taiko";
+        public override string ShortName => SHORT_NAME;
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 

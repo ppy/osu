@@ -26,8 +26,7 @@ namespace osu.Game.Overlays.Notifications
 
         public void Add(Notification notification, float position)
         {
-            notifications.Add(notification);
-            notifications.SetLayoutPosition(notification, position);
+            notifications.Insert((int)position, notification);
         }
 
         public IEnumerable<Type> AcceptTypes;

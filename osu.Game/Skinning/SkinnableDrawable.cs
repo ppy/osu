@@ -1,96 +1,127 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osuTK;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableDrawable : SkinnableDrawable<Drawable>
-    {
-        public SkinnableDrawable(string name, Func<string, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
-            : base(name, defaultImplementation, allowFallback, restrictSize)
-        {
-        }
-    }
-
     /// <summary>
     /// A drawable which can be skinned via an <see cref="ISkinSource"/>.
     /// </summary>
-    /// <typeparam name="T">The type of drawable.</typeparam>
-    public class SkinnableDrawable<T> : SkinReloadableDrawable
-        where T : Drawable
+    public class SkinnableDrawable : SkinReloadableDrawable
     {
         /// <summary>
-        /// The displayed component. May or may not be a type-<typeparamref name="T"/> member.
+        /// The displayed component.
         /// </summary>
-        protected Drawable Drawable { get; private set; }
+        public Drawable Drawable { get; private set; }
 
-        private readonly string componentName;
+        private readonly ISkinComponent component;
 
-        private readonly bool restrictSize;
+        private readonly ConfineMode confineMode;
 
         /// <summary>
         /// Create a new skinnable drawable.
         /// </summary>
-        /// <param name="name">The namespace-complete resource name for this skinnable element.</param>
+        /// <param name="component">The namespace-complete resource name for this skinnable element.</param>
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
-        /// <param name="restrictSize">Whether a user-skin drawable should be limited to the size of our parent.</param>
-        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
-            : this(name, allowFallback, restrictSize)
+        /// <param name="confineMode">How (if at all) the <see cref="Drawable"/> should be resize to fit within our own bounds.</param>
+        public SkinnableDrawable(ISkinComponent component, Func<ISkinComponent, Drawable> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : this(component, allowFallback, confineMode)
         {
             createDefault = defaultImplementation;
         }
 
-        protected SkinnableDrawable(string name, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
+        protected SkinnableDrawable(ISkinComponent component, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(allowFallback)
         {
-            componentName = name;
-            this.restrictSize = restrictSize;
+            this.component = component;
+            this.confineMode = confineMode;
 
             RelativeSizeAxes = Axes.Both;
         }
 
-        private readonly Func<string, T> createDefault;
+        private readonly Func<ISkinComponent, Drawable> createDefault;
 
-        protected virtual T CreateDefault(string name) => createDefault(name);
+        private readonly Cached scaling = new Cached();
+
+        private bool isDefault;
+
+        protected virtual Drawable CreateDefault(ISkinComponent component) => createDefault(component);
 
         /// <summary>
-        /// Whether to apply size restrictions (specified via <see cref="restrictSize"/>) to the default implementation.
+        /// Whether to apply size restrictions (specified via <see cref="confineMode"/>) to the default implementation.
         /// </summary>
         protected virtual bool ApplySizeRestrictionsToDefault => false;
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            Drawable = skin.GetDrawableComponent(componentName);
+            Drawable = skin.GetDrawableComponent(component);
 
-            bool isDefault = false;
+            isDefault = false;
 
             if (Drawable == null && allowFallback)
             {
-                Drawable = CreateDefault(componentName);
+                Drawable = CreateDefault(component);
                 isDefault = true;
             }
 
             if (Drawable != null)
             {
-                if (restrictSize && (!isDefault || ApplySizeRestrictionsToDefault))
-                {
-                    Drawable.RelativeSizeAxes = Axes.Both;
-                    Drawable.Size = Vector2.One;
-                    Drawable.Scale = Vector2.One;
-                    Drawable.FillMode = FillMode.Fit;
-                }
-
+                scaling.Invalidate();
                 Drawable.Origin = Anchor.Centre;
                 Drawable.Anchor = Anchor.Centre;
-
                 InternalChild = Drawable;
             }
             else
                 ClearInternal();
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!scaling.IsValid)
+            {
+                try
+                {
+                    if (Drawable == null || (isDefault && !ApplySizeRestrictionsToDefault)) return;
+
+                    switch (confineMode)
+                    {
+                        case ConfineMode.NoScaling:
+                            return;
+
+                        case ConfineMode.ScaleDownToFit:
+                            if (Drawable.DrawSize.X <= DrawSize.X && Drawable.DrawSize.Y <= DrawSize.Y)
+                                return;
+
+                            break;
+                    }
+
+                    Drawable.RelativeSizeAxes = Axes.Both;
+                    Drawable.Size = Vector2.One;
+                    Drawable.Scale = Vector2.One;
+                    Drawable.FillMode = FillMode.Fit;
+                }
+                finally
+                {
+                    scaling.Validate();
+                }
+            }
+        }
+    }
+
+    public enum ConfineMode
+    {
+        /// <summary>
+        /// Don't apply any scaling. This allows the user element to be of any size, exceeding specified bounds.
+        /// </summary>
+        NoScaling,
+        ScaleDownToFit,
+        ScaleToFit,
     }
 }

@@ -20,7 +20,7 @@ namespace osu.Game.Storyboards
         public CommandTimeline<float> Rotation = new CommandTimeline<float>();
         public CommandTimeline<Color4> Colour = new CommandTimeline<Color4>();
         public CommandTimeline<float> Alpha = new CommandTimeline<float>();
-        public CommandTimeline<BlendingMode> BlendingMode = new CommandTimeline<BlendingMode>();
+        public CommandTimeline<BlendingParameters> BlendingParameters = new CommandTimeline<BlendingParameters>();
         public CommandTimeline<bool> FlipH = new CommandTimeline<bool>();
         public CommandTimeline<bool> FlipV = new CommandTimeline<bool>();
 
@@ -35,7 +35,7 @@ namespace osu.Game.Storyboards
                 yield return Rotation;
                 yield return Colour;
                 yield return Alpha;
-                yield return BlendingMode;
+                yield return BlendingParameters;
                 yield return FlipH;
                 yield return FlipV;
             }
@@ -65,6 +65,7 @@ namespace osu.Game.Storyboards
         public virtual IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {
             if (offset != 0)
+            {
                 return timelineSelector(this).Commands.Select(command =>
                     new CommandTimeline<T>.TypedCommand
                     {
@@ -74,6 +75,7 @@ namespace osu.Game.Storyboards
                         StartValue = command.StartValue,
                         EndValue = command.EndValue,
                     });
+            }
 
             return timelineSelector(this).Commands;
         }

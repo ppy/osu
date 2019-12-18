@@ -1,21 +1,30 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Audio;
 using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
-    public class StoryboardSample : IStoryboardElement
+    public class StoryboardSampleInfo : IStoryboardElement, ISampleInfo
     {
-        public string Path { get; set; }
+        public string Path { get; }
         public bool IsDrawable => true;
 
         public double StartTime { get; }
 
-        public float Volume;
+        public int Volume { get; }
 
-        public StoryboardSample(string path, double time, float volume)
+        public IEnumerable<string> LookupNames => new[]
+        {
+            // Try first with the full name, then attempt with no path
+            Path,
+            System.IO.Path.ChangeExtension(Path, null),
+        };
+
+        public StoryboardSampleInfo(string path, double time, int volume)
         {
             Path = path;
             StartTime = time;

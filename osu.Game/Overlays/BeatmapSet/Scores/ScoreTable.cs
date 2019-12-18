@@ -59,11 +59,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Content = null;
                 backgroundFlow.Clear();
 
-                if (value == null || !value.Any())
+                if (value?.Any() != true)
                     return;
 
                 for (int i = 0; i < value.Count; i++)
-                    backgroundFlow.Add(new ScoreTableRowBackground(i));
+                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i]));
 
                 Columns = createHeaders(value[0]);
                 Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
@@ -171,6 +171,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Direction = FillDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
+                    Spacing = new Vector2(1),
                     ChildrenEnumerable = score.Mods.Select(m => new ModIcon(m)
                     {
                         AutoSizeAxes = Axes.Both,

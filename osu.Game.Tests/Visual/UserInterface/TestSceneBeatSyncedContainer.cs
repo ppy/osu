@@ -2,13 +2,15 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Lists;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -22,30 +24,41 @@ namespace osu.Game.Tests.Visual.UserInterface
     [TestFixture]
     public class TestSceneBeatSyncedContainer : OsuTestScene
     {
-        private readonly MusicController mc;
+        private readonly NowPlayingOverlay np;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(BeatSyncedContainer)
+        };
+
+        [Cached]
+        private MusicController musicController = new MusicController();
 
         public TestSceneBeatSyncedContainer()
         {
             Clock = new FramedClock();
             Clock.ProcessFrame();
 
-            Add(new BeatContainer
+            AddRange(new Drawable[]
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre,
-            });
-
-            Add(mc = new MusicController
-            {
-                Origin = Anchor.TopRight,
-                Anchor = Anchor.TopRight,
+                musicController,
+                new BeatContainer
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
+                np = new NowPlayingOverlay
+                {
+                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopRight,
+                }
             });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            mc.ToggleVisibility();
+            np.ToggleVisibility();
         }
 
         private class BeatContainer : BeatSyncedContainer
@@ -140,21 +153,23 @@ namespace osu.Game.Tests.Visual.UserInterface
                 };
             }
 
-            private SortedList<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints;
+            private List<TimingControlPoint> timingPoints => Beatmap.Value.Beatmap.ControlPointInfo.TimingPoints.ToList();
 
             private TimingControlPoint getNextTimingPoint(TimingControlPoint current)
             {
-                if (timingPoints[timingPoints.Count - 1] == current)
+                if (timingPoints[^1] == current)
                     return current;
 
-                return timingPoints[timingPoints.IndexOf(current) + 1];
+                int index = timingPoints.IndexOf(current); // -1 means that this is a "default beat"
+
+                return index == -1 ? current : timingPoints[index + 1];
             }
 
             private int calculateBeatCount(TimingControlPoint current)
             {
                 if (timingPoints.Count == 0) return 0;
 
-                if (timingPoints[timingPoints.Count - 1] == current)
+                if (timingPoints[^1] == current)
                     return (int)Math.Ceiling((Beatmap.Value.Track.Length - current.Time) / current.BeatLength);
 
                 return (int)Math.Ceiling((getNextTimingPoint(current).Time - current.Time) / current.BeatLength);

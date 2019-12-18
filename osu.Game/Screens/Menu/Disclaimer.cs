@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -21,7 +20,6 @@ namespace osu.Game.Screens.Menu
 {
     public class Disclaimer : StartupScreen
     {
-        private Intro intro;
         private SpriteIcon icon;
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
@@ -32,10 +30,13 @@ namespace osu.Game.Screens.Menu
         private const float icon_y = -85;
         private const float icon_size = 30;
 
+        private readonly OsuScreen nextScreen;
+
         private readonly Bindable<User> currentUser = new Bindable<User>();
 
-        public Disclaimer()
+        public Disclaimer(OsuScreen nextScreen = null)
         {
+            this.nextScreen = nextScreen;
             ValidForResume = false;
         }
 
@@ -91,7 +92,7 @@ namespace osu.Game.Screens.Menu
             textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();
 
-            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
             textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
@@ -146,7 +147,8 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            LoadComponentAsync(intro = new Intro());
+            if (nextScreen != null)
+                LoadComponentAsync(nextScreen);
         }
 
         public override void OnEntering(IScreen last)
@@ -170,7 +172,11 @@ namespace osu.Game.Screens.Menu
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d => this.Push(intro));
+                .Finally(d =>
+                {
+                    if (nextScreen != null)
+                        this.Push(nextScreen);
+                });
         }
     }
 }
