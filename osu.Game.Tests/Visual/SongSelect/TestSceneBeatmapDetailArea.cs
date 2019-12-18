@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Position = new Vector2(0, 25),
             });
 
-            modDisplay.Current.BindTo(Mods);
+            modDisplay.Current.BindTo(SelectedMods);
 
             AddStep("all metrics", () => detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
             {
@@ -204,7 +204,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 });
 
-                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) };
+                SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) };
             });
 
             AddStep("with HR mod", () =>
@@ -230,7 +230,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                     }
                 });
 
-                Mods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) };
+                SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) };
             });
         }
     }
