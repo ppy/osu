@@ -17,6 +17,7 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
 using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
@@ -44,7 +45,9 @@ namespace osu.Game.Overlays
                     return;
 
                 users = value ?? Array.Empty<User>();
-                recreatePanels();
+
+                if (LoadState >= LoadState.Ready)
+                    recreatePanels();
             }
         }
 
@@ -70,7 +73,6 @@ namespace osu.Game.Overlays
             };
 
             Header.Tabs.Current.ValueChanged += _ => queueUpdate();
-
             Filter.Tabs.Current.ValueChanged += _ => onFilterUpdate();
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += _ => recreatePanels();
@@ -86,6 +88,12 @@ namespace osu.Game.Overlays
                 else
                     queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            recreatePanels();
         }
 
         private APIRequest getUsersRequest;
