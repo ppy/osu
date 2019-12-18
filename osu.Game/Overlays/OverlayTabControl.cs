@@ -32,7 +32,7 @@ namespace osu.Game.Overlays
 
                 foreach (TabItem<T> tabItem in TabContainer)
                 {
-                    ((OverlayTabItem<T>)tabItem).AccentColour = value;
+                    ((OverlayTabItem)tabItem).AccentColour = value;
                 }
             }
         }
@@ -59,9 +59,9 @@ namespace osu.Game.Overlays
 
         protected override Dropdown<T> CreateDropdown() => null;
 
-        protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem<T>(value);
+        protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem(value);
 
-        protected class OverlayTabItem<U> : TabItem<U>
+        protected class OverlayTabItem : TabItem<T>
         {
             private readonly ExpandingBar bar;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays
                 }
             }
 
-            public OverlayTabItem(U value)
+            public OverlayTabItem(T value)
                 : base(value)
             {
                 AutoSizeAxes = Axes.X;

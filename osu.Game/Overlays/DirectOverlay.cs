@@ -116,7 +116,7 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (text.NewValue != string.Empty)
+                if (!string.IsNullOrEmpty(text.NewValue))
                 {
                     Header.Tabs.Current.Value = DirectTab.Search;
 
