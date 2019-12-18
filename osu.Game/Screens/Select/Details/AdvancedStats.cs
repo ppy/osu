@@ -68,41 +68,39 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            BeatmapInfo processed = Beatmap?.Clone();
+            var baseDifficulty = Beatmap?.BaseDifficulty;
+            var adjustedDifficulty = baseDifficulty;
 
-            if (processed != null && mods.Value.Any(m => m is IApplicableToDifficulty))
+            if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
             {
-                processed.BaseDifficulty = processed.BaseDifficulty.Clone();
+                adjustedDifficulty = adjustedDifficulty?.Clone();
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(processed.BaseDifficulty);
+                    mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            BeatmapDifficulty baseDifficulty = Beatmap?.BaseDifficulty;
-            BeatmapDifficulty moddedDifficulty = processed?.BaseDifficulty;
-
             //mania specific
-            if ((processed?.Ruleset?.ID ?? 0) == 3)
+            if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
             {
                 firstValue.Title = "Key Amount";
                 firstValue.BaseValue = (int)MathF.Round(baseDifficulty?.CircleSize ?? 0);
-                firstValue.ModdedValue = (int)MathF.Round(moddedDifficulty?.CircleSize ?? 0);
+                firstValue.ModdedValue = (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0);
             }
             else
             {
                 firstValue.Title = "Circle Size";
                 firstValue.BaseValue = baseDifficulty?.CircleSize ?? 0;
-                firstValue.ModdedValue = moddedDifficulty?.CircleSize ?? 0;
+                firstValue.ModdedValue = adjustedDifficulty?.CircleSize ?? 0;
             }
 
             hpDrain.BaseValue = baseDifficulty?.DrainRate ?? 0;
             accuracy.BaseValue = baseDifficulty?.OverallDifficulty ?? 0;
             approachRate.BaseValue = baseDifficulty?.ApproachRate ?? 0;
-            starDifficulty.BaseValue = (float)(processed?.StarDifficulty ?? 0);
+            starDifficulty.BaseValue = (float)(Beatmap?.StarDifficulty ?? 0);
 
-            hpDrain.ModdedValue = moddedDifficulty?.DrainRate ?? 0;
-            accuracy.ModdedValue = moddedDifficulty?.OverallDifficulty ?? 0;
-            approachRate.ModdedValue = moddedDifficulty?.ApproachRate ?? 0;
+            hpDrain.ModdedValue = adjustedDifficulty?.DrainRate ?? 0;
+            accuracy.ModdedValue = adjustedDifficulty?.OverallDifficulty ?? 0;
+            approachRate.ModdedValue = adjustedDifficulty?.ApproachRate ?? 0;
         }
 
         private class StatisticRow : Container, IHasAccentColour
