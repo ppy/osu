@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.Containers
         public double TimeSinceLastBeat { get; private set; }
 
         /// <summary>
-        /// How many baets per beatlength to trigger. Defaults to 1.
+        /// How many beats per beatlength to trigger. Defaults to 1.
         /// </summary>
         public int Divisor { get; set; } = 1;
 
