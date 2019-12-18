@@ -68,12 +68,12 @@ namespace osu.Game.Screens.Select.Details
 
         private void updateStatistics()
         {
-            var baseDifficulty = Beatmap?.BaseDifficulty;
-            var adjustedDifficulty = baseDifficulty;
+            BeatmapDifficulty baseDifficulty = Beatmap?.BaseDifficulty;
+            BeatmapDifficulty adjustedDifficulty = null;
 
             if (baseDifficulty != null && mods.Value.Any(m => m is IApplicableToDifficulty))
             {
-                adjustedDifficulty = adjustedDifficulty?.Clone();
+                adjustedDifficulty = baseDifficulty.Clone();
 
                 foreach (var mod in mods.Value.OfType<IApplicableToDifficulty>())
                     mod.ApplyToDifficulty(adjustedDifficulty);
@@ -83,24 +83,19 @@ namespace osu.Game.Screens.Select.Details
             if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
             {
                 firstValue.Title = "Key Amount";
-                firstValue.BaseValue = (int)MathF.Round(baseDifficulty?.CircleSize ?? 0);
-                firstValue.ModdedValue = (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0);
+                firstValue.Value = ((int)MathF.Round(baseDifficulty?.CircleSize ?? 0), (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0));
             }
             else
             {
                 firstValue.Title = "Circle Size";
-                firstValue.BaseValue = baseDifficulty?.CircleSize ?? 0;
-                firstValue.ModdedValue = adjustedDifficulty?.CircleSize ?? 0;
+                firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
             }
 
-            hpDrain.BaseValue = baseDifficulty?.DrainRate ?? 0;
-            accuracy.BaseValue = baseDifficulty?.OverallDifficulty ?? 0;
-            approachRate.BaseValue = baseDifficulty?.ApproachRate ?? 0;
-            starDifficulty.BaseValue = (float)(Beatmap?.StarDifficulty ?? 0);
+            starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
 
-            hpDrain.ModdedValue = adjustedDifficulty?.DrainRate ?? 0;
-            accuracy.ModdedValue = adjustedDifficulty?.OverallDifficulty ?? 0;
-            approachRate.ModdedValue = adjustedDifficulty?.ApproachRate ?? 0;
+            hpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
+            accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
+            approachRate.Value = (baseDifficulty?.ApproachRate ?? 0, adjustedDifficulty?.ApproachRate);
         }
 
         private class StatisticRow : Container, IHasAccentColour
@@ -110,7 +105,7 @@ namespace osu.Game.Screens.Select.Details
 
             private readonly float maxValue;
             private readonly bool forceDecimalPlaces;
-            private readonly OsuSpriteText name, value;
+            private readonly OsuSpriteText name, valueText;
             private readonly Bar bar, modBar;
 
             [Resolved]
@@ -122,36 +117,29 @@ namespace osu.Game.Screens.Select.Details
                 set => name.Text = value;
             }
 
-            private float baseValue;
+            private (float baseValue, float? adjustedValue) value;
 
-            private float moddedValue;
-
-            public float BaseValue
+            public (float baseValue, float? adjustedValue) Value
             {
-                get => baseValue;
+                get => value;
                 set
                 {
-                    baseValue = value;
-                    bar.Length = value / maxValue;
-                    this.value.Text = value.ToString(forceDecimalPlaces ? "0.00" : "0.##");
-                }
-            }
+                    if (value == this.value)
+                        return;
 
-            public float ModdedValue
-            {
-                get => moddedValue;
-                set
-                {
-                    moddedValue = value;
-                    modBar.Length = value / maxValue;
-                    this.value.Text = value.ToString(forceDecimalPlaces ? "0.00" : "0.##");
+                    this.value = value;
 
-                    if (moddedValue > baseValue)
-                        modBar.AccentColour = this.value.Colour = colours.Red;
-                    else if (moddedValue < baseValue)
-                        modBar.AccentColour = this.value.Colour = colours.BlueDark;
+                    bar.Length = value.baseValue / maxValue;
+
+                    valueText.Text = (value.adjustedValue ?? value.baseValue).ToString(forceDecimalPlaces ? "0.00" : "0.##");
+                    modBar.Length = (value.adjustedValue ?? 0) / maxValue;
+
+                    if (value.adjustedValue > value.baseValue)
+                        modBar.AccentColour = valueText.Colour = colours.Red;
+                    else if (value.adjustedValue < value.baseValue)
+                        modBar.AccentColour = valueText.Colour = colours.BlueDark;
                     else
-                        modBar.AccentColour = this.value.Colour = Color4.White;
+                        modBar.AccentColour = valueText.Colour = Color4.White;
                 }
             }
 
@@ -203,7 +191,7 @@ namespace osu.Game.Screens.Select.Details
                         Origin = Anchor.TopRight,
                         Width = value_width,
                         RelativeSizeAxes = Axes.Y,
-                        Child = value = new OsuSpriteText
+                        Child = valueText = new OsuSpriteText
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
