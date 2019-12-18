@@ -186,11 +186,6 @@ namespace osu.Game.Rulesets.Mania
 
         public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
-        public ManiaRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
-
         public override IEnumerable<int> AvailableVariants
         {
             get
