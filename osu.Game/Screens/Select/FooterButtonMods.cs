@@ -60,8 +60,6 @@ namespace osu.Game.Screens.Select
                 AutoSizeAxes = Axes.Both,
                 Margin = new MarginPadding { Left = 70 }
             });
-
-            Current.ValueChanged += _ => updateMultiplierText();
         }
 
         [BackgroundDependencyLoader]
@@ -73,6 +71,13 @@ namespace osu.Game.Screens.Select
             highMultiplierColour = colours.Green;
             Text = @"mods";
             Hotkey = Key.F1;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindValueChanged(_ => updateMultiplierText(), true);
         }
 
         private void updateMultiplierText()
