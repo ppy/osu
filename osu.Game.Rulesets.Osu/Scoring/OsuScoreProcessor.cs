@@ -1,50 +1,28 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
-    internal class OsuScoreProcessor : ScoreProcessor<OsuHitObject>
+    internal class OsuScoreProcessor : ScoreProcessor
     {
-        public OsuScoreProcessor(DrawableRuleset<OsuHitObject> drawableRuleset)
-            : base(drawableRuleset)
+        public OsuScoreProcessor(IBeatmap beatmap)
+            : base(beatmap)
         {
         }
 
         private float hpDrainRate;
 
-        private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
-
-        protected override void ApplyBeatmap(Beatmap<OsuHitObject> beatmap)
+        protected override void ApplyBeatmap(IBeatmap beatmap)
         {
             base.ApplyBeatmap(beatmap);
 
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
-        }
-
-        protected override void Reset(bool storeResults)
-        {
-            base.Reset(storeResults);
-            comboResultCounts.Clear();
-        }
-
-        protected override void ApplyResult(JudgementResult result)
-        {
-            base.ApplyResult(result);
-
-            var osuResult = (OsuJudgementResult)result;
-
-            if (result.Type != HitResult.None)
-                comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;
         }
 
         protected override double HealthAdjustmentFactorFor(JudgementResult result)
@@ -71,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             }
         }
 
-        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
+        protected override JudgementResult CreateResult(HitObject hitObject, Judgement judgement) => new OsuJudgementResult(hitObject, judgement);
 
         public override HitWindows CreateHitWindows() => new OsuHitWindows();
     }

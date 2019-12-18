@@ -30,6 +30,9 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"preview_url")]
         private string preview { get; set; }
 
+        [JsonProperty(@"has_favourited")]
+        private bool hasFavourited { get; set; }
+
         [JsonProperty(@"play_count")]
         private int playCount { get; set; }
 
@@ -66,6 +69,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"availability")]
         private BeatmapSetOnlineAvailability availability { get; set; }
 
+        [JsonProperty(@"genre")]
+        private BeatmapSetOnlineGenre genre { get; set; }
+
+        [JsonProperty(@"language")]
+        private BeatmapSetOnlineLanguage language { get; set; }
+
         [JsonProperty(@"beatmaps")]
         private IEnumerable<APIBeatmap> beatmaps { get; set; }
 
@@ -91,6 +100,9 @@ namespace osu.Game.Online.API.Requests.Responses
                     Ranked = ranked,
                     LastUpdated = lastUpdated,
                     Availability = availability,
+                    HasFavourited = hasFavourited,
+                    Genre = genre,
+                    Language = language
                 },
                 Beatmaps = beatmaps?.Select(b => b.ToBeatmap(rulesets)).ToList(),
             };

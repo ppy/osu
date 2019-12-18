@@ -170,7 +170,8 @@ namespace osu.Game.Overlays
                 var tcs = new TaskCompletionSource<bool>();
 
                 var req = new GetChangelogRequest();
-                req.Success += res =>
+
+                req.Success += res => Schedule(() =>
                 {
                     // remap streams to builds to ensure model equality
                     res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
@@ -182,9 +183,15 @@ namespace osu.Game.Overlays
                     header.Streams.Populate(res.Streams);
 
                     tcs.SetResult(true);
+                });
+
+                req.Failure += _ =>
+                {
+                    initialFetchTask = null;
+                    tcs.SetResult(false);
                 };
-                req.Failure += _ => initialFetchTask = null;
-                req.Perform(API);
+
+                await API.PerformAsync(req);
 
                 await tcs.Task;
             });

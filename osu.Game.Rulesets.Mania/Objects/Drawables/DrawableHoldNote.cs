@@ -1,14 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System.Diagnostics;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -21,8 +21,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        public readonly DrawableNote Head;
-        public readonly DrawableNote Tail;
+        public DrawableNote Head => headContainer.Child;
+        public DrawableNote Tail => tailContainer.Child;
+
+        private readonly Container<DrawableHeadNote> headContainer;
+        private readonly Container<DrawableTailNote> tailContainer;
+        private readonly Container<DrawableHoldNoteTick> tickContainer;
 
         private readonly BodyPiece bodyPiece;
 
@@ -36,8 +40,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
-        private readonly Container<DrawableHoldNoteTick> tickContainer;
-
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
         {
@@ -45,35 +47,75 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             AddRangeInternal(new Drawable[]
             {
-                bodyPiece = new BodyPiece
-                {
-                    RelativeSizeAxes = Axes.X,
-                },
-                tickContainer = new Container<DrawableHoldNoteTick>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ChildrenEnumerable = HitObject.NestedHitObjects.OfType<HoldNoteTick>().Select(tick => new DrawableHoldNoteTick(tick)
-                    {
-                        HoldStartTime = () => holdStartTime
-                    })
-                },
-                Head = new DrawableHeadNote(this)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                },
-                Tail = new DrawableTailNote(this)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
+                bodyPiece = new BodyPiece { RelativeSizeAxes = Axes.X },
+                tickContainer = new Container<DrawableHoldNoteTick> { RelativeSizeAxes = Axes.Both },
+                headContainer = new Container<DrawableHeadNote> { RelativeSizeAxes = Axes.Both },
+                tailContainer = new Container<DrawableTailNote> { RelativeSizeAxes = Axes.Both },
             });
 
-            foreach (var tick in tickContainer)
-                AddNested(tick);
+            AccentColour.BindValueChanged(colour =>
+            {
+                bodyPiece.AccentColour = colour.NewValue;
+            }, true);
+        }
 
-            AddNested(Head);
-            AddNested(Tail);
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableHeadNote head:
+                    headContainer.Child = head;
+                    break;
+
+                case DrawableTailNote tail:
+                    tailContainer.Child = tail;
+                    break;
+
+                case DrawableHoldNoteTick tick:
+                    tickContainer.Add(tick);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            headContainer.Clear();
+            tailContainer.Clear();
+            tickContainer.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case TailNote _:
+                    return new DrawableTailNote(this)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AccentColour = { BindTarget = AccentColour }
+                    };
+
+                case Note _:
+                    return new DrawableHeadNote(this)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        AccentColour = { BindTarget = AccentColour }
+                    };
+
+                case HoldNoteTick tick:
+                    return new DrawableHoldNoteTick(tick)
+                    {
+                        HoldStartTime = () => holdStartTime,
+                        AccentColour = { BindTarget = AccentColour }
+                    };
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -81,20 +123,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.OnDirectionChanged(e);
 
             bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-        }
-
-        public override Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set
-            {
-                base.AccentColour = value;
-
-                bodyPiece.AccentColour = value;
-                Head.AccentColour = value;
-                Tail.AccentColour = value;
-                tickContainer.ForEach(t => t.AccentColour = value);
-            }
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -110,6 +138,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // Make the body piece not lie under the head note
             bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
+        {
+            using (BeginDelayedSequence(HitObject.Duration, true))
+                base.UpdateStateTransforms(state);
         }
 
         protected void BeginHold()
@@ -210,6 +244,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
+                Debug.Assert(HitObject.HitWindows != null);
+
                 // Factor in the release lenience
                 timeOffset /= release_window_lenience;
 

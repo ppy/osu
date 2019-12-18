@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
@@ -17,7 +18,9 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets
 {
@@ -40,9 +43,11 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="mods">The legacy enum which will be converted</param>
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
-        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
+        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
 
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
+
+        public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
 
         protected Ruleset(RulesetInfo rulesetInfo = null)
         {
@@ -56,7 +61,13 @@ namespace osu.Game.Rulesets
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
-        public abstract DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+
+        /// <summary>
+        /// Creates a <see cref="ScoreProcessor"/> for a beatmap converted to this ruleset.
+        /// </summary>
+        /// <returns>The score processor.</returns>
+        public virtual ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ScoreProcessor(beatmap);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
@@ -79,6 +90,8 @@ namespace osu.Game.Rulesets
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
+
+        public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly.Location), @"Resources");
 
         public abstract string Description { get; }
 
@@ -110,7 +123,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">A variant.</param>
         /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
-        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
+        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => Array.Empty<KeyBinding>();
 
         /// <summary>
         /// Gets the name for a key binding variant. This is used for display in the settings overlay.

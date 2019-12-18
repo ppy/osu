@@ -26,8 +26,13 @@ namespace osu.Game.Overlays.Direct
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(10, 0);
             AutoSizeAxes = Axes.Both;
+        }
 
-            Current.DisabledChanged += value => SelectedTab.FadeColour(value ? Color4.DarkGray : Color4.White, 200, Easing.OutQuint);
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Current.BindDisabledChanged(value => SelectedTab.FadeColour(value ? Color4.DarkGray : Color4.White, 200, Easing.OutQuint), true);
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new DirectRulesetTabItem(value);

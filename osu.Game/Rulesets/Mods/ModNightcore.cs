@@ -2,8 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio;
+using osu.Framework.Audio.Track;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Timing;
 using osu.Game.Graphics;
 
 namespace osu.Game.Rulesets.Mods
@@ -15,12 +16,23 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
 
-        public override void ApplyToClock(IAdjustableClock clock)
+        private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
+        private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);
+
+        protected ModNightcore()
         {
-            if (clock is IHasPitchAdjust pitchAdjust)
-                pitchAdjust.PitchAdjust *= RateAdjust;
-            else
-                base.ApplyToClock(clock);
+            SpeedChange.BindValueChanged(val =>
+            {
+                freqAdjust.Value = SpeedChange.Default;
+                tempoAdjust.Value = val.NewValue / SpeedChange.Default;
+            }, true);
+        }
+
+        public override void ApplyToTrack(Track track)
+        {
+            // base.ApplyToTrack() intentionally not called (different tempo adjustment is applied)
+            track.AddAdjustment(AdjustableProperty.Frequency, freqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, tempoAdjust);
         }
     }
 }

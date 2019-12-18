@@ -20,6 +20,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneUpdateableBeatmapBackgroundSprite : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         private BeatmapSetInfo testBeatmap;
         private IAPIProvider api;
         private RulesetStore rulesets;

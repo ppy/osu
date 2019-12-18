@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Menu
         private const float visualiser_rounds = 5;
 
         /// <summary>
-        /// How much should each bar go down each milisecond (based on a full bar).
+        /// How much should each bar go down each millisecond (based on a full bar).
         /// </summary>
         private const float decay_per_milisecond = 0.0024f;
 
@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Menu
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
         }
 
         [BackgroundDependencyLoader]
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Menu
             Color4 defaultColour = Color4.White.Opacity(0.2f);
 
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? defaultColour;
+                AccentColour = skin.Value.GetConfig<GlobalSkinColour, Color4>(GlobalSkinColour.MenuGlow)?.Value ?? defaultColour;
             else
                 AccentColour = defaultColour;
         }
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Menu
             private IShader shader;
             private Texture texture;
 
-            //Asuming the logo is a circle, we don't need a second dimension.
+            //Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
             private Color4 colour;
@@ -206,8 +206,8 @@ namespace osu.Game.Screens.Menu
                                 continue;
 
                             float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
-                            float rotationCos = (float)Math.Cos(rotation);
-                            float rotationSin = (float)Math.Sin(rotation);
+                            float rotationCos = MathF.Cos(rotation);
+                            float rotationSin = MathF.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 

@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new RendererSettings(),
                 new LayoutSettings(),
                 new DetailSettings(),
-                new MainMenuSettings(),
+                new UserInterfaceSettings(),
             };
         }
     }

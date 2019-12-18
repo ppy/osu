@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public Vector2 ScreenSpaceDragPosition { get; private set; }
         public Vector2 DragPosition { get; private set; }
 
-        protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
+        public new DrawableManiaHitObject DrawableObject => (DrawableManiaHitObject)base.DrawableObject;
 
         protected IClock EditorClock { get; private set; }
 
@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
 
-        public ManiaSelectionBlueprint(DrawableHitObject hitObject)
-            : base(hitObject)
+        public ManiaSelectionBlueprint(DrawableHitObject drawableObject)
+            : base(drawableObject)
         {
             RelativeSizeAxes = Axes.None;
         }
@@ -44,13 +44,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
+            Position = Parent.ToLocalSpace(DrawableObject.ToScreenSpace(Vector2.Zero));
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
             return base.OnMouseDown(e);
         }
@@ -60,20 +60,20 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             var result = base.OnDrag(e);
 
             ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
             return result;
         }
 
         public override void Show()
         {
-            HitObject.AlwaysAlive = true;
+            DrawableObject.AlwaysAlive = true;
             base.Show();
         }
 
         public override void Hide()
         {
-            HitObject.AlwaysAlive = false;
+            DrawableObject.AlwaysAlive = false;
             base.Hide();
         }
     }

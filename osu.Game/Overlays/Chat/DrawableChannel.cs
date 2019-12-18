@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -12,14 +12,22 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat
 {
     public class DrawableChannel : Container
     {
         public readonly Channel Channel;
-        protected ChatLineContainer ChatLineFlow;
+        protected FillFlowContainer ChatLineFlow;
         private OsuScrollContainer scroll;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         public DrawableChannel(Channel channel)
         {
@@ -30,27 +38,24 @@ namespace osu.Game.Overlays.Chat
         [BackgroundDependencyLoader]
         private void load()
         {
-            Children = new Drawable[]
+            Child = new OsuContextMenuContainer
             {
-                scroll = new OsuScrollContainer
+                RelativeSizeAxes = Axes.Both,
+                Masking = true,
+                Child = scroll = new OsuScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     // Some chat lines have effects that slightly protrude to the bottom,
                     // which we do not want to mask away, hence the padding.
                     Padding = new MarginPadding { Bottom = 5 },
-                    Child = new OsuContextMenuContainer
+                    Child = ChatLineFlow = new FillFlowContainer
                     {
+                        Padding = new MarginPadding { Left = 20, Right = 20 },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Child = ChatLineFlow = new ChatLineContainer
-                        {
-                            Padding = new MarginPadding { Left = 20, Right = 20 },
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                        }
-                    },
-                }
+                        Direction = FillDirection.Vertical,
+                    }
+                },
             };
 
             newMessagesArrived(Channel.Messages);
@@ -77,31 +82,61 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual ChatLine CreateChatLine(Message m) => new ChatLine(m);
 
+        protected virtual DaySeparator CreateDaySeparator(DateTimeOffset time) => new DaySeparator(time)
+        {
+            Margin = new MarginPadding { Vertical = 10 },
+            Colour = colours.ChatBlue.Lighten(0.7f),
+        };
+
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
+            bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
+
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
 
-            ChatLineFlow.AddRange(displayMessages.Select(CreateChatLine));
+            Message lastMessage = chatLines.LastOrDefault()?.Message;
 
-            if (scroll.IsScrolledToEnd(10) || !ChatLineFlow.Children.Any() || newMessages.Any(m => m is LocalMessage))
-                scrollToEnd();
-
-            var staleMessages = ChatLineFlow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
-            int count = staleMessages.Length - Channel.MaxHistory;
-
-            for (int i = 0; i < count; i++)
+            foreach (var message in displayMessages)
             {
-                var d = staleMessages[i];
-                if (!scroll.IsScrolledToEnd(10))
-                    scroll.OffsetScrollPosition(-d.DrawHeight);
-                d.Expire();
+                if (lastMessage == null || lastMessage.Timestamp.ToLocalTime().Date != message.Timestamp.ToLocalTime().Date)
+                    ChatLineFlow.Add(CreateDaySeparator(message.Timestamp));
+
+                ChatLineFlow.Add(CreateChatLine(message));
+                lastMessage = message;
             }
+
+            var staleMessages = chatLines.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
+            int count = staleMessages.Length - Channel.MAX_HISTORY;
+
+            if (count > 0)
+            {
+                void expireAndAdjustScroll(Drawable d)
+                {
+                    scroll.OffsetScrollPosition(-d.DrawHeight);
+                    d.Expire();
+                }
+
+                for (int i = 0; i < count; i++)
+                    expireAndAdjustScroll(staleMessages[i]);
+
+                // remove all adjacent day separators after stale message removal
+                for (int i = 0; i < ChatLineFlow.Count - 1; i++)
+                {
+                    if (!(ChatLineFlow[i] is DaySeparator)) break;
+                    if (!(ChatLineFlow[i + 1] is DaySeparator)) break;
+
+                    expireAndAdjustScroll(ChatLineFlow[i]);
+                }
+            }
+
+            if (shouldScrollToEnd)
+                scrollToEnd();
         }
 
         private void pendingMessageResolved(Message existing, Message updated)
         {
-            var found = ChatLineFlow.Children.LastOrDefault(c => c.Message == existing);
+            var found = chatLines.LastOrDefault(c => c.Message == existing);
 
             if (found != null)
             {
@@ -115,19 +150,74 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed)
         {
-            ChatLineFlow.Children.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
+
+        private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
-        protected class ChatLineContainer : FillFlowContainer<ChatLine>
+        public class DaySeparator : Container
         {
-            protected override int Compare(Drawable x, Drawable y)
+            public float TextSize
             {
-                var xC = (ChatLine)x;
-                var yC = (ChatLine)y;
+                get => text.Font.Size;
+                set => text.Font = text.Font.With(size: value);
+            }
 
-                return xC.Message.CompareTo(yC.Message);
+            private float lineHeight = 2;
+
+            public float LineHeight
+            {
+                get => lineHeight;
+                set => lineHeight = leftBox.Height = rightBox.Height = value;
+            }
+
+            private readonly SpriteText text;
+            private readonly Box leftBox;
+            private readonly Box rightBox;
+
+            public DaySeparator(DateTimeOffset time)
+            {
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
+                Child = new GridContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(),
+                    },
+                    RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize), },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            leftBox = new Box
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = lineHeight,
+                            },
+                            text = new OsuSpriteText
+                            {
+                                Margin = new MarginPadding { Horizontal = 10 },
+                                Text = time.ToLocalTime().ToString("dd MMM yyyy"),
+                            },
+                            rightBox = new Box
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = lineHeight,
+                            },
+                        }
+                    }
+                };
             }
         }
     }
