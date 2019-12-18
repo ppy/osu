@@ -377,8 +377,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 double dashModifier = Dashing ? 1 : 0.5;
                 double speed = BASE_SPEED * dashModifier * hyperDashModifier;
 
-                Scale = new Vector2(Math.Abs(Scale.X) * direction, Scale.Y);
-                X = (float)Math.Clamp(X + direction * Clock.ElapsedFrameTime * speed, 0, 1);
+                UpdatePosition((float)(X + direction * Clock.ElapsedFrameTime * speed));
 
                 // Correct overshooting.
                 if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
@@ -451,6 +450,17 @@ namespace osu.Game.Rulesets.Catch.UI
                 // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
                 fruit.LifetimeStart = Time.Current;
                 fruit.Expire();
+            }
+
+            public void UpdatePosition(float position)
+            {
+                position = Math.Clamp(position, 0, 1);
+
+                if (position == X)
+                    return;
+
+                Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
+                X = position;
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,19 +17,22 @@ namespace osu.Game.Overlays.SearchableList
         public const float WIDTH_PADDING = 80;
     }
 
-    public abstract class SearchableListOverlay<T, U, S> : SearchableListOverlay
+    public abstract class SearchableListOverlay<THeader, TTab, TCategory> : SearchableListOverlay
+        where THeader : struct, Enum
+        where TTab : struct, Enum
+        where TCategory : struct, Enum
     {
         private readonly Container scrollContainer;
 
-        protected readonly SearchableListHeader<T> Header;
-        protected readonly SearchableListFilterControl<U, S> Filter;
+        protected readonly SearchableListHeader<THeader> Header;
+        protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
         protected readonly FillFlowContainer ScrollFlow;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract Color4 TrianglesColourLight { get; }
         protected abstract Color4 TrianglesColourDark { get; }
-        protected abstract SearchableListHeader<T> CreateHeader();
-        protected abstract SearchableListFilterControl<U, S> CreateFilterControl();
+        protected abstract SearchableListHeader<THeader> CreateHeader();
+        protected abstract SearchableListFilterControl<TTab, TCategory> CreateFilterControl();
 
         protected SearchableListOverlay()
         {

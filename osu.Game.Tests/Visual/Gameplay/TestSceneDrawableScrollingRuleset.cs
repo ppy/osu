@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var ruleset = new TestScrollingRuleset();
 
-            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap), Array.Empty<Mod>());
+            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
             drawableRuleset.FrameStablePlayback = false;
 
             overrideAction?.Invoke(drawableRuleset);
@@ -194,14 +194,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScrollingRuleset : Ruleset
         {
-            public TestScrollingRuleset(RulesetInfo rulesetInfo = null)
-                : base(rulesetInfo)
-            {
-            }
-
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new TestDrawableScrollingRuleset(this, beatmap, mods);
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new TestDrawableScrollingRuleset(this, beatmap, mods);
 
             public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
 
@@ -222,7 +217,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new Bindable<double> TimeRange => base.TimeRange;
 
-            public TestDrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            public TestDrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
                 : base(ruleset, beatmap, mods)
             {
                 TimeRange.Value = time_range;

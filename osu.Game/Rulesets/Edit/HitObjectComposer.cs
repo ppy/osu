@@ -34,7 +34,9 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         protected IRulesetConfigManager Config { get; private set; }
-        protected EditorBeatmap<TObject> EditorBeatmap { get; private set; }
+
+        protected new EditorBeatmap<TObject> EditorBeatmap { get; private set; }
+
         protected readonly Ruleset Ruleset;
 
         [Resolved]
@@ -46,7 +48,6 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private IWorkingBeatmap workingBeatmap;
         private Beatmap<TObject> playableBeatmap;
         private IBeatmapProcessor beatmapProcessor;
 
@@ -69,7 +70,7 @@ namespace osu.Game.Rulesets.Edit
         {
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap, Array.Empty<Mod>()))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, playableBeatmap))
                 {
                     Clock = framedClock,
                     ProcessCustomClock = false
@@ -143,12 +144,11 @@ namespace osu.Game.Rulesets.Edit
         {
             var parentWorkingBeatmap = parent.Get<IBindable<WorkingBeatmap>>().Value;
 
-            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
-            workingBeatmap = new EditorWorkingBeatmap<TObject>(playableBeatmap, parentWorkingBeatmap);
+            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo);
 
             beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
-            EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+            base.EditorBeatmap = EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
             EditorBeatmap.StartTimeChanged += UpdateHitObject;
@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         public void BeginPlacement(HitObject hitObject)
         {
@@ -332,6 +332,11 @@ namespace osu.Game.Rulesets.Edit
         /// All the <see cref="DrawableHitObject"/>s.
         /// </summary>
         public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
+
+        /// <summary>
+        /// An editor-specific beatmap, exposing mutation events.
+        /// </summary>
+        public IEditorBeatmap EditorBeatmap { get; protected set; }
 
         /// <summary>
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.

@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
-                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
+                    if (!Enum.TryParse(line[1..^1], out section))
                     {
                         Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
                         section = Section.None;
@@ -146,47 +146,6 @@ namespace osu.Game.Beatmaps.Formats
             HitObjects,
             Variables,
             Fonts
-        }
-
-        internal enum LegacySampleBank
-        {
-            None = 0,
-            Normal = 1,
-            Soft = 2,
-            Drum = 3
-        }
-
-        internal enum EventType
-        {
-            Background = 0,
-            Video = 1,
-            Break = 2,
-            Colour = 3,
-            Sprite = 4,
-            Sample = 5,
-            Animation = 6
-        }
-
-        internal enum LegacyOrigins
-        {
-            TopLeft,
-            Centre,
-            CentreLeft,
-            TopRight,
-            BottomCentre,
-            TopCentre,
-            Custom,
-            CentreRight,
-            BottomLeft,
-            BottomRight
-        }
-
-        internal enum StoryLayer
-        {
-            Background = 0,
-            Fail = 1,
-            Pass = 2,
-            Foreground = 3
         }
 
         internal class LegacyDifficultyControlPoint : DifficultyControlPoint

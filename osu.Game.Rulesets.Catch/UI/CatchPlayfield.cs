@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Catch.UI
         public const float BASE_WIDTH = 512;
 
         internal readonly CatcherArea CatcherArea;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || CatcherArea.ReceivePositionalInputAt(screenSpacePos);
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation)
         {

@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Play
         private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
-        /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
+        /// The <see cref="WorkingBeatmap"/>'s track.
         /// </summary>
-        private IAdjustableClock sourceClock;
+        private Track track;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
 
         private readonly double firstHitObjectTime;
 
-        public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
+        public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
             MinValue = 0.5,
@@ -72,8 +72,7 @@ namespace osu.Game.Screens.Play
 
             RelativeSizeAxes = Axes.Both;
 
-            sourceClock = (IAdjustableClock)beatmap.Track ?? new StopwatchClock();
-            (sourceClock as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track = beatmap.Track;
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
@@ -120,18 +119,17 @@ namespace osu.Game.Screens.Play
             Seek(startTime);
 
             adjustableClock.ProcessFrame();
-            UserPlaybackRate.ValueChanged += _ => updateRate();
         }
 
         public void Restart()
         {
             Task.Run(() =>
             {
-                sourceClock.Reset();
+                track.Reset();
 
                 Schedule(() =>
                 {
-                    adjustableClock.ChangeSource(sourceClock);
+                    adjustableClock.ChangeSource(track);
                     updateRate();
 
                     if (!IsPaused.Value)
@@ -197,13 +195,13 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void StopUsingBeatmapClock()
         {
-            if (sourceClock != beatmap.Track)
+            if (track != beatmap.Track)
                 return;
 
             removeSourceClockAdjustments();
 
-            sourceClock = new TrackVirtual(beatmap.Track.Length);
-            adjustableClock.ChangeSource(sourceClock);
+            track = new TrackVirtual(beatmap.Track.Length);
+            adjustableClock.ChangeSource(track);
         }
 
         protected override void Update()
@@ -214,19 +212,20 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
+        private bool speedAdjustmentsApplied;
+
         private void updateRate()
         {
-            if (sourceClock == null) return;
+            if (track == null) return;
 
-            sourceClock.ResetSpeedAdjustments();
+            speedAdjustmentsApplied = true;
+            track.ResetSpeedAdjustments();
 
-            if (sourceClock is IHasTempoAdjust tempo)
-                tempo.TempoAdjust = UserPlaybackRate.Value;
-            else
-                sourceClock.Rate = UserPlaybackRate.Value;
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
-            foreach (var mod in mods.OfType<IApplicableToClock>())
-                mod.ApplyToClock(sourceClock);
+            foreach (var mod in mods.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(track);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -234,13 +233,16 @@ namespace osu.Game.Screens.Play
             base.Dispose(isDisposing);
 
             removeSourceClockAdjustments();
-            sourceClock = null;
+            track = null;
         }
 
         private void removeSourceClockAdjustments()
         {
-            sourceClock.ResetSpeedAdjustments();
-            (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            if (speedAdjustmentsApplied)
+            {
+                track.ResetSpeedAdjustments();
+                speedAdjustmentsApplied = false;
+            }
         }
     }
 }

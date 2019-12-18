@@ -188,26 +188,22 @@ namespace osu.Game.Screens.Play
             InternalButtons.Add(button);
         }
 
-        private int _selectionIndex = -1;
+        private int selectionIndex = -1;
 
-        private int selectionIndex
+        private void setSelected(int value)
         {
-            get => _selectionIndex;
-            set
-            {
-                if (_selectionIndex == value)
-                    return;
+            if (selectionIndex == value)
+                return;
 
-                // Deselect the previously-selected button
-                if (_selectionIndex != -1)
-                    InternalButtons[_selectionIndex].Selected.Value = false;
+            // Deselect the previously-selected button
+            if (selectionIndex != -1)
+                InternalButtons[selectionIndex].Selected.Value = false;
 
-                _selectionIndex = value;
+            selectionIndex = value;
 
-                // Select the newly-selected button
-                if (_selectionIndex != -1)
-                    InternalButtons[_selectionIndex].Selected.Value = true;
-            }
+            // Select the newly-selected button
+            if (selectionIndex != -1)
+                InternalButtons[selectionIndex].Selected.Value = true;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -218,16 +214,16 @@ namespace osu.Game.Screens.Play
                 {
                     case Key.Up:
                         if (selectionIndex == -1 || selectionIndex == 0)
-                            selectionIndex = InternalButtons.Count - 1;
+                            setSelected(InternalButtons.Count - 1);
                         else
-                            selectionIndex--;
+                            setSelected(selectionIndex - 1);
                         return true;
 
                     case Key.Down:
                         if (selectionIndex == -1 || selectionIndex == InternalButtons.Count - 1)
-                            selectionIndex = 0;
+                            setSelected(0);
                         else
-                            selectionIndex++;
+                            setSelected(selectionIndex + 1);
                         return true;
                 }
             }
@@ -266,9 +262,9 @@ namespace osu.Game.Screens.Play
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {
             if (!isSelected)
-                selectionIndex = -1;
+                setSelected(-1);
             else
-                selectionIndex = InternalButtons.IndexOf(button);
+                setSelected(InternalButtons.IndexOf(button));
         }
 
         private void updateRetryCount()
