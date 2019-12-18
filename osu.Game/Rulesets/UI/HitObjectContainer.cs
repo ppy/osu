@@ -33,13 +33,14 @@ namespace osu.Game.Rulesets.UI
 
         public virtual bool Remove(DrawableHitObject hitObject)
         {
-            bool result = RemoveInternal(hitObject);
+            if (!RemoveInternal(hitObject))
+                return false;
 
             // Removed last for the comparer to remain ordered during RemoveInternal
             startTimeMap[hitObject].bindable.UnbindAll();
             startTimeMap.Remove(hitObject);
 
-            return result;
+            return true;
         }
 
         private void onStartTimeChanged(DrawableHitObject hitObject)
