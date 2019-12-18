@@ -79,8 +79,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
 
             addSeekStep(5000);
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+
             addSeekStep(2500);
-            AddAssert("is spm almost same", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
         }
 
         private void addSeekStep(double time)
