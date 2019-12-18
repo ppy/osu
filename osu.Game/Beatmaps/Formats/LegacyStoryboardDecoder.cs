@@ -176,7 +176,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
+                                timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -186,7 +186,7 @@ namespace osu.Game.Beatmaps.Formats
                                 var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
                                 var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                                timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                 break;
                             }
 
