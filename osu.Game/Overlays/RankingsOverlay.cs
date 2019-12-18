@@ -138,7 +138,13 @@ namespace osu.Game.Overlays
             cancellationToken?.Cancel();
             lastRequest?.Cancel();
 
-            var request = createScopedRequest();
+            APIRequest request = Scope.Value switch
+            {
+                RankingsScope.Performance => new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName),
+                RankingsScope.Country => new GetCountryRankingsRequest(ruleset.Value),
+                RankingsScope.Score => new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score),
+                _ => null,
+            };
             lastRequest = request;
 
             if (request == null)
@@ -147,50 +153,20 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            request.Success += () => loadTable(createTableFromResponse(request));
+            request.Success += () => loadTable(request switch
+            {
+                GetUserRankingsRequest userRequest => userRequest.Type switch
+                {
+                    UserRankingsType.Performance => new PerformanceTable(1, userRequest.Result.Users),
+                    UserRankingsType.Score => new ScoresTable(1, userRequest.Result.Users),
+                    _ => null,
+                },
+                GetCountryRankingsRequest countryRequest => new CountriesTable(1, countryRequest.Result.Countries),
+                _ => null,
+            });
             request.Failure += _ => loadTable(null);
 
             api.Queue(request);
-        }
-
-        private APIRequest createScopedRequest()
-        {
-            switch (Scope.Value)
-            {
-                case RankingsScope.Performance:
-                    return new GetUserRankingsRequest(ruleset.Value, country: Country.Value?.FlagName);
-
-                case RankingsScope.Country:
-                    return new GetCountryRankingsRequest(ruleset.Value);
-
-                case RankingsScope.Score:
-                    return new GetUserRankingsRequest(ruleset.Value, UserRankingsType.Score);
-            }
-
-            return null;
-        }
-
-        private Drawable createTableFromResponse(APIRequest request)
-        {
-            switch (request)
-            {
-                case GetUserRankingsRequest userRequest:
-                    switch (userRequest.Type)
-                    {
-                        case UserRankingsType.Performance:
-                            return new PerformanceTable(1, userRequest.Result.Users);
-
-                        case UserRankingsType.Score:
-                            return new ScoresTable(1, userRequest.Result.Users);
-                    }
-
-                    return null;
-
-                case GetCountryRankingsRequest countryRequest:
-                    return new CountriesTable(1, countryRequest.Result.Countries);
-            }
-
-            return null;
         }
 
         private void loadTable(Drawable table)

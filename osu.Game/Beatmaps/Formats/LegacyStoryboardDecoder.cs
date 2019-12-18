@@ -275,7 +275,7 @@ namespace osu.Game.Beatmaps.Formats
         private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
 
         private Anchor parseOrigin(string value)
-            => ((LegacyOrigins)Enum.Parse(typeof(LegacyOrigins), value)) switch
+            => Enum.Parse<LegacyOrigins>(value) switch
             {
                 LegacyOrigins.TopLeft => Anchor.TopLeft,
                 LegacyOrigins.TopCentre => Anchor.TopCentre,

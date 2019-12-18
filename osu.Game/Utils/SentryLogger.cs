@@ -58,30 +58,16 @@ namespace osu.Game.Utils
 
         private bool shouldSubmitException(Exception exception)
         {
-            switch (exception)
+            // disk full exceptions, see https://stackoverflow.com/a/9294382
+            const int hr_error_handle_disk_full = unchecked((int)0x80070027);
+            const int hr_error_disk_full = unchecked((int)0x80070070);
+
+            return exception switch
             {
-                case IOException ioe:
-                    // disk full exceptions, see https://stackoverflow.com/a/9294382
-                    const int hr_error_handle_disk_full = unchecked((int)0x80070027);
-                    const int hr_error_disk_full = unchecked((int)0x80070070);
-
-                    if (ioe.HResult == hr_error_handle_disk_full || ioe.HResult == hr_error_disk_full)
-                        return false;
-
-                    break;
-
-                case WebException we:
-                    switch (we.Status)
-                    {
-                        // more statuses may need to be blocked as we come across them.
-                        case WebExceptionStatus.Timeout:
-                            return false;
-                    }
-
-                    break;
-            }
-
-            return true;
+                IOException ioe when ioe.HResult == hr_error_handle_disk_full || ioe.HResult == hr_error_disk_full => false,
+                WebException { Status: WebExceptionStatus.Timeout } => false, // more statuses may need to be blocked as we come across them.
+                _ => true,
+            };
         }
 
         #region Disposal

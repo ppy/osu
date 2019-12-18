@@ -148,7 +148,7 @@ namespace osu.Game.Beatmaps.Formats
                         1 => new Rulesets.Objects.Legacy.Taiko.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
                         2 => new Rulesets.Objects.Legacy.Catch.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
                         3 => new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser(getOffsetTime(), FormatVersion),
-                        _ => parser,
+                        _ => throw new FormatException($"Unknown ruleset ID {beatmap.BeatmapInfo.RulesetID}."),
                     };
                     break;
 

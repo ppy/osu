@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Game.Beatmaps;
 using osuTK.Graphics;
 
@@ -14,20 +15,22 @@ namespace osu.Game.Graphics
 
         public static Color4 FromHex(string hex)
         {
-            if (hex[0] == '#')
-                hex = hex.Substring(1);
+            var hexSpan = hex.AsSpan();
 
-            return hex.Length switch
+            if (hexSpan[0] == '#')
+                hexSpan = hexSpan[1..];
+
+            return hexSpan.Length switch
             {
                 3 => new Color4(
-                    (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
-                    (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
-                    (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                    (byte)(byte.Parse(hexSpan[0..1], NumberStyles.HexNumber) * 17),
+                    (byte)(byte.Parse(hexSpan[1..2], NumberStyles.HexNumber) * 17),
+                    (byte)(byte.Parse(hexSpan[2..3], NumberStyles.HexNumber) * 17),
                     255),
                 6 => new Color4(
-                    Convert.ToByte(hex.Substring(0, 2), 16),
-                    Convert.ToByte(hex.Substring(2, 2), 16),
-                    Convert.ToByte(hex.Substring(4, 2), 16),
+                    byte.Parse(hexSpan[0..2], NumberStyles.HexNumber),
+                    byte.Parse(hexSpan[2..4], NumberStyles.HexNumber),
+                    byte.Parse(hexSpan[4..6], NumberStyles.HexNumber),
                     255),
                 _ => throw new ArgumentException(@"Invalid hex string length!"),
             };

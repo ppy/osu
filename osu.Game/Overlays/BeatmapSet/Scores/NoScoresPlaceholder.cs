@@ -27,20 +27,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             Show();
 
-            switch (scope)
+            text.Text = scope switch
             {
-                default:
-                    text.Text = @"No scores have been set yet. Maybe you can be the first!";
-                    break;
-
-                case BeatmapLeaderboardScope.Friend:
-                    text.Text = @"None of your friends have set a score on this map yet.";
-                    break;
-
-                case BeatmapLeaderboardScope.Country:
-                    text.Text = @"No one from your country has set a score on this map yet.";
-                    break;
-            }
+                BeatmapLeaderboardScope.Friend => @"None of your friends have set a score on this map yet.",
+                BeatmapLeaderboardScope.Country => @"No one from your country has set a score on this map yet.",
+                _ => @"No scores have been set yet. Maybe you can be the first!",
+            };
         }
     }
 }

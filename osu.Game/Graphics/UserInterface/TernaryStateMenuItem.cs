@@ -28,7 +28,14 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="type">The type of action which this <see cref="TernaryStateMenuItem"/> performs.</param>
         /// <param name="action">A delegate to be invoked when this <see cref="TernaryStateMenuItem"/> is pressed.</param>
         public TernaryStateMenuItem(string text, MenuItemType type, Action<TernaryState> action)
-            : this(text, getNextState, type, action)
+            : this(text,
+                state => state switch
+                {
+                    TernaryState.False => TernaryState.True,
+                    TernaryState.Indeterminate => TernaryState.True,
+                    TernaryState.True => TernaryState.False,
+                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, null),
+                }, type, action)
         {
         }
 
@@ -45,35 +52,11 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         public override IconUsage? GetIconForState(TernaryState state)
-        {
-            switch (state)
+            => state switch
             {
-                case TernaryState.Indeterminate:
-                    return FontAwesome.Solid.DotCircle;
-
-                case TernaryState.True:
-                    return FontAwesome.Solid.Check;
-            }
-
-            return null;
-        }
-
-        private static TernaryState getNextState(TernaryState state)
-        {
-            switch (state)
-            {
-                case TernaryState.False:
-                    return TernaryState.True;
-
-                case TernaryState.Indeterminate:
-                    return TernaryState.True;
-
-                case TernaryState.True:
-                    return TernaryState.False;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
-            }
-        }
+                TernaryState.Indeterminate => FontAwesome.Solid.DotCircle,
+                TernaryState.True => FontAwesome.Solid.Check,
+                _ => null,
+            };
     }
 }

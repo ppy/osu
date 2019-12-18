@@ -173,25 +173,13 @@ namespace osu.Game.Database
                     if (logLevel < LogLevel.Information)
                         return;
 
-                    Framework.Logging.LogLevel frameworkLogLevel;
-
-                    switch (logLevel)
+                    Logger.Log(formatter(state, exception), LoggingTarget.Database, logLevel switch
                     {
-                        default:
-                            frameworkLogLevel = Framework.Logging.LogLevel.Debug;
-                            break;
-
-                        case LogLevel.Warning:
-                            frameworkLogLevel = Framework.Logging.LogLevel.Important;
-                            break;
-
-                        case LogLevel.Error:
-                        case LogLevel.Critical:
-                            frameworkLogLevel = Framework.Logging.LogLevel.Error;
-                            break;
-                    }
-
-                    Logger.Log(formatter(state, exception), LoggingTarget.Database, frameworkLogLevel);
+                        LogLevel.Warning => Framework.Logging.LogLevel.Important,
+                        LogLevel.Error => Framework.Logging.LogLevel.Error,
+                        LogLevel.Critical => Framework.Logging.LogLevel.Error,
+                        _ => Framework.Logging.LogLevel.Debug,
+                    });
                 }
 
                 public bool IsEnabled(LogLevel logLevel)

@@ -15,10 +15,10 @@ using osu.Framework.Audio;
 using osu.Framework.Statistics;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Video;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
@@ -55,13 +55,8 @@ namespace osu.Game.Beatmaps
             const double excess_length = 1000;
 
             var lastObject = Beatmap.HitObjects.LastOrDefault();
+            var length = lastObject?.GetEndTime() ?? 0 + excess_length;
 
-            var length = lastObject switch
-            {
-                null => excess_length,
-                IHasEndTime endTime => endTime.EndTime + excess_length,
-                _ => lastObject.StartTime + excess_length,
-            };
             return AudioManager.Tracks.GetVirtual(length);
         }
 

@@ -52,15 +52,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
         public IEnumerable<DifficultyAttributes> CalculateAll()
-        {
-            foreach (var combination in CreateDifficultyAdjustmentModCombinations())
-            {
-                if (combination is MultiMod multi)
-                    yield return Calculate(multi.Mods);
-                else
-                    yield return Calculate(combination);
-            }
-        }
+            => CreateDifficultyAdjustmentModCombinations()
+                .Select(c => c switch
+                {
+                    MultiMod multi => Calculate(multi.Mods),
+                    _ => Calculate(c),
+                });
 
         private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {

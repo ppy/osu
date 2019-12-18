@@ -45,21 +45,12 @@ namespace osu.Game.Graphics.UserInterface
 
         private void updateTextColour()
         {
-            switch ((Item as OsuMenuItem)?.Type)
+            text.Colour = (Item as OsuMenuItem)?.Type switch
             {
-                default:
-                case MenuItemType.Standard:
-                    text.Colour = Color4.White;
-                    break;
-
-                case MenuItemType.Destructive:
-                    text.Colour = Color4.Red;
-                    break;
-
-                case MenuItemType.Highlighted:
-                    text.Colour = OsuColour.FromHex(@"ffcc22");
-                    break;
-            }
+                MenuItemType.Destructive => Color4.Red,
+                MenuItemType.Highlighted => OsuColour.FromHex(@"ffcc22"),
+                _ => Color4.White,
+            };
         }
 
         protected override bool OnHover(HoverEvent e)

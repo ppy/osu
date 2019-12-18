@@ -315,17 +315,15 @@ namespace osu.Game.Online.API
 
         private bool handleWebException(WebException we)
         {
-            HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
-                                        ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
-
-            // special cases for un-typed but useful message responses.
-            switch (we.Message)
+            var statusCode = we switch
             {
-                case "Unauthorized":
-                case "Forbidden":
-                    statusCode = HttpStatusCode.Unauthorized;
-                    break;
-            }
+                // special cases for un-typed but useful message responses.
+                { Message: "Unauthorized" } => HttpStatusCode.Unauthorized,
+                { Message: "Forbidden" } => HttpStatusCode.Unauthorized,
+                { Response: HttpWebResponse hwr } => hwr.StatusCode,
+                { Status: WebExceptionStatus.UnknownError } => HttpStatusCode.NotAcceptable,
+                _ => HttpStatusCode.RequestTimeout,
+            };
 
             switch (statusCode)
             {

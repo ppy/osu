@@ -18,12 +18,12 @@ namespace osu.Game.Online.API.Requests
         }
 
         protected override string Target
-            => "rooms" + primaryFilter switch
+            => primaryFilter switch
             {
-                PrimaryFilter.Open => string.Empty,
-                PrimaryFilter.Owned => "/owned",
-                PrimaryFilter.Participated => "/participated",
-                PrimaryFilter.RecentlyEnded => "/ended",
+                PrimaryFilter.Open => "rooms",
+                PrimaryFilter.Owned => "rooms/owned",
+                PrimaryFilter.Participated => "rooms/participated",
+                PrimaryFilter.RecentlyEnded => "rooms/ended",
                 _ => throw new ArgumentException($"Unknown enum member {nameof(PrimaryFilter)} {primaryFilter}"),
             };
     }

@@ -116,36 +116,25 @@ namespace osu.Game.Online.Chat
 
             switch (args[0])
             {
-                case "http":
-                case "https":
-                    // length > 3 since all these links need another argument to work
-                    if (args.Length > 3 && (args[1] == "osu.ppy.sh" || args[1] == "new.ppy.sh"))
+                case "http" when args.Length == 4 && (args[1] == "osu.ppy.sh" || args[1] == "new.ppy.sh"):
+                case "https" when args.Length == 4 && (args[1] == "osu.ppy.sh" || args[1] == "new.ppy.sh"):
+                    return new LinkDetails(args[2] switch
                     {
-                        switch (args[2])
-                        {
-                            case "b":
-                            case "beatmaps":
-                                return new LinkDetails(LinkAction.OpenBeatmap, args[3]);
+                        "b" => LinkAction.OpenBeatmap,
+                        "beatmaps" => LinkAction.OpenBeatmap,
 
-                            case "s":
-                            case "beatmapsets":
-                            case "d":
-                                return new LinkDetails(LinkAction.OpenBeatmapSet, args[3]);
+                        "s" => LinkAction.OpenBeatmapSet,
+                        "beatmapsets" => LinkAction.OpenBeatmapSet,
+                        "d" => LinkAction.OpenBeatmapSet,
 
-                            case "u":
-                            case "users":
-                                return new LinkDetails(LinkAction.OpenUserProfile, args[3]);
-                        }
-                    }
+                        "u" => LinkAction.OpenUserProfile,
+                        "users" => LinkAction.OpenUserProfile,
 
-                    return new LinkDetails(LinkAction.External, null);
+                        _ => LinkAction.External,
+                    }, args[3]);
 
-                case "osu":
-                    // every internal link also needs some kind of argument
-                    if (args.Length < 3)
-                        return new LinkDetails(LinkAction.External, null);
-
-                    var linkType = args[1] switch
+                case "osu" when args.Length == 3:
+                    return new LinkDetails(args[1] switch
                     {
                         "chan" => LinkAction.OpenChannel,
                         "edit" => LinkAction.OpenEditorTimestamp,
@@ -155,8 +144,7 @@ namespace osu.Game.Online.Chat
                         "spectate" => LinkAction.Spectate,
                         "u" => LinkAction.OpenUserProfile,
                         _ => LinkAction.External,
-                    };
-                    return new LinkDetails(linkType, args[2]);
+                    }, args[2]);
 
                 case "osump":
                     return new LinkDetails(LinkAction.JoinMultiplayerMatch, args[1]);

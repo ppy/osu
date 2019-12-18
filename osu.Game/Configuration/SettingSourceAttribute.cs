@@ -35,6 +35,16 @@ namespace osu.Game.Configuration
     {
         public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
+            Drawable createFromNonGeneric(IBindable bindable)
+            {
+                var dropdownType = typeof(SettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
+                var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
+
+                dropdown.GetType().GetProperty(nameof(IHasCurrentValue<object>.Current))?.SetValue(dropdown, obj);
+
+                return dropdown;
+            }
+
             foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
             {
                 var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
@@ -42,68 +52,36 @@ namespace osu.Game.Configuration
                 if (attr == null)
                     continue;
 
-                var prop = property.GetValue(obj);
-
-                switch (prop)
+                yield return property.GetValue(obj) switch
                 {
-                    case BindableNumber<float> bNumber:
-                        yield return new SettingsSlider<float>
-                        {
-                            LabelText = attr.Label,
-                            Bindable = bNumber
-                        };
-
-                        break;
-
-                    case BindableNumber<double> bNumber:
-                        yield return new SettingsSlider<double>
-                        {
-                            LabelText = attr.Label,
-                            Bindable = bNumber
-                        };
-
-                        break;
-
-                    case BindableNumber<int> bNumber:
-                        yield return new SettingsSlider<int>
-                        {
-                            LabelText = attr.Label,
-                            Bindable = bNumber
-                        };
-
-                        break;
-
-                    case Bindable<bool> bBool:
-                        yield return new SettingsCheckbox
-                        {
-                            LabelText = attr.Label,
-                            Bindable = bBool
-                        };
-
-                        break;
-
-                    case Bindable<string> bString:
-                        yield return new SettingsTextBox
-                        {
-                            LabelText = attr.Label,
-                            Bindable = bString
-                        };
-
-                        break;
-
-                    case IBindable bindable:
-                        var dropdownType = typeof(SettingsEnumDropdown<>).MakeGenericType(bindable.GetType().GetGenericArguments()[0]);
-                        var dropdown = (Drawable)Activator.CreateInstance(dropdownType);
-
-                        dropdown.GetType().GetProperty(nameof(IHasCurrentValue<object>.Current))?.SetValue(dropdown, obj);
-
-                        yield return dropdown;
-
-                        break;
-
-                    default:
-                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({prop})");
-                }
+                    BindableNumber<float> bNumber => new SettingsSlider<float>
+                    {
+                        LabelText = attr.Label,
+                        Bindable = bNumber
+                    },
+                    BindableNumber<double> bNumber => new SettingsSlider<double>
+                    {
+                        LabelText = attr.Label,
+                        Bindable = bNumber
+                    },
+                    BindableNumber<int> bNumber => new SettingsSlider<int>
+                    {
+                        LabelText = attr.Label,
+                        Bindable = bNumber
+                    },
+                    Bindable<bool> bBool => new SettingsCheckbox
+                    {
+                        LabelText = attr.Label,
+                        Bindable = bBool
+                    },
+                    Bindable<string> bString => new SettingsTextBox
+                    {
+                        LabelText = attr.Label,
+                        Bindable = bString
+                    },
+                    IBindable bindable => createFromNonGeneric(bindable),
+                    var other => throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({other})"),
+                };
             }
         }
     }

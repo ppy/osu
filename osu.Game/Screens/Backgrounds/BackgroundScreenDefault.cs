@@ -72,23 +72,15 @@ namespace osu.Game.Screens.Backgrounds
 
         private Background createBackground()
         {
-            Background newBackground;
-
-            if (user.Value?.IsSupporter ?? false)
+            var newBackground = user.Value switch
             {
-                switch (mode.Value)
+                { IsSupporter: true } => mode.Value switch
                 {
-                    case BackgroundSource.Beatmap:
-                        newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
-                        break;
-
-                    default:
-                        newBackground = new SkinnedBackground(skin.Value, backgroundName);
-                        break;
-                }
-            }
-            else
-                newBackground = new Background(backgroundName);
+                    BackgroundSource.Beatmap => new BeatmapBackground(beatmap.Value, backgroundName),
+                    _ => new SkinnedBackground(skin.Value, backgroundName),
+                },
+                _ => new Background(backgroundName),
+            };
 
             newBackground.Depth = currentDisplay;
 

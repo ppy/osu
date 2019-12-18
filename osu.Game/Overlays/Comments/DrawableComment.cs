@@ -306,7 +306,12 @@ namespace osu.Game.Overlays.Comments
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
         {
-            public string TooltipText => getParentMessage();
+            public string TooltipText => parentComment switch
+            {
+                { HasMessage: true } => parentComment.GetMessage,
+                { IsDeleted: true } => "deleted",
+                _ => string.Empty,
+            };
 
             private readonly Comment parentComment;
 
@@ -331,14 +336,6 @@ namespace osu.Game.Overlays.Comments
                         Text = parentComment?.User?.Username ?? parentComment?.LegacyName
                     }
                 };
-            }
-
-            private string getParentMessage()
-            {
-                if (parentComment == null)
-                    return string.Empty;
-
-                return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
         }
     }
