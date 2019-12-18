@@ -63,7 +63,13 @@ namespace osu.Game.Screens.Select.Details
         private void load(OsuColour colours)
         {
             starDifficulty.AccentColour = colours.Yellow;
-            mods.ValueChanged += _ => updateStatistics();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            mods.BindValueChanged(_ => updateStatistics(), true);
         }
 
         private void updateStatistics()
