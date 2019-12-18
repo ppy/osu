@@ -12,6 +12,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.IO;
 using osu.Game.Storyboards;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -83,12 +84,12 @@ namespace osu.Game.Beatmaps.Formats
             {
                 storyboardSprite = null;
 
-                if (!Enum.TryParse(split[0], out EventType type))
+                if (!Enum.TryParse(split[0], out LegacyEventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
                 {
-                    case EventType.Sprite:
+                    case LegacyEventType.Sprite:
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
@@ -100,7 +101,7 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     }
 
-                    case EventType.Animation:
+                    case LegacyEventType.Animation:
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
@@ -115,7 +116,7 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     }
 
-                    case EventType.Sample:
+                    case LegacyEventType.Sample:
                     {
                         var time = double.Parse(split[1], CultureInfo.InvariantCulture);
                         var layer = parseLayer(split[2]);
@@ -176,7 +177,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startValue), new Vector2(endValue));
+                                timelineGroup?.Scale.Add(easing, startTime, endTime, startValue, endValue);
                                 break;
                             }
 
@@ -186,7 +187,7 @@ namespace osu.Game.Beatmaps.Formats
                                 var startY = float.Parse(split[5], CultureInfo.InvariantCulture);
                                 var endX = split.Length > 6 ? float.Parse(split[6], CultureInfo.InvariantCulture) : startX;
                                 var endY = split.Length > 7 ? float.Parse(split[7], CultureInfo.InvariantCulture) : startY;
-                                timelineGroup?.Scale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
+                                timelineGroup?.VectorScale.Add(easing, startTime, endTime, new Vector2(startX, startY), new Vector2(endX, endY));
                                 break;
                             }
 
@@ -271,7 +272,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse(typeof(StoryLayer), value).ToString();
+        private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
 
         private Anchor parseOrigin(string value)
         {

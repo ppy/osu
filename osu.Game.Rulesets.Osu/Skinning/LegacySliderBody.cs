@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.MathUtils;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK.Graphics;
 
@@ -15,19 +16,27 @@ namespace osu.Game.Rulesets.Osu.Skinning
 
         private class LegacyDrawableSliderPath : DrawableSliderPath
         {
+            private const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
+
             public new Color4 AccentColour => new Color4(base.AccentColour.R, base.AccentColour.G, base.AccentColour.B, base.AccentColour.A * 0.70f);
 
             protected override Color4 ColourAt(float position)
             {
-                if (CalculatedBorderPortion != 0f && position <= CalculatedBorderPortion)
+                float realBorderPortion = shadow_portion + CalculatedBorderPortion;
+                float realGradientPortion = 1 - realBorderPortion;
+
+                if (position <= shadow_portion)
+                    return new Color4(0f, 0f, 0f, 0.25f * position / shadow_portion);
+
+                if (position <= realBorderPortion)
                     return BorderColour;
 
-                position -= BORDER_PORTION;
+                position -= realBorderPortion;
 
                 Color4 outerColour = AccentColour.Darken(0.1f);
                 Color4 innerColour = lighten(AccentColour, 0.5f);
 
-                return Interpolation.ValueAt(position / GRADIENT_PORTION, outerColour, innerColour, 0, 1);
+                return Interpolation.ValueAt(position / realGradientPortion, outerColour, innerColour, 0, 1);
             }
 
             /// <summary>
