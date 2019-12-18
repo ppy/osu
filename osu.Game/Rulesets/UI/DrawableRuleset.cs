@@ -305,8 +305,6 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor(Beatmap);
-
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
@@ -475,13 +473,6 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
-
-        /// <summary>
-        /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
-        /// <see cref="DrawableRuleset"/>.
-        /// </summary>
-        /// <returns>A score processor.</returns>
-        public abstract ScoreProcessor CreateScoreProcessor();
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
@@ -515,34 +506,34 @@ namespace osu.Game.Rulesets.UI
 
         public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
 
-        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+        public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotImplementedException();
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
 
-        public BindableNumber<double> Volume => throw new NotImplementedException();
+        public BindableNumber<double> Volume => throw new NotSupportedException();
 
-        public BindableNumber<double> Balance => throw new NotImplementedException();
+        public BindableNumber<double> Balance => throw new NotSupportedException();
 
-        public BindableNumber<double> Frequency => throw new NotImplementedException();
+        public BindableNumber<double> Frequency => throw new NotSupportedException();
 
-        public BindableNumber<double> Tempo => throw new NotImplementedException();
+        public BindableNumber<double> Tempo => throw new NotSupportedException();
 
-        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotImplementedException();
+        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
 
-        public IBindable<double> AggregateVolume => throw new NotImplementedException();
+        public IBindable<double> AggregateVolume => throw new NotSupportedException();
 
-        public IBindable<double> AggregateBalance => throw new NotImplementedException();
+        public IBindable<double> AggregateBalance => throw new NotSupportedException();
 
-        public IBindable<double> AggregateFrequency => throw new NotImplementedException();
+        public IBindable<double> AggregateFrequency => throw new NotSupportedException();
 
-        public IBindable<double> AggregateTempo => throw new NotImplementedException();
+        public IBindable<double> AggregateTempo => throw new NotSupportedException();
 
         public int PlaybackConcurrency
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
         public void Dispose()

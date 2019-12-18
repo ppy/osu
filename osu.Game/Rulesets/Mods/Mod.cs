@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Mods
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]
-        public virtual Type[] IncompatibleMods => new Type[] { };
+        public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
