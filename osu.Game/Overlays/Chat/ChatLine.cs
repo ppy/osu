@@ -31,7 +31,9 @@ namespace osu.Game.Overlays.Chat
 
         protected virtual float MessagePadding => default_message_padding;
 
-        private const float timestamp_padding = 65;
+        private const float default_timestamp_padding = 65;
+
+        protected virtual float TimestampPadding => default_timestamp_padding;
 
         private const float default_horizontal_padding = 15;
 
@@ -56,9 +58,8 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private LinkFlowContainer contentFlow;
 
-        public LinkFlowContainer ContentFlow => contentFlow;
+        public LinkFlowContainer ContentFlow { get; private set; }
 
         public Message Message
         {
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.Chat
                 Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                MaxWidth = default_message_padding - timestamp_padding
+                MaxWidth = MessagePadding - TimestampPadding
             };
 
             if (hasBackground)
@@ -149,7 +150,6 @@ namespace osu.Game.Overlays.Chat
                         new MessageSender(message.Sender)
                         {
                             AutoSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Left = timestamp_padding },
                             Origin = Anchor.TopRight,
                             Anchor = Anchor.TopRight,
                             Child = effectedUsername,
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = MessagePadding + HorizontalPadding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new LinkFlowContainer(t =>
+                        ContentFlow = new LinkFlowContainer(t =>
                         {
                             t.Shadow = false;
 
@@ -205,8 +205,8 @@ namespace osu.Game.Overlays.Chat
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
 
-            contentFlow.Clear();
-            contentFlow.AddLinks(message.DisplayContent, message.Links);
+            ContentFlow.Clear();
+            ContentFlow.AddLinks(message.DisplayContent, message.Links);
         }
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu

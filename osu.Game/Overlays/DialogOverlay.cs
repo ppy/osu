@@ -13,7 +13,8 @@ namespace osu.Game.Overlays
     public class DialogOverlay : OsuFocusedOverlayContainer
     {
         private readonly Container dialogContainer;
-        private PopupDialog currentDialog;
+
+        public PopupDialog CurrentDialog { get; private set; }
 
         public DialogOverlay()
         {
@@ -31,15 +32,15 @@ namespace osu.Game.Overlays
 
         public void Push(PopupDialog dialog)
         {
-            if (dialog == currentDialog) return;
+            if (dialog == CurrentDialog) return;
 
-            currentDialog?.Hide();
-            currentDialog = dialog;
+            CurrentDialog?.Hide();
+            CurrentDialog = dialog;
 
-            dialogContainer.Add(currentDialog);
+            dialogContainer.Add(CurrentDialog);
 
-            currentDialog.Show();
-            currentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
+            CurrentDialog.Show();
+            CurrentDialog.State.ValueChanged += state => onDialogOnStateChanged(dialog, state.NewValue);
             Show();
         }
 
@@ -52,8 +53,11 @@ namespace osu.Game.Overlays
             //handle the dialog being dismissed.
             dialog.Delay(PopupDialog.EXIT_DURATION).Expire();
 
-            if (dialog == currentDialog)
+            if (dialog == CurrentDialog)
+            {
                 Hide();
+                CurrentDialog = null;
+            }
         }
 
         protected override void PopIn()
@@ -66,9 +70,9 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
-            if (currentDialog?.State.Value == Visibility.Visible)
+            if (CurrentDialog?.State.Value == Visibility.Visible)
             {
-                currentDialog.Hide();
+                CurrentDialog.Hide();
                 return;
             }
 
@@ -80,7 +84,7 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Select:
-                    currentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
+                    CurrentDialog?.Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
                     return true;
             }
 

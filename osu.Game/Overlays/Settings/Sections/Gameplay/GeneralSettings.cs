@@ -31,6 +31,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Lighten playfield during breaks",
+                    Bindable = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
                 },
@@ -38,6 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Show health display even when you can't fail",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
+                    Keywords = new[] { "hp", "bar" }
                 },
                 new SettingsCheckbox
                 {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osu.Game.Skinning;
@@ -98,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
-            List<Vector2> curve = drawableSlider.Body.CurrentCurve;
+            List<Vector2> curve = ((PlaySliderBody)drawableSlider.Body.Drawable).CurrentCurve;
 
             Position = isRepeatAtEnd ? end : start;
 
@@ -120,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
-            float aimRotation = MathHelper.RadiansToDegrees((float)Math.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = MathHelper.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)
                 aimRotation += aimRotation < Rotation ? 360 : -360;
 
@@ -132,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             else
             {
                 // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
-                Rotation = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
+                Rotation = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
     }

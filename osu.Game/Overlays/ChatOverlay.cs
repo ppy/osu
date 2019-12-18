@@ -21,6 +21,7 @@ using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -138,7 +139,6 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "type your message",
-                                            Exit = Hide,
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
@@ -156,6 +156,14 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
+                                },
+                                new SpriteIcon
+                                {
+                                    Icon = FontAwesome.Solid.Comments,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(20),
+                                    Margin = new MarginPadding(10),
                                 },
                                 ChannelTabControl = CreateChannelTabControl().With(d =>
                                 {
