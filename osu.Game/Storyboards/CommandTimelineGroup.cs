@@ -16,7 +16,8 @@ namespace osu.Game.Storyboards
     {
         public CommandTimeline<float> X = new CommandTimeline<float>();
         public CommandTimeline<float> Y = new CommandTimeline<float>();
-        public CommandTimeline<Vector2> Scale = new CommandTimeline<Vector2>();
+        public CommandTimeline<float> Scale = new CommandTimeline<float>();
+        public CommandTimeline<Vector2> VectorScale = new CommandTimeline<Vector2>();
         public CommandTimeline<float> Rotation = new CommandTimeline<float>();
         public CommandTimeline<Color4> Colour = new CommandTimeline<Color4>();
         public CommandTimeline<float> Alpha = new CommandTimeline<float>();
@@ -65,6 +66,7 @@ namespace osu.Game.Storyboards
         public virtual IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)
         {
             if (offset != 0)
+            {
                 return timelineSelector(this).Commands.Select(command =>
                     new CommandTimeline<T>.TypedCommand
                     {
@@ -74,6 +76,7 @@ namespace osu.Game.Storyboards
                         StartValue = command.StartValue,
                         EndValue = command.EndValue,
                     });
+            }
 
             return timelineSelector(this).Commands;
         }

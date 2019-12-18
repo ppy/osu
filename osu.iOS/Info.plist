@@ -14,6 +14,8 @@
 	<string>0.1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>MinimumOSVersion</key>
 	<string>10.0</string>
 	<key>UIDeviceFamily</key>
@@ -32,9 +34,9 @@
 	<key>UIStatusBarHidden</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-    <string>We don't really use the camera.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>We don't really use the microphone.</string>
+	<string>We don&apos;t really use the camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We don&apos;t really use the microphone.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -107,6 +109,18 @@
 			<array>
 				<string>sh.ppy.osu.items</string>
 			</array>
+		</dict>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>osu</string>
+				<string>osump</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 		</dict>
 	</array>
 </dict>

@@ -10,7 +10,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor
+    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor, IApplicableFailOverride
     {
         public override string Name => "Sudden Death";
         public override string Acronym => "SD";
@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
+
+        public bool AllowFail => true;
+        public bool RestartOnFail => true;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {

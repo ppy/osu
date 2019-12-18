@@ -80,6 +80,9 @@ namespace osu.Game.Configuration
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+            Set(OsuSetting.LightenDuringBreaks, true);
+
+            Set(OsuSetting.HitLighting, true);
 
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
@@ -112,7 +115,11 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
 
+            Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
+
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
+
+            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
         }
 
         public OsuConfigManager(Storage storage)
@@ -136,6 +143,7 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         DimLevel,
         BlurLevel,
+        LightenDuringBreaks,
         ShowStoryboard,
         ShowVideoBackground,
         KeyOverlay,
@@ -180,6 +188,9 @@ namespace osu.Game.Configuration
         ScalingSizeX,
         ScalingSizeY,
         UIScale,
-        IntroSequence
+        IntroSequence,
+        UIHoldActivationDelay,
+        HitLighting,
+        MenuBackgroundSource
     }
 }

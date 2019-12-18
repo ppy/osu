@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, ScoreInfo> : Container, IOnlineComponent
+    public abstract class Leaderboard<TScope, TScoreInfo> : Container, IOnlineComponent
     {
         private const double fade_duration = 300;
 
@@ -35,9 +35,13 @@ namespace osu.Game.Online.Leaderboards
 
         private bool scoresLoadedOnce;
 
-        private IEnumerable<ScoreInfo> scores;
+        private readonly Container content;
 
-        public IEnumerable<ScoreInfo> Scores
+        protected override Container<Drawable> Content => content;
+
+        private IEnumerable<TScoreInfo> scores;
+
+        public IEnumerable<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -60,19 +64,21 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var sf = CreateScoreFlow();
-                sf.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
+                var scoreFlow = CreateScoreFlow();
+                scoreFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate = Schedule(() => LoadComponentAsync(sf, _ =>
+                showScoresDelegate = Schedule(() => LoadComponentAsync(scoreFlow, _ =>
                 {
-                    scrollContainer.Add(scrollFlow = sf);
+                    scrollContainer.Add(scrollFlow = scoreFlow);
 
                     int i = 0;
 
                     foreach (var s in scrollFlow.Children)
+                    {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
+                    }
 
                     scrollContainer.ScrollTo(0f, false);
                 }, (showScoresCancellationSource = new CancellationTokenSource()).Token));
@@ -95,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
             get => scope;
             set
             {
-                if (value.Equals(scope))
+                if (EqualityComparer<TScope>.Default.Equals(value, scope))
                     return;
 
                 scope = value;
@@ -116,9 +122,7 @@ namespace osu.Game.Online.Leaderboards
             {
                 if (value != PlaceholderState.Successful)
                 {
-                    getScoresRequest?.Cancel();
-                    getScoresRequest = null;
-                    Scores = null;
+                    Reset();
                 }
 
                 if (value == placeholderState)
@@ -162,12 +166,35 @@ namespace osu.Game.Online.Leaderboards
 
         protected Leaderboard()
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                scrollContainer = new OsuScrollContainer
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
+                    RowDimensions = new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.AutoSize),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
+                        {
+                            scrollContainer = new OsuScrollContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ScrollbarVisible = false,
+                            }
+                        },
+                        new Drawable[]
+                        {
+                            content = new Container
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                            },
+                        }
+                    },
                 },
                 loading = new LoadingAnimation(),
                 placeholderContainer = new Container
@@ -175,6 +202,13 @@ namespace osu.Game.Online.Leaderboards
                     RelativeSizeAxes = Axes.Both
                 },
             };
+        }
+
+        protected virtual void Reset()
+        {
+            getScoresRequest?.Cancel();
+            getScoresRequest = null;
+            Scores = null;
         }
 
         private IAPIProvider api;
@@ -254,7 +288,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
+        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;
 
@@ -310,17 +344,21 @@ namespace osu.Game.Online.Leaderboards
                 else
                 {
                     if (bottomY - fadeBottom > 0 && FadeBottom)
+                    {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
+                    }
                     else if (FadeTop)
+                    {
                         c.Colour = ColourInfo.GradientVertical(
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
                             Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / LeaderboardScore.HEIGHT, 1)));
+                    }
                 }
             }
         }
 
-        protected abstract LeaderboardScore CreateDrawableScore(ScoreInfo model, int index);
+        protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
     }
 }

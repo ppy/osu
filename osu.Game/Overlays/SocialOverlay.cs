@@ -40,7 +40,7 @@ namespace osu.Game.Overlays
             get => users;
             set
             {
-                if (users?.Equals(value) ?? false)
+                if (ReferenceEquals(users, value))
                     return;
 
                 users = value?.ToList();
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays
 
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
-                    userRequest.Success += response => updateUsers(response.Select(r => r.User));
+                    userRequest.Success += res => updateUsers(res.Users.Select(r => r.User));
                     API.Queue(getUsersRequest = userRequest);
                     break;
             }
