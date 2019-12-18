@@ -12,6 +12,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.IO;
 using osu.Game.Storyboards;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -83,12 +84,12 @@ namespace osu.Game.Beatmaps.Formats
             {
                 storyboardSprite = null;
 
-                if (!Enum.TryParse(split[0], out EventType type))
+                if (!Enum.TryParse(split[0], out LegacyEventType type))
                     throw new InvalidDataException($@"Unknown event type: {split[0]}");
 
                 switch (type)
                 {
-                    case EventType.Sprite:
+                    case LegacyEventType.Sprite:
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
@@ -100,7 +101,7 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     }
 
-                    case EventType.Animation:
+                    case LegacyEventType.Animation:
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
@@ -115,7 +116,7 @@ namespace osu.Game.Beatmaps.Formats
                         break;
                     }
 
-                    case EventType.Sample:
+                    case LegacyEventType.Sample:
                     {
                         var time = double.Parse(split[1], CultureInfo.InvariantCulture);
                         var layer = parseLayer(split[2]);
@@ -271,7 +272,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string parseLayer(string value) => Enum.Parse(typeof(StoryLayer), value).ToString();
+        private string parseLayer(string value) => Enum.Parse(typeof(LegacyStoryLayer), value).ToString();
 
         private Anchor parseOrigin(string value)
         {
