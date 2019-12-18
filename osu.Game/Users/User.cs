@@ -26,9 +26,9 @@ namespace osu.Game.Users
         [JsonProperty(@"country")]
         public Country Country;
 
-        public Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public IBindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         //public Team Team;
 
