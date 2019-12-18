@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Select
 
         private void updateMultiplierText()
         {
-            var multiplier = Current.Value.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier);
+            double multiplier = Current.Value?.Aggregate(1.0, (current, mod) => current * mod.ScoreMultiplier) ?? 1;
 
             MultiplierText.Text = multiplier.Equals(1.0) ? string.Empty : $"{multiplier:N2}x";
 
