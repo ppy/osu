@@ -43,6 +43,8 @@ namespace osu.Game.Rulesets.UI
             return true;
         }
 
+        public int IndexOf(DrawableHitObject hitObject) => IndexOfInternal(hitObject);
+
         private void onStartTimeChanged(DrawableHitObject hitObject)
         {
             if (!RemoveInternal(hitObject))
