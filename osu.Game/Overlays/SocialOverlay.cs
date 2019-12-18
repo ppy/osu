@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -15,7 +16,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
-using System;
 using System.Threading;
 using osu.Framework.Threading;
 
@@ -33,17 +33,18 @@ namespace osu.Game.Overlays
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
-        private IEnumerable<User> users;
+        private User[] users = Array.Empty<User>();
 
-        public IEnumerable<User> Users
+        public User[] Users
         {
             get => users;
             set
             {
-                if (ReferenceEquals(users, value))
+                if (users == value)
                     return;
 
-                users = value?.ToList();
+                users = value ?? Array.Empty<User>();
+                recreatePanels();
             }
         }
 
@@ -72,8 +73,8 @@ namespace osu.Game.Overlays
 
             Filter.Tabs.Current.ValueChanged += _ => onFilterUpdate();
 
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => updateUsers(Users);
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += _ => recreatePanels();
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => recreatePanels();
 
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
@@ -115,19 +116,19 @@ namespace osu.Game.Overlays
             {
                 case SocialTab.Friends:
                     var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
-                    friendRequest.Success += updateUsers;
+                    friendRequest.Success += users => Users = users.ToArray();
                     API.Queue(getUsersRequest = friendRequest);
                     break;
 
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
-                    userRequest.Success += res => updateUsers(res.Users.Select(r => r.User));
+                    userRequest.Success += res => Users = res.Users.Select(r => r.User).ToArray();
                     API.Queue(getUsersRequest = userRequest);
                     break;
             }
         }
 
-        private void recreatePanels(PanelDisplayStyle displayStyle)
+        private void recreatePanels()
         {
             clearPanels();
 
@@ -139,17 +140,33 @@ namespace osu.Game.Overlays
 
             loadCancellation = new CancellationTokenSource();
 
+            IEnumerable<User> sortedUsers = Users;
+
+            switch (Filter.Tabs.Current.Value)
+            {
+                case SocialSortCriteria.Location:
+                    sortedUsers = sortedUsers.OrderBy(u => u.Country.FullName);
+                    break;
+
+                case SocialSortCriteria.Name:
+                    sortedUsers = sortedUsers.OrderBy(u => u.Username);
+                    break;
+            }
+
+            if (Filter.DisplayStyleControl.Dropdown.Current.Value == SortDirection.Descending)
+                sortedUsers = sortedUsers.Reverse();
+
             var newPanels = new FillFlowContainer<SocialPanel>
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10f),
                 Margin = new MarginPadding { Top = 10 },
-                ChildrenEnumerable = Users.Select(u =>
+                ChildrenEnumerable = sortedUsers.Select(u =>
                 {
                     SocialPanel panel;
 
-                    switch (displayStyle)
+                    switch (Filter.DisplayStyleControl.DisplayStyle.Value)
                     {
                         case PanelDisplayStyle.Grid:
                             panel = new SocialGridPanel(u)
@@ -188,35 +205,8 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            updateUsers(Users);
+            recreatePanels();
         }
-
-        private void updateUsers(IEnumerable<User> newUsers)
-        {
-            var sortDirection = Filter.DisplayStyleControl.Dropdown.Current.Value;
-
-            IEnumerable<User> sortedUsers = newUsers;
-
-            if (sortedUsers.Any())
-            {
-                switch (Filter.Tabs.Current.Value)
-                {
-                    case SocialSortCriteria.Location:
-                        sortedUsers = sortBy(sortedUsers, u => u.Country.FullName, sortDirection);
-                        break;
-
-                    case SocialSortCriteria.Name:
-                        sortedUsers = sortBy(sortedUsers, u => u.Username, sortDirection);
-                        break;
-                }
-            }
-
-            Users = sortedUsers;
-            recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-        }
-
-        private IEnumerable<User> sortBy<T>(IEnumerable<User> users, Func<User, T> condition, SortDirection sortDirection) =>
-            sortDirection == SortDirection.Ascending ? users.OrderBy(condition) : users.OrderByDescending(condition);
 
         private void clearPanels()
         {
