@@ -1,12 +1,12 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 
-namespace osu.Game.Rulesets.Objects.Legacy
+namespace osu.Game.Beatmaps.Legacy
 {
     [Flags]
-    internal enum ConvertHitObjectType
+    internal enum LegacyHitObjectType
     {
         Circle = 1,
         Slider = 1 << 1,
