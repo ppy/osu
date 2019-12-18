@@ -217,26 +217,12 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleOsuHitObject(TextWriter writer, HitObject hitObject)
         {
-            var positionData = hitObject as IHasPosition;
-            var comboData = hitObject as IHasCombo;
-
-            Debug.Assert(positionData != null);
-            Debug.Assert(comboData != null);
-
-            LegacyHitObjectType hitObjectType = (LegacyHitObjectType)(comboData.ComboOffset << 4);
-            if (comboData.NewCombo)
-                hitObjectType |= LegacyHitObjectType.NewCombo;
-            if (hitObject is IHasCurve)
-                hitObjectType |= LegacyHitObjectType.Slider;
-            else if (hitObject is IHasEndTime)
-                hitObjectType |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
-            else
-                hitObjectType |= LegacyHitObjectType.Circle;
+            var positionData = (IHasPosition)hitObject;
 
             writer.Write(FormattableString.Invariant($"{positionData.X},"));
             writer.Write(FormattableString.Invariant($"{positionData.Y},"));
             writer.Write(FormattableString.Invariant($"{hitObject.StartTime},"));
-            writer.Write(FormattableString.Invariant($"{(int)hitObjectType},"));
+            writer.Write(FormattableString.Invariant($"{(int)getObjectType(hitObject)},"));
 
             writer.Write(hitObject is IHasCurve
                 ? FormattableString.Invariant($"0,")
@@ -244,74 +230,106 @@ namespace osu.Game.Beatmaps.Formats
 
             if (hitObject is IHasCurve curveData)
             {
-                PathType? lastType = null;
-
-                for (int i = 0; i < curveData.Path.ControlPoints.Count; i++)
-                {
-                    PathControlPoint point = curveData.Path.ControlPoints[i];
-
-                    if (point.Type.Value != null)
-                    {
-                        if (point.Type.Value != lastType)
-                        {
-                            switch (point.Type.Value)
-                            {
-                                case PathType.Bezier:
-                                    writer.Write("B|");
-                                    break;
-
-                                case PathType.Catmull:
-                                    writer.Write("C|");
-                                    break;
-
-                                case PathType.PerfectCurve:
-                                    writer.Write("P|");
-                                    break;
-
-                                case PathType.Linear:
-                                    writer.Write("L|");
-                                    break;
-                            }
-
-                            lastType = point.Type.Value;
-                        }
-                        else
-                        {
-                            // New segment with the same type - duplicate the control point
-                            writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}|"));
-                        }
-                    }
-
-                    if (i != 0)
-                    {
-                        writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}"));
-                        writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
-                    }
-                }
-
-                writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
-                writer.Write(FormattableString.Invariant($"{curveData.Path.Distance},"));
-
-                for (int i = 0; i < curveData.NodeSamples.Count; i++)
-                {
-                    writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
-                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
-                }
-
-                for (int i = 0; i < curveData.NodeSamples.Count; i++)
-                {
-                    writer.Write(getSampleBank(curveData.NodeSamples[i], true));
-                    writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
-                }
+                addCurveData(writer, curveData, positionData);
+                writer.Write(getSampleBank(hitObject.Samples, zeroBanks: true));
             }
-            else if (hitObject is IHasEndTime endTimeData)
-                writer.Write(FormattableString.Invariant($"{endTimeData.EndTime},"));
-
-            writer.Write(hitObject is IHasCurve
-                ? getSampleBank(hitObject.Samples, zeroBanks: true)
-                : getSampleBank(hitObject.Samples));
+            else
+            {
+                if (hitObject is IHasEndTime endTimeData)
+                    writer.Write(FormattableString.Invariant($"{endTimeData.EndTime},"));
+                writer.Write(getSampleBank(hitObject.Samples));
+            }
 
             writer.WriteLine();
+        }
+
+        private static LegacyHitObjectType getObjectType(HitObject hitObject)
+        {
+            var comboData = (IHasCombo)hitObject;
+
+            var type = (LegacyHitObjectType)(comboData.ComboOffset << 4);
+
+            if (comboData.NewCombo) type |= LegacyHitObjectType.NewCombo;
+
+            switch (hitObject)
+            {
+                case IHasCurve _:
+                    type |= LegacyHitObjectType.Slider;
+                    break;
+
+                case IHasEndTime _:
+                    type |= LegacyHitObjectType.Spinner | LegacyHitObjectType.NewCombo;
+                    break;
+
+                default:
+                    type |= LegacyHitObjectType.Circle;
+                    break;
+            }
+
+            return type;
+        }
+
+        private void addCurveData(TextWriter writer, IHasCurve curveData, IHasPosition positionData)
+        {
+            PathType? lastType = null;
+
+            for (int i = 0; i < curveData.Path.ControlPoints.Count; i++)
+            {
+                PathControlPoint point = curveData.Path.ControlPoints[i];
+
+                if (point.Type.Value != null)
+                {
+                    if (point.Type.Value != lastType)
+                    {
+                        switch (point.Type.Value)
+                        {
+                            case PathType.Bezier:
+                                writer.Write("B|");
+                                break;
+
+                            case PathType.Catmull:
+                                writer.Write("C|");
+                                break;
+
+                            case PathType.PerfectCurve:
+                                writer.Write("P|");
+                                break;
+
+                            case PathType.Linear:
+                                writer.Write("L|");
+                                break;
+                        }
+
+                        lastType = point.Type.Value;
+                    }
+                    else
+                    {
+                        // New segment with the same type - duplicate the control point
+                        writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}|"));
+                    }
+                }
+
+                if (i != 0)
+                {
+                    writer.Write(FormattableString.Invariant($"{positionData.X + point.Position.Value.X}:{positionData.Y + point.Position.Value.Y}"));
+                    writer.Write(i != curveData.Path.ControlPoints.Count - 1 ? "|" : ",");
+                }
+            }
+
+            writer.Write(FormattableString.Invariant($"{curveData.RepeatCount + 1},"));
+            writer.Write(FormattableString.Invariant($"{curveData.Path.Distance},"));
+
+            for (int i = 0; i < curveData.NodeSamples.Count; i++)
+            {
+                writer.Write(FormattableString.Invariant($"{(int)toLegacyHitSoundType(curveData.NodeSamples[i])}"));
+                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+            }
+
+            for (int i = 0; i < curveData.NodeSamples.Count; i++)
+            {
+                writer.Write(getSampleBank(curveData.NodeSamples[i], true));
+                writer.Write(i != curveData.NodeSamples.Count - 1 ? "|" : ",");
+            }
         }
 
         private void handleTaikoHitObject(TextWriter writer, HitObject hitObject) => throw new NotImplementedException();
