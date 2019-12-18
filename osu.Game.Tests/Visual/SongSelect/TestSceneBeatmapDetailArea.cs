@@ -8,6 +8,9 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Beatmaps;
 using osuTK;
@@ -20,8 +23,10 @@ namespace osu.Game.Tests.Visual.SongSelect
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(BeatmapDetails) };
 
+        private ModDisplay modDisplay;
+
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, RulesetStore rulesets)
         {
             BeatmapDetailArea detailsArea;
             Add(detailsArea = new BeatmapDetailArea
@@ -30,6 +35,16 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Origin = Anchor.Centre,
                 Size = new Vector2(550f, 450f),
             });
+
+            Add(modDisplay = new ModDisplay
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Both,
+                Position = new Vector2(0, 25),
+            });
+
+            modDisplay.Current.BindTo(SelectedMods);
 
             AddStep("all metrics", () => detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
             {
@@ -163,6 +178,60 @@ namespace osu.Game.Tests.Visual.SongSelect
             }));
 
             AddStep("null beatmap", () => detailsArea.Beatmap = null);
+
+            Ruleset ruleset = rulesets.AvailableRulesets.First().CreateInstance();
+
+            AddStep("with EZ mod", () =>
+            {
+                detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Version = "Has Easy Mod",
+                        Metadata = new BeatmapMetadata
+                        {
+                            Source = "osu!lazer",
+                            Tags = "this beatmap has the easy mod enabled",
+                        },
+                        BaseDifficulty = new BeatmapDifficulty
+                        {
+                            CircleSize = 3,
+                            DrainRate = 3,
+                            OverallDifficulty = 3,
+                            ApproachRate = 3,
+                        },
+                        StarDifficulty = 1f,
+                    }
+                });
+
+                SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) };
+            });
+
+            AddStep("with HR mod", () =>
+            {
+                detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
+                {
+                    BeatmapInfo =
+                    {
+                        Version = "Has Hard Rock Mod",
+                        Metadata = new BeatmapMetadata
+                        {
+                            Source = "osu!lazer",
+                            Tags = "this beatmap has the hard rock mod enabled",
+                        },
+                        BaseDifficulty = new BeatmapDifficulty
+                        {
+                            CircleSize = 3,
+                            DrainRate = 3,
+                            OverallDifficulty = 3,
+                            ApproachRate = 3,
+                        },
+                        StarDifficulty = 1f,
+                    }
+                });
+
+                SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) };
+            });
         }
     }
 }
