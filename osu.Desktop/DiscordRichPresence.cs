@@ -91,7 +91,7 @@ namespace osu.Desktop
             presence.Assets.LargeImageText = $"{user.Value.Username}" + (user.Value.Statistics?.Ranks.Global > 0 ? $" (rank #{user.Value.Statistics.Ranks.Global:N0})" : string.Empty);
 
             // update ruleset
-            presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_unknown";
+            presence.Assets.SmallImageKey = ruleset.Value.ID <= 3 ? $"mode_{ruleset.Value.ID}" : "mode_custom";
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);
