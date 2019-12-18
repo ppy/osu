@@ -88,6 +88,20 @@ namespace osu.Game.Tests.Visual.Background
             AddUntilStep("not lightened", () => userDimContainer.DimEqual(test_user_dim));
         }
 
+        [Test]
+        public void TestIgnoreUserSettings()
+        {
+            AddStep("set dim level 0.6", () => userDimContainer.UserDimLevel.Value = test_user_dim);
+            AddUntilStep("dim reached", () => userDimContainer.DimEqual(test_user_dim));
+
+            AddStep("ignore settings", () => userDimContainer.IgnoreUserSettings.Value = true);
+            AddUntilStep("no dim", () => userDimContainer.DimEqual(0));
+            AddStep("set break", () => isBreakTime.Value = true);
+            AddAssert("no dim", () => userDimContainer.DimEqual(0));
+            AddStep("clear break", () => isBreakTime.Value = false);
+            AddAssert("no dim", () => userDimContainer.DimEqual(0));
+        }
+
         private class TestUserDimContainer : UserDimContainer
         {
             public bool DimEqual(float expectedDimLevel) => Content.Colour == OsuColour.Gray(1f - expectedDimLevel);

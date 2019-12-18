@@ -115,11 +115,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                     Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
-                                search = new HeaderSearchTextBox
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    PlaceholderText = @"Search",
-                                },
+                                search = new HeaderSearchTextBox { RelativeSizeAxes = Axes.X },
                             },
                         },
                     },
