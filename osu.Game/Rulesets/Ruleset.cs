@@ -49,9 +49,9 @@ namespace osu.Game.Rulesets
 
         public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
 
-        protected Ruleset(RulesetInfo rulesetInfo = null)
+        protected Ruleset()
         {
-            RulesetInfo = rulesetInfo ?? createRulesetInfo();
+            RulesetInfo = createRulesetInfo();
         }
 
         /// <summary>
