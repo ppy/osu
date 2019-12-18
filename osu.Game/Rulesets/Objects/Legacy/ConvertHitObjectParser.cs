@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 int repeatCount = Parsing.ParseInt(split[6]);
 
                 if (repeatCount > 9000)
-                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+                    throw new FormatException(@"Repeat count is way too high");
 
                 // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                 repeatCount = Math.Max(0, repeatCount - 1);
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 result = CreateSlider(pos, combo, comboOffset, convertControlPoints(points, pathType), length, repeatCount, nodeSamples);
 
                 // The samples are played when the slider ends, which is the last node
-                result.Samples = nodeSamples[nodeSamples.Count - 1];
+                result.Samples = nodeSamples[^1];
             }
             else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
@@ -280,7 +280,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 if (vertices[i] == vertices[i - 1])
                 {
-                    points[points.Count - 1].Type.Value = type;
+                    points[^1].Type.Value = type;
                     continue;
                 }
 
