@@ -227,6 +227,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 shader.Bind();
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
+                texture.TextureGL.Bind();
+
                 RectangleF textureRect = texture.GetTextureRect();
 
                 foreach (var part in parts)
