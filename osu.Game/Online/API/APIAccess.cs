@@ -153,6 +153,10 @@ namespace osu.Game.Online.API
                         userReq.Success += u =>
                         {
                             LocalUser.Value = u;
+
+                            // todo: save/pull from settings
+                            LocalUser.Value.Status.Value = new UserStatusOnline();
+
                             failureCount = 0;
 
                             //we're connected!

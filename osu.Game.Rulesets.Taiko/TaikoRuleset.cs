@@ -136,10 +136,5 @@ namespace osu.Game.Rulesets.Taiko
         public override int? LegacyID => 1;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
-
-        public TaikoRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
     }
 }
