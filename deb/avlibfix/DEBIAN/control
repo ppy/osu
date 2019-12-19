@@ -1,9 +1,0 @@
-Package: avlibfix
-Version: 20191103
-Section: default
-Priority: optional
-Depends: libavformat58,libavutil56,libavcodec58,libswscale5
-Architecture: amd64
-Maintainer: MATRIX-feather<midnightcarnival@outlook.com>
-Installed-Size: 1KB
-Description: 解决新版osulazer在Ubuntu19.10上无法播放视频的问题

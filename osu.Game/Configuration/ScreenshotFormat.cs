@@ -7,7 +7,7 @@ namespace osu.Game.Configuration
 {
     public enum ScreenshotFormat
     {
-        [Description("JPG (适用于网络传输)")]
+        [Description("JPG (适合网络传输)")]
         Jpg = 1,
 
         [Description("PNG (无损)")]

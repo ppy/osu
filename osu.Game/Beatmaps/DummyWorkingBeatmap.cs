@@ -25,8 +25,8 @@ namespace osu.Game.Beatmaps
             {
                 Metadata = new BeatmapMetadata
                 {
-                    Artist = "please load a beatmap!",
-                    Title = "no beatmaps available!"
+                    Artist = "请先选择一张谱面!",
+                    Title = "未选择任何谱面!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
                 BaseDifficulty = new BeatmapDifficulty

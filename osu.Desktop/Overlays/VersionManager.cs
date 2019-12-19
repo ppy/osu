@@ -62,7 +62,7 @@ namespace osu.Desktop.Overlays
                             Font = OsuFont.Numeric.With(size: 15),
                             Colour = colours.Yellow,
                            // Text = @"早期开发版本(Development Build)"
-                           Text = @"早期开发版本"
+                           Text = @"2019.1113.0+matrixfeather 6"
                         },
                         new Sprite
                         {

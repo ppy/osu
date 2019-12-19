@@ -39,12 +39,13 @@ namespace osu.Game.Online.API.Requests
         Leaderboard,
         [Description("计入排名的")]
         Ranked,
+        [Description("质量合格的")]
         Qualified,
         Loved,
         [Description("我喜欢的")]
         Favourites,
 
-        [Description("Pending & WIP")]
+        [Description("Pending 与 WIP")]
         Pending,
         [Description("坟图")]
         Graveyard,
