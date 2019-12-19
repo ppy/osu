@@ -10,7 +10,6 @@ using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
@@ -20,16 +19,6 @@ namespace osu.Game.Rulesets.Scoring
         private const double base_portion = 0.3;
         private const double combo_portion = 0.7;
         private const double max_score = 1000000;
-
-        /// <summary>
-        /// Invoked when all <see cref="HitObject"/>s have been judged.
-        /// </summary>
-        public event Action AllJudged;
-
-        /// <summary>
-        /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by the <see cref="ScoreProcessor"/>.
-        /// </summary>
-        public event Action<JudgementResult> NewJudgement;
 
         /// <summary>
         /// The current total score.
@@ -65,11 +54,6 @@ namespace osu.Game.Rulesets.Scoring
         /// The <see cref="ScoringMode"/> used to calculate scores.
         /// </summary>
         public readonly Bindable<ScoringMode> Mode = new Bindable<ScoringMode>();
-
-        /// <summary>
-        /// Whether all <see cref="Judgement"/>s have been processed.
-        /// </summary>
-        public bool HasCompleted => JudgedHits == MaxHits;
 
         private double maxHighestCombo;
 
@@ -158,11 +142,6 @@ namespace osu.Game.Rulesets.Scoring
             }
 
             updateScore();
-
-            NewJudgement?.Invoke(result);
-
-            if (HasCompleted)
-                AllJudged?.Invoke();
         }
 
         protected sealed override void RevertResultInternal(JudgementResult result)

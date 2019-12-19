@@ -12,6 +12,16 @@ namespace osu.Game.Rulesets.Scoring
     public abstract class JudgementProcessor
     {
         /// <summary>
+        /// Invoked when all <see cref="HitObject"/>s have been judged by this <see cref="JudgementProcessor"/>.
+        /// </summary>
+        public event Action AllJudged;
+
+        /// <summary>
+        /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by this <see cref="JudgementProcessor"/>.
+        /// </summary>
+        public event Action<JudgementResult> NewJudgement;
+
+        /// <summary>
         /// The maximum number of hits that can be judged.
         /// </summary>
         protected int MaxHits { get; private set; }
@@ -20,6 +30,11 @@ namespace osu.Game.Rulesets.Scoring
         /// The total number of judged <see cref="HitObject"/>s at the current point in time.
         /// </summary>
         public int JudgedHits { get; private set; }
+
+        /// <summary>
+        /// Whether all <see cref="Judgement"/>s have been processed.
+        /// </summary>
+        public bool HasCompleted => JudgedHits == MaxHits;
 
         protected JudgementProcessor(IBeatmap beatmap)
         {
@@ -47,6 +62,11 @@ namespace osu.Game.Rulesets.Scoring
             JudgedHits++;
 
             ApplyResultInternal(result);
+
+            NewJudgement?.Invoke(result);
+
+            if (HasCompleted)
+                AllJudged?.Invoke();
         }
 
         /// <summary>
