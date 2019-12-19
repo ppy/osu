@@ -29,7 +29,7 @@ namespace osu.Game.Database
 
         private readonly IAPIProvider api;
 
-        private readonly List<ArchiveDownloadRequest<TModel>> currentDownloads = new List<ArchiveDownloadRequest<TModel>>();
+        private readonly List<DownloadRequestPackage<TModel>> currentDownloads = new List<DownloadRequestPackage<TModel>>();
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
@@ -59,12 +59,14 @@ namespace osu.Game.Database
         {
             if (!canDownload(model)) return false;
 
-            var request = CreateDownloadRequest(model, minimiseDownloadSize);
-
-            DownloadNotification notification = new DownloadNotification
+            var package = new DownloadRequestPackage<TModel>
             {
-                Text = $"Downloading {request.Model}",
+                Request = CreateDownloadRequest(model, minimiseDownloadSize),
+                Notification = new DownloadNotification { Text = $"Downloading {model}" },
             };
+
+            var request = package.Request;
+            var notification = package.Notification;
 
             request.DownloadProgressed += progress =>
             {
@@ -83,7 +85,7 @@ namespace osu.Game.Database
                     if (!imported.Any())
                         DownloadFailed?.Invoke(request);
 
-                    currentDownloads.Remove(request);
+                    currentDownloads.Remove(package);
                 }, TaskCreationOptions.LongRunning);
             };
 
@@ -97,7 +99,7 @@ namespace osu.Game.Database
                 return true;
             };
 
-            currentDownloads.Add(request);
+            currentDownloads.Add(package);
             PostNotification?.Invoke(notification);
 
             api.PerformAsync(request);
@@ -113,7 +115,7 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Cancelled;
                 Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
-                currentDownloads.Remove(request);
+                currentDownloads.Remove(package);
             }
         }
 
@@ -128,24 +130,8 @@ namespace osu.Game.Database
         protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
             => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
 
-        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
+        public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(p => p.Request.Model.Equals(model)).Request;
 
         private bool canDownload(TModel model) => GetExistingDownload(model) == null && api != null;
-
-        private class DownloadNotification : ProgressNotification
-        {
-            public override bool IsImportant => false;
-
-            protected override Notification CreateCompletionNotification() => new SilencedProgressCompletionNotification
-            {
-                Activated = CompletionClickAction,
-                Text = CompletionText
-            };
-
-            private class SilencedProgressCompletionNotification : ProgressCompletionNotification
-            {
-                public override bool IsImportant => false;
-            }
-        }
     }
 }
