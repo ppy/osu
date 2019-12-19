@@ -70,6 +70,12 @@ namespace osu.Game.Rulesets
         public virtual ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ScoreProcessor(beatmap);
 
         /// <summary>
+        /// Creates a <see cref="HealthProcessor"/> for a beatmap converted to this ruleset.
+        /// </summary>
+        /// <returns>The health processor.</returns>
+        public virtual HealthProcessor CreateHealthProcessor(IBeatmap beatmap) => new HealthProcessor(beatmap);
+
+        /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
