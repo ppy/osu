@@ -374,13 +374,10 @@ namespace osu.Game.Online.Leaderboards
 
         public MenuItem[] ContextMenuItems
         {
-            get
+            get => (score.ID == 0) ? null : new MenuItem[]
             {
-                return (allowHighlight) ? null : new MenuItem[]
-                {
-                    new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteLocalScore(score)),
-                };
-            }
+                new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteLocalScore(score)),
+            };
         }
     }
 }
