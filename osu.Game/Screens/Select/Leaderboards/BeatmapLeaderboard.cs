@@ -206,10 +206,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private void deleteLocalScore(ScoreInfo score)
         {
-            if (score == null)
-                return;
-
-            Schedule(() => this.RefreshScores());
+            Schedule(RefreshScores);
         }
     }
 }

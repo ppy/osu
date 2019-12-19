@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -370,8 +369,6 @@ namespace osu.Game.Online.Leaderboards
 
         private void deleteLocalScore(ScoreInfo score)
         {
-            if (score == null || score.ID <= 0) return;
-
             dialogOverlay?.Push(new LocalScoreDeleteDialog(score));
         }
 
@@ -379,9 +376,9 @@ namespace osu.Game.Online.Leaderboards
         {
             get
             {
-                return (this.allowHighlight) ? null : new MenuItem[]
+                return (allowHighlight) ? null : new MenuItem[]
                 {
-                    new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteLocalScore(this.score))
+                    new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteLocalScore(score)),
                 };
             }
         }
