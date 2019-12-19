@@ -146,8 +146,6 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            loadCancellation = new CancellationTokenSource();
-
             IEnumerable<User> sortedUsers = Users;
 
             switch (Filter.Tabs.Current.Value)
@@ -202,7 +200,7 @@ namespace osu.Game.Overlays
 
                 loading.Hide();
                 ScrollFlow.Add(panels = newPanels);
-            }, loadCancellation.Token);
+            }, (loadCancellation = new CancellationTokenSource()).Token);
         }
 
         private void onFilterUpdate()
