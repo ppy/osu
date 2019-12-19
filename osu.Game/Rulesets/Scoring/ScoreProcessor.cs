@@ -165,6 +165,8 @@ namespace osu.Game.Rulesets.Scoring
                 baseScore -= result.Judgement.NumericResultFor(result);
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
+
+            updateScore();
         }
 
         private void updateScore()
