@@ -93,9 +93,7 @@ namespace osu.Game.Database
 
             notification.CancelRequested += () =>
             {
-                request.Cancel();
-                currentDownloads.Remove(request);
-                notification.State = ProgressNotificationState.Cancelled;
+                cancelDownload(package, false);
                 return true;
             };
 
@@ -117,6 +115,28 @@ namespace osu.Game.Database
                 Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
                 currentDownloads.Remove(package);
             }
+        }
+
+        /// <summary>
+        /// Cancels an existing download request for this <typeparamref name="TModel"/>.
+        /// </summary>
+        /// <param name="model">The <typeparamref name="TModel"/> to be cancelled.</param>
+        /// <returns>Whether the download request has been cancelled successfully.</returns>
+        public bool CancelDownload(TModel model) => cancelDownload(currentDownloads.Find(p => p.Request.Model.Equals(model)));
+
+        private bool cancelDownload(DownloadRequestPackage<TModel> package, bool closeNotification = true)
+        {
+            if (!currentDownloads.Contains(package))
+                return false;
+
+            package.Request.Cancel();
+            package.Notification.State = ProgressNotificationState.Cancelled;
+
+            if (closeNotification)
+                package.Notification.Close();
+
+            currentDownloads.Remove(package);
+            return true;
         }
 
         public bool IsAvailableLocally(TModel model) => CheckLocalAvailability(model, modelStore.ConsumableItems.Where(m => !m.DeletePending));
