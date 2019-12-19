@@ -39,28 +39,6 @@ namespace osu.Game.Screens.Select
             };
         }
 
-        public BeatmapClearScoresDialog(ScoreInfo score, Action onCompletion)
-        {
-            string accuracy = string.Format(score?.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", score?.Accuracy);
-
-            BodyText = $@"{score?.Beatmap?.Metadata?.Artist} - {score?.Beatmap?.Metadata?.Title} {Environment.NewLine} {score?.User} - Rank: {score?.Rank} - Max Combo: {score?.MaxCombo} - {accuracy} - {score?.Date.Date.ToShortDateString()}";
-
-            Icon = FontAwesome.Solid.Eraser;
-            HeaderText = @"Clearing this local score. Are you sure?";
-            Buttons = new PopupDialogButton[]
-            {
-                new PopupDialogOkButton
-                {
-                    Text = @"Yes. Please.",
-                    Action = (() => scoreManager.Delete(score)) + onCompletion
-                },
-                new PopupDialogCancelButton
-                {
-                    Text = @"No, I'm still attached.",
-                },
-            };
-        }
-
         [BackgroundDependencyLoader]
         private void load(ScoreManager scoreManager)
         {

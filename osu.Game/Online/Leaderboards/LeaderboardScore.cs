@@ -58,8 +58,6 @@ namespace osu.Game.Online.Leaderboards
 
         private DialogOverlay dialogOverlay;
 
-        public Action RefreshAction { get; set; }
-
         public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
         {
             this.score = score;
@@ -370,13 +368,20 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        private void deleteLocalScore(ScoreInfo score)
+        {
+            if (score == null || score.ID <= 0) return;
+
+            dialogOverlay?.Push(new LocalScoreDeleteDialog(score));
+        }
+
         public MenuItem[] ContextMenuItems
         {
             get
             {
                 return (this.allowHighlight) ? null : new MenuItem[]
                 {
-                    new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapClearScoresDialog(this.score, () => Schedule(this.RefreshAction))))
+                    new OsuMenuItem("Delete", MenuItemType.Destructive, () => deleteLocalScore(this.score))
                 };
             }
         }

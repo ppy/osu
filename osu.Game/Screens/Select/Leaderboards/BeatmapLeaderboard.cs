@@ -19,7 +19,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public class BeatmapLeaderboard : Leaderboard<BeatmapLeaderboardScope, ScoreInfo>
     {
+
         public Action<ScoreInfo> ScoreSelected;
+
 
         [Resolved]
         private RulesetStore rulesets { get; set; }
@@ -103,12 +105,24 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 ScoreSelected = s => ScoreSelected?.Invoke(s)
             });
+
+            scoreManager.ItemRemoved += deleteLocalScore;
         }
 
         protected override void Reset()
         {
             base.Reset();
             TopScore = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (scoreManager != null)
+            {
+                scoreManager.ItemRemoved -= deleteLocalScore;
+            }
         }
 
         protected override bool IsOnlineScope => Scope != BeatmapLeaderboardScope.Local;
@@ -188,9 +202,16 @@ namespace osu.Game.Screens.Select.Leaderboards
 
             return new LeaderboardScore(model, index, IsOnlineScope)
             {
-                Action = () => ScoreSelected?.Invoke(model),
-                RefreshAction = () => this.RefreshScores()
+                Action = () => ScoreSelected?.Invoke(model)
             };
+        }
+
+        private void deleteLocalScore(ScoreInfo score)
+        {
+            if (score == null)
+                return;
+
+            Schedule(() => this.RefreshScores());
         }
     }
 }
