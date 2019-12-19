@@ -15,9 +15,10 @@ namespace osu.Game.Screens.Select
     {
         private ScoreManager scoreManager;
 
-        public LocalScoreDeleteDialog (ScoreInfo score)
+        public LocalScoreDeleteDialog(ScoreInfo score)
         {
-            try{
+            try
+            {
                 string accuracy = string.Format(score?.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", score?.Accuracy);
 
                 BodyText = $@"{score} {Environment.NewLine} Rank: {score.Rank} - Max Combo: {score.MaxCombo} - {accuracy}";
@@ -35,7 +36,9 @@ namespace osu.Game.Screens.Select
                         Text = @"No, I'm still attached.",
                     },
                 };
-            } catch (Exception e){
+            }
+            catch (Exception e)
+            {
                 Logger.Error(e, "ScoreInfo cannot be null!");
 
                 HeaderText = $@"ScoreInfo cannot be null!";
