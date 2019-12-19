@@ -80,23 +80,5 @@ namespace osu.Game.Rulesets.Scoring
             Health.Value = 1;
             HasFailed = false;
         }
-
-        /// <summary>
-        /// Checks if the score is in a failed state and notifies subscribers.
-        /// <para>
-        /// This can only ever notify subscribers once.
-        /// </para>
-        /// </summary>
-        private void updateFailed(JudgementResult result)
-        {
-            if (HasFailed)
-                return;
-
-            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
-                return;
-
-            if (Failed?.Invoke() != false)
-                HasFailed = true;
-        }
     }
 }
