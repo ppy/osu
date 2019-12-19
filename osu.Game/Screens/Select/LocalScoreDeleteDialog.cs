@@ -7,7 +7,6 @@ using osu.Game.Scoring;
 using System;
 using System.Diagnostics;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Logging;
 
 namespace osu.Game.Screens.Select
 {
