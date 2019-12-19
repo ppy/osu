@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             break;
 
                         case OsuSkinConfiguration.ExpandNumberPiece:
-                            bool expand = source.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value < 2.0m;
+                            bool expand = !(source.GetConfig<LegacySetting, decimal>(LegacySetting.Version)?.Value >= 2.0m);
                             return SkinUtils.As<TValue>(new BindableBool(expand));
                     }
 
