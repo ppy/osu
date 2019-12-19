@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
@@ -23,13 +22,6 @@ namespace osu.Game.Rulesets.Scoring
         private const double max_score = 1000000;
 
         /// <summary>
-        /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
-        /// This may occur regardless of whether an <see cref="AllJudged"/> event is invoked.
-        /// Return true if the fail was permitted.
-        /// </summary>
-        public event Func<bool> Failed;
-
-        /// <summary>
         /// Invoked when all <see cref="HitObject"/>s have been judged.
         /// </summary>
         public event Action AllJudged;
@@ -40,11 +32,6 @@ namespace osu.Game.Rulesets.Scoring
         public event Action<JudgementResult> NewJudgement;
 
         /// <summary>
-        /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
-        /// </summary>
-        public event Func<ScoreProcessor, JudgementResult, bool> FailConditions;
-
-        /// <summary>
         /// The current total score.
         /// </summary>
         public readonly BindableDouble TotalScore = new BindableDouble { MinValue = 0 };
@@ -53,11 +40,6 @@ namespace osu.Game.Rulesets.Scoring
         /// The current accuracy.
         /// </summary>
         public readonly BindableDouble Accuracy = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
-
-        /// <summary>
-        /// The current health.
-        /// </summary>
-        public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
         /// The current combo.
@@ -88,11 +70,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether all <see cref="Judgement"/>s have been processed.
         /// </summary>
         public bool HasCompleted => JudgedHits == MaxHits;
-
-        /// <summary>
-        /// Whether this ScoreProcessor has already triggered the failed state.
-        /// </summary>
-        public bool HasFailed { get; private set; }
 
         private double maxHighestCombo;
 
@@ -145,10 +122,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             result.ComboAtJudgement = Combo.Value;
             result.HighestComboAtJudgement = HighestCombo.Value;
-            result.HealthAtJudgement = Health.Value;
-            result.FailedAtJudgement = HasFailed;
 
-            if (HasFailed)
+            if (result.FailedAtJudgement)
                 return;
 
             if (result.Judgement.AffectsCombo)
@@ -182,10 +157,7 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
 
-            Health.Value += HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
-
             updateScore();
-            updateFailed(result);
 
             NewJudgement?.Invoke(result);
 
@@ -197,9 +169,6 @@ namespace osu.Game.Rulesets.Scoring
         {
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
-            Health.Value = result.HealthAtJudgement;
-
-            // Todo: Revert HasFailed state with proper player support
 
             if (result.FailedAtJudgement)
                 return;
@@ -218,13 +187,6 @@ namespace osu.Game.Rulesets.Scoring
                 rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
         }
-
-        /// <summary>
-        /// An adjustment factor which is multiplied into the health increase provided by a <see cref="JudgementResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> for which the adjustment should apply.</param>
-        /// <returns>The adjustment factor.</returns>
-        protected virtual double HealthAdjustmentFactorFor(JudgementResult result) => 1;
 
         private void updateScore()
         {
@@ -246,24 +208,6 @@ namespace osu.Game.Rulesets.Scoring
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
                     return bonusScore + baseScore * ((1 + Math.Max(0, HighestCombo.Value - 1) * scoreMultiplier) / 25);
             }
-        }
-
-        /// <summary>
-        /// Checks if the score is in a failed state and notifies subscribers.
-        /// <para>
-        /// This can only ever notify subscribers once.
-        /// </para>
-        /// </summary>
-        private void updateFailed(JudgementResult result)
-        {
-            if (HasFailed)
-                return;
-
-            if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
-                return;
-
-            if (Failed?.Invoke() != false)
-                HasFailed = true;
         }
 
         private ScoreRank rankFrom(double acc)
@@ -308,12 +252,9 @@ namespace osu.Game.Rulesets.Scoring
 
             TotalScore.Value = 0;
             Accuracy.Value = 1;
-            Health.Value = 1;
             Combo.Value = 0;
             Rank.Value = ScoreRank.X;
             HighestCombo.Value = 0;
-
-            HasFailed = false;
         }
 
         /// <summary>
@@ -333,11 +274,6 @@ namespace osu.Game.Rulesets.Scoring
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 score.Statistics[result] = GetStatistic(result);
         }
-
-        /// <summary>
-        /// The default conditions for failing.
-        /// </summary>
-        protected virtual bool DefaultFailCondition => Precision.AlmostBigger(Health.MinValue, Health.Value);
 
         /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.

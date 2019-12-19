@@ -72,6 +72,9 @@ namespace osu.Game.Screens.Play
         public BreakOverlay BreakOverlay;
 
         protected ScoreProcessor ScoreProcessor { get; private set; }
+
+        protected HealthProcessor HealthProcessor { get; private set; }
+
         protected DrawableRuleset DrawableRuleset { get; private set; }
 
         protected HUDOverlay HUDOverlay { get; private set; }
@@ -131,6 +134,8 @@ namespace osu.Game.Screens.Play
             ScoreProcessor = ruleset.CreateScoreProcessor(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap);
+
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
@@ -145,15 +150,28 @@ namespace osu.Game.Screens.Play
             // bind clock into components that require it
             DrawableRuleset.IsPaused.BindTo(GameplayClockContainer.IsPaused);
 
-            DrawableRuleset.OnNewResult += ScoreProcessor.ApplyResult;
-            DrawableRuleset.OnRevertResult += ScoreProcessor.RevertResult;
+            DrawableRuleset.OnNewResult += r =>
+            {
+                HealthProcessor.ApplyResult(r);
+                ScoreProcessor.ApplyResult(r);
+            };
 
-            // Bind ScoreProcessor to ourselves
+            DrawableRuleset.OnRevertResult += r =>
+            {
+                HealthProcessor.RevertResult(r);
+                ScoreProcessor.RevertResult(r);
+            };
+
+            // Bind the judgement processors to ourselves
             ScoreProcessor.AllJudged += onCompletion;
-            ScoreProcessor.Failed += onFail;
+            HealthProcessor.Failed += onFail;
 
             foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+
+            foreach (var mod in Mods.Value.OfType<IApplicableToHealthProcessor>())
+                mod.ApplyToHealthProcessor(HealthProcessor);
+
             BreakOverlay.IsBreakTime.ValueChanged += _ => updatePauseOnFocusLostState();
         }
 
@@ -197,7 +215,7 @@ namespace osu.Game.Screens.Play
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
-                HUDOverlay = new HUDOverlay(ScoreProcessor, DrawableRuleset, Mods.Value)
+                HUDOverlay = new HUDOverlay(ScoreProcessor, HealthProcessor, DrawableRuleset, Mods.Value)
                 {
                     HoldToQuit =
                     {
@@ -342,7 +360,7 @@ namespace osu.Game.Screens.Play
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (ScoreProcessor.HasFailed || completionProgressDelegate != null)
+            if (HealthProcessor.HasFailed || completionProgressDelegate != null)
                 return;
 
             ValidForResume = false;
