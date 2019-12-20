@@ -11,7 +11,10 @@ using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
 {
-    public abstract class UpdateManager : CompositeDrawable
+    /// <summary>
+    /// An update manager which only shows notifications after an update completes.
+    /// </summary>
+    public class UpdateManager : CompositeDrawable
     {
         [Resolved]
         private OsuConfigManager config { get; set; }
