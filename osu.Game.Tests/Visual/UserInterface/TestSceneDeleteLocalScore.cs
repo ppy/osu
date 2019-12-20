@@ -32,7 +32,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(UserTopScoreContainer),
             typeof(Leaderboard<BeatmapLeaderboardScope, ScoreInfo>),
             typeof(LeaderboardScore),
-
         };
 
         private readonly FailableLeaderboard leaderboard;
