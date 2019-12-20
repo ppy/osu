@@ -65,20 +65,30 @@ namespace osu.Game.Storyboards
         {
             applyCommands(drawable, getCommands(g => g.X, triggeredGroups), (d, value) => d.X = value, (d, value, duration, easing) => d.MoveToX(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.Y, triggeredGroups), (d, value) => d.Y = value, (d, value, duration, easing) => d.MoveToY(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = value, (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
+            applyCommands(drawable, getCommands(g => g.Scale, triggeredGroups), (d, value) => d.Scale = new Vector2(value), (d, value, duration, easing) => d.ScaleTo(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.Rotation, triggeredGroups), (d, value) => d.Rotation = value, (d, value, duration, easing) => d.RotateTo(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.Colour, triggeredGroups), (d, value) => d.Colour = value, (d, value, duration, easing) => d.FadeColour(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
-            applyCommands(drawable, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
+            applyCommands(drawable, getCommands(g => g.BlendingParameters, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration),
+                false);
+
+            if (drawable is IVectorScalable vectorScalable)
+            {
+                applyCommands(drawable, getCommands(g => g.VectorScale, triggeredGroups), (d, value) => vectorScalable.VectorScale = value,
+                    (d, value, duration, easing) => vectorScalable.VectorScaleTo(value, duration, easing));
+            }
 
             if (drawable is IFlippable flippable)
             {
-                applyCommands(drawable, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration), false);
-                applyCommands(drawable, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration), false);
+                applyCommands(drawable, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration),
+                    false);
+                applyCommands(drawable, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration),
+                    false);
             }
         }
 
-        private void applyCommands<T>(Drawable drawable, IEnumerable<CommandTimeline<T>.TypedCommand> commands, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform, bool alwaysInitialize = true)
+        private void applyCommands<T>(Drawable drawable, IEnumerable<CommandTimeline<T>.TypedCommand> commands, DrawablePropertyInitializer<T> initializeProperty, DrawableTransformer<T> transform,
+                                      bool alwaysInitialize = true)
             where T : struct
         {
             var initialized = false;
@@ -105,9 +115,13 @@ namespace osu.Game.Storyboards
             var commands = TimelineGroup.GetCommands(timelineSelector);
             foreach (var loop in loops)
                 commands = commands.Concat(loop.GetCommands(timelineSelector));
+
             if (triggeredGroups != null)
+            {
                 foreach (var pair in triggeredGroups)
                     commands = commands.Concat(pair.Item1.GetCommands(timelineSelector, pair.Item2));
+            }
+
             return commands;
         }
 

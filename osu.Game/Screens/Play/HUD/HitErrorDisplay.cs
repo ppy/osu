@@ -31,7 +31,8 @@ namespace osu.Game.Screens.Play.HUD
 
             RelativeSizeAxes = Axes.Both;
 
-            processor.NewJudgement += onNewJudgement;
+            if (processor != null)
+                processor.NewJudgement += onNewJudgement;
         }
 
         [BackgroundDependencyLoader]
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void onNewJudgement(JudgementResult result)
         {
-            if (result.HitObject.HitWindows == null)
+            if (result.HitObject.HitWindows.WindowFor(HitResult.Miss) == 0)
                 return;
 
             foreach (var c in Children)
@@ -100,7 +101,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            processor.NewJudgement -= onNewJudgement;
+
+            if (processor != null)
+                processor.NewJudgement -= onNewJudgement;
         }
     }
 }

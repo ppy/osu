@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
+            iconText.Alpha = Math.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
             base.Update();
         }
 

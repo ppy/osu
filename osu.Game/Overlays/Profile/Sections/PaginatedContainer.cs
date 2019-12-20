@@ -19,10 +19,11 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        private readonly ShowMoreButton moreButton;
+        private readonly ProfileShowMoreButton moreButton;
         private readonly OsuSpriteText missingText;
         private APIRequest<List<TModel>> retrievalRequest;
         private CancellationTokenSource loadCancellation;
+        private readonly BindableInt count = new BindableInt();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -44,11 +45,28 @@ namespace osu.Game.Overlays.Profile.Sections
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
+                new FillFlowContainer
                 {
-                    Text = header,
-                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5, 0),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Text = header,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        },
+                        new CounterPill
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Current = { BindTarget = count }
+                        }
+                    }
                 },
                 ItemsContainer = new FillFlowContainer
                 {
@@ -56,7 +74,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     RelativeSizeAxes = Axes.X,
                     Spacing = new Vector2(0, 2),
                 },
-                moreButton = new ShowMoreButton
+                moreButton = new ProfileShowMoreButton
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -91,7 +109,10 @@ namespace osu.Game.Overlays.Profile.Sections
             ItemsContainer.Clear();
 
             if (e.NewValue != null)
+            {
                 showMore();
+                count.Value = GetCount(e.NewValue);
+            }
         }
 
         private void showMore()
@@ -123,6 +144,8 @@ namespace osu.Game.Overlays.Profile.Sections
                 ItemsContainer.AddRange(drawables);
             }, loadCancellation.Token);
         });
+
+        protected virtual int GetCount(User user) => 0;
 
         protected abstract APIRequest<List<TModel>> CreateRequest();
 

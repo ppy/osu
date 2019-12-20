@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -32,9 +33,9 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            var newScale = MathHelper.Clamp(scale + e.ScrollDelta.Y / 15 * scale, min_scale, max_scale);
+            var newScale = Math.Clamp(scale + e.ScrollDelta.Y / 15 * scale, min_scale, max_scale);
 
-            this.MoveTo(target = target - e.MousePosition * (newScale - scale), 2000, Easing.OutQuint);
+            this.MoveTo(target -= e.MousePosition * (newScale - scale), 2000, Easing.OutQuint);
             this.ScaleTo(scale = newScale, 2000, Easing.OutQuint);
 
             return true;

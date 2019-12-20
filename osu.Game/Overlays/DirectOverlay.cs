@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
             get => beatmapSets;
             set
             {
-                if (beatmapSets?.Equals(value) ?? false) return;
+                if (ReferenceEquals(beatmapSets, value)) return;
 
                 beatmapSets = value?.ToList();
 
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (text.NewValue != string.Empty)
+                if (!string.IsNullOrEmpty(text.NewValue))
                 {
                     Header.Tabs.Current.Value = DirectTab.Search;
 

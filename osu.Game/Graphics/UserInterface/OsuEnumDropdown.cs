@@ -6,12 +6,10 @@ using System;
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuEnumDropdown<T> : OsuDropdown<T>
+        where T : struct, Enum
     {
         public OsuEnumDropdown()
         {
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("OsuEnumDropdown only supports enums as the generic type argument");
-
             Items = (T[])Enum.GetValues(typeof(T));
         }
     }

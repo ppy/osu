@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osuTK;
 
@@ -26,6 +28,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         public Action<ScoreInfo> ScoreSelected;
 
         protected override bool StartHidden => true;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         public UserTopScoreContainer()
         {
@@ -77,9 +82,11 @@ namespace osu.Game.Screens.Select.Leaderboards
             if (newScore == null)
                 return;
 
-            LoadComponentAsync(new LeaderboardScore(newScore.Score, newScore.Position)
+            var scoreInfo = newScore.Score.CreateScoreInfo(rulesets);
+
+            LoadComponentAsync(new LeaderboardScore(scoreInfo, newScore.Position, false)
             {
-                Action = () => ScoreSelected?.Invoke(newScore.Score)
+                Action = () => ScoreSelected?.Invoke(scoreInfo)
             }, drawableScore =>
             {
                 scoreContainer.Child = drawableScore;

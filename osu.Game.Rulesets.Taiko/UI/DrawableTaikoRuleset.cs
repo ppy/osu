@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Framework.Input;
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        public DrawableTaikoRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableTaikoRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             Direction.Value = ScrollingDirection.Left;
@@ -39,8 +37,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             new BarLineGenerator<BarLine>(Beatmap).BarLines.ForEach(bar => Playfield.Add(bar.Major ? new DrawableBarLineMajor(bar) : new DrawableBarLine(bar)));
         }
-
-        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new TaikoPlayfieldAdjustmentContainer();
 

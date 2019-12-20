@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select
             newRoot.Filter(activeCriteria);
 
             // preload drawables as the ctor overhead is quite high currently.
-            var _ = newRoot.Drawables;
+            _ = newRoot.Drawables;
 
             root = newRoot;
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
@@ -351,7 +351,7 @@ namespace osu.Game.Screens.Select
         /// <summary>
         /// Half the height of the visible content.
         /// <remarks>
-        /// This is different from the height of <see cref="ScrollContainer{T}.displayableContent"/>, since
+        /// This is different from the height of <see cref="ScrollContainer{T}"/>.displayableContent, since
         /// the beatmap carousel bleeds into the <see cref="FilterControl"/> and the <see cref="Footer"/>
         /// </remarks>
         /// </summary>
@@ -452,9 +452,6 @@ namespace osu.Game.Screens.Select
             if (!itemsCache.IsValid)
                 updateItems();
 
-            if (!scrollPositionCache.IsValid)
-                updateScrollPosition();
-
             // Remove all items that should no longer be on-screen
             scrollableContent.RemoveAll(p => p.Y < visibleUpperBound - p.DrawHeight || p.Y > visibleBottomBound || !p.IsPresent);
 
@@ -517,6 +514,14 @@ namespace osu.Game.Screens.Select
             // (e.g. x-offset and opacity).
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p);
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (!scrollPositionCache.IsValid)
+                updateScrollPosition();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -582,13 +587,16 @@ namespace osu.Game.Screens.Select
                     switch (d)
                     {
                         case DrawableCarouselBeatmapSet set:
+                        {
                             lastSet = set;
 
                             set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
                             set.MoveToY(currentY, 750, Easing.OutExpo);
                             break;
+                        }
 
                         case DrawableCarouselBeatmap beatmap:
+                        {
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
                                 scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
 
@@ -614,6 +622,7 @@ namespace osu.Game.Screens.Select
                             }
 
                             break;
+                        }
                     }
                 }
 
@@ -635,10 +644,22 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
         }
 
+        private bool firstScroll = true;
+
         private void updateScrollPosition()
         {
-            if (scrollTarget != null) scroll.ScrollTo(scrollTarget.Value);
-            scrollPositionCache.Validate();
+            if (scrollTarget != null)
+            {
+                if (firstScroll)
+                {
+                    // reduce movement when first displaying the carousel.
+                    scroll.ScrollTo(scrollTarget.Value - 200, false);
+                    firstScroll = false;
+                }
+
+                scroll.ScrollTo(scrollTarget.Value);
+                scrollPositionCache.Validate();
+            }
         }
 
         /// <summary>
@@ -653,8 +674,8 @@ namespace osu.Game.Screens.Select
         {
             // The radius of the circle the carousel moves on.
             const float circle_radius = 3;
-            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
-            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
+            float discriminant = MathF.Max(0, circle_radius * circle_radius - dist * dist);
+            float x = (circle_radius - MathF.Sqrt(discriminant)) * halfHeight;
 
             return 125 + x;
         }
@@ -677,7 +698,7 @@ namespace osu.Game.Screens.Select
             // We are applying a multiplicative alpha (which is internally done by nesting an
             // additional container and setting that container's alpha) such that we can
             // layer transformations on top, with a similar reasoning to the previous comment.
-            p.SetMultiplicativeAlpha(MathHelper.Clamp(1.75f - 1.5f * dist, 0, 1));
+            p.SetMultiplicativeAlpha(Math.Clamp(1.75f - 1.5f * dist, 0, 1));
         }
 
         private class CarouselRoot : CarouselGroupEagerSelect
