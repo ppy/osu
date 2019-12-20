@@ -166,6 +166,8 @@ namespace osu.Game.Rulesets.Judgements
 
         private string detailText(JudgementResult result)
         {
+            if (result.TimeOffset == 0)
+                return "";
             switch (result.Type)
             {
                 case HitResult.Perfect:
