@@ -82,7 +82,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Move to Delete Context Menu", () => InputManager.MoveMouseTo(InputManager.FocusedDrawable));
             AddStep("Show Delete Score Dialog", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Wait for DialogOverlay", () => dialogOverlay.CurrentDialog.IsLoaded);
-            AddStep("Move to confirm button", () => InputManager.MoveMouseTo(((TestLocalScoreDeleteDialog)dialogOverlay.CurrentDialog).confirmButton));
+            AddStep("Move to confirm button", () => InputManager.MoveMouseTo(((TestLocalScoreDeleteDialog)dialogOverlay.CurrentDialog).ConfirmButton));
             AddStep("Confirm Action", () => InputManager.Click(MouseButton.Left));
             AddAssert("Check Score Count", () => leaderboard.ScoreCount() == 49);
         }
@@ -95,7 +95,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Move to Delete Context Menu", () => InputManager.MoveMouseTo(InputManager.FocusedDrawable));
             AddStep("Show Delete Score Dialog", () => InputManager.Click(MouseButton.Left));
             AddUntilStep("Wait for DialogOverlay", () => dialogOverlay.CurrentDialog.IsLoaded);
-            AddStep("Move to cancel button", () => InputManager.MoveMouseTo(((TestLocalScoreDeleteDialog)dialogOverlay.CurrentDialog).cancelButton));
+            AddStep("Move to cancel button", () => InputManager.MoveMouseTo(((TestLocalScoreDeleteDialog)dialogOverlay.CurrentDialog).CancelButton));
             AddStep("Cancel Action", () => InputManager.Click(MouseButton.Left));
             AddAssert("Check Score Count", () => leaderboard.ScoreCount() == 49);
         }
@@ -197,9 +197,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestLocalScoreDeleteDialog : PopupDialog
         {
-            public readonly PopupDialogOkButton confirmButton;
+            public readonly PopupDialogOkButton ConfirmButton;
 
-            public readonly PopupDialogCancelButton cancelButton;
+            public readonly PopupDialogCancelButton CancelButton;
 
             public TestLocalScoreDeleteDialog(ScoreInfo score, FailableLeaderboard leaderboard)
             {
