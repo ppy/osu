@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Scoring;
-using System;
 using System.Diagnostics;
 using osu.Framework.Graphics.Sprites;
 
