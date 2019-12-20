@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Judgements
         private OsuColour colours;
 
         protected readonly JudgementResult Result;
+        protected readonly HitDetail Detail;
 
         public readonly DrawableHitObject JudgedObject;
 
@@ -51,6 +52,7 @@ namespace osu.Game.Rulesets.Judgements
         public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
         {
             Result = result;
+            Detail = result.GetDetail();
             JudgedObject = judgedObject;
 
             Size = new Vector2(judgement_size);
@@ -75,12 +77,12 @@ namespace osu.Game.Rulesets.Judgements
                         Colour = judgementColour(Result.Type),
                         Scale = new Vector2(0.85f, 1),
                     }, confineMode: ConfineMode.NoScaling),
-                    new SkinnableDrawable(new GameplaySkinComponent<HitDetail>(Result.Detail), _ => JudgementDetailText = new OsuSpriteText
+                    new SkinnableDrawable(new GameplaySkinComponent<HitDetail>(Detail), _ => JudgementDetailText = new OsuSpriteText
                     {
                         Text = detailText(Result),
                         Font = OsuFont.Numeric.With(size: 15),
                         Y = -20,
-                        Colour = detailColour(Result.Detail),
+                        Colour = detailColour(Detail),
                         Scale = new Vector2(0.7f, 1),
                     }, confineMode: ConfineMode.NoScaling)
                 }
@@ -151,10 +153,10 @@ namespace osu.Game.Rulesets.Judgements
         {
             switch (detail)
             {
-                case HitDetail.Early:
+                case HitDetail.Fast:
                     return colours.Blue;
 
-                case HitDetail.Late:
+                case HitDetail.Slow:
                     return colours.Red;
 
                 default:
@@ -168,9 +170,10 @@ namespace osu.Game.Rulesets.Judgements
             {
                 case HitResult.Perfect:
                 case HitResult.Great:
+                case HitResult.Miss:
                     return "";
                 default:
-                    return result.Detail.GetDescription().ToUpperInvariant();
+                    return result.GetDetail().ToString().ToUpperInvariant();
             }
         }
     }

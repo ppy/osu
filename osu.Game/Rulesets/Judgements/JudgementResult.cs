@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Judgements
         [NotNull]
         public readonly Judgement Judgement;
 
-        public HitDetail Detail => TimeOffset < 0 ? HitDetail.Early : HitDetail.Late;
-
         /// <summary>
         /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
         /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
@@ -78,6 +76,19 @@ namespace osu.Game.Rulesets.Judgements
             HitObject = hitObject;
             Judgement = judgement;
         }
+
+        /// <summary>
+        /// Gets the <see cref="HitDetail"/> associated with this judgement.
+        /// </summary>
+        public HitDetail GetDetail()
+        {
+           if (TimeOffset < 0)
+               return HitDetail.Fast;
+           if (TimeOffset > 0)
+               return HitDetail.Slow;
+           return HitDetail.Flawless;
+        }
+
 
         public override string ToString() => $"{Type} (Score:{Judgement.NumericResultFor(this)} HP:{Judgement.HealthIncreaseFor(this)} {Judgement})";
     }
