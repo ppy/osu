@@ -66,12 +66,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             };
 
-            AddStep("Insert Local Scores", () => reset());
+            AddStep("Insert Local Scores", reset);
         }
 
         private void reset()
         {
-            leaderboard.initialLoad = true;
+            leaderboard.InitialLoad = true;
             leaderboard.RefreshScores();
         }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             private Random rnd;
 
-            public bool initialLoad;
+            public bool InitialLoad;
 
             public void DeleteScore(ScoreInfo score)
             {
@@ -98,7 +98,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public FailableLeaderboard()
             {
-                initialLoad = true;
+                InitialLoad = true;
             }
 
             public void SetRetrievalState(PlaceholderState state)
@@ -108,14 +108,14 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
             {
-                if (initialLoad)
+                if (InitialLoad)
                 {
                     rnd = new Random();
 
                     scoreList = Enumerable.Range(1, 50).Select(createScore).ToList();
                     Scores = scoreList.OrderByDescending(s => s.TotalScore).ToArray();
 
-                    initialLoad = false;
+                    InitialLoad = false;
                 }
                 else
                 {
@@ -169,10 +169,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestLocalScoreDeleteDialog : PopupDialog
         {
-            public readonly PopupDialogOkButton ConfirmButton;
-
-            public readonly PopupDialogCancelButton CancelButton;
-
             public TestLocalScoreDeleteDialog(ScoreInfo score, FailableLeaderboard leaderboard)
             {
                 Debug.Assert(score != null);
@@ -184,12 +180,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 HeaderText = @"Deleting this local score. Are you sure?";
                 Buttons = new PopupDialogButton[]
                 {
-                    ConfirmButton = new PopupDialogOkButton
+                    new PopupDialogOkButton
                     {
                         Text = @"Yes. Please.",
                         Action = () => leaderboard.DeleteScore(score)
                     },
-                    CancelButton = new PopupDialogCancelButton
+                    new PopupDialogCancelButton
                     {
                         Text = @"No, I'm still attached.",
                     },
