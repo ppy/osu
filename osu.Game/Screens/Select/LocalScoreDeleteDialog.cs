@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
 
             string accuracy = string.Format(score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", score.Accuracy);
 
-            BodyText = $@"{score} {Environment.NewLine} Rank: {score.Rank} - Max Combo: {score.MaxCombo} - {accuracy}";
+            BodyText = $@"{score.User}'s {accuracy} {score.Rank} Rank on {score.Beatmap}";
             Icon = FontAwesome.Solid.Eraser;
             HeaderText = @"Deleting this local score. Are you sure?";
             Buttons = new PopupDialogButton[]
