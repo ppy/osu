@@ -25,57 +25,43 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private ModDisplay modDisplay;
 
+        private BeatmapDetailArea detailsArea;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game, RulesetStore rulesets)
         {
-            BeatmapDetailArea detailsArea;
-            Add(detailsArea = new BeatmapDetailArea
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = new Vector2(550f, 450f),
-            });
+        }
 
-            Add(modDisplay = new ModDisplay
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            Children = new Drawable[]
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Position = new Vector2(0, 25),
-            });
+                detailsArea = new BeatmapDetailArea
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(550f, 450f),
+                },
+                modDisplay = new ModDisplay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Position = new Vector2(0, 25),
+                }
+            };
 
             modDisplay.Current.BindTo(SelectedMods);
+        });
 
-            AddStep("all metrics", () => detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
-            {
-                BeatmapInfo =
-                {
-                    BeatmapSet = new BeatmapSetInfo
-                    {
-                        Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
-                    },
-                    Version = "All Metrics",
-                    Metadata = new BeatmapMetadata
-                    {
-                        Source = "osu!lazer",
-                        Tags = "this beatmap has all the metrics",
-                    },
-                    BaseDifficulty = new BeatmapDifficulty
-                    {
-                        CircleSize = 7,
-                        DrainRate = 1,
-                        OverallDifficulty = 5.7f,
-                        ApproachRate = 3.5f,
-                    },
-                    StarDifficulty = 5.3f,
-                    Metrics = new BeatmapMetrics
-                    {
-                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
-                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
-                    },
-                }
-            }));
-
+        [Test]
+        public void TestBasicScenarios()
+        {
+            showAllMetrics();
             AddStep("all except source", () => detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
             {
                 BeatmapInfo =
@@ -178,60 +164,50 @@ namespace osu.Game.Tests.Visual.SongSelect
             }));
 
             AddStep("null beatmap", () => detailsArea.Beatmap = null);
+        }
+
+        [Test]
+        public void TestModAdjustments()
+        {
+            showAllMetrics();
 
             Ruleset ruleset = rulesets.AvailableRulesets.First().CreateInstance();
 
-            AddStep("with EZ mod", () =>
+            AddStep("with EZ mod", () => SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) });
+            AddStep("with HR mod", () => SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) });
+        }
+
+        private void showAllMetrics()
+        {
+            AddStep("all metrics", () => detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
             {
-                detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
+                BeatmapInfo =
                 {
-                    BeatmapInfo =
+                    BeatmapSet = new BeatmapSetInfo
                     {
-                        Version = "Has Easy Mod",
-                        Metadata = new BeatmapMetadata
-                        {
-                            Source = "osu!lazer",
-                            Tags = "this beatmap has the easy mod enabled",
-                        },
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            CircleSize = 3,
-                            DrainRate = 3,
-                            OverallDifficulty = 3,
-                            ApproachRate = 3,
-                        },
-                        StarDifficulty = 1f,
-                    }
-                });
-
-                SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) };
-            });
-
-            AddStep("with HR mod", () =>
-            {
-                detailsArea.Beatmap = new TestWorkingBeatmap(new Beatmap
-                {
-                    BeatmapInfo =
+                        Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).ToArray() }
+                    },
+                    Version = "All Metrics",
+                    Metadata = new BeatmapMetadata
                     {
-                        Version = "Has Hard Rock Mod",
-                        Metadata = new BeatmapMetadata
-                        {
-                            Source = "osu!lazer",
-                            Tags = "this beatmap has the hard rock mod enabled",
-                        },
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            CircleSize = 3,
-                            DrainRate = 3,
-                            OverallDifficulty = 3,
-                            ApproachRate = 3,
-                        },
-                        StarDifficulty = 1f,
-                    }
-                });
-
-                SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) };
-            });
+                        Source = "osu!lazer",
+                        Tags = "this beatmap has all the metrics",
+                    },
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        CircleSize = 7,
+                        DrainRate = 1,
+                        OverallDifficulty = 5.7f,
+                        ApproachRate = 3.5f,
+                    },
+                    StarDifficulty = 5.3f,
+                    Metrics = new BeatmapMetrics
+                    {
+                        Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6).ToArray(),
+                        Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6).ToArray(),
+                    },
+                }
+            }));
         }
     }
 }
