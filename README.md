@@ -35,7 +35,7 @@ If you are not interested in developing the game, you can still consume our [bin
 
 **Latest build:**
 
-| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://testflight.apple.com/join/2tLcjWlF) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
+| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://osu.ppy.sh/home/testflight) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
 | ------------- | ------------- | ------------- | ------------- |
 
 - **Linux** users are recommended to self-compile until we have official deployment in place.
