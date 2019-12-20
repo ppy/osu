@@ -44,4 +44,13 @@ namespace osu.Game.Rulesets.Scoring
         [Description(@"Perfect")]
         Perfect,
     }
+
+    public enum HitDetail
+    {
+        [Description(@"Fast")]
+        Early,
+
+        [Description(@"Slow")]
+        Late,
+    }
 }

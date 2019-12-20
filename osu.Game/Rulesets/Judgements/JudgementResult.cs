@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Judgements
         [NotNull]
         public readonly Judgement Judgement;
 
+        public HitDetail Detail => TimeOffset < 0 ? HitDetail.Early : HitDetail.Late;
+
         /// <summary>
         /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
         /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.

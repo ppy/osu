@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Judgements
 
         protected Container JudgementBody;
         protected SpriteText JudgementText;
+        protected SpriteText JudgementDetailText;
 
         /// <summary>
         /// Duration of initial fade in.
@@ -65,13 +66,24 @@ namespace osu.Game.Rulesets.Judgements
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                Child = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
+                Children =  new Drawable []
                 {
-                    Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = OsuFont.Numeric.With(size: 20),
-                    Colour = judgementColour(Result.Type),
-                    Scale = new Vector2(0.85f, 1),
-                }, confineMode: ConfineMode.NoScaling)
+                    new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
+                    {
+                        Text = Result.Type.GetDescription().ToUpperInvariant(),
+                        Font = OsuFont.Numeric.With(size: 20),
+                        Colour = judgementColour(Result.Type),
+                        Scale = new Vector2(0.85f, 1),
+                    }, confineMode: ConfineMode.NoScaling),
+                    new SkinnableDrawable(new GameplaySkinComponent<HitDetail>(Result.Detail), _ => JudgementDetailText = new OsuSpriteText
+                    {
+                        Text = detailText(Result),
+                        Font = OsuFont.Numeric.With(size: 15),
+                        Y = -20,
+                        Colour = detailColour(Result.Detail),
+                        Scale = new Vector2(0.7f, 1),
+                    }, confineMode: ConfineMode.NoScaling)
+                }
             };
         }
 
@@ -132,6 +144,33 @@ namespace osu.Game.Rulesets.Judgements
 
                 default:
                     return Color4.White;
+            }
+        }
+
+        private Color4 detailColour(HitDetail detail)
+        {
+            switch (detail)
+            {
+                case HitDetail.Early:
+                    return colours.Blue;
+
+                case HitDetail.Late:
+                    return colours.Red;
+
+                default:
+                    return Color4.White;
+            }
+        }
+
+        private string detailText(JudgementResult result)
+        {
+            switch (result.Type)
+            {
+                case HitResult.Perfect:
+                case HitResult.Great:
+                    return "";
+                default:
+                    return result.Detail.GetDescription().ToUpperInvariant();
             }
         }
     }
