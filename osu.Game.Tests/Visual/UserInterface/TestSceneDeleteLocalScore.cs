@@ -212,12 +212,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 HeaderText = @"Deleting this local score. Are you sure?";
                 Buttons = new PopupDialogButton[]
                 {
-                    confirmButton = new PopupDialogOkButton
+                    ConfirmButton = new PopupDialogOkButton
                     {
                         Text = @"Yes. Please.",
                         Action = () => leaderboard.DeleteScore(score)
                     },
-                    cancelButton = new PopupDialogCancelButton
+                    CancelButton = new PopupDialogCancelButton
                     {
                         Text = @"No, I'm still attached.",
                     },
