@@ -22,10 +22,6 @@ namespace osu.Game.Tests
     {
         private readonly ITrackStore trackStore;
 
-        private Stream getStream() => TestResources.GetTestBeatmapStream();
-
-        private ZipArchiveReader getZipReader() => new ZipArchiveReader(getStream());
-
         public WaveformTestBeatmap(AudioManager audioManager)
             : base(new BeatmapInfo(), audioManager)
         {
@@ -37,6 +33,10 @@ namespace osu.Game.Tests
             base.Dispose(isDisposing);
             trackStore?.Dispose();
         }
+
+        private Stream getStream() => TestResources.GetTestBeatmapStream();
+
+        private ZipArchiveReader getZipReader() => new ZipArchiveReader(getStream());
 
         protected override IBeatmap GetBeatmap() => createTestBeatmap();
 
