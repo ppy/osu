@@ -154,10 +154,10 @@ namespace osu.Game.Rulesets.Judgements
             switch (detail)
             {
                 case HitDetail.Fast:
-                    return colours.Blue;
+                    return colours.Cyan;
 
                 case HitDetail.Slow:
-                    return colours.Red;
+                    return colours.RedLight;
 
                 default:
                     return Color4.White;
