@@ -45,7 +45,7 @@ namespace osu.Game.Tests.NonVisual
             cpi.Add(1000, new DifficultyControlPoint()); // is redundant
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(0));
-            Assert.That(cpi.TimingPoints.Count, Is.EqualTo(0));
+            Assert.That(cpi.DifficultyPoints.Count, Is.EqualTo(0));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(0));
 
             cpi.Add(1000, new DifficultyControlPoint { SpeedMultiplier = 2 }); // is not redundant
@@ -60,18 +60,18 @@ namespace osu.Game.Tests.NonVisual
         {
             var cpi = new ControlPointInfo();
 
-            cpi.Add(0, new SampleControlPoint()); // is redundant
+            cpi.Add(0, new SampleControlPoint()); // is *not* redundant, special exception for first sample point
             cpi.Add(1000, new SampleControlPoint()); // is redundant
-
-            Assert.That(cpi.Groups.Count, Is.EqualTo(0));
-            Assert.That(cpi.TimingPoints.Count, Is.EqualTo(0));
-            Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(0));
-
-            cpi.Add(1000, new SampleControlPoint { SampleVolume = 50 }); // is not redundant
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(1));
             Assert.That(cpi.SamplePoints.Count, Is.EqualTo(1));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(1));
+
+            cpi.Add(1000, new SampleControlPoint { SampleVolume = 50 }); // is not redundant
+
+            Assert.That(cpi.Groups.Count, Is.EqualTo(2));
+            Assert.That(cpi.SamplePoints.Count, Is.EqualTo(2));
+            Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace osu.Game.Tests.NonVisual
             cpi.Add(1000, new EffectControlPoint()); // is redundant
 
             Assert.That(cpi.Groups.Count, Is.EqualTo(0));
-            Assert.That(cpi.TimingPoints.Count, Is.EqualTo(0));
+            Assert.That(cpi.EffectPoints.Count, Is.EqualTo(0));
             Assert.That(cpi.AllControlPoints.Count(), Is.EqualTo(0));
 
             cpi.Add(1000, new EffectControlPoint { KiaiMode = true }); // is not redundant

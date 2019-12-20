@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
         }
 
-        protected override bool ShowDimContent => ShowVideo.Value && DimLevel < 1;
+        protected override bool ShowDimContent => IgnoreUserSettings.Value || (ShowVideo.Value && DimLevel < 1);
 
         private void initializeVideo(bool async)
         {
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
             if (drawableVideo != null)
                 return;
 
-            if (!ShowVideo.Value)
+            if (!ShowVideo.Value && !IgnoreUserSettings.Value)
                 return;
 
             drawableVideo = new DrawableVideo(video);
