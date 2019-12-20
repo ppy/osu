@@ -82,6 +82,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             Set(OsuSetting.LightenDuringBreaks, true);
 
+            Set(OsuSetting.ShowJudgementDetail, false);
+
             Set(OsuSetting.HitLighting, true);
 
             Set(OsuSetting.ShowInterface, true);
@@ -190,6 +192,7 @@ namespace osu.Game.Configuration
         UIScale,
         IntroSequence,
         UIHoldActivationDelay,
+        ShowJudgementDetail,
         HitLighting,
         MenuBackgroundSource
     }

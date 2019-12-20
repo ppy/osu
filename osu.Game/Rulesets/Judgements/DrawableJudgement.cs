@@ -7,6 +7,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -59,34 +60,53 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuConfigManager config)
         {
             this.colours = colours;
 
-            InternalChild = JudgementBody = new Container
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                RelativeSizeAxes = Axes.Both,
-                Children =  new Drawable []
+            if (config.Get<bool>(OsuSetting.ShowJudgementDetail)) {
+                InternalChild = JudgementBody = new Container
                 {
-                    new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Children =  new Drawable []
                     {
-                        Text = Result.Type.GetDescription().ToUpperInvariant(),
-                        Font = OsuFont.Numeric.With(size: 20),
-                        Colour = judgementColour(Result.Type),
-                        Scale = new Vector2(0.85f, 1),
-                    }, confineMode: ConfineMode.NoScaling),
-                    new SkinnableDrawable(new GameplaySkinComponent<HitDetail>(Detail), _ => JudgementDetailText = new OsuSpriteText
+                        new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
+                        {
+                            Text = Result.Type.GetDescription().ToUpperInvariant(),
+                            Font = OsuFont.Numeric.With(size: 20),
+                            Colour = judgementColour(Result.Type),
+                            Scale = new Vector2(0.85f, 1),
+                        }, confineMode: ConfineMode.NoScaling),
+                        new SkinnableDrawable(new GameplaySkinComponent<HitDetail>(Detail), _ => JudgementDetailText = new OsuSpriteText
+                        {
+                            Text = detailText(Result),
+                            Font = OsuFont.Numeric.With(size: 15),
+                            Y = -20,
+                            Colour = detailColour(Detail),
+                            Scale = new Vector2(0.7f, 1),
+                        }, confineMode: ConfineMode.NoScaling)
+                    }
+                };
+            } else {
+                InternalChild = JudgementBody = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Children =  new Drawable []
                     {
-                        Text = detailText(Result),
-                        Font = OsuFont.Numeric.With(size: 15),
-                        Y = -20,
-                        Colour = detailColour(Detail),
-                        Scale = new Vector2(0.7f, 1),
-                    }, confineMode: ConfineMode.NoScaling)
-                }
-            };
+                        new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
+                        {
+                            Text = Result.Type.GetDescription().ToUpperInvariant(),
+                            Font = OsuFont.Numeric.With(size: 20),
+                            Colour = judgementColour(Result.Type),
+                            Scale = new Vector2(0.85f, 1),
+                        }, confineMode: ConfineMode.NoScaling),
+                    }
+                };
+            }
         }
 
         protected virtual void ApplyHitAnimations()
