@@ -16,7 +16,6 @@ using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
