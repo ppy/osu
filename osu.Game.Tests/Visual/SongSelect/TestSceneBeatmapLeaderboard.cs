@@ -30,11 +30,11 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private readonly FailableLeaderboard leaderboard;
 
-        private DialogOverlay dialogOverlay;
+        private readonly DialogOverlay dialogOverlay;
 
         public TestSceneBeatmapLeaderboard()
         {
-            Add(dialogOverlay = new DialogOverlay()
+            Add(dialogOverlay = new DialogOverlay
             {
                 Depth = -1
             });
