@@ -17,14 +17,14 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneUserTopScoreContainer : OsuTestScene
     {
-        private DialogOverlay dialogOverlay;
-        private Container container;
+        private readonly DialogOverlay dialogOverlay;
+        private readonly Container container;
 
         public TestSceneUserTopScoreContainer()
         {
             UserTopScoreContainer topScoreContainer;
 
-            Add(dialogOverlay = new DialogOverlay()
+            Add(dialogOverlay = new DialogOverlay
             {
                 Depth = -1
             });

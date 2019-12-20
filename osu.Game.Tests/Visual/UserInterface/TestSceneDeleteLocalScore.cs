@@ -36,11 +36,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly FailableLeaderboard leaderboard;
 
-        private DialogOverlay dialogOverlay;
+        private readonly DialogOverlay dialogOverlay;
 
         public TestSceneDeleteLocalScore()
         {
-            Add(dialogOverlay = new DialogOverlay()
+            Add(dialogOverlay = new DialogOverlay
             {
                 Depth = -1
             });
@@ -70,11 +70,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Insert Locacl Scores", null);
 
-            TestConfirmDeleteLocalScore();
-            TestCancelDeleteLocalScore();
+            testConfirmDeleteLocalScore();
+            testCancelDeleteLocalScore();
         }
 
-        private void TestConfirmDeleteLocalScore()
+        private void testConfirmDeleteLocalScore()
         {
             AddStep("Move to leaderboard", () => InputManager.MoveMouseTo(leaderboard));
             AddStep("Show ContextMenu", () => InputManager.Click(MouseButton.Right));
@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Check Score Count", () => leaderboard.ScoreCount() == 49);
         }
 
-        private void TestCancelDeleteLocalScore()
+        private void testCancelDeleteLocalScore()
         {
             AddStep("Move to leaderboard", () => InputManager.MoveMouseTo(leaderboard));
             AddStep("Show ContextMenu", () => InputManager.Click(MouseButton.Right));
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class FailableLeaderboard : BeatmapLeaderboard
         {
-            private DialogOverlay dialogOverlay;
+            private readonly DialogOverlay dialogOverlay;
 
             private List<ScoreInfo> scoreList;
 
@@ -129,7 +129,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             public FailableLeaderboard(DialogOverlay dialogOverlay)
-                : base()
             {
                 this.dialogOverlay = dialogOverlay;
                 initialLoad = true;
@@ -179,9 +178,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestLeaderboardScore : LeaderboardScore
         {
-            private DialogOverlay dialogOverlay;
+            private readonly DialogOverlay dialogOverlay;
 
-            private FailableLeaderboard leaderboard;
+            private readonly FailableLeaderboard leaderboard;
 
             public TestLeaderboardScore(ScoreInfo score, int rank, DialogOverlay dialogOverlay, FailableLeaderboard leaderboard, bool allowHighlight = true)
                 : base(score, rank, allowHighlight)
@@ -190,7 +189,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 this.leaderboard = leaderboard;
             }
 
-            protected override void deleteLocalScore(ScoreInfo score)
+            protected override void DeleteLocalScore(ScoreInfo score)
             {
                 dialogOverlay?.Push(new TestLocalScoreDeleteDialog(score, leaderboard));
             }
@@ -198,9 +197,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestLocalScoreDeleteDialog : PopupDialog
         {
-            public PopupDialogOkButton confirmButton;
+            public readonly PopupDialogOkButton confirmButton;
 
-            public PopupDialogCancelButton cancelButton;
+            public readonly PopupDialogCancelButton cancelButton;
 
             public TestLocalScoreDeleteDialog(ScoreInfo score, FailableLeaderboard leaderboard)
             {
