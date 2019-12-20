@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => @"Difficulty Adjust";
 
-        public override string Description => @"Override a beatmap's difficulty settings";
+        public override string Description => @"Override a beatmap's difficulty settings.";
 
         public override string Acronym => "DA";
 
