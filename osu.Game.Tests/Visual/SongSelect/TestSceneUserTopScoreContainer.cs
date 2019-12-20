@@ -1,11 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Scoring;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Leaderboards;
@@ -15,11 +17,19 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneUserTopScoreContainer : OsuTestScene
     {
+        private DialogOverlay dialogOverlay;
+        private Container container;
+
         public TestSceneUserTopScoreContainer()
         {
             UserTopScoreContainer topScoreContainer;
 
-            Add(new Container
+            Add(dialogOverlay = new DialogOverlay()
+            {
+                Depth = -1
+            });
+
+            container = new Container
             {
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.Centre,
@@ -38,7 +48,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Anchor = Anchor.BottomCentre,
                     }
                 }
-            });
+            };
 
             var scores = new[]
             {
@@ -113,6 +123,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Add score(rank 110000)", () => topScoreContainer.Score.Value = scores[1]);
             AddStep(@"Add score(rank 22333)", () => topScoreContainer.Score.Value = scores[2]);
             AddStep(@"Add null score", () => topScoreContainer.Score.Value = null);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(dialogOverlay);
+
+            Add(container);
         }
     }
 }

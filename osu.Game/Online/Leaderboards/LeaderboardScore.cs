@@ -367,7 +367,7 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        private void deleteLocalScore(ScoreInfo score)
+        protected virtual void deleteLocalScore(ScoreInfo score)
         {
             dialogOverlay?.Push(new LocalScoreDeleteDialog(score));
         }
