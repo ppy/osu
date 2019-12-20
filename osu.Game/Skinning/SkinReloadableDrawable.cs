@@ -13,6 +13,11 @@ namespace osu.Game.Skinning
     public abstract class SkinReloadableDrawable : CompositeDrawable
     {
         /// <summary>
+        /// Invoked when <see cref="CurrentSkin"/> has changed.
+        /// </summary>
+        public event Action OnSkinChanged;
+
+        /// <summary>
         /// The current skin source.
         /// </summary>
         protected ISkinSource CurrentSkin { get; private set; }
@@ -43,12 +48,18 @@ namespace osu.Game.Skinning
         private void onChange() =>
             // schedule required to avoid calls after disposed.
             // note that this has the side-effect of components only performing a skin change when they are alive.
-            Scheduler.AddOnce(() => SkinChanged(CurrentSkin, allowDefaultFallback));
+            Scheduler.AddOnce(skinChanged);
 
         protected override void LoadAsyncComplete()
         {
             base.LoadAsyncComplete();
+            skinChanged();
+        }
+
+        private void skinChanged()
+        {
             SkinChanged(CurrentSkin, allowDefaultFallback);
+            OnSkinChanged?.Invoke();
         }
 
         /// <summary>
@@ -66,6 +77,8 @@ namespace osu.Game.Skinning
 
             if (CurrentSkin != null)
                 CurrentSkin.SourceChanged -= onChange;
+
+            OnSkinChanged = null;
         }
     }
 }

@@ -158,7 +158,9 @@ namespace osu.Game.Beatmaps
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
-        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items) => items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
+        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
+            => base.CheckLocalAvailability(model, items)
+               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
 
         /// <summary>
         /// Delete a beatmap difficulty.
