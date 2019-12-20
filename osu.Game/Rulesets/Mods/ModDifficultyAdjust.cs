@@ -5,11 +5,10 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using System;
-using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public class ModDifficultyAdjust : Mod, IApplicableToDifficulty
+    public abstract class ModDifficultyAdjust : Mod, IApplicableToDifficulty
     {
         public override string Name => @"Difficulty Adjust";
 
@@ -25,45 +24,13 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
-        [SettingSource("Drain Rate", "Override the beatmap's set HP")]
-        public BindableNumber<float> DrainRate { get; } = new BindableFloat
-        {
-            MinValue = 1,
-            MaxValue = 10,
-            Default = 5,
-            Value = 5,
-            Precision = 0.1F,
-        };
+        public virtual BindableNumber<float> DrainRate { get; }
 
-        [SettingSource("Circle Size", "Override the beatmap's set CS")]
-        public BindableNumber<float> CircleSize { get; } = new BindableFloat
-        {
-            MinValue = 1,
-            MaxValue = 10,
-            Default = 5,
-            Value = 5,
-            Precision = 0.1F,
-        };
+        public virtual BindableNumber<float> CircleSize { get; }
 
-        [SettingSource("Approach Rate", "Override the beatmap's set AR")]
-        public BindableNumber<float> ApproachRate { get; } = new BindableFloat
-        {
-            MinValue = 1,
-            MaxValue = 10,
-            Default = 5,
-            Value = 5,
-            Precision = 0.1F,
-        };
+        public virtual BindableNumber<float> ApproachRate { get; }
 
-        [SettingSource("Overall Difficulty", "Override the beatmap's set OD")]
-        public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
-        {
-            MinValue = 1,
-            MaxValue = 10,
-            Default = 5,
-            Value = 5,
-            Precision = 0.1F,
-        };
+        public virtual BindableNumber<float> OverallDifficulty { get; }
 
         private BeatmapDifficulty difficulty;
 
@@ -72,17 +39,25 @@ namespace osu.Game.Rulesets.Mods
             if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
             {
                 this.difficulty = difficulty;
-                DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
-                CircleSize.Value = CircleSize.Default = difficulty.CircleSize;
-                ApproachRate.Value = ApproachRate.Default = difficulty.ApproachRate;
-                OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
+
+                if (DrainRate != null)
+                    DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
+
+                if (CircleSize != null)
+                    CircleSize.Value = CircleSize.Default = difficulty.CircleSize;
+
+                if (ApproachRate != null)
+                    ApproachRate.Value = ApproachRate.Default = difficulty.ApproachRate;
+
+                if (OverallDifficulty != null)
+                    OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
             }
             else
             {
-                difficulty.DrainRate = DrainRate.Value;
-                difficulty.CircleSize = CircleSize.Value;
-                difficulty.ApproachRate = ApproachRate.Value;
-                difficulty.OverallDifficulty = OverallDifficulty.Value;
+                difficulty.DrainRate = DrainRate?.Value ?? difficulty.DrainRate;
+                difficulty.CircleSize = CircleSize?.Value ?? difficulty.CircleSize;
+                difficulty.ApproachRate = ApproachRate?.Value ?? difficulty.ApproachRate;
+                difficulty.OverallDifficulty = OverallDifficulty?.Value ?? difficulty.OverallDifficulty;
             }
         }
     }

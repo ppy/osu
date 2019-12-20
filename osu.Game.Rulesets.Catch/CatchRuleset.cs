@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new ModDifficultyAdjust(),
+                        new CatchModDifficultyAdjust(),
                     };
 
                 case ModType.Automation:
