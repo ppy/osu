@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
@@ -28,15 +30,22 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private readonly FailableLeaderboard leaderboard;
 
+        private DialogOverlay dialogOverlay;
+
         public TestSceneBeatmapLeaderboard()
         {
-            Add(leaderboard = new FailableLeaderboard
+            Add(dialogOverlay = new DialogOverlay()
+            {
+                Depth = -1
+            });
+
+            leaderboard = new FailableLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Size = new Vector2(550f, 450f),
                 Scope = BeatmapLeaderboardScope.Global,
-            });
+            };
 
             AddStep(@"New Scores", newScores);
             AddStep(@"Show personal best", showPersonalBest);
@@ -280,6 +289,14 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 PlaceholderState = state;
             }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Dependencies.Cache(dialogOverlay);
+
+            Add(leaderboard);
         }
     }
 }
