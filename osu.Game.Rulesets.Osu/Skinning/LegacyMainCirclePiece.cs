@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -43,6 +44,17 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Colour = drawableObject.AccentColour.Value,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                },
+                new KiaiFlash
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(0.921875f),
+
+                    Masking = true,
+                    CornerRadius = Size.X / 2,
+                    CornerExponent = 2,
                 },
                 hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
