@@ -12,6 +12,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
     {
         public Drawable FlashComponent { get; set; }
 
+        public float Intensity { get; set; }
+
         public KiaiFlash()
         {
             Blending = BlendingParameters.Additive;
@@ -31,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (effectPoint.KiaiMode)
             {
                 FlashComponent
-                    .FadeTo(0.25f, EarlyActivationMilliseconds, Easing.OutQuint)
+                    .FadeTo(Intensity, EarlyActivationMilliseconds, Easing.OutQuint)
                     .Then()
                     .FadeOut(timingPoint.BeatLength - 80, Easing.OutSine);
             }

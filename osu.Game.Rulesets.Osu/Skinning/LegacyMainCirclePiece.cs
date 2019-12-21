@@ -55,6 +55,8 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     Masking = true,
                     CornerRadius = Size.X / 2,
                     CornerExponent = 2,
+
+                    Intensity = 0.1f
                 },
                 hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
