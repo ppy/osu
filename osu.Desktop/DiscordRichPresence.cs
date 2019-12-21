@@ -1,7 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
+using System.Text;
 using DiscordRPC;
+using DiscordRPC.Helper;
 using DiscordRPC.Message;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -78,8 +81,8 @@ namespace osu.Desktop
 
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
-                presence.State = activity.Value.Status;
-                presence.Details = getDetails(activity.Value);
+                presence.State = truncate(activity.Value.Status);
+                presence.Details = truncate(getDetails(activity.Value));
             }
             else
             {
@@ -96,6 +99,8 @@ namespace osu.Desktop
 
             client.SetPresence(presence);
         }
+
+        private string truncate(string str) => str.WithinLength(128) ? str : new string (str.TakeWhile((c, i) => Encoding.UTF8.GetByteCount(str.Substring(0, i + 1)) <= 125).ToArray()) + '…'; //the ellipsis char is 3 bytes long in UTF8
 
         private string getDetails(UserActivity activity)
         {
