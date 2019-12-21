@@ -68,8 +68,11 @@ namespace osu.Game.Tests.Visual.Editor
         {
             private readonly Drawable marker;
 
-            private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-            private IAdjustableClock adjustableClock;
+            [Resolved]
+            private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+            [Resolved]
+            private IAdjustableClock adjustableClock { get; set; }
 
             public AudioVisualiser()
             {
@@ -89,13 +92,6 @@ namespace osu.Game.Tests.Visual.Editor
                         Width = 2,
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(IAdjustableClock adjustableClock, IBindable<WorkingBeatmap> beatmap)
-            {
-                this.adjustableClock = adjustableClock;
-                this.beatmap.BindTo(beatmap);
             }
 
             protected override void Update()

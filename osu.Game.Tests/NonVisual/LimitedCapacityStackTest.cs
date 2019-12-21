@@ -25,7 +25,7 @@ namespace osu.Game.Tests.NonVisual
         {
             Assert.AreEqual(0, stack.Count);
 
-            Assert.Throws<IndexOutOfRangeException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 int unused = stack[0];
             });
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.NonVisual
             // e.g. indices 3, 4, 5, 6 (out of range)
             for (int i = stack.Count; i < stack.Count + capacity; i++)
             {
-                Assert.Throws<IndexOutOfRangeException>(() =>
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
                     int unused = stack[i];
                 });
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.NonVisual
             // e.g. indices 3, 4, 5, 6 (out of range)
             for (int i = stack.Count; i < stack.Count + capacity; i++)
             {
-                Assert.Throws<IndexOutOfRangeException>(() =>
+                Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
                     int unused = stack[i];
                 });
