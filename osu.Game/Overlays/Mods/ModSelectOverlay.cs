@@ -400,7 +400,7 @@ namespace osu.Game.Overlays.Mods
                 ranked &= mod.Ranked;
             }
 
-            MultiplierLabel.Text = $"{multiplier:N2}x";
+            MultiplierLabel.Text = $"{multiplier:N2} 倍";
             if (multiplier > 1.0)
                 MultiplierLabel.FadeColour(HighMultiplierColour, 200);
             else if (multiplier < 1.0)

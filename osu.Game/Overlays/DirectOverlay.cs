@@ -103,12 +103,12 @@ namespace osu.Game.Overlays
                     {
                         new OsuSpriteText
                         {
-                            Text = "Found ",
-                            Font = OsuFont.GetFont(size: 15)
+                            Text = "已找到",
+                            Font = OsuFont.GetFont(size: 17)
                         },
                         resultCountsText = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                         },
                     }
                 },
@@ -174,9 +174,9 @@ namespace osu.Game.Overlays
             resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, Easing.OutQuint);
             if (ResultAmounts == null) return;
 
-            resultCountsText.Text = "Artist".ToQuantity(ResultAmounts.Artists) + ", " +
-                                    "Song".ToQuantity(ResultAmounts.Songs) + ", " +
-                                    "Tag".ToQuantity(ResultAmounts.Tags);
+            resultCountsText.Text = "名艺术家".ToQuantity(ResultAmounts.Artists) + ", " +
+                                    "首歌曲".ToQuantity(ResultAmounts.Songs) + ", " +
+                                    "个标签".ToQuantity(ResultAmounts.Tags);
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)

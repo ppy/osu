@@ -237,11 +237,11 @@ namespace osu.Game.Overlays.Chat
                 {
                     List<MenuItem> items = new List<MenuItem>
                     {
-                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
+                        new OsuMenuItem("查看玩家信息", MenuItemType.Highlighted, Action)
                     };
 
                     if (sender.Id != api.LocalUser.Value.Id)
-                        items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction));
+                        items.Add(new OsuMenuItem("开始聊天", MenuItemType.Standard, startChatAction));
 
                     return items.ToArray();
                 }

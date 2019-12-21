@@ -291,13 +291,6 @@ namespace osu.Game.Screens.Play
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                },
-                new OsuSpriteText
-                {
-                    Text = "",
-                    Shadow = true,
-                    ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    Font = OsuFont.GetFont(size: 18),
                 }
             };
         }

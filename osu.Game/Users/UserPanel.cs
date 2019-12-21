@@ -247,7 +247,7 @@ namespace osu.Game.Users
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile),
+            new OsuMenuItem("查看玩家信息", MenuItemType.Highlighted, ViewProfile),
         };
     }
 }

@@ -45,7 +45,7 @@ namespace osu.Game.Online.API.Requests
         [Description("我喜欢的")]
         Favourites,
 
-        [Description("Pending 与 WIP")]
+        [Description("审核中 与 制作中")]
         Pending,
         [Description("坟图")]
         Graveyard,
