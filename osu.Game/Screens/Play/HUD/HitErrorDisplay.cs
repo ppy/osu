@@ -77,6 +77,19 @@ namespace osu.Game.Screens.Play.HUD
                 case ScoreMeterType.HitErrorRight:
                     createBar(true);
                     break;
+
+                case ScoreMeterType.ColourBoth:
+                    createColour(false);
+                    createColour(true);
+                    break;
+
+                case ScoreMeterType.ColourLeft:
+                    createColour(false);
+                    break;
+
+                case ScoreMeterType.ColourRight:
+                    createColour(true);
+                    break;
             }
         }
 
@@ -90,6 +103,24 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 0,
             };
 
+            completeDisplayLoading(display);
+        }
+
+        private void createColour(bool rightAligned)
+        {
+            var display = new ColourHitErrorMeter(hitWindows)
+            {
+                Margin = new MarginPadding(margin),
+                Anchor = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Origin = rightAligned ? Anchor.CentreRight : Anchor.CentreLeft,
+                Alpha = 0,
+            };
+
+            completeDisplayLoading(display);
+        }
+
+        private void completeDisplayLoading(HitErrorMeter display)
+        {
             Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
