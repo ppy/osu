@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -50,13 +51,19 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(0.921875f),
+                    Size = new Vector2(OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / 64),
 
                     Masking = true,
                     CornerRadius = Size.X / 2,
                     CornerExponent = 2,
 
-                    Intensity = 0.1f
+                    Intensity = 0.1f,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                        Alpha = 0f,
+                    }
                 },
                 hitCircleText = new SkinnableSpriteText(new OsuSkinComponent(OsuSkinComponents.HitCircleText), _ => new OsuSpriteText
                 {
