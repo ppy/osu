@@ -20,7 +20,7 @@ namespace osu.Game.Skinning
         /// </summary>
         internal bool AllowDefaultComboColoursFallback = true;
 
-        public static List<Color4> DefaultComboColours = new List<Color4>
+        public static List<Color4> DefaultComboColours { get; } = new List<Color4>
         {
             new Color4(255, 192, 0, 255),
             new Color4(0, 202, 0, 255),
