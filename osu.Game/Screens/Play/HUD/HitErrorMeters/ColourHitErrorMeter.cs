@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 {
@@ -34,55 +33,20 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public override void OnNewJudgement(JudgementResult judgement)
         {
-            judgementsFlow.Add(new DrawableJudgement(HitWindows.ResultFor(judgement.TimeOffset)));
+            judgementsFlow.Add(new DrawableJudgement(GetColourForHitResult(HitWindows.ResultFor(judgement.TimeOffset))));
         }
 
         private class DrawableJudgement : CircularContainer
         {
-            private readonly Box background;
-            private readonly HitResult result;
-
-            public DrawableJudgement(HitResult result)
+            public DrawableJudgement(Color4 colour)
             {
-                this.result = result;
-
                 Masking = true;
                 Size = new Vector2(8);
-                Child = background = new Box
+                Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colour
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                switch (result)
-                {
-                    case HitResult.Miss:
-                        background.Colour = colours.Red;
-                        break;
-
-                    case HitResult.Meh:
-                        background.Colour = colours.Yellow;
-                        break;
-
-                    case HitResult.Ok:
-                        background.Colour = colours.Green;
-                        break;
-
-                    case HitResult.Good:
-                        background.Colour = colours.GreenLight;
-                        break;
-
-                    case HitResult.Great:
-                        background.Colour = colours.Blue;
-                        break;
-
-                    default:
-                        background.Colour = colours.BlueLight;
-                        break;
-                }
             }
         }
     }
