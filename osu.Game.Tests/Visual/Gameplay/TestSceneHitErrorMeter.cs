@@ -19,18 +19,22 @@ using osu.Game.Screens.Play.HUD.HitErrorMeters;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneBarHitErrorMeter : OsuTestScene
+    public class TestSceneHitErrorMeter : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(HitErrorMeter),
+            typeof(BarHitErrorMeter),
+            typeof(ColourHitErrorMeter)
         };
 
-        private HitErrorMeter meter;
-        private HitErrorMeter meter2;
+        private BarHitErrorMeter barMeter;
+        private BarHitErrorMeter barMeter2;
+        private ColourHitErrorMeter colourMeter;
+        private ColourHitErrorMeter colourMeter2;
         private HitWindows hitWindows;
 
-        public TestSceneBarHitErrorMeter()
+        public TestSceneHitErrorMeter()
         {
             recreateDisplay(new OsuHitWindows(), 5);
 
@@ -91,16 +95,30 @@ namespace osu.Game.Tests.Visual.Gameplay
                 }
             });
 
-            Add(meter = new BarHitErrorMeter(hitWindows, true)
+            Add(barMeter = new BarHitErrorMeter(hitWindows, true)
             {
                 Anchor = Anchor.CentreRight,
                 Origin = Anchor.CentreRight,
             });
 
-            Add(meter2 = new BarHitErrorMeter(hitWindows, false)
+            Add(barMeter2 = new BarHitErrorMeter(hitWindows, false)
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
+            });
+
+            Add(colourMeter = new ColourHitErrorMeter(hitWindows)
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Margin = new MarginPadding { Right = 50 }
+            });
+
+            Add(colourMeter2 = new ColourHitErrorMeter(hitWindows)
+            {
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding { Left = 50 }
             });
         }
 
@@ -112,8 +130,10 @@ namespace osu.Game.Tests.Visual.Gameplay
                 Type = HitResult.Perfect,
             };
 
-            meter.OnNewJudgement(judgement);
-            meter2.OnNewJudgement(judgement);
+            barMeter.OnNewJudgement(judgement);
+            barMeter2.OnNewJudgement(judgement);
+            colourMeter.OnNewJudgement(judgement);
+            colourMeter2.OnNewJudgement(judgement);
         }
     }
 }
