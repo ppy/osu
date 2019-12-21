@@ -3,8 +3,11 @@
 
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -173,6 +176,18 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 OnlineBeatmapID = 162,
             });
+        }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        [Test]
+        public void TestModAdjustments()
+        {
+            Ruleset ruleset = rulesets.AvailableRulesets.First().CreateInstance();
+
+            AddStep("with EZ mod", () => SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) });
+            AddStep("with HR mod", () => SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) });
         }
     }
 }
