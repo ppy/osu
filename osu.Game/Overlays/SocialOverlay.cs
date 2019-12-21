@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
@@ -15,6 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
+using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
@@ -31,17 +34,20 @@ namespace osu.Game.Overlays
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
-        private IEnumerable<User> users;
+        private User[] users = Array.Empty<User>();
 
-        public IEnumerable<User> Users
+        public User[] Users
         {
             get => users;
             set
             {
-                if (ReferenceEquals(users, value))
+                if (users == value)
                     return;
 
-                users = value?.ToList();
+                users = value ?? Array.Empty<User>();
+
+                if (LoadState >= LoadState.Ready)
+                    recreatePanels();
             }
         }
 
@@ -67,11 +73,10 @@ namespace osu.Game.Overlays
             };
 
             Header.Tabs.Current.ValueChanged += _ => queueUpdate();
+            Filter.Tabs.Current.ValueChanged += _ => onFilterUpdate();
 
-            Filter.Tabs.Current.ValueChanged += _ => queueUpdate();
-
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => queueUpdate();
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += _ => recreatePanels();
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => recreatePanels();
 
             currentQuery.BindTo(Filter.Search.Current);
             currentQuery.ValueChanged += query =>
@@ -85,6 +90,12 @@ namespace osu.Game.Overlays
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            recreatePanels();
+        }
+
         private APIRequest getUsersRequest;
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
@@ -92,6 +103,8 @@ namespace osu.Game.Overlays
         private ScheduledDelegate queryChangedDebounce;
 
         private void queueUpdate() => Scheduler.AddOnce(updateSearch);
+
+        private CancellationTokenSource loadCancellation;
 
         private void updateSearch()
         {
@@ -102,7 +115,6 @@ namespace osu.Game.Overlays
 
             Users = null;
             clearPanels();
-            loading.Hide();
             getUsersRequest?.Cancel();
 
             if (API?.IsLoggedIn != true)
@@ -112,26 +124,43 @@ namespace osu.Game.Overlays
             {
                 case SocialTab.Friends:
                     var friendRequest = new GetFriendsRequest(); // TODO filter arguments?
-                    friendRequest.Success += updateUsers;
+                    friendRequest.Success += users => Users = users.ToArray();
                     API.Queue(getUsersRequest = friendRequest);
                     break;
 
                 default:
                     var userRequest = new GetUsersRequest(); // TODO filter arguments!
-                    userRequest.Success += res => updateUsers(res.Users.Select(r => r.User));
+                    userRequest.Success += res => Users = res.Users.Select(r => r.User).ToArray();
                     API.Queue(getUsersRequest = userRequest);
                     break;
             }
-
-            loading.Show();
         }
 
-        private void recreatePanels(PanelDisplayStyle displayStyle)
+        private void recreatePanels()
         {
             clearPanels();
 
             if (Users == null)
+            {
+                loading.Hide();
                 return;
+            }
+
+            IEnumerable<User> sortedUsers = Users;
+
+            switch (Filter.Tabs.Current.Value)
+            {
+                case SocialSortCriteria.Location:
+                    sortedUsers = sortedUsers.OrderBy(u => u.Country.FullName);
+                    break;
+
+                case SocialSortCriteria.Name:
+                    sortedUsers = sortedUsers.OrderBy(u => u.Username);
+                    break;
+            }
+
+            if (Filter.DisplayStyleControl.Dropdown.Current.Value == SortDirection.Descending)
+                sortedUsers = sortedUsers.Reverse();
 
             var newPanels = new FillFlowContainer<SocialPanel>
             {
@@ -139,11 +168,11 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(10f),
                 Margin = new MarginPadding { Top = 10 },
-                ChildrenEnumerable = Users.Select(u =>
+                ChildrenEnumerable = sortedUsers.Select(u =>
                 {
                     SocialPanel panel;
 
-                    switch (displayStyle)
+                    switch (Filter.DisplayStyleControl.DisplayStyle.Value)
                     {
                         case PanelDisplayStyle.Grid:
                             panel = new SocialGridPanel(u)
@@ -169,19 +198,28 @@ namespace osu.Game.Overlays
                 if (panels != null)
                     ScrollFlow.Remove(panels);
 
+                loading.Hide();
                 ScrollFlow.Add(panels = newPanels);
-            });
+            }, (loadCancellation = new CancellationTokenSource()).Token);
         }
 
-        private void updateUsers(IEnumerable<User> newUsers)
+        private void onFilterUpdate()
         {
-            Users = newUsers;
-            loading.Hide();
-            recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+            if (Filter.Tabs.Current.Value == SocialSortCriteria.Rank)
+            {
+                queueUpdate();
+                return;
+            }
+
+            recreatePanels();
         }
 
         private void clearPanels()
         {
+            loading.Show();
+
+            loadCancellation?.Cancel();
+
             if (panels != null)
             {
                 panels.Expire();
