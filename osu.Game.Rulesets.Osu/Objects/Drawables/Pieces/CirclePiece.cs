@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 new KiaiFlash
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Intensity = 0.25f,
                 },
                 new TrianglesPiece
                 {
