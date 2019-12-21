@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.Centre,
                     Text = "欢迎",
                     Padding = new MarginPadding { Bottom = 10 },
-                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 80),
+                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 120),
                     Alpha = 0,
                     Spacing = new Vector2(5),
                 },
