@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -132,6 +133,8 @@ namespace osu.Game.Screens.Menu
 
         private void confirmAndExit()
         {
+            if (exitConfirmed) return;
+
             exitConfirmed = true;
             this.Exit();
         }
@@ -248,6 +251,12 @@ namespace osu.Game.Screens.Menu
             {
                 dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
                 return true;
+            }
+
+            if (dialogOverlay.CurrentDialog is ConfirmExitDialog)
+            {
+                exitConfirmed = true;
+                dialogOverlay.CurrentDialog.Buttons.First().Click();
             }
 
             buttons.State = ButtonSystemState.Exit;
