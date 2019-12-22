@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
     public class ColourHitErrorMeter : HitErrorMeter
     {
         private const int max_available_judgements = 20;
+        private const int animation_duration = 200;
 
         private readonly JudgementFlow judgementsFlow;
         private readonly BindableList<(Color4 colour, JudgementResult result)> judgements = new BindableList<(Color4 colour, JudgementResult result)>();
@@ -46,7 +47,6 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
         {
             private const int drawable_judgement_size = 8;
             private const int spacing = 2;
-            private const int animation_duration = 200;
 
             public readonly BindableList<(Color4 colour, JudgementResult result)> Judgements = new BindableList<(Color4 colour, JudgementResult result)>();
 
@@ -72,13 +72,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             private void push(IEnumerable<(Color4 colour, JudgementResult result)> judgements)
             {
                 var (colour, result) = judgements.Single();
-                var drawableJudgement = new DrawableResult(colour, result, drawable_judgement_size)
-                {
-                    Alpha = 0,
-                };
-
-                Insert(runningDepth--, drawableJudgement);
-                drawableJudgement.FadeInFromZero(animation_duration, Easing.OutQuint);
+                Insert(runningDepth--, new DrawableResult(colour, result, drawable_judgement_size));
             }
 
             private void pop(IEnumerable<(Color4 colour, JudgementResult result)> judgements)
@@ -88,21 +82,36 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             }
         }
 
-        private class DrawableResult : CircularContainer
+        private class DrawableResult : Container
         {
             public JudgementResult Result { get; private set; }
+
+            private readonly CircularContainer content;
 
             public DrawableResult(Color4 colour, JudgementResult result, int size)
             {
                 Result = result;
 
-                Masking = true;
                 Size = new Vector2(size);
-                Child = new Box
+                Child = content = new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colour
+                    Masking = true,
+                    Alpha = 0,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colour
+                    },
                 };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                content.FadeInFromZero(animation_duration, Easing.OutQuint);
+                content.MoveToY(-DrawSize.Y);
+                content.MoveToY(0, animation_duration, Easing.OutQuint);
             }
         }
     }
