@@ -61,19 +61,52 @@ namespace osu.Game.Overlays.Changelog
                 }
             };
 
-            text.AddParagraph("想反馈问题?", t =>
+            text.AddParagraph("反馈问题?", t =>
             {
                 t.Colour = Color4.White;
-                t.Font = OsuFont.Default.With(italics: true, size: 20);
+                t.Font = OsuFont.Default.With(italics: true, size: 24);
                 t.Padding = new MarginPadding { Bottom = 20 };
             });
 
-            text.AddParagraph("我们想知道你如何看待这次更新! ");
+            text.AddParagraph("我们想知道你如何看待这次更新! ",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 20);
+            });
             text.AddIcon(FontAwesome.Regular.GrinHearts);
 
-            text.AddParagraph("请访问");
-            text.AddLink("网页版", $"{build.Url}#comments");
-            text.AddText("的更改日志来留言.");
+            text.AddParagraph("请访问",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 20);
+            });
+            text.AddLink("网页版", $"{build.Url}#comments",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 20);
+            });
+            text.AddText("的更改日志来留言.",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 20);
+            });
+
+            text.AddParagraph("另外,你还可以通过访问",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 17);
+            });
+            text.AddLink("这个链接","https://github.com/ppy/osu/graphs/contributors",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 17);
+            });
+            text.AddParagraph("和",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 17);
+            });
+            text.AddLink("这个链接","https://github.com/matrix-feather/osu/graphs/contributors",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 17);
+            });
+            text.AddText("来查看迄今为止所有参与过osu!lazer以及中文版osu!lazer开发的人员!感谢他们的辛勤付出!",t =>
+            {
+                t.Font = OsuFont.Default.With(size: 17);
+            });
         }
     }
 }

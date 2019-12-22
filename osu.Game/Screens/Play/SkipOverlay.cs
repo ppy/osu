@@ -288,7 +288,7 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.7f,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
                                 Origin = Anchor.Centre,
                                 Text = @"跳过",
                             },
