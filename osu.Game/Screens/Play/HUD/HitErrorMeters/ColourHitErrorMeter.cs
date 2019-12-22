@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 Insert(runningDepth--, new DrawableResult(colour, drawable_judgement_size));
 
                 if (Children.Count > max_available_judgements)
-                    Children.FirstOrDefault(c => !c.IsRemoved).Remove();
+                    Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
             }
         }
 
