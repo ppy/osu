@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using System;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -24,41 +25,49 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
-        public virtual BindableNumber<float> DrainRate { get; }
+        [SettingSource("Drain Rate", "Override a beatmap's set HP.")]
+        public BindableNumber<float> DrainRate { get; } = new BindableFloat()
+        {
+            Precision = 0.1f,
+            MinValue = 1,
+            MaxValue = 10,
+            Default = 5,
+            Value = 5,
+        };
 
-        public virtual BindableNumber<float> CircleSize { get; }
-
-        public virtual BindableNumber<float> ApproachRate { get; }
-
-        public virtual BindableNumber<float> OverallDifficulty { get; }
+        [SettingSource("Overall Difficulty", "Override a beatmap's set OD.")]
+        public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat()
+        {
+            Precision = 0.1f,
+            MinValue = 1,
+            MaxValue = 10,
+            Default = 5,
+            Value = 5,
+        };
 
         private BeatmapDifficulty difficulty;
 
-        public virtual void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
             {
                 this.difficulty = difficulty;
-
-                if (DrainRate != null)
-                    DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
-
-                if (CircleSize != null)
-                    CircleSize.Value = CircleSize.Default = difficulty.CircleSize;
-
-                if (ApproachRate != null)
-                    ApproachRate.Value = ApproachRate.Default = difficulty.ApproachRate;
-
-                if (OverallDifficulty != null)
-                    OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
+                UpdateSettings(difficulty);
             }
             else
-            {
-                difficulty.DrainRate = DrainRate?.Value ?? difficulty.DrainRate;
-                difficulty.CircleSize = CircleSize?.Value ?? difficulty.CircleSize;
-                difficulty.ApproachRate = ApproachRate?.Value ?? difficulty.ApproachRate;
-                difficulty.OverallDifficulty = OverallDifficulty?.Value ?? difficulty.OverallDifficulty;
-            }
+                ApplySettings(difficulty);
+        }
+
+        protected virtual void UpdateSettings(BeatmapDifficulty difficulty)
+        {
+            DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
+            OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
+        }
+
+        protected virtual void ApplySettings(BeatmapDifficulty difficulty)
+        {
+            difficulty.DrainRate = DrainRate.Value;
+            difficulty.OverallDifficulty = OverallDifficulty.Value;
         }
     }
 }
