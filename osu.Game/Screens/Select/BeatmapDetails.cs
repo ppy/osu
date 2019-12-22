@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Select
                                 new OsuSpriteText
                                 {
                                     Text = "失败点",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                                 },
                                 failRetryGraph = new FailRetryGraph
                                 {
@@ -321,7 +321,7 @@ namespace osu.Game.Screens.Select
                             Child = new OsuSpriteText
                             {
                                 Text = title,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                             },
                         },
                     },

@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Ranking.Pages
                             Origin = Anchor.TopCentre,
                             Colour = colours.PinkDarker,
                             Shadow = false,
-                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 24,weight: FontWeight.Bold),
                             Text = "总分",
                             Margin = new MarginPadding { Bottom = 15 },
                         },

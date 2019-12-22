@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Select.Details
                 {
                     firstValue = new StatisticRow(), //circle size/key amount
                     hpDrain = new StatisticRow { Title = "掉血速度" },
-                    accuracy = new StatisticRow { Title = "准确率" },
+                    accuracy = new StatisticRow { Title = "整体难度" },
                     approachRate = new StatisticRow { Title = "缩圈速度" },
                     starDifficulty = new StatisticRow(10, true) { Title = "难度星级" },
                 },
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Select.Details
                         AutoSizeAxes = Axes.Y,
                         Child = name = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 17)
                         },
                     },
                     bar = new Bar

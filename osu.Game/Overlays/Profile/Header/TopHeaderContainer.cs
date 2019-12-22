@@ -31,8 +31,8 @@ namespace osu.Game.Overlays.Profile.Header
         private UpdateableFlag userFlag;
         private OsuSpriteText userCountryText;
         private FillFlowContainer userStats;
-
         [BackgroundDependencyLoader]
+        
         private void load(OsuColour colours)
         {
             Height = 150;
@@ -61,6 +61,7 @@ namespace osu.Game.Overlays.Profile.Header
                             CornerRadius = avatar_size * 0.25f,
                             OpenOnClick = { Value = false },
                             ShowGuestOnNull = false,
+                            
                         },
                         new Container
                         {
@@ -197,7 +198,7 @@ namespace osu.Game.Overlays.Profile.Header
                 {
                     new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: 15),
+                        Font = OsuFont.GetFont(size: 17),
                         Text = left,
                     },
                     new OsuSpriteText

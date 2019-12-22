@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             private readonly SpriteText text;
 
             public TextColumn(string title, FontUsage font)
-                : this(title, new OsuSpriteText { Font = font })
+                : this(title, new OsuSpriteText { Font = OsuFont.GetFont(size: 20) })
             {
             }
 

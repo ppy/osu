@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     header = new OsuSpriteText
                     {
                         Text = title,
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },

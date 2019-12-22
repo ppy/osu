@@ -156,11 +156,11 @@ namespace osu.Game.Overlays.Profile.Header
                                         },
                                         detailCountryRank = new OverlinedInfoContainer(false, 110)
                                         {
-                                            Title = "国内排名",
+                                            Title = "国内或地区排名",
                                             LineColour = colours.Yellow,
                                         },
                                     }
-                                }
+                                },
                             }
                         },
                     }

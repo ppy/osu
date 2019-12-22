@@ -200,7 +200,7 @@ namespace osu.Game.Overlays.Comments
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.GetFont(size: 12),
-                    Text = $@"edited {HumanizerUtils.Humanize(comment.EditedAt.Value)} by {comment.EditedUser.Username}"
+                    Text = $@" 由 {comment.EditedUser.Username} 于 {HumanizerUtils.Humanize(comment.EditedAt.Value)}编辑"
                 });
             }
 

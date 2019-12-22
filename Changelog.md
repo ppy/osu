@@ -16,6 +16,8 @@
         *   `1.00x` 改为 `1.00倍`
 
 ## 2019/12/22
+### **重要 : git相关**
+* **分支由master变更至lang_zhCN**
 ### 其他
 * 补全了以下部分的翻译
     *   解析谱面时取值过低/过高等问题的报错(Value is too low/high | Not a number)
@@ -28,5 +30,19 @@
         *   增大了"音效","总体","音乐"的文字大小(? -> 20)
     *   [游戏间歇](osu.Game/Screens/Play/Break/BreakInfo.cs)
         *   增大了文字大小(? -> 20)
+    *   [工具栏>个人信息按钮](osu.Game/Overlays/Toolbar/ToolbarUserButton.cs)
+        *   进行了一点本地化修改
+    *   [更改日志界面](osu.Game/Overlays/Changelog/Comments.cs)
+        *   添加了前往[osulazer项目地址](https://github.com/ppy/osu)和[mf-osu项目地址](https://github.com/ppy/osu)的链接
+    *   [界面](osu.Game/)
+        *   将多个界面中的字体调大
 * 翻译改进
     *   改进了`主菜单`中的`单人`和`多人`为`单人游戏`和`多人游戏`
+* 翻译补全
+    *   补全了`/me`,`/help`,`/join` 聊天指令的翻译
+
+* Note:
+    *   所有英文转中文的文字一般字号+4以避免发虚等问题
+    *   osu默认字号:16
+        *   特殊
+            *  [玩家信息界面:186](./osu.Game/Overlays/Profile/Header/TopHeaderContainer.cs):15->17

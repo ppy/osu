@@ -465,7 +465,7 @@ namespace osu.Game.Rulesets.Scoring
 
     public enum ScoringMode
     {
-        [Description("标准(V2)")]
+        [Description("标准")]
         Standardised,
         [Description("经典(std)")]
         Classic

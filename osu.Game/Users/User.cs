@@ -192,7 +192,7 @@ namespace osu.Game.Users
         /// </summary>
         public static readonly User SYSTEM_USER = new User
         {
-            Username = "system",
+            Username = "osu!",
             Colour = @"9c0101",
             Id = 0
         };

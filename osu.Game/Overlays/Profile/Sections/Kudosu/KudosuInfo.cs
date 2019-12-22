@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
             public CountAvailable()
                 : base("可用的Kudosu")
             {
-                DescriptionText.Text = "Kudosu可以被转换为Kudosu星,可以让你的谱面获得更多的注意.这是你还没有被转换的Kudosu数量";
+                DescriptionText.Text = "Kudosu可以被转换为Kudosu星,可以让你的谱面获得更多的注意.\n这是你还没有被转换的Kudosu数量";
             }
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         new OsuSpriteText
                         {
                             Text = header,
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold)
                         },
                         valueText = new OsuSpriteText
                         {
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                             UseFullGlyphHeight = false,
                         },
-                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
+                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 18))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                             Text = "显示更多".ToUpper(),
                         },
                         rightChevron = new ChevronIcon(),

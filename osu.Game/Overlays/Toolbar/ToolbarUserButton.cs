@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -17,6 +18,7 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarUserButton : ToolbarOverlayToggleButton, IOnlineComponent
     {
         private readonly UpdateableAvatar avatar;
+        private FontUsage Font;
 
         public ToolbarUserButton()
         {
@@ -59,12 +61,13 @@ namespace osu.Game.Overlays.Toolbar
             switch (state)
             {
                 default:
-                    Text = @"Guest";
+                    Text = @"游客";
                     avatar.User = new User();
                     break;
 
                 case APIState.Online:
-                    Text = api.LocalUser.Value.Username;
+                    Text = $"别来无恙, {api.LocalUser.Value.Username} !";
+                    Font = OsuFont.GetFont(size: 20);
                     avatar.User = api.LocalUser.Value;
                     break;
             }
