@@ -247,14 +247,14 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+            if (!exitConfirmed && dialogOverlay != null)
             {
-                dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
-                return true;
-            }
+                if (!(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+                {
+                    dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                    return true;
+                }
 
-            if (dialogOverlay.CurrentDialog is ConfirmExitDialog)
-            {
                 exitConfirmed = true;
                 dialogOverlay.CurrentDialog.Buttons.First().Click();
             }
