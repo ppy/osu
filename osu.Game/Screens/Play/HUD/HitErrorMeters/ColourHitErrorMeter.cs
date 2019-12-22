@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -43,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                 judgements.RemoveAt(0);
         }
 
-        private class JudgementFlow : Container<DrawableResult>
+        private class JudgementFlow : FillFlowContainer<DrawableResult>
         {
             private const int drawable_judgement_size = 8;
             private const int spacing = 2;
@@ -51,10 +50,16 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             public readonly BindableList<(Color4 colour, JudgementResult result)> Judgements = new BindableList<(Color4 colour, JudgementResult result)>();
 
+            private int runningDepth;
+
             public JudgementFlow()
             {
                 AutoSizeAxes = Axes.X;
                 Height = max_available_judgements * (drawable_judgement_size + spacing);
+                Spacing = new Vector2(0, spacing);
+                Direction = FillDirection.Vertical;
+                LayoutDuration = animation_duration;
+                LayoutEasing = Easing.OutQuint;
             }
 
             protected override void LoadComplete()
@@ -66,24 +71,20 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             private void push(IEnumerable<(Color4 colour, JudgementResult result)> judgements)
             {
-                Children.ForEach(c => c.FinishTransforms());
-
                 var (colour, result) = judgements.Single();
                 var drawableJudgement = new DrawableResult(colour, result, drawable_judgement_size)
                 {
                     Alpha = 0,
-                    Y = -(drawable_judgement_size + spacing)
                 };
 
-                Add(drawableJudgement);
+                Insert(runningDepth--, drawableJudgement);
                 drawableJudgement.FadeInFromZero(animation_duration, Easing.OutQuint);
-
-                Children.ForEach(c => c.MoveToOffset(new Vector2(0, drawable_judgement_size + spacing), animation_duration, Easing.OutQuint));
             }
 
             private void pop(IEnumerable<(Color4 colour, JudgementResult result)> judgements)
             {
-                Children.FirstOrDefault(c => c.Result == judgements.Single().result).FadeOut(animation_duration, Easing.OutQuint).Expire();
+                var (colour, result) = judgements.Single();
+                Children.FirstOrDefault(c => c.Result == result).FadeOut(animation_duration, Easing.OutQuint).Expire();
             }
         }
 
