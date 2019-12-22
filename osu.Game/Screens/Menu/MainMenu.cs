@@ -249,14 +249,16 @@ namespace osu.Game.Screens.Menu
         {
             if (!exitConfirmed && dialogOverlay != null)
             {
-                if (!(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+                if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
+                {
+                    exitConfirmed = true;
+                    exitDialog.Buttons.First().Click();
+                }
+                else
                 {
                     dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
                     return true;
                 }
-
-                exitConfirmed = true;
-                dialogOverlay.CurrentDialog.Buttons.First().Click();
             }
 
             buttons.State = ButtonSystemState.Exit;
