@@ -6,9 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Shapes;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -40,13 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 new KiaiFlash
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Intensity = 0.25f,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.White,
-                        Alpha = 0f,
-                    },
+                    FlashOpacity = 0.25f,
                 },
                 new TrianglesPiece
                 {
