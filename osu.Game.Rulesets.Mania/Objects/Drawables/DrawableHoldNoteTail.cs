@@ -49,8 +49,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
             ApplyResult(r =>
             {
-                if (holdNote.HasBroken && (result == HitResult.Perfect || result == HitResult.Perfect))
-                    result = HitResult.Good;
+                // If the head wasn't hit or the hold note was broken, cap the max score to Meh.
+                if (result > HitResult.Meh && (!holdNote.Head.IsHit || holdNote.HasBroken))
+                    result = HitResult.Meh;
 
                 r.Type = result;
             });
