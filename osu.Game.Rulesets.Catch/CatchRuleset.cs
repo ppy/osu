@@ -106,6 +106,12 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModFlashlight(),
                     };
 
+                case ModType.Conversion:
+                    return new Mod[]
+                    {
+                        new CatchModMirror(),
+                    };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
