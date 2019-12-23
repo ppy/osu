@@ -45,11 +45,12 @@ namespace osu.Desktop.Overlays
                             {
                                 new OsuSpriteText
                                 {
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                                    Font = OsuFont.GetFont(size: 20,weight: FontWeight.Bold),
                                     Text = game.Name
                                 },
                                 new OsuSpriteText
                                 {
+                                    Font = OsuFont.GetFont(size: 20,weight: FontWeight.Bold),
                                     Colour = DebugUtils.IsDebugBuild ? colours.Red : Color4.White,
                                     Text = game.Version
                                 },
@@ -62,7 +63,7 @@ namespace osu.Desktop.Overlays
                             Font = OsuFont.Numeric.With(size: 15),
                             Colour = colours.Yellow,
                            // Text = @"早期开发版本(Development Build)"
-                           Text = @"2019.1113.0+matrixfeather 7"
+                           Text = @"2019.1113.0+matrixfeather 8 Pending"
                         },
                         new Sprite
                         {

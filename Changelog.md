@@ -46,3 +46,28 @@
     *   osu默认字号:16
         *   特殊
             *  [玩家信息界面:186](./osu.Game/Overlays/Profile/Header/TopHeaderContainer.cs):15->17
+
+## 2019/12/23
+* 翻译补全
+    *   补全了"音乐播放"快捷键按下时的翻译
+    *   补全了"鼠标按键"快捷键按下时的翻译
+    *   多人游戏创建房间时的标题
+* 字体增大
+    *   [弹出菜单](osu.Game/Overlays/OSD/Toast.cs)
+        *   14,24,12 -> 18,28,16
+    *   [主界面菜单按钮](osu.Game/Screens/Menu/Button.cs)
+        *   (第128行)字体增大至20
+    *   [选歌界面随机按钮](osu.Game/Screens/Select/FooterButtonRandom.cs)
+        *   (行27)字体调整为18
+    *   [选歌界面下方按钮](osu.Game/Screens/Select/FooterButton.cs)
+        *   (行91)字体调整为18
+    *   [多人游戏大厅](osu.Game/Screens/Multi/Components/RoomStatusInfo.cs)
+        *   (行37)房间信息字体调整为17
+        *   [参与人数](osu.Game/Screens/Multi/Lounge/Components/ParticipantInfo.cs)字体调整为17(貌似没有任何效果)
+* UI修改
+    *   [工具栏个人信息按钮](osu.Game/Overlays/Toolbar/ToolbarUserButton.cs)
+        *   文字调整为"别来无恙,<玩家名>!"(`Text = {api.LocalUser.Value.Username};`->`Text = $"别来无恙, {api.LocalUser.Value.Username} !";`)
+        *   字体调整为18
+    *   ["功能尚未准备"弹出菜单](osu.Game/Screens/ScreenWhiteBox.cs)
+        *   (行168)第二行字大小调整为24
+        *   (行175)第三行字大小调整为18

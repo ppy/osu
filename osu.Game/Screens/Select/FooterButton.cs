@@ -88,6 +88,7 @@ namespace osu.Game.Screens.Select
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Font = Graphics.OsuFont.GetFont(size:18),
                     }
                 },
             };

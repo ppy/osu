@@ -289,7 +289,7 @@ namespace osu.Game.Overlays
         public class MusicControllerToast : Toast
         {
             public MusicControllerToast(string action)
-                : base("音乐回放", action, string.Empty)
+                : base("音乐播放", action, string.Empty)
             {
             }
         }

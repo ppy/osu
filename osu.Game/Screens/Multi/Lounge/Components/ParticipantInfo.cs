@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 if (host.NewValue != null)
                 {
                     hostText.AddText("房主: ");
-                    hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                    hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true,size:17));
 
                     flagContainer.Child = new UpdateableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }

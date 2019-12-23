@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.Toolbar
     public class ToolbarUserButton : ToolbarOverlayToggleButton, IOnlineComponent
     {
         private readonly UpdateableAvatar avatar;
-        private FontUsage Font;
 
         public ToolbarUserButton()
         {
@@ -27,7 +26,7 @@ namespace osu.Game.Overlays.Toolbar
 
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = OsuFont.GetFont(italics: true);
+            DrawableText.Font = OsuFont.GetFont(size:18, italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
 
@@ -67,7 +66,6 @@ namespace osu.Game.Overlays.Toolbar
 
                 case APIState.Online:
                     Text = $"别来无恙, {api.LocalUser.Value.Username} !";
-                    Font = OsuFont.GetFont(size: 20);
                     avatar.User = api.LocalUser.Value;
                     break;
             }

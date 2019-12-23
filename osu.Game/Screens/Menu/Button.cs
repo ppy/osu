@@ -20,6 +20,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Menu
 {
@@ -123,7 +124,8 @@ namespace osu.Game.Screens.Menu
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Position = new Vector2(0, 35),
-                            Text = text
+                            Text = text,
+                            Font = OsuFont.GetFont(size: 20)
                         }
                     }
                 }

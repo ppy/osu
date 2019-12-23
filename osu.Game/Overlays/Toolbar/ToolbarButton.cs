@@ -129,6 +129,7 @@ namespace osu.Game.Overlays.Toolbar
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
                             Shadow = true,
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                         }
                     }
                 }

@@ -24,6 +24,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = @"撤销随机",
+                Font = OsuFont.GetFont(size: 18),
                 Alpha = 0
             });
         }
