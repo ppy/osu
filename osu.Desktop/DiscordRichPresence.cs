@@ -1,10 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
+using System;
 using System.Text;
 using DiscordRPC;
-using DiscordRPC.Helper;
 using DiscordRPC.Message;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -100,12 +99,19 @@ namespace osu.Desktop
             client.SetPresence(presence);
         }
 
-        private string truncate(string str)
+        private string truncate(ReadOnlySpan<char> str)
         {
-            if (str.WithinLength(128))
-                return str;
+            if (Encoding.UTF8.GetByteCount(str) < 128)
+                return new string(str);
 
-            return new string(str.TakeWhile((c, i) => Encoding.UTF8.GetByteCount(str.Substring(0, i + 1)) <= 125).ToArray()) + '…'; //the ellipsis char is 3 bytes long in UTF8
+            int ellipsisLength = Encoding.UTF8.GetByteCount(new[] { '…' });
+
+            do
+            {
+                str = str[..^1];
+            } while (Encoding.UTF8.GetByteCount(str) + ellipsisLength > 128);
+
+            return new string(str) + '…';
         }
 
         private string getDetails(UserActivity activity)
