@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             this.holdNote = holdNote;
         }
 
+        public void UpdateResult() => base.UpdateResult(true);
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             Debug.Assert(HitObject.HitWindows != null);
@@ -54,21 +56,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             });
         }
 
-        public override bool OnPressed(ManiaAction action) => false; // Tail doesn't handle key down
+        public override bool OnPressed(ManiaAction action) => false; // Handled by the hold note
 
-        public override bool OnReleased(ManiaAction action)
-        {
-            // Make sure that the user started holding the key during the hold note
-            if (!holdNote.HoldStartTime.HasValue)
-                return false;
-
-            if (action != Action.Value)
-                return false;
-
-            UpdateResult(true);
-
-            // Handled by the hold note, which will set holding = false
-            return false;
-        }
+        public override bool OnReleased(ManiaAction action) => false; // Handled by the hold note
     }
 }
