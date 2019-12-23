@@ -100,7 +100,7 @@ namespace osu.Desktop
 
         private string truncate(ReadOnlySpan<char> str)
         {
-            if (Encoding.UTF8.GetByteCount(str) < 128)
+            if (Encoding.UTF8.GetByteCount(str) <= 128)
                 return new string(str);
 
             int ellipsisLength = Encoding.UTF8.GetByteCount(new[] { '…' });
