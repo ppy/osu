@@ -32,12 +32,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
         /// </summary>
-        internal double? HoldStartTime;
+        public double? HoldStartTime { get; private set; }
 
         /// <summary>
         /// Whether the hold note has been released too early and shouldn't give full score for the release.
         /// </summary>
-        internal bool HasBroken;
+        public bool HasBroken { get; private set; }
 
         public DrawableHoldNote(HoldNote hitObject)
             : base(hitObject)
