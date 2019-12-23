@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        public DrawableNote Head => headContainer.Child;
-        public DrawableNote Tail => tailContainer.Child;
+        public DrawableHoldNoteHead Head => headContainer.Child;
+        public DrawableHoldNoteTail Tail => tailContainer.Child;
 
         private readonly Container<DrawableHoldNoteHead> headContainer;
         private readonly Container<DrawableHoldNoteTail> tailContainer;
@@ -124,12 +124,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (Tail.AllJudged)
-                ApplyResult(r => r.Type = HitResult.Perfect);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -145,50 +139,64 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.UpdateStateTransforms(state);
         }
 
-        internal void BeginHold()
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            HoldStartTime = Time.Current;
-            bodyPiece.Hitting = true;
-        }
+            if (Tail.AllJudged)
+                ApplyResult(r => r.Type = HitResult.Perfect);
 
-        protected void EndHold()
-        {
-            HoldStartTime = null;
-            bodyPiece.Hitting = false;
+            if (Tail.Result.Type == HitResult.Miss)
+                HasBroken = true;
         }
 
         public bool OnPressed(ManiaAction action)
         {
-            // Make sure the action happened within the body of the hold note
-            if (Time.Current < HitObject.StartTime || Time.Current > HitObject.EndTime)
+            if (AllJudged)
                 return false;
 
             if (action != Action.Value)
                 return false;
 
-            // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
-            // and within the limited range of the above if-statement. This state will be managed by the head note if the
-            // user has pressed during the hit windows of the head note.
-            BeginHold();
+            beginHoldAt(Time.Current - Head.HitObject.StartTime);
+            Head.UpdateResult();
+
             return true;
+        }
+
+        private void beginHoldAt(double timeOffset)
+        {
+            if (timeOffset < -Head.HitObject.HitWindows.WindowFor(HitResult.Miss))
+                return;
+
+            HoldStartTime = Time.Current;
+            bodyPiece.Hitting = true;
         }
 
         public bool OnReleased(ManiaAction action)
         {
-            // Make sure that the user started holding the key during the hold note
-            if (!HoldStartTime.HasValue)
+            if (AllJudged)
                 return false;
 
             if (action != Action.Value)
                 return false;
 
-            EndHold();
+            // Make sure a hold was started
+            if (HoldStartTime == null)
+                return false;
+
+            Tail.UpdateResult();
+            endHold();
 
             // If the key has been released too early, the user should not receive full score for the release
             if (!Tail.IsHit)
                 HasBroken = true;
 
             return true;
+        }
+
+        private void endHold()
+        {
+            HoldStartTime = null;
+            bodyPiece.Hitting = false;
         }
     }
 }
