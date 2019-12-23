@@ -113,6 +113,7 @@ namespace osu.Game.Overlays.Settings
                     bindable = value;
                     bindable.ValueChanged += _ => UpdateState();
                     bindable.DisabledChanged += _ => UpdateState();
+                    bindable.DefaultChanged += _ => UpdateState();
                     UpdateState();
                 }
             }

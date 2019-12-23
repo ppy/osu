@@ -45,8 +45,7 @@ namespace osu.Desktop
             };
 
             client.OnReady += onReady;
-            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network, LogLevel.Error);
-            client.OnConnectionFailed += (_, e) => Logger.Log($"An connection occurred with Discord RPC Client: {e.Type}", LoggingTarget.Network, LogLevel.Error);
+            client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
 
             (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
             {
