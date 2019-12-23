@@ -238,7 +238,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         }
 
         private void assertHeadJudgement(HitResult result)
-            => AddAssert($"head judged as{result}", () => judgementResults[0].Type == result);
+            => AddAssert($"head judged as {result}", () => judgementResults[0].Type == result);
 
         private void assertTailJudgement(HitResult result)
             => AddAssert($"tail judged as {result}", () => judgementResults[^2].Type == result);
