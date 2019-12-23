@@ -100,7 +100,13 @@ namespace osu.Desktop
             client.SetPresence(presence);
         }
 
-        private string truncate(string str) => str.WithinLength(128) ? str : new string (str.TakeWhile((c, i) => Encoding.UTF8.GetByteCount(str.Substring(0, i + 1)) <= 125).ToArray()) + '…'; //the ellipsis char is 3 bytes long in UTF8
+        private string truncate(string str)
+        {
+            if (str.WithinLength(128))
+                return str;
+
+            return new string(str.TakeWhile((c, i) => Encoding.UTF8.GetByteCount(str.Substring(0, i + 1)) <= 125).ToArray()) + '…'; //the ellipsis char is 3 bytes long in UTF8
+        }
 
         private string getDetails(UserActivity activity)
         {
