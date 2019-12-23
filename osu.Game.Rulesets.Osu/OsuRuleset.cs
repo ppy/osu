@@ -130,6 +130,7 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[]
                     {
                         new OsuModTarget(),
+                        new OsuModMirror(),
                     };
 
                 case ModType.Automation:
