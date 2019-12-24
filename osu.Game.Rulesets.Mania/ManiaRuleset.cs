@@ -35,9 +35,9 @@ namespace osu.Game.Rulesets.Mania
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ManiaScoreProcessor(beatmap);
+        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor();
 
-        public override HealthProcessor CreateHealthProcessor(IBeatmap beatmap) => new ManiaHealthProcessor(beatmap);
+        public override HealthProcessor CreateHealthProcessor() => new ManiaHealthProcessor();
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 

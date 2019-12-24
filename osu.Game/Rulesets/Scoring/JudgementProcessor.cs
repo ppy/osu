@@ -36,21 +36,15 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasCompleted => JudgedHits == MaxHits;
 
-        protected JudgementProcessor(IBeatmap beatmap)
+        /// <summary>
+        /// Applies a <see cref="IBeatmap"/> to this <see cref="ScoreProcessor"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to read properties from.</param>
+        public void ApplyBeatmap(IBeatmap beatmap)
         {
-            ApplyBeatmap(beatmap);
-
             Reset(false);
             SimulateAutoplay(beatmap);
             Reset(true);
-        }
-
-        /// <summary>
-        /// Applies any properties of the <see cref="IBeatmap"/> which affect scoring to this <see cref="ScoreProcessor"/>.
-        /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> to read properties from.</param>
-        protected virtual void ApplyBeatmap(IBeatmap beatmap)
-        {
         }
 
         /// <summary>
