@@ -47,6 +47,10 @@ namespace osu.Game.Rulesets.Scoring
             Reset(true);
         }
 
+        public virtual void ApplyElapsedTime(double elapsedTime)
+        {
+        }
+
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
@@ -115,6 +119,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="beatmap">The <see cref="IBeatmap"/> to simulate.</param>
         protected virtual void SimulateAutoplay(IBeatmap beatmap)
         {
+            HitObject lastObject = null;
+
             foreach (var obj in beatmap.HitObjects)
                 simulate(obj);
 
@@ -122,6 +128,9 @@ namespace osu.Game.Rulesets.Scoring
             {
                 foreach (var nested in obj.NestedHitObjects)
                     simulate(nested);
+
+                if (lastObject != null)
+                    ApplyElapsedTime(lastObject.GetEndTime() - obj.StartTime);
 
                 var judgement = obj.CreateJudgement();
                 if (judgement == null)
@@ -132,8 +141,9 @@ namespace osu.Game.Rulesets.Scoring
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
                 result.Type = judgement.MaxResult;
-
                 ApplyResult(result);
+
+                lastObject = obj;
             }
         }
     }
