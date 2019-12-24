@@ -51,7 +51,14 @@ namespace osu.Game.Rulesets
 
         protected Ruleset()
         {
-            RulesetInfo = createRulesetInfo();
+            RulesetInfo = new RulesetInfo
+            {
+                Name = Description,
+                ShortName = ShortName,
+                ID = (this as ILegacyRuleset)?.LegacyID,
+                InstantiationInfo = GetType().AssemblyQualifiedName,
+                Available = true
+            };
         }
 
         /// <summary>
@@ -133,17 +140,5 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
-
-        /// <summary>
-        /// Create a ruleset info based on this ruleset.
-        /// </summary>
-        /// <returns>A filled <see cref="RulesetInfo"/>.</returns>
-        private RulesetInfo createRulesetInfo() => new RulesetInfo
-        {
-            Name = Description,
-            ShortName = ShortName,
-            InstantiationInfo = GetType().AssemblyQualifiedName,
-            Available = true
-        };
     }
 }
