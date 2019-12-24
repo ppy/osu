@@ -23,43 +23,6 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private CommentBundle commentBundle;
-
-        public CommentBundle CommentBundle
-        {
-            get => commentBundle;
-            set
-            {
-                if (commentBundle == value)
-                    return;
-
-                commentBundle = value;
-
-                if (commentBundle == null)
-                {
-                    content.Clear();
-                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
-                    totalCommentsCounter.Current.Value = 0;
-                    noCommentsPlaceholder.Hide();
-                    loadingLayer.Hide();
-                    moreButton.IsLoading = true;
-                    moreButton.Show();
-                    return;
-                }
-
-                if (!commentBundle.Comments.Any())
-                {
-                    content.Clear();
-                    deletedChildrenPlaceholder.DeletedCount.Value = 0;
-                    noCommentsPlaceholder.Show();
-                    onLoadFinished(commentBundle);
-                    return;
-                }
-
-                addComments(commentBundle, true);
-            }
-        }
-
         private readonly Bindable<CommentsSortCriteria> sort = new Bindable<CommentsSortCriteria>();
         private readonly Bindable<User> user = new Bindable<User>();
 
@@ -226,7 +189,7 @@ namespace osu.Game.Overlays.Comments
 
         private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
         {
-            onLoadStarted();
+            OnLoadStarted();
             getComments();
         }
 
@@ -242,7 +205,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     if (reset)
                     {
-                        CommentBundle = comments;
+                        ResetComments(comments);
                         return;
                     }
 
@@ -256,7 +219,7 @@ namespace osu.Game.Overlays.Comments
             });
         }
 
-        private void onLoadStarted()
+        protected void OnLoadStarted()
         {
             currentPage = 0;
             showCommentsCancellationSource?.Cancel();
@@ -265,6 +228,32 @@ namespace osu.Game.Overlays.Comments
 
             if (content.Children.Any() || noCommentsPlaceholder.IsPresent)
                 loadingLayer.Show();
+        }
+
+        protected void ResetComments(CommentBundle commentBundle)
+        {
+            if (commentBundle == null)
+            {
+                content.Clear();
+                deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                totalCommentsCounter.Current.Value = 0;
+                noCommentsPlaceholder.Hide();
+                loadingLayer.Hide();
+                moreButton.IsLoading = true;
+                moreButton.Show();
+                return;
+            }
+
+            if (!commentBundle.Comments.Any())
+            {
+                content.Clear();
+                deletedChildrenPlaceholder.DeletedCount.Value = 0;
+                noCommentsPlaceholder.Show();
+                onLoadFinished(commentBundle);
+                return;
+            }
+
+            addComments(commentBundle, true);
         }
 
         private void addComments(CommentBundle comments, bool clearExisting)
