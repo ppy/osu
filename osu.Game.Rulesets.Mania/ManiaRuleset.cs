@@ -31,7 +31,7 @@ using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania
 {
-    public class ManiaRuleset : Ruleset
+    public class ManiaRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableManiaRuleset(this, beatmap, mods);
 
@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Mania
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);
 
-        public override int? LegacyID => 3;
+        public int LegacyID => 3;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 

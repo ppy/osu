@@ -32,7 +32,7 @@ using System;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuRuleset : Ruleset
+    public class OsuRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
 
@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);
 
-        public override int? LegacyID => 0;
+        public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
