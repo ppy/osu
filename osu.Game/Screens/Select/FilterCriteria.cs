@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Select
         }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
-            where T : struct, IComparable
+            where T : struct
         {
             public bool HasFilter => Max != null || Min != null;
 
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select
 
             public string SearchTerm;
 
-            public bool Equals(OptionalTextFilter other) => SearchTerm?.Equals(other.SearchTerm) ?? true;
+            public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
         }
     }
 }

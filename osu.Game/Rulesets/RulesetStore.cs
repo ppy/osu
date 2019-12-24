@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets
             {
                 var context = usage.Context;
 
-                var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
+                var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r)).ToList();
 
                 //add all legacy modes in correct order
                 foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets
                             // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
                             asm.Version = null;
                             return Assembly.Load(asm);
-                        }, null), (RulesetInfo)null)).RulesetInfo;
+                        }, null))).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
