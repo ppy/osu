@@ -24,7 +24,9 @@ namespace osu.Game.Rulesets
         {
             if (!Available) return null;
 
-            return (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+            var instance = (Ruleset)Activator.CreateInstance(Type.GetType(InstantiationInfo));
+            instance.RulesetInfo = this;
+            return instance;
         }
 
         public bool Equals(RulesetInfo other) => other != null && ID == other.ID && Available == other.Available && Name == other.Name && InstantiationInfo == other.InstantiationInfo;

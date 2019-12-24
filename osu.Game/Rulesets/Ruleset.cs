@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
-        public readonly RulesetInfo RulesetInfo;
+        public RulesetInfo RulesetInfo { get; internal set; }
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
