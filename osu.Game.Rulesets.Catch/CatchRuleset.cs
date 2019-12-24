@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new CatchScoreProcessor(beatmap);
 
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
         public const string SHORT_NAME = "fruits";

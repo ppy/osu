@@ -14,8 +14,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 {
     public class CatchBeatmapConverter : BeatmapConverter<CatchHitObject>
     {
-        public CatchBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public CatchBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
         }
 

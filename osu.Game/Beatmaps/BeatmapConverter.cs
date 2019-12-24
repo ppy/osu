@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
@@ -25,7 +26,7 @@ namespace osu.Game.Beatmaps
 
         public IBeatmap Beatmap { get; }
 
-        protected BeatmapConverter(IBeatmap beatmap)
+        protected BeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
         {
             Beatmap = beatmap;
         }
