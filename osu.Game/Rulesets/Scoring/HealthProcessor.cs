@@ -4,7 +4,6 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Scoring
@@ -31,11 +30,6 @@ namespace osu.Game.Rulesets.Scoring
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
         public bool HasFailed { get; private set; }
-
-        public HealthProcessor(IBeatmap beatmap)
-            : base(beatmap)
-        {
-        }
 
         protected override void ApplyResultInternal(JudgementResult result)
         {
