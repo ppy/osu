@@ -15,10 +15,14 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             var catchObject = (CatchHitObject)hitObject;
 
-            catchObject.X = 1 - catchObject.X;
+            catchObject.BaseX = 1 - catchObject.BaseX;
+            catchObject.XOffsetReversed = true;
 
             foreach (var nested in catchObject.NestedHitObjects.Cast<CatchHitObject>())
-                nested.X = 1 - nested.X;
+            {
+                nested.BaseX = 1 - nested.BaseX;
+                nested.XOffsetReversed = true;
+            }
 
             if (catchObject is JuiceStream juiceStream)
             {

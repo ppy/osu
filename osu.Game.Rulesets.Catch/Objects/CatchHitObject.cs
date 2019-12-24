@@ -15,13 +15,15 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const double OBJECT_RADIUS = 44;
 
-        private float x;
+        internal float BaseX { get; set; }
 
         public float X
         {
-            get => x + XOffset;
-            set => x = value;
+            get => XOffsetReversed ? BaseX - XOffset : BaseX + XOffset;
+            set => BaseX = XOffsetReversed ? value + XOffset : value - XOffset;
         }
+
+        internal bool XOffsetReversed { get; set; }
 
         /// <summary>
         /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
