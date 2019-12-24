@@ -37,10 +37,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public ManiaBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
-            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);

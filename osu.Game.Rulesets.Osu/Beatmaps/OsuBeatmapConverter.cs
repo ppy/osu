@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 {
     public class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
     {
-        public OsuBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public OsuBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
         }
 

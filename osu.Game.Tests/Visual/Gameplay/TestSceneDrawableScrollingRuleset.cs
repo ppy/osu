@@ -198,7 +198,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new TestDrawableScrollingRuleset(this, beatmap, mods);
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap, null);
 
             public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
 
@@ -268,8 +268,8 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestBeatmapConverter : BeatmapConverter<TestHitObject>
         {
-            public TestBeatmapConverter(IBeatmap beatmap)
-                : base(beatmap)
+            public TestBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+                : base(beatmap, ruleset)
             {
             }
 
