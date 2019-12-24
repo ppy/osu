@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Play
         public Action OnResume;
 
         public override string Header => "已暂停";
-        public override string Description => "你不会做我认为你会做的事，是吗:D?";
+        public override string Description => "要去做什么呢owo?";
 
         protected override Action BackAction => () => InternalButtons.Children.First().Click();
 

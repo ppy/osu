@@ -1,7 +1,7 @@
 # Changelog
 ## 2019/12/21
 ### 其他
-* 添加Changelog.md
+* 添加[Changelog.md](Changelog.md)
 ### 游戏界面
 * 补全了以下界面的翻译
     *   多人游戏大厅标题
@@ -51,7 +51,7 @@
 * 翻译补全
     *   补全了"音乐播放"快捷键按下时的翻译
     *   补全了"鼠标按键"快捷键按下时的翻译
-    *   多人游戏创建房间时的标题
+    *   多人游戏创建房间时的界面标题
 * 字体增大
     *   [弹出菜单](osu.Game/Overlays/OSD/Toast.cs)
         *   14,24,12 -> 18,28,16
@@ -84,3 +84,38 @@
         *   (行76~83)字体大小调整暂时失败:无法调整
     *   [多人联机游戏大厅->房间参与人数](osu.Game/Screens/Multi/Lounge/Components/ParticipantInfo.cs)
         *   字体大小调整暂时失败:代码中字体调整为17,然而界面没有任何改变
+
+* 翻译补全
+    *   [找不到osu!stable时的报错](osu.Desktop/OsuGameDesktop.cs)
+    *   [失败界面标题](osu.Game/Screens/Play/FailOverlay.cs)
+    *   **[选歌界面左侧侧边栏](osu.Game/Screens/Select/BeatmapDetailAreaTabControl.cs)**
+        *   *把之前学编程时和命名空间有关的知识忘得一干二净*
+        *   *下一步定位这类字体是在哪指定的*
+
+* 翻译改进
+    *   [暂停界面](osu.Game/Screens/Play/PauseOverlay.cs)
+        *   副标题由 "你不会做我认为你会做的事，是吗:D" 改为 "要去做什么呢owo?"
+    *   [Mods按钮](osu.Game/Screens/Select/FooterButtonMods.cs)
+        *   文本由原有的"Mods"改为"游戏模组"
+        *   *感觉这样子选歌界面看上去更和谐一点*
+    *   [Mod选择界面](osu.Game/Overlays/Mods/ModSelectOverlay.cs)
+        *   重置Mod按钮文本改为"重置已选模组"
+        *   标题从"游戏Mods"改为"额外玩法"
+        *   描述从"...有些Mod对你的游戏分数..."改为"...有些玩法对你的游戏分数..."
+    *   [聊天界面](osu.Game/Overlays/ChatOverlay.cs)
+        *   "在此输入你的信息"改为"再此输入你要发送的信息"
+    *   [独立聊天界面](osu.Game/Online/Chat/StandAloneChatDisplay.cs)
+        *   "在此输入你要发送的信息"改为"在此输入你要发送的信息"
+
+* 文本翻译(失败)
+    *   `An unhandled error has occurred`:无法找到
+        *   猜测:存在于`osu!Framework`中
+    *   `DEBUG LOG,visible,hidden`:无法被找到
+        *   触发方法:`设置>调试>总体>显示日志Overlay`设置为`开`
+    *   `*x refresh rate`:无法被找到
+        *   猜测:存在于`osu!Framework`中
+
+# 待定版测试
+| 开始时间 | 结束时间 | 版本 |
+| :--: | :--: | :--: |
+| 2019/12/25 00:00:00 | 2019/12/28 00:00:00 | 2019.1113.0+matrixfeather 8 待定版本 |

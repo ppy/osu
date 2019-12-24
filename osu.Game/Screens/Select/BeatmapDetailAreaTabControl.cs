@@ -12,15 +12,15 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
-//由于第18行有"Container",和翻译需要的System.ComponentModel冲突,故无法翻译
+using System.ComponentModel;
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapDetailAreaTabControl : Container
+    public class BeatmapDetailAreaTabControl : Framework.Graphics.Containers.Container
     {
         public static readonly float HEIGHT = 24;
         private readonly OsuTabControlCheckbox modsCheckbox;
         private readonly OsuTabControl<BeatmapDetailTab> tabs;
-        private readonly Container tabsContainer;
+        private readonly Framework.Graphics.Containers.Container tabsContainer;
 
         public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
 
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Select
                     Height = 1,
                     Colour = Color4.White.Opacity(0.2f),
                 },
-                tabsContainer = new Container
+                tabsContainer = new Framework.Graphics.Containers.Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = tabs = new OsuTabControl<BeatmapDetailTab>
@@ -86,12 +86,15 @@ namespace osu.Game.Screens.Select
 
     public enum BeatmapDetailTab
     {
-        //本人技术不佳,无法翻译此处
-        //加Description会报'Container' is an ambiguous reference between 'osu.Framework.Graphics.Containers.Container' and 'System.ComponentModel.Container'
+        [Description("详细信息")]
         Details,
+        [Description("本地排行")]
         Local,
+        [Description("国内或地区排行")]
         Country,
+        [Description("全球排行")]
         Global,
+        [Description("好友排行")]
         Friends
     }
 }

@@ -9,7 +9,9 @@ namespace osu.Game.Screens.Play
 {
     public class FailOverlay : GameplayMenuOverlay
     {
-        public override string Header => "F A I L";
+        //public override string Header => "F A I L";
+        public override string Header => "游戏失败";
+
         public override string Description => "你失败了..重试一遍?";
 
         [BackgroundDependencyLoader]

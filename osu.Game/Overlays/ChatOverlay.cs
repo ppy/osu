@@ -138,7 +138,7 @@ namespace osu.Game.Overlays
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
-                                            PlaceholderText = "在此输入你的信息",
+                                            PlaceholderText = "在此输入你要发送的消息",
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
