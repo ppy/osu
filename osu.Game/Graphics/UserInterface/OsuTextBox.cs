@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected override float LeftRightPadding => 10;
 
+        protected override float CaretWidth => 3;
+
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(italics: true),
