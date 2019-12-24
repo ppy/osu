@@ -63,7 +63,6 @@
         *   (行91)字体调整为18
     *   [多人游戏大厅](osu.Game/Screens/Multi/Components/RoomStatusInfo.cs)
         *   (行37)房间信息字体调整为17
-        *   [参与人数](osu.Game/Screens/Multi/Lounge/Components/ParticipantInfo.cs)字体调整为17(貌似没有任何效果)
 * UI修改
     *   [工具栏个人信息按钮](osu.Game/Overlays/Toolbar/ToolbarUserButton.cs)
         *   文字调整为"别来无恙,<玩家名>!"(`Text = {api.LocalUser.Value.Username};`->`Text = $"别来无恙, {api.LocalUser.Value.Username} !";`)
@@ -71,3 +70,17 @@
     *   ["功能尚未准备"弹出菜单](osu.Game/Screens/ScreenWhiteBox.cs)
         *   (行168)第二行字大小调整为24
         *   (行175)第三行字大小调整为18
+
+## 2019/12/24
+* UI修改
+    *   [osu!direct界面->谱面选择->排行榜第一名的显示](osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs)
+        *   (行126)字体大小调整为20
+    *   **[osu!默认字体大小](osu.Game/Graphics/OsuFont.cs)**
+        *   (行13)字体大小调整为20
+            * **调整后大部分没有指定字体或无法调整字体的地方字号都将调整为18,如果你发现了界面排布错误,请及时[提交issue(github,优先推荐)](https://github.com/matrix-feather/osu/issues) [提交issue(gitee,如果github上不去则使用这个)](https://gitee.com/matrix-feather/osu/issues)**
+
+* UI修改(失败)
+    *   [osu!direct界面->谱面选择->排行榜的显示](osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs)
+        *   (行76~83)字体大小调整暂时失败:无法调整
+    *   [多人联机游戏大厅->房间参与人数](osu.Game/Screens/Multi/Lounge/Components/ParticipantInfo.cs)
+        *   字体大小调整暂时失败:代码中字体调整为17,然而界面没有任何改变
