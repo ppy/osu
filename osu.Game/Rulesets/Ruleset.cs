@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
-        public readonly RulesetInfo RulesetInfo;
+        public RulesetInfo RulesetInfo { get; internal set; }
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
@@ -104,11 +104,6 @@ namespace osu.Game.Rulesets
         public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
 
         /// <summary>
-        /// Do not override this unless you are a legacy mode.
-        /// </summary>
-        public virtual int? LegacyID => null;
-
-        /// <summary>
         /// A unique short name to reference this ruleset in online requests.
         /// </summary>
         public abstract string ShortName { get; }
@@ -148,7 +143,6 @@ namespace osu.Game.Rulesets
             Name = Description,
             ShortName = ShortName,
             InstantiationInfo = GetType().AssemblyQualifiedName,
-            ID = LegacyID,
             Available = true
         };
     }

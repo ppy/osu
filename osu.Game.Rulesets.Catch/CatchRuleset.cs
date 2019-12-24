@@ -24,7 +24,7 @@ using System;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchRuleset : Ruleset
+    public class CatchRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
 
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new CatchPerformanceCalculator(this, beatmap, score);
 
-        public override int? LegacyID => 2;
+        public int LegacyID => 2;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
     }
