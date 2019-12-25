@@ -183,7 +183,7 @@ namespace osu.Game.Database
 
             TModel import;
             using (ArchiveReader reader = getReaderFrom(path))
-                import = await Import(reader, cancellationToken);
+                import = await Import(reader, cancellationToken).ConfigureAwait(false);
 
             // We may or may not want to delete the file depending on where it is stored.
             //  e.g. reconstructing/repairing database with items from default storage.
@@ -301,7 +301,7 @@ namespace osu.Game.Database
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
 
-                await Populate(item, archive, cancellationToken);
+                await Populate(item, archive, cancellationToken).ConfigureAwait(false);
 
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {

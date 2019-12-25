@@ -193,7 +193,7 @@ namespace osu.Game.Overlays
 
                 await API.PerformAsync(req);
 
-                await tcs.Task;
+                await tcs.Task.ConfigureAwait(false);
             });
         }
 

@@ -126,7 +126,7 @@ namespace osu.Game.Tests.Scores.IO
             {
                 try
                 {
-                    var osu = await loadOsu(host);
+                    var osu = await loadOsu(host).ConfigureAwait(false);
 
                     var toImport = new ScoreInfo
                     {
@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Scores.IO
                         }
                     };
 
-                    var imported = await loadIntoOsu(osu, toImport);
+                    var imported = await loadIntoOsu(osu, toImport).ConfigureAwait(false);
 
                     var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Scores.IO
                     beatmapManager.Delete(beatmapManager.QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == imported.Beatmap.ID)));
                     Assert.That(scoreManager.Query(s => s.ID == imported.ID).DeletePending, Is.EqualTo(true));
 
-                    var secondImport = await loadIntoOsu(osu, imported);
+                    var secondImport = await loadIntoOsu(osu, imported).ConfigureAwait(false);
                     Assert.That(secondImport, Is.Null);
                 }
                 finally
@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Scores.IO
                 {
                     var osu = await loadOsu(host);
 
-                    await loadIntoOsu(osu, new ScoreInfo { OnlineScoreID = 2 }, new TestArchiveReader());
+                    await loadIntoOsu(osu, new ScoreInfo { OnlineScoreID = 2 }, new TestArchiveReader()).ConfigureAwait(false);
 
                     var scoreManager = osu.Dependencies.Get<ScoreManager>();
 

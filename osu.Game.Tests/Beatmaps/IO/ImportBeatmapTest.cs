@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 try
                 {
-                    await LoadOszIntoOsu(loadOsu(host));
+                    await LoadOszIntoOsu(loadOsu(host)).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -156,7 +156,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                     manager.ItemAdded += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
                     manager.ItemRemoved += _ => Interlocked.Increment(ref itemAddRemoveFireCount);
 
-                    var imported = await LoadOszIntoOsu(osu);
+                    var imported = await LoadOszIntoOsu(osu).ConfigureAwait(false);
 
                     Assert.AreEqual(0, itemAddRemoveFireCount -= 1);
 
@@ -289,7 +289,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     deleteBeatmapSet(imported, osu);
 
-                    var importedSecondTime = await LoadOszIntoOsu(osu);
+                    var importedSecondTime = await LoadOszIntoOsu(osu).ConfigureAwait(false);
 
                     // check the newly "imported" beatmap has been reimported due to mismatch (even though hashes matched)
                     Assert.IsTrue(imported.ID != importedSecondTime.ID);
