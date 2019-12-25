@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Scoring
         /// Applies a <see cref="IBeatmap"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to read properties from.</param>
-        public void ApplyBeatmap(IBeatmap beatmap)
+        public virtual void ApplyBeatmap(IBeatmap beatmap)
         {
             Reset(false);
             SimulateAutoplay(beatmap);
