@@ -171,6 +171,7 @@ namespace osu.Game.Overlays
                                     d.Origin = Anchor.BottomLeft;
                                     d.RelativeSizeAxes = Axes.Both;
                                     d.OnRequestLeave = channelManager.LeaveChannel;
+                                    d.IsSwitchable = true;
                                 }),
                             }
                         },
