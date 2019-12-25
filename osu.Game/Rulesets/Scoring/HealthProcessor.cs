@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.MathUtils;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
@@ -34,7 +35,14 @@ namespace osu.Game.Rulesets.Scoring
         public bool HasFailed { get; private set; }
 
         private readonly List<(double time, double health)> healthIncreases = new List<(double time, double health)>();
+        private double targetMinimumHealth;
         private double drainRate = 1;
+
+        public override void ApplyBeatmap(IBeatmap beatmap)
+        {
+            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.85, 0.65);
+            base.ApplyBeatmap(beatmap);
+        }
 
         public override void ApplyElapsedTime(double elapsedTime) => Health.Value -= drainRate * elapsedTime;
 
@@ -85,8 +93,6 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
             {
-                const double percentage_target = 0.5;
-
                 int count = 1;
 
                 while (true)
@@ -107,11 +113,11 @@ namespace osu.Game.Rulesets.Scoring
                             break;
                     }
 
-                    if (Math.Abs(lowestHealth - percentage_target) <= 0.01)
+                    if (Math.Abs(lowestHealth - targetMinimumHealth) <= 0.01)
                         break;
 
                     count *= 2;
-                    drainRate += 1.0 / count * Math.Sign(lowestHealth - percentage_target);
+                    drainRate += 1.0 / count * Math.Sign(lowestHealth - targetMinimumHealth);
                 }
             }
 
