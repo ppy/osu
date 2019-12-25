@@ -100,17 +100,23 @@ namespace osu.Desktop
 
         private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
 
-        private string truncate(ReadOnlySpan<char> str)
+        private string truncate(string str)
         {
             if (Encoding.UTF8.GetByteCount(str) <= 128)
-                return new string(str);
+                return str;
+
+            ReadOnlyMemory<char> strMem = str.AsMemory();
 
             do
             {
-                str = str[..^1];
-            } while (Encoding.UTF8.GetByteCount(str) + ellipsis_length > 128);
+                strMem = strMem[..^1];
+            } while (Encoding.UTF8.GetByteCount(strMem.Span) + ellipsis_length > 128);
 
-            return new string(str) + '…';
+            return string.Create(strMem.Length + 1, strMem, (span, mem) =>
+            {
+                mem.Span.CopyTo(span);
+                span[^1] = '…';
+            });
         }
 
         private string getDetails(UserActivity activity)
