@@ -49,7 +49,12 @@ namespace osu.Game.Rulesets.Scoring
             healthIncreases = null;
         }
 
-        public override void ApplyElapsedTime(double elapsedTime) => Health.Value -= drainRate * elapsedTime;
+        protected override void Update()
+        {
+            base.Update();
+
+            Health.Value -= drainRate * Time.Elapsed;
+        }
 
         protected override void ApplyResultInternal(JudgementResult result)
         {

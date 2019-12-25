@@ -3,13 +3,14 @@
 
 using System;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract class JudgementProcessor
+    public abstract class JudgementProcessor : Component
     {
         /// <summary>
         /// Invoked when all <see cref="HitObject"/>s have been judged by this <see cref="JudgementProcessor"/>.
@@ -45,10 +46,6 @@ namespace osu.Game.Rulesets.Scoring
             Reset(false);
             SimulateAutoplay(beatmap);
             Reset(true);
-        }
-
-        public virtual void ApplyElapsedTime(double elapsedTime)
-        {
         }
 
         /// <summary>
@@ -119,8 +116,6 @@ namespace osu.Game.Rulesets.Scoring
         /// <param name="beatmap">The <see cref="IBeatmap"/> to simulate.</param>
         protected virtual void SimulateAutoplay(IBeatmap beatmap)
         {
-            HitObject lastObject = null;
-
             foreach (var obj in beatmap.HitObjects)
                 simulate(obj);
 
@@ -128,9 +123,6 @@ namespace osu.Game.Rulesets.Scoring
             {
                 foreach (var nested in obj.NestedHitObjects)
                     simulate(nested);
-
-                if (lastObject != null)
-                    ApplyElapsedTime(lastObject.GetEndTime() - obj.StartTime);
 
                 var judgement = obj.CreateJudgement();
                 if (judgement == null)
@@ -142,8 +134,6 @@ namespace osu.Game.Rulesets.Scoring
 
                 result.Type = judgement.MaxResult;
                 ApplyResult(result);
-
-                lastObject = obj;
             }
         }
     }
