@@ -136,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public static Color4[] Colours { get; } =
             {
-                new Color4(10, 100, 150, 255),
+                new Color4(150, 100, 50, 255),
                 new Color4(20, 20, 20, 255),
             };
 
