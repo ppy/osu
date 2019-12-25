@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Catch.Mods
     public class CatchModDifficultyAdjust : ModDifficultyAdjust
     {
         [SettingSource("Fruit Size", "Override a beatmap's set CS.")]
-        public BindableNumber<float> CircleSize { get; } = new BindableFloat()
+        public BindableNumber<float> CircleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,
             MinValue = 1,
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         };
 
         [SettingSource("Approach Rate", "Override a beatmap's set AR.")]
-        public BindableNumber<float> ApproachRate { get; } = new BindableFloat()
+        public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
             MinValue = 1,
