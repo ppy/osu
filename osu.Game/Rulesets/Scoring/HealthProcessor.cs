@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Scoring
             result.HealthAtJudgement = Health.Value;
             result.FailedAtJudgement = HasFailed;
 
-            double healthIncrease = HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
+            double healthIncrease = result.Judgement.HealthIncreaseFor(result);
             healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, healthIncrease));
 
             if (HasFailed)
@@ -72,13 +72,6 @@ namespace osu.Game.Rulesets.Scoring
 
             // Todo: Revert HasFailed state with proper player support
         }
-
-        /// <summary>
-        /// An adjustment factor which is multiplied into the health increase provided by a <see cref="JudgementResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> for which the adjustment should apply.</param>
-        /// <returns>The adjustment factor.</returns>
-        protected virtual double HealthAdjustmentFactorFor(JudgementResult result) => 1;
 
         /// <summary>
         /// The default conditions for failing.
