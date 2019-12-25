@@ -11,7 +11,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Retrieves the list of combo colours for presentation only.
         /// </summary>
-        IReadOnlyList<Color4> ComboColours { get; set; }
+        IReadOnlyList<Color4> ComboColours { get; }
 
         /// <summary>
         /// Adds combo colours to the list.
