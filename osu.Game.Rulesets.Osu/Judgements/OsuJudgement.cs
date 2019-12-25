@@ -8,6 +8,11 @@ namespace osu.Game.Rulesets.Osu.Judgements
 {
     public class OsuJudgement : Judgement
     {
+        /// <summary>
+        /// The health increase for a maximum judgement result.
+        /// </summary>
+        protected const double MAX_HEALTH_INCREASE = 0.05;
+
         public override HitResult MaxResult => HitResult.Great;
 
         protected override int NumericResultFor(HitResult result)
@@ -33,12 +38,16 @@ namespace osu.Game.Rulesets.Osu.Judgements
             switch (result)
             {
                 case HitResult.Miss:
-                    return -0.02;
+                    return -MAX_HEALTH_INCREASE;
 
                 case HitResult.Meh:
+                    return -MAX_HEALTH_INCREASE * 0.05;
+
                 case HitResult.Good:
+                    return MAX_HEALTH_INCREASE * 0.3;
+
                 case HitResult.Great:
-                    return 0.01;
+                    return MAX_HEALTH_INCREASE;
 
                 default:
                     return 0;
