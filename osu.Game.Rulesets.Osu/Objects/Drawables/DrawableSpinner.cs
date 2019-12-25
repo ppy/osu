@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected readonly Spinner Spinner;
 
         private readonly Container<DrawableSpinnerTick> ticks;
-        private readonly OsuSpriteText bonusCounter;
 
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
         public readonly SpinnerSpmCounter SpmCounter;
+        private readonly SpinnerBonusComponent bonusComponent;
 
         private readonly Container mainContainer;
 
@@ -123,13 +123,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Y = 120,
                     Alpha = 0
                 },
-                bonusCounter = new OsuSpriteText
+                bonusComponent = new SpinnerBonusComponent(this, ticks)
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Y = -120,
-                    Font = OsuFont.Numeric.With(size: 24),
-                    Alpha = 0,
                 }
             };
         }
@@ -226,8 +224,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             base.Update();
         }
 
-        private int currentSpins;
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -235,30 +231,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
             SpmCounter.SetRotation(Disc.RotationAbsolute);
-
-            var newSpins = (int)(Disc.RotationAbsolute / 360) - currentSpins;
-
-            for (int i = currentSpins; i < currentSpins + newSpins; i++)
-            {
-                if (i < 0 || i >= ticks.Count)
-                    break;
-
-                var tick = ticks[i];
-
-                tick.HasBonusPoints = Progress >= 1 && i > Spinner.SpinsRequired;
-
-                if (tick.HasBonusPoints)
-                {
-                    bonusCounter.Text = $"{(i - Spinner.SpinsRequired) * 1000}";
-                    bonusCounter
-                        .FadeOutFromOne(1500)
-                        .ScaleTo(1.5f).ScaleTo(1f, 1000, Easing.OutQuint);
-                }
-
-                tick.TriggerResult(HitResult.Great);
-            }
-
-            currentSpins += newSpins;
+            bonusComponent.UpdateRotation(Disc.RotationAbsolute);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
@@ -298,15 +271,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 case ArmedState.Miss:
                     sequence.ScaleTo(Scale * 0.8f, 320, Easing.In);
                     break;
-            }
-
-            if (state != ArmedState.Idle)
-            {
-                Schedule(() =>
-                {
-                    foreach (var tick in ticks.Where(t => !t.IsHit))
-                        tick.TriggerResult(HitResult.Miss);
-                });
             }
         }
     }

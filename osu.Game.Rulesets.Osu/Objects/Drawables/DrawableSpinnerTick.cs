@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         /// <summary>
         /// Whether this judgement has a bonus of 1,000 points additional to the numeric result.
-        /// Should be set when a spin occured after the spinner has completed.
+        /// Set when a spin occured after the spinner has completed.
         /// </summary>
         public bool HasBonusPoints
         {
@@ -44,10 +44,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Samples.AddAdjustment(AdjustableProperty.Volume, bonusSampleVolume);
         }
 
-        public void TriggerResult(HitResult result)
+        /// <summary>
+        /// Apply a judgement result.
+        /// </summary>
+        /// <param name="hit">Whether to apply a <see cref="HitResult.Great"/> result, <see cref="HitResult.Miss"/> otherwise.</param>
+        internal void TriggerResult(bool hit)
         {
             HitObject.StartTime = Time.Current;
-            ApplyResult(r => r.Type = result);
+            ApplyResult(r => r.Type = hit ? HitResult.Great : HitResult.Miss);
         }
     }
 }
