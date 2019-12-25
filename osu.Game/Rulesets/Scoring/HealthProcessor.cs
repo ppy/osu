@@ -70,7 +70,11 @@ namespace osu.Game.Rulesets.Scoring
             base.Update();
 
             if (!IsBreakTime.Value)
-                Health.Value -= drainRate * Time.Elapsed;
+            {
+                // When jumping from before the gameplay start to after it or vice-versa, we only want to consider any drain since the gameplay start time
+                double lastTime = Math.Max(gameplayStartTime, Time.Current - Time.Elapsed);
+                Health.Value -= drainRate * (Time.Current - lastTime);
+            }
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
