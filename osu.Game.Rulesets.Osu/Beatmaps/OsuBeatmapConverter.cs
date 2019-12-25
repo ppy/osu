@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects.Types;
-using System;
+using System.Linq;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Framework.Extensions.IEnumerableExtensions;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         {
         }
 
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasPosition) };
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasPosition);
 
         protected override IEnumerable<OsuHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
         {
