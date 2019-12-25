@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace osu.Game.Online.Chat
@@ -214,9 +215,11 @@ namespace osu.Game.Online.Chat
             // handle channels
             handleMatches(channel_regex, "{0}", "osu://chan/{0}", result, startIndex, LinkAction.OpenChannel);
 
-            var empty = "";
+            StringBuilder builder = new StringBuilder();
             while (space-- > 0)
-                empty += "\0";
+                builder.Append("\0");
+
+            string empty = builder.ToString();
 
             handleMatches(emoji_regex, empty, "{0}", result, startIndex);
 
