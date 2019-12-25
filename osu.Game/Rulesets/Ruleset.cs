@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets
         /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The health processor.</returns>
-        public virtual HealthProcessor CreateHealthProcessor(double gameplayStartTime) => new HealthProcessor(gameplayStartTime);
+        public virtual HealthProcessor CreateHealthProcessor(double gameplayStartTime) => new DrainingHealthProcessor(gameplayStartTime);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
