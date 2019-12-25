@@ -14,7 +14,10 @@ namespace osu.Game.Graphics.UserInterface
 {
     public abstract class ScreenTitle : CompositeDrawable, IHasAccentColour
     {
+        public const float ICON_WIDTH = ICON_SIZE + spacing;
+
         public const float ICON_SIZE = 30;
+        private const float spacing = 6;
         private const int text_offset = 2;
 
         private SpriteIcon iconSprite;
@@ -61,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(6, 0),
+                    Spacing = new Vector2(spacing, 0),
                     Direction = FillDirection.Horizontal,
                     Children = new[]
                     {

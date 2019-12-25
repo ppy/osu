@@ -39,7 +39,7 @@ namespace osu.Game.Overlays
                     Depth = -float.MaxValue,
                     Children = new Drawable[]
                     {
-                        CreateTitle().With(t => t.X = -ScreenTitle.ICON_SIZE),
+                        CreateTitle().With(t => t.X = -ScreenTitle.ICON_WIDTH),
                         TabControl = new OverlayHeaderTabControl
                         {
                             Anchor = Anchor.BottomLeft,
