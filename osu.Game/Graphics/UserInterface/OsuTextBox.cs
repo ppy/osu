@@ -12,9 +12,11 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class OsuTextBox : TextBox
+    public class OsuTextBox : BasicTextBox
     {
         protected override float LeftRightPadding => 10;
+
+        protected override float CaretWidth => 3;
 
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
@@ -40,6 +42,8 @@ namespace osu.Game.Graphics.UserInterface
             BackgroundFocused = OsuColour.Gray(0.3f).Opacity(0.8f);
             BackgroundCommit = BorderColour = colour.Yellow;
         }
+
+        protected override Color4 SelectionColour => new Color4(249, 90, 255, 255);
 
         protected override void OnFocus(FocusEvent e)
         {
