@@ -26,19 +26,20 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Resolved]
         private AudioManager audio { get; set; }
 
-        [Test]
-        public void TestBeatmapComboColours()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void TestBeatmapComboColours(bool customSkinColoursPresent)
         {
             ExposedPlayer player = null;
 
-            AddStep("load coloured beatmap", () => player = loadBeatmap(false, true));
+            AddStep("load coloured beatmap", () => player = loadBeatmap(customSkinColoursPresent, true));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
             AddAssert("is beatmap skin colours", () => player.UsableComboColours.SequenceEqual(TestBeatmapSkin.Colours));
         }
 
         [Test]
-        public void TestEmptyBeatmapComboColours()
+        public void TestBeatmapNoComboColours()
         {
             ExposedPlayer player = null;
 
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         [Test]
-        public void TestEmptyBeatmapCustomSkinColours()
+        public void TestBeatmapNoComboColoursSkinOverride()
         {
             ExposedPlayer player = null;
 
