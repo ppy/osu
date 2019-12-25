@@ -24,13 +24,13 @@ using System;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    public class TaikoRuleset : Ruleset
+    public class TaikoRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new TaikoScoreProcessor(beatmap);
 
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 
         public const string SHORT_NAME = "taiko";
 
@@ -105,6 +105,12 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModFlashlight(),
                     };
 
+                case ModType.Conversion:
+                    return new Mod[]
+                    {
+                        new TaikoModDifficultyAdjust(),
+                    };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
@@ -133,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new TaikoPerformanceCalculator(this, beatmap, score);
 
-        public override int? LegacyID => 1;
+        public int LegacyID => 1;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
     }
