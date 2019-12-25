@@ -272,6 +272,8 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset.Overlays.Add(ScoreProcessor);
             DrawableRuleset.Overlays.Add(HealthProcessor);
+
+            HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
 
         private void updatePauseOnFocusLostState() =>

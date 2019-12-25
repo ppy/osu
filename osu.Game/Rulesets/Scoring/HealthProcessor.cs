@@ -30,6 +30,11 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
+        /// Whether gameplay is currently in a break.
+        /// </summary>
+        public readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+
+        /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
         public bool HasFailed { get; private set; }
@@ -53,7 +58,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             base.Update();
 
-            Health.Value -= drainRate * Time.Elapsed;
+            if (!IsBreakTime.Value)
+                Health.Value -= drainRate * Time.Elapsed;
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
