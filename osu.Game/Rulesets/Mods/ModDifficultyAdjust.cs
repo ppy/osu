@@ -52,18 +52,26 @@ namespace osu.Game.Rulesets.Mods
             if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
             {
                 this.difficulty = difficulty;
-                UpdateSettings(difficulty);
+                TransferSettings(difficulty);
             }
             else
                 ApplySettings(difficulty);
         }
 
-        protected virtual void UpdateSettings(BeatmapDifficulty difficulty)
+        /// <summary>
+        /// Transfer initial settings from the beatmap to settings.
+        /// </summary>
+        /// <param name="difficulty">The beatmap's initial values.</param>
+        protected virtual void TransferSettings(BeatmapDifficulty difficulty)
         {
             DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
             OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
         }
 
+        /// <summary>
+        /// Apply all custom settings to the provided beatmap.
+        /// </summary>
+        /// <param name="difficulty">The beatmap to have settings applied.</param>
         protected virtual void ApplySettings(BeatmapDifficulty difficulty)
         {
             difficulty.DrainRate = DrainRate.Value;

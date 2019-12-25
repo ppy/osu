@@ -30,9 +30,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = 5,
         };
 
-        protected override void UpdateSettings(BeatmapDifficulty difficulty)
+        protected override void TransferSettings(BeatmapDifficulty difficulty)
         {
-            base.UpdateSettings(difficulty);
+            base.TransferSettings(difficulty);
 
             CircleSize.Value = CircleSize.Default = difficulty.CircleSize;
             ApproachRate.Value = ApproachRate.Default = difficulty.ApproachRate;
