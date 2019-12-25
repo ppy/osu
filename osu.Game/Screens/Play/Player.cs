@@ -208,12 +208,6 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Breaks = working.Beatmap.Breaks
-                },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
@@ -268,6 +262,16 @@ namespace osu.Game.Screens.Play
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             });
+
+            DrawableRuleset.Overlays.Add(BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Breaks = working.Beatmap.Breaks
+            });
+
+            DrawableRuleset.Overlays.Add(ScoreProcessor);
+            DrawableRuleset.Overlays.Add(HealthProcessor);
         }
 
         private void updatePauseOnFocusLostState() =>
@@ -340,14 +344,6 @@ namespace osu.Game.Screens.Play
                 Pause();
             else
                 this.Exit();
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!GameplayClockContainer.IsPaused.Value)
-                HealthProcessor.ApplyElapsedTime(GameplayClockContainer.GameplayClock.ElapsedFrameTime);
         }
 
         /// <summary>
