@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        public IEnumerable<BarLine> BarLines;
+        private IEnumerable<BarLine> barLines;
 
         protected override bool RelativeScaleBeatLengths => true;
 
@@ -66,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
+
+        public IEnumerable<BarLine> BarLines { get => barLines; set => barLines = value; }
 
         protected override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
