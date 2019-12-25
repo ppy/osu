@@ -342,6 +342,14 @@ namespace osu.Game.Screens.Play
                 this.Exit();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!GameplayClockContainer.IsPaused.Value)
+                HealthProcessor.ApplyElapsedTime(GameplayClockContainer.GameplayClock.ElapsedFrameTime);
+        }
+
         /// <summary>
         /// Restart gameplay via a parent <see cref="PlayerLoader"/>.
         /// <remarks>This can be called from a child screen in order to trigger the restart process.</remarks>
