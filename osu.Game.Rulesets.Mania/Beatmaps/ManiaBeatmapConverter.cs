@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private const int max_notes_for_density = 7;
 
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
-
         public int TargetColumns;
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
@@ -68,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
         }
+
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition || h is ManiaHitObject);
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {

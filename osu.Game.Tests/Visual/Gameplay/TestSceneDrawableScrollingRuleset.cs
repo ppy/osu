@@ -273,7 +273,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
             }
 
-            protected override IEnumerable<Type> ValidConversionTypes => new[] { typeof(HitObject) };
+            public override bool CanConvert() => true;
 
             protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
             {
