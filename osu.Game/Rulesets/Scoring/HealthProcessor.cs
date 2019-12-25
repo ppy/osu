@@ -34,14 +34,19 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasFailed { get; private set; }
 
-        private readonly List<(double time, double health)> healthIncreases = new List<(double time, double health)>();
+        private List<(double time, double health)> healthIncreases;
         private double targetMinimumHealth;
         private double drainRate = 1;
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            healthIncreases = new List<(double time, double health)>();
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.85, 0.65);
+
             base.ApplyBeatmap(beatmap);
+
+            // Only required during the simulation stage
+            healthIncreases = null;
         }
 
         public override void ApplyElapsedTime(double elapsedTime) => Health.Value -= drainRate * elapsedTime;
@@ -52,7 +57,7 @@ namespace osu.Game.Rulesets.Scoring
             result.FailedAtJudgement = HasFailed;
 
             double healthIncrease = result.Judgement.HealthIncreaseFor(result);
-            healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, healthIncrease));
+            healthIncreases?.Add((result.HitObject.GetEndTime() + result.TimeOffset, healthIncrease));
 
             if (HasFailed)
                 return;
