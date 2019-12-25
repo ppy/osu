@@ -8,9 +8,5 @@ namespace osu.Game.Skinning
     /// </summary>
     public class DefaultSkinConfiguration : SkinConfiguration
     {
-        public DefaultSkinConfiguration()
-        {
-            ComboColours = DefaultComboColours;
-        }
     }
 }
