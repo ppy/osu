@@ -109,6 +109,7 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Conversion:
                     return new Mod[]
                     {
+                        new CatchModDifficultyAdjust(),
                         new CatchModMirror(),
                     };
 
