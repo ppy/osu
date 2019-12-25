@@ -21,9 +21,9 @@ Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh
 
 ## Requirements
 
-- A desktop platform with the [.NET Core SDK 3.0](https://www.microsoft.com/net/learn/get-started) or higher installed.
+- A desktop platform with the [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download) or higher installed.
 - When running on Linux, please have a system-wide FFmpeg installation available to support video decoding.
-- When running on Windows 7 or 8.1, **[additional prerequisites](https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?tabs=netcore30&pivots=os-windows)** may be required to correctly run .NET Core applications if your operating system is not up-to-date with the latest service packs.
+- When running on Windows 7 or 8.1, **[additional prerequisites](https://docs.microsoft.com/en-us/dotnet/core/install/dependencies?tabs=netcore31&pivots=os-windows)** may be required to correctly run .NET Core applications if your operating system is not up-to-date with the latest service packs.
 - When developing with mobile, [Xamarin](https://docs.microsoft.com/en-us/xamarin/) is required, which is shipped together with Visual Studio or [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/).
 - When working with the codebase, we recommend using an IDE with intelligent code completion and syntax highlighting, such as [Visual Studio 2019+](https://visualstudio.microsoft.com/vs/), [JetBrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
 
@@ -35,7 +35,7 @@ If you are not interested in developing the game, you can still consume our [bin
 
 **Latest build:**
 
-| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://testflight.apple.com/join/2tLcjWlF) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
+| [Windows (x64)](https://github.com/ppy/osu/releases/latest/download/install.exe)  | [macOS 10.12+](https://github.com/ppy/osu/releases/latest/download/osu.app.zip) | [iOS(iOS 10+)](https://osu.ppy.sh/home/testflight) | [Android (5+)](https://github.com/ppy/osu/releases/latest/download/sh.ppy.osulazer.apk)
 | ------------- | ------------- | ------------- | ------------- |
 
 - **Linux** users are recommended to self-compile until we have official deployment in place.
