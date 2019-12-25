@@ -9,8 +9,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens;
 using osu.Game.Screens.Play;
@@ -30,39 +30,33 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestBeatmapComboColours()
         {
             ExposedPlayer player = null;
-            IReadOnlyList<Color4> colours = null;
 
-            AddStep("load beatmap", () => player = loadBeatmap(false, true));
+            AddStep("load coloured beatmap", () => player = loadBeatmap(false, true));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
-            AddStep("retrieve combo colours", () => colours = player.BeatmapSkin.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value);
-            AddAssert("is beatmap skin colours", () => colours.SequenceEqual(TestBeatmapSkin.Colours));
+            AddAssert("is beatmap skin colours", () => player.UsableComboColours.SequenceEqual(TestBeatmapSkin.Colours));
         }
 
         [Test]
         public void TestEmptyBeatmapComboColours()
         {
             ExposedPlayer player = null;
-            IReadOnlyList<Color4> colours = null;
 
             AddStep("load no-colour beatmap", () => player = loadBeatmap(false, false));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
-            AddStep("retrieve combo colours", () => colours = player.BeatmapSkin.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value);
-            AddAssert("is default user skin colours", () => colours.SequenceEqual(SkinConfiguration.DefaultComboColours));
+            AddAssert("is default user skin colours", () => player.UsableComboColours.SequenceEqual(SkinConfiguration.DefaultComboColours));
         }
 
         [Test]
         public void TestEmptyBeatmapCustomSkinColours()
         {
             ExposedPlayer player = null;
-            IReadOnlyList<Color4> colours = null;
 
-            AddStep("load no-colour beatmap", () => player = loadBeatmap(true, false));
+            AddStep("load custom-skin colour", () => player = loadBeatmap(true, false));
             AddUntilStep("wait for player", () => player.IsLoaded);
 
-            AddStep("retrieve combo colours", () => colours = player.BeatmapSkin.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value);
-            AddAssert("is custom user skin colours", () => colours.SequenceEqual(TestSkin.Colours));
+            AddAssert("is custom user skin colours", () => player.UsableComboColours.SequenceEqual(TestSkin.Colours));
         }
 
         private ExposedPlayer loadBeatmap(bool userHasCustomColours, bool beatmapHasColours)
@@ -92,7 +86,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 return dependencies;
             }
 
-            public BeatmapSkinProvidingContainer BeatmapSkin => GameplayClockContainer.OfType<ScalingContainer>().First().OfType<BeatmapSkinProvidingContainer>().First();
+            public IReadOnlyList<Color4> UsableComboColours =>
+                GameplayClockContainer.ChildrenOfType<BeatmapSkinProvidingContainer>()
+                                      .First()
+                                      .GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
         }
 
         private class CustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
