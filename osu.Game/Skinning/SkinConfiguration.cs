@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Beatmaps.Formats;
 using osuTK.Graphics;
 
@@ -28,7 +27,7 @@ namespace osu.Game.Skinning
             new Color4(242, 24, 57, 255),
         };
 
-        private List<Color4> comboColours = new List<Color4>();
+        private readonly List<Color4> comboColours = new List<Color4>();
 
         public IReadOnlyList<Color4> ComboColours
         {
@@ -42,7 +41,6 @@ namespace osu.Game.Skinning
 
                 return null;
             }
-            set => comboColours = value.ToList();
         }
 
         public void AddComboColours(params Color4[] colours) => comboColours.AddRange(colours);
