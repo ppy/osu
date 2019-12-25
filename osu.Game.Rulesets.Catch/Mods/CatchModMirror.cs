@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Catch.Mods
         {
             var catchObject = (CatchHitObject)hitObject;
 
-            catchObject.BaseX = 1 - catchObject.BaseX;
+            catchObject.X = 1 - catchObject.X;
             catchObject.XOffsetReversed = true;
 
             foreach (var nested in catchObject.NestedHitObjects.Cast<CatchHitObject>())
             {
-                nested.BaseX = 1 - nested.BaseX;
+                nested.X = 1 - nested.X;
                 nested.XOffsetReversed = true;
             }
 

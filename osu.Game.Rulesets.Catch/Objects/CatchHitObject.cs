@@ -15,13 +15,7 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public const double OBJECT_RADIUS = 44;
 
-        internal float BaseX { get; set; }
-
-        public float X
-        {
-            get => XOffsetReversed ? BaseX - XOffset : BaseX + XOffset;
-            set => BaseX = XOffsetReversed ? value + XOffset : value - XOffset;
-        }
+        public float X { get; set; }
 
         internal bool XOffsetReversed { get; set; }
 
@@ -29,6 +23,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// A random offset applied to <see cref="X"/>, set by the <see cref="CatchBeatmapProcessor"/>.
         /// </summary>
         internal float XOffset { get; set; }
+
+        /// <summary>
+        /// The effective X position during gameplay, applying with HardRock offset.
+        /// </summary>
+        public float GameplayX => XOffsetReversed ? X - XOffset : X + XOffset;
 
         public double TimePreempt = 1000;
 
