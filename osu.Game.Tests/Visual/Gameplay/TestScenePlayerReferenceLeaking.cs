@@ -20,7 +20,6 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("no leaked beatmaps", () =>
             {
-                GC.Collect();
                 GC.WaitForPendingFinalizers();
                 int count = 0;
 
