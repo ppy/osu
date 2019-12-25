@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Bindables;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -31,15 +33,23 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasFailed { get; private set; }
 
+        private readonly List<(double time, double health)> healthIncreases = new List<(double time, double health)>();
+        private double drainRate = 1;
+
+        public override void ApplyElapsedTime(double elapsedTime) => Health.Value -= drainRate * elapsedTime;
+
         protected override void ApplyResultInternal(JudgementResult result)
         {
             result.HealthAtJudgement = Health.Value;
             result.FailedAtJudgement = HasFailed;
 
+            double healthIncrease = HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
+            healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, healthIncrease));
+
             if (HasFailed)
                 return;
 
-            Health.Value += HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
+            Health.Value += healthIncrease;
 
             if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
                 return;
@@ -70,6 +80,42 @@ namespace osu.Game.Rulesets.Scoring
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);
+
+            drainRate = 1;
+
+            if (storeResults)
+            {
+                const double percentage_target = 0.5;
+
+                int count = 1;
+
+                while (true)
+                {
+                    double currentHealth = 1;
+                    double lowestHealth = 1;
+
+                    for (int i = 0; i < healthIncreases.Count; i++)
+                    {
+                        var lastTime = i > 0 ? healthIncreases[i - 1].time : 0;
+
+                        currentHealth -= (healthIncreases[i].time - lastTime) * drainRate;
+                        lowestHealth = Math.Min(lowestHealth, currentHealth);
+                        currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
+
+                        // Common scenario for when the drain rate is definitely too harsh
+                        if (lowestHealth < 0)
+                            break;
+                    }
+
+                    if (Math.Abs(lowestHealth - percentage_target) <= 0.01)
+                        break;
+
+                    count *= 2;
+                    drainRate += 1.0 / count * Math.Sign(lowestHealth - percentage_target);
+                }
+            }
+
+            healthIncreases.Clear();
 
             Health.Value = 1;
             HasFailed = false;
