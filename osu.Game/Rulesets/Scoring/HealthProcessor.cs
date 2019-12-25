@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Scoring
             this.beatmap = beatmap;
 
             healthIncreases = new List<(double time, double health)>();
-            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.6, 0.2);
+            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.70, 0.30);
 
             base.ApplyBeatmap(beatmap);
 
