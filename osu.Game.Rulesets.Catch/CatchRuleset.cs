@@ -24,13 +24,13 @@ using System;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchRuleset : Ruleset
+    public class CatchRuleset : Ruleset, ILegacyRuleset
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
 
         public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new CatchScoreProcessor(beatmap);
 
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
         public const string SHORT_NAME = "fruits";
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new CatchPerformanceCalculator(this, beatmap, score);
 
-        public override int? LegacyID => 2;
+        public int LegacyID => 2;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
     }
