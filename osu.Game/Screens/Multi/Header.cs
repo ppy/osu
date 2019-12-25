@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Multi
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            X = -ScreenTitle.ICON_WIDTH,
+                            X = -ScreenTitle.ICON_SIZE,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
