@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private double hpMissMultiplier;
 
         public TaikoHealthProcessor(double gameplayStartTime)
-            : base(gameplayStartTime)
+            : base(gameplayStartTime, 0.5)
         {
         }
 
@@ -42,6 +42,5 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         protected override double GetHealthIncreaseFor(JudgementResult result)
             => base.GetHealthIncreaseFor(result) * (result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier);
 
-        protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value <= 0.5;
     }
 }

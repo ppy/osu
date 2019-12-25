@@ -41,6 +41,10 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         protected readonly double GameplayStartTime;
 
+        /// <summary>
+        /// Creates a new <see cref="HealthProcessor"/>.
+        /// </summary>
+        /// <param name="gameplayStartTime">The gameplay start time.</param>
         protected HealthProcessor(double gameplayStartTime)
         {
             GameplayStartTime = gameplayStartTime;
@@ -70,6 +74,11 @@ namespace osu.Game.Rulesets.Scoring
             // Todo: Revert HasFailed state with proper player support
         }
 
+        /// <summary>
+        /// Retrieves the health increase for a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/>.</param>
+        /// <returns>The health increase.</returns>
         protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.Judgement.HealthIncreaseFor(result);
 
         /// <summary>
