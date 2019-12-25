@@ -127,7 +127,7 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = @"额外玩法",
+                                                Text = @"游戏Mods",
                                                 Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Text = "他们可以让你以不同的方式来进行游戏。有些玩法对你的游戏分数会有影响\n还有一些仅供娱乐。",
+                                                Text = "他们可以让你以不同的方式来进行游戏。有些Mod对你的游戏分数会有影响\n还有一些仅供娱乐。",
                                             },
                                         },
                                     },

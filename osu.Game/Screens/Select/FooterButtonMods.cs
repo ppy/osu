@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Yellow;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"额外玩法";
+            Text = @"游戏Mods";
             Hotkey = Key.F1;
         }
 

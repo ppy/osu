@@ -131,7 +131,7 @@ namespace osu.Game.Database
                             imported.Add(model);
                         current++;
 
-                        notification.Text = $"已导入 {current} / {paths.Length} {HumanisedModelName}s";
+                        notification.Text = $"已导入 {current} / {paths.Length} {HumanisedModelName}";
                         notification.Progress = (float)current / paths.Length;
                     }
                 }
@@ -154,7 +154,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"已导入 {imported.First()}!"
-                    : $"已导入 {imported.Count} {HumanisedModelName}s!";
+                    : $"已导入 {imported.Count} {HumanisedModelName}!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
@@ -395,8 +395,8 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                Text = $"正在准备删除所有的 {HumanisedModelName}s...",
-                CompletionText = $"已删除所有的 {HumanisedModelName}s!",
+                Text = $"正在准备删除所有的 {HumanisedModelName}...",
+                CompletionText = $"已删除所有的 {HumanisedModelName}!",
                 State = ProgressNotificationState.Active,
             };
 
@@ -411,7 +411,7 @@ namespace osu.Game.Database
                     // user requested abort
                     return;
 
-                notification.Text = $"正在删除 {HumanisedModelName}s ({++i} / {items.Count})";
+                notification.Text = $"正在删除 {HumanisedModelName} ({++i} / {items.Count})";
 
                 Delete(b);
 

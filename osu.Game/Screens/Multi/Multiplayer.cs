@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Multi
                         Text = "创建房间",
                         Action = () => loungeSubScreen.Open(new Room
                         {
-                            Name = { Value = $"{api.LocalUser}'s awesome room" }
+                            Name = { Value = $"{api.LocalUser}的米奇妙妙屋" }
                         }),
                     },
                     roomManager = new RoomManager()

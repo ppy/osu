@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class VisualSettings : PlayerSettingsGroup
     {
-        protected override string Title => "可见度设置";
+        protected override string Title => "视觉效果设置";
 
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;

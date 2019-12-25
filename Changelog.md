@@ -96,10 +96,10 @@
     *   [暂停界面](osu.Game/Screens/Play/PauseOverlay.cs)
         *   副标题由 "你不会做我认为你会做的事，是吗:D" 改为 "要去做什么呢owo?"
     *   [Mods按钮](osu.Game/Screens/Select/FooterButtonMods.cs)
-        *   文本由原有的"Mods"改为"游戏模组"
+        *   文本由原有的"Mods"改为"额外玩法"
         *   *感觉这样子选歌界面看上去更和谐一点*
     *   [Mod选择界面](osu.Game/Overlays/Mods/ModSelectOverlay.cs)
-        *   重置Mod按钮文本改为"重置已选模组"
+        *   重置Mod按钮文本改为"恢复默认玩法"
         *   标题从"游戏Mods"改为"额外玩法"
         *   描述从"...有些Mod对你的游戏分数..."改为"...有些玩法对你的游戏分数..."
     *   [聊天界面](osu.Game/Overlays/ChatOverlay.cs)
@@ -114,6 +114,20 @@
         *   触发方法:`设置>调试>总体>显示日志Overlay`设置为`开`
     *   `*x refresh rate`:无法被找到
         *   猜测:存在于`osu!Framework`中
+
+## 2019/12/25
+* 翻译优化:
+    *   [Mods按钮](osu.Game/Screens/Select/FooterButtonMods.cs)
+        *   文本由原有的"额外玩法"改为"游戏Mods"
+    *   [Mod选择界面](osu.Game/Overlays/Mods/ModSelectOverlay.cs)
+        *   标题从"额外玩法"改为"游戏Mods"
+        *   描述从"...有些玩法对你的游戏分数..."改为"...有些Mod对你的游戏分数..."
+    *   [导入相关](osu.Game/Database/ArchiveModelManager.cs)
+        *   翻译改进
+
+* 翻译修正:
+    *   [HUD>视觉设置](osu.Game/Screens/Play/PlayerSettings/VisualSettings.cs)
+        *   (行13):从"可见度设置"变为"视觉效果设置"
 
 # 待定版测试
 | 开始时间 | 结束时间 | 版本 |
