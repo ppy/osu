@@ -98,17 +98,17 @@ namespace osu.Desktop
             client.SetPresence(presence);
         }
 
+        private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
+
         private string truncate(ReadOnlySpan<char> str)
         {
             if (Encoding.UTF8.GetByteCount(str) <= 128)
                 return new string(str);
 
-            int ellipsisLength = Encoding.UTF8.GetByteCount(new[] { '…' });
-
             do
             {
                 str = str[..^1];
-            } while (Encoding.UTF8.GetByteCount(str) + ellipsisLength > 128);
+            } while (Encoding.UTF8.GetByteCount(str) + ellipsis_length > 128);
 
             return new string(str) + '…';
         }
