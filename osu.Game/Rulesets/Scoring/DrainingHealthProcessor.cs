@@ -9,6 +9,9 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
+    /// <summary>
+    /// A <see cref="HealthProcessor"/> which continuously drains health.
+    /// </summary>
     public class DrainingHealthProcessor : HealthProcessor
     {
         private IBeatmap beatmap;
@@ -17,6 +20,10 @@ namespace osu.Game.Rulesets.Scoring
         private double targetMinimumHealth;
         private double drainRate = 1;
 
+        /// <summary>
+        /// Creates a new <see cref="DrainingHealthProcessor"/>.
+        /// </summary>
+        /// <param name="gameplayStartTime">The gameplay start time.</param>
         public DrainingHealthProcessor(double gameplayStartTime)
             : base(gameplayStartTime)
         {

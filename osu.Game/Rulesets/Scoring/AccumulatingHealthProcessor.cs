@@ -3,11 +3,25 @@
 
 namespace osu.Game.Rulesets.Scoring
 {
+    /// <summary>
+    /// A <see cref="HealthProcessor"/> that accumulates health and causes a fail if the final health
+    /// is less than a value required to pass the beatmap.
+    /// </summary>
     public class AccumulatingHealthProcessor : HealthProcessor
     {
-        public AccumulatingHealthProcessor(double gameplayStartTime)
+        protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value < requiredHealth;
+
+        private readonly double requiredHealth;
+
+        /// <summary>
+        /// Creates a new <see cref="AccumulatingHealthProcessor"/>.
+        /// </summary>
+        /// <param name="gameplayStartTime">The gameplay start time.</param>
+        /// <param name="requiredHealth">The minimum amount of health required to beatmap.</param>
+        public AccumulatingHealthProcessor(double gameplayStartTime, double requiredHealth)
             : base(gameplayStartTime)
         {
+            this.requiredHealth = requiredHealth;
         }
 
         protected override void Reset(bool storeResults)
