@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
 
+        public override HealthProcessor CreateHealthProcessor(double gameplayStartTime) => new TaikoHealthProcessor(gameplayStartTime);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 
 
