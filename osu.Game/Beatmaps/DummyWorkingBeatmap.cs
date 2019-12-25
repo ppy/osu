@@ -76,7 +76,7 @@ namespace osu.Game.Beatmaps
 
                     public IBeatmap Beatmap { get; set; }
 
-                    public bool CanConvert => true;
+                    public bool CanConvert() => true;
 
                     public IBeatmap Convert()
                     {
