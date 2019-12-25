@@ -39,14 +39,25 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasFailed { get; private set; }
 
+        private readonly double gameplayStartTime;
+
+        private IBeatmap beatmap;
+
         private List<(double time, double health)> healthIncreases;
         private double targetMinimumHealth;
         private double drainRate = 1;
 
+        public HealthProcessor(double gameplayStartTime)
+        {
+            this.gameplayStartTime = gameplayStartTime;
+        }
+
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
+            this.beatmap = beatmap;
+
             healthIncreases = new List<(double time, double health)>();
-            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.85, 0.65);
+            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.6, 0.2);
 
             base.ApplyBeatmap(beatmap);
 
@@ -108,11 +119,24 @@ namespace osu.Game.Rulesets.Scoring
                 {
                     double currentHealth = 1;
                     double lowestHealth = 1;
+                    int currentBreak = -1;
 
                     for (int i = 0; i < healthIncreases.Count; i++)
                     {
-                        var lastTime = i > 0 ? healthIncreases[i - 1].time : 0;
+                        double currentTime = healthIncreases[i].time;
+                        double lastTime = i > 0 ? healthIncreases[i - 1].time : gameplayStartTime;
 
+                        // Subtract any break time from the duration since the last object
+                        if (beatmap.Breaks.Count > 0)
+                        {
+                            while (currentBreak + 1 < beatmap.Breaks.Count && beatmap.Breaks[currentBreak + 1].EndTime < currentTime)
+                                currentBreak++;
+
+                            if (currentBreak >= 0)
+                                lastTime = Math.Max(lastTime, beatmap.Breaks[currentBreak].EndTime);
+                        }
+
+                        // Apply health adjustments
                         currentHealth -= (healthIncreases[i].time - lastTime) * drainRate;
                         lowestHealth = Math.Min(lowestHealth, currentHealth);
                         currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
