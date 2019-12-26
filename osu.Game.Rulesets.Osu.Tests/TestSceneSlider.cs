@@ -148,9 +148,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("repeat samples updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<RepeatPoint>().All(assertSamples));
             AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
 
-            bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
+            static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
 
-            bool assertSamples(HitObject hitObject)
+            static bool assertSamples(HitObject hitObject)
             {
                 return hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_CLAP)
                        && hitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_WHISTLE);
@@ -183,8 +183,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("repeat samples not updated", () => ((Slider)slider.HitObject).NestedHitObjects.OfType<RepeatPoint>().All(assertSamples));
             AddAssert("tail has no samples", () => ((Slider)slider.HitObject).TailCircle.Samples.Count == 0);
 
-            bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
-            bool assertSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name != HitSampleInfo.HIT_CLAP && s.Name != HitSampleInfo.HIT_WHISTLE);
+            static bool assertTickSamples(SliderTick tick) => tick.Samples.Single().Name == "slidertick";
+
+            static bool assertSamples(HitObject hitObject) => hitObject.Samples.All(s => s.Name != HitSampleInfo.HIT_CLAP && s.Name != HitSampleInfo.HIT_WHISTLE);
         }
 
         private Drawable testSimpleBig(int repeats = 0) => createSlider(2, repeats: repeats);
@@ -361,7 +362,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableSlider(slider);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             drawable.OnNewResult += onNewResult;
@@ -379,8 +380,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            var osuObject = judgedObject as DrawableOsuHitObject;
-            if (osuObject == null)
+            if (!(judgedObject is DrawableOsuHitObject osuObject))
                 return;
 
             OsuSpriteText text;

@@ -25,7 +25,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
@@ -158,7 +158,9 @@ namespace osu.Game.Beatmaps
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
-        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items) => items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
+        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
+            => base.CheckLocalAvailability(model, items)
+               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
 
         /// <summary>
         /// Delete a beatmap difficulty.
@@ -334,7 +336,8 @@ namespace osu.Game.Beatmaps
 
             var lastObject = b.HitObjects.Last();
 
-            double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+            //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+            double endTime = lastObject.GetEndTime();
             double startTime = b.HitObjects.First().StartTime;
 
             return endTime - startTime;
@@ -397,7 +400,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     // intentionally blocking to limit web request concurrency
-                    req.Perform(api);
+                    api.Perform(req);
 
                     var res = req.Result;
 

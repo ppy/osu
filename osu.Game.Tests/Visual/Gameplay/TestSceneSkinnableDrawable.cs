@@ -335,16 +335,14 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestSkinComponent : ISkinComponent
         {
-            private readonly string name;
-
             public TestSkinComponent(string name)
             {
-                this.name = name;
+                LookupName = name;
             }
 
             public string ComponentGroup => string.Empty;
 
-            public string LookupName => name;
+            public string LookupName { get; }
         }
     }
 }

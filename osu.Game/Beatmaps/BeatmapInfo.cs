@@ -76,7 +76,7 @@ namespace osu.Game.Beatmaps
         public string MD5Hash { get; set; }
 
         // General
-        public int AudioLeadIn { get; set; }
+        public double AudioLeadIn { get; set; }
         public bool Countdown { get; set; } = true;
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
@@ -98,7 +98,7 @@ namespace osu.Game.Beatmaps
             {
                 if (string.IsNullOrEmpty(value))
                 {
-                    Bookmarks = new int[0];
+                    Bookmarks = Array.Empty<int>();
                     return;
                 }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Beatmaps
         }
 
         [NotMapped]
-        public int[] Bookmarks { get; set; } = new int[0];
+        public int[] Bookmarks { get; set; } = Array.Empty<int>();
 
         public double DistanceSpacing { get; set; }
         public int BeatDivisor { get; set; }

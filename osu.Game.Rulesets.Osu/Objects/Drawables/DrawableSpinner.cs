@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
-        private readonly SpinnerSpmCounter spmCounter;
+        public readonly SpinnerSpmCounter SpmCounter;
 
         private readonly Container mainContainer;
 
@@ -109,7 +110,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         },
                     }
                 },
-                spmCounter = new SpinnerSpmCounter
+                SpmCounter = new SpinnerSpmCounter
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -136,7 +137,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
-        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
+        public float Progress => Math.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
@@ -176,8 +177,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
-            if (!spmCounter.IsPresent && Disc.Tracking)
-                spmCounter.FadeIn(HitObject.TimeFadeIn);
+            if (!SpmCounter.IsPresent && Disc.Tracking)
+                SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
             base.Update();
         }
@@ -188,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
-            spmCounter.SetRotation(Disc.RotationAbsolute);
+            SpmCounter.SetRotation(Disc.RotationAbsolute);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);

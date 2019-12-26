@@ -5,56 +5,106 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APILegacyScoreInfo : LegacyScoreInfo
+    public class APILegacyScoreInfo
     {
-        [JsonProperty(@"score")]
-        private int totalScore
+        public ScoreInfo CreateScoreInfo(RulesetStore rulesets)
         {
-            set => TotalScore = value;
+            var ruleset = rulesets.GetRuleset(OnlineRulesetID);
+
+            var mods = Mods != null ? ruleset.CreateInstance().GetAllMods().Where(mod => Mods.Contains(mod.Acronym)).ToArray() : Array.Empty<Mod>();
+
+            var scoreInfo = new ScoreInfo
+            {
+                TotalScore = TotalScore,
+                MaxCombo = MaxCombo,
+                User = User,
+                Accuracy = Accuracy,
+                OnlineScoreID = OnlineScoreID,
+                Date = Date,
+                PP = PP,
+                Beatmap = Beatmap,
+                RulesetID = OnlineRulesetID,
+                Hash = Replay ? "online" : string.Empty, // todo: temporary?
+                Rank = Rank,
+                Ruleset = ruleset,
+                Mods = mods,
+            };
+
+            if (Statistics != null)
+            {
+                foreach (var kvp in Statistics)
+                {
+                    switch (kvp.Key)
+                    {
+                        case @"count_geki":
+                            scoreInfo.SetCountGeki(kvp.Value);
+                            break;
+
+                        case @"count_300":
+                            scoreInfo.SetCount300(kvp.Value);
+                            break;
+
+                        case @"count_katu":
+                            scoreInfo.SetCountKatu(kvp.Value);
+                            break;
+
+                        case @"count_100":
+                            scoreInfo.SetCount100(kvp.Value);
+                            break;
+
+                        case @"count_50":
+                            scoreInfo.SetCount50(kvp.Value);
+                            break;
+
+                        case @"count_miss":
+                            scoreInfo.SetCountMiss(kvp.Value);
+                            break;
+                    }
+                }
+            }
+
+            return scoreInfo;
         }
+
+        [JsonProperty(@"score")]
+        public int TotalScore { get; set; }
 
         [JsonProperty(@"max_combo")]
-        private int maxCombo
-        {
-            set => MaxCombo = value;
-        }
+        public int MaxCombo { get; set; }
 
         [JsonProperty(@"user")]
-        private User user
-        {
-            set => User = value;
-        }
+        public User User { get; set; }
 
         [JsonProperty(@"id")]
-        private long onlineScoreID
-        {
-            set => OnlineScoreID = value;
-        }
+        public long OnlineScoreID { get; set; }
 
         [JsonProperty(@"replay")]
         public bool Replay { get; set; }
 
         [JsonProperty(@"created_at")]
-        private DateTimeOffset date
-        {
-            set => Date = value;
-        }
+        public DateTimeOffset Date { get; set; }
 
         [JsonProperty(@"beatmap")]
-        private BeatmapInfo beatmap
-        {
-            set => Beatmap = value;
-        }
+        public BeatmapInfo Beatmap { get; set; }
+
+        [JsonProperty("accuracy")]
+        public double Accuracy { get; set; }
+
+        [JsonProperty(@"pp")]
+        public double? PP { get; set; }
 
         [JsonProperty(@"beatmapset")]
-        private BeatmapMetadata metadata
+        public BeatmapMetadata Metadata
         {
             set
             {
@@ -67,68 +117,16 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"statistics")]
-        private Dictionary<string, int> jsonStats
-        {
-            set
-            {
-                foreach (var kvp in value)
-                {
-                    switch (kvp.Key)
-                    {
-                        case @"count_geki":
-                            CountGeki = kvp.Value;
-                            break;
-
-                        case @"count_300":
-                            Count300 = kvp.Value;
-                            break;
-
-                        case @"count_katu":
-                            CountKatu = kvp.Value;
-                            break;
-
-                        case @"count_100":
-                            Count100 = kvp.Value;
-                            break;
-
-                        case @"count_50":
-                            Count50 = kvp.Value;
-                            break;
-
-                        case @"count_miss":
-                            CountMiss = kvp.Value;
-                            break;
-
-                        default:
-                            continue;
-                    }
-                }
-            }
-        }
+        public Dictionary<string, int> Statistics { get; set; }
 
         [JsonProperty(@"mode_int")]
-        public int OnlineRulesetID
-        {
-            get => RulesetID;
-            set => RulesetID = value;
-        }
+        public int OnlineRulesetID { get; set; }
 
         [JsonProperty(@"mods")]
-        private string[] modStrings { get; set; }
+        public string[] Mods { get; set; }
 
-        public override RulesetInfo Ruleset
-        {
-            get => base.Ruleset;
-            set
-            {
-                base.Ruleset = value;
-
-                if (modStrings != null)
-                {
-                    // Evaluate the mod string
-                    Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.Acronym)).ToArray();
-                }
-            }
-        }
+        [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ScoreRank Rank { get; set; }
     }
 }

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Taiko.Beatmaps;
@@ -39,80 +38,85 @@ namespace osu.Game.Rulesets.Taiko.Replays
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 TaikoHitObject h = Beatmap.HitObjects[i];
+                double endTime = h.GetEndTime();
 
-                IHasEndTime endTimeData = h as IHasEndTime;
-                double endTime = endTimeData?.EndTime ?? h.StartTime;
-
-                Swell swell = h as Swell;
-                DrumRoll drumRoll = h as DrumRoll;
-                Hit hit = h as Hit;
-
-                if (swell != null)
+                switch (h)
                 {
-                    int d = 0;
-                    int count = 0;
-                    int req = swell.RequiredHits;
-                    double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
-
-                    for (double j = h.StartTime; j < endTime; j += hitRate)
+                    case Swell swell:
                     {
-                        TaikoAction action;
+                        int d = 0;
+                        int count = 0;
+                        int req = swell.RequiredHits;
+                        double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
 
-                        switch (d)
+                        for (double j = h.StartTime; j < endTime; j += hitRate)
                         {
-                            default:
-                            case 0:
-                                action = TaikoAction.LeftCentre;
-                                break;
+                            TaikoAction action;
 
-                            case 1:
-                                action = TaikoAction.LeftRim;
-                                break;
+                            switch (d)
+                            {
+                                default:
+                                case 0:
+                                    action = TaikoAction.LeftCentre;
+                                    break;
 
-                            case 2:
-                                action = TaikoAction.RightCentre;
-                                break;
+                                case 1:
+                                    action = TaikoAction.LeftRim;
+                                    break;
 
-                            case 3:
-                                action = TaikoAction.RightRim;
+                                case 2:
+                                    action = TaikoAction.RightCentre;
+                                    break;
+
+                                case 3:
+                                    action = TaikoAction.RightRim;
+                                    break;
+                            }
+
+                            Frames.Add(new TaikoReplayFrame(j, action));
+                            d = (d + 1) % 4;
+                            if (++count == req)
                                 break;
                         }
 
-                        Frames.Add(new TaikoReplayFrame(j, action));
-                        d = (d + 1) % 4;
-                        if (++count == req)
-                            break;
-                    }
-                }
-                else if (drumRoll != null)
-                {
-                    foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
-                    {
-                        Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre));
-                        hitButton = !hitButton;
-                    }
-                }
-                else if (hit != null)
-                {
-                    TaikoAction[] actions;
-
-                    if (hit is CentreHit)
-                    {
-                        actions = h.IsStrong
-                            ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
-                            : new[] { hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre };
-                    }
-                    else
-                    {
-                        actions = h.IsStrong
-                            ? new[] { TaikoAction.LeftRim, TaikoAction.RightRim }
-                            : new[] { hitButton ? TaikoAction.LeftRim : TaikoAction.RightRim };
+                        break;
                     }
 
-                    Frames.Add(new TaikoReplayFrame(h.StartTime, actions));
+                    case DrumRoll drumRoll:
+                    {
+                        foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
+                        {
+                            Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre));
+                            hitButton = !hitButton;
+                        }
+
+                        break;
+                    }
+
+                    case Hit hit:
+                    {
+                        TaikoAction[] actions;
+
+                        if (hit is CentreHit)
+                        {
+                            actions = h.IsStrong
+                                ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
+                                : new[] { hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre };
+                        }
+                        else
+                        {
+                            actions = h.IsStrong
+                                ? new[] { TaikoAction.LeftRim, TaikoAction.RightRim }
+                                : new[] { hitButton ? TaikoAction.LeftRim : TaikoAction.RightRim };
+                        }
+
+                        Frames.Add(new TaikoReplayFrame(h.StartTime, actions));
+                        break;
+                    }
+
+                    default:
+                        throw new InvalidOperationException("Unknown hit object type.");
                 }
-                else
-                    throw new InvalidOperationException("Unknown hit object type.");
 
                 var nextHitObject = GetNextObject(i); // Get the next object that requires pressing the same button
 
