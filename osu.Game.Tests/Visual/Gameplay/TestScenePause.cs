@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestResumeWithResumeOverlay()
         {
             AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
             resume();
@@ -73,7 +73,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestPauseWithResumeOverlay()
         {
             AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
 
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("move cursor to button", () =>
                 InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.Children.OfType<HoldToConfirmContainer>().First().ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
             resumeAndConfirm();
@@ -285,7 +285,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected class PausePlayer : TestPlayer
         {
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 
