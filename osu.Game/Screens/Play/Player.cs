@@ -350,18 +350,7 @@ namespace osu.Game.Screens.Play
             if (!showResults) return;
 
             using (BeginDelayedSequence(1000))
-            {
-                completionProgressDelegate = Schedule(delegate
-                {
-                    if (!this.IsCurrentScreen()) return;
-
-                    var score = CreateScore();
-                    if (DrawableRuleset.ReplayScore == null)
-                        scoreManager.Import(score).Wait();
-
-                    this.Push(CreateResults(score));
-                });
-            }
+                scheduleGotoRanking();
         }
 
         protected virtual ScoreInfo CreateScore()
@@ -541,14 +530,8 @@ namespace osu.Game.Screens.Play
         {
             if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
-                // Proceed to result screen if beatmap already finished playing.
-                // This is scheduled since the player needs to become the current screen before the delegate runs. This happens after the return true.
-                Scheduler.Add(() =>
-                {
-                    if (!completionProgressDelegate.Completed && !completionProgressDelegate.Cancelled)
-                        completionProgressDelegate.RunTask();
-                });
-
+                // proceed to result screen if beatmap already finished playing
+                scheduleGotoRanking();
                 return true;
             }
 
@@ -581,6 +564,19 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
+        }
+
+        private void scheduleGotoRanking()
+        {
+            completionProgressDelegate?.Cancel();
+            completionProgressDelegate = Schedule(delegate
+            {
+                var score = CreateScore();
+                if (DrawableRuleset.ReplayScore == null)
+                    scoreManager.Import(score).Wait();
+
+                this.Push(CreateResults(score));
+            });
         }
 
         #endregion
