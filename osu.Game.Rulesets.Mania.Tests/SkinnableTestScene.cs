@@ -45,30 +45,5 @@ namespace osu.Game.Rulesets.Mania.Tests
                     Child = creationFunction()
                 });
         }
-
-        private class TestLegacySkin : LegacySkin
-        {
-            private readonly bool extrapolateAnimations;
-
-            public TestLegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, bool extrapolateAnimations)
-                : base(skin, storage, audioManager, "skin.ini")
-            {
-                this.extrapolateAnimations = extrapolateAnimations;
-            }
-
-            public override Texture GetTexture(string componentName)
-            {
-                // extrapolate frames to test longer animations
-                if (extrapolateAnimations)
-                {
-                    var match = Regex.Match(componentName, "-([0-9]*)");
-
-                    if (match.Length > 0 && int.TryParse(match.Groups[1].Value, out var number) && number < 60)
-                        return base.GetTexture(componentName.Replace($"-{number}", $"-{number % 2}"));
-                }
-
-                return base.GetTexture(componentName);
-            }
-        }
     }
 }
