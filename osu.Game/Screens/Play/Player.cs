@@ -376,18 +376,7 @@ namespace osu.Game.Screens.Play
             if (!showResults) return;
 
             using (BeginDelayedSequence(1000))
-            {
-                completionProgressDelegate = Schedule(delegate
-                {
-                    if (!this.IsCurrentScreen()) return;
-
-                    var score = CreateScore();
-                    if (DrawableRuleset.ReplayScore == null)
-                        scoreManager.Import(score).Wait();
-
-                    this.Push(CreateResults(score));
-                });
-            }
+                scheduleGotoRanking();
         }
 
         protected virtual ScoreInfo CreateScore()
@@ -568,7 +557,7 @@ namespace osu.Game.Screens.Play
             if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
                 // proceed to result screen if beatmap already finished playing
-                completionProgressDelegate.RunTask();
+                scheduleGotoRanking();
                 return true;
             }
 
@@ -601,6 +590,19 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
+        }
+
+        private void scheduleGotoRanking()
+        {
+            completionProgressDelegate?.Cancel();
+            completionProgressDelegate = Schedule(delegate
+            {
+                var score = CreateScore();
+                if (DrawableRuleset.ReplayScore == null)
+                    scoreManager.Import(score).Wait();
+
+                this.Push(CreateResults(score));
+            });
         }
 
         #endregion
