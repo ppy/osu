@@ -14,8 +14,12 @@ namespace osu.Game.Rulesets.Scoring
     /// </summary>
     public class DrainingHealthProcessor : HealthProcessor
     {
-        private IBeatmap beatmap;
+        /// <summary>
+        /// A reasonable allowable error for the minimum health offset from <see cref="targetMinimumHealth"/>. A 1% error is unnoticeable.
+        /// </summary>
+        private const double minimum_health_error = 0.01;
 
+        private IBeatmap beatmap;
         private double gameplayEndTime;
 
         private List<(double time, double health)> healthIncreases;
@@ -74,49 +78,60 @@ namespace osu.Game.Rulesets.Scoring
             drainRate = 1;
 
             if (storeResults)
+                drainRate = computeDrainRate();
+        }
+
+        private double computeDrainRate()
+        {
+            if (healthIncreases == null || healthIncreases.Count == 0)
+                return 0;
+
+            int adjustment = 1;
+            double result = 1;
+
+            // Although we expect the following loop to converge within 30 iterations (health within 1/2^31 accuracy of the target),
+            // we'll still keep a safety measure to avoid infinite loops by detecting overflows.
+            while (adjustment > 0)
             {
-                int count = 1;
+                double currentHealth = 1;
+                double lowestHealth = 1;
+                int currentBreak = -1;
 
-                while (true)
+                for (int i = 0; i < healthIncreases.Count; i++)
                 {
-                    double currentHealth = 1;
-                    double lowestHealth = 1;
-                    int currentBreak = -1;
+                    double currentTime = healthIncreases[i].time;
+                    double lastTime = i > 0 ? healthIncreases[i - 1].time : GameplayStartTime;
 
-                    for (int i = 0; i < healthIncreases.Count; i++)
+                    // Subtract any break time from the duration since the last object
+                    if (beatmap.Breaks.Count > 0)
                     {
-                        double currentTime = healthIncreases[i].time;
-                        double lastTime = i > 0 ? healthIncreases[i - 1].time : GameplayStartTime;
+                        while (currentBreak + 1 < beatmap.Breaks.Count && beatmap.Breaks[currentBreak + 1].EndTime < currentTime)
+                            currentBreak++;
 
-                        // Subtract any break time from the duration since the last object
-                        if (beatmap.Breaks.Count > 0)
-                        {
-                            while (currentBreak + 1 < beatmap.Breaks.Count && beatmap.Breaks[currentBreak + 1].EndTime < currentTime)
-                                currentBreak++;
-
-                            if (currentBreak >= 0)
-                                lastTime = Math.Max(lastTime, beatmap.Breaks[currentBreak].EndTime);
-                        }
-
-                        // Apply health adjustments
-                        currentHealth -= (healthIncreases[i].time - lastTime) * drainRate;
-                        lowestHealth = Math.Min(lowestHealth, currentHealth);
-                        currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
-
-                        // Common scenario for when the drain rate is definitely too harsh
-                        if (lowestHealth < 0)
-                            break;
+                        if (currentBreak >= 0)
+                            lastTime = Math.Max(lastTime, beatmap.Breaks[currentBreak].EndTime);
                     }
 
-                    if (Math.Abs(lowestHealth - targetMinimumHealth) <= 0.01)
-                        break;
+                    // Apply health adjustments
+                    currentHealth -= (healthIncreases[i].time - lastTime) * result;
+                    lowestHealth = Math.Min(lowestHealth, currentHealth);
+                    currentHealth = Math.Min(1, currentHealth + healthIncreases[i].health);
 
-                    count *= 2;
-                    drainRate += 1.0 / count * Math.Sign(lowestHealth - targetMinimumHealth);
+                    // Common scenario for when the drain rate is definitely too harsh
+                    if (lowestHealth < 0)
+                        break;
                 }
+
+                // Stop if the resulting health is within a reasonable offset from the target
+                if (Math.Abs(lowestHealth - targetMinimumHealth) <= minimum_health_error)
+                    break;
+
+                // This effectively works like a binary search - each iteration the search space moves closer to the the target, but may exceed it.
+                adjustment *= 2;
+                result += 1.0 / adjustment * Math.Sign(lowestHealth - targetMinimumHealth);
             }
 
-            healthIncreases.Clear();
+            return result;
         }
     }
 }
