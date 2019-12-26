@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModDeflate : OsuModeObjectScaleTween
+    public class OsuModDeflate : OsuModObjectScaleTween
     {
         public override string Name => "Deflate";
 

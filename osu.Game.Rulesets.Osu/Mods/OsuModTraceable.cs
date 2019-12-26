@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModeObjectScaleTween) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 
         public void ReadFromConfig(OsuConfigManager config)
