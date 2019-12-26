@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Scoring
     {
         private IBeatmap beatmap;
 
+        private double gameplayEndTime;
+
         private List<(double time, double health)> healthIncreases;
         private double targetMinimumHealth;
         private double drainRate = 1;
@@ -35,15 +37,20 @@ namespace osu.Game.Rulesets.Scoring
 
             if (!IsBreakTime.Value)
             {
-                // When jumping from before the gameplay start to after it or vice-versa, we only want to consider any drain since the gameplay start time
-                double lastTime = Math.Max(GameplayStartTime, Time.Current - Time.Elapsed);
-                Health.Value -= drainRate * (Time.Current - lastTime);
+                // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
+                double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, GameplayStartTime, gameplayEndTime);
+                double currentGameplayTime = Math.Clamp(Time.Current, GameplayStartTime, gameplayEndTime);
+
+                Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
             }
         }
 
         public override void ApplyBeatmap(IBeatmap beatmap)
         {
             this.beatmap = beatmap;
+
+            if (beatmap.HitObjects.Count > 0)
+                gameplayEndTime = beatmap.HitObjects[^1].GetEndTime();
 
             healthIncreases = new List<(double time, double health)>();
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.70, 0.30);
