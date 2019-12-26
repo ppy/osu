@@ -3,7 +3,9 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -11,58 +13,93 @@ namespace osu.Game.Overlays
     {
         protected readonly OverlayHeaderTabControl TabControl;
 
-        private const float cover_height = 150;
-        private const float cover_info_height = 75;
+        private readonly Box titleBackground;
+        private readonly Box controlBackground;
+        private readonly Container background;
+
+        protected Color4 TitleBackgroundColour
+        {
+            set => titleBackground.Colour = value;
+        }
+
+        protected Color4 ControlBackgroundColour
+        {
+            set => controlBackground.Colour = value;
+        }
+
+        protected float BackgroundHeight
+        {
+            set => background.Height = value;
+        }
 
         protected OverlayHeader()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            AddRange(new[]
+            FillFlowContainer flow;
+
+            Add(flow = new FillFlowContainer
             {
-                new Container
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = cover_height,
-                    Masking = true,
-                    Child = CreateBackground()
-                },
-                new Container
-                {
-                    Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
-                    Y = cover_height,
-                    Height = cover_info_height,
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.BottomLeft,
-                    Depth = -float.MaxValue,
-                    Children = new Drawable[]
+                    background = new Container
                     {
-                        CreateTitle().With(t => t.X = -ScreenTitle.ICON_WIDTH),
-                        TabControl = new OverlayHeaderTabControl
+                        RelativeSizeAxes = Axes.X,
+                        Height = 80,
+                        Masking = true,
+                        Child = CreateBackground()
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = cover_info_height - 30,
-                            Margin = new MarginPadding { Left = -UserProfileOverlay.CONTENT_X_MARGIN },
-                            Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN }
+                            titleBackground = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Gray,
+                            },
+                            CreateTitle().With(title =>
+                            {
+                                title.Margin = new MarginPadding
+                                {
+                                    Vertical = 5,
+                                    Left = UserProfileOverlay.CONTENT_X_MARGIN
+                                };
+                            })
+                        }
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            controlBackground = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Gray,
+                            },
+                            TabControl = new OverlayHeaderTabControl
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 30,
+                                Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                            }
                         }
                     }
                 }
             });
 
             if (CreateContent != null)
-            {
-                Add(new Container
-                {
-                    Margin = new MarginPadding { Top = cover_height },
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Child = CreateContent
-                });
-            };
+                flow.Add(CreateContent);
         }
 
         protected abstract Drawable CreateBackground();
