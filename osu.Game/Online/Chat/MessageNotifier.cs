@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Logging;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
@@ -31,9 +32,6 @@ namespace osu.Game.Online.Chat
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnChat;
         private Bindable<string> highlightWords;
@@ -45,22 +43,59 @@ namespace osu.Game.Online.Chat
         public bool IsActive => chatOverlay?.IsPresent == true;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, OsuConfigManager config, IAPIProvider api)
+        private void load(OsuConfigManager config, IAPIProvider api)
         {
             notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
             notifyOnChat = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
             highlightWords = config.GetBindable<string>(OsuSetting.HighlightWords);
             localUser = api.LocalUser;
+
+            // Listen for new messages
+
+            channelManager.JoinedChannels.ItemsAdded += (joinedChannels) =>
+            {
+                foreach (var channel in joinedChannels)
+                    channel.NewMessagesArrived += channel_NewMessagesArrived;
+            };
+
+            channelManager.JoinedChannels.ItemsRemoved += (leftChannels) =>
+            {
+                foreach (var channel in leftChannels)
+                    channel.NewMessagesArrived -= channel_NewMessagesArrived;
+            };
+        }
+
+        private void channel_NewMessagesArrived(IEnumerable<Message> messages, bool populated)
+        {
+            if (messages == null || !messages.Any())
+                return;
+
+            if (!populated)
+                return;
+
+            HandleMessages(messages.First().ChannelId, messages);
+        }
+
+        /// <remarks>
+        /// Resolves the channel id
+        /// </remarks>
+        public void HandleMessages(long channelId, IEnumerable<Message> messages)
+        {
+            var channel = channelManager.JoinedChannels.FirstOrDefault(c => c.Id == channelId);
+
+            if (channel == null)
+            {
+                Logger.Log($"Couldn't resolve channel id {channelId}", LoggingTarget.Information);
+                return;
+            }
+
+            HandleMessages(channel, messages);
         }
 
         public void HandleMessages(Channel channel, IEnumerable<Message> messages)
         {
             // don't show if visible or not visible
             if (IsActive && channelManager.CurrentChannel.Value == channel)
-                return;
-
-            var channelDrawable = chatOverlay.GetChannelDrawable(channel);
-            if (channelDrawable == null)
                 return;
 
             foreach (var message in messages)
@@ -73,20 +108,17 @@ namespace osu.Game.Online.Chat
 
                 void onClick()
                 {
-                    if (channelManager != null)
-                        channelManager.CurrentChannel.Value = channel;
-
-                    channelDrawable.ScrollToAndHighlightMessage(message);
+                    chatOverlay.ScrollToAndHighlightMessage(channel, message);
+                    chatOverlay.Show();
                 }
 
                 if (notifyOnChat.Value && channel.Type == ChannelType.PM)
                 {
-                    var username = message.Sender.Username;
-                    var existingNotification = notificationOverlay.Notifications.OfType<PrivateMessageNotification>().FirstOrDefault(n => n.Username == username);
+                    var existingNotification = notificationOverlay.Notifications.OfType<PrivateMessageNotification>().FirstOrDefault(n => n.Username == message.Sender.Username);
 
                     if (existingNotification == null)
                     {
-                        var notification = new PrivateMessageNotification(username, onClick);
+                        var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
                         notificationOverlay?.Post(notification);
                     }
                     else
@@ -139,13 +171,12 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
+            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
-                    chatOverlay.Show();
                     onClick?.Invoke();
 
                     return true;

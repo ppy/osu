@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Chat
                 },
             };
 
-            newMessagesArrived(Channel.Messages);
+            newMessagesArrived(Channel.Messages, Channel.Populated);
 
             Channel.NewMessagesArrived += newMessagesArrived;
             Channel.MessageRemoved += messageRemoved;
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Chat
             Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
-        private void newMessagesArrived(IEnumerable<Message> newMessages)
+        private void newMessagesArrived(IEnumerable<Message> newMessages, bool populated)
         {
             bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
 
@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.Chat
 
             var chatLine = findChatLine(message);
             scroll.ScrollTo(chatLine);
-            chatLine.FlashColour(HighlightColour, 5000, Easing.InExpo);
+            chatLine.FlashColour(HighlightColour, 7500, Easing.InExpo);
         }
 
         private void messageRemoved(Message removed)

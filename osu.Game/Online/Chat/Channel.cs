@@ -44,7 +44,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// An event that fires when new messages arrived.
         /// </summary>
-        public event Action<IEnumerable<Message>> NewMessagesArrived;
+        public event Action<IEnumerable<Message>, bool> NewMessagesArrived;
 
         /// <summary>
         /// An event that fires when a pending message gets resolved.
@@ -57,6 +57,11 @@ namespace osu.Game.Online.Chat
         public event Action<Message> MessageRemoved;
 
         public bool ReadOnly => false; //todo not yet used.
+
+        /// <summary>
+        /// Determines if the channel's previous messages have been loaded.
+        /// </summary>
+        public bool Populated { get; set; } = false;
 
         public override string ToString() => Name;
 
@@ -105,7 +110,7 @@ namespace osu.Game.Online.Chat
             pendingMessages.Add(message);
             Messages.Add(message);
 
-            NewMessagesArrived?.Invoke(new[] { message });
+            NewMessagesArrived?.Invoke(new[] { message }, Populated);
         }
 
         public bool MessagesLoaded;
@@ -118,17 +123,21 @@ namespace osu.Game.Online.Chat
         {
             messages = messages.Except(Messages).ToArray();
 
-            if (messages.Length == 0) return;
+            if (messages.Length != 0)
+            {
+                Messages.AddRange(messages);
 
-            Messages.AddRange(messages);
+                var maxMessageId = messages.Max(m => m.Id);
+                if (maxMessageId > LastMessageId)
+                    LastMessageId = maxMessageId;
 
-            var maxMessageId = messages.Max(m => m.Id);
-            if (maxMessageId > LastMessageId)
-                LastMessageId = maxMessageId;
+                purgeOldMessages();
 
-            purgeOldMessages();
+                NewMessagesArrived?.Invoke(messages, Populated);
+            }
 
-            NewMessagesArrived?.Invoke(messages);
+            if (!Populated)
+                Populated = true;
         }
 
         /// <summary>
