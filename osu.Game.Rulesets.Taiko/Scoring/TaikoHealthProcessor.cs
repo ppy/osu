@@ -9,6 +9,10 @@ using osu.Game.Rulesets.Taiko.Objects;
 
 namespace osu.Game.Rulesets.Taiko.Scoring
 {
+    /// <summary>
+    /// A <see cref="HealthProcessor"/> for the taiko ruleset.
+    /// Taiko fails if the player has not half-filled their health by the end of the map.
+    /// </summary>
     public class TaikoHealthProcessor : AccumulatingHealthProcessor
     {
         /// <summary>
@@ -41,6 +45,5 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
         protected override double GetHealthIncreaseFor(JudgementResult result)
             => base.GetHealthIncreaseFor(result) * (result.Type == HitResult.Miss ? hpMissMultiplier : hpMultiplier);
-
     }
 }
