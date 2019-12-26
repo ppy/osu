@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override Drawable CreateBackground() => new HeaderBackground();
 
-        protected override Drawable CreateContent() => new Container
+        protected override Drawable CreateContent => new Container
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,

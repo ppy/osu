@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile
                 }
             };
 
-        protected override Drawable CreateContent() => new FillFlowContainer
+        protected override Drawable CreateContent => new FillFlowContainer
         {
             RelativeSizeAxes = Axes.X,
             AutoSizeAxes = Axes.Y,

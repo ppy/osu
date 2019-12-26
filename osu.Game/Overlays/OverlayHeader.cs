@@ -19,7 +19,7 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
+            AddRange(new[]
             {
                 new Container
                 {
@@ -50,20 +50,24 @@ namespace osu.Game.Overlays
                             Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN }
                         }
                     }
-                },
-                new Container
+                }
+            });
+
+            if (CreateContent != null)
+            {
+                Add(new Container
                 {
                     Margin = new MarginPadding { Top = cover_height },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Child = CreateContent()
-                }
+                    Child = CreateContent
+                });
             };
         }
 
         protected abstract Drawable CreateBackground();
 
-        protected abstract Drawable CreateContent();
+        protected virtual Drawable CreateContent => null;
 
         protected abstract ScreenTitle CreateTitle();
     }
