@@ -541,8 +541,14 @@ namespace osu.Game.Screens.Play
         {
             if (completionProgressDelegate != null && !completionProgressDelegate.Cancelled && !completionProgressDelegate.Completed)
             {
-                // proceed to result screen if beatmap already finished playing
-                completionProgressDelegate.RunTask();
+                // Proceed to result screen if beatmap already finished playing.
+                // This is scheduled since the player needs to become the current screen before the delegate runs. This happens after the return true.
+                Scheduler.Add(() =>
+                {
+                    if (!completionProgressDelegate.Completed && !completionProgressDelegate.Cancelled)
+                        completionProgressDelegate.RunTask();
+                });
+
                 return true;
             }
 
