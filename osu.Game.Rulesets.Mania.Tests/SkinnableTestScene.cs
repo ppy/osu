@@ -2,13 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
 
