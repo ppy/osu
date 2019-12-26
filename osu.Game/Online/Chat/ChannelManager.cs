@@ -49,10 +49,6 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
-
-        [Resolved]
-        private MessageNotifier messageNotifier { get; set; }
-
         public readonly BindableBool HighPollRate = new BindableBool();
 
         public ChannelManager()
@@ -258,7 +254,6 @@ namespace osu.Game.Online.Chat
 
                 var groupArray = group.ToArray();
                 channel.AddNewMessages(groupArray);
-                messageNotifier.HandleMessages(channel, groupArray);
             }
         }
 
