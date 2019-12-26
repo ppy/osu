@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Mods
 
         private BindableNumber<double> health;
 
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
+
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 0.5f;
