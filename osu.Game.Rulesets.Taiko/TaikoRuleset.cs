@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new TaikoScoreProcessor(beatmap);
 
+        public override HealthProcessor CreateHealthProcessor(IBeatmap beatmap) => new TaikoHealthProcessor(beatmap);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 
         public const string SHORT_NAME = "taiko";
