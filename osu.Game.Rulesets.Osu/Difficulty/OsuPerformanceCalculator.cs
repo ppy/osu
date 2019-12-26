@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 multiplier *= 0.90;
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 1.0f - Math.Pow((float)countSpinners / beatmapMaxCombo, 0.85f);
+                multiplier *= 1.0 - Math.Pow((double)countSpinners / beatmapMaxCombo, 0.85);
 
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
