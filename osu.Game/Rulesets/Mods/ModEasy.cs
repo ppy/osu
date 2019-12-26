@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 
@@ -18,9 +19,16 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
 
-        private int retries = 2;
+        [SettingSource("Extra Lives", "Number of extra lives")]
+        public Bindable<int> Retries { get; } = new BindableInt(2)
+        {
+            MinValue = 0,
+            MaxValue = 10
+        };
+
+        private int retries;
 
         private BindableNumber<double> health;
 
@@ -31,6 +39,8 @@ namespace osu.Game.Rulesets.Mods
             difficulty.ApproachRate *= ratio;
             difficulty.DrainRate *= ratio;
             difficulty.OverallDifficulty *= ratio;
+
+            retries = Retries.Value;
         }
 
         public bool AllowFail
