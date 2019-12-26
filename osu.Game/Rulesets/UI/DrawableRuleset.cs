@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(textureStore);
 
                 localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
-                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
+                dependencies.CacheAs<ISampleStore>(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
             }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();

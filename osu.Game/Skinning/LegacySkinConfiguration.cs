@@ -3,7 +3,7 @@
 
 namespace osu.Game.Skinning
 {
-    public class LegacySkinConfiguration : DefaultSkinConfiguration
+    public class LegacySkinConfiguration : SkinConfiguration
     {
         public const decimal LATEST_VERSION = 2.7m;
 

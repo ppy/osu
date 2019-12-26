@@ -13,13 +13,12 @@ namespace osu.Game.Skinning
             : base(Info, storage, audioManager, string.Empty)
         {
             Configuration.CustomColours["SliderBall"] = new Color4(2, 170, 255, 255);
-            Configuration.ComboColours.AddRange(new[]
-            {
+            Configuration.AddComboColours(
                 new Color4(255, 192, 0, 255),
                 new Color4(0, 202, 0, 255),
                 new Color4(18, 124, 255, 255),
-                new Color4(242, 24, 57, 255),
-            });
+                new Color4(242, 24, 57, 255)
+            );
 
             Configuration.LegacyVersion = 2.0m;
         }
