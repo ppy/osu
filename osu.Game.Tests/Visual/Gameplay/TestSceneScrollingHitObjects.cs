@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual.Gameplay
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[0] = new TestPlayfield()
                         },
-                        scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Down)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[1] = new TestPlayfield()
@@ -53,12 +53,12 @@ namespace osu.Game.Tests.Visual.Gameplay
                     },
                     new Drawable[]
                     {
-                        scrollContainers[2] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        scrollContainers[2] = new ScrollingTestContainer(ScrollingDirection.Left)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[2] = new TestPlayfield()
                         },
-                        scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Right)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Child = playfields[3] = new TestPlayfield()
@@ -207,7 +207,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestDrawableHitObject(double time)
                 : base(new HitObject { StartTime = time })
             {
-                Origin = Anchor.Centre;
+                Origin = Anchor.Custom;
+                OriginPosition = new Vector2(75 / 4.0f);
+
                 AutoSizeAxes = Axes.Both;
 
                 AddInternal(new Box { Size = new Vector2(75) });
