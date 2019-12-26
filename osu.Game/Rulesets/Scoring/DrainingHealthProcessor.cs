@@ -105,6 +105,7 @@ namespace osu.Game.Rulesets.Scoring
                     // Subtract any break time from the duration since the last object
                     if (beatmap.Breaks.Count > 0)
                     {
+                        // Advance the last break occuring before the current time
                         while (currentBreak + 1 < beatmap.Breaks.Count && beatmap.Breaks[currentBreak + 1].EndTime < currentTime)
                             currentBreak++;
 
@@ -126,7 +127,7 @@ namespace osu.Game.Rulesets.Scoring
                 if (Math.Abs(lowestHealth - targetMinimumHealth) <= minimum_health_error)
                     break;
 
-                // This effectively works like a binary search - each iteration the search space moves closer to the the target, but may exceed it.
+                // This effectively works like a binary search - each iteration the search space moves closer to the target, but may exceed it.
                 adjustment *= 2;
                 result += 1.0 / adjustment * Math.Sign(lowestHealth - targetMinimumHealth);
             }
