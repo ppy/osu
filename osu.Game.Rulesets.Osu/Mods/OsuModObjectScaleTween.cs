@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     /// <summary>
     /// Adjusts the size of hit objects during their fade in animation.
     /// </summary>
-    public abstract class OsuModeObjectScaleTween : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
+    public abstract class OsuModObjectScaleTween : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override ModType Type => ModType.Fun;
 
