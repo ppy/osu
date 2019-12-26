@@ -8,6 +8,7 @@ using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
@@ -172,6 +173,13 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            validateNubPosition();
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -181,9 +189,28 @@ namespace osu.Game.Graphics.UserInterface
                 DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
-        protected override void UpdateValue(float value)
+        protected override void UpdateValue(float value) => nubPositionCache.Invalidate();
+
+        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+            bool alreadyInvalidated = base.Invalidate(invalidation, source, shallPropagate);
+
+            if ((invalidation & Invalidation.DrawSize) > 0)
+                alreadyInvalidated &= !nubPositionCache.Invalidate();
+
+            return alreadyInvalidated;
+        }
+
+        private readonly Cached nubPositionCache = new Cached();
+
+        private void validateNubPosition()
+        {
+            if (nubPositionCache.IsValid)
+                return;
+
+            Nub.MoveToX(RangePadding + UsableWidth * NormalizedValue, 250, Easing.OutQuint);
+
+            nubPositionCache.Validate();
         }
 
         /// <summary>
