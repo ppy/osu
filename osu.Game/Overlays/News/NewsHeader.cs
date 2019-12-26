@@ -63,8 +63,6 @@ namespace osu.Game.Overlays.News
 
         protected override Drawable CreateBackground() => new NewsHeaderBackground();
 
-        protected override Drawable CreateContent() => new Container();
-
         protected override ScreenTitle CreateTitle() => title = new NewsHeaderTitle();
 
         private class NewsHeaderBackground : Sprite
