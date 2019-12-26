@@ -46,6 +46,7 @@
     *   osu默认字号:16
         *   特殊
             *  [玩家信息界面:186](./osu.Game/Overlays/Profile/Header/TopHeaderContainer.cs):15->17
+**已在[osu默认字体设置](osu.Game/Graphics/OsuFont.cs)里面更改为默认20**
 
 ## 2019/12/23
 * 翻译补全
@@ -129,6 +130,10 @@
     *   [HUD>视觉设置](osu.Game/Screens/Play/PlayerSettings/VisualSettings.cs)
         *   (行13):从"可见度设置"变为"视觉效果设置"
 
+## 2019/12/26
+* 翻译重置:
+    *   [多人创建房间的标题](osu.Game/Screens/Multi/Multiplayer.cs)
+        *   (行116)翻译重置为`<玩家名>'s awesome room`
 # 待定版测试
 | 开始时间 | 结束时间 | 版本 |
 | :--: | :--: | :--: |
