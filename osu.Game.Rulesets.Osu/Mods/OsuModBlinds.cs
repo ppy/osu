@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToScoreProcessor
+    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
         public override string Description => "Play with blinds on your screen.";
@@ -37,9 +37,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
         }
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
+            healthProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;

@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     EndTime = 6000,
                 },
                 // placeholder object to avoid hitting the results screen
-                new HitObject
+                new HitCircle
                 {
                     StartTime = 99999,
                 }
