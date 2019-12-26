@@ -14,13 +14,13 @@ namespace osu.Game.Rulesets.Mods
         /// Called when a beatmap is changed. Can be used to read default values.
         /// Any changes made will not be preserved.
         /// </summary>
-        /// <param name="difficulty"></param>
+        /// <param name="difficulty">The difficulty to read from.</param>
         void ReadFromDifficulty(BeatmapDifficulty difficulty);
 
         /// <summary>
         /// Called post beatmap conversion. Can be used to apply changes to difficulty attributes.
         /// </summary>
-        /// <param name="difficulty"></param>
+        /// <param name="difficulty">The difficulty to mutate.</param>
         void ApplyToDifficulty(BeatmapDifficulty difficulty);
     }
 }
