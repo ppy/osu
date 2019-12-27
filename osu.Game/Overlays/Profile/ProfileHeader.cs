@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
+            BackgroundHeight = 150;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("Info");
@@ -38,6 +40,8 @@ namespace osu.Game.Overlays.Profile
         private void load(OsuColour colours)
         {
             TabControl.AccentColour = colours.Seafoam;
+            TitleBackgroundColour = colours.GreySeafoamDarker;
+            ControlBackgroundColour = colours.GreySeafoam;
         }
 
         protected override Drawable CreateBackground() =>
@@ -110,6 +114,8 @@ namespace osu.Game.Overlays.Profile
             {
                 AccentColour = colours.Seafoam;
             }
+
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }

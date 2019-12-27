@@ -16,7 +16,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         public const float ICON_WIDTH = ICON_SIZE + spacing;
 
-        public const float ICON_SIZE = 30;
+        public const float ICON_SIZE = 25;
         private const float spacing = 6;
         private const int text_offset = 2;
 
