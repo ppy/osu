@@ -131,10 +131,12 @@ namespace osu.Game.Screens.Play
 
             DrawableRuleset = ruleset.CreateDrawableRulesetWith(playableBeatmap, Mods.Value);
 
-            ScoreProcessor = ruleset.CreateScoreProcessor(playableBeatmap);
+            ScoreProcessor = ruleset.CreateScoreProcessor();
+            ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
-            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap);
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
+            HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
@@ -206,12 +208,6 @@ namespace osu.Game.Screens.Play
         {
             target.AddRange(new[]
             {
-                BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Breaks = working.Beatmap.Breaks
-                },
                 // display the cursor above some HUD elements.
                 DrawableRuleset.Cursor?.CreateProxy() ?? new Container(),
                 DrawableRuleset.ResumeOverlay?.CreateProxy() ?? new Container(),
@@ -266,6 +262,18 @@ namespace osu.Game.Screens.Play
                 },
                 failAnimation = new FailAnimation(DrawableRuleset) { OnComplete = onFailComplete, }
             });
+
+            DrawableRuleset.Overlays.Add(BreakOverlay = new BreakOverlay(working.Beatmap.BeatmapInfo.LetterboxInBreaks, DrawableRuleset.GameplayStartTime, ScoreProcessor)
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Breaks = working.Beatmap.Breaks
+            });
+
+            DrawableRuleset.Overlays.Add(ScoreProcessor);
+            DrawableRuleset.Overlays.Add(HealthProcessor);
+
+            HealthProcessor.IsBreakTime.BindTo(BreakOverlay.IsBreakTime);
         }
 
         private void updatePauseOnFocusLostState() =>

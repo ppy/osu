@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -64,15 +63,9 @@ namespace osu.Game.Rulesets.Scoring
 
         private double scoreMultiplier = 1;
 
-        public ScoreProcessor(IBeatmap beatmap)
-            : base(beatmap)
+        public ScoreProcessor()
         {
             Debug.Assert(base_portion + combo_portion == 1.0);
-        }
-
-        protected override void ApplyBeatmap(IBeatmap beatmap)
-        {
-            base.ApplyBeatmap(beatmap);
 
             Combo.ValueChanged += combo => HighestCombo.Value = Math.Max(HighestCombo.Value, combo.NewValue);
             Accuracy.ValueChanged += accuracy =>
@@ -81,12 +74,6 @@ namespace osu.Game.Rulesets.Scoring
                 foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
                     Rank.Value = mod.AdjustRank(Rank.Value, accuracy.NewValue);
             };
-
-            if (maxBaseScore == 0 || maxHighestCombo == 0)
-            {
-                Mode.Value = ScoringMode.Classic;
-                Mode.Disabled = true;
-            }
 
             Mode.ValueChanged += _ => updateScore();
             Mods.ValueChanged += mods =>
@@ -225,6 +212,12 @@ namespace osu.Game.Rulesets.Scoring
             {
                 maxHighestCombo = HighestCombo.Value;
                 maxBaseScore = baseScore;
+
+                if (maxBaseScore == 0 || maxHighestCombo == 0)
+                {
+                    Mode.Value = ScoringMode.Classic;
+                    Mode.Disabled = true;
+                }
             }
 
             baseScore = 0;
