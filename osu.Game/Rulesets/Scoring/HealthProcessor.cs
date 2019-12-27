@@ -4,12 +4,11 @@
 using System;
 using osu.Framework.Bindables;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public class HealthProcessor : JudgementProcessor
+    public abstract class HealthProcessor : JudgementProcessor
     {
         /// <summary>
         /// Invoked when the <see cref="ScoreProcessor"/> is in a failed state.
@@ -28,14 +27,14 @@ namespace osu.Game.Rulesets.Scoring
         public readonly BindableDouble Health = new BindableDouble(1) { MinValue = 0, MaxValue = 1 };
 
         /// <summary>
+        /// Whether gameplay is currently in a break.
+        /// </summary>
+        public readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+
+        /// <summary>
         /// Whether this ScoreProcessor has already triggered the failed state.
         /// </summary>
         public bool HasFailed { get; private set; }
-
-        public HealthProcessor(IBeatmap beatmap)
-            : base(beatmap)
-        {
-        }
 
         protected override void ApplyResultInternal(JudgementResult result)
         {
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Scoring
             if (HasFailed)
                 return;
 
-            Health.Value += HealthAdjustmentFactorFor(result) * result.Judgement.HealthIncreaseFor(result);
+            Health.Value += GetHealthIncreaseFor(result);
 
             if (!DefaultFailCondition && FailConditions?.Invoke(this, result) != true)
                 return;
@@ -62,11 +61,11 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// An adjustment factor which is multiplied into the health increase provided by a <see cref="JudgementResult"/>.
+        /// Retrieves the health increase for a <see cref="JudgementResult"/>.
         /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> for which the adjustment should apply.</param>
-        /// <returns>The adjustment factor.</returns>
-        protected virtual double HealthAdjustmentFactorFor(JudgementResult result) => 1;
+        /// <param name="result">The <see cref="JudgementResult"/>.</param>
+        /// <returns>The health increase.</returns>
+        protected virtual double GetHealthIncreaseFor(JudgementResult result) => result.Judgement.HealthIncreaseFor(result);
 
         /// <summary>
         /// The default conditions for failing.
