@@ -76,6 +76,16 @@ namespace osu.Game.Tests.Gameplay
         }
 
         [Test]
+        public void TestHealthGainedAfterRewind()
+        {
+            createProcessor(createBeatmap(0, 1000));
+            setTime(500);
+
+            setTime(0);
+            assertHealthEqualTo(1);
+        }
+
+        [Test]
         public void TestHealthGainedOnHit()
         {
             Beatmap beatmap = createBeatmap(0, 1000);
