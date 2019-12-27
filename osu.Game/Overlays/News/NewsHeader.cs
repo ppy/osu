@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.News
 {
     public class NewsHeader : OverlayHeader
     {
-        private const string front_page_string = "Front Page";
+        private const string front_page_string = "frontpage";
 
         private NewsHeaderTitle title;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.News
                     ShowFrontPage?.Invoke();
             };
 
-            Current.ValueChanged += showArticle;
+            Current.ValueChanged += showPost;
         }
 
         [BackgroundDependencyLoader]
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.News
             TabControl.AccentColour = colour.Violet;
         }
 
-        private void showArticle(ValueChangedEvent<string> e)
+        private void showPost(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
                 TabControl.RemoveItem(e.OldValue);
@@ -52,12 +52,12 @@ namespace osu.Game.Overlays.News
                 TabControl.AddItem(e.NewValue);
                 TabControl.Current.Value = e.NewValue;
 
-                title.IsReadingArticle = true;
+                title.IsReadingPost = true;
             }
             else
             {
                 TabControl.Current.Value = front_page_string;
-                title.IsReadingArticle = false;
+                title.IsReadingPost = false;
             }
         }
 
@@ -84,17 +84,17 @@ namespace osu.Game.Overlays.News
 
         private class NewsHeaderTitle : ScreenTitle
         {
-            private const string article_string = "Article";
+            private const string post_string = "post";
 
-            public bool IsReadingArticle
+            public bool IsReadingPost
             {
-                set => Section = value ? article_string : front_page_string;
+                set => Section = value ? post_string : front_page_string;
             }
 
             public NewsHeaderTitle()
             {
-                Title = "News";
-                IsReadingArticle = false;
+                Title = "news";
+                IsReadingPost = false;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
