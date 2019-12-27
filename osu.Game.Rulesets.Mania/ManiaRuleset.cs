@@ -39,6 +39,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ManiaScoreProcessor(beatmap);
 
+        public override HealthProcessor CreateHealthProcessor(IBeatmap beatmap) => new ManiaHealthProcessor(beatmap);
+
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap, this);
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new ManiaPerformanceCalculator(this, beatmap, score);
