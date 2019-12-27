@@ -26,7 +26,9 @@ using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
 using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Mania.Scoring;
+using osu.Game.Rulesets.Mania.Skinning;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania
@@ -46,6 +48,8 @@ namespace osu.Game.Rulesets.Mania
         public const string SHORT_NAME = "mania";
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new ManiaLegacySkinTransformer(source);
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
