@@ -82,12 +82,12 @@ namespace osu.Game.Rulesets.Mods
 
             userChangedSettings.TryAdd(bindable, false);
 
+            bindable.Default = beatmapDefault;
+
             // users generally choose a difficulty setting and want it to stick across multiple beatmap changes.
             // we only want to value transfer if the user hasn't changed the value previously.
             if (!userChangedSettings[bindable])
-            {
-                bindable.Value = bindable.Default = beatmapDefault;
-            }
+                bindable.Value = beatmapDefault;
 
             bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
         }
