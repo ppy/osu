@@ -38,8 +38,6 @@ namespace osu.Game.Rulesets.Osu
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
 
-        public override HealthProcessor CreateHealthProcessor(IBeatmap beatmap) => new OsuHealthProcessor(beatmap);
-
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
 
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
