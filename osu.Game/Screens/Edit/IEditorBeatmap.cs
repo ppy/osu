@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// Interface for the <see cref="IBeatmap"/> contained by the see <see cref="HitObjectComposer"/>.
-    /// Children of <see cref="HitObjectComposer"/> may resolve the beatmap via <see cref="IEditorBeatmap"/> or <see cref="IEditorBeatmap{T}"/>.
+    /// Children of <see cref="HitObjectComposer"/> may resolve the beatmap via <see cref="IEditorBeatmap"/>.
     /// </summary>
     public interface IEditorBeatmap : IBeatmap
     {
@@ -25,17 +25,8 @@ namespace osu.Game.Screens.Edit
         event Action<HitObject> HitObjectRemoved;
 
         /// <summary>
-        /// Invoked when the start time of a <see cref="HitObject"/> in this <see cref="EditorBeatmap{T}"/> was changed.
+        /// Invoked when the start time of a <see cref="HitObject"/> in this <see cref="EditorBeatmap"/> was changed.
         /// </summary>
         event Action<HitObject> StartTimeChanged;
-    }
-
-    /// <summary>
-    /// Interface for the <see cref="IBeatmap"/> contained by the see <see cref="HitObjectComposer"/>.
-    /// Children of <see cref="HitObjectComposer"/> may resolve the beatmap via <see cref="IEditorBeatmap"/> or <see cref="IEditorBeatmap{T}"/>.
-    /// </summary>
-    public interface IEditorBeatmap<out T> : IEditorBeatmap, IBeatmap<T>
-        where T : HitObject
-    {
     }
 }
