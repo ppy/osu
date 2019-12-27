@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         private ScheduledDelegate hitObjectSpawnDelegate;
 
         [SetUp]
-        public void Setup()
+        public void Setup() => Schedule(() =>
         {
             Child = new GridContainer
             {
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             };
 
             setUpHitObjects();
-        }
+        });
 
         private void setUpHitObjects()
         {
