@@ -28,7 +28,7 @@ namespace osu.Game.Tests.Online
 
         [TestCase(true)]
         [TestCase(false)]
-        public void TestCancelDownloadFromRequest(bool closeFromRequest)
+        public void TestCancelDownloadRequest(bool closeFromRequest)
         {
             AddStep("download beatmap", () => beatmaps.Download(test_model));
 
