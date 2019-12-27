@@ -25,28 +25,33 @@ namespace osu.Game.Rulesets.Mania.Skinning
             switch (component)
             {
                 case GameplaySkinComponent<HitResult> resultComponent:
-                    switch (resultComponent.Component)
-                    {
-                        case HitResult.Miss:
-                            return this.GetAnimation("mania-hit0", true, true);
+                    return getResult(resultComponent);
+            }
 
-                        case HitResult.Meh:
-                            return this.GetAnimation("mania-hit50", true, true);
+            return null;
+        }
 
-                        case HitResult.Ok:
-                            return this.GetAnimation("mania-hit100", true, true);
+        private Drawable getResult(GameplaySkinComponent<HitResult> resultComponent)
+        {
+            switch (resultComponent.Component)
+            {
+                case HitResult.Miss:
+                    return this.GetAnimation("mania-hit0", true, true);
 
-                        case HitResult.Good:
-                            return this.GetAnimation("mania-hit200", true, true);
+                case HitResult.Meh:
+                    return this.GetAnimation("mania-hit50", true, true);
 
-                        case HitResult.Great:
-                            return this.GetAnimation("mania-hit300", true, true);
+                case HitResult.Ok:
+                    return this.GetAnimation("mania-hit100", true, true);
 
-                        case HitResult.Perfect:
-                            return this.GetAnimation("mania-hit300g", true, true);
-                    }
+                case HitResult.Good:
+                    return this.GetAnimation("mania-hit200", true, true);
 
-                    break;
+                case HitResult.Great:
+                    return this.GetAnimation("mania-hit300", true, true);
+
+                case HitResult.Perfect:
+                    return this.GetAnimation("mania-hit300g", true, true);
             }
 
             return null;
