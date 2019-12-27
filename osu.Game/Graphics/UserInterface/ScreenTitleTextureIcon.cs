@@ -33,6 +33,7 @@ namespace osu.Game.Graphics.UserInterface
                 Texture = textures.Get(textureName),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
+                FillMode = FillMode.Fit
             };
         }
     }

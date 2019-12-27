@@ -47,6 +47,8 @@ namespace osu.Game.Overlays.Changelog
         private void load(OsuColour colours)
         {
             TabControl.AccentColour = colours.Violet;
+            TitleBackgroundColour = colours.GreyVioletDarker;
+            ControlBackgroundColour = colours.GreyVioletDark;
         }
 
         private ChangelogHeaderTitle title;

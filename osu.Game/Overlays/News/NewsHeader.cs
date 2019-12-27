@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
@@ -37,9 +36,11 @@ namespace osu.Game.Overlays.News
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colours)
         {
-            TabControl.AccentColour = colour.Violet;
+            TabControl.AccentColour = colours.Violet;
+            TitleBackgroundColour = colours.GreyVioletDarker;
+            ControlBackgroundColour = colours.GreyVioletDark;
         }
 
         private void showPost(ValueChangedEvent<string> e)
@@ -62,8 +63,6 @@ namespace osu.Game.Overlays.News
         }
 
         protected override Drawable CreateBackground() => new NewsHeaderBackground();
-
-        protected override Drawable CreateContent() => new Container();
 
         protected override ScreenTitle CreateTitle() => title = new NewsHeaderTitle();
 
