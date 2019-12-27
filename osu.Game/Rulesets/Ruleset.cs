@@ -71,16 +71,16 @@ namespace osu.Game.Rulesets
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         /// <summary>
-        /// Creates a <see cref="ScoreProcessor"/> for a beatmap converted to this ruleset.
+        /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The score processor.</returns>
-        public virtual ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new ScoreProcessor(beatmap);
+        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
 
         /// <summary>
-        /// Creates a <see cref="HealthProcessor"/> for a beatmap converted to this ruleset.
+        /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
         /// </summary>
         /// <returns>The health processor.</returns>
-        public virtual HealthProcessor CreateHealthProcessor(IBeatmap beatmap) => new HealthProcessor(beatmap);
+        public virtual HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
