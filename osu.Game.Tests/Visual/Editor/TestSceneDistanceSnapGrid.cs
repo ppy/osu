@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Editor
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
 
-        [Cached(typeof(IEditorBeatmap))]
+        [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;
 
         [Cached(typeof(IDistanceSnapProvider))]
