@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         };
 
         [Cached(typeof(IEditorBeatmap))]
-        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
+        private readonly EditorBeatmap editorBeatmap;
 
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestSceneOsuDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
         }
 
         [SetUp]

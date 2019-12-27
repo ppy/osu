@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
-        private IEditorBeatmap<TObject> beatmap { get; set; }
+        private IEditorBeatmap beatmap { get; set; }
 
         public DrawableEditRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
