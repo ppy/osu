@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Changelog
 
             public ChangelogHeaderTitle()
             {
-                Title = "Changelog";
+                Title = "changelog";
                 Version = null;
             }
 
