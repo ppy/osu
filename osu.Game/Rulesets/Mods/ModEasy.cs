@@ -8,11 +8,10 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableFailOverride, IApplicableToScoreProcessor
+    public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableFailOverride, IApplicableToHealthProcessor
     {
         public override string Name => "Easy";
         public override string Acronym => "EZ";
@@ -61,11 +60,9 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            health = scoreProcessor.Health.GetBoundCopy();
+            health = healthProcessor.Health.GetBoundCopy();
         }
-
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
