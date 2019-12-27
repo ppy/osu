@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Scoring
         private IBeatmap beatmap;
         private double gameplayEndTime;
 
-        private List<(double time, double health)> healthIncreases;
+        private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
         private double targetMinimumHealth;
         private double drainRate = 1;
 
@@ -56,19 +56,15 @@ namespace osu.Game.Rulesets.Scoring
             if (beatmap.HitObjects.Count > 0)
                 gameplayEndTime = beatmap.HitObjects[^1].GetEndTime();
 
-            healthIncreases = new List<(double time, double health)>();
             targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.70, 0.30);
 
             base.ApplyBeatmap(beatmap);
-
-            // Only required during the simulation stage
-            healthIncreases = null;
         }
 
         protected override void ApplyResultInternal(JudgementResult result)
         {
             base.ApplyResultInternal(result);
-            healthIncreases?.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
+            healthIncreases.Add((result.HitObject.GetEndTime() + result.TimeOffset, GetHealthIncreaseFor(result)));
         }
 
         protected override void Reset(bool storeResults)
@@ -79,11 +75,13 @@ namespace osu.Game.Rulesets.Scoring
 
             if (storeResults)
                 drainRate = computeDrainRate();
+
+            healthIncreases.Clear();
         }
 
         private double computeDrainRate()
         {
-            if (healthIncreases == null || healthIncreases.Count == 0)
+            if (healthIncreases.Count == 0)
                 return 0;
 
             int adjustment = 1;
