@@ -118,8 +118,6 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
-
-            loadNewPlayer();
         }
 
         protected override void LoadComplete()
@@ -127,6 +125,21 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            loadNewPlayer();
+
+            content.ScaleTo(0.7f);
+            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
+
+            contentIn();
+
+            info.Delay(750).FadeIn(500);
+            this.Delay(1800).Schedule(pushWhenLoaded);
 
             if (!muteWarningShownOnce.Value)
             {
@@ -177,19 +190,6 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-
-            content.ScaleTo(0.7f);
-            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
-
-            contentIn();
-
-            info.Delay(750).FadeIn(500);
-            this.Delay(1800).Schedule(pushWhenLoaded);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
