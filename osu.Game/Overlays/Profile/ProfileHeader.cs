@@ -105,9 +105,8 @@ namespace osu.Game.Overlays.Profile
         {
             public ProfileHeaderTitle()
             {
-                Title = "Player";
-                Section = "Info";
-                X = -ICON_WIDTH;
+                Title = "player";
+                Section = "info";
             }
 
             [BackgroundDependencyLoader]
