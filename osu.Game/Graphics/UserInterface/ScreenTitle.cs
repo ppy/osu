@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -13,14 +14,14 @@ namespace osu.Game.Graphics.UserInterface
 {
     public abstract class ScreenTitle : CompositeDrawable, IHasAccentColour
     {
-        public const float ICON_WIDTH = ICON_SIZE + icon_spacing;
+        public const float ICON_WIDTH = ICON_SIZE + spacing;
 
         public const float ICON_SIZE = 25;
+        private const float spacing = 6;
+        private const int text_offset = 2;
 
         private SpriteIcon iconSprite;
         private readonly OsuSpriteText titleText, pageText;
-
-        private const float icon_spacing = 10;
 
         protected IconUsage Icon
         {
@@ -63,26 +64,35 @@ namespace osu.Game.Graphics.UserInterface
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Spacing = new Vector2(icon_spacing, 0),
+                    Spacing = new Vector2(spacing, 0),
+                    Direction = FillDirection.Horizontal,
                     Children = new[]
                     {
-                        CreateIcon(),
-                        new FillFlowContainer
+                        CreateIcon().With(t =>
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(6, 0),
-                            Children = new[]
-                            {
-                                titleText = new OsuSpriteText
-                                {
-                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
-                                },
-                                pageText = new OsuSpriteText
-                                {
-                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Light),
-                                }
-                            }
+                            t.Anchor = Anchor.Centre;
+                            t.Origin = Anchor.Centre;
+                        }),
+                        titleText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            Margin = new MarginPadding { Bottom = text_offset }
+                        },
+                        new Circle
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(4),
+                            Colour = Color4.Gray,
+                        },
+                        pageText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 20),
+                            Margin = new MarginPadding { Bottom = text_offset }
                         }
                     }
                 },
