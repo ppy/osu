@@ -89,9 +89,8 @@ namespace osu.Game.Overlays
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                RelativeSizeAxes = Axes.X,
-                                Height = 30,
-                                Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                                Height = 35,
+                                Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN }
                             }
                         }
                     },
