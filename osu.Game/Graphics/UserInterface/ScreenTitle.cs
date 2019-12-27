@@ -80,17 +80,12 @@ namespace osu.Game.Graphics.UserInterface
                             Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Bottom = text_offset }
                         },
-                        new CircularContainer
+                        new Circle
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Masking = true,
                             Size = new Vector2(4),
-                            Child = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
-                            }
+                            Colour = Color4.Gray,
                         },
                         pageText = new OsuSpriteText
                         {
