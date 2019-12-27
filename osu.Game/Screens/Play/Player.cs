@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Play
             ScoreProcessor.ApplyBeatmap(playableBeatmap);
             ScoreProcessor.Mods.BindTo(Mods);
 
-            HealthProcessor = ruleset.CreateHealthProcessor(DrawableRuleset.GameplayStartTime);
+            HealthProcessor = ruleset.CreateHealthProcessor(playableBeatmap.HitObjects[0].StartTime);
             HealthProcessor.ApplyBeatmap(playableBeatmap);
 
             if (!ScoreProcessor.Mode.Disabled)

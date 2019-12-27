@@ -16,10 +16,8 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Creates a new <see cref="AccumulatingHealthProcessor"/>.
         /// </summary>
-        /// <param name="gameplayStartTime">The gameplay start time.</param>
         /// <param name="requiredHealth">The minimum amount of health required to beatmap.</param>
-        public AccumulatingHealthProcessor(double gameplayStartTime, double requiredHealth)
-            : base(gameplayStartTime)
+        public AccumulatingHealthProcessor(double requiredHealth)
         {
             this.requiredHealth = requiredHealth;
         }

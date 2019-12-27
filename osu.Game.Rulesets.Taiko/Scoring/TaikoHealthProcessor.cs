@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         private double hpMissMultiplier;
 
-        public TaikoHealthProcessor(double gameplayStartTime)
-            : base(gameplayStartTime, 0.5)
+        public TaikoHealthProcessor()
+            : base(0.5)
         {
         }
 
