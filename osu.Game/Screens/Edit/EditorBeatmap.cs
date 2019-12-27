@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap : IEditorBeatmap
+    public class EditorBeatmap : IBeatmap
     {
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
@@ -29,12 +29,13 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public event Action<HitObject> StartTimeChanged;
 
-        private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
-        private readonly IBeatmap beatmap;
+        public readonly IBeatmap PlayableBeatmap;
 
-        public EditorBeatmap(IBeatmap beatmap)
+        private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
+
+        public EditorBeatmap(IBeatmap playableBeatmap)
         {
-            this.beatmap = beatmap;
+            PlayableBeatmap = playableBeatmap;
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
@@ -42,23 +43,21 @@ namespace osu.Game.Screens.Edit
 
         public BeatmapInfo BeatmapInfo
         {
-            get => beatmap.BeatmapInfo;
-            set => beatmap.BeatmapInfo = value;
+            get => PlayableBeatmap.BeatmapInfo;
+            set => PlayableBeatmap.BeatmapInfo = value;
         }
 
-        public BeatmapMetadata Metadata => beatmap.Metadata;
+        public BeatmapMetadata Metadata => PlayableBeatmap.Metadata;
 
-        public ControlPointInfo ControlPointInfo => beatmap.ControlPointInfo;
+        public ControlPointInfo ControlPointInfo => PlayableBeatmap.ControlPointInfo;
 
-        public List<BreakPeriod> Breaks => beatmap.Breaks;
+        public List<BreakPeriod> Breaks => PlayableBeatmap.Breaks;
 
-        public double TotalBreakTime => beatmap.TotalBreakTime;
+        public double TotalBreakTime => PlayableBeatmap.TotalBreakTime;
 
-        public IReadOnlyList<HitObject> HitObjects => beatmap.HitObjects;
+        public IReadOnlyList<HitObject> HitObjects => PlayableBeatmap.HitObjects;
 
-        IReadOnlyList<HitObject> IBeatmap.HitObjects => beatmap.HitObjects;
-
-        public IEnumerable<BeatmapStatistic> GetStatistics() => beatmap.GetStatistics();
+        public IEnumerable<BeatmapStatistic> GetStatistics() => PlayableBeatmap.GetStatistics();
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
@@ -71,8 +70,8 @@ namespace osu.Game.Screens.Edit
             trackStartTime(hitObject);
 
             // Preserve existing sorting order in the beatmap
-            var insertionIndex = findInsertionIndex(beatmap.HitObjects, hitObject.StartTime);
-            ((IList)beatmap.HitObjects).Insert(insertionIndex + 1, hitObject);
+            var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
+            ((IList)PlayableBeatmap.HitObjects).Insert(insertionIndex + 1, hitObject);
 
             HitObjectAdded?.Invoke(hitObject);
         }
@@ -83,10 +82,10 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Remove(HitObject hitObject)
         {
-            if (!((IList)beatmap.HitObjects).Contains(hitObject))
+            if (!((IList)PlayableBeatmap.HitObjects).Contains(hitObject))
                 return;
 
-            ((IList)beatmap.HitObjects).Remove(hitObject);
+            ((IList)PlayableBeatmap.HitObjects).Remove(hitObject);
 
             var bindable = startTimeBindables[hitObject];
             bindable.UnbindAll();
@@ -101,10 +100,10 @@ namespace osu.Game.Screens.Edit
             startTimeBindables[hitObject].ValueChanged += _ =>
             {
                 // For now we'll remove and re-add the hitobject. This is not optimal and can be improved if required.
-                ((IList)beatmap.HitObjects).Remove(hitObject);
+                ((IList)PlayableBeatmap.HitObjects).Remove(hitObject);
 
-                var insertionIndex = findInsertionIndex(beatmap.HitObjects, hitObject.StartTime);
-                ((IList)beatmap.HitObjects).Insert(insertionIndex + 1, hitObject);
+                var insertionIndex = findInsertionIndex(PlayableBeatmap.HitObjects, hitObject.StartTime);
+                ((IList)PlayableBeatmap.HitObjects).Insert(insertionIndex + 1, hitObject);
 
                 StartTimeChanged?.Invoke(hitObject);
             };
