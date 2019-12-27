@@ -114,6 +114,8 @@ namespace osu.Game.Overlays.Profile
             {
                 AccentColour = colours.Seafoam;
             }
+
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }
