@@ -10,7 +10,10 @@ using osu.Game.Rulesets.Objects;
 namespace osu.Game.Rulesets.Scoring
 {
     /// <summary>
-    /// A <see cref="HealthProcessor"/> which continuously drains health.
+    /// A <see cref="HealthProcessor"/> which continuously drains health.<br />
+    /// At HP=0, the minimum health reached for a perfect play is 95%.<br />
+    /// At HP=5, the minimum health reached for a perfect play is 70%.<br />
+    /// At HP=10, the minimum health reached for a perfect play is 30%.
     /// </summary>
     public class DrainingHealthProcessor : HealthProcessor
     {
@@ -18,6 +21,21 @@ namespace osu.Game.Rulesets.Scoring
         /// A reasonable allowable error for the minimum health offset from <see cref="targetMinimumHealth"/>. A 1% error is unnoticeable.
         /// </summary>
         private const double minimum_health_error = 0.01;
+
+        /// <summary>
+        /// The minimum health target at an HP drain rate of 0.
+        /// </summary>
+        private const double min_health_target = 0.95;
+
+        /// <summary>
+        /// The minimum health target at an HP drain rate of 5.
+        /// </summary>
+        private const double mid_health_target = 0.70;
+
+        /// <summary>
+        /// The minimum health target at an HP drain rate of 10.
+        /// </summary>
+        private const double max_health_target = 0.30;
 
         private IBeatmap beatmap;
         private double gameplayEndTime;
@@ -56,7 +74,7 @@ namespace osu.Game.Rulesets.Scoring
             if (beatmap.HitObjects.Count > 0)
                 gameplayEndTime = beatmap.HitObjects[^1].GetEndTime();
 
-            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.95, 0.70, 0.30);
+            targetMinimumHealth = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, min_health_target, mid_health_target, max_health_target);
 
             base.ApplyBeatmap(beatmap);
         }
