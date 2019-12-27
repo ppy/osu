@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -37,14 +38,12 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            FillFlowContainer flow;
-
-            Add(flow = new FillFlowContainer
+            Add(new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     background = new Container
                     {
@@ -95,19 +94,16 @@ namespace osu.Game.Overlays
                                 Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
                             }
                         }
-                    }
+                    },
+                    CreateContent()
                 }
             });
-
-            var content = CreateContent();
-
-            if (content != null)
-                flow.Add(content);
         }
 
         protected abstract Drawable CreateBackground();
 
-        protected virtual Drawable CreateContent() => null;
+        [NotNull]
+        protected virtual Drawable CreateContent() => new Container();
 
         protected abstract ScreenTitle CreateTitle();
     }
