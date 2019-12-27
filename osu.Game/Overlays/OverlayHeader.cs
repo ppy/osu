@@ -99,13 +99,15 @@ namespace osu.Game.Overlays
                 }
             });
 
-            if (CreateContent != null)
-                flow.Add(CreateContent);
+            var content = CreateContent();
+
+            if (content != null)
+                flow.Add(content);
         }
 
         protected abstract Drawable CreateBackground();
 
-        protected virtual Drawable CreateContent => null;
+        protected virtual Drawable CreateContent() => null;
 
         protected abstract ScreenTitle CreateTitle();
     }
