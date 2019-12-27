@@ -47,16 +47,16 @@ namespace osu.Game.Rulesets.Mods
 
         private BeatmapDifficulty difficulty;
 
-        public void ApplyToDifficulty(BeatmapDifficulty difficulty)
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty)
         {
             if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
             {
                 this.difficulty = difficulty;
                 TransferSettings(difficulty);
             }
-            else
-                ApplySettings(difficulty);
         }
+
+        public void ApplyToDifficulty(BeatmapDifficulty difficulty) => ApplySettings(difficulty);
 
         /// <summary>
         /// Transfer initial settings from the beatmap to settings.
