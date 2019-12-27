@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using System;
+using System.Collections.Generic;
 using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
@@ -51,8 +52,8 @@ namespace osu.Game.Rulesets.Mods
         {
             if (this.difficulty == null || this.difficulty.ID != difficulty.ID)
             {
-                this.difficulty = difficulty;
                 TransferSettings(difficulty);
+                this.difficulty = difficulty;
             }
         }
 
@@ -64,8 +65,31 @@ namespace osu.Game.Rulesets.Mods
         /// <param name="difficulty">The beatmap's initial values.</param>
         protected virtual void TransferSettings(BeatmapDifficulty difficulty)
         {
-            DrainRate.Value = DrainRate.Default = difficulty.DrainRate;
-            OverallDifficulty.Value = OverallDifficulty.Default = difficulty.OverallDifficulty;
+            TransferSetting(DrainRate, difficulty.DrainRate);
+            TransferSetting(OverallDifficulty, difficulty.OverallDifficulty);
+        }
+
+        private readonly Dictionary<IBindable, bool> userChangedSettings = new Dictionary<IBindable, bool>();
+
+        /// <summary>
+        /// Transfer a setting from <see cref="BeatmapDifficulty"/> to a configuration bindable.
+        /// Only performs the transfer if the user it not currently overriding..
+        /// </summary>
+        protected void TransferSetting<T>(BindableNumber<T> bindable, T beatmapDefault)
+            where T : struct, IComparable<T>, IConvertible, IEquatable<T>
+        {
+            bindable.UnbindEvents();
+
+            userChangedSettings.TryAdd(bindable, false);
+
+            // users generally choose a difficulty setting and want it to stick across multiple beatmap changes.
+            // we only want to value transfer if the user hasn't changed the value previously.
+            if (!userChangedSettings[bindable])
+            {
+                bindable.Value = bindable.Default = beatmapDefault;
+            }
+
+            bindable.ValueChanged += _ => userChangedSettings[bindable] = !bindable.IsDefault;
         }
 
         /// <summary>
