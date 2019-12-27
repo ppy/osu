@@ -36,20 +36,6 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasFailed { get; private set; }
 
-        /// <summary>
-        /// The gameplay start time.
-        /// </summary>
-        protected readonly double GameplayStartTime;
-
-        /// <summary>
-        /// Creates a new <see cref="HealthProcessor"/>.
-        /// </summary>
-        /// <param name="gameplayStartTime">The gameplay start time.</param>
-        protected HealthProcessor(double gameplayStartTime)
-        {
-            GameplayStartTime = gameplayStartTime;
-        }
-
         protected override void ApplyResultInternal(JudgementResult result)
         {
             result.HealthAtJudgement = Health.Value;

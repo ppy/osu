@@ -38,7 +38,10 @@ namespace osu.Game.Rulesets.Scoring
         private const double max_health_target = 0.30;
 
         private IBeatmap beatmap;
+
         private double gameplayEndTime;
+
+        private readonly double drainStartTime;
 
         private readonly List<(double time, double health)> healthIncreases = new List<(double, double)>();
         private double targetMinimumHealth;
@@ -47,10 +50,10 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Creates a new <see cref="DrainingHealthProcessor"/>.
         /// </summary>
-        /// <param name="gameplayStartTime">The gameplay start time.</param>
-        public DrainingHealthProcessor(double gameplayStartTime)
-            : base(gameplayStartTime)
+        /// <param name="drainStartTime">The time after which draining should begin.</param>
+        public DrainingHealthProcessor(double drainStartTime)
         {
+            this.drainStartTime = drainStartTime;
         }
 
         protected override void Update()
@@ -60,8 +63,8 @@ namespace osu.Game.Rulesets.Scoring
             if (!IsBreakTime.Value)
             {
                 // When jumping in and out of gameplay time within a single frame, health should only be drained for the period within the gameplay time
-                double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, GameplayStartTime, gameplayEndTime);
-                double currentGameplayTime = Math.Clamp(Time.Current, GameplayStartTime, gameplayEndTime);
+                double lastGameplayTime = Math.Clamp(Time.Current - Time.Elapsed, drainStartTime, gameplayEndTime);
+                double currentGameplayTime = Math.Clamp(Time.Current, drainStartTime, gameplayEndTime);
 
                 Health.Value -= drainRate * (currentGameplayTime - lastGameplayTime);
             }
@@ -116,7 +119,7 @@ namespace osu.Game.Rulesets.Scoring
                 for (int i = 0; i < healthIncreases.Count; i++)
                 {
                     double currentTime = healthIncreases[i].time;
-                    double lastTime = i > 0 ? healthIncreases[i - 1].time : GameplayStartTime;
+                    double lastTime = i > 0 ? healthIncreases[i - 1].time : drainStartTime;
 
                     // Subtract any break time from the duration since the last object
                     if (beatmap.Breaks.Count > 0)
