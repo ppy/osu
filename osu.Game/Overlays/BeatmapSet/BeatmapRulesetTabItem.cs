@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 Enabled.Value = beatmapsCount > 0;
             }, true);
 
-            Enabled.BindValueChanged(v => Text.Colour = v.NewValue ? AccentColour : Color4.DimGray, true);
+            Enabled.BindValueChanged(v => Text.Alpha = v.NewValue ? 1 : 0.4f, true);
         }
     }
 }
