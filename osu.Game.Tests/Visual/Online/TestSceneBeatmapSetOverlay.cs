@@ -44,7 +44,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapRulesetTabItem),
             typeof(NotSupporterPlaceholder),
             typeof(OverlayHeader),
-            typeof(BeatmapSetHeader)
+            typeof(BeatmapSetHeader),
+            typeof(OverlayRulesetSelector),
         };
 
         protected override bool UseOnlineAPI => true;

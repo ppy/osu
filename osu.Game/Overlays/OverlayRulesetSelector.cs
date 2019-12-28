@@ -5,10 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
@@ -54,74 +51,5 @@ namespace osu.Game.Overlays
             Direction = FillDirection.Horizontal,
             Spacing = new Vector2(25, 0),
         };
-
-        private class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasAccentColour
-        {
-            private readonly OsuSpriteText text;
-
-            private Color4 accentColour;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    if (accentColour == value)
-                        return;
-
-                    accentColour = value;
-
-                    updateState();
-                }
-            }
-
-            public OverlayRulesetTabItem(RulesetInfo value)
-            : base(value)
-            {
-                AutoSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    text = new OsuSpriteText
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Text = value.Name,
-                    },
-                    new HoverClickSounds()
-                };
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                base.OnHover(e);
-                updateState();
-                return true;
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                base.OnHoverLost(e);
-                updateState();
-            }
-
-            protected override void OnActivated() => updateState();
-
-            protected override void OnDeactivated() => updateState();
-
-            private void updateState()
-            {
-                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-
-                if (IsHovered || Active.Value)
-                {
-                    text.FadeColour(Color4.White, 120, Easing.OutQuint);
-                }
-                else
-                {
-                    text.FadeColour(AccentColour, 120, Easing.OutQuint);
-                }
-            }
-        }
     }
 }

@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();
 
+        protected override OverlayRulesetSelector CreateRulesetSelector() => new BeatmapRulesetSelector();
+
         private class BeatmapSetTitle : ScreenTitle
         {
             public BeatmapSetTitle()
