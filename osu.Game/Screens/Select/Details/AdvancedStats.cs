@@ -44,6 +44,8 @@ namespace osu.Game.Screens.Select.Details
             }
         }
 
+        private BeatmapManager beatmapManager;
+
         public AdvancedStats()
         {
             Child = new FillFlowContainer
@@ -63,9 +65,10 @@ namespace osu.Game.Screens.Select.Details
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, BeatmapManager beatmapManager)
         {
             starDifficulty.AccentColour = colours.Yellow;
+            this.beatmapManager = beatmapManager;
         }
 
         protected override void LoadComplete()
@@ -130,7 +133,18 @@ namespace osu.Game.Screens.Select.Details
                 firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
             }
 
-            starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
+            double? adjustedStar = null;
+
+            if (mods.Value.Any(m => m is IApplicableToDifficulty || m is IApplicableToTrack))
+            {
+                adjustedStar = Beatmap?.Ruleset
+                                      ?.CreateInstance()
+                                      ?.CreateDifficultyCalculator(beatmapManager.GetWorkingBeatmap(Beatmap))
+                                      ?.Calculate(mods.Value.ToArray())
+                                      .StarRating;
+            }
+
+            starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), (float?)adjustedStar);
 
             hpDrain.Value = (baseDifficulty?.DrainRate ?? 0, adjustedDifficulty?.DrainRate);
             accuracy.Value = (baseDifficulty?.OverallDifficulty ?? 0, adjustedDifficulty?.OverallDifficulty);
