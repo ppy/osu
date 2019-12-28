@@ -22,26 +22,15 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private readonly Container hitTargetLine;
-        private readonly Drawable hitTargetBar;
+        private readonly Drawable stageHint;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
-                hitTargetBar = new Box
+                stageHint = new DefaultStageHint
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = NotePiece.NOTE_HEIGHT,
-                    Alpha = 0.6f,
-                    Colour = Color4.Black
-                },
-                hitTargetLine = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = hit_target_bar_height,
-                    Masking = true,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 hitObjectContainer
             };
@@ -55,15 +44,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
 
-                hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
-                hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
+                stageHint.Anchor = stageHint.Origin = anchor;
             }, true);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            updateColours();
         }
 
         private Color4 accentColour;
@@ -77,22 +59,84 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     return;
 
                 accentColour = value;
-
-                updateColours();
             }
         }
 
-        private void updateColours()
+        private class DefaultStageHint : StageHint
         {
-            if (!IsLoaded)
-                return;
+            private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-            hitTargetLine.EdgeEffect = new EdgeEffectParameters
+            private readonly Container hitTargetLine;
+            private readonly Drawable hitTargetBar;
+
+            public DefaultStageHint()
             {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = accentColour.Opacity(0.5f),
-            };
+                InternalChildren = new[]
+                {
+                    hitTargetBar = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = NotePiece.NOTE_HEIGHT,
+                        Alpha = 0.6f,
+                        Colour = Color4.Black
+                    },
+                    hitTargetLine = new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = hit_target_bar_height,
+                        Masking = true,
+                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                    },
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IScrollingInfo scrollingInfo)
+            {
+                direction.BindTo(scrollingInfo.Direction);
+                direction.BindValueChanged(dir =>
+                {
+                    Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+
+                    hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
+                    hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
+                }, true);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                updateColours();
+            }
+
+            private Color4 accentColour;
+
+            public override Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    if (accentColour == value)
+                        return;
+
+                    accentColour = value;
+
+                    updateColours();
+                }
+            }
+
+            private void updateColours()
+            {
+                if (!IsLoaded)
+                    return;
+
+                hitTargetLine.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = accentColour.Opacity(0.5f),
+                };
+            }
         }
     }
 }
