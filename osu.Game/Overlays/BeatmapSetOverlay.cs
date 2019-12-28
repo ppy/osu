@@ -29,15 +29,14 @@ namespace osu.Game.Overlays
         private RulesetStore rulesets;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
+        private readonly OsuScrollContainer scroll;
+        private readonly Info info;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
-            OsuScrollContainer scroll;
-            Info info;
-
             Children = new Drawable[]
             {
                 new Box
@@ -56,8 +55,14 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            Header = new BeatmapSetHeader(),
-                            info = new Info(),
+                            Header = new BeatmapSetHeader
+                            {
+                                BeatmapSet = { BindTarget = beatmapSet }
+                            },
+                            info = new Info
+                            {
+                                BeatmapSet = { BindTarget = beatmapSet }
+                            },
                             new ScoresContainer
                             {
                                 Beatmap = { BindTarget = GetHeaderContent().Picker.Beatmap }
@@ -66,22 +71,22 @@ namespace osu.Game.Overlays
                     },
                 },
             };
-
-            GetHeaderContent().BeatmapSet.BindTo(beatmapSet);
-            info.BeatmapSet.BindTo(beatmapSet);
-
-            GetHeaderContent().Picker.Beatmap.ValueChanged += b =>
-            {
-                info.Beatmap = b.NewValue;
-
-                scroll.ScrollToStart();
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            GetHeaderContent().Picker.Beatmap.ValueChanged += b =>
+            {
+                info.Beatmap = b.NewValue;
+                scroll.ScrollToStart();
+            };
         }
 
         public BeatmapHeaderContent GetHeaderContent() => (BeatmapHeaderContent)Header.HeaderContent;

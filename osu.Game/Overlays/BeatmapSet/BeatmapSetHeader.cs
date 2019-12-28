@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
@@ -10,6 +12,8 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapSetHeader : OverlayHeader
     {
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
         public BeatmapSetHeader()
             : base(true)
         {
@@ -25,15 +29,18 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ((BeatmapHeaderContent)HeaderContent).BeatmapSet.BindValueChanged(beatmapSet => ((BeatmapRulesetSelector)RulesetSelector).BeatmapSet = beatmapSet.NewValue, true);
-            ((BeatmapHeaderContent)HeaderContent).Ruleset.BindTo(Ruleset);
+            BeatmapSet.BindValueChanged(beatmapSet => ((BeatmapRulesetSelector)RulesetSelector).BeatmapSet = beatmapSet.NewValue, true);
         }
 
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();
 
         protected override OverlayRulesetSelector CreateRulesetSelector() => new BeatmapRulesetSelector();
 
-        protected override Drawable CreateContent() => new BeatmapHeaderContent();
+        protected override Drawable CreateContent() => new BeatmapHeaderContent
+        {
+            BeatmapSet = { BindTarget = BeatmapSet },
+            Ruleset = { BindTarget = Ruleset }
+        };
 
         private class BeatmapSetTitle : ScreenTitle
         {

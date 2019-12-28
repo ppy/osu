@@ -114,29 +114,25 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 },
             };
-
-            Beatmap.ValueChanged += b =>
-            {
-                showBeatmap(b.NewValue);
-                updateDifficultyButtons();
-            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             starRating.Colour = colours.Yellow;
-            updateDisplay();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            Ruleset.ValueChanged += r => updateDisplay();
+            Beatmap.ValueChanged += b =>
+            {
+                showBeatmap(b.NewValue);
+                updateDifficultyButtons();
+            };
 
-            // done here so everything can bind in intialization and get the first trigger
-            Beatmap.TriggerChange();
+            Ruleset.BindValueChanged(_ => updateDisplay(), true);
         }
 
         private void updateDisplay()

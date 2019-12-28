@@ -44,15 +44,12 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly BeatmapPicker Picker;
 
         private readonly FavouriteButton favouriteButton;
-
         private readonly FillFlowContainer fadeContent;
-
         private readonly LoadingAnimation loading;
+        private readonly ExternalLinkButton externalLink;
 
         public BeatmapHeaderContent()
         {
-            ExternalLinkButton externalLink;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Masking = true;
@@ -195,17 +192,18 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 },
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Picker.Beatmap.ValueChanged += b =>
             {
                 Details.Beatmap = b.NewValue;
                 externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
             State.BindValueChanged(_ => updateDownloadButtons());
 
             BeatmapSet.BindValueChanged(setInfo =>
