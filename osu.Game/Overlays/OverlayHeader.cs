@@ -15,6 +15,7 @@ namespace osu.Game.Overlays
         private readonly Box titleBackground;
         private readonly Container background;
         protected readonly FillFlowContainer HeaderInfo;
+        protected readonly OverlayRulesetSelector RulesetSelector;
 
         protected Color4 TitleBackgroundColour
         {
@@ -26,8 +27,10 @@ namespace osu.Game.Overlays
             set => background.Height = value;
         }
 
-        protected OverlayHeader()
+        protected OverlayHeader(bool hasRulesetSelector)
         {
+            Container titleContainer;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -52,7 +55,7 @@ namespace osu.Game.Overlays
                                 Masking = true,
                                 Child = CreateBackground()
                             },
-                            new Container
+                            titleContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
@@ -65,6 +68,8 @@ namespace osu.Game.Overlays
                                     },
                                     CreateTitle().With(title =>
                                     {
+                                        title.Anchor = Anchor.CentreLeft;
+                                        title.Origin = Anchor.CentreLeft;
                                         title.Margin = new MarginPadding
                                         {
                                             Vertical = 10,
@@ -78,6 +83,20 @@ namespace osu.Game.Overlays
                     CreateContent()
                 }
             });
+
+            if (hasRulesetSelector)
+            {
+                titleContainer.Add(RulesetSelector = CreateRulesetSelector().With(selector =>
+                {
+                    selector.Anchor = Anchor.CentreRight;
+                    selector.Origin = Anchor.CentreRight;
+                    selector.Margin = new MarginPadding
+                    {
+                        Vertical = 10,
+                        Right = UserProfileOverlay.CONTENT_X_MARGIN
+                    };
+                }));
+            }
         }
 
         [NotNull]
@@ -85,6 +104,9 @@ namespace osu.Game.Overlays
 
         [NotNull]
         protected virtual Drawable CreateContent() => new Container();
+
+        [NotNull]
+        protected virtual OverlayRulesetSelector CreateRulesetSelector() => new OverlayRulesetSelector();
 
         protected abstract ScreenTitle CreateTitle();
     }

@@ -10,10 +10,16 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapSetHeader : OverlayHeader
     {
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colors)
+        public BeatmapSetHeader()
+            : base(true)
         {
-            TitleBackgroundColour = colors.Gray2;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            TitleBackgroundColour = colours.Gray2;
+            RulesetSelector.AccentColour = colours.Blue;
         }
 
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();

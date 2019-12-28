@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Changelog
         private const string listing_string = "listing";
 
         public ChangelogHeader()
+            : base(false)
         {
             BackgroundHeight = 80;
 

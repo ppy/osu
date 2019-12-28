@@ -21,7 +21,8 @@ namespace osu.Game.Overlays
             set => controlBackground.Colour = value;
         }
 
-        protected ControllableOverlayHeader()
+        protected ControllableOverlayHeader(bool hasRulesetSelector)
+            : base(hasRulesetSelector)
         {
             HeaderInfo.Add(new Container
             {
