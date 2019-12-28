@@ -4,16 +4,17 @@
 using System.IO;
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
+using osu.Game.Resources;
 
 namespace osu.Game.Tests.Resources
 {
     public static class TestResources
     {
-        public static DllResourceStore GetStore() => new DllResourceStore("osu.Game.Tests.dll");
+        public static DllResourceStore GetStore() => new DllResourceStore(typeof(TestResources).Assembly);
 
         public static Stream OpenResource(string name) => GetStore().GetStream($"Resources/{name}");
 
-        public static Stream GetTestBeatmapStream(bool virtualTrack = false) => new DllResourceStore("osu.Game.Resources.dll").GetStream($"Beatmaps/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}.osz");
+        public static Stream GetTestBeatmapStream(bool virtualTrack = false) => new DllResourceStore(OsuResources.ResourceAssembly).GetStream($"Beatmaps/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}.osz");
 
         public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
