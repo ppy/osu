@@ -44,7 +44,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     HeaderInfo = new FillFlowContainer
                     {
