@@ -20,8 +20,7 @@ namespace osu.Game.Overlays
 
         public readonly OverlayRulesetSelector RulesetSelector;
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-
-        public readonly Drawable HeaderContent; 
+        public readonly Drawable HeaderContent;
 
         protected Color4 TitleBackgroundColour
         {
