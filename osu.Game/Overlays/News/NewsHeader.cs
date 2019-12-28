@@ -24,6 +24,8 @@ namespace osu.Game.Overlays.News
 
         public NewsHeader()
         {
+            BackgroundHeight = 80;
+
             TabControl.AddItem(front_page_string);
 
             TabControl.Current.ValueChanged += e =>

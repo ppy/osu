@@ -49,7 +49,6 @@ namespace osu.Game.Overlays
                             background = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 80,
                                 Masking = true,
                                 Child = CreateBackground()
                             },
@@ -81,7 +80,8 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected abstract Drawable CreateBackground();
+        [NotNull]
+        protected virtual Drawable CreateBackground() => new Container();
 
         [NotNull]
         protected virtual Drawable CreateContent() => new Container();

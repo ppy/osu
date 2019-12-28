@@ -27,6 +27,8 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogHeader()
         {
+            BackgroundHeight = 80;
+
             TabControl.AddItem(listing_string);
             TabControl.Current.ValueChanged += e =>
             {
