@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private readonly Drawable stageHint;
+        private readonly StageHint stageHint;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
@@ -59,6 +59,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
                     return;
 
                 accentColour = value;
+
+                stageHint.AccentColour = accentColour;
             }
         }
 
