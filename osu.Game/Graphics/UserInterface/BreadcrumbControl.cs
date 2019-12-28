@@ -15,7 +15,7 @@ namespace osu.Game.Graphics.UserInterface
     public class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
-        private float itemChevronSize;
+        private readonly float itemChevronSize;
 
         protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value, itemChevronSize)
         {
