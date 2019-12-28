@@ -24,7 +24,7 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-        protected readonly Header Header;
+        protected readonly BeatmapSetHeader Header;
 
         private RulesetStore rulesets;
 
@@ -56,22 +56,21 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new BeatmapSetHeader(),
-                            Header = new Header(),
+                            Header = new BeatmapSetHeader(),
                             info = new Info(),
                             new ScoresContainer
                             {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
+                                Beatmap = { BindTarget = GetHeaderContent().Picker.Beatmap }
                             }
                         },
                     },
                 },
             };
 
-            Header.BeatmapSet.BindTo(beatmapSet);
+            GetHeaderContent().BeatmapSet.BindTo(beatmapSet);
             info.BeatmapSet.BindTo(beatmapSet);
 
-            Header.Picker.Beatmap.ValueChanged += b =>
+            GetHeaderContent().Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
 
@@ -84,6 +83,8 @@ namespace osu.Game.Overlays
         {
             this.rulesets = rulesets;
         }
+
+        public BeatmapHeaderContent GetHeaderContent() => (BeatmapHeaderContent)Header.HeaderContent;
 
         protected override void PopOutComplete()
         {
@@ -105,7 +106,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                GetHeaderContent().Picker.Beatmap.Value = GetHeaderContent().BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
 

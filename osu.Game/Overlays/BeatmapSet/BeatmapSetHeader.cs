@@ -22,9 +22,17 @@ namespace osu.Game.Overlays.BeatmapSet
             RulesetSelector.AccentColour = colours.Blue;
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ((BeatmapHeaderContent)HeaderContent).BeatmapSet.BindValueChanged(beatmapSet => ((BeatmapRulesetSelector)RulesetSelector).BeatmapSet = beatmapSet.NewValue, true);
+        }
+
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();
 
         protected override OverlayRulesetSelector CreateRulesetSelector() => new BeatmapRulesetSelector();
+
+        protected override Drawable CreateContent() => new BeatmapHeaderContent();
 
         private class BeatmapSetTitle : ScreenTitle
         {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,9 +18,12 @@ namespace osu.Game.Overlays
         private readonly Box titleBackground;
         private readonly Container background;
         protected readonly FillFlowContainer HeaderInfo;
-        protected readonly OverlayRulesetSelector RulesetSelector;
+        public readonly OverlayRulesetSelector RulesetSelector;
 
+        [Cached(typeof(IBindable<RulesetInfo>))]
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        public readonly Drawable HeaderContent; 
 
         protected Color4 TitleBackgroundColour
         {
@@ -84,7 +88,7 @@ namespace osu.Game.Overlays
                             }
                         }
                     },
-                    CreateContent()
+                    HeaderContent = CreateContent()
                 }
             });
 
@@ -99,9 +103,8 @@ namespace osu.Game.Overlays
                         Vertical = 10,
                         Right = UserProfileOverlay.CONTENT_X_MARGIN
                     };
+                    selector.Current = Ruleset;
                 }));
-
-                Ruleset.BindTo(RulesetSelector.Current);
             }
         }
 
