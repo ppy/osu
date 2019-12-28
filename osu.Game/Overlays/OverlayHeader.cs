@@ -18,9 +18,8 @@ namespace osu.Game.Overlays
         private readonly Box titleBackground;
         private readonly Container background;
         protected readonly FillFlowContainer HeaderInfo;
-        public readonly OverlayRulesetSelector RulesetSelector;
 
-        [Cached(typeof(IBindable<RulesetInfo>))]
+        public readonly OverlayRulesetSelector RulesetSelector;
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         public readonly Drawable HeaderContent; 

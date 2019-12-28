@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.LoadComplete();
             ((BeatmapHeaderContent)HeaderContent).BeatmapSet.BindValueChanged(beatmapSet => ((BeatmapRulesetSelector)RulesetSelector).BeatmapSet = beatmapSet.NewValue, true);
+            ((BeatmapHeaderContent)HeaderContent).Ruleset.BindTo(Ruleset);
         }
 
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();

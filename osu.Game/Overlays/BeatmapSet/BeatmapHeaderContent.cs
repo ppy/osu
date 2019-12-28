@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Overlays.Direct;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -34,6 +36,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly BeatmapAvailability beatmapAvailability;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
+
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
 
@@ -108,7 +112,10 @@ namespace osu.Game.Overlays.BeatmapSet
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Child = Picker = new BeatmapPicker(),
+                                        Child = Picker = new BeatmapPicker
+                                        {
+                                            Ruleset = { BindTarget = Ruleset }
+                                        }
                                     },
                                     new FillFlowContainer
                                     {
