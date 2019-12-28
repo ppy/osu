@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Select.Details
 
             ScheduledDelegate debounce = null;
 
-            foreach (var mod in mods.NewValue.OfType<IApplicableToDifficulty>())
+            foreach (var mod in mods.NewValue.Where(m => m is IApplicableToDifficulty || m is IApplicableToTrack))
             {
                 foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
                 {
