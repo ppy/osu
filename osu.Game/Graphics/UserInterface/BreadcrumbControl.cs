@@ -15,17 +15,18 @@ namespace osu.Game.Graphics.UserInterface
     public class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
-        private const float item_chevron_size = 10;
+        private float itemChevronSize;
 
-        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value)
+        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value, itemChevronSize)
         {
             AccentColour = AccentColour,
         };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + item_chevron_size);
+        protected override float StripWidth() => base.StripWidth() - (padding + itemChevronSize);
 
-        public BreadcrumbControl()
+        public BreadcrumbControl(float itemChevronSize = 10)
         {
+            this.itemChevronSize = itemChevronSize;
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
             Current.ValueChanged += index =>
@@ -41,7 +42,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
+        protected class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
             public event Action<Visibility> StateChanged;
 
@@ -85,17 +86,17 @@ namespace osu.Game.Graphics.UserInterface
 
             public override void Show() => State = Visibility.Visible;
 
-            public BreadcrumbTabItem(T value)
+            public BreadcrumbTabItem(T value, float itemChevronSize)
                 : base(value)
             {
                 Text.Font = Text.Font.With(size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };
-                Padding = new MarginPadding { Right = padding + item_chevron_size };
+                Padding = new MarginPadding { Right = padding + itemChevronSize };
                 Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    Size = new Vector2(item_chevron_size),
+                    Size = new Vector2(itemChevronSize),
                     Icon = FontAwesome.Solid.ChevronRight,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
