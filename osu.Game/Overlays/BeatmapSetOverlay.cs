@@ -56,6 +56,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
+                            new BeatmapSetHeader(),
                             Header = new Header(),
                             info = new Info(),
                             new ScoresContainer
