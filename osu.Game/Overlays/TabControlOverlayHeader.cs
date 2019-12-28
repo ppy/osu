@@ -3,7 +3,7 @@
 
 namespace osu.Game.Overlays
 {
-    public abstract class TabControlOverlayHeader : OverlayHeader<OverlayHeaderTabControl>
+    public abstract class TabControlOverlayHeader : ControllableOverlayHeader<OverlayHeaderTabControl>
     {
         protected override OverlayHeaderTabControl CreateControl() => new OverlayHeaderTabControl();
     }

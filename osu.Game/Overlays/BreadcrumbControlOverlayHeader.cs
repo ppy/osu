@@ -3,7 +3,7 @@
 
 namespace osu.Game.Overlays
 {
-    public abstract class BreadcrumbControlOverlayHeader : OverlayHeader<OverlayHeaderBreadcrumbControl>
+    public abstract class BreadcrumbControlOverlayHeader : ControllableOverlayHeader<OverlayHeaderBreadcrumbControl>
     {
         protected override OverlayHeaderBreadcrumbControl CreateControl() => new OverlayHeaderBreadcrumbControl();
     }

@@ -5,29 +5,20 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayHeader<TModel> : Container
-        where TModel : TabControl<string>
+    public abstract class OverlayHeader : Container
     {
-        protected readonly TModel TabControl;
-
         private readonly Box titleBackground;
-        private readonly Box controlBackground;
         private readonly Container background;
+        protected readonly FillFlowContainer HeaderInfo;
 
         protected Color4 TitleBackgroundColour
         {
             set => titleBackground.Colour = value;
-        }
-
-        protected Color4 ControlBackgroundColour
-        {
-            set => controlBackground.Colour = value;
         }
 
         protected float BackgroundHeight
@@ -45,49 +36,44 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Children = new[]
+                Children = new Drawable[]
                 {
-                    background = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 80,
-                        Masking = true,
-                        Child = CreateBackground()
-                    },
-                    new Container
+                    HeaderInfo = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            titleBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
-                            },
-                            CreateTitle().With(title =>
-                            {
-                                title.Margin = new MarginPadding
-                                {
-                                    Vertical = 10,
-                                    Left = UserProfileOverlay.CONTENT_X_MARGIN
-                                };
-                            })
-                        }
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
                         Depth = -float.MaxValue,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
-                            controlBackground = new Box
+                            background = new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 80,
+                                Masking = true,
+                                Child = CreateBackground()
                             },
-                            TabControl = CreateControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
+                                {
+                                    titleBackground = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.Gray,
+                                    },
+                                    CreateTitle().With(title =>
+                                    {
+                                        title.Margin = new MarginPadding
+                                        {
+                                            Vertical = 10,
+                                            Left = UserProfileOverlay.CONTENT_X_MARGIN
+                                        };
+                                    })
+                                }
+                            }
                         }
                     },
                     CreateContent()
@@ -101,7 +87,5 @@ namespace osu.Game.Overlays
         protected virtual Drawable CreateContent() => new Container();
 
         protected abstract ScreenTitle CreateTitle();
-
-        protected abstract TModel CreateControl();
     }
 }
