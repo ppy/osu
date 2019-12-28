@@ -54,11 +54,10 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Right = 10 }
                     }
                 },
                 AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 70 }
+                Margin = new MarginPadding { Left = 70, Right = 15 }
             });
         }
 
