@@ -16,6 +16,9 @@ namespace osu.Game.Overlays
             BarHeight = 1;
             RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.X;
+            Anchor = Anchor.BottomLeft;
+            Origin = Anchor.BottomLeft;
+            Height = 35;
         }
 
         protected override TabItem<string> CreateTabItem(string value) => new OverlayHeaderTabItem(value)

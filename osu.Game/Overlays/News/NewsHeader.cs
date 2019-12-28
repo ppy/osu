@@ -12,7 +12,7 @@ using System;
 
 namespace osu.Game.Overlays.News
 {
-    public class NewsHeader : OverlayHeader
+    public class NewsHeader : BreadcrumbControlOverlayHeader
     {
         private const string front_page_string = "frontpage";
 

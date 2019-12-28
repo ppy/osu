@@ -15,7 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : OverlayHeader
+    public class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Changelog
 
         public UpdateStreamBadgeArea Streams;
 
-        private const string listing_string = "Listing";
+        private const string listing_string = "listing";
 
         public ChangelogHeader()
         {
