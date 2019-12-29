@@ -28,8 +28,6 @@ namespace osu.Game.Overlays
 
         protected OverlayHeader()
         {
-            Container titleContainer;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -54,11 +52,11 @@ namespace osu.Game.Overlays
                                 Masking = true,
                                 Child = CreateBackground()
                             },
-                            titleContainer = new Container
+                            new Container
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
+                                Children = new[]
                                 {
                                     titleBackground = new Box
                                     {
