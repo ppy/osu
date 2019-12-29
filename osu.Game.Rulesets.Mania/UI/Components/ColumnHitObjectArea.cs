@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private readonly StageHint stageHint;
+        private readonly Drawable stageHint;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 stageHint = new DefaultStageHint
                 {
@@ -60,11 +60,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
                 accentColour = value;
 
-                stageHint.AccentColour = accentColour;
+                if (stageHint is IHasAccentColour colouredHitTarget)
+                    colouredHitTarget.AccentColour = accentColour;
             }
         }
 
-        private class DefaultStageHint : StageHint
+        private class DefaultStageHint : CompositeDrawable, IHasAccentColour
         {
             private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
