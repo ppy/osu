@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
             private Color4 accentColour;
 
-            public override Color4 AccentColour
+            public Color4 AccentColour
             {
                 get => accentColour;
                 set
