@@ -19,6 +19,8 @@ namespace osu.Game.Overlays
         protected readonly OsuSpriteText Text;
         private readonly FillFlowContainer content;
 
+        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
+
         private Color4 accentColour;
 
         public Color4 AccentColour
@@ -31,7 +33,7 @@ namespace osu.Game.Overlays
 
                 accentColour = value;
 
-                UpdateState();
+                updateState();
             }
         }
 
@@ -60,27 +62,33 @@ namespace osu.Game.Overlays
             });
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Enabled.BindValueChanged(_ => updateState(), true);
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            UpdateState();
+            updateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            UpdateState();
+            updateState();
         }
 
-        protected override void OnActivated() => UpdateState();
+        protected override void OnActivated() => updateState();
 
-        protected override void OnDeactivated() => UpdateState();
+        protected override void OnDeactivated() => updateState();
 
-        protected virtual void UpdateState()
+        private void updateState()
         {
             Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-            Text.FadeColour(IsHovered || Active.Value ? Color4.White : AccentColour, 120, Easing.OutQuint);
+            Text.FadeColour(IsHovered || Active.Value ? Color4.White : Enabled.Value ? AccentColour : Color4.DimGray, 120, Easing.OutQuint);
         }
     }
 }

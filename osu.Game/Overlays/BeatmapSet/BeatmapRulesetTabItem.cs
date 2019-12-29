@@ -22,8 +22,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
-
         public BeatmapRulesetTabItem(RulesetInfo value)
             : base(value)
         {
@@ -72,8 +70,6 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 Enabled.Value = beatmapsCount > 0;
             }, true);
-
-            Enabled.BindValueChanged(v => Text.Alpha = v.NewValue ? 1 : 0.4f, true);
         }
     }
 }
