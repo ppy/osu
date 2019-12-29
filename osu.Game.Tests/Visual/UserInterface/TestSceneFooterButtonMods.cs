@@ -45,6 +45,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep(@"Add multiple Mods", () => changeMods(mutlipleIncrementMods));
             AddAssert(@"Check multiple mod multiplier", () => assertModsMultiplier(mutlipleIncrementMods));
         }
+        
+        [Test]
+        public void Temporary()
+        {
+            var hiddenMod = new Mod[] { new OsuModRelax() };
+            AddStep(@"Add Hidden", () => changeMods(hiddenMod));
+        }
 
         [Test]
         public void TestDecrementMultiplier()
