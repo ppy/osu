@@ -155,12 +155,12 @@ namespace osu.Game.Overlays
                 Radius = 50,
             };
 
-            disc.Add(drawableMedal = new DrawableMedal(medal)
+            LoadComponentAsync(drawableMedal = new DrawableMedal(medal)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.Both,
-            });
+            }, disc.Add);
         }
 
         protected override void LoadComplete()
