@@ -9,6 +9,6 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 {
     public abstract class StageHint : CompositeDrawable, IHasAccentColour
     {
-        public abstract Color4 AccentColour { get; set; }
+        public virtual Color4 AccentColour { get; set; }
     }
 }
