@@ -22,13 +22,13 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private readonly Drawable stageHint;
+        private readonly Drawable hitTarget;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
             InternalChildren = new[]
             {
-                stageHint = new DefaultStageHint
+                hitTarget = new DefaultHitTarget
                 {
                     RelativeSizeAxes = Axes.X,
                 },
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
 
-                stageHint.Anchor = stageHint.Origin = anchor;
+                hitTarget.Anchor = hitTarget.Origin = anchor;
             }, true);
         }
 
@@ -60,19 +60,19 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
                 accentColour = value;
 
-                if (stageHint is IHasAccentColour colouredHitTarget)
+                if (hitTarget is IHasAccentColour colouredHitTarget)
                     colouredHitTarget.AccentColour = accentColour;
             }
         }
 
-        private class DefaultStageHint : CompositeDrawable, IHasAccentColour
+        private class DefaultHitTarget : CompositeDrawable, IHasAccentColour
         {
             private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
             private readonly Container hitTargetLine;
             private readonly Drawable hitTargetBar;
 
-            public DefaultStageHint()
+            public DefaultHitTarget()
             {
                 InternalChildren = new[]
                 {
