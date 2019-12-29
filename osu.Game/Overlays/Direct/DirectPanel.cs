@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,21 +10,25 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
-    public abstract class DirectPanel : Container
+    public abstract class DirectPanel : OsuClickableContainer, IHasContextMenu
     {
         public readonly BeatmapSetInfo SetInfo;
 
@@ -43,6 +48,8 @@ namespace osu.Game.Overlays.Direct
         protected virtual bool FadePlayButton => true;
 
         protected override Container<Drawable> Content => content;
+
+        protected Action ViewBeatmap;
 
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
@@ -88,6 +95,12 @@ namespace osu.Game.Overlays.Direct
                     },
                 }
             });
+
+            Action = ViewBeatmap = () =>
+            {
+                Debug.Assert(SetInfo.OnlineBeatmapSetID != null);
+                beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
+            };
         }
 
         protected override void Update()
@@ -118,13 +131,6 @@ namespace osu.Game.Overlays.Direct
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Debug.Assert(SetInfo.OnlineBeatmapSetID != null);
-            beatmapSetOverlay?.FetchAndShowBeatmapSet(SetInfo.OnlineBeatmapSetID.Value);
-            return true;
         }
 
         protected override void LoadComplete()
@@ -203,5 +209,10 @@ namespace osu.Game.Overlays.Direct
                 Value = value;
             }
         }
+
+        public MenuItem[] ContextMenuItems => new MenuItem[]
+        {
+            new OsuMenuItem("View Beatmap", MenuItemType.Highlighted, ViewBeatmap),
+        };
     }
 }
