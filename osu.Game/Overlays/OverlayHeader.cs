@@ -2,12 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
@@ -17,10 +15,6 @@ namespace osu.Game.Overlays
         private readonly Box titleBackground;
         private readonly Container background;
         protected readonly FillFlowContainer HeaderInfo;
-
-        public readonly OverlayRulesetSelector RulesetSelector;
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-        public readonly Drawable HeaderContent;
 
         protected Color4 TitleBackgroundColour
         {
@@ -32,7 +26,7 @@ namespace osu.Game.Overlays
             set => background.Height = value;
         }
 
-        protected OverlayHeader(bool hasRulesetSelector)
+        protected OverlayHeader()
         {
             Container titleContainer;
 
@@ -80,29 +74,24 @@ namespace osu.Game.Overlays
                                             Vertical = 10,
                                             Left = UserProfileOverlay.CONTENT_X_MARGIN
                                         };
+                                    }),
+                                    CreateTitleContent().With(content =>
+                                    {
+                                        content.Anchor = Anchor.CentreRight;
+                                        content.Origin = Anchor.CentreRight;
+                                        content.Margin = new MarginPadding
+                                        {
+                                            Vertical = 10,
+                                            Right = UserProfileOverlay.CONTENT_X_MARGIN
+                                        };
                                     })
                                 }
                             }
                         }
                     },
-                    HeaderContent = CreateContent()
+                    CreateContent()
                 }
             });
-
-            if (hasRulesetSelector)
-            {
-                titleContainer.Add(RulesetSelector = CreateRulesetSelector().With(selector =>
-                {
-                    selector.Anchor = Anchor.CentreRight;
-                    selector.Origin = Anchor.CentreRight;
-                    selector.Margin = new MarginPadding
-                    {
-                        Vertical = 10,
-                        Right = UserProfileOverlay.CONTENT_X_MARGIN
-                    };
-                    selector.Current = Ruleset;
-                }));
-            }
         }
 
         [NotNull]
@@ -112,7 +101,7 @@ namespace osu.Game.Overlays
         protected virtual Drawable CreateContent() => new Container();
 
         [NotNull]
-        protected virtual OverlayRulesetSelector CreateRulesetSelector() => new OverlayRulesetSelector();
+        protected virtual Drawable CreateTitleContent() => new Container();
 
         protected abstract ScreenTitle CreateTitle();
     }

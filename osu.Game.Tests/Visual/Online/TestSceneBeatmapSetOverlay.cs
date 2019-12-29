@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneBeatmapSetOverlay : OsuTestScene
     {
-        private readonly BeatmapSetOverlay overlay;
+        private readonly TestBeatmapSetOverlay overlay;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -51,7 +51,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneBeatmapSetOverlay()
         {
-            Add(overlay = new BeatmapSetOverlay());
+            Add(overlay = new TestBeatmapSetOverlay());
         }
 
         [Resolved]
@@ -259,8 +259,8 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.GetHeaderContent().Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.GetHeaderContent().Ruleset.Value)));
-            AddAssert("left-most beatmap selected", () => overlay.GetHeaderContent().Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
+            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.HeaderContent.Ruleset.Value)));
+            AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
         [Test]
@@ -327,7 +327,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.GetHeaderContent().DownloadButtonsVisible == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
+        }
+
+        private class TestBeatmapSetOverlay : BeatmapSetOverlay
+        {
+            public new BeatmapSetHeader Header => base.Header;
         }
     }
 }

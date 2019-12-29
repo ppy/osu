@@ -7,17 +7,17 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
     public class BeatmapSetHeader : OverlayHeader
     {
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
-        public BeatmapSetHeader()
-            : base(true)
-        {
-        }
+        public BeatmapRulesetSelector RulesetSelector;
+        public BeatmapHeaderContent HeaderContent;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -29,14 +29,17 @@ namespace osu.Game.Overlays.BeatmapSet
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            BeatmapSet.BindValueChanged(beatmapSet => ((BeatmapRulesetSelector)RulesetSelector).BeatmapSet = beatmapSet.NewValue, true);
+            BeatmapSet.BindValueChanged(beatmapSet => RulesetSelector.BeatmapSet = beatmapSet.NewValue, true);
         }
 
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();
 
-        protected override OverlayRulesetSelector CreateRulesetSelector() => new BeatmapRulesetSelector();
+        protected override Drawable CreateTitleContent() => RulesetSelector = new BeatmapRulesetSelector
+        {
+            Current = Ruleset
+        };
 
-        protected override Drawable CreateContent() => new BeatmapHeaderContent
+        protected override Drawable CreateContent() => HeaderContent = new BeatmapHeaderContent
         {
             BeatmapSet = { BindTarget = BeatmapSet },
             Ruleset = { BindTarget = Ruleset }

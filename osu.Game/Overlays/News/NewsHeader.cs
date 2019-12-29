@@ -23,7 +23,6 @@ namespace osu.Game.Overlays.News
         public Action ShowFrontPage;
 
         public NewsHeader()
-            : base(false)
         {
             BackgroundHeight = 80;
 

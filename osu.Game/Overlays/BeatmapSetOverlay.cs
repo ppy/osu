@@ -65,7 +65,7 @@ namespace osu.Game.Overlays
                             },
                             new ScoresContainer
                             {
-                                Beatmap = { BindTarget = GetHeaderContent().Picker.Beatmap }
+                                Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
                             }
                         },
                     },
@@ -82,14 +82,12 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            GetHeaderContent().Picker.Beatmap.ValueChanged += b =>
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
             {
                 info.Beatmap = b.NewValue;
                 scroll.ScrollToStart();
             };
         }
-
-        public BeatmapHeaderContent GetHeaderContent() => (BeatmapHeaderContent)Header.HeaderContent;
 
         protected override void PopOutComplete()
         {
@@ -111,7 +109,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                GetHeaderContent().Picker.Beatmap.Value = GetHeaderContent().BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                Header.HeaderContent.Picker.Beatmap.Value = beatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
 

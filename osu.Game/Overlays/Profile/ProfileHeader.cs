@@ -25,7 +25,6 @@ namespace osu.Game.Overlays.Profile
         private DetailHeaderContainer detailHeaderContainer;
 
         public ProfileHeader()
-            : base(false)
         {
             BackgroundHeight = 150;
 
