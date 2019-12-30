@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
@@ -15,11 +15,8 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(DismissableFlag),
-            typeof(HeaderTitle),
-            typeof(RankingsRulesetSelector),
-            typeof(RankingsScopeSelector),
             typeof(RankingsHeader),
+            typeof(CountryFilter)
         };
 
         public TestSceneRankingsHeader()
@@ -30,9 +27,7 @@ namespace osu.Game.Tests.Visual.Online
 
             Add(new RankingsHeader
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scope = { BindTarget = scope },
+                Current = { BindTarget = scope },
                 Country = { BindTarget = countryBindable },
                 Ruleset = { BindTarget = ruleset },
                 Spotlights = new[]
@@ -67,7 +62,14 @@ namespace osu.Game.Tests.Visual.Online
                 FullName = "Cook Islands"
             };
 
+            AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
+            AddStep("Set scope to Country", () => scope.Value = RankingsScope.Country);
+            AddStep("Set scope to Performance", () => scope.Value = RankingsScope.Performance);
+            AddStep("Set scope to Spotlights", () => scope.Value = RankingsScope.Spotlights);
+            AddStep("Set ruleset to Taiko", () => ruleset.Value = new TaikoRuleset().RulesetInfo);
+
             AddStep("Set country", () => countryBindable.Value = country);
+            AddStep("Set null country", () => countryBindable.Value = null);
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
             AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
         }

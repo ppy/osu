@@ -15,6 +15,7 @@ using osu.Game.Online.API;
 using System.Threading;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -52,6 +53,7 @@ namespace osu.Game.Overlays
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
                         Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 5),
                         Children = new Drawable[]
                         {
                             new RankingsHeader
@@ -59,7 +61,7 @@ namespace osu.Game.Overlays
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Country = { BindTarget = Country },
-                                Scope = { BindTarget = Scope },
+                                Current = { BindTarget = Scope },
                                 Ruleset = { BindTarget = ruleset }
                             },
                             new Container
@@ -93,7 +95,7 @@ namespace osu.Game.Overlays
             Waves.ThirdWaveColour = colour.GreenDark;
             Waves.FourthWaveColour = colour.GreenDarker;
 
-            background.Colour = OsuColour.Gray(0.1f);
+            background.Colour = colour.GreySeafoamDark;
         }
 
         protected override void LoadComplete()
