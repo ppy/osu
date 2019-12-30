@@ -40,10 +40,9 @@ namespace osu.Game.Tests.Visual.Online
 
             Add(new RankingsOverlayHeader
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 Ruleset = { BindTarget = ruleset },
-                Current = { BindTarget = scope }
+                Current = { BindTarget = scope },
+                Country = { BindTarget = countryBindable }
             });
 
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
@@ -53,6 +52,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Set ruleset to Taiko", () => ruleset.Value = new TaikoRuleset().RulesetInfo);
 
             AddStep("Set country", () => countryBindable.Value = country);
+            AddStep("Set null country", () => countryBindable.Value = null);
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
             AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
         }

@@ -27,6 +27,7 @@ namespace osu.Game.Overlays
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
+                Depth = -float.MaxValue,
                 Children = new Drawable[]
                 {
                     controlBackground = new Box
