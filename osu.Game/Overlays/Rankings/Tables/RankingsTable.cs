@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             private void load(OsuColour colours)
             {
                 if (Text != highlighted)
-                    Colour = colours.GreySeafoamLighter;
+                    Colour = colours.ForOverlayElement(OverlayColourScheme.Green, 0.1f, 0.6f);
             }
         }
 
@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Colour = colours.GreySeafoamLighter;
+                Colour = colours.ForOverlayElement(OverlayColourScheme.Green, 0.1f, 0.6f);
             }
         }
     }

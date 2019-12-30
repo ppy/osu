@@ -37,8 +37,8 @@ namespace osu.Game.Overlays.Rankings.Tables
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = idleColour = colours.GreySeafoam;
-            hoverColour = colours.GreySeafoamLight;
+            background.Colour = idleColour = colours.ForOverlayElement(OverlayColourScheme.Green, 0.1f, 0.2f);
+            hoverColour = colours.ForOverlayElement(OverlayColourScheme.Green, 0.1f, 0.3f);
         }
 
         protected override bool OnHover(HoverEvent e)
