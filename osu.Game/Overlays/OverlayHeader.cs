@@ -63,7 +63,6 @@ namespace osu.Game.Overlays
                                     titleBackground = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        
                                     },
                                     title = CreateTitle().With(title =>
                                     {
