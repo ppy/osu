@@ -40,6 +40,13 @@ namespace osu.Game.Graphics.UserInterface
             if (action.ActionType == PlatformActionType.CharNext && action.ActionMethod == PlatformActionMethod.Delete)
                 return false;
 
+            switch (action.ActionType)
+            {
+                case PlatformActionType.LineEnd:
+                case PlatformActionType.LineStart:
+                    return false;
+            }
+
             return base.OnPressed(action);
         }
 
