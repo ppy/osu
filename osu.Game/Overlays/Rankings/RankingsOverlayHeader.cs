@@ -7,14 +7,24 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Rankings
 {
     public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly Bindable<Country> Country = new Bindable<Country>();
 
         private OverlayRulesetSelector rulesetSelector;
+
+        public RankingsOverlayHeader()
+        {
+            HeaderInfo.Add(new CountryFilter
+            {
+                Country = { BindTarget = Country }
+            });
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

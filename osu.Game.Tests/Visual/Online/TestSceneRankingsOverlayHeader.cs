@@ -7,6 +7,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Taiko;
+using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -15,12 +17,26 @@ namespace osu.Game.Tests.Visual.Online
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(RankingsOverlayHeader),
+            typeof(CountryFilter)
         };
 
         public TestSceneRankingsOverlayHeader()
         {
             var ruleset = new Bindable<RulesetInfo>();
             var scope = new Bindable<RankingsScope>();
+            var countryBindable = new Bindable<Country>();
+
+            var country = new Country
+            {
+                FlagName = "BY",
+                FullName = "Belarus"
+            };
+
+            var unknownCountry = new Country
+            {
+                FlagName = "CK",
+                FullName = "Cook Islands"
+            };
 
             Add(new RankingsOverlayHeader
             {
@@ -34,6 +50,11 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Set scope to Country", () => scope.Value = RankingsScope.Country);
             AddStep("Set scope to Performance", () => scope.Value = RankingsScope.Performance);
             AddStep("Set scope to Spotlights", () => scope.Value = RankingsScope.Spotlights);
+            AddStep("Set ruleset to Taiko", () => ruleset.Value = new TaikoRuleset().RulesetInfo);
+
+            AddStep("Set country", () => countryBindable.Value = country);
+            AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
+            AddStep("Set country with no flag", () => countryBindable.Value = unknownCountry);
         }
     }
 }
