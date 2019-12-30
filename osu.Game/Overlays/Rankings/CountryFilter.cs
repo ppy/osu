@@ -15,7 +15,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -79,7 +78,7 @@ namespace osu.Game.Overlays.Rankings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 0.2f, 0.25f, 1));
+            background.Colour = colours.ForOverlayElement(colourScheme, 0.2f, 0.25f);
         }
 
         protected override void LoadComplete()

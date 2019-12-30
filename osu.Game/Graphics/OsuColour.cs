@@ -64,7 +64,9 @@ namespace osu.Game.Graphics
             }
         }
 
-        public float GetBaseHue(OverlayColourScheme colourScheme)
+        public Color4 ForOverlayElement(OverlayColourScheme colourScheme, float saturation, float lightness) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, 1));
+
+        private float getBaseHue(OverlayColourScheme colourScheme)
         {
             var hue = colourScheme switch
             {

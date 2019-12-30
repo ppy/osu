@@ -8,8 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -99,8 +97,8 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            titleBackground.Colour = Color4.FromHsl(new Vector4(colours.GetBaseHue(ColourScheme), 0.2f, 0.15f, 1));
-            title.AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(ColourScheme), 1, 0.7f, 1));
+            titleBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.15f);
+            title.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.7f);
         }
 
         [NotNull]

@@ -7,8 +7,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -41,7 +39,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            controlBackground.Colour = Color4.FromHsl(new Vector4(colours.GetBaseHue(ColourScheme), 0.2f, 0.2f, 1));
+            controlBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.2f);
         }
 
         protected abstract TModel CreateControl();

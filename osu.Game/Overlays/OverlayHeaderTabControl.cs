@@ -8,7 +8,6 @@ using osuTK;
 using osu.Game.Graphics;
 using System;
 using osu.Framework.Allocation;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -37,7 +36,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 1, 0.75f, 1));
+            AccentColour = colours.ForOverlayElement(colourScheme, 1, 0.75f);
         }
 
         protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value)

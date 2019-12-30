@@ -40,7 +40,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 1, 0.7f, 1));
+            AccentColour = colours.ForOverlayElement(colourScheme, 1, 0.7f);
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value)
