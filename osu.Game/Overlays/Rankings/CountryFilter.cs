@@ -89,6 +89,9 @@ namespace osu.Game.Overlays.Rankings
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
+            countryPill.ClearTransforms();
+            content.ClearTransforms();
+
             if (country.NewValue == null)
             {
                 countryPill.Collapse();
@@ -187,7 +190,6 @@ namespace osu.Game.Overlays.Rankings
 
             public void Collapse()
             {
-                ClearTransforms();
                 AutoSizeAxes = Axes.None;
                 this.ResizeWidthTo(0, duration, Easing.OutQuint);
                 this.FadeOut(duration, Easing.OutQuint);
