@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -19,12 +18,10 @@ namespace osu.Game.Overlays.BeatmapSet
         public BeatmapRulesetSelector RulesetSelector;
         public BeatmapHeaderContent HeaderContent;
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public BeatmapSetHeader()
+            : base(OverlayColourScheme.Blue)
         {
             BackgroundHeight = 0;
-            TitleBackgroundColour = colours.Gray2;
-            RulesetSelector.AccentColour = colours.Blue;
         }
 
         protected override void LoadComplete()
@@ -35,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         protected override ScreenTitle CreateTitle() => new BeatmapSetTitle();
 
-        protected override Drawable CreateTitleContent() => RulesetSelector = new BeatmapRulesetSelector
+        protected override Drawable CreateTitleContent() => RulesetSelector = new BeatmapRulesetSelector(ColourScheme)
         {
             Current = Ruleset
         };
@@ -52,12 +49,6 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 Title = "beatmap";
                 Section = "info";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Blue;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

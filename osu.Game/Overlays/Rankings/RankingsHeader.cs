@@ -12,6 +12,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -30,20 +32,14 @@ namespace osu.Game.Overlays.Rankings
         private SpotlightsContainer spotlightsContainer;
 
         public RankingsHeader()
+            : base(OverlayColourScheme.Green)
         {
-            HeaderInfo.Add(new CountryFilter
+            BackgroundHeight = 0;
+
+            HeaderInfo.Add(new CountryFilter(ColourScheme)
             {
                 Country = { BindTarget = Country }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            BackgroundHeight = 0;
-            TitleBackgroundColour = colours.GreySeafoamDark;
-            ControlBackgroundColour = colours.GreySeafoam;
-            TabControl.AccentColour = colours.Lime;
         }
 
         protected override void LoadComplete()
@@ -63,7 +59,7 @@ namespace osu.Game.Overlays.Rankings
             spotlightsContainer.Hide();
         }
 
-        protected override Drawable CreateTitleContent() => new RankingsRulesetSelector
+        protected override Drawable CreateTitleContent() => new RankingsRulesetSelector(ColourScheme)
         {
             Current = Ruleset,
         };
@@ -73,17 +69,21 @@ namespace osu.Game.Overlays.Rankings
             Scope = { BindTarget = Current }
         };
 
-        protected override Drawable CreateContent() => spotlightsContainer = new SpotlightsContainer
+        protected override Drawable CreateContent() => spotlightsContainer = new SpotlightsContainer(ColourScheme)
         {
             Spotlight = { BindTarget = Spotlight }
         };
 
         private class RankingsRulesetSelector : OverlayRulesetSelector
         {
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public RankingsRulesetSelector(OverlayColourScheme colourScheme)
+                : base(colourScheme)
             {
-                AccentColour = colours.Lime;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 SelectTab(TabContainer.FirstOrDefault());
             }
         }
@@ -104,9 +104,12 @@ namespace osu.Game.Overlays.Rankings
             private readonly OsuDropdown<Spotlight> dropdown;
             private readonly Container content;
             private readonly Box background;
+            private readonly OverlayColourScheme colourScheme;
 
-            public SpotlightsContainer()
+            public SpotlightsContainer(OverlayColourScheme colourScheme)
             {
+                this.colourScheme = colourScheme;
+
                 RelativeSizeAxes = Axes.X;
                 Child = content = new Container
                 {
@@ -135,7 +138,7 @@ namespace osu.Game.Overlays.Rankings
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                background.Colour = colours.GreySeafoamLight;
+                background.Colour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 0.2f, 0.25f, 1));
             }
 
             protected override void PopOut()
@@ -158,12 +161,6 @@ namespace osu.Game.Overlays.Rankings
             public RankingsHeaderTitle()
             {
                 Title = "ranking";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Lime;
             }
 
             protected override void LoadComplete()

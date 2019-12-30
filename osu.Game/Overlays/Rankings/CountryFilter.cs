@@ -15,6 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osu.Game.Users.Drawables;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -28,9 +29,12 @@ namespace osu.Game.Overlays.Rankings
         private readonly Box background;
         private readonly CountryPill countryPill;
         private readonly Container content;
+        private readonly OverlayColourScheme colourScheme;
 
-        public CountryFilter()
+        public CountryFilter(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
             Child = content = new Container
             {
@@ -75,7 +79,7 @@ namespace osu.Game.Overlays.Rankings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.GreySeafoamLight;
+            background.Colour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 0.2f, 0.25f, 1));
         }
 
         protected override void LoadComplete()

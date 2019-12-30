@@ -4,6 +4,10 @@
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Allocation;
+using osu.Game.Graphics;
+using osuTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Overlays
 {
@@ -11,10 +15,20 @@ namespace osu.Game.Overlays
     {
         private const float item_chevron_size = 8;
 
-        public OverlayHeaderBreadcrumbControl()
+        private readonly OverlayColourScheme colourScheme;
+
+        public OverlayHeaderBreadcrumbControl(OverlayColourScheme colourScheme)
             : base(item_chevron_size)
         {
+            this.colourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 1, 0.75f, 1));
         }
 
         protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value, item_chevron_size);

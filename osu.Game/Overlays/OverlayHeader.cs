@@ -2,32 +2,35 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        private readonly Box titleBackground;
         private readonly Container background;
-        protected readonly FillFlowContainer HeaderInfo;
+        private readonly Box titleBackground;
+        private readonly ScreenTitle title;
 
-        protected Color4 TitleBackgroundColour
-        {
-            set => titleBackground.Colour = value;
-        }
+        protected readonly FillFlowContainer HeaderInfo;
+        protected readonly OverlayColourScheme ColourScheme;
 
         protected float BackgroundHeight
         {
             set => background.Height = value;
         }
 
-        protected OverlayHeader()
+        protected OverlayHeader(OverlayColourScheme colourScheme)
         {
+            ColourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -62,9 +65,9 @@ namespace osu.Game.Overlays
                                     titleBackground = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.Gray,
+                                        
                                     },
-                                    CreateTitle().With(title =>
+                                    title = CreateTitle().With(title =>
                                     {
                                         title.Anchor = Anchor.CentreLeft;
                                         title.Origin = Anchor.CentreLeft;
@@ -91,6 +94,13 @@ namespace osu.Game.Overlays
                     CreateContent()
                 }
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            titleBackground.Colour = Color4.FromHsl(new Vector4(colours.GetBaseHue(ColourScheme), 0.2f, 0.15f, 1));
+            title.AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(ColourScheme), 1, 0.7f, 1));
         }
 
         [NotNull]

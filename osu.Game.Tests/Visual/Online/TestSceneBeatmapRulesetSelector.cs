@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using System;
@@ -97,6 +98,11 @@ namespace osu.Game.Tests.Visual.Online
             public new TabItem<RulesetInfo> SelectedTab => base.SelectedTab;
 
             public new TabFillFlowContainer TabContainer => base.TabContainer;
+
+            public TestRulesetSelector()
+                : base(OverlayColourScheme.Blue)
+            {
+            }
         }
     }
 }

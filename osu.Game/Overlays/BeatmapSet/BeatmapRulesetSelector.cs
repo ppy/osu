@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using System.Linq;
 
@@ -29,5 +30,10 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             BeatmapSet = { BindTarget = beatmapSet }
         };
+
+        public BeatmapRulesetSelector(OverlayColourScheme colourScheme)
+            : base(colourScheme)
+        {
+        }
     }
 }

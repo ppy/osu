@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -9,9 +10,14 @@ namespace osu.Game.Overlays
     {
         public readonly Bindable<T> Current = new Bindable<T>();
 
-        protected override OverlayHeaderTabControl<T> CreateControl() => new OverlayHeaderTabControl<T>
+        protected override OverlayHeaderTabControl<T> CreateControl() => new OverlayHeaderTabControl<T>(ColourScheme)
         {
             Current = Current
         };
+
+        protected TabControlOverlayHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
+        {
+        }
     }
 }

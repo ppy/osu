@@ -7,13 +7,19 @@ using osu.Framework.Graphics.Containers;
 using osuTK;
 using osu.Game.Graphics;
 using System;
+using osu.Framework.Allocation;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
     public class OverlayHeaderTabControl<T> : OverlayTabControl<T>
     {
-        public OverlayHeaderTabControl()
+        private readonly OverlayColourScheme colourScheme;
+
+        public OverlayHeaderTabControl(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             BarHeight = 1;
             RelativeSizeAxes = Axes.None;
             AutoSizeAxes = Axes.X;
@@ -26,6 +32,12 @@ namespace osu.Game.Overlays
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
             }
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 1, 0.75f, 1));
         }
 
         protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value)

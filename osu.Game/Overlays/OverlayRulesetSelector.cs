@@ -28,16 +28,19 @@ namespace osu.Game.Overlays
             }
         }
 
-        public OverlayRulesetSelector()
+        private readonly OverlayColourScheme colourScheme;
+
+        public OverlayRulesetSelector(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             AutoSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == default)
-                AccentColour = colours.Blue;
+            AccentColour = Color4.FromHsl(new Vector4(colours.GetBaseHue(colourScheme), 1, 0.7f, 1));
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value)
