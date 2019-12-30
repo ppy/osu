@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.BeatmapSet
         public BeatmapRulesetSelector RulesetSelector;
         public BeatmapHeaderContent HeaderContent;
 
-        public BeatmapSetHeader()
-            : base(OverlayColourScheme.Blue)
+        public BeatmapSetHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             BackgroundHeight = 0;
         }

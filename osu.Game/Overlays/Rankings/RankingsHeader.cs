@@ -29,8 +29,8 @@ namespace osu.Game.Overlays.Rankings
 
         private SpotlightsContainer spotlightsContainer;
 
-        public RankingsHeader()
-            : base(OverlayColourScheme.Green)
+        public RankingsHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             BackgroundHeight = 0;
 

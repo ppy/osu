@@ -12,7 +12,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
@@ -22,7 +21,7 @@ using osu.Game.Overlays.Changelog;
 
 namespace osu.Game.Overlays
 {
-    public class ChangelogOverlay : FullscreenOverlay
+    public class ChangelogOverlay : WebOverlay
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
@@ -36,50 +35,45 @@ namespace osu.Game.Overlays
 
         private List<APIUpdateStream> streams;
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colour)
+        public ChangelogOverlay()
+            : base(OverlayColourScheme.Purple)
         {
-            Waves.FirstWaveColour = colour.GreyVioletLight;
-            Waves.SecondWaveColour = colour.GreyViolet;
-            Waves.ThirdWaveColour = colour.GreyVioletDark;
-            Waves.FourthWaveColour = colour.GreyVioletDarker;
-
-            Children = new Drawable[]
+            Add(new OsuScrollContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.Both,
+                ScrollbarVisible = false,
+                Child = new ReverseChildIDFillFlowContainer<Drawable>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colour.PurpleDarkAlternative,
-                },
-                new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        header = new ChangelogHeader(ColourScheme)
                         {
-                            header = new ChangelogHeader
-                            {
-                                ListingSelected = ShowListing,
-                            },
-                            content = new Container<ChangelogContent>
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
+                            ListingSelected = ShowListing,
                         },
+                        content = new Container<ChangelogContent>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
                     },
                 },
-            };
-
-            sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
+            });
 
             header.Current.BindTo(Current);
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Current.BindValueChanged(e =>
             {
                 if (e.NewValue != null)

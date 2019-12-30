@@ -23,8 +23,8 @@ namespace osu.Game.Overlays.Profile
         private CentreHeaderContainer centreHeaderContainer;
         private DetailHeaderContainer detailHeaderContainer;
 
-        public ProfileHeader()
-            : base(OverlayColourScheme.Green)
+        public ProfileHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             BackgroundHeight = 150;
 

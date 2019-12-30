@@ -2,18 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Threading;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.News;
 
 namespace osu.Game.Overlays
 {
-    public class NewsOverlay : FullscreenOverlay
+    public class NewsOverlay : WebOverlay
     {
         private NewsHeader header;
 
@@ -21,41 +19,38 @@ namespace osu.Game.Overlays
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        public NewsOverlay()
+            : base(OverlayColourScheme.Purple)
         {
-            Children = new Drawable[]
+            Add(new OsuScrollContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.Both,
+                Child = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = colours.PurpleDarkAlternative
-                },
-                new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = new FillFlowContainer
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        header = new NewsHeader(ColourScheme)
                         {
-                            header = new NewsHeader
-                            {
-                                ShowFrontPage = ShowFrontPage
-                            },
-                            content = new Container<NewsContent>
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            }
+                            ShowFrontPage = ShowFrontPage
                         },
+                        content = new Container<NewsContent>
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
                     },
                 },
-            };
+            });
 
             header.Current.BindTo(Current);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
             Current.TriggerChange();
         }
 

@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.News
 
         public Action ShowFrontPage;
 
-        public NewsHeader()
-            : base(OverlayColourScheme.Purple)
+        public NewsHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             TabControl.AddItem(front_page_string);
 

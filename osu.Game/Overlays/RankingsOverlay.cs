@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
@@ -19,14 +18,13 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class RankingsOverlay : FullscreenOverlay
+    public class RankingsOverlay : WebOverlay
     {
         protected readonly Bindable<Country> Country = new Bindable<Country>();
         protected readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly BasicScrollContainer scrollFlow;
-        private readonly Box background;
         private readonly Container tableContainer;
         private readonly DimmedLoadingLayer loading;
 
@@ -37,65 +35,48 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         public RankingsOverlay()
+            : base(OverlayColourScheme.Green)
         {
-            Children = new Drawable[]
+            Add(scrollFlow = new BasicScrollContainer
             {
-                background = new Box
+                RelativeSizeAxes = Axes.Both,
+                ScrollbarVisible = false,
+                Child = new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                scrollFlow = new BasicScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new FillFlowContainer
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 5),
+                    Children = new Drawable[]
                     {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 5),
-                        Children = new Drawable[]
+                        new RankingsHeader(ColourScheme)
                         {
-                            new RankingsHeader
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Country = { BindTarget = Country },
+                            Current = { BindTarget = Scope },
+                            Ruleset = { BindTarget = ruleset }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Country = { BindTarget = Country },
-                                Current = { BindTarget = Scope },
-                                Ruleset = { BindTarget = ruleset }
-                            },
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Children = new Drawable[]
+                                tableContainer = new Container
                                 {
-                                    tableContainer = new Container
-                                    {
-                                        Anchor = Anchor.TopCentre,
-                                        Origin = Anchor.TopCentre,
-                                        AutoSizeAxes = Axes.Y,
-                                        RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding { Vertical = 10 }
-                                    },
-                                    loading = new DimmedLoadingLayer(),
-                                }
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    AutoSizeAxes = Axes.Y,
+                                    RelativeSizeAxes = Axes.X,
+                                    Margin = new MarginPadding { Vertical = 10 }
+                                },
+                                loading = new DimmedLoadingLayer(),
                             }
                         }
                     }
                 }
-            };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
-        {
-            Waves.FirstWaveColour = colour.Green;
-            Waves.SecondWaveColour = colour.GreenLight;
-            Waves.ThirdWaveColour = colour.GreenDark;
-            Waves.FourthWaveColour = colour.GreenDarker;
-
-            background.Colour = OsuColour.Gray(0.15f);
+            });
         }
 
         protected override void LoadComplete()

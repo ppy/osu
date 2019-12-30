@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -19,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class BeatmapSetOverlay : FullscreenOverlay
+    public class BeatmapSetOverlay : WebOverlay
     {
         public const float X_PADDING = 40;
         public const float TOP_PADDING = 25;
@@ -36,41 +35,34 @@ namespace osu.Game.Overlays
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
+            : base(OverlayColourScheme.Blue)
         {
-            Children = new Drawable[]
+            Add(scroll = new OsuScrollContainer
             {
-                new Box
+                RelativeSizeAxes = Axes.Both,
+                ScrollbarVisible = false,
+                Child = new ReverseChildIDFillFlowContainer<Drawable>
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.2f)
-                },
-                scroll = new OsuScrollContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ScrollbarVisible = false,
-                    Child = new ReverseChildIDFillFlowContainer<Drawable>
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        Header = new BeatmapSetHeader(ColourScheme)
                         {
-                            Header = new BeatmapSetHeader
-                            {
-                                BeatmapSet = { BindTarget = beatmapSet }
-                            },
-                            info = new Info
-                            {
-                                BeatmapSet = { BindTarget = beatmapSet }
-                            },
-                            new ScoresContainer
-                            {
-                                Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
-                            }
+                            BeatmapSet = { BindTarget = beatmapSet }
                         },
+                        info = new Info
+                        {
+                            BeatmapSet = { BindTarget = beatmapSet }
+                        },
+                        new ScoresContainer
+                        {
+                            Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
+                        }
                     },
                 },
-            };
+            });
         }
 
         [BackgroundDependencyLoader]

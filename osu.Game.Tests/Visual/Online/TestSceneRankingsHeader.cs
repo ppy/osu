@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Taiko;
@@ -25,7 +26,7 @@ namespace osu.Game.Tests.Visual.Online
             var ruleset = new Bindable<RulesetInfo>();
             var scope = new Bindable<RankingsScope>();
 
-            Add(new RankingsHeader
+            Add(new RankingsHeader(OverlayColourScheme.Green)
             {
                 Current = { BindTarget = scope },
                 Country = { BindTarget = countryBindable },

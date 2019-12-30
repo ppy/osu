@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -38,7 +39,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneUserProfileHeader()
         {
-            header = new ProfileHeader();
+            header = new ProfileHeader(OverlayColourScheme.Purple);
             Add(header);
 
             AddStep("Show test dummy", () => header.User.Value = TestSceneUserProfileOverlay.TEST_USER);

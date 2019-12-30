@@ -25,8 +25,8 @@ namespace osu.Game.Overlays.Changelog
 
         private const string listing_string = "listing";
 
-        public ChangelogHeader()
-            : base(OverlayColourScheme.Purple)
+        public ChangelogHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             TabControl.AddItem(listing_string);
             TabControl.Current.ValueChanged += e =>

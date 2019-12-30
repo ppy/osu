@@ -18,7 +18,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public class UserProfileOverlay : FullscreenOverlay
+    public class UserProfileOverlay : WebOverlay
     {
         private ProfileSection lastSection;
         private ProfileSection[] sections;
@@ -28,6 +28,11 @@ namespace osu.Game.Overlays
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
+
+        public UserProfileOverlay()
+            : base(OverlayColourScheme.Green)
+        {
+        }
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -74,7 +79,7 @@ namespace osu.Game.Overlays
 
             Add(sectionsContainer = new ProfileSectionsContainer
             {
-                ExpandableHeader = Header = new ProfileHeader(),
+                ExpandableHeader = Header = new ProfileHeader(ColourScheme),
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
