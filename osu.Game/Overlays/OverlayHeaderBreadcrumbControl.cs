@@ -9,15 +9,14 @@ namespace osu.Game.Overlays
 {
     public class OverlayHeaderBreadcrumbControl : BreadcrumbControl<string>
     {
-        private const float item_chevron_size = 8;
-
         public OverlayHeaderBreadcrumbControl()
-            : base(item_chevron_size)
         {
             RelativeSizeAxes = Axes.X;
         }
 
-        protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value, item_chevron_size);
+        protected override float ItemChevronSize => 8;
+
+        protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value, ItemChevronSize);
 
         private class ControlTabItem : BreadcrumbTabItem
         {
