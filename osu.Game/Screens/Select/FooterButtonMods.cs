@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Select
                     }
                 },
                 AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 70, Right = 15 }
+                Margin = new MarginPadding { Left = 70, Right = 14 }
             });
         }
 
