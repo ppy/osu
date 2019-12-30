@@ -22,6 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            BackgroundHeight = 0;
             TitleBackgroundColour = colours.Gray2;
             RulesetSelector.AccentColour = colours.Blue;
         }

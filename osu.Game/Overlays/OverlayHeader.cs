@@ -50,6 +50,7 @@ namespace osu.Game.Overlays
                             {
                                 RelativeSizeAxes = Axes.X,
                                 Masking = true,
+                                Height = 80,
                                 Child = CreateBackground()
                             },
                             new Container
