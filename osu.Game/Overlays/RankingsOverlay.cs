@@ -95,7 +95,7 @@ namespace osu.Game.Overlays
             Waves.ThirdWaveColour = colour.GreenDark;
             Waves.FourthWaveColour = colour.GreenDarker;
 
-            background.Colour = colour.GreySeafoamDark;
+            background.Colour = OsuColour.Gray(0.15f);
         }
 
         protected override void LoadComplete()
