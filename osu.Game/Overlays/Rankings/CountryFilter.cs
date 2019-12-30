@@ -187,6 +187,7 @@ namespace osu.Game.Overlays.Rankings
 
             public void Collapse()
             {
+                ClearTransforms();
                 AutoSizeAxes = Axes.None;
                 this.ResizeWidthTo(0, duration, Easing.OutQuint);
                 this.FadeOut(duration, Easing.OutQuint);
