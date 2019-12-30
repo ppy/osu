@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
         private readonly Box background;
         private readonly Container content;
 
-        public WebOverlay(OverlayColourScheme colourScheme)
+        protected WebOverlay(OverlayColourScheme colourScheme)
         {
             ColourScheme = colourScheme;
 

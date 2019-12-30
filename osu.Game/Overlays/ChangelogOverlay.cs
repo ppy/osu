@@ -25,9 +25,9 @@ namespace osu.Game.Overlays
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
-        private ChangelogHeader header;
+        private readonly ChangelogHeader header;
 
-        private Container<ChangelogContent> content;
+        private readonly Container<ChangelogContent> content;
 
         private SampleChannel sampleBack;
 
@@ -52,6 +52,7 @@ namespace osu.Game.Overlays
                         header = new ChangelogHeader(ColourScheme)
                         {
                             ListingSelected = ShowListing,
+                            Current = { BindTarget = Current }
                         },
                         content = new Container<ChangelogContent>
                         {
@@ -61,8 +62,6 @@ namespace osu.Game.Overlays
                     },
                 },
             });
-
-            header.Current.BindTo(Current);
         }
 
         [BackgroundDependencyLoader]

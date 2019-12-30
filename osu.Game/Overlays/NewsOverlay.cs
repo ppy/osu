@@ -13,9 +13,7 @@ namespace osu.Game.Overlays
 {
     public class NewsOverlay : WebOverlay
     {
-        private NewsHeader header;
-
-        private Container<NewsContent> content;
+        private readonly Container<NewsContent> content;
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
 
@@ -32,9 +30,10 @@ namespace osu.Game.Overlays
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        header = new NewsHeader(ColourScheme)
+                        new NewsHeader(ColourScheme)
                         {
-                            ShowFrontPage = ShowFrontPage
+                            ShowFrontPage = ShowFrontPage,
+                            Current = { BindTarget = Current }
                         },
                         content = new Container<NewsContent>
                         {
@@ -44,8 +43,6 @@ namespace osu.Game.Overlays
                     },
                 },
             });
-
-            header.Current.BindTo(Current);
         }
 
         protected override void LoadComplete()
