@@ -60,6 +60,8 @@ namespace osu.Game.Overlays
                 },
                 new HoverClickSounds()
             });
+
+            Enabled.Value = true;
         }
 
         protected override void LoadComplete()
