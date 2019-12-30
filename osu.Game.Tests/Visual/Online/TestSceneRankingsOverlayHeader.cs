@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Online
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Ruleset = { BindTarget = ruleset },
-                Scope = { BindTarget = scope }
+                Current = { BindTarget = scope }
             });
 
             AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);

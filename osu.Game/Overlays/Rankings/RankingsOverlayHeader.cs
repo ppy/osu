@@ -10,9 +10,8 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class RankingsOverlayHeader : OverlayHeader
+    public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
-        public readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private OverlayRulesetSelector rulesetSelector;
@@ -22,7 +21,8 @@ namespace osu.Game.Overlays.Rankings
         {
             BackgroundHeight = 0;
             TitleBackgroundColour = colours.GreySeafoamDark;
-            rulesetSelector.AccentColour = colours.Lime;
+            ControlBackgroundColour = colours.GreySeafoam;
+            rulesetSelector.AccentColour = TabControl.AccentColour = colours.Lime;
         }
 
         protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Rankings
 
         protected override ScreenTitle CreateTitle() => new RankingsHeaderTitle
         {
-            Scope = { BindTarget = Scope }
+            Scope = { BindTarget = Current }
         };
 
         private class RankingsHeaderTitle : ScreenTitle

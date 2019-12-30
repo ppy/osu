@@ -6,10 +6,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
 using osu.Game.Graphics;
+using System;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayHeaderTabControl : OverlayTabControl<string>
+    public class OverlayHeaderTabControl<T> : OverlayTabControl<T>
     {
         public OverlayHeaderTabControl()
         {
@@ -19,9 +20,15 @@ namespace osu.Game.Overlays
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
             Height = 35;
+
+            if (typeof(T).IsEnum)
+            {
+                foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                    AddItem(val);
+            }
         }
 
-        protected override TabItem<string> CreateTabItem(string value) => new OverlayHeaderTabItem(value)
+        protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value)
         {
             AccentColour = AccentColour,
         };
@@ -36,10 +43,10 @@ namespace osu.Game.Overlays
 
         private class OverlayHeaderTabItem : OverlayTabItem
         {
-            public OverlayHeaderTabItem(string value)
+            public OverlayHeaderTabItem(T value)
                 : base(value)
             {
-                Text.Text = value;
+                Text.Text = value.ToString();
                 Text.Font = OsuFont.GetFont(size: 14);
                 Bar.ExpandedSize = 5;
             }

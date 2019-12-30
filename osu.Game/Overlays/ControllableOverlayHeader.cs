@@ -9,8 +9,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class ControllableOverlayHeader<TModel> : OverlayHeader
-        where TModel : TabControl<string>
+    public abstract class ControllableOverlayHeader<TModel, T> : OverlayHeader
+        where TModel : TabControl<T>
     {
         protected readonly TModel TabControl;
 
