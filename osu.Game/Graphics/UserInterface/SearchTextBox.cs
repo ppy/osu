@@ -46,6 +46,7 @@ namespace osu.Game.Graphics.UserInterface
                 case PlatformActionType.CharNext:
                     if (action.ActionMethod == PlatformActionMethod.Delete)
                         return false;
+
                     break;
             }
 
