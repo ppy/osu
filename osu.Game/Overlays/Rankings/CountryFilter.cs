@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.Rankings
                 content.FadeOut(duration, Easing.OutQuint);
                 return;
             }
-            
+
             this.ResizeHeightTo(height, duration, Easing.OutQuint);
             content.FadeIn(duration, Easing.OutQuint).Finally(_ => countryPill.Expand());
         }
