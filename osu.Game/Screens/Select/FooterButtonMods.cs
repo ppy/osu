@@ -3,7 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+// using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
@@ -34,31 +34,19 @@ namespace osu.Game.Screens.Select
 
         public FooterButtonMods()
         {
-            Add(new FillFlowContainer
+            TextContainer.Add(modDisplay = new FooterModDisplay
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Direction = FillDirection.Horizontal,
-                Shear = -SHEAR,
-                Children = new Drawable[]
-                {
-                    modDisplay = new FooterModDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        DisplayUnrankedText = false,
-                        Scale = new Vector2(0.8f)
-                    },
-                    MultiplierText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Right = 6 }
-                    }
-                },
-                AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 70, Right = 14 }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                DisplayUnrankedText = false,
+                Scale = new Vector2(0.8f)
+            });
+            TextContainer.Add(MultiplierText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                Margin = new MarginPadding { Right = 6 }
             });
         }
 

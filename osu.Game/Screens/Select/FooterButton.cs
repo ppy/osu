@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected readonly Container TextContainer;
+        protected FillFlowContainer TextContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
@@ -80,15 +80,24 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                TextContainer = new Container
+                TextContainer = new FillFlowContainer
                 {
-                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Direction = FillDirection.Horizontal,
                     Shear = -SHEAR,
-                    Child = SpriteText = new OsuSpriteText
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                        SpriteText = new OsuSpriteText
+                        {
+                            Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                            Shear = -SHEAR,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                        }
+                    },
+                    AutoSizeAxes = Axes.Both,
+                    // Margin = new MarginPadding { Left = 70, Right = 14 }
                 },
             };
         }
