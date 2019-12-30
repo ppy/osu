@@ -38,8 +38,6 @@ namespace osu.Game.Overlays
         {
             if (accentColour == default)
                 AccentColour = colours.Blue;
-
-            SelectTab(TabContainer.FirstOrDefault());
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value)

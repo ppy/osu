@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -26,7 +27,6 @@ namespace osu.Game.Overlays.Rankings
             set => spotlightsContainer.Spotlights = value;
         }
 
-        private OverlayRulesetSelector rulesetSelector;
         private SpotlightsContainer spotlightsContainer;
 
         public RankingsHeader()
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Rankings
             BackgroundHeight = 0;
             TitleBackgroundColour = colours.GreySeafoamDark;
             ControlBackgroundColour = colours.GreySeafoam;
-            rulesetSelector.AccentColour = TabControl.AccentColour = colours.Lime;
+            TabControl.AccentColour = colours.Lime;
         }
 
         protected override void LoadComplete()
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.Rankings
             spotlightsContainer.Hide();
         }
 
-        protected override Drawable CreateTitleContent() => rulesetSelector = new OverlayRulesetSelector
+        protected override Drawable CreateTitleContent() => new RankingsRulesetSelector
         {
             Current = Ruleset,
         };
@@ -77,6 +77,16 @@ namespace osu.Game.Overlays.Rankings
         {
             Spotlight = { BindTarget = Spotlight }
         };
+
+        private class RankingsRulesetSelector : OverlayRulesetSelector
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                AccentColour = colours.Lime;
+                SelectTab(TabContainer.FirstOrDefault());
+            }
+        }
 
         private class SpotlightsContainer : VisibilityContainer
         {
