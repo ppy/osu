@@ -37,8 +37,6 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
-        private BeatmapSetOverlay beatmapSetOverlay;
-
         public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton?.Playing;
 
@@ -77,8 +75,6 @@ namespace osu.Game.Overlays.Direct
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
-            this.beatmapSetOverlay = beatmapSetOverlay;
-
             AddInternal(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
