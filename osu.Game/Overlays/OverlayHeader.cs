@@ -12,20 +12,13 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        protected readonly OverlayHeaderTabControl TabControl;
-
         private readonly Box titleBackground;
-        private readonly Box controlBackground;
         private readonly Container background;
+        protected readonly FillFlowContainer HeaderInfo;
 
         protected Color4 TitleBackgroundColour
         {
             set => titleBackground.Colour = value;
-        }
-
-        protected Color4 ControlBackgroundColour
-        {
-            set => controlBackground.Colour = value;
         }
 
         protected float BackgroundHeight
@@ -45,53 +38,53 @@ namespace osu.Game.Overlays
                 Direction = FillDirection.Vertical,
                 Children = new[]
                 {
-                    background = new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 80,
-                        Masking = true,
-                        Child = CreateBackground()
-                    },
-                    new Container
+                    HeaderInfo = new FillFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            titleBackground = new Box
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
-                            },
-                            CreateTitle().With(title =>
-                            {
-                                title.Margin = new MarginPadding
-                                {
-                                    Vertical = 10,
-                                    Left = UserProfileOverlay.CONTENT_X_MARGIN
-                                };
-                            })
-                        }
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
+                        Direction = FillDirection.Vertical,
                         Depth = -float.MaxValue,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
-                            controlBackground = new Box
+                            background = new Container
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
-                            },
-                            TabControl = new OverlayHeaderTabControl
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
                                 RelativeSizeAxes = Axes.X,
-                                Height = 30,
-                                Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
+                                Masking = true,
+                                Height = 80,
+                                Child = CreateBackground()
+                            },
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new[]
+                                {
+                                    titleBackground = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.Gray,
+                                    },
+                                    CreateTitle().With(title =>
+                                    {
+                                        title.Anchor = Anchor.CentreLeft;
+                                        title.Origin = Anchor.CentreLeft;
+                                        title.Margin = new MarginPadding
+                                        {
+                                            Vertical = 10,
+                                            Left = UserProfileOverlay.CONTENT_X_MARGIN
+                                        };
+                                    }),
+                                    CreateTitleContent().With(content =>
+                                    {
+                                        content.Anchor = Anchor.CentreRight;
+                                        content.Origin = Anchor.CentreRight;
+                                        content.Margin = new MarginPadding
+                                        {
+                                            Vertical = 10,
+                                            Right = UserProfileOverlay.CONTENT_X_MARGIN
+                                        };
+                                    })
+                                }
                             }
                         }
                     },
@@ -100,10 +93,14 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected abstract Drawable CreateBackground();
+        [NotNull]
+        protected virtual Drawable CreateBackground() => new Container();
 
         [NotNull]
         protected virtual Drawable CreateContent() => new Container();
+
+        [NotNull]
+        protected virtual Drawable CreateTitleContent() => new Container();
 
         protected abstract ScreenTitle CreateTitle();
     }

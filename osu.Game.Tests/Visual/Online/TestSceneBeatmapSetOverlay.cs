@@ -23,7 +23,6 @@ namespace osu.Game.Tests.Visual.Online
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Header),
             typeof(ScoreTable),
             typeof(ScoreTableRowBackground),
             typeof(DrawableTopScore),
@@ -34,7 +33,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(Details),
             typeof(HeaderDownloadButton),
             typeof(FavouriteButton),
-            typeof(Header),
+            typeof(BeatmapHeaderContent),
             typeof(HeaderButton),
             typeof(Info),
             typeof(PreviewButton),
@@ -42,7 +41,10 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapAvailability),
             typeof(BeatmapRulesetSelector),
             typeof(BeatmapRulesetTabItem),
-            typeof(NotSupporterPlaceholder)
+            typeof(NotSupporterPlaceholder),
+            typeof(OverlayHeader),
+            typeof(BeatmapSetHeader),
+            typeof(OverlayRulesetSelector),
         };
 
         protected override bool UseOnlineAPI => true;
@@ -257,8 +259,8 @@ namespace osu.Game.Tests.Visual.Online
                 });
             });
 
-            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.RulesetSelector.Current.Value)));
-            AddAssert("left-most beatmap selected", () => overlay.Header.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
+            AddAssert("shown beatmaps of current ruleset", () => overlay.Header.HeaderContent.Picker.Difficulties.All(b => b.Beatmap.Ruleset.Equals(overlay.Header.HeaderContent.Ruleset.Value)));
+            AddAssert("left-most beatmap selected", () => overlay.Header.HeaderContent.Picker.Difficulties.First().State == BeatmapPicker.DifficultySelectorState.Selected);
         }
 
         [Test]
@@ -325,12 +327,12 @@ namespace osu.Game.Tests.Visual.Online
 
         private void downloadAssert(bool shown)
         {
-            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.DownloadButtonsVisible == shown);
+            AddAssert($"is download button {(shown ? "shown" : "hidden")}", () => overlay.Header.HeaderContent.DownloadButtonsVisible == shown);
         }
 
         private class TestBeatmapSetOverlay : BeatmapSetOverlay
         {
-            public new Header Header => base.Header;
+            public new BeatmapSetHeader Header => base.Header;
         }
     }
 }

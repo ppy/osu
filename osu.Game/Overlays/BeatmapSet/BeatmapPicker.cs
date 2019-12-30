@@ -34,6 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
         public readonly DifficultiesContainer Difficulties;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private BeatmapSetInfo beatmapSet;
 
@@ -113,32 +114,25 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 },
             };
-
-            Beatmap.ValueChanged += b =>
-            {
-                showBeatmap(b.NewValue);
-                updateDifficultyButtons();
-            };
         }
-
-        [Resolved]
-        private IBindable<RulesetInfo> ruleset { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             starRating.Colour = colours.Yellow;
-            updateDisplay();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            ruleset.ValueChanged += r => updateDisplay();
+            Beatmap.ValueChanged += b =>
+            {
+                showBeatmap(b.NewValue);
+                updateDifficultyButtons();
+            };
 
-            // done here so everything can bind in intialization and get the first trigger
-            Beatmap.TriggerChange();
+            Ruleset.BindValueChanged(_ => updateDisplay(), true);
         }
 
         private void updateDisplay()
@@ -147,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             if (BeatmapSet != null)
             {
-                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Where(b => b.Ruleset.Equals(ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
+                Difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Where(b => b.Ruleset.Equals(Ruleset.Value)).OrderBy(b => b.StarDifficulty).Select(b => new DifficultySelectorButton(b)
                 {
                     State = DifficultySelectorState.NotSelected,
                     OnHovered = beatmap =>

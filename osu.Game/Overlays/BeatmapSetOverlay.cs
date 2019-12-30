@@ -24,20 +24,19 @@ namespace osu.Game.Overlays
         public const float X_PADDING = 40;
         public const float TOP_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
-        protected readonly Header Header;
+        protected readonly BeatmapSetHeader Header;
 
         private RulesetStore rulesets;
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
+        private readonly OsuScrollContainer scroll;
+        private readonly Info info;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
-            OsuScrollContainer scroll;
-            Info info;
-
             Children = new Drawable[]
             {
                 new Box
@@ -56,25 +55,21 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            Header = new Header(),
-                            info = new Info(),
+                            Header = new BeatmapSetHeader
+                            {
+                                BeatmapSet = { BindTarget = beatmapSet }
+                            },
+                            info = new Info
+                            {
+                                BeatmapSet = { BindTarget = beatmapSet }
+                            },
                             new ScoresContainer
                             {
-                                Beatmap = { BindTarget = Header.Picker.Beatmap }
+                                Beatmap = { BindTarget = Header.HeaderContent.Picker.Beatmap }
                             }
                         },
                     },
                 },
-            };
-
-            Header.BeatmapSet.BindTo(beatmapSet);
-            info.BeatmapSet.BindTo(beatmapSet);
-
-            Header.Picker.Beatmap.ValueChanged += b =>
-            {
-                info.Beatmap = b.NewValue;
-
-                scroll.ScrollToStart();
             };
         }
 
@@ -82,6 +77,16 @@ namespace osu.Game.Overlays
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Header.HeaderContent.Picker.Beatmap.ValueChanged += b =>
+            {
+                info.Beatmap = b.NewValue;
+                scroll.ScrollToStart();
+            };
         }
 
         protected override void PopOutComplete()
@@ -104,7 +109,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 beatmapSet.Value = res.ToBeatmapSet(rulesets);
-                Header.Picker.Beatmap.Value = Header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                Header.HeaderContent.Picker.Beatmap.Value = beatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             API.Queue(req);
 
