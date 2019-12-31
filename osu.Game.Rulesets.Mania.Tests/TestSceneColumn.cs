@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Height = 0.85f,
-                AccentColour = Color4.OrangeRed,
+                ColumnType = new TestColumn(),
                 Action = { Value = action },
             };
 
@@ -111,6 +111,11 @@ namespace osu.Game.Rulesets.Mania.Tests
                 TimeRange = 2000,
                 Child = column
             };
+        }
+
+        private class TestColumn : ColumnType
+        {
+            public override Color4 ColumnColour => Color4.OrangeRed;
         }
     }
 }
