@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Height = 0.85f,
-                ColumnType = new TestColumn(),
+                ColumnType = new TestColumnType(),
                 Action = { Value = action },
             };
 
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        private class TestColumn : ColumnType
+        private class TestColumnType : ColumnType
         {
             public override Color4 ColumnColour => Color4.OrangeRed;
         }

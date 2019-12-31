@@ -202,11 +202,11 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             normalColumnTypes = new List<ColumnType>
             {
-                new OddColumn(),
-                new EvenColumn(),
+                new OddColumnType(),
+                new EvenColumnType(),
             };
 
-            specialColumnType = new SpecialColumn();
+            specialColumnType = new SpecialColumnType();
 
             // Set the special column + colour + key
             foreach (var column in Columns)
