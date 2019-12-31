@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Mania.UI
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         public const float COLUMN_WIDTH = 80;
-        private const float special_column_width = 70;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
