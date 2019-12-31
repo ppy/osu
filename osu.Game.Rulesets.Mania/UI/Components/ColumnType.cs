@@ -10,16 +10,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         public abstract Color4 ColumnColour { get; }
         public virtual float DefaultColumnWidth => Column.COLUMN_WIDTH;
 
-        public virtual string NoteTexture => "mania-note1";
-        public virtual string HoldTexture => "mania-note1L";
-        public virtual string HoldHeadTexture => "mania-note1H";
-        public virtual string HoldTailTexture => "mania-note1T";
-        public virtual string KeyTexture => "mania-key1";
-        public virtual string KeyDownTexture => "mania-key1D";
+        public abstract string NoteTextureName { get; }
+        public abstract string HoldTextureName { get; }
+        public abstract string HoldHeadTextureName { get; }
+        public abstract string HoldTailTextureName { get; }
+        public abstract string KeyUpTextureName { get; }
+        public abstract string KeyDownTextureName { get; }
 
         /// <summary>
         /// Colour to use if notes are skinned.
         /// </summary>
-        public virtual Color4 SkinnedColumnColour => new Color4(31, 31, 31, 255);
+        public abstract Color4 SkinnedColumnColour { get; }
     }
 }

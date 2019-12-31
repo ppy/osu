@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        private class TestColumnType : ColumnType
+        private class TestColumnType : OddColumnType
         {
             public override Color4 ColumnColour => Color4.OrangeRed;
         }

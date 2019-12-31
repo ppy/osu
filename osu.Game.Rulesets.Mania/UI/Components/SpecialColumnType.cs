@@ -10,12 +10,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         public override Color4 ColumnColour => new Color4(0, 48, 63, 255);
         public override float DefaultColumnWidth => 70;
 
-        public override string NoteTexture => "mania-noteS";
-        public override string HoldTexture => "mania-noteSL";
-        public override string HoldHeadTexture => "mania-noteSH";
-        public override string HoldTailTexture => "mania-noteST";
-        public override string KeyTexture => "mania-keyS";
-        public override string KeyDownTexture => "mania-keySD";
+        public override string NoteTextureName => "mania-noteS";
+        public override string HoldTextureName => "mania-noteSL";
+        public override string HoldHeadTextureName => "mania-noteSH";
+        public override string HoldTailTextureName => "mania-noteST";
+        public override string KeyUpTextureName => "mania-keyS";
+        public override string KeyDownTextureName => "mania-keySD";
 
         public override Color4 SkinnedColumnColour => new Color4(63, 63, 63, 255);
     }
