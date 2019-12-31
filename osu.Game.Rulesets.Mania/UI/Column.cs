@@ -101,6 +101,23 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
+        private ColumnType columnType;
+
+        public ColumnType ColumnType
+        {
+            get => columnType;
+            set
+            {
+                if (columnType == value || columnType == null)
+                    return;
+
+                columnType = value;
+
+                AccentColour = columnType.ColumnColour;
+                Width = columnType.DefaultColumnWidth;
+            }
+        }
+
         private bool isSpecial;
 
         public bool IsSpecial
