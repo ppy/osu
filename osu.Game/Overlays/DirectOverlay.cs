@@ -179,11 +179,8 @@ namespace osu.Game.Overlays
                                     "Tag".ToQuantity(ResultAmounts.Tags);
         }
 
-        private void addPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets) {
-            if (BeatmapSets == null)
-                return;
-
-            var newPanels = sets.Select<BeatmapSetInfo, DirectPanel>(b =>
+        private IEnumerable<DirectPanel> createPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets) {
+            return sets.Select<BeatmapSetInfo, DirectPanel>(b =>
             {
                 switch (displayStyle)
                 {
@@ -198,6 +195,13 @@ namespace osu.Game.Overlays
                         return new DirectListPanel(b);
                 }
             });
+        }
+
+        private void addPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets) {
+            if (BeatmapSets == null)
+                return;
+
+            var newPanels = createPanels(displayStyle, sets);
 
             LoadComponentsAsync(newPanels, p =>
             {
@@ -225,21 +229,7 @@ namespace osu.Game.Overlays
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(panel_padding),
                 Margin = new MarginPadding { Top = 10 },
-                ChildrenEnumerable = BeatmapSets.Select<BeatmapSetInfo, DirectPanel>(b =>
-                {
-                    switch (displayStyle)
-                    {
-                        case PanelDisplayStyle.Grid:
-                            return new DirectGridPanel(b)
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                            };
-
-                        default:
-                            return new DirectListPanel(b);
-                    }
-                })
+                ChildrenEnumerable = createPanels(displayStyle, BeatmapSets)
             };
 
             LoadComponentAsync(newPanels, p =>

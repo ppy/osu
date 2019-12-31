@@ -25,6 +25,8 @@ namespace osu.Game.Overlays.SearchableList
     {
         private readonly Container scrollContainer;
 
+        protected readonly OsuScrollContainer scroll;
+
         protected readonly SearchableListHeader<THeader> Header;
         protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
         protected readonly FillFlowContainer ScrollFlow;
@@ -66,7 +68,7 @@ namespace osu.Game.Overlays.SearchableList
                     {
                         RelativeSizeAxes = Axes.Both,
                         Masking = true,
-                        Child = new OsuScrollContainer
+                        Child = scroll = new OsuScrollContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             ScrollbarVisible = false,
