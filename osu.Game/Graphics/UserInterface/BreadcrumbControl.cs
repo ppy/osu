@@ -15,18 +15,18 @@ namespace osu.Game.Graphics.UserInterface
     public class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
-        private readonly float itemChevronSize;
 
-        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value, itemChevronSize)
+        protected virtual float ItemChevronSize => 10;
+
+        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value, ItemChevronSize)
         {
             AccentColour = AccentColour,
         };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + itemChevronSize);
+        protected override float StripWidth() => base.StripWidth() - (padding + ItemChevronSize);
 
-        public BreadcrumbControl(float itemChevronSize = 10)
+        public BreadcrumbControl()
         {
-            this.itemChevronSize = itemChevronSize;
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
             Current.ValueChanged += index =>
