@@ -11,12 +11,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    /// <typeparam name="TControl">A control for overlay.</typeparam>
-    public abstract class OverlayHeader<TControl> : Container
-        where TControl : TabControl<string>
+    public abstract class OverlayHeader : Container
     {
-        protected readonly TControl TabControl;
-
         private readonly Box titleBackground;
         private readonly Box controlBackground;
         private readonly Container background;
@@ -88,7 +84,7 @@ namespace osu.Game.Overlays
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = Color4.Gray,
                             },
-                            TabControl = CreateControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
+                            CreateControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
                         }
                     },
                     CreateContent()
@@ -103,6 +99,6 @@ namespace osu.Game.Overlays
 
         protected abstract ScreenTitle CreateTitle();
 
-        protected abstract TControl CreateControl();
+        protected abstract TabControl<string> CreateControl();
     }
 }
