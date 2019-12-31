@@ -12,22 +12,24 @@ namespace osu.Game.Online.API.Requests
     {
         private readonly string query;
         private readonly RulesetInfo ruleset;
+        private readonly int page;
         private readonly BeatmapSearchCategory searchCategory;
         private readonly DirectSortCriteria sortCriteria;
         private readonly SortDirection direction;
         private string directionString => direction == SortDirection.Descending ? @"desc" : @"asc";
 
-        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+        public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, int page = 1, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
             this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
+            this.page = page;
             this.searchCategory = searchCategory;
             this.sortCriteria = sortCriteria;
             this.direction = direction;
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={searchCategory.ToString().ToLowerInvariant()}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
+        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&page={page}&s={searchCategory.ToString().ToLowerInvariant()}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
     }
 
     public enum BeatmapSearchCategory

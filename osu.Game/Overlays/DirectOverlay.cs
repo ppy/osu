@@ -179,6 +179,35 @@ namespace osu.Game.Overlays
                                     "Tag".ToQuantity(ResultAmounts.Tags);
         }
 
+        private void addPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets) {
+            if (BeatmapSets == null)
+                return;
+
+            var newPanels = sets.Select<BeatmapSetInfo, DirectPanel>(b =>
+            {
+                switch (displayStyle)
+                {
+                    case PanelDisplayStyle.Grid:
+                        return new DirectGridPanel(b)
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        };
+
+                    default:
+                        return new DirectListPanel(b);
+                }
+            });
+
+            LoadComponentsAsync(newPanels, p =>
+            {
+                if (panels == null)
+                    return;
+                
+                panels.AddRange(newPanels);
+            });
+        }
+        
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
             if (panels != null)
@@ -232,19 +261,47 @@ namespace osu.Game.Overlays
         private SearchBeatmapSetsRequest getSetsRequest;
 
         private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
+        private int currentPage = 1;
+        private bool isLastPageLoaded = false;
 
         private ScheduledDelegate queryChangedDebounce;
+        private ScheduledDelegate addPageDebounce;
         private PreviewTrackManager previewTrackManager;
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
             BeatmapSets = null;
             ResultAmounts = null;
+            currentPage = 1;
+            isLastPageLoaded = false;
 
             getSetsRequest?.Cancel();
 
             queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
+        }
+
+        private void queueAddPage()
+        {
+            if (getSetsRequest != null)
+                return;
+
+            if (addPageDebounce != null)
+                return;
+            
+            if (isLastPageLoaded)
+                return;
+            
+            currentPage++;
+            updateSearch();
+
+            getSetsRequest.Success += response =>
+            {
+                addPageDebounce = Scheduler.AddDelayed(() =>
+                {
+                    addPageDebounce = null;
+                }, 500);
+            };
         }
 
         private void updateSearch()
@@ -263,6 +320,7 @@ namespace osu.Game.Overlays
             getSetsRequest = new SearchBeatmapSetsRequest(
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
+                currentPage,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)
 
@@ -275,13 +333,40 @@ namespace osu.Game.Overlays
                     // may not need scheduling; loads async internally.
                     Schedule(() =>
                     {
-                        BeatmapSets = sets;
-                        recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                        if (sets.Count <= 0) isLastPageLoaded = true;
+
+                        if (currentPage > 1)
+                        {
+                            BeatmapSets = BeatmapSets.Concat(sets);
+                            addPanels(Filter.DisplayStyleControl.DisplayStyle.Value, sets);
+                        }
+                        else
+                        {
+                            BeatmapSets = sets;
+                            recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                        }
+                        
+                        getSetsRequest = null;
                     });
                 });
             };
 
             API.Queue(getSetsRequest);
+        }
+
+        protected override void Update() {
+            base.Update();
+
+            if (panels == null)
+                return;
+
+            if (scroll.ScrollableExtent <= 0)
+                return;
+
+            if (!scroll.IsScrolledToEnd(500f))
+                return;
+                        
+            queueAddPage();
         }
 
         private int distinctCount(List<string> list) => list.Distinct().ToArray().Length;
