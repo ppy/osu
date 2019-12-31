@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                Margin = new MarginPadding { Right = 6 }
+                // Margin = new MarginPadding { Right = 6 }
             });
         }
 
@@ -80,6 +80,11 @@ namespace osu.Game.Screens.Select
                 MultiplierText.FadeColour(lowMultiplierColour, 200);
             else
                 MultiplierText.FadeColour(Color4.White, 200);
+
+            if (Current.Value?.Count > 0)
+                modDisplay.FadeIn(0);
+            else
+                modDisplay.FadeOut(0);
         }
 
         private class FooterModDisplay : ModDisplay

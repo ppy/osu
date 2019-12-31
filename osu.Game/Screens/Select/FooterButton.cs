@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Select
                         SpriteText = new OsuSpriteText
                         {
                             Size = new Vector2(100 - SHEAR_WIDTH, 50),
-                            Shear = -SHEAR,
+                            Shear = SHEAR,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         }
