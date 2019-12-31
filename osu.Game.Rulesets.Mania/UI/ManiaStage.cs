@@ -12,6 +12,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
+using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -39,8 +40,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Container topLevelContainer;
 
-        private List<Color4> normalColumnColours = new List<Color4>();
-        private Color4 specialColumnColour;
+        private List<ColumnType> normalColumnTypes = new List<ColumnType>();
+        private ColumnType specialColumnType;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
 
@@ -199,13 +200,13 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            normalColumnColours = new List<Color4>
+            normalColumnTypes = new List<ColumnType>
             {
-                new Color4(94, 0, 57, 255),
-                new Color4(6, 84, 0, 255)
+                new OddColumn(),
+                new EvenColumn(),
             };
 
-            specialColumnColour = new Color4(0, 48, 63, 255);
+            specialColumnType = new SpecialColumn();
 
             // Set the special column + colour + key
             foreach (var column in Columns)
@@ -213,7 +214,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 if (!column.IsSpecial)
                     continue;
 
-                column.AccentColour = specialColumnColour;
+                column.ColumnType = specialColumnType;
             }
 
             var nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
@@ -222,9 +223,9 @@ namespace osu.Game.Rulesets.Mania.UI
             // column colours are mirrored across their centre and special styles mess with this
             for (int i = 0; i < Math.Ceiling(nonSpecialColumns.Count / 2f); i++)
             {
-                Color4 colour = normalColumnColours[i % normalColumnColours.Count];
-                nonSpecialColumns[i].AccentColour = colour;
-                nonSpecialColumns[nonSpecialColumns.Count - 1 - i].AccentColour = colour;
+                ColumnType columnType = normalColumnTypes[i % normalColumnTypes.Count];
+                nonSpecialColumns[i].ColumnType = columnType;
+                nonSpecialColumns[nonSpecialColumns.Count - 1 - i].ColumnType = columnType;
             }
         }
 

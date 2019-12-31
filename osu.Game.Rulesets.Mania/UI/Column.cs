@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.UI
             get => columnType;
             set
             {
-                if (columnType == value || columnType == null)
+                if (columnType == value)
                     return;
 
                 columnType = value;
@@ -118,21 +118,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        private bool isSpecial;
-
-        public bool IsSpecial
-        {
-            get => isSpecial;
-            set
-            {
-                if (isSpecial == value)
-                    return;
-
-                isSpecial = value;
-
-                Width = isSpecial ? special_column_width : COLUMN_WIDTH;
-            }
-        }
+        public bool IsSpecial { get; set; }
 
         private Color4 accentColour;
 
