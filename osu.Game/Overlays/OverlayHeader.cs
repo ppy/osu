@@ -11,10 +11,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayHeader<TModel> : Container
-        where TModel : TabControl<string>
+    /// <typeparam name="TControl">A control for overlay.</typeparam>
+    public abstract class OverlayHeader<TControl> : Container
+        where TControl : TabControl<string>
     {
-        protected readonly TModel TabControl;
+        protected readonly TControl TabControl;
 
         private readonly Box titleBackground;
         private readonly Box controlBackground;
@@ -102,6 +103,6 @@ namespace osu.Game.Overlays
 
         protected abstract ScreenTitle CreateTitle();
 
-        protected abstract TModel CreateControl();
+        protected abstract TControl CreateControl();
     }
 }
