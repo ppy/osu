@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-    - name: osu!stable issues
-      url: https://github.com/ppy/osu-stable-issues
-      about: For issues regarding osu!stable (not osu!lazer), open them here.
+    - name: 反馈游戏问题
+      url: https://github.com/ppy/osu/issues
+      about: 在确定遇到的游戏问题在其他版本(包括官方版2019.1113.0)后,通过这里反馈你在游戏中遇到的问题
