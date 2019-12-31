@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         public override string HoldTexture => "mania-note2L";
         public override string HoldHeadTexture => "mania-note2H";
         public override string HoldTailTexture => "mania-note2T";
-        public override string KeyTexture  => "mania-key2";
+        public override string KeyTexture => "mania-key2";
         public override string KeyDownTexture => "mania-key2D";
 
         public override Color4 SkinnedColumnColour => new Color4(47, 47, 47, 255);

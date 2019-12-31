@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         public virtual string HoldTexture => "mania-note1L";
         public virtual string HoldHeadTexture => "mania-note1H";
         public virtual string HoldTailTexture => "mania-note1T";
-        public virtual string KeyTexture  => "mania-key1";
+        public virtual string KeyTexture => "mania-key1";
         public virtual string KeyDownTexture => "mania-key1D";
 
         /// <summary>
