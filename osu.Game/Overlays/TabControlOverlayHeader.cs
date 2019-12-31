@@ -3,14 +3,17 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Graphics;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public abstract class TabControlOverlayHeader<T> : ControllableOverlayHeader<OverlayHeaderTabControl<T>, T>
+    public abstract class TabControlOverlayHeader<T> : ControllableOverlayHeader<T>
     {
         public readonly Bindable<T> Current = new Bindable<T>();
 
-        protected override OverlayHeaderTabControl<T> CreateControl() => new OverlayHeaderTabControl<T>(ColourScheme)
+        protected OverlayHeaderTabControl<T> TabControl;
+
+        protected override TabControl<T> CreateControl() => TabControl = new OverlayHeaderTabControl<T>(ColourScheme)
         {
             Current = Current
         };

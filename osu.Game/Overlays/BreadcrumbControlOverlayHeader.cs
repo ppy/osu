@@ -1,13 +1,16 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class BreadcrumbControlOverlayHeader : ControllableOverlayHeader<OverlayHeaderBreadcrumbControl, string>
+    public abstract class BreadcrumbControlOverlayHeader : ControllableOverlayHeader<string>
     {
-        protected override OverlayHeaderBreadcrumbControl CreateControl() => new OverlayHeaderBreadcrumbControl(ColourScheme);
+        protected OverlayHeaderBreadcrumbControl TabControl;
+
+        protected override TabControl<string> CreateControl() => TabControl = new OverlayHeaderBreadcrumbControl(ColourScheme);
 
         protected BreadcrumbControlOverlayHeader(OverlayColourScheme colourScheme)
             : base(colourScheme)
