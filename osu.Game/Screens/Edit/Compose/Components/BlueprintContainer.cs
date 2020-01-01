@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private HitObjectComposer composer { get; set; }
 
         [Resolved]
-        private IEditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; }
 
         public BlueprintContainer()
         {
