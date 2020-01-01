@@ -62,6 +62,8 @@ namespace osu.Game.Screens.Edit
 
         public IBeatmap Clone() => (EditorBeatmap)MemberwiseClone();
 
+        private IList mutableHitObjects => (IList)beatmap.HitObjects;
+
         /// <summary>
         /// Adds a <see cref="HitObject"/> to this <see cref="EditorBeatmap"/>.
         /// </summary>
@@ -72,7 +74,7 @@ namespace osu.Game.Screens.Edit
 
             // Preserve existing sorting order in the beatmap
             var insertionIndex = findInsertionIndex(beatmap.HitObjects, hitObject.StartTime);
-            ((IList)beatmap.HitObjects).Insert(insertionIndex + 1, hitObject);
+            mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
             HitObjectAdded?.Invoke(hitObject);
         }
@@ -83,10 +85,10 @@ namespace osu.Game.Screens.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Remove(HitObject hitObject)
         {
-            if (!((IList)beatmap.HitObjects).Contains(hitObject))
+            if (!mutableHitObjects.Contains(hitObject))
                 return;
 
-            ((IList)beatmap.HitObjects).Remove(hitObject);
+            mutableHitObjects.Remove(hitObject);
 
             var bindable = startTimeBindables[hitObject];
             bindable.UnbindAll();
@@ -101,10 +103,10 @@ namespace osu.Game.Screens.Edit
             startTimeBindables[hitObject].ValueChanged += _ =>
             {
                 // For now we'll remove and re-add the hitobject. This is not optimal and can be improved if required.
-                ((IList)beatmap.HitObjects).Remove(hitObject);
+                mutableHitObjects.Remove(hitObject);
 
                 var insertionIndex = findInsertionIndex(beatmap.HitObjects, hitObject.StartTime);
-                ((IList)beatmap.HitObjects).Insert(insertionIndex + 1, hitObject);
+                mutableHitObjects.Insert(insertionIndex + 1, hitObject);
 
                 StartTimeChanged?.Invoke(hitObject);
             };
