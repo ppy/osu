@@ -20,9 +20,9 @@
 	<array>
 		<integer>1</integer>
 		<integer>2</integer>
-    </array>
-    <key>UIFileSharingEnabled</key>
-    <true/>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -104,9 +104,9 @@
 			<key>LSHandlerRank</key>
 			<string>Owner</string>
 			<key>CFBundleTypeName</key>
-            <string>Supported osu! files</string>
-            <key>CFBundleTypeRole</key>
-            <string>Viewer</string>
+			<string>Supported osu! files</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>sh.ppy.osu.items</string>
