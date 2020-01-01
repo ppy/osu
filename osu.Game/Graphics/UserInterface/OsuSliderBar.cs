@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
@@ -31,6 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Nub Nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+        private readonly Container nubContainer;
 
         public virtual string TooltipText { get; private set; }
 
@@ -72,10 +74,15 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.CentreRight,
                     Alpha = 0.5f,
                 },
-                Nub = new Nub
+                nubContainer = new Container
                 {
-                    Origin = Anchor.TopCentre,
-                    Expanded = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Nub = new Nub
+                    {
+                        Origin = Anchor.TopCentre,
+                        RelativePositionAxes = Axes.X,
+                        Expanded = true,
+                    },
                 },
                 new HoverClickSounds()
             };
@@ -88,6 +95,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             sample = audio.Samples.Get(@"UI/sliderbar-notch");
             AccentColour = colours.Pink;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            nubContainer.Padding = new MarginPadding { Horizontal = RangePadding };
         }
 
         protected override void LoadComplete()
@@ -176,14 +190,14 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.UpdateAfterChildren();
             leftBox.Scale = new Vector2(Math.Clamp(
-                Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+                RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
             rightBox.Scale = new Vector2(Math.Clamp(
-                DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+                DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+            Nub.MoveToX(value, 250, Easing.OutQuint);
         }
 
         /// <summary>
