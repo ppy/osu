@@ -28,7 +28,9 @@ namespace osu.Game.Rulesets.Taiko
     {
         public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
 
-        public override ScoreProcessor CreateScoreProcessor(IBeatmap beatmap) => new TaikoScoreProcessor(beatmap);
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TaikoHealthProcessor();
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
 

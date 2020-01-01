@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -35,12 +34,13 @@ namespace osu.Game.Rulesets.Edit
     {
         protected IRulesetConfigManager Config { get; private set; }
 
-        protected new EditorBeatmap<TObject> EditorBeatmap { get; private set; }
-
         protected readonly Ruleset Ruleset;
 
         [Resolved]
         protected IFrameBasedClock EditorClock { get; private set; }
+
+        [Resolved]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved]
         private IAdjustableClock adjustableClock { get; set; }
@@ -48,7 +48,6 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private Beatmap<TObject> playableBeatmap;
         private IBeatmapProcessor beatmapProcessor;
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
@@ -68,9 +67,17 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IFrameBasedClock framedClock)
         {
+            beatmapProcessor = Ruleset.CreateBeatmapProcessor(EditorBeatmap.PlayableBeatmap);
+
+            EditorBeatmap.HitObjectAdded += addHitObject;
+            EditorBeatmap.HitObjectRemoved += removeHitObject;
+            EditorBeatmap.StartTimeChanged += UpdateHitObject;
+
+            Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, playableBeatmap))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
                 {
                     Clock = framedClock,
                     ProcessCustomClock = false
@@ -138,28 +145,6 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
 
             blueprintContainer.SelectionChanged += selectionChanged;
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var parentWorkingBeatmap = parent.Get<IBindable<WorkingBeatmap>>().Value;
-
-            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo);
-
-            beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
-
-            base.EditorBeatmap = EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
-            EditorBeatmap.HitObjectAdded += addHitObject;
-            EditorBeatmap.HitObjectRemoved += removeHitObject;
-            EditorBeatmap.StartTimeChanged += UpdateHitObject;
-
-            var dependencies = new DependencyContainer(parent);
-            dependencies.CacheAs<IEditorBeatmap>(EditorBeatmap);
-            dependencies.CacheAs<IEditorBeatmap<TObject>>(EditorBeatmap);
-
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
-
-            return base.CreateChildDependencies(dependencies);
         }
 
         protected override void LoadComplete()
@@ -234,7 +219,7 @@ namespace osu.Game.Rulesets.Edit
             scheduledUpdate = Schedule(() =>
             {
                 beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
+                hitObject?.ApplyDefaults(EditorBeatmap.ControlPointInfo, EditorBeatmap.BeatmapInfo.BaseDifficulty);
                 beatmapProcessor?.PostProcess();
             });
         }
@@ -332,11 +317,6 @@ namespace osu.Game.Rulesets.Edit
         /// All the <see cref="DrawableHitObject"/>s.
         /// </summary>
         public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
-
-        /// <summary>
-        /// An editor-specific beatmap, exposing mutation events.
-        /// </summary>
-        public IEditorBeatmap EditorBeatmap { get; protected set; }
 
         /// <summary>
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.

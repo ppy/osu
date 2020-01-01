@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected IDistanceSnapProvider SnapProvider { get; private set; }
 
         [Resolved]
-        private IEditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; }
 
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }

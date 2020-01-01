@@ -4,6 +4,8 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual.Editor
@@ -11,10 +13,21 @@ namespace osu.Game.Tests.Visual.Editor
     [TestFixture]
     public class TestSceneComposeScreen : EditorClockTestScene
     {
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap =
+            new EditorBeatmap(new OsuBeatmap
+            {
+                BeatmapInfo =
+                {
+                    Ruleset = new OsuRuleset().RulesetInfo
+                }
+            });
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value = CreateWorkingBeatmap(editorBeatmap.PlayableBeatmap);
+
             Child = new ComposeScreen();
         }
     }
