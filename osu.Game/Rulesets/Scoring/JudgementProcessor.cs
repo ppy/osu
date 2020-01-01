@@ -3,13 +3,14 @@
 
 using System;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Scoring
 {
-    public abstract class JudgementProcessor
+    public abstract class JudgementProcessor : Component
     {
         /// <summary>
         /// Invoked when all <see cref="HitObject"/>s have been judged by this <see cref="JudgementProcessor"/>.
@@ -36,21 +37,15 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public bool HasCompleted => JudgedHits == MaxHits;
 
-        protected JudgementProcessor(IBeatmap beatmap)
+        /// <summary>
+        /// Applies a <see cref="IBeatmap"/> to this <see cref="ScoreProcessor"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to read properties from.</param>
+        public virtual void ApplyBeatmap(IBeatmap beatmap)
         {
-            ApplyBeatmap(beatmap);
-
             Reset(false);
             SimulateAutoplay(beatmap);
             Reset(true);
-        }
-
-        /// <summary>
-        /// Applies any properties of the <see cref="IBeatmap"/> which affect scoring to this <see cref="ScoreProcessor"/>.
-        /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> to read properties from.</param>
-        protected virtual void ApplyBeatmap(IBeatmap beatmap)
-        {
         }
 
         /// <summary>
@@ -138,7 +133,6 @@ namespace osu.Game.Rulesets.Scoring
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
 
                 result.Type = judgement.MaxResult;
-
                 ApplyResult(result);
             }
         }
