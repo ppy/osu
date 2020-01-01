@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
+using osu.Framework.Screens;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Play
@@ -20,15 +20,13 @@ namespace osu.Game.Screens.Play
             scoreInfo = score.ScoreInfo;
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        public override void OnEntering(IScreen last)
         {
-            var dependencies = base.CreateChildDependencies(parent);
-
             // these will be reverted thanks to PlayerLoader's lease.
             Mods.Value = scoreInfo.Mods;
             Ruleset.Value = scoreInfo.Ruleset;
 
-            return dependencies;
+            base.OnEntering(last);
         }
     }
 }
