@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(CircularDistanceSnapGrid)
         };
 
-        [Cached(typeof(IEditorBeatmap))]
+        [Cached(typeof(EditorBeatmap))]
         private readonly EditorBeatmap editorBeatmap;
 
         [Cached]

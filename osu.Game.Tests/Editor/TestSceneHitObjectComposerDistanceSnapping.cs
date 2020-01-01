@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Screens.Edit;
 using osu.Game.Tests.Visual;
@@ -15,6 +17,9 @@ namespace osu.Game.Tests.Editor
     public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
     {
         private TestHitObjectComposer composer;
+
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap = new EditorBeatmap(new OsuBeatmap());
 
         [SetUp]
         public void Setup() => Schedule(() =>
