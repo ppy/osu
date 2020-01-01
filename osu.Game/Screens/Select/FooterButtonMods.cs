@@ -34,19 +34,19 @@ namespace osu.Game.Screens.Select
 
         public FooterButtonMods()
         {
-            TextContainer.Add(modDisplay = new FooterModDisplay
+            ButtonContentContainer.Add(modDisplay = new FooterModDisplay
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 DisplayUnrankedText = false,
                 Scale = new Vector2(0.8f)
             });
-            TextContainer.Add(MultiplierText = new OsuSpriteText
+            ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                // Margin = new MarginPadding { Right = 6 }
+                Margin = new MarginPadding { Right = 10 }
             });
         }
 
