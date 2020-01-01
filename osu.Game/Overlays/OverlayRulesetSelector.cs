@@ -43,10 +43,7 @@ namespace osu.Game.Overlays
             AccentColour = colours.ForOverlayElement(colourScheme, 1, 0.7f);
         }
 
-        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value)
-        {
-            AccentColour = AccentColour
-        };
+        protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new OverlayRulesetTabItem(value);
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
