@@ -25,6 +25,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(OverlayRulesetTabItem),
         };
 
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private readonly OverlayRulesetSelector selector;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
@@ -38,31 +41,27 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            selector.AccentColour = colours.Lime;
-        }
-
         [Test]
         public void TestSelection()
         {
-            var osuRuleset = new OsuRuleset().RulesetInfo;
-            var maniaRuleset = new ManiaRuleset().RulesetInfo;
-            var taikoRuleset = new TaikoRuleset().RulesetInfo;
-            var catchRuleset = new CatchRuleset().RulesetInfo;
+            AddStep("Select osu!", () => ruleset.Value = new OsuRuleset().RulesetInfo);
+            AddAssert("Check osu! selected", () => selector.Current.Value.Equals(new OsuRuleset().RulesetInfo));
 
-            AddStep("Select osu!", () => ruleset.Value = osuRuleset);
-            AddAssert("Check osu! selected", () => selector.Current.Value == osuRuleset);
+            AddStep("Select mania", () => ruleset.Value = new ManiaRuleset().RulesetInfo);
+            AddAssert("Check mania selected", () => selector.Current.Value.Equals(new ManiaRuleset().RulesetInfo));
 
-            AddStep("Select mania", () => ruleset.Value = maniaRuleset);
-            AddAssert("Check mania selected", () => selector.Current.Value == maniaRuleset);
+            AddStep("Select taiko", () => ruleset.Value = new TaikoRuleset().RulesetInfo);
+            AddAssert("Check taiko selected", () => selector.Current.Value.Equals(new TaikoRuleset().RulesetInfo));
 
-            AddStep("Select taiko", () => ruleset.Value = taikoRuleset);
-            AddAssert("Check taiko selected", () => selector.Current.Value == taikoRuleset);
+            AddStep("Select catch", () => ruleset.Value = new CatchRuleset().RulesetInfo);
+            AddAssert("Check catch selected", () => selector.Current.Value.Equals(new CatchRuleset().RulesetInfo));
+        }
 
-            AddStep("Select catch", () => ruleset.Value = catchRuleset);
-            AddAssert("Check catch selected", () => selector.Current.Value == catchRuleset);
+        [Test]
+        public void TestColours()
+        {
+            AddStep("Set colour to blue", () => selector.AccentColour = colours.Blue);
+            AddAssert("Check colour is blue", () => selector.AccentColour == colours.Blue);
         }
     }
 }
