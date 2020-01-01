@@ -31,9 +31,6 @@ namespace osu.Game.Overlays
         private readonly OsuScrollContainer scroll;
         private readonly Info info;
 
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
-
         public BeatmapSetOverlay()
             : base(OverlayColourScheme.Blue)
         {
@@ -85,12 +82,6 @@ namespace osu.Game.Overlays
         {
             base.PopOutComplete();
             beatmapSet.Value = null;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Hide();
-            return true;
         }
 
         public void FetchAndShowBeatmap(int beatmapId)
