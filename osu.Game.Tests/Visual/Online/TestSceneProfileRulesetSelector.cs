@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneProfileRulesetSelector()
         {
             ProfileRulesetSelector selector;
-            Bindable<User> user = new Bindable<User>();
+            var user = new Bindable<User>();
 
             Child = selector = new ProfileRulesetSelector
             {
