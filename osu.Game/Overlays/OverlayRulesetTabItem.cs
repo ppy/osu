@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
 
                 accentColour = value;
 
-                updateState();
+                UpdateState();
             }
         }
 
@@ -67,27 +67,27 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Enabled.BindValueChanged(_ => updateState(), true);
+            Enabled.BindValueChanged(_ => UpdateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            updateState();
+            UpdateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            updateState();
+            UpdateState();
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated() => UpdateState();
 
-        protected override void OnDeactivated() => updateState();
+        protected override void OnDeactivated() => UpdateState();
 
-        private void updateState()
+        protected virtual void UpdateState()
         {
             Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
             Text.FadeColour(IsHovered || Active.Value ? Color4.White : Enabled.Value ? AccentColour : Color4.DimGray, 120, Easing.OutQuint);

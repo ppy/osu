@@ -11,6 +11,7 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Users;
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -25,9 +26,9 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneProfileRulesetSelector()
         {
             ProfileRulesetSelector selector;
-            Bindable<User> user = new Bindable<User>();
+            var user = new Bindable<User>();
 
-            Child = selector = new ProfileRulesetSelector
+            Child = selector = new ProfileRulesetSelector(OverlayColourScheme.Pink)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
