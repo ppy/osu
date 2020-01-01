@@ -56,7 +56,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected FillFlowContainer TextContainer;
+        protected FillFlowContainer ButtonContentContainer;
+        protected readonly Container TextContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
@@ -80,24 +81,35 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                TextContainer = new FillFlowContainer
+                new Container
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Direction = FillDirection.Horizontal,
-                    Shear = -SHEAR,
+                    AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        SpriteText = new OsuSpriteText
+                        ButtonContentContainer = new FillFlowContainer
                         {
-                            Size = new Vector2(100 - SHEAR_WIDTH, 50),
-                            Shear = SHEAR,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Direction = FillDirection.Horizontal,
+                            Shear = -SHEAR,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Horizontal = SHEAR_WIDTH / 4 },
+                            Children = new Drawable[]
+                            {
+                                TextContainer = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                                    Child = SpriteText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    }
+                                },
+                            },
+                        },
                     },
-                    AutoSizeAxes = Axes.Both,
-                    // Margin = new MarginPadding { Left = 70, Right = 14 }
                 },
             };
         }
