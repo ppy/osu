@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container topLevelContainer;
 
         private List<ColumnType> normalColumnTypes = new List<ColumnType>();
-        private ColumnType specialColumnType;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
 
@@ -130,7 +129,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 var isSpecial = definition.IsSpecialColumn(i);
                 var column = new Column(firstColumnIndex + i)
                 {
-                    IsSpecial = isSpecial,
+                    ColumnType = isSpecial ? new SpecialColumnType() : null,
                     Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
@@ -206,18 +205,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 new EvenColumnType(),
             };
 
-            specialColumnType = new SpecialColumnType();
-
-            // Set the special column + colour + key
-            foreach (var column in Columns)
-            {
-                if (!column.IsSpecial)
-                    continue;
-
-                column.ColumnType = specialColumnType;
-            }
-
-            var nonSpecialColumns = Columns.Where(c => !c.IsSpecial).ToList();
+            var nonSpecialColumns = Columns.Where(c => !(c.ColumnType is SpecialColumnType)).ToList();
 
             // We'll set the colours of the non-special columns in a separate loop, because the non-special
             // column colours are mirrored across their centre and special styles mess with this

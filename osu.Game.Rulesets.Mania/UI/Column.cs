@@ -117,8 +117,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public bool IsSpecial { get; set; }
-
         private Color4 accentColour;
 
         public Color4 AccentColour
