@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Edit
     {
         protected IRulesetConfigManager Config { get; private set; }
 
-        protected new EditorBeatmap<TObject> EditorBeatmap { get; private set; }
+        protected new EditorBeatmap EditorBeatmap { get; private set; }
 
         protected readonly Ruleset Ruleset;
 
@@ -148,14 +148,13 @@ namespace osu.Game.Rulesets.Edit
 
             beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
 
-            base.EditorBeatmap = EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
+            base.EditorBeatmap = EditorBeatmap = new EditorBeatmap(playableBeatmap);
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
             EditorBeatmap.StartTimeChanged += UpdateHitObject;
 
             var dependencies = new DependencyContainer(parent);
             dependencies.CacheAs<IEditorBeatmap>(EditorBeatmap);
-            dependencies.CacheAs<IEditorBeatmap<TObject>>(EditorBeatmap);
 
             Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
