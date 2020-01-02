@@ -41,9 +41,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
-        private HitObjectComposer composer { get; set; }
-
-        [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
         protected BlueprintContainer()
@@ -77,7 +74,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 dragBox.CreateProxy()
             };
 
-            foreach (var obj in composer.HitObjects)
+            foreach (var obj in beatmap.HitObjects)
                 addBlueprintFor(obj);
         }
 
