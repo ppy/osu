@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = AccentColour,
         };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + ItemChevronSize);
+        protected override float StripWidth => base.StripWidth - (padding + ItemChevronSize);
 
         public BreadcrumbControl()
         {
