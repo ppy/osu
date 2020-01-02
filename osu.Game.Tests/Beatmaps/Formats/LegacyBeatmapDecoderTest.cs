@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -313,7 +314,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var beatmap = decoder.Decode(stream);
 
-                var converted = new OsuBeatmapConverter(beatmap).Convert();
+                var converted = new OsuBeatmapConverter(beatmap, new OsuRuleset()).Convert();
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
@@ -336,7 +337,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var beatmap = decoder.Decode(stream);
 
-                var converted = new CatchBeatmapConverter(beatmap).Convert();
+                var converted = new CatchBeatmapConverter(beatmap, new CatchRuleset()).Convert();
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 

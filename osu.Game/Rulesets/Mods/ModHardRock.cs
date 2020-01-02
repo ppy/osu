@@ -15,7 +15,9 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage Icon => OsuIcon.ModHardrock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";
-        public override Type[] IncompatibleMods => new[] { typeof(ModEasy) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModDifficultyAdjust) };
+
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
