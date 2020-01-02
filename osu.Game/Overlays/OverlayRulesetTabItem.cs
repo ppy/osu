@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -33,9 +34,11 @@ namespace osu.Game.Overlays
 
                 accentColour = value;
 
-                UpdateState();
+                updateState();
             }
         }
+
+        protected Action<Color4> OnStateUpdated;
 
         protected override Container<Drawable> Content => content;
 
@@ -67,32 +70,32 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Enabled.BindValueChanged(_ => UpdateState(), true);
+            Enabled.BindValueChanged(_ => updateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            UpdateState();
+            updateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            UpdateState();
+            updateState();
         }
 
-        protected override void OnActivated() => UpdateState();
+        protected override void OnActivated() => updateState();
 
-        protected override void OnDeactivated() => UpdateState();
+        protected override void OnDeactivated() => updateState();
 
-        protected virtual void UpdateState()
+        private void updateState()
         {
+            var updatedColour = IsHovered || Active.Value ? Color4.White : Enabled.Value ? AccentColour : Color4.DimGray;
             Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-            Text.FadeColour(GetColour(), 120, Easing.OutQuint);
+            Text.FadeColour(updatedColour, 120, Easing.OutQuint);
+            OnStateUpdated?.Invoke(updatedColour);
         }
-
-        protected Color4 GetColour() => IsHovered || Active.Value ? Color4.White : Enabled.Value ? AccentColour : Color4.DimGray;
     }
 }
