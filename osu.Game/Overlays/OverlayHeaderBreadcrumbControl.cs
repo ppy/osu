@@ -25,6 +25,7 @@ namespace osu.Game.Overlays
             {
                 Text.Font = Text.Font.With(size: 14);
                 Chevron.Y = 3;
+                Bar.Height = 0;
             }
         }
     }
