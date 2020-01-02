@@ -22,7 +22,11 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
-    public class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
+    /// <summary>
+    /// A container which provides a "blueprint" display of hitobjects.
+    /// Includes selection and manipulation support via a <see cref="SelectionHandler"/>.
+    /// </summary>
+    public abstract class BlueprintContainer : CompositeDrawable, IKeyBindingHandler<PlatformAction>
     {
         public event Action<IEnumerable<HitObject>> SelectionChanged;
 
@@ -42,15 +46,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
-        public BlueprintContainer()
+        protected BlueprintContainer()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
+        /// <summary>
+        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
+        /// </summary>
+        public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
+
+        /// <summary>
+        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
+        public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            selectionHandler = composer.CreateSelectionHandler();
+            selectionHandler = CreateSelectionHandler();
             selectionHandler.DeselectAll = deselectAll;
 
             InternalChildren = new[]
@@ -259,7 +274,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             refreshTool();
 
-            var blueprint = composer.CreateBlueprintFor(hitObject);
+            var blueprint = CreateBlueprintFor(hitObject);
             if (blueprint == null)
                 return;
 

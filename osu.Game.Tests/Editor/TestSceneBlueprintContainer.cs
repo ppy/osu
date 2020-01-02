@@ -9,12 +9,10 @@ namespace osu.Game.Tests.Editor
 {
     public class TestSceneBlueprintContainer : EditorClockTestScene
     {
-        private BlueprintContainer blueprintContainer;
-
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = blueprintContainer = new BlueprintContainer();
+            Child = new ComposeBlueprintContainer();
         });
     }
 }
