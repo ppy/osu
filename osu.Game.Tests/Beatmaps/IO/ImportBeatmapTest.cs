@@ -11,9 +11,14 @@ using NUnit.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
+using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.IO.Archives;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -552,6 +557,46 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
+        [Test]
+        public async Task TestUpdateFile()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateFile)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+                    await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                    BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+                    Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
+                    BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
+
+                    using (var stream = new MemoryStream())
+                    {
+                        using (var writer = new StreamWriter(stream, leaveOpen: true))
+                        {
+                            beatmapToUpdate.BeatmapInfo.Version = "updated";
+                            new LegacyBeatmapEncoder(beatmapToUpdate).Encode(writer);
+                        }
+
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        using (var reader = new UpdateArchiveReader<BeatmapSetInfo, BeatmapSetFileInfo>(manager.Files.Store, setToUpdate, fileToUpdate, stream))
+                            await manager.Import(setToUpdate, reader);
+                    }
+
+                    var allBeatmaps = manager.GetAllUsableBeatmapSets();
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
         public static async Task<BeatmapSetInfo> LoadOszIntoOsu(OsuGameBase osu, string path = null, bool virtualTrack = false)
         {
             var temp = path ?? TestResources.GetTestBeatmapForImport(virtualTrack);
@@ -654,6 +699,57 @@ namespace osu.Game.Tests.Beatmaps.IO
             });
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
+        }
+
+        private class UpdateArchiveReader<TModel, TFileModel> : ArchiveReader
+            where TModel : class, IHasFiles<TFileModel>
+            where TFileModel : INamedFileInfo, new()
+        {
+            private readonly IResourceStore<byte[]> store;
+            private readonly TModel modelToUpdate;
+            private readonly TFileModel fileToUpdate;
+            private readonly Stream newContents;
+
+            public UpdateArchiveReader(IResourceStore<byte[]> store, TModel modelToUpdate, TFileModel fileToUpdate, Stream newContents)
+                : base(string.Empty)
+            {
+                this.store = store;
+                this.modelToUpdate = modelToUpdate;
+                this.fileToUpdate = fileToUpdate;
+                this.newContents = newContents;
+            }
+
+            public override Stream GetStream(string name)
+            {
+                name = name.ToStandardisedPath();
+
+                if (name.Contains(fileToUpdate.Filename, StringComparison.Ordinal))
+                {
+                    var stream = new MemoryStream();
+
+                    newContents.Seek(0, SeekOrigin.Begin);
+                    newContents.CopyTo(stream);
+
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    return stream;
+                }
+
+                TFileModel existing = modelToUpdate.Files.FirstOrDefault(m => name.Contains(m.Filename, StringComparison.Ordinal));
+
+                if (!string.IsNullOrEmpty(existing?.FileInfo?.StoragePath))
+                    return store.GetStream(existing.FileInfo.StoragePath);
+
+                return null;
+            }
+
+            public override void Dispose()
+            {
+            }
+
+            public override IEnumerable<string> Filenames => Enumerable.Empty<string>(); // modelToUpdate.Files.Select(f => f.Filename);
+
+            public override Stream GetUnderlyingStream() => null;
         }
     }
 }

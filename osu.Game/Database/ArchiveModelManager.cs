@@ -68,7 +68,7 @@ namespace osu.Game.Database
 
         public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        protected readonly FileStore Files;
+        public readonly FileStore Files;
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
@@ -222,9 +222,8 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return Task.FromResult<TModel>(null);
-
-                model.Hash = computeHash(archive);
+                if (model == null)
+                    return Task.FromResult<TModel>(null);
             }
             catch (TaskCanceledException)
             {
@@ -303,6 +302,7 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Hash = archive != null ? computeHash(archive) : item.Hash;
 
                 await Populate(item, archive, cancellationToken);
 
