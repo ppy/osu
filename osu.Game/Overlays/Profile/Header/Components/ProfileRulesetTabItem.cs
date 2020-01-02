@@ -5,19 +5,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class ProfileRulesetTabItem : OverlayRulesetTabItem
     {
         private readonly SpriteIcon icon;
-
-        public new Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set => base.AccentColour = icon.Colour = value;
-        }
 
         private bool isDefault;
 
@@ -47,12 +40,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Icon = FontAwesome.Solid.Star,
                 Size = new Vector2(12),
             });
-        }
 
-        protected override void UpdateState()
-        {
-            base.UpdateState();
-            icon.FadeColour(GetColour(), 120, Easing.OutQuint);
+            OnStateUpdated += colour => icon.FadeColour(colour, 120, Easing.OutQuint);
         }
     }
 }
