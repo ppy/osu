@@ -52,7 +52,29 @@ namespace osu.Game.Users
                 Ruleset = ruleset;
             }
 
-            public override string Status => @"Playing alone";
+            public override string Status
+            {
+                get
+                {
+                    switch (Ruleset.ID)
+                    {
+                        case 0:
+                            return "Clicking circles";
+
+                        case 1:
+                            return "Bashing drums";
+
+                        case 2:
+                            return "Catching fruit";
+
+                        case 3:
+                            return "Smashing keys";
+
+                        default:
+                            return "Playing solo";
+                    }
+                }
+            }
         }
 
         public class Spectating : UserActivity
