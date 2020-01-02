@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Resources
 
         public static Stream OpenResource(string name) => GetStore().GetStream($"Resources/{name}");
 
-        public static Stream GetTestBeatmapStream(bool virtualTrack = false) => new DllResourceStore("osu.Game.Resources.dll").GetStream($"Beatmaps/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}.osz");
+        public static Stream GetTestBeatmapStream(bool virtualTrack = false) => OpenResource($"Archives/241526 Soleily - Renatus{(virtualTrack ? "_virtual" : "")}.osz");
 
         public static string GetTestBeatmapForImport(bool virtualTrack = false)
         {
