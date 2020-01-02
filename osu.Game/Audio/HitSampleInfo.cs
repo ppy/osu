@@ -18,11 +18,6 @@ namespace osu.Game.Audio
         public const string HIT_CLAP = @"hitclap";
 
         /// <summary>
-        /// An optional ruleset namespace.
-        /// </summary>
-        public string Namespace;
-
-        /// <summary>
         /// The bank to load the sample from.
         /// </summary>
         public string Bank;
@@ -49,15 +44,6 @@ namespace osu.Game.Audio
         {
             get
             {
-                if (!string.IsNullOrEmpty(Namespace))
-                {
-                    if (!string.IsNullOrEmpty(Suffix))
-                        yield return $"{Namespace}/{Bank}-{Name}{Suffix}";
-
-                    yield return $"{Namespace}/{Bank}-{Name}";
-                }
-
-                // check non-namespace as a fallback even when we have a namespace
                 if (!string.IsNullOrEmpty(Suffix))
                     yield return $"{Bank}-{Name}{Suffix}";
 
