@@ -14,15 +14,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineHitObjectDisplay : TimelinePart
+    internal class TimelineHitObjectDisplay : BlueprintContainer
     {
         private EditorBeatmap beatmap { get; }
+
+        private readonly TimelinePart content;
 
         public TimelineHitObjectDisplay(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
 
             this.beatmap = beatmap;
+
+            AddInternal(content = new TimelinePart());
         }
 
         [BackgroundDependencyLoader]
@@ -42,15 +46,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void remove(HitObject h)
         {
-            foreach (var d in Children.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
+            foreach (var d in content.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
                 d.Expire();
         }
 
         private void add(HitObject h)
         {
-            var yOffset = Children.Count(d => d.X == h.StartTime);
+            var yOffset = content.Count(d => d.X == h.StartTime);
 
-            Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS });
+            content.Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS });
         }
 
         private class TimelineHitObjectRepresentation : CompositeDrawable
