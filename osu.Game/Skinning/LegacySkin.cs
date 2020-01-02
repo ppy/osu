@@ -175,7 +175,7 @@ namespace osu.Game.Skinning
         {
             foreach (var lookup in sampleInfo.LookupNames)
             {
-                var sample = Samples?.Get(getFallbackName(lookup));
+                var sample = Samples?.Get(lookup);
 
                 if (sample != null)
                     return sample;
