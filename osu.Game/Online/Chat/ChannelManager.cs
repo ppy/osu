@@ -445,6 +445,14 @@ namespace osu.Game.Online.Chat
             return tcs.Task;
         }
 
+        public void MarkChannelAsRead(Message message)
+        {
+            var channel = JoinedChannels.First(c => c.Id == message.ChannelId);
+            var req = new MarkChannelAsReadRequest(channel, message);
+            req.Success += () => channel.LastReadId = message.Id;
+            api.Queue(req);
+        }
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
