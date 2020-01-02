@@ -14,14 +14,14 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.X;
         }
 
-        protected override float ItemChevronSize => 8;
-
-        protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value, ItemChevronSize);
+        protected override TabItem<string> CreateTabItem(string value) => new ControlTabItem(value);
 
         private class ControlTabItem : BreadcrumbTabItem
         {
-            public ControlTabItem(string value, float itemChevronSize)
-                : base(value, itemChevronSize)
+            protected override float ChevronSize => 8;
+
+            public ControlTabItem(string value)
+                : base(value)
             {
                 Text.Font = Text.Font.With(size: 14);
                 Chevron.Y = 3;
