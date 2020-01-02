@@ -52,7 +52,6 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool HandleNonPositionalInput => State == Visibility.Visible;
             public override bool HandlePositionalInput => State == Visibility.Visible;
-            public override bool IsRemovable => true;
 
             private Visibility state;
 
