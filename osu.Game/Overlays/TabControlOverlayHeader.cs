@@ -9,7 +9,7 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class TabControlOverlayHeader : OverlayHeader
+    public abstract class TabControlOverlayHeader : ControllableOverlayHeader
     {
         protected OverlayHeaderTabControl TabControl;
 
