@@ -108,7 +108,7 @@ namespace osu.Game.Beatmaps
             IBeatmapConverter converter = CreateBeatmapConverter(Beatmap, rulesetInstance);
 
             // Check if the beatmap can be converted
-            if (!converter.CanConvert)
+            if (Beatmap.HitObjects.Count > 0 && !converter.CanConvert())
                 throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
 
             // Apply conversion mods
