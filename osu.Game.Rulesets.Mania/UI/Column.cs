@@ -40,7 +40,16 @@ namespace osu.Game.Rulesets.Mania.UI
             Width = COLUMN_WIDTH;
         }
 
-        [BackgroundDependencyLoader]
+        public static Column CreateColumnFromType(ColumnType type, int index)
+            => type switch
+        {
+            ColumnType.Odd => new OddColumn(index),
+            ColumnType.Even => new EvenColumn(index),
+            ColumnType.Special => new SpecialColumn(index),
+            _ => null
+        };
+
+    [BackgroundDependencyLoader]
         private void load()
         {
             Direction.BindValueChanged(dir =>

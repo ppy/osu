@@ -123,13 +123,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             for (int i = 0; i < definition.Columns; i++)
             {
-                Column column = definition.TypeOfColumn(i) switch
-                {
-                    ColumnType.Odd => new OddColumn(i + firstColumnIndex),
-                    ColumnType.Even => new EvenColumn(i + firstColumnIndex),
-                    ColumnType.Special => new SpecialColumn(i + firstColumnIndex),
-                    _ => null
-                };
+                var column = Column.CreateColumnFromType(definition.TypeOfColumn(i), i + firstColumnIndex);
                 column.Action.Value = column.IsSpecial ? specialColumnStartAction++ : normalColumnStartAction++;
 
                 AddColumn(column);
