@@ -52,7 +52,7 @@ namespace osu.Game.Users
                 Ruleset = ruleset;
             }
 
-            public override string Status => @"Playing alone";
+            public override string Status => Ruleset.PlayingVerb;
         }
 
         public class Spectating : UserActivity

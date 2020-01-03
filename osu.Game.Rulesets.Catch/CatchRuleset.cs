@@ -135,6 +135,8 @@ namespace osu.Game.Rulesets.Catch
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Catching fruit";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);

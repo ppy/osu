@@ -21,6 +21,7 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
@@ -57,7 +58,8 @@ namespace osu.Game.Rulesets
                 ShortName = ShortName,
                 ID = (this as ILegacyRuleset)?.LegacyID,
                 InstantiationInfo = GetType().AssemblyQualifiedName,
-                Available = true
+                Available = true,
+                PlayingVerb = PlayingVerb,
             };
         }
 
@@ -120,6 +122,11 @@ namespace osu.Game.Rulesets
         /// A unique short name to reference this ruleset in online requests.
         /// </summary>
         public abstract string ShortName { get; }
+
+        /// <summary>
+        /// String used for <see cref="UserActivity.SoloGame.Status"/> and <see cref="UserPanel"/>
+        /// </summary>
+        public virtual string PlayingVerb => "Playing solo";
 
         /// <summary>
         /// A list of available variant ids.
