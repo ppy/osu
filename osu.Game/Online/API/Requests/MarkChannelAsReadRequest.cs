@@ -16,6 +16,6 @@ namespace osu.Game.Online.API.Requests
             this.message = message;
         }
 
-        protected override string Target => $"/chat/channels/{channel}/mark-as-read/{message}";
+        protected override string Target => $"chat/channels/{channel.Id}/mark-as-read/{message.Id}";
     }
 }
