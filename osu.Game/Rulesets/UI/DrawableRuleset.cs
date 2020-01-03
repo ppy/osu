@@ -72,10 +72,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
-        /// <summary>
-        /// Place to put drawables above hit objects but below UI.
-        /// </summary>
-        public Container Overlays { get; private set; }
+        private Container overlays;
+
+        public override Container Overlays => overlays;
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
@@ -159,7 +158,7 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(textureStore);
 
                 localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
-                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
+                dependencies.CacheAs<ISampleStore>(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
             }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
@@ -185,12 +184,15 @@ namespace osu.Game.Rulesets.UI
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
                     FrameStablePlayback = FrameStablePlayback,
-                    Child = KeyBindingInputManager
-                        .WithChild(CreatePlayfieldAdjustmentContainer()
-                            .WithChild(Playfield)
-                        )
+                    Children = new Drawable[]
+                    {
+                        KeyBindingInputManager
+                            .WithChild(CreatePlayfieldAdjustmentContainer()
+                                .WithChild(Playfield)
+                            ),
+                        overlays = new Container { RelativeSizeAxes = Axes.Both }
+                    }
                 },
-                Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
@@ -384,6 +386,11 @@ namespace osu.Game.Rulesets.UI
         /// The playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        /// <summary>
+        /// Place to put drawables above hit objects but below UI.
+        /// </summary>
+        public abstract Container Overlays { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
