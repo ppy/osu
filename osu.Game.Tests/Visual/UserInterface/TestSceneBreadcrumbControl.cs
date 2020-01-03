@@ -10,11 +10,11 @@ using osu.Game.Graphics.UserInterface;
 namespace osu.Game.Tests.Visual.UserInterface
 {
     [TestFixture]
-    public class TestSceneBreadcrumbs : OsuTestScene
+    public class TestSceneBreadcrumbControl : OsuTestScene
     {
         private readonly BreadcrumbControl<BreadcrumbTab> breadcrumbs;
 
-        public TestSceneBreadcrumbs()
+        public TestSceneBreadcrumbControl()
         {
             Add(breadcrumbs = new BreadcrumbControl<BreadcrumbTab>
             {
