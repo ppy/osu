@@ -139,6 +139,8 @@ namespace osu.Game.Rulesets.Taiko
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Bashing drums";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
