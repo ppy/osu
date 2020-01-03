@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania.UI
         protected abstract Container ExplosionContainer { get; }
         protected internal abstract Container TopLevelContainer { get; }
 
-        public Column(int index)
+        protected Column(int index)
         {
             Index = index;
 
@@ -100,6 +100,7 @@ namespace osu.Game.Rulesets.Mania.UI
             h.OnNewResult -= OnNewResult;
             return true;
         }
+
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
@@ -129,6 +130,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public bool OnReleased(ManiaAction action) => false;
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
             => DrawRectangle.Inflate(new Vector2(ManiaStage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));

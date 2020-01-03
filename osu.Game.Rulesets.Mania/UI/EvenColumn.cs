@@ -7,7 +7,8 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class EvenColumn : DefaultColumn
     {
-        public EvenColumn(int index) : base(index)
+        public EvenColumn(int index)
+            : base(index)
         {
             AccentColour = new Color4(6, 84, 0, 255);
         }

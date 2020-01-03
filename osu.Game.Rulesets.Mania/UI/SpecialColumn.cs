@@ -7,7 +7,8 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class SpecialColumn : DefaultColumn
     {
-        public SpecialColumn(int index) : base(index)
+        public SpecialColumn(int index)
+            : base(index)
         {
             Width = 70;
             AccentColour = new Color4(0, 48, 63, 255);
