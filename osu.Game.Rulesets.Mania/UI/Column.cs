@@ -42,14 +42,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public static Column CreateColumnFromType(ColumnType type, int index)
             => type switch
-        {
-            ColumnType.Odd => new OddColumn(index),
-            ColumnType.Even => new EvenColumn(index),
-            ColumnType.Special => new SpecialColumn(index),
-            _ => null
-        };
+            {
+                ColumnType.Odd => new OddColumn(index),
+                ColumnType.Even => new EvenColumn(index),
+                ColumnType.Special => new SpecialColumn(index),
+                _ => null
+            };
 
-    [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader]
         private void load()
         {
             Direction.BindValueChanged(dir =>
