@@ -26,6 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
+            typeof(Column),
             typeof(DefaultColumn),
             typeof(ColumnBackground),
             typeof(ColumnKeyArea),
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
-        private readonly List<DefaultColumn> columns = new List<DefaultColumn>();
+        private readonly List<Column> columns = new List<Column>();
 
         public TestSceneColumn()
             : base(2)
