@@ -12,5 +12,7 @@ namespace osu.Game.Rulesets.Mania.UI
             Width = 70;
             AccentColour = new Color4(0, 48, 63, 255);
         }
+
+        public override bool IsSpecial => true;
     }
 }

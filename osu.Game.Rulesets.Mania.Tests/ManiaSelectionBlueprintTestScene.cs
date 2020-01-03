@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Cached(Type = typeof(IAdjustableClock))]
         private readonly IAdjustableClock clock = new StopwatchClock();
 
-        private readonly DefaultColumn column;
+        private readonly Column column;
 
         protected ManiaSelectionBlueprintTestScene()
         {
@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             });
         }
 
-        public DefaultColumn ColumnAt(Vector2 screenSpacePosition) => column;
+        public Column ColumnAt(Vector2 screenSpacePosition) => column;
 
         public int TotalColumns => 1;
     }

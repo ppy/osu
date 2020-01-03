@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="screenSpacePosition">The screen-space position.</param>
         /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
-        public DefaultColumn GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
+        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 

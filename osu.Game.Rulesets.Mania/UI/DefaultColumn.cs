@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     public class DefaultColumn : Column, IHasAccentColour
     {
-        private const float special_column_width = 70;
-
         private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;

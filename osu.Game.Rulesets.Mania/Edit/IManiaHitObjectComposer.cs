@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public interface IManiaHitObjectComposer
     {
-        DefaultColumn ColumnAt(Vector2 screenSpacePosition);
+        Column ColumnAt(Vector2 screenSpacePosition);
 
         int TotalColumns { get; }
     }

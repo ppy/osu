@@ -38,7 +38,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             RelativeSizeAxes = Axes.Y;
             Width = COLUMN_WIDTH;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             Direction.BindValueChanged(dir =>
             {
                 HitTargetContainer.Padding = new MarginPadding
@@ -56,6 +60,8 @@ namespace osu.Game.Rulesets.Mania.UI
                 KeyArea.Anchor = KeyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
+
+        public virtual bool IsSpecial => false;
 
         public override Axes RelativeSizeAxes => Axes.Y;
 

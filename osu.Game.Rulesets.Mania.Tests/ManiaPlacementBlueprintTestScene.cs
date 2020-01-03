@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     [Cached(Type = typeof(IManiaHitObjectComposer))]
     public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene, IManiaHitObjectComposer
     {
-        private readonly DefaultColumn column;
+        private readonly Column column;
 
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
 
-        public DefaultColumn ColumnAt(Vector2 screenSpacePosition) => column;
+        public Column ColumnAt(Vector2 screenSpacePosition) => column;
 
         public int TotalColumns => 1;
     }
