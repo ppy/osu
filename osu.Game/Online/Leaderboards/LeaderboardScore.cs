@@ -55,7 +55,8 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        private DialogOverlay dialogOverlay;
+        [Resolved]
+        private DialogOverlay dialogOverlay { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
         {
@@ -68,10 +69,9 @@ namespace osu.Game.Online.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OsuColour colour, DialogOverlay overlay)
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = score.User;
-            dialogOverlay = overlay;
 
             statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 

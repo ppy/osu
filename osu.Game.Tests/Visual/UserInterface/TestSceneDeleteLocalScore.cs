@@ -34,6 +34,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly FailableLeaderboard leaderboard;
 
+        [Cached]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneDeleteLocalScore()
@@ -43,7 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Depth = -1
             });
 
-            leaderboard = new FailableLeaderboard
+            Add(leaderboard = new FailableLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
@@ -64,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                     Version = "Insane"
                 },
-            };
+            });
 
             AddStep("Insert Local Scores", reset);
         }
@@ -73,13 +74,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             leaderboard.InitialLoad = true;
             leaderboard.RefreshScores();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Dependencies.Cache(dialogOverlay);
-            Add(leaderboard);
         }
 
         private class FailableLeaderboard : BeatmapLeaderboard
@@ -145,7 +139,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestLeaderboardScore : LeaderboardScore
         {
-            private DialogOverlay dialogOverlay;
+            [Resolved]
+            private DialogOverlay dialogOverlay { get; set; }
 
             private readonly FailableLeaderboard leaderboard;
 
@@ -158,12 +153,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override void DeleteLocalScore(ScoreInfo score)
             {
                 dialogOverlay?.Push(new TestLocalScoreDeleteDialog(score, leaderboard));
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(DialogOverlay dialogOverlay)
-            {
-                this.dialogOverlay = dialogOverlay;
             }
         }
 

@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private readonly FailableLeaderboard leaderboard;
 
+        [Cached]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneBeatmapLeaderboard()
@@ -39,13 +40,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Depth = -1
             });
 
-            leaderboard = new FailableLeaderboard
+            Add(leaderboard = new FailableLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Size = new Vector2(550f, 450f),
                 Scope = BeatmapLeaderboardScope.Global,
-            };
+            });
 
             AddStep(@"New Scores", newScores);
             AddStep(@"Show personal best", showPersonalBest);
@@ -289,14 +290,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 PlaceholderState = state;
             }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Dependencies.Cache(dialogOverlay);
-
-            Add(leaderboard);
         }
     }
 }
