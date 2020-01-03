@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets
                 ID = (this as ILegacyRuleset)?.LegacyID,
                 InstantiationInfo = GetType().AssemblyQualifiedName,
                 Available = true,
-                PlayingVerb = PlayingVerb,
             };
         }
 
