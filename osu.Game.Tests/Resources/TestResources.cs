@@ -4,7 +4,6 @@
 using System.IO;
 using NUnit.Framework;
 using osu.Framework.IO.Stores;
-using osu.Game.Resources;
 
 namespace osu.Game.Tests.Resources
 {
