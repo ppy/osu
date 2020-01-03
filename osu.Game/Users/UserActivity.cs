@@ -52,7 +52,7 @@ namespace osu.Game.Users
                 Ruleset = ruleset;
             }
 
-            public override string Status => Beatmap.Ruleset.CreateInstance().PlayingVerb;
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class Spectating : UserActivity
