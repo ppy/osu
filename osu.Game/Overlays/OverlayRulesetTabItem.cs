@@ -90,7 +90,9 @@ namespace osu.Game.Overlays
 
             currentColour.Value = IsHovered || Active.Value
                 ? Color4.White
-                : Enabled.Value ? AccentColour : Color4.DimGray;
+                : Enabled.Value
+                    ? AccentColour
+                    : Color4.DimGray;
         }
 
         protected virtual void OnCurrentColourChanged(ValueChangedEvent<Color4> colour) => Text.FadeColour(colour.NewValue, 120, Easing.OutQuint);
