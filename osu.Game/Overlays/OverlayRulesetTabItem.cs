@@ -11,7 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
-using System;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays
 {
@@ -22,23 +22,14 @@ namespace osu.Game.Overlays
 
         public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
 
-        private Color4 accentColour;
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+        private readonly Bindable<Color4> currentColour = new Bindable<Color4>();
 
         public Color4 AccentColour
         {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-
-                updateState();
-            }
+            get => accentColour.Value;
+            set => accentColour.Value = value;
         }
-
-        protected Action<Color4> OnStateUpdated;
 
         protected override Container<Drawable> Content => content;
 
@@ -70,6 +61,9 @@ namespace osu.Game.Overlays
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            currentColour.BindValueChanged(OnCurrentColourChanged);
+            accentColour.BindValueChanged(_ => updateState());
             Enabled.BindValueChanged(_ => updateState(), true);
         }
 
@@ -92,10 +86,13 @@ namespace osu.Game.Overlays
 
         private void updateState()
         {
-            var updatedColour = IsHovered || Active.Value ? Color4.White : Enabled.Value ? AccentColour : Color4.DimGray;
             Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-            Text.FadeColour(updatedColour, 120, Easing.OutQuint);
-            OnStateUpdated?.Invoke(updatedColour);
+
+            currentColour.Value = IsHovered || Active.Value
+                ? Color4.White
+                : Enabled.Value ? AccentColour : Color4.DimGray;
         }
+
+        protected virtual void OnCurrentColourChanged(ValueChangedEvent<Color4> colour) => Text.FadeColour(colour.NewValue, 120, Easing.OutQuint);
     }
 }

@@ -1,17 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class ProfileRulesetTabItem : OverlayRulesetTabItem
     {
-        private readonly SpriteIcon icon;
-
         private bool isDefault;
 
         public bool IsDefault
@@ -28,6 +28,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
+        private readonly SpriteIcon icon;
+
         public ProfileRulesetTabItem(RulesetInfo value)
             : base(value)
         {
@@ -40,8 +42,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Icon = FontAwesome.Solid.Star,
                 Size = new Vector2(12),
             });
+        }
 
-            OnStateUpdated += colour => icon.FadeColour(colour, 120, Easing.OutQuint);
+        protected override void OnCurrentColourChanged(ValueChangedEvent<Color4> colour)
+        {
+            base.OnCurrentColourChanged(colour);
+            icon.FadeColour(colour.NewValue, 120, Easing.OutQuint);
         }
     }
 }
