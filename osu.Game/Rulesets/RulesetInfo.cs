@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
@@ -17,6 +18,7 @@ namespace osu.Game.Rulesets
 
         public string InstantiationInfo { get; set; }
 
+        [NotMapped]
         public string PlayingVerb { get; set; }
 
         [JsonIgnore]
