@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
@@ -12,8 +13,6 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayHeader : Container
     {
-        protected readonly OverlayHeaderTabControl TabControl;
-
         private readonly Box titleBackground;
         private readonly Box controlBackground;
         private readonly Container background;
@@ -85,14 +84,7 @@ namespace osu.Game.Overlays
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = Color4.Gray,
                             },
-                            TabControl = new OverlayHeaderTabControl
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                RelativeSizeAxes = Axes.X,
-                                Height = 30,
-                                Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
-                            }
+                            CreateTabControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
                         }
                     },
                     CreateContent()
@@ -106,5 +98,7 @@ namespace osu.Game.Overlays
         protected virtual Drawable CreateContent() => new Container();
 
         protected abstract ScreenTitle CreateTitle();
+
+        protected abstract TabControl<string> CreateTabControl();
     }
 }
