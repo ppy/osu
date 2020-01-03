@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModGrow : OsuModeObjectScaleTween
+    internal class OsuModGrow : OsuModObjectScaleTween
     {
         public override string Name => "Grow";
 

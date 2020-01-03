@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
@@ -59,9 +60,12 @@ namespace osu.Game.Tests.Visual.Editor
                 },
             });
 
+            var editorBeatmap = new EditorBeatmap(Beatmap.Value.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
+
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             Dependencies.CacheAs<IAdjustableClock>(clock);
             Dependencies.CacheAs<IFrameBasedClock>(clock);
+            Dependencies.CacheAs(editorBeatmap);
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }

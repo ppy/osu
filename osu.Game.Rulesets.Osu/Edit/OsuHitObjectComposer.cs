@@ -91,10 +91,10 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (sourceIndex == -1)
                 return null;
 
-            OsuHitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
+            HitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
 
             int targetIndex = sourceIndex + targetOffset;
-            OsuHitObject targetObject = null;
+            HitObject targetObject = null;
 
             // Keep advancing the target object while its start time falls before the end time of the source object
             while (true)
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                 targetIndex++;
             }
 
-            return new OsuDistanceSnapGrid(sourceObject, targetObject);
+            return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject);
         }
     }
 }

@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -21,15 +20,15 @@ namespace osu.Game.Tests.Visual.Editor
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
 
-        [Cached(typeof(IEditorBeatmap))]
-        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap;
 
         [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         public TestSceneDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
         }
 
