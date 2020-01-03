@@ -11,7 +11,8 @@ namespace osu.Game.Screens.Select
 {
     public class LocalScoreDeleteDialog : PopupDialog
     {
-        private ScoreManager scoreManager;
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         public LocalScoreDeleteDialog(ScoreInfo score)
         {
@@ -34,12 +35,6 @@ namespace osu.Game.Screens.Select
                     Text = @"No, I'm still attached.",
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ScoreManager scoreManager)
-        {
-            this.scoreManager = scoreManager;
         }
     }
 }

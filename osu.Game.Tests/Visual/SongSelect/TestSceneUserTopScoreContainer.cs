@@ -17,8 +17,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneUserTopScoreContainer : OsuTestScene
     {
+        [Cached]
         private readonly DialogOverlay dialogOverlay;
-        private readonly Container container;
 
         public TestSceneUserTopScoreContainer()
         {
@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Depth = -1
             });
 
-            container = new Container
+            Add(new Container
             {
                 Origin = Anchor.BottomCentre,
                 Anchor = Anchor.Centre,
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Anchor = Anchor.BottomCentre,
                     }
                 }
-            };
+            });
 
             var scores = new[]
             {
@@ -123,14 +123,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep(@"Add score(rank 110000)", () => topScoreContainer.Score.Value = scores[1]);
             AddStep(@"Add score(rank 22333)", () => topScoreContainer.Score.Value = scores[2]);
             AddStep(@"Add null score", () => topScoreContainer.Score.Value = null);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            Dependencies.Cache(dialogOverlay);
-
-            Add(container);
         }
     }
 }
