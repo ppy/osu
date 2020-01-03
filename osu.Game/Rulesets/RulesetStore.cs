@@ -92,7 +92,6 @@ namespace osu.Game.Rulesets
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
                         r.InstantiationInfo = instanceInfo.InstantiationInfo;
-                        r.PlayingVerb = instanceInfo.PlayingVerb;
 
                         r.Available = true;
                     }
