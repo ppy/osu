@@ -124,13 +124,6 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 double calculatedDelay = canDelayKeyUp ? KEY_UP_DELAY : (nextHitObject.StartTime - endTime) * 0.9;
                 Frames.Add(new TaikoReplayFrame(endTime + calculatedDelay));
 
-                if (i < Beatmap.HitObjects.Count - 1)
-                {
-                    double waitTime = Beatmap.HitObjects[i + 1].StartTime - 1000;
-                    if (waitTime > endTime)
-                        Frames.Add(new TaikoReplayFrame(waitTime));
-                }
-
                 hitButton = !hitButton;
             }
 
