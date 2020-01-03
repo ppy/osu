@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Container topLevelContainer;
 
-        private List<ColumnType> normalColumnTypes = new List<ColumnType>();
+        private List<ColumnInfo> normalColumnTypes = new List<ColumnInfo>();
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Columns.Any(c => c.ReceivePositionalInputAt(screenSpacePos));
 
@@ -129,7 +129,7 @@ namespace osu.Game.Rulesets.Mania.UI
                 var isSpecial = definition.IsSpecialColumn(i);
                 var column = new Column(firstColumnIndex + i)
                 {
-                    ColumnType = isSpecial ? new SpecialColumnType() : null,
+                    ColumnType = isSpecial ? new SpecialColumn() : null,
                     Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
@@ -199,19 +199,19 @@ namespace osu.Game.Rulesets.Mania.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            normalColumnTypes = new List<ColumnType>
+            normalColumnTypes = new List<ColumnInfo>
             {
-                new OddColumnType(),
-                new EvenColumnType(),
+                new OddColumn(),
+                new EvenColumn(),
             };
 
-            var nonSpecialColumns = Columns.Where(c => !(c.ColumnType is SpecialColumnType)).ToList();
+            var nonSpecialColumns = Columns.Where(c => !(c.ColumnType is SpecialColumn)).ToList();
 
             // We'll set the colours of the non-special columns in a separate loop, because the non-special
             // column colours are mirrored across their centre and special styles mess with this
             for (int i = 0; i < Math.Ceiling(nonSpecialColumns.Count / 2f); i++)
             {
-                ColumnType columnType = normalColumnTypes[i % normalColumnTypes.Count];
+                ColumnInfo columnType = normalColumnTypes[i % normalColumnTypes.Count];
                 nonSpecialColumns[i].ColumnType = columnType;
                 nonSpecialColumns[nonSpecialColumns.Count - 1 - i].ColumnType = columnType;
             }

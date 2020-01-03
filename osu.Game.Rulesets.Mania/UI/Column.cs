@@ -22,6 +22,7 @@ namespace osu.Game.Rulesets.Mania.UI
     public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         public const float COLUMN_WIDTH = 80;
+        public const float SPECIAL_COLUMN_WIDTH = 70;
 
         /// <summary>
         /// The index of this column as part of the whole playfield.
@@ -100,9 +101,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override Axes RelativeSizeAxes => Axes.Y;
 
-        private ColumnType columnType;
+        private ColumnInfo columnType;
 
-        public ColumnType ColumnType
+        public ColumnInfo ColumnType
         {
             get => columnType;
             set
@@ -112,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
                 columnType = value;
 
-                AccentColour = columnType.ColumnColour;
+                AccentColour = columnType.DefaultAccentColour;
                 Width = columnType.DefaultColumnWidth;
             }
         }

@@ -1,13 +1,22 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI.Components
 {
-    public abstract class ColumnType
+    /// <summary>
+    /// Provides information about the appearance of a <see cref="Column"/>.
+    /// </summary>
+    public abstract class ColumnInfo
     {
-        public abstract Color4 ColumnColour { get; }
+        /// <summary>
+        /// The colour of the column without skins.
+        /// </summary>
+        public abstract Color4 DefaultAccentColour { get; }
+        /// <summary>
+        /// The width of the column without skins.
+        /// </summary>
         public virtual float DefaultColumnWidth => Column.COLUMN_WIDTH;
 
         public abstract string NoteTextureName { get; }
@@ -16,10 +25,5 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         public abstract string HoldTailTextureName { get; }
         public abstract string KeyUpTextureName { get; }
         public abstract string KeyDownTextureName { get; }
-
-        /// <summary>
-        /// Colour to use if notes are skinned.
-        /// </summary>
-        public abstract Color4 SkinnedColumnColour { get; }
     }
 }
