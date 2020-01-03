@@ -30,8 +30,6 @@ namespace osu.Game.Graphics.UserInterface
 
         protected virtual float StripWidth => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
 
-        protected virtual float StripHeight => 1;
-
         /// <summary>
         /// Whether entries should be automatically populated if <typeparamref name="T"/> is an <see cref="Enum"/> type.
         /// </summary>
@@ -47,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Height = StripHeight,
+                Height = 1,
                 Colour = Color4.White.Opacity(0),
             });
 
