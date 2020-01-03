@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public const float HIT_TARGET_POSITION = 50;
 
-        public IReadOnlyList<DefaultColumn> Columns => columnFlow.Children;
-        private readonly FillFlowContainer<DefaultColumn> columnFlow;
+        public IReadOnlyList<Column> Columns => columnFlow.Children;
+        private readonly FillFlowContainer<Column> columnFlow;
 
         private readonly Container barLineContainer;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black
                                 },
-                                columnFlow = new FillFlowContainer<DefaultColumn>
+                                columnFlow = new FillFlowContainer<Column>
                                 {
                                     Name = "Columns",
                                     RelativeSizeAxes = Axes.Y,

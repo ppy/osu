@@ -15,6 +15,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         public int Columns;
 
+        public int SpecialColumnIndex() => Columns / 2;
+
         /// <summary>
         /// Whether the column index is a special column for this stage.
         /// </summary>
