@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets
 
         public string InstantiationInfo { get; set; }
 
+        public string PlayingVerb { get; set; }
+
         [JsonIgnore]
         public bool Available { get; set; }
 
