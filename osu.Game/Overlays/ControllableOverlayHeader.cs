@@ -31,11 +31,11 @@ namespace osu.Game.Overlays
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Gray,
                     },
-                    CreateControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
+                    CreateTabControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
                 }
             });
         }
 
-        protected abstract TabControl<string> CreateControl();
+        protected abstract TabControl<string> CreateTabControl();
     }
 }

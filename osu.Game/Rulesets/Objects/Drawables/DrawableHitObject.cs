@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
-        protected virtual string SampleNamespace => null;
-
         protected SkinnableSound Samples { get; private set; }
 
         protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
@@ -154,11 +151,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                                                     + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
-            foreach (var s in samples)
-                s.Namespace = SampleNamespace;
-
-            AddInternal(Samples = new SkinnableSound(samples));
+            AddInternal(Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
         }
 
         private void onDefaultsApplied() => apply(HitObject);

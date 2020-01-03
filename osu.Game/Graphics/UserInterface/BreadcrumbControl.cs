@@ -16,14 +16,12 @@ namespace osu.Game.Graphics.UserInterface
     {
         private const float padding = 10;
 
-        protected virtual float ItemChevronSize => 10;
-
-        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value, ItemChevronSize)
+        protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value)
         {
             AccentColour = AccentColour,
         };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + ItemChevronSize);
+        protected override float StripWidth => base.StripWidth - TabContainer.FirstOrDefault()?.Padding.Right ?? 0;
 
         public BreadcrumbControl()
         {
@@ -44,6 +42,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
+            protected virtual float ChevronSize => 10;
+
             public event Action<Visibility> StateChanged;
 
             public readonly SpriteIcon Chevron;
@@ -86,17 +86,17 @@ namespace osu.Game.Graphics.UserInterface
 
             public override void Show() => State = Visibility.Visible;
 
-            public BreadcrumbTabItem(T value, float itemChevronSize)
+            public BreadcrumbTabItem(T value)
                 : base(value)
             {
                 Text.Font = Text.Font.With(size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };
-                Padding = new MarginPadding { Right = padding + itemChevronSize };
+                Padding = new MarginPadding { Right = padding + ChevronSize };
                 Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    Size = new Vector2(itemChevronSize),
+                    Size = new Vector2(ChevronSize),
                     Icon = FontAwesome.Solid.ChevronRight,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,
