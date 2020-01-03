@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
     {
         protected new T HitObject => (T)base.HitObject;
 
-        protected Column Column;
+        protected DefaultColumn Column;
 
         /// <summary>
         /// The current mouse position, snapped to the closest column.
@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return hitObjectToMousePosition(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent)).Y;
         }
 
-        protected Column ColumnAt(Vector2 screenSpacePosition)
+        protected DefaultColumn ColumnAt(Vector2 screenSpacePosition)
             => composer.ColumnAt(screenSpacePosition);
 
         /// <summary>

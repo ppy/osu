@@ -63,9 +63,9 @@ namespace osu.Game.Rulesets.Mania.UI
         /// </summary>
         /// <param name="screenSpacePosition">The screen-space position.</param>
         /// <returns>The column which the <paramref name="screenSpacePosition"/> lies in.</returns>
-        public Column GetColumnByPosition(Vector2 screenSpacePosition)
+        public DefaultColumn GetColumnByPosition(Vector2 screenSpacePosition)
         {
-            Column found = null;
+            DefaultColumn found = null;
 
             foreach (var stage in stages)
             {

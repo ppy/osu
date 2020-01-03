@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
     public struct StageDefinition
     {
         /// <summary>
-        /// The number of <see cref="Column"/>s which this stage contains.
+        /// The number of <see cref="DefaultColumn"/>s which this stage contains.
         /// </summary>
         public int Columns;
 

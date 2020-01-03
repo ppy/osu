@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     [Cached(Type = typeof(IManiaHitObjectComposer))]
     public abstract class ManiaPlacementBlueprintTestScene : PlacementBlueprintTestScene, IManiaHitObjectComposer
     {
-        private readonly Column column;
+        private readonly DefaultColumn column;
 
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             scrollingInfo = ((ScrollingTestContainer)HitObjectContainer).ScrollingInfo;
 
-            Add(column = new Column(0)
+            Add(column = new DefaultColumn(0)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
 
-        public Column ColumnAt(Vector2 screenSpacePosition) => column;
+        public DefaultColumn ColumnAt(Vector2 screenSpacePosition) => column;
 
         public int TotalColumns => 1;
     }

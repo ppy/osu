@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mania.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Column),
+            typeof(DefaultColumn),
             typeof(ColumnBackground),
             typeof(ColumnKeyArea),
             typeof(ColumnHitObjectArea)
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [Cached(typeof(IReadOnlyList<Mod>))]
         private IReadOnlyList<Mod> mods { get; set; } = Array.Empty<Mod>();
 
-        private readonly List<Column> columns = new List<Column>();
+        private readonly List<DefaultColumn> columns = new List<DefaultColumn>();
 
         public TestSceneColumn()
             : base(2)
@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createColumn(ScrollingDirection direction, ManiaAction action, int index)
         {
-            var column = new Column(index)
+            var column = new DefaultColumn(index)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

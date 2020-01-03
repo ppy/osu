@@ -21,7 +21,7 @@ using osuTK.Graphics;
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
-    /// A collection of <see cref="Column"/>s.
+    /// A collection of <see cref="DefaultColumn"/>s.
     /// </summary>
     public class ManiaStage : ScrollingPlayfield
     {
@@ -29,8 +29,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public const float HIT_TARGET_POSITION = 50;
 
-        public IReadOnlyList<Column> Columns => columnFlow.Children;
-        private readonly FillFlowContainer<Column> columnFlow;
+        public IReadOnlyList<DefaultColumn> Columns => columnFlow.Children;
+        private readonly FillFlowContainer<DefaultColumn> columnFlow;
 
         private readonly Container barLineContainer;
 
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black
                                 },
-                                columnFlow = new FillFlowContainer<Column>
+                                columnFlow = new FillFlowContainer<DefaultColumn>
                                 {
                                     Name = "Columns",
                                     RelativeSizeAxes = Axes.Y,
@@ -127,7 +127,7 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < definition.Columns; i++)
             {
                 var isSpecial = definition.IsSpecialColumn(i);
-                var column = new Column(firstColumnIndex + i)
+                var column = new DefaultColumn(firstColumnIndex + i)
                 {
                     IsSpecial = isSpecial,
                     Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }, true);
         }
 
-        public void AddColumn(Column c)
+        public void AddColumn(DefaultColumn c)
         {
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columnFlow.Add(c);
