@@ -52,7 +52,7 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
+            Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
             AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
             AddFont(Resources, @"Resources/Fonts/Aquatico-Light");

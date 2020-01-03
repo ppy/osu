@@ -259,6 +259,9 @@ namespace osu.Game.Database
         /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
+        /// <remarks>
+        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
+        /// </remarks>
         private string computeHash(ArchiveReader reader)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
@@ -270,7 +273,7 @@ namespace osu.Game.Database
                     s.CopyTo(hashable);
             }
 
-            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
+            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : reader.Name.ComputeSHA2Hash();
         }
 
         /// <summary>
