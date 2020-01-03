@@ -283,8 +283,6 @@ namespace osu.Game.Migrations
 
                     b.Property<string>("ShortName");
 
-                    b.Property<string>("PlayingVerb");
-
                     b.HasKey("ID");
 
                     b.HasIndex("Available");
