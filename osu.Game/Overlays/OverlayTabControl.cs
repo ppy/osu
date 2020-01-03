@@ -43,6 +43,11 @@ namespace osu.Game.Overlays
             set => TabContainer.Padding = value;
         }
 
+        protected float BarHeight
+        {
+            set => bar.Height = value;
+        }
+
         protected OverlayTabControl()
         {
             TabContainer.Masking = false;
@@ -63,8 +68,7 @@ namespace osu.Game.Overlays
 
         protected class OverlayTabItem : TabItem<T>
         {
-            private readonly ExpandingBar bar;
-
+            protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;
 
             private Color4 accentColour;
@@ -78,7 +82,7 @@ namespace osu.Game.Overlays
                         return;
 
                     accentColour = value;
-                    bar.Colour = value;
+                    Bar.Colour = value;
 
                     updateState();
                 }
@@ -99,7 +103,7 @@ namespace osu.Game.Overlays
                         Anchor = Anchor.BottomLeft,
                         Font = OsuFont.GetFont(),
                     },
-                    bar = new ExpandingBar
+                    Bar = new ExpandingBar
                     {
                         Anchor = Anchor.BottomCentre,
                         ExpandedSize = 7.5f,
@@ -149,13 +153,13 @@ namespace osu.Game.Overlays
 
             protected virtual void HoverAction()
             {
-                bar.Expand();
+                Bar.Expand();
                 Text.FadeColour(Color4.White, 120, Easing.InQuad);
             }
 
             protected virtual void UnhoverAction()
             {
-                bar.Collapse();
+                Bar.Collapse();
                 Text.FadeColour(AccentColour, 120, Easing.InQuad);
             }
         }

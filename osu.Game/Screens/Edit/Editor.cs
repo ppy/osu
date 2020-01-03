@@ -23,6 +23,7 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Edit.Compose;
@@ -49,8 +50,10 @@ namespace osu.Game.Screens.Edit
         private EditorScreen currentScreen;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-
         private EditorClock clock;
+
+        private IBeatmap playableBeatmap;
+        private EditorBeatmap editorBeatmap;
 
         private DependencyContainer dependencies;
         private GameHost host;
@@ -73,9 +76,13 @@ namespace osu.Game.Screens.Edit
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
+            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            editorBeatmap = new EditorBeatmap(playableBeatmap);
+
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.Cache(beatDivisor);
+            dependencies.CacheAs(editorBeatmap);
 
             EditorMenuBar menuBar;
 
