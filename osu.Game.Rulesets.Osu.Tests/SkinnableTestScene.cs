@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SkinManager skinManager)
         {
-            var dllStore = new DllResourceStore("osu.Game.Rulesets.Osu.Tests.dll");
+            var dllStore = new DllResourceStore(typeof(SkinnableTestScene).Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
             defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
