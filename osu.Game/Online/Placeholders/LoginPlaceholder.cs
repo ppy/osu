@@ -1,0 +1,44 @@
+﻿using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Game.Overlays;
+
+namespace osu.Game.Online.Placeholders
+{
+    public sealed class LoginPlaceholder : Placeholder
+    {
+        [Resolved]
+        private LoginOverlay login { get; set; }
+
+        public LoginPlaceholder(string action)
+        {
+            AddIcon(FontAwesome.Solid.UserLock, cp =>
+            {
+                cp.Font = cp.Font.With(size: TEXT_SIZE);
+                cp.Padding = new MarginPadding { Right = 10 };
+            });
+
+            AddText(@"Please sign in to " + action);
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            this.ScaleTo(0.8f, 4000, Easing.OutQuint);
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            this.ScaleTo(1, 1000, Easing.OutElastic);
+            return base.OnMouseUp(e);
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            login?.Show();
+            return base.OnClick(e);
+        }
+
+    }
+}
