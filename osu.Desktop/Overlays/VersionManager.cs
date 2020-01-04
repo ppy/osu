@@ -59,9 +59,9 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Font = OsuFont.Numeric.With(size: 15),
+                            Font = OsuFont.Numeric.With(size: 12),
                             Colour = colours.Yellow,
-                            Text = @"2020.104.0+matrixfeather DEV"
+                            Text = @"Development Build"
                         },
                         new Sprite
                         {

@@ -201,13 +201,17 @@ namespace osu.Game.Overlays.Volume
 
                 if (displayVolume > 0.99f)
                 {
-                    text.Text = "MAX";
+                    text.Text = "超大声";
                     maxGlow.EffectColour = meterColour.Opacity(2f);
                 }
                 else
                 {
                     maxGlow.EffectColour = Color4.Transparent;
                     text.Text = Math.Round(displayVolume * 100).ToString(CultureInfo.CurrentCulture);
+                }
+                if (displayVolume < 0.01f){
+                    text.Text = "静音";
+                    maxGlow.EffectColour = meterColour.Opacity(2f);
                 }
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;
