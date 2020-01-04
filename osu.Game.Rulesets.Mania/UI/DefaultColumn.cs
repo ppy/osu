@@ -20,29 +20,22 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;
 
-        private readonly Container hitTargetContainer;
-        private readonly Container topLevelContainer;
-        private readonly Container explosionContainer;
-
         // Push up more stuff when needed.
-        protected override Container HitTargetContainer => hitTargetContainer;
+        protected override Container HitTargetContainer { get; }
         protected override Drawable KeyArea => keyArea;
-        protected override Container ExplosionContainer => explosionContainer;
-        protected internal override Container TopLevelContainer => topLevelContainer;
+        protected override Container ExplosionContainer { get; }
+        protected internal override Container TopLevelContainer { get; }
 
         public DefaultColumn(int index)
             : base(index)
         {
-            RelativeSizeAxes = Axes.Y;
-            Width = COLUMN_WIDTH;
-
             background = new ColumnBackground { RelativeSizeAxes = Axes.Both };
 
             InternalChildren = new[]
             {
                 // For input purposes, the background is added at the highest depth, but is then proxied back below all other elements
                 background.CreateProxy(),
-                hitTargetContainer = new Container
+                HitTargetContainer = new Container
                 {
                     Name = "Hit target + hit objects",
                     RelativeSizeAxes = Axes.Both,
@@ -52,7 +45,7 @@ namespace osu.Game.Rulesets.Mania.UI
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
-                        explosionContainer = new Container
+                        ExplosionContainer = new Container
                         {
                             Name = "Hit explosions",
                             RelativeSizeAxes = Axes.Both,
@@ -65,10 +58,10 @@ namespace osu.Game.Rulesets.Mania.UI
                     Height = ManiaStage.HIT_TARGET_POSITION,
                 },
                 background,
-                topLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
+                TopLevelContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
-            topLevelContainer.Add(explosionContainer.CreateProxy());
+            TopLevelContainer.Add(ExplosionContainer.CreateProxy());
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
