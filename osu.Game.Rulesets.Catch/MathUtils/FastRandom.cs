@@ -12,14 +12,14 @@ namespace osu.Game.Rulesets.Catch.MathUtils
     {
         private const double int_to_real = 1.0 / (int.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
-        private const uint y = 842502087;
-        private const uint z = 3579807591;
-        private const uint w = 273326509;
-        private uint _x, _y = y, _z = z, _w = w;
+        private const uint y_initial = 842502087;
+        private const uint z_initial = 3579807591;
+        private const uint w_initial = 273326509;
+        private uint x, y = y_initial, z = z_initial, w = w_initial;
 
         public FastRandom(int seed)
         {
-            _x = (uint)seed;
+            x = (uint)seed;
         }
 
         public FastRandom()
@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = _x ^ (_x << 11);
-            _x = _y;
-            _y = _z;
-            _z = _w;
-            return _w = _w ^ (_w >> 19) ^ t ^ (t >> 8);
+            uint t = x ^ (x << 11);
+            x = y;
+            y = z;
+            z = w;
+            return w = w ^ (w >> 19) ^ t ^ (t >> 8);
         }
 
         /// <summary>

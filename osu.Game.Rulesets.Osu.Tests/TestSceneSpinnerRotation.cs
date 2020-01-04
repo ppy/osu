@@ -70,6 +70,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is rotation absolute almost same", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, estimatedRotation, 100));
         }
 
+        [Test]
+        public void TestSpinPerMinuteOnRewind()
+        {
+            double estimatedSpm = 0;
+
+            addSeekStep(2500);
+            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
+
+            addSeekStep(5000);
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+
+            addSeekStep(2500);
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+        }
+
         private void addSeekStep(double time)
         {
             AddStep($"seek to {time}", () => track.Seek(time));
@@ -84,10 +99,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new Spinner
                 {
                     Position = new Vector2(256, 192),
-                    EndTime = 5000,
+                    EndTime = 6000,
                 },
                 // placeholder object to avoid hitting the results screen
-                new HitObject
+                new HitCircle
                 {
                     StartTime = 99999,
                 }

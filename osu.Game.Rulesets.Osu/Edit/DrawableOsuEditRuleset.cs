@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         /// </summary>
         private const double editor_hit_object_fade_out_extension = 500;
 
-        public DrawableOsuEditRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableOsuEditRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods)
             : base(ruleset, beatmap, mods)
         {
         }

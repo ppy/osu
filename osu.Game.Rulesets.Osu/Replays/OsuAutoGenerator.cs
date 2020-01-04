@@ -156,9 +156,9 @@ namespace osu.Game.Rulesets.Osu.Replays
             // TODO: Shouldn't the spinner always spin in the same direction?
             if (h is Spinner)
             {
-                calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[Frames.Count - 1]).Position, out startPosition, out spinnerDirection);
+                calcSpinnerStartPosAndDirection(((OsuReplayFrame)Frames[^1]).Position, out startPosition, out spinnerDirection);
 
-                Vector2 spinCentreOffset = SPINNER_CENTRE - ((OsuReplayFrame)Frames[Frames.Count - 1]).Position;
+                Vector2 spinCentreOffset = SPINNER_CENTRE - ((OsuReplayFrame)Frames[^1]).Position;
 
                 if (spinCentreOffset.Length > SPIN_RADIUS)
                 {
@@ -230,7 +230,7 @@ namespace osu.Game.Rulesets.Osu.Replays
 
         private void moveToHitObject(OsuHitObject h, Vector2 targetPos, Easing easing)
         {
-            OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[Frames.Count - 1];
+            OsuReplayFrame lastFrame = (OsuReplayFrame)Frames[^1];
 
             // Wait until Auto could "see and react" to the next note.
             double waitTime = h.StartTime - Math.Max(0.0, h.TimePreempt - reactionTime);
@@ -363,7 +363,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!
-            if (Frames[Frames.Count - 1].Time <= endFrame.Time)
+            if (Frames[^1].Time <= endFrame.Time)
                 AddFrameToReplay(endFrame);
         }
 

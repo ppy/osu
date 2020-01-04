@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
                 new User { PreviousUsernames = new[] { "longusername", "longerusername" } },
                 new User { PreviousUsernames = new[] { "test", "angelsim", "verylongusername" } },
                 new User { PreviousUsernames = new[] { "ihavenoidea", "howcani", "makethistext", "anylonger" } },
-                new User { PreviousUsernames = new string[0] },
+                new User { PreviousUsernames = Array.Empty<string>() },
                 null
             };
 

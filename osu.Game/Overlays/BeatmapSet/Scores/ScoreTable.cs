@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     return;
 
                 for (int i = 0; i < value.Count; i++)
-                    backgroundFlow.Add(new ScoreTableRowBackground(i));
+                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i]));
 
                 Columns = createHeaders(value[0]);
                 Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();

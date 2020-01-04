@@ -167,15 +167,18 @@ namespace osu.Game.Overlays.Mods
             {
                 switch (e.Button)
                 {
-                    case MouseButton.Left:
-                        SelectNext(1);
-                        break;
-
                     case MouseButton.Right:
                         SelectNext(-1);
                         break;
                 }
             }
+
+            return true;
+        }
+
+        protected override bool OnClick(ClickEvent e)
+        {
+            SelectNext(1);
 
             return true;
         }

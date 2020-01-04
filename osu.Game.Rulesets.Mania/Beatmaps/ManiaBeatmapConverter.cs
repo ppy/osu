@@ -24,8 +24,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         private const int max_notes_for_density = 7;
 
-        protected override IEnumerable<Type> ValidConversionTypes { get; } = new[] { typeof(IHasXPosition) };
-
         public int TargetColumns;
         public bool Dual;
         public readonly bool IsForCurrentRuleset;
@@ -37,10 +35,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
         private ManiaBeatmap beatmap;
 
-        public ManiaBeatmapConverter(IBeatmap beatmap)
-            : base(beatmap)
+        public ManiaBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+            : base(beatmap, ruleset)
         {
-            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(new ManiaRuleset().RulesetInfo);
+            IsForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
 
             var roundedCircleSize = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             var roundedOverallDifficulty = Math.Round(beatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty);
@@ -68,6 +66,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                     TargetColumns = Math.Max(4, Math.Min((int)roundedOverallDifficulty + 1, 7));
             }
         }
+
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasXPosition || h is ManiaHitObject);
 
         protected override Beatmap<ManiaHitObject> ConvertBeatmap(IBeatmap original)
         {
@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 prevNoteTimes.RemoveAt(0);
             prevNoteTimes.Add(newNoteTime);
 
-            density = (prevNoteTimes[prevNoteTimes.Count - 1] - prevNoteTimes[0]) / prevNoteTimes.Count;
+            density = (prevNoteTimes[^1] - prevNoteTimes[0]) / prevNoteTimes.Count;
         }
 
         private double lastTime;

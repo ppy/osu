@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [TestCase(6.931145117263422, "diffcalc-test")]
+        [TestCase(6.9311451172608853d, "diffcalc-test")]
         [TestCase(1.0736587013228804d, "zero-length-sliders")]
         public void Test(double expected, string name)
             => base.Test(expected, name);

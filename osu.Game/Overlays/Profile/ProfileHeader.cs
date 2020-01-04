@@ -15,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : OverlayHeader
+    public class ProfileHeader : TabControlOverlayHeader
     {
         private UserCoverBackground coverContainer;
 
@@ -26,10 +26,12 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
+            BackgroundHeight = 150;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
-            TabControl.AddItem("Info");
-            TabControl.AddItem("Modding");
+            TabControl.AddItem("info");
+            TabControl.AddItem("modding");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
@@ -38,6 +40,8 @@ namespace osu.Game.Overlays.Profile
         private void load(OsuColour colours)
         {
             TabControl.AccentColour = colours.Seafoam;
+            TitleBackgroundColour = colours.GreySeafoamDarker;
+            ControlBackgroundColour = colours.GreySeafoam;
         }
 
         protected override Drawable CreateBackground() =>
@@ -101,8 +105,8 @@ namespace osu.Game.Overlays.Profile
         {
             public ProfileHeaderTitle()
             {
-                Title = "Player";
-                Section = "Info";
+                Title = "player";
+                Section = "info";
             }
 
             [BackgroundDependencyLoader]
@@ -110,6 +114,8 @@ namespace osu.Game.Overlays.Profile
             {
                 AccentColour = colours.Seafoam;
             }
+
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }

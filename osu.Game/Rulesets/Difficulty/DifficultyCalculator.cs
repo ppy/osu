@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -41,10 +41,10 @@ namespace osu.Game.Rulesets.Difficulty
 
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
-            var clock = new StopwatchClock();
-            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+            var track = new TrackVirtual(10000);
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
 
-            return calculate(playableBeatmap, mods, clock.Rate);
+            return calculate(playableBeatmap, mods, track.Rate);
         }
 
         /// <summary>
