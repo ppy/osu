@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         protected PageSelectorItem()
         {
             AutoSizeAxes = Axes.X;
-            Height = PageSelector.HEIGHT;
+            Height = 20;
             base.Content.Add(content = new CircularContainer
             {
                 RelativeSizeAxes = Axes.Y,
