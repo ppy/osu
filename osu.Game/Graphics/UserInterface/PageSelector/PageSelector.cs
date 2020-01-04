@@ -86,19 +86,10 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
             for (int i = 1; i <= MaxPages.Value; i++)
                 addDrawablePage(i);
 
-            if (CurrentPage.Value > MaxPages.Value)
-            {
-                CurrentPage.Value = MaxPages.Value;
-                return;
-            }
-
-            if (CurrentPage.Value < 1)
-            {
+            if (CurrentPage.Value == 1)
+                CurrentPage.TriggerChange();
+            else
                 CurrentPage.Value = 1;
-                return;
-            }
-
-            CurrentPage.TriggerChange();
         }
 
         private void updateButtonsState()
