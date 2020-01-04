@@ -14,7 +14,9 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(PageSelector),
-            typeof(DrawablePage)
+            typeof(DrawablePage),
+            typeof(PageSelectorButton),
+            typeof(PageSelectorItem)
         };
 
         private readonly PageSelector pageSelector;
@@ -42,6 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestPageSelectorValues()
         {
             AddStep("10 max pages", () => setMaxPages(10));
+            AddStep("11 max pages", () => setMaxPages(11));
             AddStep("200 max pages, current 199", () =>
             {
                 setMaxPages(200);
