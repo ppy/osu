@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly Container topLevelContainer;
         private readonly Container explosionContainer;
 
+        // Push up more stuff when needed.
         protected override Container HitTargetContainer => hitTargetContainer;
         protected override Drawable KeyArea => keyArea;
         protected override Container ExplosionContainer => explosionContainer;
@@ -68,23 +69,6 @@ namespace osu.Game.Rulesets.Mania.UI
             };
 
             topLevelContainer.Add(explosionContainer.CreateProxy());
-
-            Direction.BindValueChanged(dir =>
-            {
-                hitTargetContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
-                };
-
-                explosionContainer.Padding = new MarginPadding
-                {
-                    Top = dir.NewValue == ScrollingDirection.Up ? NotePiece.NOTE_HEIGHT / 2 : 0,
-                    Bottom = dir.NewValue == ScrollingDirection.Down ? NotePiece.NOTE_HEIGHT / 2 : 0
-                };
-
-                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
-            }, true);
         }
 
         public override Axes RelativeSizeAxes => Axes.Y;
@@ -105,13 +89,6 @@ namespace osu.Game.Rulesets.Mania.UI
                 keyArea.AccentColour = value;
                 hitObjectArea.AccentColour = value;
             }
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IBindable<ManiaAction>>(Action);
-            return dependencies;
         }
 
         /// <summary>

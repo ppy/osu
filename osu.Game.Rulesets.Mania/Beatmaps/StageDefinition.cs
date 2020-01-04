@@ -21,7 +21,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
         /// </summary>
         /// <param name="column">The 0-based column index.</param>
         /// <returns>Whether the column is a special column.</returns>
-        public bool IsSpecialColumn(int column) => Columns % 2 == 1 && column == Columns / 2;
+        public bool IsSpecialColumn(int column)
+            // TODO: Inline this method.
+            => Columns % 2 == 1 && column == Columns / 2;
 
         public ColumnType TypeOfColumn(int column)
         {
