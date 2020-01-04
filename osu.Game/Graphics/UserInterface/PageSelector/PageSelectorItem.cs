@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
                 Masking = true,
-                Children = new Drawable[]
+                Children = new[]
                 {
                     Background = new Box
                     {
