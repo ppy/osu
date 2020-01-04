@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -22,8 +23,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [Resolved(CanBeNull = true)]
         private OsuRulesetConfigManager config { get; set; }
 
-        public ReverseArrowPiece()
+        private readonly RepeatPoint repeatPoint;
+
+        public ReverseArrowPiece(RepeatPoint repeatPoint)
         {
+            this.repeatPoint = repeatPoint;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -45,8 +50,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
-            if (PulseMode.Value == ReverseArrowPulseMode.Synced)
-                InternalChild.ScaleTo(1.3f).ScaleTo(1f, timingPoint.BeatLength, Easing.Out);
+            if (PulseMode.Value == ReverseArrowPulseMode.Synced && Clock.CurrentTime < repeatPoint.StartTime)
+                InternalChild.ScaleTo(1.3f).ScaleTo(1f, Math.Min(timingPoint.BeatLength, repeatPoint.StartTime - Clock.CurrentTime), Easing.Out);
         }
 
         [BackgroundDependencyLoader]
