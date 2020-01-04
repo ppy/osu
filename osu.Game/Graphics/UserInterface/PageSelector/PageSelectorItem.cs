@@ -3,17 +3,10 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Framework.Graphics.Sprites;
-using osuTK.Graphics;
-using osuTK;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using JetBrains.Annotations;
 
 namespace osu.Game.Graphics.UserInterface.PageSelector
