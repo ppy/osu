@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSelectionOverlay : WaveOverlayContainer
     {
-        public static readonly float WIDTH_PADDING = 170;
+        public const float WIDTH_PADDING = 170;
 
         private const float transition_duration = 500;
 
@@ -111,15 +111,11 @@ namespace osu.Game.Overlays.Chat.Selection
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = @"聊天频道",
+                                    Text = @"Chat Channels",
                                     Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
-                                search = new HeaderSearchTextBox
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    PlaceholderText = @"搜索",
-                                },
+                                search = new HeaderSearchTextBox { RelativeSizeAxes = Axes.X },
                             },
                         },
                     },
@@ -137,7 +133,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 {
                     new ChannelSection
                     {
-                        Header = "所有频道",
+                        Header = "All Channels",
                         Channels = channels,
                     },
                 };

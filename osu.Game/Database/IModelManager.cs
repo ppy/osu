@@ -6,7 +6,7 @@ using System;
 namespace osu.Game.Database
 {
     /// <summary>
-    /// Represents a model manager that publishes events when <see cref="TModel"/>s are added or removed.
+    /// Represents a model manager that publishes events when <typeparamref name="TModel"/>s are added or removed.
     /// </summary>
     /// <typeparam name="TModel">The model type.</typeparam>
     public interface IModelManager<out TModel>

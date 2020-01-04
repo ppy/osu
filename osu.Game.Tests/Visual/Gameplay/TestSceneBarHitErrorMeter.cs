@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Framework.MathUtils;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Osu.Scoring;
@@ -85,9 +85,9 @@ namespace osu.Game.Tests.Visual.Gameplay
                 AutoSizeAxes = Axes.Both,
                 Children = new[]
                 {
-                    new SpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
-                    new SpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Good)}" },
-                    new SpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
+                    new OsuSpriteText { Text = $@"Great: {hitWindows?.WindowFor(HitResult.Great)}" },
+                    new OsuSpriteText { Text = $@"Good: {hitWindows?.WindowFor(HitResult.Good)}" },
+                    new OsuSpriteText { Text = $@"Meh: {hitWindows?.WindowFor(HitResult.Meh)}" },
                 }
             });
 

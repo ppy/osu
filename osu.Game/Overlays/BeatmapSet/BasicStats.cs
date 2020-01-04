@@ -75,10 +75,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.Regular.Clock, "长度") { Width = 0.25f },
+                    length = new Statistic(FontAwesome.Regular.Clock, "Length") { Width = 0.25f },
                     bpm = new Statistic(FontAwesome.Regular.Circle, "BPM") { Width = 0.25f },
-                    circleCount = new Statistic(FontAwesome.Regular.Circle, "圆圈数") { Width = 0.25f },
-                    sliderCount = new Statistic(FontAwesome.Regular.Circle, "滑条数") { Width = 0.25f },
+                    circleCount = new Statistic(FontAwesome.Regular.Circle, "Circle Count") { Width = 0.25f },
+                    sliderCount = new Statistic(FontAwesome.Regular.Circle, "Slider Count") { Width = 0.25f },
                 },
             };
         }
@@ -91,10 +91,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private class Statistic : Container, IHasTooltip
         {
-            private readonly string name;
             private readonly OsuSpriteText value;
 
-            public string TooltipText => name;
+            public string TooltipText { get; }
 
             public string Value
             {
@@ -104,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public Statistic(IconUsage icon, string name)
             {
-                this.name = name;
+                TooltipText = name;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 

@@ -9,10 +9,10 @@ namespace osu.Game.Configuration
     {
         Local,
 
-        [Description("全局")]
+        [Description("Global")]
         Top,
 
-        [Description("已选择的Mods")]
+        [Description("Selected Mods")]
         SelectedMod,
         Friends,
         Country

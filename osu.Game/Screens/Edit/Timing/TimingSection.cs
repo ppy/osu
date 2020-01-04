@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Timing
                 },
                 timeSignature = new SettingsEnumDropdown<TimeSignatures>
                 {
-                    LabelText = "时间戳"
+                    LabelText = "Time Signature"
                 },
             });
         }

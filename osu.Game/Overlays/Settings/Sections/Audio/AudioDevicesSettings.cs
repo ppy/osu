@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override string Header => "输出设备";
+        protected override string Header => "Devices";
 
         private AudioManager audio;
         private SettingsDropdown<string> dropdown;
@@ -60,7 +60,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown()
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
             };
 
             updateItems();

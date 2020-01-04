@@ -62,8 +62,8 @@ namespace osu.Game.Screens.Play.HUD
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
-                    Text = @"/ 不计入排名 /",
-                    Font = OsuFont.Numeric.With(size: 15)
+                    Text = @"/ UNRANKED /",
+                    Font = OsuFont.Numeric.With(size: 12)
                 }
             };
 

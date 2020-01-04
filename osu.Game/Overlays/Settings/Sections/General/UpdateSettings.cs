@@ -10,14 +10,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
 {
     public class UpdateSettings : SettingsSubsection
     {
-        protected override string Header => "更新";
+        protected override string Header => "Updates";
 
         [BackgroundDependencyLoader]
         private void load(Storage storage, OsuConfigManager config)
         {
             Add(new SettingsEnumDropdown<ReleaseStream>
             {
-                LabelText = "更新频道",
+                LabelText = "Release stream",
                 Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
             });
 
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 Add(new SettingsButton
                 {
-                    Text = "打开osu!文件夹",
+                    Text = "Open osu! folder",
                     Action = storage.OpenInNativeExplorer,
                 });
             }

@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModPerfect : ModPerfect
     {
-        public override string Description => @"不SS，便重试。";
     }
 }

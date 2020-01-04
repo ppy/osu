@@ -10,7 +10,7 @@ namespace osu.Game.Online.Multiplayer.GameTypes
 {
     public class GameTypeTag : GameType
     {
-        public override string Name => "接力";
+        public override string Name => "Tag";
 
         public override Drawable GetIcon(OsuColour colours, float size)
         {

@@ -233,6 +233,24 @@ namespace osu.Game.Overlays
             queuedDirection = null;
         }
 
+        private bool allowRateAdjustments;
+
+        /// <summary>
+        /// Whether mod rate adjustments are allowed to be applied.
+        /// </summary>
+        public bool AllowRateAdjustments
+        {
+            get => allowRateAdjustments;
+            set
+            {
+                if (allowRateAdjustments == value)
+                    return;
+
+                allowRateAdjustments = value;
+                ResetTrackAdjustments();
+            }
+        }
+
         public void ResetTrackAdjustments()
         {
             var track = current?.Track;
@@ -241,8 +259,11 @@ namespace osu.Game.Overlays
 
             track.ResetSpeedAdjustments();
 
-            foreach (var mod in mods.Value.OfType<IApplicableToClock>())
-                mod.ApplyToClock(track);
+            if (allowRateAdjustments)
+            {
+                foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
+                    mod.ApplyToTrack(track);
+            }
         }
 
         protected override void Dispose(bool isDisposing)
@@ -265,18 +286,18 @@ namespace osu.Game.Overlays
             {
                 case GlobalAction.MusicPlay:
                     if (TogglePause())
-                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "播放" : "暂停"));
+                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "Play track" : "Pause track"));
                     return true;
 
                 case GlobalAction.MusicNext:
                     if (NextTrack())
-                        onScreenDisplay?.Display(new MusicControllerToast("下一首"));
+                        onScreenDisplay?.Display(new MusicControllerToast("Next track"));
 
                     return true;
 
                 case GlobalAction.MusicPrev:
                     if (PrevTrack())
-                        onScreenDisplay?.Display(new MusicControllerToast("上一首"));
+                        onScreenDisplay?.Display(new MusicControllerToast("Previous track"));
 
                     return true;
             }
@@ -289,7 +310,7 @@ namespace osu.Game.Overlays
         public class MusicControllerToast : Toast
         {
             public MusicControllerToast(string action)
-                : base("音乐播放", action, string.Empty)
+                : base("Music Playback", action, string.Empty)
             {
             }
         }

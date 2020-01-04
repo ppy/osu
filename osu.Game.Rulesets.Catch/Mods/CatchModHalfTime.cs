@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModHalfTime : ModHalfTime
     {
-        public override string Description => @"减<<<<<<速（0.75倍速）";
         public override double ScoreMultiplier => 0.3;
     }
 }

@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 avatar.User = value.User;
                 flag.Country = value.User.Country;
-                date.Text = $@"达成于 {HumanizerUtils.Humanize(value.Date)}";
+                date.Text = $@"achieved {HumanizerUtils.Humanize(value.Date)}";
 
                 usernameText.Clear();
                 usernameText.AddUserLink(value.User);

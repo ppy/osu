@@ -58,9 +58,8 @@ namespace osu.Game.Overlays.Chat
 
         private Message message;
         private OsuSpriteText username;
-        private LinkFlowContainer contentFlow;
 
-        public LinkFlowContainer ContentFlow => contentFlow;
+        public LinkFlowContainer ContentFlow { get; private set; }
 
         public Message Message
         {
@@ -164,7 +163,7 @@ namespace osu.Game.Overlays.Chat
                     Padding = new MarginPadding { Left = MessagePadding + HorizontalPadding },
                     Children = new Drawable[]
                     {
-                        contentFlow = new LinkFlowContainer(t =>
+                        ContentFlow = new LinkFlowContainer(t =>
                         {
                             t.Shadow = false;
 
@@ -206,8 +205,8 @@ namespace osu.Game.Overlays.Chat
             // remove non-existent channels from the link list
             message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
 
-            contentFlow.Clear();
-            contentFlow.AddLinks(message.DisplayContent, message.Links);
+            ContentFlow.Clear();
+            ContentFlow.AddLinks(message.DisplayContent, message.Links);
         }
 
         private class MessageSender : OsuClickableContainer, IHasContextMenu
@@ -237,11 +236,11 @@ namespace osu.Game.Overlays.Chat
                 {
                     List<MenuItem> items = new List<MenuItem>
                     {
-                        new OsuMenuItem("查看玩家信息", MenuItemType.Highlighted, Action)
+                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
                     };
 
                     if (sender.Id != api.LocalUser.Value.Id)
-                        items.Add(new OsuMenuItem("开始聊天", MenuItemType.Standard, startChatAction));
+                        items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction));
 
                     return items.ToArray();
                 }

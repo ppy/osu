@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHalfTime : ModHalfTime
     {
-        public override string Description => @"减<<<<<<速（0.75倍速）（按下切换到Daycore）";
         public override double ScoreMultiplier => 0.3;
     }
 }

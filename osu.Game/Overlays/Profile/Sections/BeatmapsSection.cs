@@ -8,19 +8,19 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public class BeatmapsSection : ProfileSection
     {
-        public override string Title => "谱面";
+        public override string Title => "Beatmaps";
 
-        public override string Identifier => "谱面";
+        public override string Identifier => "beatmaps";
 
         public BeatmapsSection()
         {
             Children = new[]
             {
-                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User, "收藏的谱面"),
-                new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User, "Ranked & Approved的谱面"),
-                new PaginatedBeatmapContainer(BeatmapSetType.Loved, User, "Loved的谱面"),
-                new PaginatedBeatmapContainer(BeatmapSetType.Unranked, User, "Pending的谱面"),
-                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User, "坟场里的谱面"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User, "Favourite Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User, "Ranked & Approved Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Loved, User, "Loved Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Unranked, User, "Pending Beatmaps"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Graveyard, User, "Graveyarded Beatmaps"),
             };
         }
     }

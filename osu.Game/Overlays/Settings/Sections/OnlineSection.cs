@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class OnlineSection : SettingsSection
     {
-        public override string Header => "在线相关";
+        public override string Header => "Online";
         public override IconUsage Icon => FontAwesome.Solid.GlobeAsia;
 
         public OnlineSection()

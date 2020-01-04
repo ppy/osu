@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -87,20 +86,20 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            textFlow.AddText("这是一个 ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
-            textFlow.AddText("非常早期的构建版本", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
+            textFlow.AddText("This is an ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
+            textFlow.AddText("early development build", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
 
-            textFlow.AddParagraph("一些事情可能不会按预期工作", t => t.Font = t.Font.With(size: 20));
+            textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();
 
-            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
-            textFlow.AddParagraph("欢迎来到github的issues页进行反馈", format);
+            textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
 
-            textFlow.AddText("访问 ", format);
+            textFlow.AddText("Visit ", format);
             textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
-            textFlow.AddText("来一起帮助开发或获取最新进度!", format);
+            textFlow.AddText(" to help out or follow progress!", format);
 
             textFlow.NewParagraph();
             textFlow.NewParagraph();
@@ -115,13 +114,13 @@ namespace osu.Game.Screens.Menu
 
                 if (e.NewValue.IsSupporter)
                 {
-                    supportFlow.AddText("感谢支持osu!", format);
+                    supportFlow.AddText("Thank you for supporting osu!", format);
                 }
                 else
                 {
-                    supportFlow.AddText("考虑成为一名 ", format);
+                    supportFlow.AddText("Consider becoming an ", format);
                     supportFlow.AddLink("osu!supporter", "https://osu.ppy.sh/home/support", creationParameters: format);
-                    supportFlow.AddText("来帮助我们维护这个游戏", format);
+                    supportFlow.AddText(" to help support the game", format);
                 }
 
                 heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>

@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled.Value ? "下载该谱面" : "登录以下载";
+        public string TooltipText => button.Enabled.Value ? "Download this beatmap" : "Login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "下载中...",
+                                Text = "Downloading...",
                                 Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "导入中...",
+                                Text = "Importing...",
                                 Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
@@ -145,12 +145,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         {
                             new OsuSpriteText
                             {
-                                Text = "下载",
+                                Text = "Download",
                                 Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
-                                Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "不带视频" : string.Empty,
+                                Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
                                 Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
                             },
                         };

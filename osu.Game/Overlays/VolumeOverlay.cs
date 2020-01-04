@@ -30,8 +30,7 @@ namespace osu.Game.Overlays
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
-        private readonly Bindable<bool> isMuted = new Bindable<bool>();
-        public Bindable<bool> IsMuted => isMuted;
+        public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -57,16 +56,16 @@ namespace osu.Game.Overlays
                     Margin = new MarginPadding { Left = offset },
                     Children = new Drawable[]
                     {
-                        volumeMeterEffect = new VolumeMeter("音效", 125, colours.BlueDarker)
+                        volumeMeterEffect = new VolumeMeter("EFFECTS", 125, colours.BlueDarker)
                         {
                             Margin = new MarginPadding { Top = 100 + MuteButton.HEIGHT } //to counter the mute button and re-center the volume meters
                         },
-                        volumeMeterMaster = new VolumeMeter("总体", 150, colours.PinkDarker),
-                        volumeMeterMusic = new VolumeMeter("音乐", 125, colours.BlueDarker),
+                        volumeMeterMaster = new VolumeMeter("MASTER", 150, colours.PinkDarker),
+                        volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
                         muteButton = new MuteButton
                         {
                             Margin = new MarginPadding { Top = 100 },
-                            Current = { BindTarget = isMuted }
+                            Current = { BindTarget = IsMuted }
                         }
                     }
                 },
@@ -76,7 +75,7 @@ namespace osu.Game.Overlays
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            isMuted.BindValueChanged(muted =>
+            IsMuted.BindValueChanged(muted =>
             {
                 if (muted.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);

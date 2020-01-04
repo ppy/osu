@@ -138,7 +138,7 @@ namespace osu.Game.Overlays
                                         {
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
-                                            PlaceholderText = "在此输入你要发送的消息",
+                                            PlaceholderText = "type your message",
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
@@ -171,6 +171,7 @@ namespace osu.Game.Overlays
                                     d.Origin = Anchor.BottomLeft;
                                     d.RelativeSizeAxes = Axes.Both;
                                     d.OnRequestLeave = channelManager.LeaveChannel;
+                                    d.IsSwitchable = true;
                                 }),
                             }
                         },

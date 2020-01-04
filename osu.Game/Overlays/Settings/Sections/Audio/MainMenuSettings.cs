@@ -11,7 +11,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class MainMenuSettings : SettingsSubsection
     {
-        protected override string Header => "主目录";
+        protected override string Header => "Main Menu";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -20,20 +20,26 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "界面语音",
+                    LabelText = "Interface voices",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "osu! 主题音乐",
+                    LabelText = "osu! music theme",
                     Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
                 },
                 new SettingsDropdown<IntroSequence>
                 {
-                    LabelText = "开场动画样式",
+                    LabelText = "Intro sequence",
                     Bindable = config.GetBindable<IntroSequence>(OsuSetting.IntroSequence),
                     Items = Enum.GetValues(typeof(IntroSequence)).Cast<IntroSequence>()
                 },
+                new SettingsDropdown<BackgroundSource>
+                {
+                    LabelText = "Background source",
+                    Bindable = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource),
+                    Items = Enum.GetValues(typeof(BackgroundSource)).Cast<BackgroundSource>()
+                }
             };
         }
     }

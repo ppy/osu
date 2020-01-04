@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -19,6 +20,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -55,12 +57,33 @@ namespace osu.Game.Tests.Visual.Gameplay
             beforeLoadAction?.Invoke();
             Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
 
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(Beatmap.Value.Track);
+
             InputManager.Child = container = new TestPlayerLoaderContainer(
                 loader = new TestPlayerLoader(() =>
                 {
                     afterLoadAction?.Invoke();
                     return player = new TestPlayer(interactive, interactive);
                 }));
+        }
+
+        /// <summary>
+        /// When <see cref="PlayerLoader"/> exits early, it has to wait for the player load task
+        /// to complete before running disposal on player. This previously caused an issue where mod
+        /// speed adjustments were undone too late, causing cross-screen pollution.
+        /// </summary>
+        [Test]
+        public void TestEarlyExit()
+        {
+            AddStep("load dummy beatmap", () => ResetPlayer(false, () => SelectedMods.Value = new[] { new OsuModNightcore() }));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+            AddAssert("mod rate applied", () => Beatmap.Value.Track.Rate != 1);
+            AddStep("exit loader", () => loader.Exit());
+            AddUntilStep("wait for not current", () => !loader.IsCurrentScreen());
+            AddAssert("player did not load", () => !player.IsLoaded);
+            AddUntilStep("player disposed", () => loader.DisposalTask?.IsCompleted == true);
+            AddAssert("mod rate still applied", () => Beatmap.Value.Track.Rate != 1);
         }
 
         [Test]
@@ -100,7 +123,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             TestMod playerMod1 = null;
             TestMod playerMod2 = null;
 
-            AddStep("load player", () => { ResetPlayer(true, () => Mods.Value = new[] { gameMod = new TestMod() }); });
+            AddStep("load player", () => { ResetPlayer(true, () => SelectedMods.Value = new[] { gameMod = new TestMod() }); });
 
             AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
@@ -195,6 +218,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         private class TestPlayerLoader : PlayerLoader
         {
             public new VisualSettings VisualSettings => base.VisualSettings;
+
+            public new Task DisposalTask => base.DisposalTask;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)

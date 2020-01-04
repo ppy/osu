@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class SongSelectSettings : SettingsSubsection
     {
-        protected override string Header => "谱面选择";
+        protected override string Header => "Song Select";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,29 +19,31 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "右键快速定位",
+                    LabelText = "Right mouse drag to absolute scroll",
                     Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "显示已转换的谱面",
+                    LabelText = "Show converted beatmaps",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarSlider>
                 {
-                    LabelText = "显示谱面难度,从",
+                    LabelText = "Display beatmaps from",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
-                    KeyboardStep = 0.1f
+                    KeyboardStep = 0.1f,
+                    Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsSlider<double, StarSlider>
                 {
-                    LabelText = "到",
+                    LabelText = "up to",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
-                    KeyboardStep = 0.1f
+                    KeyboardStep = 0.1f,
+                    Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = "随机选择算法",
+                    LabelText = "Random selection algorithm",
                     Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
@@ -49,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 
         private class StarSlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Value.ToString(@"0.## 星");
+            public override string TooltipText => Current.Value.ToString(@"0.## stars");
         }
     }
 }

@@ -104,7 +104,7 @@ namespace osu.Game.Overlays
                                     Position = new Vector2(0, 40),
                                     Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"没有东西可以播放 :\\",
+                                    Text = @"Nothing to play",
                                 },
                                 artist = new OsuSpriteText
                                 {
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
                                     Position = new Vector2(0, 45),
                                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
-                                    Text = @"没有东西可以播放 :\\",
+                                    Text = @"Nothing to play",
                                 },
                                 new Container
                                 {
@@ -259,8 +259,8 @@ namespace osu.Game.Overlays
                 {
                     if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
                     {
-                        title.Text = @"没有东西可以播放 :\\";
-                        artist.Text = @"没有东西可以播放 :\\";
+                        title.Text = @"Nothing to play";
+                        artist.Text = @"Nothing to play";
                     }
                     else
                     {
@@ -390,7 +390,7 @@ namespace osu.Game.Overlays
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.7f) / change.Length;
 
                 this.MoveTo(change);
                 return true;

@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModPerfect : ModPerfect
     {
-        public override string Description => @"不SS,遍重试";
     }
 }

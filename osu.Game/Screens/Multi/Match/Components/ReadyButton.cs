@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(200, 1);
 
-            Text = "开始";
+            Text = "Start";
         }
 
         [BackgroundDependencyLoader]

@@ -31,8 +31,8 @@ namespace osu.Game.Overlays.Profile.Header
         private UpdateableFlag userFlag;
         private OsuSpriteText userCountryText;
         private FillFlowContainer userStats;
+
         [BackgroundDependencyLoader]
-        
         private void load(OsuColour colours)
         {
             Height = 150;
@@ -61,7 +61,6 @@ namespace osu.Game.Overlays.Profile.Header
                             CornerRadius = avatar_size * 0.25f,
                             OpenOnClick = { Value = false },
                             ShowGuestOnNull = false,
-                            
                         },
                         new Container
                         {
@@ -178,13 +177,13 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user?.Statistics != null)
             {
-                userStats.Add(new UserStatsLine("Ranked 谱面总分", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("准确率", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
-                userStats.Add(new UserStatsLine("游戏次数", user.Statistics.PlayCount.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("总分", user.Statistics.TotalScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("总命中次数", user.Statistics.TotalHits.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("最大连击", user.Statistics.MaxCombo.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("回放被观看次数", user.Statistics.ReplaysWatched.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Hit Accuracy", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
+                userStats.Add(new UserStatsLine("Play Count", user.Statistics.PlayCount.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Total Score", user.Statistics.TotalScore.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Total Hits", user.Statistics.TotalHits.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Maximum Combo", user.Statistics.MaxCombo.ToString("#,##0")));
+                userStats.Add(new UserStatsLine("Replays Watched by Others", user.Statistics.ReplaysWatched.ToString("#,##0")));
             }
         }
 
@@ -198,7 +197,7 @@ namespace osu.Game.Overlays.Profile.Header
                 {
                     new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: 17),
+                        Font = OsuFont.GetFont(size: 15),
                         Text = left,
                     },
                     new OsuSpriteText

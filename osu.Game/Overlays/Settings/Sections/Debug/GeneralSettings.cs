@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "总体";
+        protected override string Header => "General";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, FrameworkConfigManager frameworkConfig)
@@ -18,17 +18,17 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "显示日志Overlay",
+                    LabelText = "Show log overlay",
                     Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.ShowLogOverlay)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "记录性能相关信息",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.PerformanceLogging)
+                    LabelText = "Performance logging",
+                    Bindable = config.GetBindable<bool>(DebugSetting.PerformanceLogging)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "绕过 front-to-back 渲染检查(render pass)",
+                    LabelText = "Bypass front-to-back render pass",
                     Bindable = config.GetBindable<bool>(DebugSetting.BypassFrontToBackPass)
                 }
             };

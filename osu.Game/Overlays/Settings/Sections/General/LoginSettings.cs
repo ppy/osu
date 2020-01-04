@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new OsuSpriteText
                         {
-                            Text = "账号",
+                            Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
                             Font = OsuFont.GetFont(weight: FontWeight.Black),
                         },
@@ -107,12 +107,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             Origin = Anchor.TopCentre,
                             TextAnchor = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            Text = state == APIState.Failing ? "连接失败,将会尝试重新连接" : "正在连接至服务器...",
+                            Text = state == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };
 
-                    linkFlow.AddLink("取消", api.Logout, string.Empty);
+                    linkFlow.AddLink("cancel", api.Logout, string.Empty);
                     break;
 
                 case APIState.Online:
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Text = "已登入",
+                                            Text = "Signed in",
                                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                             Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                         },
@@ -225,26 +225,26 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "电子邮箱地址/用户名",
+                        PlaceholderText = "username",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
                     {
-                        PlaceholderText = "密码",
+                        PlaceholderText = "password",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
                         OnCommit = (sender, newText) => performLogin()
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "记住电子邮箱地址/用户名",
+                        LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "记住我",
+                        LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new Container
@@ -259,7 +259,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 AutoSizeAxes = Axes.Y,
                                 Child = new SettingsButton
                                 {
-                                    Text = "登入",
+                                    Text = "Sign in",
                                     Action = performLogin
                                 },
                             }
@@ -267,7 +267,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsButton
                     {
-                        Text = "注册",
+                        Text = "Register",
                         Action = () =>
                         {
                             RequestHide();
@@ -297,10 +297,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 set
                 {
-                    var h = Header as UserDropdownHeader;
-                    if (h == null) return;
-
-                    h.StatusColour = value;
+                    if (Header is UserDropdownHeader h)
+                        h.StatusColour = value;
                 }
             }
 
@@ -401,16 +399,15 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         private enum UserAction
         {
-            [Description(@"在线")]
             Online,
 
-            [Description(@"请勿打扰")]
+            [Description(@"Do not disturb")]
             DoNotDisturb,
 
-            [Description(@"隐身")]
+            [Description(@"Appear offline")]
             AppearOffline,
 
-            [Description(@"登出")]
+            [Description(@"Sign out")]
             SignOut,
         }
     }

@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Music
                         break;
                 }
 
-                dstIndex = MathHelper.Clamp(dstIndex, 0, items.Count - 1);
+                dstIndex = Math.Clamp(dstIndex, 0, items.Count - 1);
 
                 if (srcIndex == dstIndex)
                     return;
@@ -239,7 +239,7 @@ namespace osu.Game.Overlays.Music
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
-                public IEnumerable<string> FilterTerms => new string[] { };
+                public IEnumerable<string> FilterTerms => Array.Empty<string>();
 
                 public bool MatchingFilter
                 {

@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     title = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 20 : 18, weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold)
                     },
                     content = new OsuSpriteText
                     {

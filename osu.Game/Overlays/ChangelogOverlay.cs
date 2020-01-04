@@ -158,7 +158,8 @@ namespace osu.Game.Overlays
 
         private Task initialFetchTask;
 
-        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ => Schedule(action));
+        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ =>
+            Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
 
         private Task fetchListing()
         {
@@ -185,21 +186,13 @@ namespace osu.Game.Overlays
                     tcs.SetResult(true);
                 });
 
-                req.Failure += _ =>
+                req.Failure += e =>
                 {
                     initialFetchTask = null;
-                    tcs.SetResult(false);
+                    tcs.SetException(e);
                 };
 
-                try
-                {
-                    req.Perform(API);
-                }
-                catch
-                {
-                    initialFetchTask = null;
-                    tcs.SetResult(false);
-                }
+                await API.PerformAsync(req);
 
                 await tcs.Task;
             });

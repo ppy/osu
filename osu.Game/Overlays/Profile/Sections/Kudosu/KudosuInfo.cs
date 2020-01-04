@@ -55,20 +55,20 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
         private class CountAvailable : CountSection
         {
             public CountAvailable()
-                : base("可用的Kudosu")
+                : base("Kudosu Avaliable")
             {
-                DescriptionText.Text = "Kudosu可以被转换为Kudosu星,可以让你的谱面获得更多的注意.\n这是你还没有被转换的Kudosu数量";
+                DescriptionText.Text = "Kudosu can be traded for kudosu stars, which will help your beatmap get more attention. This is the number of kudosu you haven't traded in yet.";
             }
         }
 
         private class CountTotal : CountSection
         {
             public CountTotal()
-                : base("总共获得的Kudosu")
+                : base("Total Kudosu Earned")
             {
-                DescriptionText.AddText("基于你对游戏谱面制作的贡献有多少,查看");
-                DescriptionText.AddLink("这个链接", "https://osu.ppy.sh/wiki/Kudosu");
-                DescriptionText.AddText("以获得更多信息.");
+                DescriptionText.AddText("Based on how much of a contribution the user has made to beatmap moderation. See ");
+                DescriptionText.AddLink("this link", "https://osu.ppy.sh/wiki/Kudosu");
+                DescriptionText.AddText(" for more information.");
             }
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                         new OsuSpriteText
                         {
                             Text = header,
-                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold)
                         },
                         valueText = new OsuSpriteText
                         {
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                             Font = OsuFont.GetFont(size: 40, weight: FontWeight.Light),
                             UseFullGlyphHeight = false,
                         },
-                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 18))
+                        DescriptionText = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

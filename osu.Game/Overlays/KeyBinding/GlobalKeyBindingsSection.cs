@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.KeyBinding
     public class GlobalKeyBindingsSection : SettingsSection
     {
         public override IconUsage Icon => FontAwesome.Solid.Globe;
-        public override string Header => "全局";
+        public override string Header => "Global";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private class InGameKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override string Header => "游戏中";
+            protected override string Header => "In Game";
 
             public InGameKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.KeyBinding
 
         private class AudioControlKeyBindingsSubsection : KeyBindingsSubsection
         {
-            protected override string Header => "音频";
+            protected override string Header => "Audio";
 
             public AudioControlKeyBindingsSubsection(GlobalActionContainer manager)
                 : base(null)

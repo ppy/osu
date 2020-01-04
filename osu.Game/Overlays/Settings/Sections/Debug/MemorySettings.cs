@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
 {
     public class MemorySettings : SettingsSubsection
     {
-        protected override string Header => "内存";
+        protected override string Header => "Memory";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config, GameHost host)
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             {
                 new SettingsButton
                 {
-                    Text = "清理所有缓存",
+                    Text = "Clear all caches",
                     Action = host.Collect
                 },
             };

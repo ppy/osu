@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModNoFail : ModNoFail
     {
-        public override string Description => @"无论如何,你都失败不了";
     }
 }

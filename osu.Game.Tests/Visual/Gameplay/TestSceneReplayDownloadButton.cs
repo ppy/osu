@@ -5,11 +5,12 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Online;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
 using osu.Game.Users;
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Ranking.Pages;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -17,6 +18,9 @@ namespace osu.Game.Tests.Visual.Gameplay
     [TestFixture]
     public class TestSceneReplayDownloadButton : OsuTestScene
     {
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ReplayDownloadButton)
@@ -49,16 +53,15 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             return new APILegacyScoreInfo
             {
-                ID = 1,
                 OnlineScoreID = 2553163309,
-                Ruleset = new OsuRuleset().RulesetInfo,
+                OnlineRulesetID = 0,
                 Replay = replayAvailable,
                 User = new User
                 {
                     Id = 39828,
                     Username = @"WubWoofWolf",
                 }
-            };
+            }.CreateScoreInfo(rulesets);
         }
 
         private class TestReplayDownloadButton : ReplayDownloadButton

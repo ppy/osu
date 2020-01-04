@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override int KeyCount => 2;
         public override string Name => "Two Keys";
         public override string Acronym => "2K";
-        public override string Description => @"2键位模式";
+        public override string Description => @"Play with two keys.";
     }
 }

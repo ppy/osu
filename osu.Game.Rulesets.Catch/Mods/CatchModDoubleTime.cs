@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModDoubleTime : ModDoubleTime
     {
-        public override string Description => @"加>>>>>>>>>>>速（1.5倍速）（按下切换到Nightcore）";
         public override double ScoreMultiplier => 1.06;
     }
 }

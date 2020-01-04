@@ -13,17 +13,17 @@ namespace osu.Game.Screens.Play
     {
         public Action OnResume;
 
-        public override string Header => "已暂停";
-        public override string Description => "要去做什么呢owo?";
+        public override string Header => "paused";
+        public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
         protected override Action BackAction => () => InternalButtons.Children.First().Click();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton("继续", colours.Green, () => OnResume?.Invoke());
-            AddButton("重试", colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton("退出", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            AddButton("Continue", colours.Green, () => OnResume?.Invoke());
+            AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
+            AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
         }
     }
 }

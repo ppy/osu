@@ -6,16 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModHidden : ModHidden
     {
-        public override string Description => @"没有缩圈，圆圈渐隐，分数略微提高。";
+        public override string Description => @"Play with no approach circles and fading circles/sliders.";
         public override double ScoreMultiplier => 1.06;
 
         public override Type[] IncompatibleMods => new[] { typeof(OsuModTraceable), typeof(OsuModSpinIn) };
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
+            static void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)
-            var longFadeDuration = ((h as IHasEndTime)?.EndTime ?? h.StartTime) - fadeOutStartTime;
+            var longFadeDuration = h.GetEndTime() - fadeOutStartTime;
 
             switch (drawable)
             {

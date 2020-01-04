@@ -10,7 +10,7 @@ namespace osu.Game.Online.Multiplayer.GameTypes
 {
     public class GameTypeTimeshift : GameType
     {
-        public override string Name => "时移";
+        public override string Name => "Timeshift";
 
         public override Drawable GetIcon(OsuColour colours, float size) => new SpriteIcon
         {

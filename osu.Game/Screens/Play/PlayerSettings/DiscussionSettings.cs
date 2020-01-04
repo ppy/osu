@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class DiscussionSettings : PlayerSettingsGroup
     {
-        protected override string Title => @"讨论";
+        protected override string Title => @"discussions";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,14 +19,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 new PlayerCheckbox
                 {
-                    LabelText = "显示弹幕",
+                    LabelText = "Show floating comments",
                     Current = config.GetBindable<bool>(OsuSetting.FloatingComments)
                 },
                 new FocusedTextBox
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 30,
-                    PlaceholderText = "发送弹幕",
+                    PlaceholderText = "Add Comment",
                     HoldFocus = false,
                 },
             };

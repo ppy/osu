@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
@@ -9,7 +10,6 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             // Flip the vertical coordinate space when scrolling downwards
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                targetPosition = targetPosition - referenceParent.DrawHeight;
+                targetPosition -= referenceParent.DrawHeight;
 
             float movementDelta = targetPosition - reference.DrawableObject.Position.Y;
 
@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     maxColumn = obj.Column;
             }
 
-            columnDelta = MathHelper.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
+            columnDelta = Math.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
 
             foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
                 obj.Column += columnDelta;

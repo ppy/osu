@@ -22,7 +22,7 @@ namespace osu.Game.Online.Leaderboards
                 Padding = new MarginPadding { Right = 10 }
             });
 
-            AddText(@"无法获取分数信息oAo!");
+            AddText(@"Couldn't retrieve scores!");
         }
 
         public class RetryButton : OsuHoverContainer

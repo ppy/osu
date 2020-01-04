@@ -24,7 +24,7 @@ namespace osu.Game.Skinning
 
         public bool DeletePending { get; set; }
 
-        public string FullName => $"皮肤\"{Name}\",作者 {Creator}";
+        public string FullName => $"\"{Name}\" by {Creator}";
 
         public static SkinInfo Default { get; } = new SkinInfo
         {

@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModSuddenDeath : ModSuddenDeath
     {
-        public override string Description => @"不全连,便重试";
     }
 }

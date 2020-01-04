@@ -70,7 +70,10 @@ namespace osu.Game.Screens.Ranking.Pages
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new UserHeader(Score.User)
+                        new DelayedLoadWrapper(new UserHeader(Score.User)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        })
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -114,8 +117,8 @@ namespace osu.Game.Screens.Ranking.Pages
                             Origin = Anchor.TopCentre,
                             Colour = colours.PinkDarker,
                             Shadow = false,
-                            Font = OsuFont.GetFont(size: 24,weight: FontWeight.Bold),
-                            Text = "总分",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                            Text = "total score",
                             Margin = new MarginPadding { Bottom = 15 },
                         },
                         new BeatmapDetails(Beatmap.BeatmapInfo)
@@ -359,7 +362,7 @@ namespace osu.Game.Screens.Ranking.Pages
 
                 if (!string.IsNullOrEmpty(creator))
                 {
-                    versionMapper.Text = $"作图者 {creator}";
+                    versionMapper.Text = $"mapped by {creator}";
 
                     if (!string.IsNullOrEmpty(beatmap.Version))
                         versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;
@@ -370,6 +373,7 @@ namespace osu.Game.Screens.Ranking.Pages
             }
         }
 
+        [LongRunningLoad]
         private class UserHeader : Container
         {
             private readonly User user;

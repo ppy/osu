@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
@@ -75,19 +74,20 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             leaderboard.ScoresLoaded = scoresLoaded;
         }
 
-        private void scoresLoaded(IEnumerable<APIRoomScoreInfo> scores)
+        private void scoresLoaded(IEnumerable<APIUserScoreAggregate> scores)
         {
-            Action<SpriteText> gray = s => s.Colour = colours.GrayC;
-            Action<SpriteText> white = s =>
+            void gray(SpriteText s) => s.Colour = colours.GrayC;
+
+            void white(SpriteText s)
             {
                 s.Font = s.Font.With(size: s.Font.Size * 1.4f);
                 s.Colour = colours.GrayF;
-            };
+            }
 
             rankText.AddText(name + "\n", white);
-            rankText.AddText("你在房间内排第  ", gray);
+            rankText.AddText("You are placed ", gray);
 
-            int index = scores.IndexOf(new APIRoomScoreInfo { User = Score.User }, new FuncEqualityComparer<APIRoomScoreInfo>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
+            int index = scores.IndexOf(new APIUserScoreAggregate { User = Score.User }, new FuncEqualityComparer<APIUserScoreAggregate>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
 
             rankText.AddText($"#{index + 1} ", s =>
             {
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                 s.Colour = colours.YellowDark;
             });
 
-            rankText.AddText("名!", gray);
+            rankText.AddText("in the room!", gray);
         }
 
         protected virtual MatchLeaderboard CreateLeaderboard() => new ResultsMatchLeaderboard();
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
         {
             protected override bool FadeTop => true;
 
-            protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index)
+            protected override LeaderboardScore CreateDrawableScore(APIUserScoreAggregate model, int index)
                 => new ResultsMatchLeaderboardScore(model, index);
 
             protected override FillFlowContainer<LeaderboardScore> CreateScoreFlow()
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
             private class ResultsMatchLeaderboardScore : MatchLeaderboardScore
             {
-                public ResultsMatchLeaderboardScore(APIRoomScoreInfo score, int rank)
+                public ResultsMatchLeaderboardScore(APIUserScoreAggregate score, int rank)
                     : base(score, rank)
                 {
                 }

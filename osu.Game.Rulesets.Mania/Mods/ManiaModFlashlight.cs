@@ -13,7 +13,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModFlashlight : ModFlashlight<ManiaHitObject>
     {
-        public override string Description => @"限制视野";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModHidden) };
 

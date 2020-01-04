@@ -29,6 +29,7 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
+using osu.Game.Resources;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -74,18 +75,21 @@ namespace osu.Game
 
         protected Storage Storage { get; set; }
 
-        private Bindable<WorkingBeatmap> beatmap; // cached via load() method
-
         [Cached]
         [Cached(typeof(IBindable<RulesetInfo>))]
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        [Cached(typeof(IBindable<IReadOnlyList<Mod>>))]
+        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
-        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
+        /// <summary>
+        /// Mods available for the current <see cref="Ruleset"/>.
+        /// </summary>
+        public readonly Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> AvailableMods = new Bindable<Dictionary<ModType, IReadOnlyList<Mod>>>();
+
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; } // cached via load() method
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -98,7 +102,7 @@ namespace osu.Game
             get
             {
                 if (!IsDeployedBuild)
-                    return @"本地 " + (DebugUtils.IsDebugBuild ? @"调试版" : @"发行版");
+                    return @"local " + (DebugUtils.IsDebugBuild ? @"debug" : @"release");
 
                 var version = AssemblyVersion;
                 return $@"{version.Major}.{version.Minor}.{version.Build}";
@@ -122,7 +126,7 @@ namespace osu.Game
         [BackgroundDependencyLoader]
         private void load()
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
+            Resources.AddStore(new DllResourceStore(OsuResources.ResourceAssembly));
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Storage));
 
@@ -133,29 +137,29 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+            AddFont(Resources, @"Fonts/osuFont");
+            AddFont(Resources, @"Fonts/Exo2.0-Medium");
+            AddFont(Resources, @"Fonts/Exo2.0-MediumItalic");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Hangul"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Compatibility"));
+            AddFont(Resources, @"Fonts/Noto-Basic");
+            AddFont(Resources, @"Fonts/Noto-Hangul");
+            AddFont(Resources, @"Fonts/Noto-CJK-Basic");
+            AddFont(Resources, @"Fonts/Noto-CJK-Compatibility");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Bold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+            AddFont(Resources, @"Fonts/Exo2.0-Regular");
+            AddFont(Resources, @"Fonts/Exo2.0-RegularItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-SemiBold");
+            AddFont(Resources, @"Fonts/Exo2.0-SemiBoldItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Bold");
+            AddFont(Resources, @"Fonts/Exo2.0-BoldItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Light");
+            AddFont(Resources, @"Fonts/Exo2.0-LightItalic");
+            AddFont(Resources, @"Fonts/Exo2.0-Black");
+            AddFont(Resources, @"Fonts/Exo2.0-BlackItalic");
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Medium"));
+            AddFont(Resources, @"Fonts/Venera");
+            AddFont(Resources, @"Fonts/Venera-Light");
+            AddFont(Resources, @"Fonts/Venera-Medium");
 
             runMigrations();
 
@@ -201,16 +205,16 @@ namespace osu.Game
             // this adds a global reduction of track volume for the time being.
             Audio.Tracks.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
-            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
+            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            Beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
             {
                 // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
                 if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
                     b.OldValue.RecycleTrack();
             }));
 
-            dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
-            dependencies.CacheAs(beatmap);
+            dependencies.CacheAs<IBindable<WorkingBeatmap>>(Beatmap);
+            dependencies.CacheAs(Beatmap);
 
             FileStore.Cleanup();
 
@@ -235,6 +239,23 @@ namespace osu.Game
             PreviewTrackManager previewTrackManager;
             dependencies.Cache(previewTrackManager = new PreviewTrackManager());
             Add(previewTrackManager);
+
+            Ruleset.BindValueChanged(onRulesetChanged);
+        }
+
+        private void onRulesetChanged(ValueChangedEvent<RulesetInfo> r)
+        {
+            var dict = new Dictionary<ModType, IReadOnlyList<Mod>>();
+
+            if (r.NewValue?.Available == true)
+            {
+                foreach (ModType type in Enum.GetValues(typeof(ModType)))
+                    dict[type] = r.NewValue.CreateInstance().GetModsFor(type).ToList();
+            }
+
+            if (!SelectedMods.Disabled)
+                SelectedMods.Value = Array.Empty<Mod>();
+            AvailableMods.Value = dict;
         }
 
         protected virtual Container CreateScalingContainer() => new DrawSizePreservingFillContainer();

@@ -59,10 +59,10 @@ namespace osu.Game.Rulesets.Osu
 
     public enum OsuAction
     {
-        [Description("左键")]
+        [Description("Left button")]
         LeftButton,
 
-        [Description("右键")]
+        [Description("Right button")]
         RightButton
     }
 }

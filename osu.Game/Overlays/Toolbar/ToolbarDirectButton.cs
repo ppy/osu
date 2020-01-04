@@ -11,8 +11,6 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarDirectButton()
         {
             SetIcon(OsuIcon.ChevronDownCircle);
-            TooltipMain = "osu!direct";
-            TooltipSub = "在这里下图";
         }
 
         [BackgroundDependencyLoader(true)]

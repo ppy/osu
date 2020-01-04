@@ -66,11 +66,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 case RecentActivityType.Achievement:
-                    return new MedalIcon(activity.Achievement.Slug)
+                    return new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fit,
+                    })
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 60,
-                        FillMode = FillMode.Fit,
                     };
 
                 default:
@@ -96,31 +99,31 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (activity.Type)
             {
                 case RecentActivityType.Achievement:
-                    message = $"{userLinkTemplate()} 解锁了 {activity.Achievement.Name} 奖章!";
+                    message = $"{userLinkTemplate()} unlocked the {activity.Achievement.Name} medal!";
                     break;
 
                 case RecentActivityType.BeatmapPlaycount:
-                    message = $"{beatmapLinkTemplate()} 已被游玩了 {activity.Count} 次!";
+                    message = $"{beatmapLinkTemplate()} has been played {activity.Count} times!";
                     break;
 
                 case RecentActivityType.BeatmapsetApprove:
-                    message = $"{beatmapsetLinkTemplate()} 已被 {activity.Approval.ToString().ToLowerInvariant()}!";
+                    message = $"{beatmapsetLinkTemplate()} has been {activity.Approval.ToString().ToLowerInvariant()}!";
                     break;
 
                 case RecentActivityType.BeatmapsetDelete:
-                    message = $"{beatmapsetLinkTemplate()} 已被删除.";
+                    message = $"{beatmapsetLinkTemplate()} has been deleted.";
                     break;
 
                 case RecentActivityType.BeatmapsetRevive:
-                    message = $"{beatmapsetLinkTemplate()} 已被 {userLinkTemplate()} 从永恒的沉睡中唤醒.";
+                    message = $"{beatmapsetLinkTemplate()} has been revived from eternal slumber by {userLinkTemplate()}.";
                     break;
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    message = $"{userLinkTemplate()} 更新了谱面: {beatmapsetLinkTemplate()}!";
+                    message = $"{userLinkTemplate()} has updated the beatmap {beatmapsetLinkTemplate()}!";
                     break;
 
                 case RecentActivityType.BeatmapsetUpload:
-                    message = $"{userLinkTemplate()} 上传了一张新的谱面: {beatmapsetLinkTemplate()}!";
+                    message = $"{userLinkTemplate()} has submitted a new beatmap {beatmapsetLinkTemplate()}!";
                     break;
 
                 case RecentActivityType.Medal:
@@ -129,27 +132,27 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.Rank:
-                    message = $"{userLinkTemplate()} 在 {beatmapLinkTemplate()} ({activity.Mode}) 上获得了第 #{activity.Rank} 名!";
+                    message = $"{userLinkTemplate()} achieved rank #{activity.Rank} on {beatmapLinkTemplate()} ({activity.Mode}!)";
                     break;
 
                 case RecentActivityType.RankLost:
-                    message = $"{userLinkTemplate()} 在 {beatmapLinkTemplate()} ({activity.Mode}) 上失去了第一名!";
+                    message = $"{userLinkTemplate()} has lost first place on {beatmapLinkTemplate()} ({activity.Mode}!)";
                     break;
 
                 case RecentActivityType.UserSupportAgain:
-                    message = $"{userLinkTemplate()} 再次选择了支持osu! - 感谢你的慷慨!";
+                    message = $"{userLinkTemplate()} has once again chosen to support osu! - thanks for your generosity!";
                     break;
 
                 case RecentActivityType.UserSupportFirst:
-                    message = $"{userLinkTemplate()} 成为了一名 osu! 支持者 - 感谢你的慷慨!";
+                    message = $"{userLinkTemplate()} has become an osu!supporter - thanks for your generosity!";
                     break;
 
                 case RecentActivityType.UserSupportGift:
-                    message = $"{userLinkTemplate()} 收到了 osu!supporter 礼物!";
+                    message = $"{userLinkTemplate()} has received the gift of osu!supporter!";
                     break;
 
                 case RecentActivityType.UsernameChange:
-                    message = $"{activity.User?.PreviousUsername} 将玩家名更改为 {userLinkTemplate()}!";
+                    message = $"{activity.User?.PreviousUsername} has changed their username to {userLinkTemplate()}!";
                     break;
 
                 default:

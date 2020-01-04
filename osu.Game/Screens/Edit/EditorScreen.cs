@@ -17,6 +17,9 @@ namespace osu.Game.Screens.Edit
         [Resolved]
         protected IBindable<WorkingBeatmap> Beatmap { get; private set; }
 
+        [Resolved]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
+
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 

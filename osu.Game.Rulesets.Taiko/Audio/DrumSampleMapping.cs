@@ -26,10 +26,6 @@ namespace osu.Game.Rulesets.Taiko.Audio
                 var centre = s.GetSampleInfo();
                 var rim = s.GetSampleInfo(HitSampleInfo.HIT_CLAP);
 
-                // todo: this is ugly
-                centre.Namespace = "taiko";
-                rim.Namespace = "taiko";
-
                 mappings[s.Time] = new DrumSample
                 {
                     Centre = addSound(centre),

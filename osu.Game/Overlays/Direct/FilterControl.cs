@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -35,23 +34,14 @@ namespace osu.Game.Overlays.Direct
 
     public enum DirectSortCriteria
     {
-        [Description("相关性")]
         Relevance,
-        [Description("标题")]
         Title,
-        [Description("艺术家")]
         Artist,
-        [Description("作图者")]
         Creator,
-        [Description("难度")]
         Difficulty,
-        [Description("Ranked 时间")]
         Ranked,
-        [Description("评分")]
         Rating,
-        [Description("游玩次数")]
         Plays,
-        [Description("收藏量")]
         Favourites,
     }
 }

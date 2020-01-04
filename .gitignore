@@ -331,9 +331,3 @@ fastlane/report.xml
 # inspectcode
 inspectcodereport.xml
 inspectcode
-
-#deb build files(unnecessary)
-deb/osu/opt/matrixfeather-osu/*
-deb/*.deb
-updater/patch
-updater/VERSION.get

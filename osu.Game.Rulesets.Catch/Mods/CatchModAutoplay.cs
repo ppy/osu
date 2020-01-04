@@ -12,7 +12,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModAutoplay : ModAutoplay<CatchHitObject>
     {
-        public override string Description => @"来看看精彩绝伦的自动表演。";
         public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "osu!salad!" } },

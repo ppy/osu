@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header
                                         },
                                         medalInfo = new OverlinedInfoContainer
                                         {
-                                            Title = "奖章",
+                                            Title = "Medals",
                                             LineColour = colours.GreenLight,
                                         },
                                         ppInfo = new OverlinedInfoContainer
@@ -151,16 +151,16 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         detailGlobalRank = new OverlinedInfoContainer(true, 110)
                                         {
-                                            Title = "全球排名",
+                                            Title = "Global Ranking",
                                             LineColour = colours.Yellow,
                                         },
                                         detailCountryRank = new OverlinedInfoContainer(false, 110)
                                         {
-                                            Title = "国内或地区排名",
+                                            Title = "Country Ranking",
                                             LineColour = colours.Yellow,
                                         },
                                     }
-                                },
+                                }
                             }
                         },
                     }
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Profile.Header
                         },
                         rankCount = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre
                         }

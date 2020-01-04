@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
@@ -21,12 +20,9 @@ namespace osu.Game.Overlays.Toolbar
 
         public ToolbarUserButton()
         {
-            TooltipMain = "我";
-            TooltipSub = $"在这里查看个人信息";
-
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = OsuFont.GetFont(size:18, italics: true);
+            DrawableText.Font = OsuFont.GetFont(italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
 
@@ -60,12 +56,12 @@ namespace osu.Game.Overlays.Toolbar
             switch (state)
             {
                 default:
-                    Text = @"游客";
+                    Text = @"Guest";
                     avatar.User = new User();
                     break;
 
                 case APIState.Online:
-                    Text = $"别来无恙, {api.LocalUser.Value.Username} !";
+                    Text = api.LocalUser.Value.Username;
                     avatar.User = api.LocalUser.Value;
                     break;
             }

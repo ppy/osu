@@ -87,9 +87,9 @@ namespace osu.Game.Screens
         private static Color4 getColourFor(object type)
         {
             int hash = type.GetHashCode();
-            byte r = (byte)MathHelper.Clamp(((hash & 0xFF0000) >> 16) * 0.8f, 20, 255);
-            byte g = (byte)MathHelper.Clamp(((hash & 0x00FF00) >> 8) * 0.8f, 20, 255);
-            byte b = (byte)MathHelper.Clamp((hash & 0x0000FF) * 0.8f, 20, 255);
+            byte r = (byte)Math.Clamp(((hash & 0xFF0000) >> 16) * 0.8f, 20, 255);
+            byte g = (byte)Math.Clamp(((hash & 0x00FF00) >> 8) * 0.8f, 20, 255);
+            byte b = (byte)Math.Clamp((hash & 0x0000FF) * 0.8f, 20, 255);
             return new Color4(r, g, b, 255);
         }
 
@@ -164,15 +164,15 @@ namespace osu.Game.Screens
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "目前还没有准备好!",
-                                        Font = OsuFont.GetFont(size: 24),
+                                        Text = "is not yet ready for use!",
+                                        Font = OsuFont.GetFont(size: 20),
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "请之后再来看看吧~",
-                                        Font = OsuFont.GetFont(size: 18),
+                                        Text = "please check back a bit later.",
+                                        Font = OsuFont.GetFont(size: 14),
                                     },
                                 }
                             },

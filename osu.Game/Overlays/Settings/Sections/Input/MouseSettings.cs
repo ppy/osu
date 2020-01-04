@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 {
     public class MouseSettings : SettingsSubsection
     {
-        protected override string Header => "鼠标";
+        protected override string Header => "Mouse";
 
         private readonly BindableBool rawInputToggle = new BindableBool();
         private Bindable<string> ignoredInputHandler;
@@ -26,32 +26,32 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "绝对输入(在Linux上有问题)",
+                    LabelText = "Raw input",
                     Bindable = rawInputToggle
                 },
                 sensitivity = new SensitivitySetting
                 {
-                    LabelText = "光标灵敏度",
+                    LabelText = "Cursor sensitivity",
                     Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "绝对坐标只映射在osu!窗口中",
+                    LabelText = "Map absolute input to window",
                     Bindable = config.GetBindable<bool>(FrameworkSetting.MapAbsoluteInputToWindow)
                 },
                 new SettingsEnumDropdown<ConfineMouseMode>
                 {
-                    LabelText = "光标边界",
+                    LabelText = "Confine mouse cursor to window",
                     Bindable = config.GetBindable<ConfineMouseMode>(FrameworkSetting.ConfineMouseMode),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在游戏中禁用鼠标滚轮",
+                    LabelText = "Disable mouse wheel during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "在游戏中禁用鼠标按键",
+                    LabelText = "Disable mouse buttons during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
             };
@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public override string TooltipText => Current.Disabled ? "需要启用绝对输入来引用光标灵敏度" : $"{base.TooltipText}x";
+            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : $"{base.TooltipText}x";
         }
     }
 }

@@ -3,16 +3,14 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Bindings;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
-using osu.Game.Screens.Ranking;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -36,21 +34,21 @@ namespace osu.Game.Overlays
 
         protected override bool DimMainContent => false; // dimming is handled by main overlay
 
-        private class BackButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
+        private class BackButton : OsuButton
         {
-            private AspectContainer aspect;
-
             [BackgroundDependencyLoader]
             private void load()
             {
                 Size = new Vector2(Sidebar.DEFAULT_WIDTH);
-                Children = new Drawable[]
+
+                BackgroundColour = Color4.Black;
+
+                AddRange(new Drawable[]
                 {
-                    aspect = new AspectContainer
+                    new Container
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
                             new SpriteIcon
@@ -67,38 +65,12 @@ namespace osu.Game.Overlays
                                 Origin = Anchor.Centre,
                                 Y = 15,
                                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                Text = @"返回",
+                                Text = @"back",
                             },
                         }
                     }
-                };
+                });
             }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(e);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
-            }
-
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        Click();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action) => false;
         }
     }
 }

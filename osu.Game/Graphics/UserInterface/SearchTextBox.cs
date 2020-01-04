@@ -29,16 +29,26 @@ namespace osu.Game.Graphics.UserInterface
                 }
             });
 
-            PlaceholderText = "输入以搜索";
+            PlaceholderText = "type to search";
         }
 
         public override bool OnPressed(PlatformAction action)
         {
-            // Shift+delete is handled via PlatformAction on macOS. this is not so useful in the context of a SearchTextBox
-            // as we do not allow arrow key navigation in the first place (ie. the care should always be at the end of text)
-            // Avoid handling it here to allow other components to potentially consume the shortcut.
-            if (action.ActionType == PlatformActionType.CharNext && action.ActionMethod == PlatformActionMethod.Delete)
-                return false;
+            switch (action.ActionType)
+            {
+                case PlatformActionType.LineEnd:
+                case PlatformActionType.LineStart:
+                    return false;
+
+                // Shift+delete is handled via PlatformAction on macOS. this is not so useful in the context of a SearchTextBox
+                // as we do not allow arrow key navigation in the first place (ie. the caret should always be at the end of text)
+                // Avoid handling it here to allow other components to potentially consume the shortcut.
+                case PlatformActionType.CharNext:
+                    if (action.ActionMethod == PlatformActionMethod.Delete)
+                        return false;
+
+                    break;
+            }
 
             return base.OnPressed(action);
         }

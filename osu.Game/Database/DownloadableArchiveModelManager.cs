@@ -33,7 +33,8 @@ namespace osu.Game.Database
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
-        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
+        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore,
+                                                  IIpcHost importHost = null)
             : base(storage, contextFactory, modelStore, importHost)
         {
             this.api = api;
@@ -41,17 +42,17 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Creates the download request for this <see cref="TModel"/>.
+        /// Creates the download request for this <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>The request object.</returns>
         protected abstract ArchiveDownloadRequest<TModel> CreateDownloadRequest(TModel model, bool minimiseDownloadSize);
 
         /// <summary>
-        /// Begin a download for the requested <see cref="TModel"/>.
+        /// Begin a download for the requested <typeparamref name="TModel"/>.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> to be downloaded.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> to be downloaded.</param>
         /// <param name="minimiseDownloadSize">Whether this download should be optimised for slow connections. Generally means extras are not included in the download bundle.</param>
         /// <returns>Whether the download was started.</returns>
         public bool Download(TModel model, bool minimiseDownloadSize = false)
@@ -62,7 +63,7 @@ namespace osu.Game.Database
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"正在下载 {request.Model}",
+                Text = $"Downloading {request.Model}",
             };
 
             request.DownloadProgressed += progress =>
@@ -99,17 +100,7 @@ namespace osu.Game.Database
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    request.Perform(api);
-                }
-                catch (Exception error)
-                {
-                    triggerFailure(error);
-                }
-            }, TaskCreationOptions.LongRunning);
+            api.PerformAsync(request);
 
             DownloadBegan?.Invoke(request);
             return true;
@@ -121,7 +112,7 @@ namespace osu.Game.Database
                 if (error is OperationCanceledException) return;
 
                 notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} 下载失败!");
+                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
                 currentDownloads.Remove(request);
             }
         }
@@ -131,10 +122,11 @@ namespace osu.Game.Database
         /// <summary>
         /// Performs implementation specific comparisons to determine whether a given model is present in the local store.
         /// </summary>
-        /// <param name="model">The <see cref="TModel"/> whose existence needs to be checked.</param>
+        /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
-        /// <returns>Whether the <see cref="TModel"/> exists.</returns>
-        protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
+        /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
+        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
+            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 

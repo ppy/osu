@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Optional judgement.
         /// </summary>
-        [Description(@"Ok")]
+        [Description(@"OK")]
         Ok,
 
         [Description(@"Good")]

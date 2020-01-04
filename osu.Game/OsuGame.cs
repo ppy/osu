@@ -39,6 +39,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
@@ -71,7 +72,7 @@ namespace osu.Game
         [Cached]
         private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
-        protected RavenLogger RavenLogger;
+        protected SentryLogger SentryLogger;
 
         public virtual Storage GetStorageForStableInstall() => null;
 
@@ -110,7 +111,7 @@ namespace osu.Game
 
             forwardLoggedErrorsToNotifications();
 
-            RavenLogger = new RavenLogger(this);
+            SentryLogger = new SentryLogger(this);
         }
 
         private void updateBlockingOverlayFade() =>
@@ -166,7 +167,7 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
 
-            dependencies.Cache(RavenLogger);
+            dependencies.Cache(SentryLogger);
 
             dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
@@ -204,6 +205,7 @@ namespace osu.Game
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
+            SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
@@ -245,7 +247,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"该链接的类型尚不支持!",
+                        Text = @"This link type is not yet supported!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -403,14 +405,34 @@ namespace osu.Game
                     oldBeatmap.Track.Completed -= currentTrackCompleted;
             }
 
+            updateModDefaults();
+
             nextBeatmap?.LoadBeatmapAsync();
         }
 
-        private void currentTrackCompleted()
+        private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            updateModDefaults();
+        }
+
+        private void updateModDefaults()
+        {
+            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
+
+            if (baseDifficulty != null && SelectedMods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                var adjustedDifficulty = baseDifficulty.Clone();
+
+                foreach (var mod in SelectedMods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ReadFromDifficulty(adjustedDifficulty);
+            }
+        }
+
+        private void currentTrackCompleted() => Schedule(() =>
         {
             if (!Beatmap.Value.Track.Looping && !Beatmap.Disabled)
                 musicController.NextTrack();
-        }
+        });
 
         #endregion
 
@@ -433,7 +455,7 @@ namespace osu.Game
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = $"点此以 {taskName}",
+                    Text = $"Click here to {taskName}",
                     Activated = () =>
                     {
                         performFromMainMenu(action, taskName, targetScreen, true);
@@ -486,7 +508,7 @@ namespace osu.Game
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            RavenLogger.Dispose();
+            SentryLogger.Dispose();
         }
 
         protected override void LoadComplete()
@@ -723,7 +745,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
-                        Text = "有关更多消息已记录至日志,点此查看.",
+                        Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
@@ -748,7 +770,7 @@ namespace osu.Game
             if (d is OverlayContainer overlay)
                 overlays.Add(overlay);
 
-            // schedule is here to ensure thyijiluzhimponent loads are done after LoadComplete is run (and thus all dependencies are cached).
+            // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
             Schedule(() =>
@@ -924,6 +946,8 @@ namespace osu.Game
             if (newScreen is IOsuScreen newOsuScreen)
             {
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+
+                musicController.AllowRateAdjustments = newOsuScreen.AllowRateAdjustments;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
                     CloseAllOverlays();

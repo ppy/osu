@@ -9,7 +9,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModSuddenDeath : ModSuddenDeath
     {
-        public override string Description => @"不全连，便重试";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
     }
 }

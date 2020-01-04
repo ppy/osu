@@ -12,7 +12,7 @@ namespace osu.Game.Overlays
 {
     public class KeyBindingPanel : SettingsSubPanel
     {
-        protected override Drawable CreateHeader() => new SettingsHeader("键盘配置", "自定义你的按键!");
+        protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(RulesetStore rulesets, GlobalActionContainer global)

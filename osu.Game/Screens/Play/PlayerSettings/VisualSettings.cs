@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class VisualSettings : PlayerSettingsGroup
     {
-        protected override string Title => "视觉效果设置";
+        protected override string Title => "Visual settings";
 
         private readonly PlayerSliderBar<double> dimSliderBar;
         private readonly PlayerSliderBar<double> blurSliderBar;
@@ -25,22 +25,22 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 new OsuSpriteText
                 {
-                    Text = "背景暗化:"
+                    Text = "Background dim:"
                 },
                 dimSliderBar = new PlayerSliderBar<double>(),
                 new OsuSpriteText
                 {
-                    Text = "背景模糊:"
+                    Text = "Background blur:"
                 },
                 blurSliderBar = new PlayerSliderBar<double>(),
                 new OsuSpriteText
                 {
-                    Text = "切换:"
+                    Text = "Toggles:"
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = "故事版" },
-                showVideoToggle = new PlayerCheckbox { LabelText = "视频" },
-                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "谱面皮肤" },
-                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "谱面击打音效" }
+                showStoryboardToggle = new PlayerCheckbox { LabelText = "Storyboards" },
+                showVideoToggle = new PlayerCheckbox { LabelText = "Video" },
+                beatmapSkinsToggle = new PlayerCheckbox { LabelText = "Beatmap skins" },
+                beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "Beatmap hitsounds" }
             };
         }
 

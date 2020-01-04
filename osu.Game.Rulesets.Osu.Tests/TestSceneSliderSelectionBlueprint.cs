@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep($"move mouse to control point {index}", () =>
             {
-                Vector2 position = slider.Position + slider.Path.ControlPoints[index];
+                Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position.Value;
                 InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
             });
         }

@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModDaycore : ModDaycore
     {
-        public override string Description => @"哇~~~~~~~~~哦~~~~~~~~~~~";
         public override double ScoreMultiplier => 0.3;
     }
 }

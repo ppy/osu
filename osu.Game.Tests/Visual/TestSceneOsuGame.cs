@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual
         private IReadOnlyList<Type> requiredGameDependencies => new[]
         {
             typeof(OsuGame),
-            typeof(RavenLogger),
+            typeof(SentryLogger),
             typeof(OsuLogo),
             typeof(IdleTracker),
             typeof(OnScreenDisplay),
@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual
                 foreach (var type in requiredGameDependencies)
                 {
                     if (game.Dependencies.Get(type) == null)
-                        throw new Exception($"{type} has not been cached");
+                        throw new InvalidOperationException($"{type} has not been cached");
                 }
 
                 return true;
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual
                 foreach (var type in requiredGameBaseDependencies)
                 {
                     if (gameBase.Dependencies.Get(type) == null)
-                        throw new Exception($"{type} has not been cached");
+                        throw new InvalidOperationException($"{type} has not been cached");
                 }
 
                 return true;

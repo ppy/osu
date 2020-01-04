@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Comments
@@ -100,6 +101,7 @@ namespace osu.Game.Overlays.Comments
                                                 Size = new Vector2(avatar_size),
                                                 Masking = true,
                                                 CornerRadius = avatar_size / 2f,
+                                                CornerExponent = 2,
                                             },
                                         }
                                     },
@@ -122,7 +124,7 @@ namespace osu.Game.Overlays.Comments
                                                         AutoSizeAxes = Axes.Both,
                                                     },
                                                     new ParentUsername(comment),
-                                                    new SpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         Alpha = comment.IsDeleted ? 1 : 0,
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
@@ -144,7 +146,7 @@ namespace osu.Game.Overlays.Comments
                                                 Colour = OsuColour.Gray(0.7f),
                                                 Children = new Drawable[]
                                                 {
-                                                    new SpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
@@ -195,12 +197,12 @@ namespace osu.Game.Overlays.Comments
 
             if (comment.EditedAt.HasValue)
             {
-                info.Add(new SpriteText
+                info.Add(new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Font = OsuFont.GetFont(size: 12),
-                    Text = $@" 由 {comment.EditedUser.Username} 于 {HumanizerUtils.Humanize(comment.EditedAt.Value)}编辑"
+                    Text = $@"edited {HumanizerUtils.Humanize(comment.EditedAt.Value)} by {comment.EditedUser.Username}"
                 });
             }
 
@@ -290,7 +292,7 @@ namespace osu.Game.Overlays.Comments
                 this.count = count;
 
                 Alpha = count == 0 ? 0 : 1;
-                Child = text = new SpriteText
+                Child = text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 };
@@ -323,7 +325,7 @@ namespace osu.Game.Overlays.Comments
                         Icon = FontAwesome.Solid.Reply,
                         Size = new Vector2(14),
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                         Text = parentComment?.User?.Username ?? parentComment?.LegacyName

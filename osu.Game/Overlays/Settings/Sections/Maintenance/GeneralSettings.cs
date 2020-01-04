@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
     public class GeneralSettings : SettingsSubsection
     {
-        protected override string Header => "总体";
+        protected override string Header => "General";
 
         private TriangleButton importBeatmapsButton;
         private TriangleButton importScoresButton;
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importBeatmapsButton = new SettingsButton
                 {
-                    Text = "从osu!stable中导入谱面",
+                    Text = "Import beatmaps from stable",
                     Action = () =>
                     {
                         importBeatmapsButton.Enabled.Value = false;
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(deleteBeatmapsButton = new DangerousSettingsButton
             {
-                Text = "删除所有谱面",
+                Text = "Delete ALL beatmaps",
                 Action = () =>
                 {
                     dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importScoresButton = new SettingsButton
                 {
-                    Text = "从osu!stable中导入分数",
+                    Text = "Import scores from stable",
                     Action = () =>
                     {
                         importScoresButton.Enabled.Value = false;
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
 
             Add(deleteScoresButton = new DangerousSettingsButton
             {
-                Text = "删除所有分数",
+                Text = "Delete ALL scores",
                 Action = () =>
                 {
                     dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 Add(importSkinsButton = new SettingsButton
                 {
-                    Text = "从osu!stable中导入皮肤",
+                    Text = "Import skins from stable",
                     Action = () =>
                     {
                         importSkinsButton.Enabled.Value = false;
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
             {
                 deleteSkinsButton = new DangerousSettingsButton
                 {
-                    Text = "删除所有皮肤",
+                    Text = "Delete ALL skins",
                     Action = () =>
                     {
                         dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
@@ -109,7 +109,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 },
                 restoreButton = new SettingsButton
                 {
-                    Text = "恢复所有被隐藏的难度",
+                    Text = "Restore all hidden difficulties",
                     Action = () =>
                     {
                         restoreButton.Enabled.Value = false;
@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                 },
                 undeleteButton = new SettingsButton
                 {
-                    Text = "恢复所有最近删除的谱面",
+                    Text = "Restore all recently deleted beatmaps",
                     Action = () =>
                     {
                         undeleteButton.Enabled.Value = false;

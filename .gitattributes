@@ -2,6 +2,7 @@
 # line endings to lf internally. When checked out they may
 # use different line endings.
 * text=auto
+
 # Check out with crlf (Windows) line endings
 *.sln text eol=crlf
 *.csproj text eol=crlf
@@ -15,10 +16,10 @@ App.config text eol=crlf
 *.snippet text eol=crlf
 *.manifest text eol=crlf
 *.licenseheader text eol=crlf
+
 # Check out with lf (UNIX) line endings
 *.sh text eol=lf
 .gitignore text eol=lf
 .gitattributes text eol=lf
 *.md text eol=lf
 .travis.yml text eol=lf
-osu.deb filter=lfs diff=lfs merge=lfs -text

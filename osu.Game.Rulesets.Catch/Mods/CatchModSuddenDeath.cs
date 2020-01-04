@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModSuddenDeath : ModSuddenDeath
     {
-        public override string Description => @"不全连，便重试";
     }
 }

@@ -26,9 +26,9 @@ namespace osu.Game.Users
         [JsonProperty(@"country")]
         public Country Country;
 
-        public Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public IBindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         //public Team Team;
 
@@ -126,10 +126,28 @@ namespace osu.Game.Users
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
 
+        [JsonProperty(@"favourite_beatmapset_count")]
+        public int FavouriteBeatmapsetCount;
+
+        [JsonProperty(@"graveyard_beatmapset_count")]
+        public int GraveyardBeatmapsetCount;
+
+        [JsonProperty(@"loved_beatmapset_count")]
+        public int LovedBeatmapsetCount;
+
+        [JsonProperty(@"ranked_and_approved_beatmapset_count")]
+        public int RankedAndApprovedBeatmapsetCount;
+
+        [JsonProperty(@"unranked_beatmapset_count")]
+        public int UnrankedBeatmapsetCount;
+
+        [JsonProperty(@"scores_first_count")]
+        public int ScoresFirstCount;
+
         [JsonProperty]
         private string[] playstyle
         {
-            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
         }
 
         public PlayStyle[] PlayStyles;
@@ -192,23 +210,23 @@ namespace osu.Game.Users
         /// </summary>
         public static readonly User SYSTEM_USER = new User
         {
-            Username = "osu!",
+            Username = "system",
             Colour = @"9c0101",
             Id = 0
         };
 
         public enum PlayStyle
         {
-            [Description("键盘")]
+            [Description("Keyboard")]
             Keyboard,
 
-            [Description("鼠标")]
+            [Description("Mouse")]
             Mouse,
 
-            [Description("数位板")]
+            [Description("Tablet")]
             Tablet,
 
-            [Description("触摸屏")]
+            [Description("Touch Screen")]
             Touch,
         }
     }

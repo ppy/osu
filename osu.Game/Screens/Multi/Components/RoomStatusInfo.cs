@@ -34,9 +34,9 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     statusPart = new StatusPart
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14)
                     },
-                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 17) }
+                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 14) }
                 }
             };
 
@@ -61,15 +61,15 @@ namespace osu.Game.Screens.Multi.Components
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
-                    return $"已于{base.Format()}关闭";
+                    return $"Closed {base.Format()}";
 
                 if (diffToNow.TotalSeconds < 0)
-                    return "已关闭";
+                    return "Closed";
 
                 if (diffToNow.TotalSeconds < 5)
-                    return "即将关闭";
+                    return "Closing soon";
 
-                return $"即将关闭( {base.Format()} )";
+                return $"Closing {base.Format()}";
             }
         }
 

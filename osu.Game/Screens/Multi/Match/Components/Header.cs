@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             public BeatmapSelectButton()
             {
-                Text = "选择谱面";
+                Text = "Select beatmap";
             }
 
             [BackgroundDependencyLoader]

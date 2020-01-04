@@ -9,16 +9,14 @@ namespace osu.Game.Screens.Play
 {
     public class FailOverlay : GameplayMenuOverlay
     {
-        //public override string Header => "F A I L";
-        public override string Header => "游戏失败";
-
-        public override string Description => "你失败了..重试一遍?";
+        public override string Header => "failed";
+        public override string Description => "you're dead, try again?";
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            AddButton("重试", colours.YellowDark, () => OnRetry?.Invoke());
-            AddButton("退出", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
+            AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
+            AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
         }
     }
 }

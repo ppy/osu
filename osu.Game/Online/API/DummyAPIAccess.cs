@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Users;
@@ -55,6 +56,10 @@ namespace osu.Game.Online.API
         public virtual void Queue(APIRequest request)
         {
         }
+
+        public void Perform(APIRequest request) { }
+
+        public Task PerformAsync(APIRequest request) => Task.CompletedTask;
 
         public void Register(IOnlineComponent component)
         {

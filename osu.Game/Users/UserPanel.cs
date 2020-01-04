@@ -63,7 +63,7 @@ namespace osu.Game.Users
         private void load(UserProfileOverlay profile)
         {
             if (colours == null)
-                throw new ArgumentNullException(nameof(colours));
+                throw new InvalidOperationException($"{nameof(colours)} not initialized!");
 
             FillFlowContainer infoContainer;
 
@@ -247,7 +247,7 @@ namespace osu.Game.Users
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("查看玩家信息", MenuItemType.Highlighted, ViewProfile),
+            new OsuMenuItem("View Profile", MenuItemType.Highlighted, ViewProfile),
         };
     }
 }

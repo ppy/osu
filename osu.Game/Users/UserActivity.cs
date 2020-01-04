@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Users
@@ -14,18 +15,18 @@ namespace osu.Game.Users
 
         public class Modding : UserActivity
         {
-            public override string Status => "正在摸图";
+            public override string Status => "Modding a map";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.PurpleDark;
         }
 
         public class ChoosingBeatmap : UserActivity
         {
-            public override string Status => "正在选图";
+            public override string Status => "Choosing a beatmap";
         }
 
         public class MultiplayerGame : UserActivity
         {
-            public override string Status => "多人游戏中";
+            public override string Status => "Playing with others";
         }
 
         public class Editing : UserActivity
@@ -37,32 +38,32 @@ namespace osu.Game.Users
                 Beatmap = info;
             }
 
-            public override string Status => @"正在编辑谱面";
+            public override string Status => @"Editing a beatmap";
         }
 
         public class SoloGame : UserActivity
         {
             public BeatmapInfo Beatmap { get; }
 
-            public Rulesets.RulesetInfo Ruleset { get; }
+            public RulesetInfo Ruleset { get; }
 
-            public SoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
+            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
             {
                 Beatmap = info;
                 Ruleset = ruleset;
             }
 
-            public override string Status => @"单人游戏中";
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class Spectating : UserActivity
         {
-            public override string Status => @"旁观他人中";
+            public override string Status => @"Spectating a game";
         }
 
         public class InLobby : UserActivity
         {
-            public override string Status => @"在大厅中";
+            public override string Status => @"In a multiplayer lobby";
         }
     }
 }

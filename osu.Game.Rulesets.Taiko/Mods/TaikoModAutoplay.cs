@@ -12,7 +12,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModAutoplay : ModAutoplay<TaikoHitObject>
     {
-        public override string Description => @"欣赏精彩绝伦的自动表演";
         public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "mekkadosu!" } },

@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private HitObjectComposer composer { get; set; }
 
         [Resolved]
-        private IEditorBeatmap beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; }
 
         public BlueprintContainer()
         {
@@ -313,14 +313,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Attempts to select any hovered blueprints.
         /// </summary>
         /// <param name="e">The input event that triggered this selection.</param>
-        private void beginClickSelection(UIEvent e)
+        private void beginClickSelection(MouseButtonEvent e)
         {
             Debug.Assert(!clickSelectionBegan);
 
-            // If a select blueprint is already hovered, disallow changes in selection.
-            // Exception is made when holding control, as deselection should still be allowed.
-            if (!e.CurrentState.Keyboard.ControlPressed &&
-                selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
+            // Deselections are only allowed for control + left clicks
+            bool allowDeselection = e.ControlPressed && e.Button == MouseButton.Left;
+
+            // Todo: This is probably incorrectly disallowing multiple selections on stacked objects
+            if (!allowDeselection && selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
                 return;
 
             foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)

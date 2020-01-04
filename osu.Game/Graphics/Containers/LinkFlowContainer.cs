@@ -19,14 +19,8 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        private OsuGame game;
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game)
-        {
-            // will be null in tests
-            this.game = game;
-        }
+        [Resolved(CanBeNull = true)]
+        private OsuGame game { get; set; }
 
         public void AddLinks(string text, List<Link> links)
         {
@@ -43,7 +37,7 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
-                AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
+                AddText(text[previousLinkEnd..link.Index]);
                 AddLink(text.Substring(link.Index, link.Length), link.Action, link.Argument ?? link.Url);
                 previousLinkEnd = link.Index + link.Length;
             }
@@ -69,7 +63,7 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddUserLink(User user, Action<SpriteText> creationParameters = null)
-            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "查看玩家信息");
+            => createLink(AddText(user.Username, creationParameters), new LinkDetails(LinkAction.OpenUserProfile, user.Id.ToString()), "View Profile");
 
         private void createLink(IEnumerable<Drawable> drawables, LinkDetails link, string tooltipText, Action action = null)
         {
@@ -82,7 +76,7 @@ namespace osu.Game.Graphics.Containers
                     if (action != null)
                         action();
                     else
-                        game.HandleLink(link);
+                        game?.HandleLink(link);
                 },
             });
         }

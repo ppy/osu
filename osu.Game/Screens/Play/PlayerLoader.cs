@@ -55,7 +55,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool PlayResumeSound => false;
 
-        private Task loadTask;
+        protected Task LoadTask { get; private set; }
+
+        protected Task DisposalTask { get; private set; }
 
         private InputManager inputManager;
         private IdleTracker idleTracker;
@@ -116,8 +118,6 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
-
-            loadNewPlayer();
         }
 
         protected override void LoadComplete()
@@ -125,6 +125,21 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            loadNewPlayer();
+
+            content.ScaleTo(0.7f);
+            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
+
+            contentIn();
+
+            info.Delay(750).FadeIn(500);
+            this.Delay(1800).Schedule(pushWhenLoaded);
 
             if (!muteWarningShownOnce.Value)
             {
@@ -159,7 +174,7 @@ namespace osu.Game.Screens.Play
             player.RestartCount = restartCount;
             player.RestartRequested = restartRequested;
 
-            loadTask = LoadComponentAsync(player, _ => info.Loading = false);
+            LoadTask = LoadComponentAsync(player, _ => info.Loading = false);
         }
 
         private void contentIn()
@@ -175,19 +190,6 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-
-            content.ScaleTo(0.7f);
-            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
-
-            contentIn();
-
-            info.Delay(750).FadeIn(500);
-            this.Delay(1800).Schedule(pushWhenLoaded);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -250,7 +252,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        loadTask = null;
+                        LoadTask = null;
 
                         //By default, we want to load the player and never be returned to.
                         //Note that this may change if the player we load requested a re-run.
@@ -301,7 +303,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                loadTask?.ContinueWith(_ => player.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
             }
         }
 
@@ -474,12 +476,12 @@ namespace osu.Game.Screens.Play
                                     Bottom = 40
                                 },
                             },
-                            new MetadataLine("来源:", metadata.Source)
+                            new MetadataLine("Source", metadata.Source)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
-                            new MetadataLine("作图者:", metadata.AuthorString)
+                            new MetadataLine("Mapper", metadata.AuthorString)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
@@ -504,7 +506,7 @@ namespace osu.Game.Screens.Play
         {
             public MutedNotification()
             {
-                Text = "音乐音量为0%! 点击这里恢复";
+                Text = "Your music volume is set to 0%! Click here to restore it.";
             }
 
             public override bool IsImportant => true;

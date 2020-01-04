@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Play.HUD
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
-                    ? "按住返回菜单"
-                    : "点此返回菜单";
+                    ? "hold for menu"
+                    : "press for menu";
             }, true);
 
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
@@ -102,8 +102,8 @@ namespace osu.Game.Screens.Play.HUD
             else
             {
                 Alpha = Interpolation.ValueAt(
-                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
+                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
             }
         }
 

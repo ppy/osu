@@ -43,11 +43,6 @@ namespace osu.Game.Tests.Visual.Online
                 FullName = "United States"
             };
 
-            AddStep("Set country", () => countryBindable.Value = countryA);
-            AddAssert("Check scope is Performance", () => scope.Value == RankingsScope.Performance);
-            AddStep("Set scope to Score", () => scope.Value = RankingsScope.Score);
-            AddAssert("Check country is Null", () => countryBindable.Value == null);
-
             AddStep("Set country 1", () => countryBindable.Value = countryA);
             AddStep("Set country 2", () => countryBindable.Value = countryB);
             AddStep("Set null country", () => countryBindable.Value = null);

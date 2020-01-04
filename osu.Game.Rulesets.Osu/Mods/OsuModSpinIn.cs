@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "SI";
         public override IconUsage Icon => FontAwesome.Solid.Undo;
         public override ModType Type => ModType.Fun;
-        public override string Description => "圆圈会旋转进入屏幕. 没有缩圈.";
+        public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
 
         // todo: this mod should be able to be compatible with hidden with a bit of further implementation.
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModeObjectScaleTween), typeof(OsuModHidden), typeof(OsuModTraceable) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModObjectScaleTween), typeof(OsuModHidden), typeof(OsuModTraceable) };
 
         private const int rotate_offset = 360;
         private const float rotate_starting_width = 2;

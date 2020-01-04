@@ -10,6 +10,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
@@ -51,11 +52,6 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
-
-            Add(carousel = new TestBeatmapCarousel
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
         }
 
         /// <summary>
@@ -338,10 +334,19 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestHiding()
         {
-            BeatmapSetInfo hidingSet = createTestBeatmapSet(1);
-            hidingSet.Beatmaps[1].Hidden = true;
+            BeatmapSetInfo hidingSet = null;
+            List<BeatmapSetInfo> hiddenList = new List<BeatmapSetInfo>();
 
-            loadBeatmaps(new List<BeatmapSetInfo> { hidingSet });
+            AddStep("create hidden set", () =>
+            {
+                hidingSet = createTestBeatmapSet(1);
+                hidingSet.Beatmaps[1].Hidden = true;
+
+                hiddenList.Clear();
+                hiddenList.Add(hidingSet);
+            });
+
+            loadBeatmaps(hiddenList);
 
             setSelected(1, 1);
 
@@ -375,9 +380,14 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestSelectingFilteredRuleset()
         {
-            var testMixed = createTestBeatmapSet(set_count + 1);
+            BeatmapSetInfo testMixed = null;
+
+            createCarousel();
+
             AddStep("add mixed ruleset beatmapset", () =>
             {
+                testMixed = createTestBeatmapSet(set_count + 1);
+
                 for (int i = 0; i <= 2; i++)
                 {
                     testMixed.Beatmaps[i].Ruleset = rulesets.AvailableRulesets.ElementAt(i);
@@ -429,6 +439,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
         {
+            createCarousel();
+
             if (beatmapSets == null)
             {
                 beatmapSets = new List<BeatmapSetInfo>();
@@ -446,6 +458,20 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddUntilStep("Wait for load", () => changed);
+        }
+
+        private void createCarousel(Container target = null)
+        {
+            AddStep("Create carousel", () =>
+            {
+                selectedSets.Clear();
+                eagerSelectedIDs.Clear();
+
+                (target ?? this).Child = carousel = new TestBeatmapCarousel
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+            });
         }
 
         private void ensureRandomFetchSuccess() =>

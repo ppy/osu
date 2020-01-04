@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class GraphicsSection : SettingsSection
     {
-        public override string Header => "图形";
+        public override string Header => "Graphics";
         public override IconUsage Icon => FontAwesome.Solid.Laptop;
 
         public GraphicsSection()

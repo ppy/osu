@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -59,7 +60,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 if (Beatmap.Value == null)
                     return;
 
-                float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
+                float markerPos = Math.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
                 adjustableClock.Seek(markerPos / DrawWidth * Beatmap.Value.Track.Length);
             });
         }

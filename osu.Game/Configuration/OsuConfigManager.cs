@@ -80,6 +80,7 @@ namespace osu.Game.Configuration
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+            Set(OsuSetting.LightenDuringBreaks, true);
 
             Set(OsuSetting.HitLighting, true);
 
@@ -117,6 +118,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
+
+            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
         }
 
         public OsuConfigManager(Storage storage)
@@ -126,8 +129,8 @@ namespace osu.Game.Configuration
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
-            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "鼠标按键", v ? "关闭" : "开启")),
-            new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "缩放", m.GetDescription())),
+            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
+            new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
         };
     }
 
@@ -140,6 +143,7 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         DimLevel,
         BlurLevel,
+        LightenDuringBreaks,
         ShowStoryboard,
         ShowVideoBackground,
         KeyOverlay,
@@ -186,6 +190,7 @@ namespace osu.Game.Configuration
         UIScale,
         IntroSequence,
         UIHoldActivationDelay,
-        HitLighting
+        HitLighting,
+        MenuBackgroundSource
     }
 }

@@ -25,7 +25,6 @@ namespace osu.Game.Online.Chat
         /// </summary>
         private readonly string[] defaultChannels =
         {
-            @"#chinese",
             @"#lazer",
             @"#osu",
             @"#lobby"
@@ -124,7 +123,7 @@ namespace osu.Game.Online.Chat
             {
                 if (!api.IsLoggedIn)
                 {
-                    target.AddNewMessages(new ErrorMessage("请在登录后进行发言!"));
+                    target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                     return;
                 }
 
@@ -153,7 +152,7 @@ namespace osu.Game.Online.Chat
 
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
-                        Logger.Error(exception, "发送消息失败oAo");
+                        Logger.Error(exception, "Posting message failed.");
                         target.ReplaceMessage(message, null);
                         dequeueAndRun();
                     };
@@ -172,7 +171,7 @@ namespace osu.Game.Online.Chat
 
                 req.Failure += exception =>
                 {
-                    Logger.Error(exception, "发送消息失败oAo");
+                    Logger.Error(exception, "Posting message failed.");
                     target.ReplaceMessage(message, null);
                     dequeueAndRun();
                 };
@@ -207,7 +206,7 @@ namespace osu.Game.Online.Chat
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("用法: /me [动作]"));
+                        target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                         break;
                     }
 
@@ -217,7 +216,7 @@ namespace osu.Game.Online.Chat
                 case "join":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("用法: /join [频道id]"));
+                        target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
                         break;
                     }
 
@@ -225,7 +224,7 @@ namespace osu.Game.Online.Chat
 
                     if (channel == null)
                     {
-                        target.AddNewMessages(new ErrorMessage($"频道 '{content}' 未找到."));
+                        target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
                         break;
                     }
 
@@ -234,11 +233,11 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    target.AddNewMessages(new InfoMessage("当前版本支持的指令: /help, /me [动作], /join [频道id]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
                     break;
 
                 default:
-                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" 目前还没有加入! 请输入 /help 来查看当前版本支持的指令."));
+                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                     break;
             }
         }
@@ -270,7 +269,7 @@ namespace osu.Game.Online.Chat
             };
             req.Failure += error =>
             {
-                Logger.Error(error, "获取频道列表失败");
+                Logger.Error(error, "Fetching channel list failed");
                 initializeChannels();
             };
 
@@ -459,7 +458,7 @@ namespace osu.Game.Online.Chat
     public class ChannelNotFoundException : Exception
     {
         public ChannelNotFoundException(string channelName)
-            : base($"频道 {channelName} 未找到")
+            : base($"A channel with the name {channelName} could not be found.")
         {
         }
     }

@@ -269,8 +269,8 @@ namespace osu.Game.Online.Leaderboards
 
         protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "最大连击", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "准确率", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
         };
 
         protected override bool OnHover(HoverEvent e)
@@ -288,17 +288,15 @@ namespace osu.Game.Online.Leaderboards
         private class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
-
-            private readonly string name;
             private readonly FillFlowContainer content;
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText => name;
+            public string TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
-                name = statistic.Name;
+                TooltipText = statistic.Name;
                 AutoSizeAxes = Axes.Both;
 
                 Child = content = new FillFlowContainer

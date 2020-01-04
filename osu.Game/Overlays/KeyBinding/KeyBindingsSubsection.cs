@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Text = "重置所有键位设定";
+            Text = "Reset all bindings in section";
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Top = 5 };
             Height = 20;

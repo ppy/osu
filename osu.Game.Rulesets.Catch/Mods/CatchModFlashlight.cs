@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 
         private const float default_flashlight_size = 350;
 
-        public override string Description => @"限制视野";
-
         public override Flashlight CreateFlashlight() => new CatchFlashlight(playfield);
 
         private CatchPlayfield playfield;

@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Multi.Match
 
         public override string Title { get; }
 
-        public override string ShortTitle => "房间";
+        public override string ShortTitle => "room";
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Match
 
         public MatchSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "新房间" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
         }
 
         [BackgroundDependencyLoader]

@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModRelax : ModRelax
     {
-        public override string Description => @"放松！你不会再被突然出现的转盘、累人的擂鼓和意外的“咔”弄得晕头转向";
+        public override string Description => @"No ninja-like spinners, demanding drumrolls or unexpected katu's.";
     }
 }

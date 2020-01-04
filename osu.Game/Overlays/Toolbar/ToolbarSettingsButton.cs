@@ -11,8 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarSettingsButton()
         {
             Icon = FontAwesome.Solid.Cog;
-            TooltipMain = "设置";
-            TooltipSub = "在这里更改osu!的设置";
+            TooltipMain = "Settings";
+            TooltipSub = "Change your settings";
         }
 
         [BackgroundDependencyLoader(true)]

@@ -42,8 +42,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = "无最近游玩",
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular)
+                    Text = "No recent plays",
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
                 },
                 graph = new RankChartLineGraph
                 {
@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 placeholder.FadeOut(fade_duration, Easing.Out);
 
                 graph.DefaultValueCount = ranks.Length;
-                graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
+                graph.Values = ranks.Select(x => -MathF.Log(x.Value));
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             public void HideBar() => bar.FadeOut(fade_duration);
 
-            private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+            private int calculateIndex(float mouseXPosition) => (int)MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
             private Vector2 calculateBallPosition(int index)
             {
@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 return new TooltipDisplayContent
                 {
                     Rank = $"#{ranks[dayIndex].Value:#,##0}",
-                    Time = days == 0 ? "现在" : $"{days} 天之前"
+                    Time = days == 0 ? "now" : $"{days} days ago"
                 };
             }
         }
@@ -247,12 +247,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 {
                                     new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                                        Text = "全球排名"
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
+                                        Text = "Global Ranking "
                                     },
                                     globalRankingText = new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular),
+                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                     }
@@ -260,7 +260,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             },
                             timeText = new OsuSpriteText
                             {
-                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular),
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
                             }
                         }
                     }

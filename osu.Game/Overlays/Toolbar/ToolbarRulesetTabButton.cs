@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Toolbar
             var rInstance = value.CreateInstance();
 
             ruleset.TooltipMain = rInstance.Description;
-            ruleset.TooltipSub = $"来玩 {rInstance.Description}";
+            ruleset.TooltipSub = $"Play some {rInstance.Description}";
             ruleset.SetIcon(rInstance.CreateIcon());
         }
 

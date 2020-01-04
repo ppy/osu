@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new MetadataSection("描述"),
+                                Child = new MetadataSection("Description"),
                             },
                         },
                         new Container
@@ -86,10 +86,10 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Direction = FillDirection.Full,
                                 Children = new[]
                                 {
-                                    source = new MetadataSection("来源"),
-                                    genre = new MetadataSection("流派") { Width = 0.5f },
-                                    language = new MetadataSection("语言") { Width = 0.5f },
-                                    tags = new MetadataSection("标签"),
+                                    source = new MetadataSection("Source"),
+                                    genre = new MetadataSection("Genre") { Width = 0.5f },
+                                    language = new MetadataSection("Language") { Width = 0.5f },
+                                    tags = new MetadataSection("Tags"),
                                 },
                             },
                         },
@@ -163,7 +163,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     header = new OsuSpriteText
                     {
                         Text = title,
-                        Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },

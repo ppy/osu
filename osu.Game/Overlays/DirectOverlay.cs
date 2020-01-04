@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
             get => beatmapSets;
             set
             {
-                if (beatmapSets?.Equals(value) ?? false) return;
+                if (ReferenceEquals(beatmapSets, value)) return;
 
                 beatmapSets = value?.ToList();
 
@@ -103,12 +103,12 @@ namespace osu.Game.Overlays
                     {
                         new OsuSpriteText
                         {
-                            Text = "已找到",
-                            Font = OsuFont.GetFont(size: 17)
+                            Text = "Found ",
+                            Font = OsuFont.GetFont(size: 15)
                         },
                         resultCountsText = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
+                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                         },
                     }
                 },
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (text.NewValue != string.Empty)
+                if (!string.IsNullOrEmpty(text.NewValue))
                 {
                     Header.Tabs.Current.Value = DirectTab.Search;
 
@@ -174,9 +174,9 @@ namespace osu.Game.Overlays
             resultCountsContainer.FadeTo(ResultAmounts == null ? 0f : 1f, 200, Easing.OutQuint);
             if (ResultAmounts == null) return;
 
-            resultCountsText.Text = "名艺术家".ToQuantity(ResultAmounts.Artists) + ", " +
-                                    "首歌曲".ToQuantity(ResultAmounts.Songs) + ", " +
-                                    "个标签".ToQuantity(ResultAmounts.Tags);
+            resultCountsText.Text = "Artist".ToQuantity(ResultAmounts.Artists) + ", " +
+                                    "Song".ToQuantity(ResultAmounts.Songs) + ", " +
+                                    "Tag".ToQuantity(ResultAmounts.Tags);
         }
 
         private void recreatePanels(PanelDisplayStyle displayStyle)

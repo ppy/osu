@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Mods.Sections
 
         public AutomationSection()
         {
-            Header = @"自动化";
+            Header = @"Automation";
         }
     }
 }

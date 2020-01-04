@@ -62,14 +62,14 @@ namespace osu.Desktop.Updater
                 }
 
                 notification.Progress = 0;
-                notification.Text = @"下载更新中...";
+                notification.Text = @"Downloading update...";
 
                 try
                 {
                     await updateManager.DownloadReleases(info.ReleasesToApply, p => notification.Progress = p / 100f);
 
                     notification.Progress = 0;
-                    notification.Text = @"安装更新中...";
+                    notification.Text = @"Installing update...";
 
                     await updateManager.ApplyReleases(info, p => notification.Progress = p / 100f);
 

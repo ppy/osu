@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
@@ -37,12 +38,22 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
 
-            Search.Current.BindValueChanged(_ => updateFilter());
+            Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
             Tabs.Current.BindValueChanged(_ => updateFilter(), true);
+        }
+
+        private ScheduledDelegate scheduledFilterUpdate;
+
+        private void scheduleUpdateFilter()
+        {
+            scheduledFilterUpdate?.Cancel();
+            scheduledFilterUpdate = Scheduler.AddDelayed(updateFilter, 200);
         }
 
         private void updateFilter()
         {
+            scheduledFilterUpdate?.Cancel();
+
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
@@ -54,20 +65,16 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
     public enum PrimaryFilter
     {
-        [Description("开放中的")]
         Open,
 
-        [Description("最近结束的")]
+        [Description("Recently Ended")]
         RecentlyEnded,
-        [Description("参加过的")]
         Participated,
-        [Description("我拥有的")]
         Owned,
     }
 
     public enum SecondaryFilter
     {
-        [Description("公开的")]
         Public,
         //Private,
     }

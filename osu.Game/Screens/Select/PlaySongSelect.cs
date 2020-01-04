@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            BeatmapOptions.AddButton(@"编辑", @"谱面", FontAwesome.Solid.PencilAlt, colours.Yellow, () =>
+            BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.Solid.PencilAlt, colours.Yellow, () =>
             {
                 ValidForResume = false;
                 Edit();

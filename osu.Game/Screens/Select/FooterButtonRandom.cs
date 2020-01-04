@@ -23,8 +23,7 @@ namespace osu.Game.Screens.Select
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = @"撤销随机",
-                Font = OsuFont.GetFont(size: 18),
+                Text = @"rewind",
                 Alpha = 0
             });
         }
@@ -34,7 +33,7 @@ namespace osu.Game.Screens.Select
         {
             SelectedColour = colours.Green;
             DeselectedColour = SelectedColour.Opacity(0.5f);
-            Text = @"随机选择";
+            Text = @"random";
             Hotkey = Key.F2;
         }
 

@@ -9,7 +9,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModNoFail : ModNoFail
     {
-        public override string Description => @"无论如何,你都失败不了";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
     }
 }

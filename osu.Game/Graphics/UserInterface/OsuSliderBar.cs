@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
@@ -31,6 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Nub Nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+        private readonly Container nubContainer;
 
         public virtual string TooltipText { get; private set; }
 
@@ -72,10 +74,15 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.CentreRight,
                     Alpha = 0.5f,
                 },
-                Nub = new Nub
+                nubContainer = new Container
                 {
-                    Origin = Anchor.TopCentre,
-                    Expanded = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Nub = new Nub
+                    {
+                        Origin = Anchor.TopCentre,
+                        RelativePositionAxes = Axes.X,
+                        Expanded = true,
+                    },
                 },
                 new HoverClickSounds()
             };
@@ -88,6 +95,13 @@ namespace osu.Game.Graphics.UserInterface
         {
             sample = audio.Samples.Get(@"UI/sliderbar-notch");
             AccentColour = colours.Pink;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            nubContainer.Padding = new MarginPadding { Horizontal = RangePadding };
         }
 
         protected override void LoadComplete()
@@ -151,18 +165,18 @@ namespace osu.Game.Graphics.UserInterface
         private void updateTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                TooltipText = ((int)Convert.ChangeType(value, typeof(int))).ToString("N0");
+                TooltipText = value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
             else
             {
-                double floatValue = (double)Convert.ChangeType(value, typeof(double));
-                double floatMinValue = (double)Convert.ChangeType(CurrentNumber.MinValue, typeof(double));
-                double floatMaxValue = (double)Convert.ChangeType(CurrentNumber.MaxValue, typeof(double));
+                double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
+                double floatMinValue = CurrentNumber.MinValue.ToDouble(NumberFormatInfo.InvariantInfo);
+                double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
                 if (floatMaxValue == 1 && floatMinValue >= -1)
                     TooltipText = floatValue.ToString("P0");
                 else
                 {
-                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+                    var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
                     var significantDigits = findPrecision(decimalPrecision);
@@ -175,15 +189,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(MathHelper.Clamp(
-                Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(MathHelper.Clamp(
-                DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            leftBox.Scale = new Vector2(Math.Clamp(
+                RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            rightBox.Scale = new Vector2(Math.Clamp(
+                DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+            Nub.MoveToX(value, 250, Easing.OutQuint);
         }
 
         /// <summary>

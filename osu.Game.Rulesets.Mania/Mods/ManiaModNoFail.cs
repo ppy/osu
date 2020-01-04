@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModNoFail : ModNoFail
     {
-        public override string Description => @"无论如何,你都失败不了";
     }
 }

@@ -7,7 +7,6 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModHalfTime : ModHalfTime
     {
-        public override string Description => @"减<<<<<<速( 0.75倍速 )";
         public override double ScoreMultiplier => 0.5;
     }
 }

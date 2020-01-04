@@ -69,14 +69,14 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             textContainer.Clear();
             textContainer.AddParagraph(downloadDisabled
-                ? "该谱面目前不能被下载."
-                : "应创建者或第三方权利所有者的要求，已删除了该谱面的部分内容。", t => t.Colour = Color4.Orange);
+                ? "This beatmap is currently not available for download."
+                : "Portions of this beatmap have been removed at the request of the creator or a third-party rights holder.", t => t.Colour = Color4.Orange);
 
             if (hasExternalLink)
             {
                 textContainer.NewParagraph();
                 textContainer.NewParagraph();
-                textContainer.AddLink("点这里以查看更多信息", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
+                textContainer.AddLink("Check here for more information.", BeatmapSet.OnlineInfo.Availability.ExternalLink, creationParameters: t => t.Font = OsuFont.GetFont(size: 10));
             }
         }
     }

@@ -7,6 +7,5 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModPerfect : ModPerfect
     {
-        public override string Description => @"不SS，便重试。";
     }
 }

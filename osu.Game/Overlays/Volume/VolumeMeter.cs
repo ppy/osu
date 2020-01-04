@@ -168,7 +168,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = name
                         }
                     }
@@ -199,23 +199,15 @@ namespace osu.Game.Overlays.Volume
             {
                 displayVolume = value;
 
-                if ( displayVolume > 0.99f )
+                if (displayVolume > 0.99f)
                 {
-                    text.Text = "超大声";
-                    text.Font = text.Font.With(size: 30);
+                    text.Text = "MAX";
                     maxGlow.EffectColour = meterColour.Opacity(2f);
                 }
                 else
                 {
                     maxGlow.EffectColour = Color4.Transparent;
-                    text.Font = text.Font.With(size: 24);
                     text.Text = Math.Round(displayVolume * 100).ToString(CultureInfo.CurrentCulture);
-                }
-
-                if ( displayVolume < 0.01f ){
-                    text.Text = "静音";
-                    text.Font = text.Font.With(size: 30);
-                    maxGlow.EffectColour = meterColour.Opacity(2f);
                 }
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;

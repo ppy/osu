@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "节拍细分",//取自Stable翻译
+                                Text = "beat snap divisor",
                                 RelativeSizeAxes = Axes.X,
                                 TextAnchor = Anchor.TopCentre
                             },
@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {

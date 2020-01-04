@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModGrow : OsuModeObjectScaleTween
+    internal class OsuModGrow : OsuModObjectScaleTween
     {
         public override string Name => "Grow";
 
@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override IconUsage Icon => FontAwesome.Solid.ArrowsAltV;
 
-        public override string Description => "在正确的大小击打物件!";
+        public override string Description => "Hit them at the right size!";
 
         protected override float StartScale => 0.5f;
     }

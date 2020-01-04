@@ -70,8 +70,8 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "玩家评价",
-                            Font = OsuFont.GetFont(size: 17)
+                            Text = "User Rating",
+                            Font = OsuFont.GetFont(size: 13)
                         },
                         ratingsBar = new Bar
                         {
@@ -103,8 +103,8 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Text = "评分情况",
-                            Font = OsuFont.GetFont(size: 17),
+                            Text = "Rating Spread",
+                            Font = OsuFont.GetFont(size: 13),
                             Margin = new MarginPadding { Top = 10, Bottom = 5 },
                         },
                     },

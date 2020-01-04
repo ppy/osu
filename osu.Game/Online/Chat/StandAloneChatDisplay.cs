@@ -58,7 +58,7 @@ namespace osu.Game.Online.Chat
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = textbox_height,
-                    PlaceholderText = "在此输入你要发送的消息",
+                    PlaceholderText = "type your message",
                     OnCommit = postMessage,
                     ReleaseFocusOnCommit = false,
                     HoldFocus = true,

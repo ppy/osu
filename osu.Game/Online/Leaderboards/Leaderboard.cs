@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, ScoreInfo> : Container, IOnlineComponent
+    public abstract class Leaderboard<TScope, TScoreInfo> : Container, IOnlineComponent
     {
         private const double fade_duration = 300;
 
@@ -39,9 +39,9 @@ namespace osu.Game.Online.Leaderboards
 
         protected override Container<Drawable> Content => content;
 
-        private IEnumerable<ScoreInfo> scores;
+        private IEnumerable<TScoreInfo> scores;
 
-        public IEnumerable<ScoreInfo> Scores
+        public IEnumerable<TScoreInfo> Scores
         {
             get => scores;
             set
@@ -101,7 +101,7 @@ namespace osu.Game.Online.Leaderboards
             get => scope;
             set
             {
-                if (value.Equals(scope))
+                if (EqualityComparer<TScope>.Default.Equals(value, scope))
                     return;
 
                 scope = value;
@@ -138,23 +138,23 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NoneSelected:
-                        replacePlaceholder(new MessagePlaceholder(@"请选择一张谱面!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
                         break;
 
                     case PlaceholderState.Unavailable:
-                        replacePlaceholder(new MessagePlaceholder(@"在线排名对这张谱面不可用!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
                         break;
 
                     case PlaceholderState.NoScores:
-                        replacePlaceholder(new MessagePlaceholder(@"还没有任何分数记录!"));
+                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"请登入来查看在线排行榜!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"请成为一名 osu!supporter 来查看此排行榜!"));
+                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
                         break;
 
                     default:
@@ -288,7 +288,7 @@ namespace osu.Game.Online.Leaderboards
         /// </summary>
         /// <param name="scoresCallback">A callback which should be called when fetching is completed. Scheduling is not required.</param>
         /// <returns>An <see cref="APIRequest"/> responsible for the fetch operation. This will be queued and performed automatically.</returns>
-        protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
+        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;
 
@@ -359,6 +359,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected abstract LeaderboardScore CreateDrawableScore(ScoreInfo model, int index);
+        protected abstract LeaderboardScore CreateDrawableScore(TScoreInfo model, int index);
     }
 }

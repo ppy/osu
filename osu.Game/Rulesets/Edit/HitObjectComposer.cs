@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -34,11 +33,14 @@ namespace osu.Game.Rulesets.Edit
         where TObject : HitObject
     {
         protected IRulesetConfigManager Config { get; private set; }
-        protected EditorBeatmap<TObject> EditorBeatmap { get; private set; }
+
         protected readonly Ruleset Ruleset;
 
         [Resolved]
         protected IFrameBasedClock EditorClock { get; private set; }
+
+        [Resolved]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
 
         [Resolved]
         private IAdjustableClock adjustableClock { get; set; }
@@ -46,8 +48,6 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private BindableBeatDivisor beatDivisor { get; set; }
 
-        private IWorkingBeatmap workingBeatmap;
-        private Beatmap<TObject> playableBeatmap;
         private IBeatmapProcessor beatmapProcessor;
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
@@ -67,9 +67,17 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IFrameBasedClock framedClock)
         {
+            beatmapProcessor = Ruleset.CreateBeatmapProcessor(EditorBeatmap.PlayableBeatmap);
+
+            EditorBeatmap.HitObjectAdded += addHitObject;
+            EditorBeatmap.HitObjectRemoved += removeHitObject;
+            EditorBeatmap.StartTimeChanged += UpdateHitObject;
+
+            Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+
             try
             {
-                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, workingBeatmap, Array.Empty<Mod>()))
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
                 {
                     Clock = framedClock,
                     ProcessCustomClock = false
@@ -131,35 +139,12 @@ namespace osu.Game.Rulesets.Edit
 
             toolboxCollection.Items =
                 CompositionTools.Select(t => new RadioButton(t.Name, () => selectTool(t)))
-                                .Prepend(new RadioButton("选择", () => selectTool(null)))
+                                .Prepend(new RadioButton("Select", () => selectTool(null)))
                                 .ToList();
 
             toolboxCollection.Items[0].Select();
 
             blueprintContainer.SelectionChanged += selectionChanged;
-        }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var parentWorkingBeatmap = parent.Get<IBindable<WorkingBeatmap>>().Value;
-
-            playableBeatmap = (Beatmap<TObject>)parentWorkingBeatmap.GetPlayableBeatmap(Ruleset.RulesetInfo, Array.Empty<Mod>());
-            workingBeatmap = new EditorWorkingBeatmap<TObject>(playableBeatmap, parentWorkingBeatmap);
-
-            beatmapProcessor = Ruleset.CreateBeatmapProcessor(playableBeatmap);
-
-            EditorBeatmap = new EditorBeatmap<TObject>(playableBeatmap);
-            EditorBeatmap.HitObjectAdded += addHitObject;
-            EditorBeatmap.HitObjectRemoved += removeHitObject;
-            EditorBeatmap.StartTimeChanged += UpdateHitObject;
-
-            var dependencies = new DependencyContainer(parent);
-            dependencies.CacheAs<IEditorBeatmap>(EditorBeatmap);
-            dependencies.CacheAs<IEditorBeatmap<TObject>>(EditorBeatmap);
-
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
-
-            return base.CreateChildDependencies(dependencies);
         }
 
         protected override void LoadComplete()
@@ -234,7 +219,7 @@ namespace osu.Game.Rulesets.Edit
             scheduledUpdate = Schedule(() =>
             {
                 beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(playableBeatmap.ControlPointInfo, playableBeatmap.BeatmapInfo.BaseDifficulty);
+                hitObject?.ApplyDefaults(EditorBeatmap.ControlPointInfo, EditorBeatmap.BeatmapInfo.BaseDifficulty);
                 beatmapProcessor?.PostProcess();
             });
         }
@@ -248,7 +233,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         public void BeginPlacement(HitObject hitObject)
         {

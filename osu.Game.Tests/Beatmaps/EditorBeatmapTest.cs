@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestHitObjectAddEvent()
         {
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap());
 
             HitObject addedObject = null;
             editorBeatmap.HitObjectAdded += h => addedObject = h;
@@ -38,7 +38,7 @@ namespace osu.Game.Tests.Beatmaps
         public void HitObjectRemoveEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap { HitObjects = { hitCircle } });
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
 
             HitObject removedObject = null;
             editorBeatmap.HitObjectRemoved += h => removedObject = h;
@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Beatmaps
         public void TestInitialHitObjectStartTimeChangeEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap { HitObjects = { hitCircle } });
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
 
             HitObject changedObject = null;
             editorBeatmap.StartTimeChanged += h => changedObject = h;
@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestAddedHitObjectStartTimeChangeEvent()
         {
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap());
 
             HitObject changedObject = null;
             editorBeatmap.StartTimeChanged += h => changedObject = h;
@@ -92,7 +92,7 @@ namespace osu.Game.Tests.Beatmaps
         public void TestRemovedHitObjectStartTimeChangeEvent()
         {
             var hitCircle = new HitCircle();
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap { HitObjects = { hitCircle } });
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap { HitObjects = { hitCircle } });
 
             HitObject changedObject = null;
             editorBeatmap.StartTimeChanged += h => changedObject = h;
@@ -110,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps
         [Test]
         public void TestAddHitObjectInMiddle()
         {
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
                 HitObjects =
                 {
@@ -134,7 +134,7 @@ namespace osu.Game.Tests.Beatmaps
         public void TestResortWhenStartTimeChanged()
         {
             var hitCircle = new HitCircle { StartTime = 1000 };
-            var editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap
+            var editorBeatmap = new EditorBeatmap(new OsuBeatmap
             {
                 HitObjects =
                 {

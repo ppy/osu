@@ -14,7 +14,7 @@ namespace osu.Game.Users
 
     public class UserStatusOnline : UserStatus
     {
-        public override string Message => @"在线";
+        public override string Message => @"Online";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.BlueDarker;
     }
 
@@ -25,13 +25,13 @@ namespace osu.Game.Users
 
     public class UserStatusOffline : UserStatus
     {
-        public override string Message => @"离线";
+        public override string Message => @"Offline";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray7;
     }
 
     public class UserStatusDoNotDisturb : UserStatus
     {
-        public override string Message => @"请勿打扰";
+        public override string Message => @"Do not disturb";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.RedDark;
     }
 }

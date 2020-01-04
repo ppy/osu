@@ -72,69 +72,69 @@ namespace osu.Game.Input.Bindings
 
     public enum GlobalAction
     {
-        [Description("切换聊天栏")]
+        [Description("Toggle chat overlay")]
         ToggleChat,
 
-        [Description("切换玩家列表")]
+        [Description("Toggle social overlay")]
         ToggleSocial,
 
-        [Description("重置输入设置")]
+        [Description("Reset input settings")]
         ResetInputSettings,
 
-        [Description("切换工具栏")]
+        [Description("Toggle toolbar")]
         ToggleToolbar,
 
-        [Description("切换设置")]
+        [Description("Toggle settings")]
         ToggleSettings,
 
-        [Description("切换osu!direct")]
+        [Description("Toggle osu!direct")]
         ToggleDirect,
 
-        [Description("增加音量")]
+        [Description("Increase volume")]
         IncreaseVolume,
 
-        [Description("减小音量")]
+        [Description("Decrease volume")]
         DecreaseVolume,
 
-        [Description("切换静音")]
+        [Description("Toggle mute")]
         ToggleMute,
 
         // In-Game Keybindings
-        [Description("跳过")]
+        [Description("Skip cutscene")]
         SkipCutscene,
 
-        [Description("重新开始(按住)")]
+        [Description("Quick retry (hold)")]
         QuickRetry,
 
-        [Description("截图")]
+        [Description("Take screenshot")]
         TakeScreenshot,
 
-        [Description("切换鼠标按键")]
+        [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
 
-        [Description("返回")]
+        [Description("Back")]
         Back,
 
-        [Description("增加滚动速度")]
+        [Description("Increase scroll speed")]
         IncreaseScrollSpeed,
 
-        [Description("减小滚动速度")]
+        [Description("Decrease scroll speed")]
         DecreaseScrollSpeed,
 
-        [Description("选择")]
+        [Description("Select")]
         Select,
 
-        [Description("快速退出(按住)")]
+        [Description("Quick exit (Hold)")]
         QuickExit,
 
         // Game-wide beatmap msi ccotolle keybindings
-        [Description("下一首")]
+        [Description("Next track")]
         MusicNext,
 
-        [Description("上一首")]
+        [Description("Previous track")]
         MusicPrev,
 
-        [Description("播放 / 暂停")]
+        [Description("Play / pause")]
         MusicPlay,
     }
 }

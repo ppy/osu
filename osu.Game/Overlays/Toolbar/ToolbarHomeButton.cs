@@ -10,8 +10,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarHomeButton()
         {
             Icon = FontAwesome.Solid.Home;
-            TooltipMain = "主菜单";
-            TooltipSub = "返回主菜单";
+            TooltipMain = "Home";
+            TooltipSub = "Return to the main menu";
         }
     }
 }
