@@ -10,7 +10,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osuTK;
 
@@ -41,13 +40,21 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public static Column CreateColumnFromType(ColumnType type, int index)
-            => type switch
+        {
+            switch (type)
             {
-                ColumnType.Odd => new OddColumn(index),
-                ColumnType.Even => new EvenColumn(index),
-                ColumnType.Special => new SpecialColumn(index),
-                _ => null
-            };
+                case ColumnType.Odd:
+                    return new OddColumn(index);
+
+                case ColumnType.Even:
+                    return new EvenColumn(index);
+
+                case ColumnType.Special:
+                    return new SpecialColumn(index);
+            }
+
+            return null;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
