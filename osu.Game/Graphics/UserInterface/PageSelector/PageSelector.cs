@@ -10,8 +10,6 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
 {
     public class PageSelector : CompositeDrawable
     {
-        public const int HEIGHT = 20;
-
         public readonly BindableInt CurrentPage = new BindableInt(1);
         public readonly BindableInt MaxPages = new BindableInt(1);
 
