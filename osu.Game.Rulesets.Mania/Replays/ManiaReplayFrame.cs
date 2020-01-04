@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Types;
 
@@ -42,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
             while (activeColumns > 0)
             {
-                var isSpecial = stage.IsSpecialColumn(counter);
+                var isSpecial = stage.TypeOfColumn(counter) == ColumnType.Special;
 
                 if ((activeColumns & 1) > 0)
                     Actions.Add(isSpecial ? specialAction : normalAction);
