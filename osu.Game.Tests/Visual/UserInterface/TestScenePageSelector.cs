@@ -13,10 +13,12 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(PageSelector)
+            typeof(PageSelector),
+            typeof(DrawablePage)
         };
 
         private readonly PageSelector pageSelector;
+        private readonly DrawablePage drawablePage;
 
         public TestScenePageSelector()
         {
@@ -26,6 +28,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                },
+                drawablePage = new DrawablePage(1234)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Margin = new MarginPadding { Top = 50 },
                 }
             });
         }
@@ -56,6 +64,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 setMaxPages(-10);
             });
             AddAssert("Current is 1, max is 1", () => pageSelector.CurrentPage.Value == 1 && pageSelector.MaxPages.Value == 1);
+        }
+
+        [Test]
+        public void TestDrawablePage()
+        {
+            AddStep("Select", () => drawablePage.Selected = true);
+            AddStep("Deselect", () => drawablePage.Selected = false);
         }
 
         private void setMaxPages(int maxPages) => pageSelector.MaxPages.Value = maxPages;
