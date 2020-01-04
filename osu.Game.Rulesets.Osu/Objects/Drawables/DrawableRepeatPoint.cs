@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
-using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,9 +21,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
 
+        public readonly Bindable<ReverseArrowPulseMode> PulseMode = new Bindable<ReverseArrowPulseMode>(ReverseArrowPulseMode.Synced);
+
         private double animDuration;
 
-        private readonly SkinnableDrawable scaleContainer;
+        private readonly Drawable scaleContainer;
+
+        [Resolved(CanBeNull = true)]
+        private OsuRulesetConfigManager config { get; set; }
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
@@ -36,16 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
-            {
-                RelativeSizeAxes = Axes.Both,
-                Icon = FontAwesome.Solid.ChevronRight,
-                Size = new Vector2(0.35f)
-            }, confineMode: ConfineMode.NoScaling)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
+            InternalChild = scaleContainer = new ReverseArrowPiece();
         }
 
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
@@ -55,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
             scaleBindable.BindTo(HitObject.ScaleBindable);
+
+            config?.BindWith(OsuRulesetSetting.ReverseArrowPulse, PulseMode);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -69,14 +67,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             this.FadeIn(animDuration);
 
-            double fadeInStart = repeatPoint.StartTime - 2 * repeatPoint.SpanDuration;
+            if (PulseMode.Value == ReverseArrowPulseMode.Stable)
+            {
+                double fadeInStart = repeatPoint.StartTime - 2 * repeatPoint.SpanDuration;
 
-            // We want first repeat arrow to start pulsing during snake in
-            if (repeatPoint.RepeatIndex == 0)
-                fadeInStart -= repeatPoint.TimePreempt;
+                // We want first repeat arrow to start pulsing during snake in
+                if (repeatPoint.RepeatIndex == 0)
+                    fadeInStart -= repeatPoint.TimePreempt;
 
-            for (double pulseStartTime = fadeInStart; pulseStartTime < repeatPoint.StartTime; pulseStartTime += 300)
-                this.Delay(pulseStartTime - LifetimeStart).ScaleTo(1.3f).ScaleTo(1f, Math.Min(300, repeatPoint.StartTime - pulseStartTime), Easing.Out);
+                for (double pulseStartTime = fadeInStart; pulseStartTime < repeatPoint.StartTime; pulseStartTime += 300)
+                    this.Delay(pulseStartTime - LifetimeStart).ScaleTo(1.3f).ScaleTo(1f, Math.Min(300, repeatPoint.StartTime - pulseStartTime), Easing.Out);
+            }
+            else if (PulseMode.Value == ReverseArrowPulseMode.Off)
+                this.ScaleTo(0.5f).ScaleTo(1f, animDuration * 2, Easing.OutElasticHalf);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
