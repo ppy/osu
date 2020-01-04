@@ -6,6 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI.Components;
 
 namespace osu.Game.Rulesets.Mania.UI
@@ -16,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly ColumnKeyArea keyArea;
         private readonly ColumnHitObjectArea hitObjectArea;
 
-        // Push up more stuff when needed.
+        // Pull up more stuff when needed.
         protected override Container HitTargetContainer { get; }
         protected override Drawable KeyArea => keyArea;
         protected override Container ExplosionContainer { get; }
@@ -88,6 +90,15 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             hitObject.AccentColour.Value = AccentColour;
             base.Add(hitObject);
+        }
+
+        public override void AddHitExplosion(DrawableHitObject judgedObject)
+        {
+            ExplosionContainer.Add(new HitExplosion(judgedObject.AccentColour.Value, judgedObject is DrawableHoldNoteTick)
+            {
+                Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre,
+                Origin = Anchor.Centre
+            });
         }
     }
 }
