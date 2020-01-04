@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
                 return;
             }
 
-            itemsFlow.ForEach(page => page.Selected = page.Page == newPage ? true : false);
+            itemsFlow.ForEach(page => page.Selected = page.Page == newPage);
             updateButtonsState();
         }
 
