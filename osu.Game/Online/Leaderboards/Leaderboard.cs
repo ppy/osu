@@ -151,7 +151,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
+                        replacePlaceholder(new LoginPlaceholder(@"view online leaderboards!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
