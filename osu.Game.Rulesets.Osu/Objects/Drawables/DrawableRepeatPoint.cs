@@ -65,12 +65,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void UpdateInitialTransforms()
         {
-            animDuration = Math.Min(150, repeatPoint.SpanDuration / 2);
+            animDuration = Math.Min(300, repeatPoint.SpanDuration);
 
-            this.Animate(
-                d => d.FadeIn(animDuration),
-                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 4, Easing.OutElasticHalf)
-            );
+            this.FadeIn(animDuration);
+
+            double fadeInStart = repeatPoint.StartTime - 2 * repeatPoint.SpanDuration;
+
+            // We want first repeat arrow to start pulsing during snake in
+            if (repeatPoint.RepeatIndex == 0)
+                fadeInStart -= repeatPoint.TimePreempt;
+
+            for (double pulseStartTime = fadeInStart; pulseStartTime < repeatPoint.StartTime; pulseStartTime += 300)
+                this.Delay(pulseStartTime - LifetimeStart).ScaleTo(1.3f).ScaleTo(1f, Math.Min(300, repeatPoint.StartTime - pulseStartTime));
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
@@ -88,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     break;
 
                 case ArmedState.Hit:
-                    this.FadeOut(animDuration, Easing.OutQuint)
+                    this.FadeOut(animDuration, Easing.Out)
                         .ScaleTo(Scale * 1.5f, animDuration, Easing.Out);
                     break;
             }
