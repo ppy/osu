@@ -41,32 +41,30 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestPageSelectorValues()
+        public void TestCurrentPageReset()
         {
-            AddStep("10 max pages", () => setMaxPages(10));
-            AddStep("11 max pages", () => setMaxPages(11));
-            AddStep("200 max pages, current 199", () =>
-            {
-                setMaxPages(200);
-                setCurrentPage(199);
-            });
-            AddStep("200 max pages, current 201", () =>
-            {
-                setMaxPages(200);
-                setCurrentPage(201);
-            });
-            AddAssert("Current equals max", () => pageSelector.CurrentPage.Value == pageSelector.MaxPages.Value);
-            AddStep("200 max pages, current -10", () =>
-            {
-                setMaxPages(200);
-                setCurrentPage(-10);
-            });
-            AddAssert("Current is 1", () => pageSelector.CurrentPage.Value == 1);
-            AddStep("-10 max pages", () =>
-            {
-                setMaxPages(-10);
-            });
-            AddAssert("Current is 1, max is 1", () => pageSelector.CurrentPage.Value == 1 && pageSelector.MaxPages.Value == 1);
+            AddStep("Set 10 pages", () => setMaxPages(10));
+            AddStep("Select 5 page", () => setCurrentPage(5));
+            AddStep("Set 11 pages", () => setMaxPages(11));
+            AddAssert("Check 1 page is current", () => pageSelector.CurrentPage.Value == 1);
+        }
+
+        [Test]
+        public void TestUnexistingPageSelection()
+        {
+            AddStep("Set 10 pages", () => setMaxPages(10));
+            AddStep("Select 11 page", () => setCurrentPage(11));
+            AddAssert("Check current equals max", () => pageSelector.CurrentPage.Value == pageSelector.MaxPages.Value);
+
+            AddStep("Select -1 page", () => setCurrentPage(-1));
+            AddAssert("Check current is 1", () => pageSelector.CurrentPage.Value == 1);
+        }
+
+        [Test]
+        public void TestNegativeMaxPages()
+        {
+            AddStep("Set -10 pages", () => setMaxPages(-10));
+            AddAssert("Check current and max is 1", () => pageSelector.CurrentPage.Value == 1 && pageSelector.MaxPages.Value == 1);
         }
 
         [Test]

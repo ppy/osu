@@ -46,6 +46,7 @@ namespace osu.Game.Graphics.UserInterface.PageSelector
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Horizontal,
+            Spacing = new Vector2(3, 0),
             Children = new Drawable[]
             {
                 name = new OsuSpriteText
