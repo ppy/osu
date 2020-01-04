@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 fadeInStart -= repeatPoint.TimePreempt;
 
             for (double pulseStartTime = fadeInStart; pulseStartTime < repeatPoint.StartTime; pulseStartTime += 300)
-                this.Delay(pulseStartTime - LifetimeStart).ScaleTo(1.3f).ScaleTo(1f, Math.Min(300, repeatPoint.StartTime - pulseStartTime));
+                this.Delay(pulseStartTime - LifetimeStart).ScaleTo(1.3f).ScaleTo(1f, Math.Min(300, repeatPoint.StartTime - pulseStartTime), Easing.Out);
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
