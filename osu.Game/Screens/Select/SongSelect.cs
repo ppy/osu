@@ -262,8 +262,10 @@ namespace osu.Game.Screens.Select
 
         protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
-            if (this.IsCurrentScreen())
-                Carousel.Filter(criteria);
+            // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
+            bool shouldDebounce = this.IsCurrentScreen();
+
+            Schedule(() => Carousel.Filter(criteria, shouldDebounce));
         }
 
         private DependencyContainer dependencies;
@@ -436,8 +438,6 @@ namespace osu.Game.Screens.Select
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-
-            Carousel.Filter(FilterControl.CreateCriteria(), false);
 
             this.FadeInFromZero(250);
             FilterControl.Activate();

@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.Containers
 
             foreach (var link in links)
             {
-                AddText(text.Substring(previousLinkEnd, link.Index - previousLinkEnd));
+                AddText(text[previousLinkEnd..link.Index]);
                 AddLink(text.Substring(link.Index, link.Length), link.Action, link.Argument ?? link.Url);
                 previousLinkEnd = link.Index + link.Length;
             }

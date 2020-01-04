@@ -45,6 +45,10 @@ namespace osu.Game.Rulesets.UI
     public abstract class DrawableRuleset<TObject> : DrawableRuleset, IProvideCursor, ICanAttachKeyCounter
         where TObject : HitObject
     {
+        public override event Action<JudgementResult> OnNewResult;
+
+        public override event Action<JudgementResult> OnRevertResult;
+
         /// <summary>
         /// The selected variant.
         /// </summary>
@@ -68,10 +72,9 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public override Playfield Playfield => playfield.Value;
 
-        /// <summary>
-        /// Place to put drawables above hit objects but below UI.
-        /// </summary>
-        public Container Overlays { get; private set; }
+        private Container overlays;
+
+        public override Container Overlays => overlays;
 
         public override GameplayClock FrameStableClock => frameStabilityContainer.GameplayClock;
 
@@ -92,19 +95,9 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public event Action<JudgementResult> OnNewResult;
-
-        /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        public event Action<JudgementResult> OnRevertResult;
-
-        /// <summary>
         /// The beatmap.
         /// </summary>
-        public Beatmap<TObject> Beatmap;
+        public readonly Beatmap<TObject> Beatmap;
 
         public override IEnumerable<HitObject> Objects => Beatmap.HitObjects;
 
@@ -124,19 +117,21 @@ namespace osu.Game.Rulesets.UI
         /// Creates a ruleset visualisation for the provided ruleset and beatmap.
         /// </summary>
         /// <param name="ruleset">The ruleset being represented.</param>
-        /// <param name="workingBeatmap">The beatmap to create the hit renderer for.</param>
+        /// <param name="beatmap">The beatmap to create the hit renderer for.</param>
         /// <param name="mods">The <see cref="Mod"/>s to apply.</param>
-        protected DrawableRuleset(Ruleset ruleset, IWorkingBeatmap workingBeatmap, IReadOnlyList<Mod> mods)
+        protected DrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset)
         {
-            if (workingBeatmap == null)
-                throw new ArgumentException("Beatmap cannot be null.", nameof(workingBeatmap));
+            if (beatmap == null)
+                throw new ArgumentNullException(nameof(beatmap), "Beatmap cannot be null.");
 
-            this.mods = mods.ToArray();
+            if (!(beatmap is Beatmap<TObject> tBeatmap))
+                throw new ArgumentException($"{GetType()} expected the beatmap to contain hitobjects of type {typeof(TObject)}.", nameof(beatmap));
+
+            Beatmap = tBeatmap;
+            this.mods = mods?.ToArray() ?? Array.Empty<Mod>();
 
             RelativeSizeAxes = Axes.Both;
-
-            Beatmap = (Beatmap<TObject>)workingBeatmap.GetPlayableBeatmap(ruleset.RulesetInfo, mods);
 
             KeyBindingInputManager = CreateInputManager();
             playfield = new Lazy<Playfield>(CreatePlayfield);
@@ -163,7 +158,7 @@ namespace osu.Game.Rulesets.UI
                 dependencies.Cache(textureStore);
 
                 localSampleStore = dependencies.Get<AudioManager>().GetSampleStore(new NamespacedResourceStore<byte[]>(resources, "Samples"));
-                dependencies.CacheAs(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
+                dependencies.CacheAs<ISampleStore>(new FallbackSampleStore(localSampleStore, dependencies.Get<ISampleStore>()));
             }
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
@@ -189,12 +184,15 @@ namespace osu.Game.Rulesets.UI
                 frameStabilityContainer = new FrameStabilityContainer(GameplayStartTime)
                 {
                     FrameStablePlayback = FrameStablePlayback,
-                    Child = KeyBindingInputManager
-                        .WithChild(CreatePlayfieldAdjustmentContainer()
-                            .WithChild(Playfield)
-                        )
+                    Children = new Drawable[]
+                    {
+                        KeyBindingInputManager
+                            .WithChild(CreatePlayfieldAdjustmentContainer()
+                                .WithChild(Playfield)
+                            ),
+                        overlays = new Container { RelativeSizeAxes = Axes.Both }
+                    }
                 },
-                Overlays = new Container { RelativeSizeAxes = Axes.Both }
             };
 
             if ((ResumeOverlay = CreateResumeOverlay()) != null)
@@ -309,8 +307,6 @@ namespace osu.Game.Rulesets.UI
         /// <returns>The Playfield.</returns>
         protected abstract Playfield CreatePlayfield();
 
-        public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
-
         /// <summary>
         /// Applies the active mods to this DrawableRuleset.
         /// </summary>
@@ -367,6 +363,16 @@ namespace osu.Game.Rulesets.UI
     public abstract class DrawableRuleset : CompositeDrawable
     {
         /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public abstract event Action<JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public abstract event Action<JudgementResult> OnRevertResult;
+
+        /// <summary>
         /// Whether a replay is currently loaded.
         /// </summary>
         public readonly BindableBool HasReplayLoaded = new BindableBool();
@@ -380,6 +386,11 @@ namespace osu.Game.Rulesets.UI
         /// The playfield.
         /// </summary>
         public abstract Playfield Playfield { get; }
+
+        /// <summary>
+        /// Place to put drawables above hit objects but below UI.
+        /// </summary>
+        public abstract Container Overlays { get; }
 
         /// <summary>
         /// The frame-stable clock which is being used for playfield display.
@@ -469,13 +480,6 @@ namespace osu.Game.Rulesets.UI
         /// Invoked when the user requests to pause while the resume overlay is active.
         /// </summary>
         public abstract void CancelResume();
-
-        /// <summary>
-        /// Create a <see cref="ScoreProcessor"/> for the associated ruleset  and link with this
-        /// <see cref="DrawableRuleset"/>.
-        /// </summary>
-        /// <returns>A score processor.</returns>
-        public abstract ScoreProcessor CreateScoreProcessor();
     }
 
     public class BeatmapInvalidForRulesetException : ArgumentException
@@ -509,28 +513,34 @@ namespace osu.Game.Rulesets.UI
 
         public Stream GetStream(string name) => primary.GetStream(name) ?? secondary.GetStream(name);
 
-        public IEnumerable<string> GetAvailableResources() => throw new NotImplementedException();
+        public IEnumerable<string> GetAvailableResources() => throw new NotSupportedException();
 
-        public void AddAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+        public void AddAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
 
-        public void RemoveAdjustment(AdjustableProperty type, BindableDouble adjustBindable) => throw new NotImplementedException();
+        public void RemoveAdjustment(AdjustableProperty type, BindableNumber<double> adjustBindable) => throw new NotSupportedException();
 
-        public BindableDouble Volume => throw new NotImplementedException();
+        public BindableNumber<double> Volume => throw new NotSupportedException();
 
-        public BindableDouble Balance => throw new NotImplementedException();
+        public BindableNumber<double> Balance => throw new NotSupportedException();
 
-        public BindableDouble Frequency => throw new NotImplementedException();
+        public BindableNumber<double> Frequency => throw new NotSupportedException();
 
-        public IBindable<double> AggregateVolume => throw new NotImplementedException();
+        public BindableNumber<double> Tempo => throw new NotSupportedException();
 
-        public IBindable<double> AggregateBalance => throw new NotImplementedException();
+        public IBindable<double> GetAggregate(AdjustableProperty type) => throw new NotSupportedException();
 
-        public IBindable<double> AggregateFrequency => throw new NotImplementedException();
+        public IBindable<double> AggregateVolume => throw new NotSupportedException();
+
+        public IBindable<double> AggregateBalance => throw new NotSupportedException();
+
+        public IBindable<double> AggregateFrequency => throw new NotSupportedException();
+
+        public IBindable<double> AggregateTempo => throw new NotSupportedException();
 
         public int PlaybackConcurrency
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
         public void Dispose()

@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public abstract class ScreenTestScene : ManualInputManagerTestScene
     {
-        private readonly OsuScreenStack stack;
+        protected readonly OsuScreenStack Stack;
 
         private readonly Container content;
 
@@ -22,16 +22,16 @@ namespace osu.Game.Tests.Visual
         {
             base.Content.AddRange(new Drawable[]
             {
-                stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
+                Stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both },
                 content = new Container { RelativeSizeAxes = Axes.Both }
             });
         }
 
         protected void LoadScreen(OsuScreen screen)
         {
-            if (stack.CurrentScreen != null)
-                stack.Exit();
-            stack.Push(screen);
+            if (Stack.CurrentScreen != null)
+                Stack.Exit();
+            Stack.Push(screen);
         }
     }
 }

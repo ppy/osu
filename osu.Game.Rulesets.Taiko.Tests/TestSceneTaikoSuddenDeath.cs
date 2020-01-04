@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Mods.Value.Concat(new[] { new TaikoModSuddenDeath() }).ToArray();
+            SelectedMods.Value = SelectedMods.Value.Concat(new[] { new TaikoModSuddenDeath() }).ToArray();
             return new ScoreAccessiblePlayer();
         }
 

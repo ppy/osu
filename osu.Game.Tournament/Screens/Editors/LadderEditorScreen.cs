@@ -49,7 +49,7 @@ namespace osu.Game.Tournament.Screens.Editors
             get
             {
                 if (editorInfo == null)
-                    return new MenuItem[0];
+                    return Array.Empty<MenuItem>();
 
                 return new MenuItem[]
                 {

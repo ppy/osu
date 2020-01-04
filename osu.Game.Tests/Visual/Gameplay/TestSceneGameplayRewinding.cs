@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
+            SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
             return new RulesetExposingPlayer();
         }
 

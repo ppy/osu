@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 
@@ -21,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public bool Tracking { get; set; }
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+        private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         public DrawableSliderTail(Slider slider, SliderTailCircle hitCircle)
             : base(hitCircle)
@@ -36,10 +35,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AlwaysPresent = true;
 
             positionBindable.BindTo(hitCircle.PositionBindable);
-            pathBindable.BindTo(slider.PathBindable);
+            pathVersion.BindTo(slider.Path.Version);
 
             positionBindable.BindValueChanged(_ => updatePosition());
-            pathBindable.BindValueChanged(_ => updatePosition(), true);
+            pathVersion.BindValueChanged(_ => updatePosition(), true);
 
             // TODO: This has no drawable content. Support for skins should be added.
         }

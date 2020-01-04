@@ -7,9 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
@@ -22,15 +20,15 @@ namespace osu.Game.Tests.Visual.Editor
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
 
-        [Cached(typeof(IEditorBeatmap))]
-        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap;
 
         [Cached(typeof(IDistanceSnapProvider))]
         private readonly SnapProvider snapProvider = new SnapProvider();
 
         public TestSceneDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
             editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
         }
 
@@ -44,7 +42,7 @@ namespace osu.Game.Tests.Visual.Editor
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.SlateGray
                 },
-                new TestDistanceSnapGrid(new HitObject(), grid_position)
+                new TestDistanceSnapGrid()
             };
         });
 
@@ -73,7 +71,7 @@ namespace osu.Game.Tests.Visual.Editor
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    new TestDistanceSnapGrid(new HitObject(), grid_position, new HitObject { StartTime = 100 })
+                    new TestDistanceSnapGrid(100)
                 };
             });
         }
@@ -82,68 +80,68 @@ namespace osu.Game.Tests.Visual.Editor
         {
             public new float DistanceSpacing => base.DistanceSpacing;
 
-            public TestDistanceSnapGrid(HitObject hitObject, Vector2 centrePosition, HitObject nextHitObject = null)
-                : base(hitObject, nextHitObject, centrePosition)
+            public TestDistanceSnapGrid(double? endTime = null)
+                : base(grid_position, 0, endTime)
             {
             }
 
-            protected override void CreateContent(Vector2 centrePosition)
+            protected override void CreateContent(Vector2 startPosition)
             {
                 AddInternal(new Circle
                 {
                     Origin = Anchor.Centre,
                     Size = new Vector2(5),
-                    Position = centrePosition
+                    Position = startPosition
                 });
 
                 int beatIndex = 0;
 
-                for (float s = centrePosition.X + DistanceSpacing; s <= DrawWidth && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
+                for (float s = startPosition.X + DistanceSpacing; s <= DrawWidth && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
-                        Position = new Vector2(s, centrePosition.Y),
+                        Position = new Vector2(s, startPosition.Y),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
 
                 beatIndex = 0;
 
-                for (float s = centrePosition.X - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
+                for (float s = startPosition.X - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
-                        Position = new Vector2(s, centrePosition.Y),
+                        Position = new Vector2(s, startPosition.Y),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
 
                 beatIndex = 0;
 
-                for (float s = centrePosition.Y + DistanceSpacing; s <= DrawHeight && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
+                for (float s = startPosition.Y + DistanceSpacing; s <= DrawHeight && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
-                        Position = new Vector2(centrePosition.X, s),
+                        Position = new Vector2(startPosition.X, s),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
 
                 beatIndex = 0;
 
-                for (float s = centrePosition.Y - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
+                for (float s = startPosition.Y - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
-                        Position = new Vector2(centrePosition.X, s),
+                        Position = new Vector2(startPosition.X, s),
                         Colour = GetColourForBeatIndex(beatIndex)
                     });
                 }
