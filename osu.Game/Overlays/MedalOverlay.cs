@@ -154,19 +154,22 @@ namespace osu.Game.Overlays
                 Colour = colours.Blue.Opacity(0.5f),
                 Radius = 50,
             };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             LoadComponentAsync(drawableMedal = new DrawableMedal(medal)
             {
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
                 RelativeSizeAxes = Axes.Both,
-            }, disc.Add);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Show();
+            }, loaded =>
+            {
+                disc.Add(loaded);
+                Show();
+            });
         }
 
         protected override void Update()
