@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Graphics.UserInterface;
+using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Graphics.UserInterface.PageSelector;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -19,12 +20,19 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestScenePageSelector()
         {
-            Child = pageSelector = new PageSelector
+            AddRange(new Drawable[]
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-            };
+                pageSelector = new PageSelector
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                }
+            });
+        }
 
+        [Test]
+        public void TestPageSelectorValues()
+        {
             AddStep("10 max pages", () => setMaxPages(10));
             AddStep("200 max pages, current 199", () =>
             {

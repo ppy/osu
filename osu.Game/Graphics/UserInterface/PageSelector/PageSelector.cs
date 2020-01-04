@@ -16,7 +16,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 
-namespace osu.Game.Graphics.UserInterface
+namespace osu.Game.Graphics.UserInterface.PageSelector
 {
     public class PageSelector : CompositeDrawable
     {
