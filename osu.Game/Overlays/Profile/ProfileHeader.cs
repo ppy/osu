@@ -15,7 +15,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : OverlayHeader
+    public class ProfileHeader : TabControlOverlayHeader
     {
         private UserCoverBackground coverContainer;
 
@@ -30,8 +30,8 @@ namespace osu.Game.Overlays.Profile
 
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
-            TabControl.AddItem("Info");
-            TabControl.AddItem("Modding");
+            TabControl.AddItem("info");
+            TabControl.AddItem("modding");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
