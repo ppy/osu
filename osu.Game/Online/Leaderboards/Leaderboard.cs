@@ -14,6 +14,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 
