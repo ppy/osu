@@ -11,7 +11,7 @@ namespace osu.Game.Online.Placeholders
 {
     public sealed class LoginPlaceholder : Placeholder
     {
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private LoginOverlay login { get; set; }
 
         public LoginPlaceholder(string action)
