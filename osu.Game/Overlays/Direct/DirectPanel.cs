@@ -208,7 +208,7 @@ namespace osu.Game.Overlays.Direct
 
         public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("View Beatmap", MenuItemType.Highlighted, ViewBeatmap),
+            new OsuMenuItem("查看该谱面", MenuItemType.Highlighted, ViewBeatmap),
         };
     }
 }

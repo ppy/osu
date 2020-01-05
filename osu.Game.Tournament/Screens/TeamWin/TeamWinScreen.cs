@@ -125,7 +125,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = "WINNER",
+                                Text = "胜出者",
                                 Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 15, FontWeight.Regular),
                             },
                             new OsuSpriteText
@@ -133,7 +133,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = match.Round.Value?.Name.Value ?? "Unknown Round",
+                                Text = match.Round.Value?.Name.Value ?? "未知回合",
                                 Font = TournamentFont.GetFont(TournamentTypeface.Aquatico, 50, FontWeight.Light),
                                 Spacing = new Vector2(10, 0),
                             },
@@ -161,7 +161,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                 var colour = left ? red : blue;
                 InternalChildren = new Drawable[]
                 {
-                    new TeamDisplay(team, left ? "Team Red" : "Team Blue", colour)
+                    new TeamDisplay(team, left ? "红队" : "蓝队", colour)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

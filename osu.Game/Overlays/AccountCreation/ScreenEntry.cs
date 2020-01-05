@@ -65,11 +65,11 @@ namespace osu.Game.Overlays.AccountCreation
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.GetFont(size: 20),
-                            Text = "Let's create an account!",
+                            Text = "让我们创建一个账号!",
                         },
                         usernameTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "username",
+                            PlaceholderText = "用户名",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         emailTextBox = new OsuTextBox
                         {
-                            PlaceholderText = "email address",
+                            PlaceholderText = "电子邮件地址",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this
                         },
@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.AccountCreation
                         },
                         passwordTextBox = new OsuPasswordTextBox
                         {
-                            PlaceholderText = "password",
+                            PlaceholderText = "密码",
                             RelativeSizeAxes = Axes.X,
                             TabbableContentContainer = this,
                         },
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.AccountCreation
                                     AutoSizeAxes = Axes.Y,
                                     Child = new SettingsButton
                                     {
-                                        Text = "Register",
+                                        Text = "注册",
                                         Margin = new MarginPadding { Vertical = 20 },
                                         Action = performRegistration
                                     }
@@ -126,14 +126,14 @@ namespace osu.Game.Overlays.AccountCreation
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
 
-            usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
+            usernameDescription.AddText("这将会公开显示在你的个人界面上,请勿填写不良信息",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
+            usernameDescription.AddText("也不要填写你自己的个人信息!",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
 
-            emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
-            emailAddressDescription.AddText(" Make sure to get it right!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold));
+            emailAddressDescription.AddText("这将会用作发送通知和密码重置.",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
+            emailAddressDescription.AddText("确保这些信息正确!", cp => cp.Font = cp.Font.With(Typeface.Exo, weight: FontWeight.Bold,size: 16));
 
-            passwordDescription.AddText("At least ");
-            characterCheckText = passwordDescription.AddText("8 characters long");
-            passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
+            passwordDescription.AddText("至少长",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
+            characterCheckText = passwordDescription.AddText("8个字符",cp => cp.Font = cp.Font.With(Typeface.Exo, size: 16));
 
             passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.AccountCreation
                         }
                         else
                         {
-                            passwordDescription.AddErrors(new[] { "Something happened... but we're not sure what." });
+                            passwordDescription.AddErrors(new[] { "好像有什么不对劲,但我们无法确认具体原因..." });
                         }
 
                         registerShake.Shake();

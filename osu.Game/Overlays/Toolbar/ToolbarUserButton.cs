@@ -22,7 +22,9 @@ namespace osu.Game.Overlays.Toolbar
         {
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = OsuFont.GetFont(italics: true);
+            DrawableText.Font = OsuFont.GetFont(italics: true,size: 18);
+            TooltipMain = "我";
+            TooltipSub = "长得很好看(=・ω・=)";
 
             Add(new OpaqueBackground { Depth = 1 });
 
@@ -56,12 +58,12 @@ namespace osu.Game.Overlays.Toolbar
             switch (state)
             {
                 default:
-                    Text = @"Guest";
+                    Text = @"游客";
                     avatar.User = new User();
                     break;
 
                 case APIState.Online:
-                    Text = api.LocalUser.Value.Username;
+                    Text = $"别来无恙, {api.LocalUser.Value.Username} !";
                     avatar.User = api.LocalUser.Value;
                     break;
             }

@@ -138,23 +138,23 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NoneSelected:
-                        replacePlaceholder(new MessagePlaceholder(@"Please select a beatmap!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请选择一张谱面!"));
                         break;
 
                     case PlaceholderState.Unavailable:
-                        replacePlaceholder(new MessagePlaceholder(@"Leaderboards are not available for this beatmap!"));
+                        replacePlaceholder(new MessagePlaceholder(@"在线排行对这张谱面不可用!"));
                         break;
 
                     case PlaceholderState.NoScores:
-                        replacePlaceholder(new MessagePlaceholder(@"No records yet!"));
+                        replacePlaceholder(new MessagePlaceholder(@"这里还没有记录!"));
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请登入来查看在线排行!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"Please invest in an osu!supporter tag to view this leaderboard!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请成为一名osu!supporter来查看这个排行!"));
                         break;
 
                     default:

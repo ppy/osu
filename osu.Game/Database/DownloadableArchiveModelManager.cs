@@ -63,7 +63,7 @@ namespace osu.Game.Database
 
             DownloadNotification notification = new DownloadNotification
             {
-                Text = $"Downloading {request.Model}",
+                Text = $"正在下载 {request.Model}",
             };
 
             request.DownloadProgressed += progress =>

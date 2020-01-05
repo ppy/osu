@@ -8,7 +8,7 @@ namespace osu.Game.Online.Multiplayer.RoomStatuses
 {
     public class RoomStatusOpen : RoomStatus
     {
-        public override string Message => @"Welcoming Players";
+        public override string Message => @"开放中";
         public override Color4 GetAppropriateColour(OsuColour colours) => colours.GreenLight;
     }
 }

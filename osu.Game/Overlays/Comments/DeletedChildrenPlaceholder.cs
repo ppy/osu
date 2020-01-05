@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Comments
         {
             if (DeletedCount.Value != 0)
             {
-                countText.Text = @"deleted comment".ToQuantity(DeletedCount.Value);
+                countText.Text = @"已删除的回复".ToQuantity(DeletedCount.Value);
                 this.FadeTo(ShowDeleted.Value ? 0 : 1);
             }
             else

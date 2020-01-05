@@ -103,7 +103,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = "COMING UP NEXT",
+                                Text = "接下来:",
                                 Spacing = new Vector2(2, 0),
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Black)
                             },
@@ -112,7 +112,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = match.Round.Value?.Name.Value ?? "Unknown Round",
+                                Text = match.Round.Value?.Name.Value ?? "未知回合",
                                 Spacing = new Vector2(10, 0),
                                 Font = OsuFont.GetFont(size: 50, weight: FontWeight.Light)
                             },
@@ -141,7 +141,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 var colour = left ? red : blue;
                 InternalChildren = new Drawable[]
                 {
-                    new TeamDisplay(team, left ? "Team Red" : "Team Blue", colour)
+                    new TeamDisplay(team, left ? "红队" : "蓝队", colour)
                     {
                         Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
                         Origin = Anchor.Centre,

@@ -22,12 +22,12 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 bank = new LabelledTextBox
                 {
-                    Label = "Bank Name",
+                    Label = "Bank名",
                 },
                 volume = new SettingsSlider<int>
                 {
                     Bindable = new SampleControlPoint().SampleVolumeBindable,
-                    LabelText = "Volume",
+                    LabelText = "音量",
                 }
             });
         }

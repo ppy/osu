@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Play
 
                 notificationOverlay?.Post(new SimpleNotification
                 {
-                    Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
+                    Text = @"分数界面已被隐藏! 你可以通过按 Shift+Tab 来恢复."
                 });
             }
 

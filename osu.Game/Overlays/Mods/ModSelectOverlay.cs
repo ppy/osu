@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             new OsuSpriteText
                                             {
-                                                Text = @"Gameplay Mods",
+                                                Text = @"游戏Mods",
                                                 Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Mods
                                             {
                                                 RelativeSizeAxes = Axes.X,
                                                 AutoSizeAxes = Axes.Y,
-                                                Text = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play.\nOthers are just for fun.",
+                                                Text = "游戏Mods提供了多种多样的游玩方式\n有一些会对您的分数等产生影响,还有一些仅供娱乐",
                                             },
                                         },
                                     },
@@ -224,7 +224,7 @@ namespace osu.Game.Overlays.Mods
                                             DeselectAllButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Deselect All",
+                                                Text = "重置为默认玩法",
                                                 Action = DeselectAll,
                                                 Margin = new MarginPadding
                                                 {
@@ -234,7 +234,7 @@ namespace osu.Game.Overlays.Mods
                                             CustomiseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Customisation",
+                                                Text = "自定义",
                                                 Action = () => ModSettingsContainer.Alpha = ModSettingsContainer.Alpha == 1 ? 0 : 1,
                                                 Enabled = { Value = false },
                                                 Margin = new MarginPadding
@@ -245,7 +245,7 @@ namespace osu.Game.Overlays.Mods
                                             CloseButton = new TriangleButton
                                             {
                                                 Width = 180,
-                                                Text = "Close",
+                                                Text = "关闭",
                                                 Action = Hide,
                                                 Margin = new MarginPadding
                                                 {
@@ -254,7 +254,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new OsuSpriteText
                                             {
-                                                Text = @"Score Multiplier:",
+                                                Text = @"分数倍率:",
                                                 Font = OsuFont.GetFont(size: 30),
                                                 Margin = new MarginPadding
                                                 {
@@ -272,7 +272,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             UnrankedLabel = new OsuSpriteText
                                             {
-                                                Text = @"(Unranked)",
+                                                Text = @"(不计入排名)",
                                                 Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {

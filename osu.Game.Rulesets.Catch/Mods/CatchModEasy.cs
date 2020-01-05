@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModEasy : ModEasy
     {
-        public override string Description => @"Larger fruits, more forgiving HP drain, less accuracy required, and three lives!";
+        public override string Description => @"更大的水果,更少的扣血,更低的准确率要求,并且拥有额外生命!";
     }
 }

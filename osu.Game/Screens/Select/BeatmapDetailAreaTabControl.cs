@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Text = @"Selected Mods",
+                    Text = @"已选择的Mods",
                     Alpha = 0,
                 },
             };
@@ -87,10 +87,15 @@ namespace osu.Game.Screens.Select
 
     public enum BeatmapDetailTab
     {
+        [System.ComponentModel.Description("详细信息")]
         Details,
+        [System.ComponentModel.Description("本地排行")]
         Local,
+        [System.ComponentModel.Description("国内/地区内排行")]
         Country,
+        [System.ComponentModel.Description("全球排行")]
         Global,
+        [System.ComponentModel.Description("好友排行")]
         Friends
     }
 }

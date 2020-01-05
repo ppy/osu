@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 {
     public class AudioDevicesSettings : SettingsSubsection
     {
-        protected override string Header => "Devices";
+        protected override string Header => "输出设备";
 
         private AudioManager audio;
         private SettingsDropdown<string> dropdown;
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             private class AudioDeviceDropdownControl : DropdownControl
             {
                 protected override string GenerateItemText(string item)
-                    => string.IsNullOrEmpty(item) ? "Default" : base.GenerateItemText(item);
+                    => string.IsNullOrEmpty(item) ? "默认" : base.GenerateItemText(item);
             }
         }
     }

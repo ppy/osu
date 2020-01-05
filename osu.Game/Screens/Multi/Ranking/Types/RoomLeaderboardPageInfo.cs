@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi.Ranking.Types
 
         public IconUsage Icon => FontAwesome.Solid.Users;
 
-        public string Name => "Room Leaderboard";
+        public string Name => "房间排行榜";
 
         public virtual ResultsPage CreatePage() => new RoomLeaderboardPage(score, beatmap);
     }

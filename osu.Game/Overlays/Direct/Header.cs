@@ -28,15 +28,16 @@ namespace osu.Game.Overlays.Direct
 
     public enum DirectTab
     {
+        [Description("搜素")]
         Search,
 
-        [Description("Newest Maps")]
+        [Description("最近Ranked的谱面")]
         NewestMaps = DirectSortCriteria.Ranked,
 
-        [Description("Top Rated")]
+        [Description("得分最高的谱面")]
         TopRated = DirectSortCriteria.Rating,
 
-        [Description("Most Played")]
+        [Description("游玩最多的谱面")]
         MostPlayed = DirectSortCriteria.Plays,
     }
 }

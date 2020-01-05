@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
 {
     public class WebSettings : SettingsSubsection
     {
-        protected override string Header => "Web";
+        protected override string Header => "网络";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Warn about opening external links",
+                    LabelText = "再打开外部链接前确认",
                     Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
             };

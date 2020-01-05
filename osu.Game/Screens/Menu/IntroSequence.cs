@@ -101,9 +101,9 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = "welcome",
+                    Text = "欢迎来到osu!",
                     Padding = new MarginPadding { Bottom = 10 },
-                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
+                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 80),
                     Alpha = 0,
                     Spacing = new Vector2(5),
                 },

@@ -164,15 +164,15 @@ namespace osu.Game.Screens
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "is not yet ready for use!",
-                                        Font = OsuFont.GetFont(size: 20),
+                                        Text = "尚未准备好投入使用!",
+                                        Font = OsuFont.GetFont(size: 24),
                                     },
                                     new OsuSpriteText
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
-                                        Text = "please check back a bit later.",
-                                        Font = OsuFont.GetFont(size: 14),
+                                        Text = "请稍后再来看看吧~",
+                                        Font = OsuFont.GetFont(size: 18),
                                     },
                                 }
                             },

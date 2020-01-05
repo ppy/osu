@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Changelog
                 text = new LinkFlowContainer(t =>
                 {
                     t.Colour = colours.PinkLighter;
-                    t.Font = OsuFont.Default.With(size: 14);
+                    t.Font = OsuFont.Default.With(size: 18);
                 })
                 {
                     Padding = new MarginPadding(20),
@@ -61,19 +61,19 @@ namespace osu.Game.Overlays.Changelog
                 }
             };
 
-            text.AddParagraph("Got feedback?", t =>
+            text.AddParagraph("想要反馈问题?", t =>
             {
                 t.Colour = Color4.White;
                 t.Font = OsuFont.Default.With(italics: true, size: 20);
                 t.Padding = new MarginPadding { Bottom = 20 };
             });
 
-            text.AddParagraph("We would love to hear what you think of this update! ");
+            text.AddParagraph("我们很想知道你如何看待这次更新! ");
             text.AddIcon(FontAwesome.Regular.GrinHearts);
 
-            text.AddParagraph("Please visit the ");
-            text.AddLink("web version", $"{build.Url}#comments");
-            text.AddText(" of this changelog to leave any comments.");
+            text.AddParagraph("请访问");
+            text.AddLink("这个网站", $"{build.Url}#comments");
+            text.AddText("来进行留言");
         }
     }
 }

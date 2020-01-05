@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Timing
             {
                 multiplier = new SettingsSlider<double>
                 {
-                    LabelText = "Speed Multiplier",
+                    LabelText = "速度倍率",
                     Bindable = new DifficultyControlPoint().SpeedMultiplierBindable,
                     RelativeSizeAxes = Axes.X,
                 }

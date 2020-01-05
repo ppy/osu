@@ -41,7 +41,7 @@ namespace osu.Desktop
             }
             catch (Exception)
             {
-                Logger.Log("Could not find a stable install", LoggingTarget.Runtime, LogLevel.Important);
+                Logger.Log("找不到osu!stable的安装目录,因此无法从本机导入", LoggingTarget.Runtime, LogLevel.Important);
             }
 
             return null;

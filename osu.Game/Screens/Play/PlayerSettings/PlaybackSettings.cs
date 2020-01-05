@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
     {
         private const int padding = 10;
 
-        protected override string Title => @"playback";
+        protected override string Title => @"播放";
 
         public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
         {
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            Text = "Playback speed",
+                            Text = "播放速度",
                         },
                         multiplierText = new OsuSpriteText
                         {

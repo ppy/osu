@@ -30,15 +30,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             switch (scope)
             {
                 default:
-                    text.Text = @"No scores have been set yet. Maybe you can be the first!";
+                    text.Text = @"还没有成绩呢... 考虑当个第一名owo?";
                     break;
 
                 case BeatmapLeaderboardScope.Friend:
-                    text.Text = @"None of your friends have set a score on this map yet.";
+                    text.Text = @"你的好友们还没玩过这张图> <";
                     break;
 
                 case BeatmapLeaderboardScope.Country:
-                    text.Text = @"No one from your country has set a score on this map yet.";
+                    text.Text = @"你所在的国家/区域内好像只有你有这张图> <.";
                     break;
             }
         }

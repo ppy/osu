@@ -45,11 +45,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             var text = new OsuSpriteText
             {
-                Text = $"accuracy: {Score.Accuracy:P2}",
+                Text = $"准确率: {Score.Accuracy:P2}",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
-                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
+                Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular, italics: true)//第一次翻译时调整
             };
 
             RightFlowContainer.Insert(1, text);

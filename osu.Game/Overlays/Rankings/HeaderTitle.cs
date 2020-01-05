@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Rankings
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Light),
-                        Text = @"Ranking"
+                        Text = @"排名"
                     }
                 }
             };

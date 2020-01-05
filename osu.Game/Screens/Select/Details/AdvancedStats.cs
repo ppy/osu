@@ -54,10 +54,10 @@ namespace osu.Game.Screens.Select.Details
                 Children = new[]
                 {
                     firstValue = new StatisticRow(), //circle size/key amount
-                    hpDrain = new StatisticRow { Title = "HP Drain" },
-                    accuracy = new StatisticRow { Title = "Accuracy" },
-                    approachRate = new StatisticRow { Title = "Approach Rate" },
-                    starDifficulty = new StatisticRow(10, true) { Title = "Star Difficulty" },
+                    hpDrain = new StatisticRow { Title = "掉血速度" },
+                    accuracy = new StatisticRow { Title = "整体难度" },
+                    approachRate = new StatisticRow { Title = "缩圈速度" },
+                    starDifficulty = new StatisticRow(10, true) { Title = "难度星级" },
                 },
             };
         }
@@ -121,12 +121,12 @@ namespace osu.Game.Screens.Select.Details
             //mania specific
             if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
             {
-                firstValue.Title = "Key Amount";
+                firstValue.Title = "键位数量";
                 firstValue.Value = ((int)MathF.Round(baseDifficulty?.CircleSize ?? 0), (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0));
             }
             else
             {
-                firstValue.Title = "Circle Size";
+                firstValue.Title = "圆圈大小";
                 firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
             }
 
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Select.Details
                         AutoSizeAxes = Axes.Y,
                         Child = name = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 17)
                         },
                     },
                     bar = new Bar
@@ -234,7 +234,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 17)
                         },
                     },
                 };

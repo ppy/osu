@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        public override string TooltipText => "send message";
+        public override string TooltipText => "发送消息";
 
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }

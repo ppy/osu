@@ -9,7 +9,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 {
     public class InputSettings : PlayerSettingsGroup
     {
-        protected override string Title => "Input settings";
+        protected override string Title => "输入设置";
 
         private readonly PlayerCheckbox mouseButtonsCheckbox;
 
@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             {
                 mouseButtonsCheckbox = new PlayerCheckbox
                 {
-                    LabelText = "Disable mouse buttons"
+                    LabelText = "禁用鼠标按键"
                 }
             };
         }

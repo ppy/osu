@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Mods.Sections
 
         public FunSection()
         {
-            Header = @"Fun";
+            Header = @"娱乐";
         }
     }
 }

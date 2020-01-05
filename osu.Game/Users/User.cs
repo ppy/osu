@@ -217,16 +217,16 @@ namespace osu.Game.Users
 
         public enum PlayStyle
         {
-            [Description("Keyboard")]
+            [Description("键盘")]
             Keyboard,
 
-            [Description("Mouse")]
+            [Description("鼠标")]
             Mouse,
 
-            [Description("Tablet")]
+            [Description("数位板")]
             Tablet,
 
-            [Description("Touch Screen")]
+            [Description("触摸屏")]
             Touch,
         }
     }

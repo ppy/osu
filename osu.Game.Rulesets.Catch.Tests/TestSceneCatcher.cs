@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                     },
                     new OsuSpriteText
                     {
-                        Text = "custom"
+                        Text = "自定义"
                     }
                 };
             }

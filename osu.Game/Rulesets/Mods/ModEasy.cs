@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
 
-        [SettingSource("Extra Lives", "Number of extra lives")]
+        [SettingSource("复活次数", "Number of extra lives")]
         public Bindable<int> Retries { get; } = new BindableInt(2)
         {
             MinValue = 0,

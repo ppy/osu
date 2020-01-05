@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                             new TextFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Padding = new MarginPadding { Horizontal = 15 },
-                                Text = "beat snap divisor",
+                                Text = "节拍细分",
                                 RelativeSizeAxes = Axes.X,
                                 TextAnchor = Anchor.TopCentre
                             },

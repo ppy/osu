@@ -74,12 +74,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             var columns = new List<TableColumn>
             {
-                new TableColumn("rank", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("排名", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
-                new TableColumn("score", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
-                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
+                new TableColumn("分数", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("准确率", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("玩家", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
+                new TableColumn("最大连击", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
             };
 
             foreach (var statistic in score.Statistics)
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black);
+                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Black);
             }
         }
     }

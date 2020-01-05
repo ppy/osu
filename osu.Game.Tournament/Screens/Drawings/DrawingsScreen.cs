@@ -131,21 +131,21 @@ namespace osu.Game.Tournament.Screens.Drawings
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Begin random",
+                        Text = "开始随机选择",
                         Action = teamsContainer.StartScrolling,
                     },
                     new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Stop random",
+                        Text = "停止随机选择",
                         Action = teamsContainer.StopScrolling,
                     },
                     new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Reload",
+                        Text = "重载",
                         Action = reloadTeams
                     },
                     new ControlPanel.Spacer(),
@@ -153,7 +153,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     {
                         RelativeSizeAxes = Axes.X,
 
-                        Text = "Reset",
+                        Text = "重置",
                         Action = () => reset()
                     }
                 }

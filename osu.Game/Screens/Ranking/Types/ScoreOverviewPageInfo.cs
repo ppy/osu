@@ -12,7 +12,7 @@ namespace osu.Game.Screens.Ranking.Types
     {
         public IconUsage Icon => FontAwesome.Solid.Asterisk;
 
-        public string Name => "Overview";
+        public string Name => "成绩信息";
         private readonly ScoreInfo score;
         private readonly WorkingBeatmap beatmap;
 

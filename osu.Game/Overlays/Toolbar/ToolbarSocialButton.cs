@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarSocialButton()
         {
             Icon = FontAwesome.Solid.Users;
+            TooltipMain = "社交";
+            TooltipSub = "其实是排行榜(";
         }
 
         [BackgroundDependencyLoader(true)]

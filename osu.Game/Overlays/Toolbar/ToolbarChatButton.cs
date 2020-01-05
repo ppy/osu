@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarChatButton()
         {
             SetIcon(FontAwesome.Solid.Comments);
+            TooltipMain = "聊天";
+            TooltipSub = "在这里和全球各地的人们聊天";
         }
 
         [BackgroundDependencyLoader(true)]

@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Padding = new MarginPadding { Bottom = 10 },
-                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
+                        Font = OsuFont.GetFont(weight: FontWeight.Light, size: 60),
                         Alpha = 1,
                         Spacing = new Vector2(5),
                     },
@@ -179,17 +179,17 @@ namespace osu.Game.Screens.Menu
                 using (BeginAbsoluteSequence(0, true))
                 {
                     using (BeginDelayedSequence(text_1, true))
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "wel");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = "欢");
 
                     using (BeginDelayedSequence(text_2, true))
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "welcome");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = "欢迎");
 
                     using (BeginDelayedSequence(text_3, true))
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = "欢迎来到");
 
                     using (BeginDelayedSequence(text_4, true))
                     {
-                        welcomeText.FadeIn().OnComplete(t => t.Text = "welcome to osu!");
+                        welcomeText.FadeIn().OnComplete(t => t.Text = "欢迎来到osu!");
                         welcomeText.TransformTo(nameof(welcomeText.Spacing), new Vector2(50, 0), 5000);
                     }
 

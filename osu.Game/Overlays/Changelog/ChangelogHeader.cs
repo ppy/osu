@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Changelog
 
         public UpdateStreamBadgeArea Streams;
 
-        private const string listing_string = "listing";
+        private const string listing_string = "列表";
 
         public ChangelogHeader()
         {
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays.Changelog
 
             public ChangelogHeaderTitle()
             {
-                Title = "changelog";
+                Title = "变更日志";
                 Version = null;
             }
 

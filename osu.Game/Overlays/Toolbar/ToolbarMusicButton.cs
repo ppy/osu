@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarMusicButton()
         {
             Icon = FontAwesome.Solid.Music;
+            TooltipMain = "音乐";
+            TooltipSub = "在这里播放音乐";
         }
 
         [BackgroundDependencyLoader(true)]

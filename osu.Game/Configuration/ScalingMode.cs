@@ -7,11 +7,14 @@ namespace osu.Game.Configuration
 {
     public enum ScalingMode
     {
+        [Description("关")]
         Off,
+        [Description("所有元素")]
         Everything,
 
-        [Description("Excluding overlays")]
+        [Description("Overlay除外")]
         ExcludeOverlays,
+        [Description("仅游戏内界面")]
         Gameplay,
     }
 }

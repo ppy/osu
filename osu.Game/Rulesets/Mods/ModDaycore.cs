@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Daycore";
         public override string Acronym => "DC";
         public override IconUsage Icon => FontAwesome.Solid.Question;
-        public override string Description => "Whoaaaaa...";
+        public override string Description => "哇~~~~~~~~~~哦~~~~~~~~~~";
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);
         private readonly BindableNumber<double> freqAdjust = new BindableDouble(1);

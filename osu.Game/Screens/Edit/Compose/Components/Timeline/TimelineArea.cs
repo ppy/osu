@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
+                                            waveformCheckbox = new OsuCheckbox { LabelText = "波形图" }
                                         }
                                     }
                                 }

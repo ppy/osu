@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Wind Down";
         public override string Acronym => "WD";
-        public override string Description => "Sloooow doooown...";
+        public override string Description => "越~来~~越~~~慢~~~~";
         public override IconUsage Icon => FontAwesome.Solid.ChevronCircleDown;
         public override double ScoreMultiplier => 1.0;
 

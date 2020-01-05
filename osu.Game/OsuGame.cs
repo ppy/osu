@@ -247,7 +247,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"This link type is not yet supported!",
+                        Text = @"该链接类型尚不支持!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -455,7 +455,7 @@ namespace osu.Game
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = $"Click here to {taskName}",
+                    Text = $"点击这里来 {taskName}",
                     Activated = () =>
                     {
                         performFromMainMenu(action, taskName, targetScreen, true);
@@ -737,7 +737,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
+                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\n该错误已被自动反馈给开发人员" : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -745,7 +745,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
-                        Text = "Subsequent messages have been logged. Click to view log files.",
+                        Text = "详细信息已记录. 点击这里来查看日志.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();

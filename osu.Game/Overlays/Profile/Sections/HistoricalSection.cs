@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public class HistoricalSection : ProfileSection
     {
-        public override string Title => "Historical";
+        public override string Title => "历史游玩记录";
 
         public override string Identifier => "historical";
 
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Children = new Drawable[]
             {
                 new PaginatedMostPlayedBeatmapContainer(User),
-                new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)", "No performance records. :("),
+                new PaginatedScoreContainer(ScoreType.Recent, User, "最近24小时游玩", "啥都没玩(´・ω・`)"),
             };
         }
     }

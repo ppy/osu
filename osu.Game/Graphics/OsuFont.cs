@@ -10,7 +10,7 @@ namespace osu.Game.Graphics
         /// <summary>
         /// The default font size.
         /// </summary>
-        public const float DEFAULT_FONT_SIZE = 16;
+        public const float DEFAULT_FONT_SIZE = 19;
 
         /// <summary>
         /// The default font.

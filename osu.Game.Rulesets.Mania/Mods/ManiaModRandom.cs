@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override string Acronym => "RD";
         public override ModType Type => ModType.Conversion;
         public override IconUsage Icon => OsuIcon.Dice;
-        public override string Description => @"Shuffle around the keys!";
+        public override string Description => @"随机排列所有物件!";
         public override double ScoreMultiplier => 1;
 
         public void ApplyToBeatmap(IBeatmap beatmap)

@@ -64,8 +64,8 @@ namespace osu.Game.Overlays
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Y = 15,
-                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                Text = @"back",
+                                Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),//第一次翻译时修改
+                                Text = @"返回",
                             },
                         }
                     }

@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Cinema";
         public override string Acronym => "CN";
         public override IconUsage Icon => OsuIcon.ModCinema;
-        public override string Description => "Watch the video without visual distractions.";
+        public override string Description => "剧院模式";
 
         public void ApplyToHUD(HUDOverlay overlay)
         {

@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             }
 
             rankText.AddText(name + "\n", white);
-            rankText.AddText("You are placed ", gray);
+            rankText.AddText("你在房间内排第", gray);
 
             int index = scores.IndexOf(new APIUserScoreAggregate { User = Score.User }, new FuncEqualityComparer<APIUserScoreAggregate>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
 
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                 s.Colour = colours.YellowDark;
             });
 
-            rankText.AddText("in the room!", gray);
+            rankText.AddText("名!", gray);
         }
 
         protected virtual MatchLeaderboard CreateLeaderboard() => new ResultsMatchLeaderboard();

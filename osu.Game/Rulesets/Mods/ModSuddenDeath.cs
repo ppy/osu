@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "SD";
         public override IconUsage Icon => OsuIcon.ModSuddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "Miss and fail.";
+        public override string Description => "不全连,便重试";
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };

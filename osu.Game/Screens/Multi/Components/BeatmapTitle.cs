@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
 
             if (beatmap == null)
             {
-                textFlow.AddText("No beatmap selected", s =>
+                textFlow.AddText("还没有选择谱面", s =>
                 {
                     s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;

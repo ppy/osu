@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Multi.Lounge
 {
     public class LoungeSubScreen : MultiplayerSubScreen
     {
-        public override string Title => "Lounge";
+        public override string Title => "大厅";
 
         protected readonly FilterControl Filter;
 

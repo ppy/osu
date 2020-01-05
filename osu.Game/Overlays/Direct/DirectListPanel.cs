@@ -179,7 +179,7 @@ namespace osu.Game.Overlays.Direct
                                         }.With(d =>
                                         {
                                             d.AutoSizeAxes = Axes.Both;
-                                            d.AddText("mapped by ");
+                                            d.AddText("作图者 ");
                                             d.AddUserLink(SetInfo.Metadata.Author);
                                         }),
                                         new OsuSpriteText

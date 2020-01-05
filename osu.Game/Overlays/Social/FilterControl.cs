@@ -5,6 +5,7 @@ using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
+using System.ComponentModel;
 
 namespace osu.Game.Overlays.Social
 {
@@ -22,8 +23,11 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialSortCriteria
     {
+        [Description("排名")]
         Rank,
+        [Description("名称")]
         Name,
+        [Description("位置")]
         Location,
         //[Description("Time Zone")]
         //TimeZone,

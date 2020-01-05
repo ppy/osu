@@ -99,31 +99,31 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (activity.Type)
             {
                 case RecentActivityType.Achievement:
-                    message = $"{userLinkTemplate()} unlocked the {activity.Achievement.Name} medal!";
+                    message = $"{userLinkTemplate()} 解锁了 {activity.Achievement.Name} 奖章!";
                     break;
 
                 case RecentActivityType.BeatmapPlaycount:
-                    message = $"{beatmapLinkTemplate()} has been played {activity.Count} times!";
+                    message = $"{beatmapLinkTemplate()} 已被游玩 {activity.Count} 次!";
                     break;
 
                 case RecentActivityType.BeatmapsetApprove:
-                    message = $"{beatmapsetLinkTemplate()} has been {activity.Approval.ToString().ToLowerInvariant()}!";
+                    message = $"{beatmapsetLinkTemplate()} 已被 {activity.Approval.ToString().ToLowerInvariant()}!";
                     break;
 
                 case RecentActivityType.BeatmapsetDelete:
-                    message = $"{beatmapsetLinkTemplate()} has been deleted.";
+                    message = $"{beatmapsetLinkTemplate()} 已被删除.";
                     break;
 
                 case RecentActivityType.BeatmapsetRevive:
-                    message = $"{beatmapsetLinkTemplate()} has been revived from eternal slumber by {userLinkTemplate()}.";
+                    message = $"{beatmapsetLinkTemplate()} 被 {userLinkTemplate()} 从永恒的沉睡中换线.";
                     break;
 
                 case RecentActivityType.BeatmapsetUpdate:
-                    message = $"{userLinkTemplate()} has updated the beatmap {beatmapsetLinkTemplate()}!";
+                    message = $"{userLinkTemplate()} 更新了谱面 {beatmapsetLinkTemplate()}!";
                     break;
 
                 case RecentActivityType.BeatmapsetUpload:
-                    message = $"{userLinkTemplate()} has submitted a new beatmap {beatmapsetLinkTemplate()}!";
+                    message = $"{userLinkTemplate()} 上传了一张新的谱面 :{beatmapsetLinkTemplate()}!";
                     break;
 
                 case RecentActivityType.Medal:
@@ -132,27 +132,27 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
 
                 case RecentActivityType.Rank:
-                    message = $"{userLinkTemplate()} achieved rank #{activity.Rank} on {beatmapLinkTemplate()} ({activity.Mode}!)";
+                    message = $"{userLinkTemplate()} 在 {beatmapLinkTemplate()} ({activity.Mode}) 上获得了 #{activity.Rank} 名!";
                     break;
 
                 case RecentActivityType.RankLost:
-                    message = $"{userLinkTemplate()} has lost first place on {beatmapLinkTemplate()} ({activity.Mode}!)";
+                    message = $"{userLinkTemplate()} 在 {beatmapLinkTemplate()} ({activity.Mode}) 上失去了第一名 !";
                     break;
 
                 case RecentActivityType.UserSupportAgain:
-                    message = $"{userLinkTemplate()} has once again chosen to support osu! - thanks for your generosity!";
+                    message = $"{userLinkTemplate()} 再次选择支持osu! - 感谢您的慷慨!";
                     break;
 
                 case RecentActivityType.UserSupportFirst:
-                    message = $"{userLinkTemplate()} has become an osu!supporter - thanks for your generosity!";
+                    message = $"{userLinkTemplate()} 选择支持osu! - 感谢您的慷慨!";
                     break;
 
                 case RecentActivityType.UserSupportGift:
-                    message = $"{userLinkTemplate()} has received the gift of osu!supporter!";
+                    message = $"{userLinkTemplate()} 收到了一份osu!supporter礼物!";
                     break;
 
                 case RecentActivityType.UsernameChange:
-                    message = $"{activity.User?.PreviousUsername} has changed their username to {userLinkTemplate()}!";
+                    message = $"{activity.User?.PreviousUsername} 改名为 {userLinkTemplate()}!";
                     break;
 
                 default:

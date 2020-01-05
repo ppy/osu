@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
-                Text = @"back",
+                Text = @"返回",
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
             };

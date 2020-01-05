@@ -127,9 +127,9 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection("Description"),
-                                            source = new MetadataSection("Source"),
-                                            tags = new MetadataSection("Tags"),
+                                            description = new MetadataSection("难度描述"),
+                                            source = new MetadataSection("来源"),
+                                            tags = new MetadataSection("标签"),
                                         },
                                     },
                                 },
@@ -144,8 +144,8 @@ namespace osu.Game.Screens.Select
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = "Points of Failure",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                    Text = "失败点",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),//第一次翻译时修改
                                 },
                                 failRetryGraph = new FailRetryGraph
                                 {
@@ -321,7 +321,7 @@ namespace osu.Game.Screens.Select
                             Child = new OsuSpriteText
                             {
                                 Text = title,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                             },
                         },
                     },
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Select
 
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 18))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

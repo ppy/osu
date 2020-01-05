@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class SongSelectSettings : SettingsSubsection
     {
-        protected override string Header => "Song Select";
+        protected override string Header => "歌曲选择";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
@@ -19,31 +19,31 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Right mouse drag to absolute scroll",
+                    LabelText = "右键鼠标来快速定位",
                     Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show converted beatmaps",
+                    LabelText = "显示转换过的谱面",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarSlider>
                 {
-                    LabelText = "Display beatmaps from",
+                    LabelText = "筛选谱面星级,从",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsSlider<double, StarSlider>
                 {
-                    LabelText = "up to",
+                    LabelText = "到",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
-                    LabelText = "Random selection algorithm",
+                    LabelText = "随机选择算法",
                     Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };

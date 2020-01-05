@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         private const float panel_padding = 10f;
         private readonly BeatmapSetType type;
 
-        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
+        public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "目前..还没有(´・ω・`)")
             : base(user, header, missing)
         {
             this.type = type;

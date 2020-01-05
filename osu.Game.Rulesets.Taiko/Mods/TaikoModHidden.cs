@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModHidden : ModHidden
     {
-        public override string Description => @"Beats fade out before you hit them!";
+        public override string Description => @"音符会在到达击打位置前逐渐消失!";
         public override double ScoreMultiplier => 1.06;
         public override bool HasImplementation => false;
     }

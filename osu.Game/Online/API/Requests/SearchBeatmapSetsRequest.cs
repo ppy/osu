@@ -32,20 +32,26 @@ namespace osu.Game.Online.API.Requests
 
     public enum BeatmapSearchCategory
     {
+        [Description("所有谱面")]
         Any,
 
-        [Description("Has Leaderboard")]
+        [Description("拥有排行榜的谱面")]
         Leaderboard,
+        [Description("计入排行的谱面")]
         Ranked,
+        [Description("质量合格的谱面")]
         Qualified,
+        [Description("Loved谱面")]
         Loved,
+        [Description("喜欢的谱面")]
         Favourites,
 
-        [Description("Pending & WIP")]
+        [Description("审核中 和 制作中的谱面")]
         Pending,
+        [Description("坟图")]
         Graveyard,
 
-        [Description("My Maps")]
+        [Description("我制作的谱面")]
         Mine,
     }
 }

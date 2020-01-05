@@ -49,7 +49,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             };
 
             name = round.Name.GetBoundCopy();
-            name.BindValueChanged(n => textName.Text = ((losers ? "Losers " : "") + round.Name).ToUpper(), true);
+            name.BindValueChanged(n => textName.Text = ((losers ? "失败者" : "") + round.Name).ToUpper(), true);
 
             description = round.Description.GetBoundCopy();
             description.BindValueChanged(n => textDescription.Text = round.Description.Value?.ToUpper(), true);

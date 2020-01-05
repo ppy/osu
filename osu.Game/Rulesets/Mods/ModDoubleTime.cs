@@ -16,12 +16,12 @@ namespace osu.Game.Rulesets.Mods
         public override string Acronym => "DT";
         public override IconUsage Icon => OsuIcon.ModDoubletime;
         public override ModType Type => ModType.DifficultyIncrease;
-        public override string Description => "Zoooooooooom...";
+        public override string Description => "加速>>>>>>>>>>";
         public override bool Ranked => true;
 
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(ModHalfTime)).ToArray();
 
-        [SettingSource("Speed increase", "The actual increase to apply")]
+        [SettingSource("速度调整", "The actual increase to apply")]
         public override BindableNumber<double> SpeedChange { get; } = new BindableDouble
         {
             MinValue = 1.01,

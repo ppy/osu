@@ -19,6 +19,7 @@ using osu.Game.Users;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Threading;
+using System.ComponentModel;
 
 namespace osu.Game.Overlays
 {
@@ -245,7 +246,9 @@ namespace osu.Game.Overlays
 
     public enum SortDirection
     {
+        [Description("正序")]
         Ascending,
+        [Description("倒序")]
         Descending
     }
 }

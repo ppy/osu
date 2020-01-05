@@ -39,11 +39,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             Children = new Drawable[]
             {
-                team1Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 1" },
-                team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "Team 2" },
-                roundDropdown = new SettingsRoundDropdown(ladderInfo.Rounds) { LabelText = "Round" },
+                team1Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "队伍1" },
+                team2Dropdown = new SettingsTeamDropdown(ladderInfo.Teams) { LabelText = "队伍2" },
+                roundDropdown = new SettingsRoundDropdown(ladderInfo.Rounds) { LabelText = "回合" },
                 losersCheckbox = new PlayerCheckbox { LabelText = "Losers Bracket" },
-                dateTimeBox = new DateTextBox { LabelText = "Match Time" },
+                dateTimeBox = new DateTextBox { LabelText = "比赛时间" },
             };
 
             editorInfo.Selected.ValueChanged += selection =>

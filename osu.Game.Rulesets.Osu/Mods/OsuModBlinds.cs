@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
-        public override string Description => "Play with blinds on your screen.";
+        public override string Description => "蒙上你的眼睛";
         public override string Acronym => "BL";
 
         public override IconUsage Icon => FontAwesome.Solid.Adjust;

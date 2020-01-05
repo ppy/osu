@@ -7,16 +7,16 @@ namespace osu.Game.Screens.Select.Leaderboards
 {
     public enum BeatmapLeaderboardScope
     {
-        [Description("Local Ranking")]
+        [Description("本地排行")]
         Local,
 
-        [Description("Country Ranking")]
+        [Description("国内/区内排行")]
         Country,
 
-        [Description("Global Ranking")]
+        [Description("全球排行")]
         Global,
 
-        [Description("Friend Ranking")]
+        [Description("好友排行")]
         Friend,
     }
 }

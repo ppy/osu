@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Dual Stages";
         public override string Acronym => "DS";
-        public override string Description => @"Double the stages, double the fun!";
+        public override string Description => @"双倍键位,双倍快乐!";
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
 

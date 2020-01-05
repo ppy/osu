@@ -10,7 +10,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
     public class RendererSettings : SettingsSubsection
     {
-        protected override string Header => "Renderer";
+        protected override string Header => "渲染";
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager config, OsuConfigManager osuConfig)
@@ -21,12 +21,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 // TODO: this needs to be a custom dropdown at some point
                 new SettingsEnumDropdown<FrameSync>
                 {
-                    LabelText = "Frame limiter",
+                    LabelText = "帧数限制",
                     Bindable = config.GetBindable<FrameSync>(FrameworkSetting.FrameSync)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Show FPS",
+                    LabelText = "显示FPS",
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };

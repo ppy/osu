@@ -35,11 +35,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 RightFlowContainer.Add(new OsuSpriteText
                 {
-                    Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
+                    Text = $"比重: {pp * weight:0}pp ({weight:P0})",
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Colour = colour.GrayA,
-                    Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
+                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular, italics: true)//第一次翻译时调整
                 });
             }
         }

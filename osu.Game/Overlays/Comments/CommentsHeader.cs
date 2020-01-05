@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Comments
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
                                     Font = OsuFont.GetFont(size: font_size),
-                                    Text = @"Sort by"
+                                    Text = @"分类规则:"
                                 },
                                 new SortTabControl
                                 {
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Comments
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: font_size),
-                            Text = @"Show deleted"
+                            Text = @"显示已删除的"
                         }
                     },
                 });

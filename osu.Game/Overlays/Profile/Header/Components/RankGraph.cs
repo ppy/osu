@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = "No recent plays",
+                    Text = "最近什么也没玩(°ー°〃)",
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
                 },
                 graph = new RankChartLineGraph
@@ -248,7 +248,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                     new OsuSpriteText
                                     {
                                         Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                        Text = "Global Ranking "
+                                        Text = "全球排行"
                                     },
                                     globalRankingText = new OsuSpriteText
                                     {

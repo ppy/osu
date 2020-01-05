@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "TC";
         public override IconUsage Icon => FontAwesome.Brands.SnapchatGhost;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Put your faith in the approach circles...";
+        public override string Description => "注意缩圈,意念打图";
         public override double ScoreMultiplier => 1;
 
         public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };

@@ -15,7 +15,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
         private readonly Circle line;
         private readonly OsuSpriteText title;
         private readonly OsuSpriteText content;
-
         public string Title
         {
             set => title.Text = value;
@@ -47,11 +46,11 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     },
                     title = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 14 : 12, weight: FontWeight.Bold)
+                        Font = OsuFont.GetFont(size: big ? 22 : 20, weight: FontWeight.Bold)
                     },
                     content = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: big ? 40 : 18, weight: FontWeight.Light)
+                        Font = OsuFont.GetFont(size: big ? 44 : 16, weight: FontWeight.Light)
                     },
                     new Container //Add a minimum size to the FillFlowContainer
                     {

@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Comments
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 20, italics: true),
-                        Text = @"Comments"
+                        Text = @"回复"
                     },
                     new CircularContainer
                     {

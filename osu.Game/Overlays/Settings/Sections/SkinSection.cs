@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections
     {
         private SkinSettingsDropdown skinDropdown;
 
-        public override string Header => "Skin";
+        public override string Header => "皮肤";
 
         public override IconUsage Icon => FontAwesome.Solid.PaintBrush;
 
@@ -37,29 +37,29 @@ namespace osu.Game.Overlays.Settings.Sections
                 skinDropdown = new SkinSettingsDropdown(),
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "Menu cursor size",
+                    LabelText = "菜单光标大小",
                     Bindable = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsSlider<float, SizeSlider>
                 {
-                    LabelText = "Gameplay cursor size",
+                    LabelText = "游戏内光标大小",
                     Bindable = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Adjust gameplay cursor size based on current beatmap",
+                    LabelText = "根据谱面调整光标大小",
                     Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Beatmap skins",
+                    LabelText = "使用谱面自带皮肤",
                     Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Beatmap hitsounds",
+                    LabelText = "使用谱面自带音效",
                     Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
             };

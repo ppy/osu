@@ -88,14 +88,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                             Children = new Drawable[]
                                             {
                                                 new MostPlayedBeatmapMetadataContainer(beatmap),
-                                                new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular))
+                                                new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular))
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Colour = colours.GreySeafoamLighter
                                                 }.With(d =>
                                                 {
-                                                    d.AddText("mapped by ");
+                                                    d.AddText("作图者: ");
                                                     d.AddUserLink(beatmap.Metadata.Author);
                                                 }),
                                             }
@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 },
                 new OsuSpriteText
                 {
-                    Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Text = "艺术家:" + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                     Font = OsuFont.GetFont(weight: FontWeight.Regular)
                 },
             };
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 
         private class PlayCountText : CompositeDrawable, IHasTooltip
         {
-            public string TooltipText => "times played";
+            public string TooltipText => "游玩次数";
 
             public PlayCountText(int playCount)
             {

@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Ranking.Types
 
         public IconUsage Icon => FontAwesome.Solid.User;
 
-        public string Name => @"Local Leaderboard";
+        public string Name => @"本地排行榜";
 
         public ResultsPage CreatePage() => new LocalLeaderboardPage(score, beatmap);
     }

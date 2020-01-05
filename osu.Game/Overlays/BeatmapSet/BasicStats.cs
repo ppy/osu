@@ -75,10 +75,10 @@ namespace osu.Game.Overlays.BeatmapSet
                 Direction = FillDirection.Horizontal,
                 Children = new[]
                 {
-                    length = new Statistic(FontAwesome.Regular.Clock, "Length") { Width = 0.25f },
+                    length = new Statistic(FontAwesome.Regular.Clock, "长度") { Width = 0.25f },
                     bpm = new Statistic(FontAwesome.Regular.Circle, "BPM") { Width = 0.25f },
-                    circleCount = new Statistic(FontAwesome.Regular.Circle, "Circle Count") { Width = 0.25f },
-                    sliderCount = new Statistic(FontAwesome.Regular.Circle, "Slider Count") { Width = 0.25f },
+                    circleCount = new Statistic(FontAwesome.Regular.Circle, "圆圈数量") { Width = 0.25f },
+                    sliderCount = new Statistic(FontAwesome.Regular.Circle, "滑条数量") { Width = 0.25f },
                 },
             };
         }

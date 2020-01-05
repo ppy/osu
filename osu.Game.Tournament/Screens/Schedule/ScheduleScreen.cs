@@ -118,7 +118,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                             new ScheduleMatch(match.NewValue, false),
                             new OsuSpriteText
                             {
-                                Text = "Start Time " + match.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
+                                Text = "开始时间" + match.NewValue.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
                                 Colour = Color4.Black,
                                 Font = OsuFont.GetFont(size: 20)
                             },

@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class GameplaySection : SettingsSection
     {
-        public override string Header => "Gameplay";
+        public override string Header => "游戏内";
         public override IconUsage Icon => FontAwesome.Regular.Circle;
 
         public GameplaySection()

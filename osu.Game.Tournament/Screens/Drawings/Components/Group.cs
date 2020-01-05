@@ -51,7 +51,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     Position = new Vector2(0, 7f),
 
                     Text = $"GROUP {name.ToUpperInvariant()}",
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 8),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 8),//第一次翻译时修改
                     Colour = new Color4(255, 204, 34, 255),
                 },
                 teams = new FillFlowContainer<GroupTeam>

@@ -106,13 +106,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         warmupButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Toggle warmup",
+                            Text = "切换热身",
                             Action = () => warmup.Toggle()
                         },
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Toggle chat",
+                            Text = "切换聊天",
                             Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
                         }
                     }

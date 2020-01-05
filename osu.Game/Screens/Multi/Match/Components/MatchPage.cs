@@ -18,11 +18,11 @@ namespace osu.Game.Screens.Multi.Match.Components
 
     public class SettingsMatchPage : MatchPage
     {
-        public override string Name => "Settings";
+        public override string Name => "设置";
     }
 
     public class RoomMatchPage : MatchPage
     {
-        public override string Name => "Room";
+        public override string Name => "房间";
     }
 }

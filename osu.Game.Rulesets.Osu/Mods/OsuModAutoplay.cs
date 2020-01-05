@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModAutoplay : ModAutoplay<OsuHitObject>
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).Append(typeof(OsuModSpunOut)).ToArray();
-
+        public override string Description => @"来看看精彩绝伦的自动表演.";
         public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "Autoplay" } },

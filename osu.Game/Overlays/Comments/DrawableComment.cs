@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         Alpha = comment.IsDeleted ? 1 : 0,
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                                        Text = @"deleted",
+                                                        Text = @"已删除",
                                                     }
                                                 }
                                             },
@@ -300,7 +300,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
-                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
+                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} 回复 ({count})";
             }
         }
 

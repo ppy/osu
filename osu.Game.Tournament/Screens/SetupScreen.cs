@@ -57,21 +57,21 @@ namespace osu.Game.Tournament.Screens
             {
                 new ActionableInfo
                 {
-                    Label = "Current IPC source",
-                    ButtonText = "Refresh",
+                    Label = "当前的IPC源",
+                    ButtonText = "刷新",
                     Action = () =>
                     {
                         fileBasedIpc?.LocateStableStorage();
                         reload();
                     },
-                    Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "Not found",
+                    Value = fileBasedIpc?.Storage?.GetFullPath(string.Empty) ?? "未找到",
                     Failing = fileBasedIpc?.Storage == null,
-                    Description = "The osu!stable installation which is currently being used as a data source. If a source is not found, make sure you have created an empty ipc.txt in your stable cutting-edge installation, and that it is registered as the default osu! install."
+                    Description = "将使用osu！stable安装目录作为IPC的数据源。 如果找不到源，请确保在osu!stable的最新cutting-edge中创建了一个空的ipc.txt，并将其注册为默认的osu！安装目录。"//谷歌翻译
                 },
                 new ActionableInfo
                 {
-                    Label = "Current User",
-                    ButtonText = "Change Login",
+                    Label = "当前用户",
+                    ButtonText = "更换用户",
                     Action = () =>
                     {
                         api.Logout();
@@ -89,12 +89,12 @@ namespace osu.Game.Tournament.Screens
                     },
                     Value = api?.LocalUser.Value.Username,
                     Failing = api?.IsLoggedIn != true,
-                    Description = "In order to access the API and display metadata, a login is required."
+                    Description = "要访问API并获取元数据, 你需要先登录."
                 },
                 new LabelledDropdown<RulesetInfo>
                 {
-                    Label = "Ruleset",
-                    Description = "Decides what stats are displayed and which ranks are retrieved for players",
+                    Label = "游戏模式",
+                    Description = "决定显示哪些统计数据以及为玩家检索哪些排名",//谷歌翻译
                     Items = rulesets.AvailableRulesets,
                     Current = LadderInfo.Ruleset,
                 },

@@ -61,15 +61,15 @@ namespace osu.Game.Screens.Multi.Components
                 var diffToNow = Date.Subtract(DateTimeOffset.Now);
 
                 if (diffToNow.TotalSeconds < -5)
-                    return $"Closed {base.Format()}";
+                    return $"关闭于 {base.Format()}";
 
                 if (diffToNow.TotalSeconds < 0)
-                    return "Closed";
+                    return "已关闭";
 
                 if (diffToNow.TotalSeconds < 5)
-                    return "Closing soon";
+                    return "即将关闭";
 
-                return $"Closing {base.Format()}";
+                return $"将关闭于 {base.Format()}";
             }
         }
 

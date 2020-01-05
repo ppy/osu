@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Mods.Sections
 
         public ConversionSection()
         {
-            Header = @"Conversion";
+            Header = @"自定义";
         }
     }
 }

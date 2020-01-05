@@ -201,7 +201,7 @@ namespace osu.Game.Screens.Ranking
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.TopCentre,
-                                Text = "max combo",
+                                Text = "最大连击",
                                 Font = OsuFont.GetFont(size: 20),
                                 RelativePositionAxes = Axes.X,
                                 X = 0.1f,
@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Ranking
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.TopCentre,
-                                Text = "accuracy",
+                                Text = "准确率",
                                 Font = OsuFont.GetFont(size: 20),
                                 RelativePositionAxes = Axes.X,
                                 X = 0.9f,

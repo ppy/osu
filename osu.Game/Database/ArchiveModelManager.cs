@@ -110,7 +110,7 @@ namespace osu.Game.Database
         protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
-            notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
+            notification.Text = $"对 {HumanisedModelName.Humanize(LetterCasing.Title)} 的导入正在进行中";
 
             int current = 0;
 
@@ -130,7 +130,7 @@ namespace osu.Game.Database
                             imported.Add(model);
                         current++;
 
-                        notification.Text = $"Imported {current} of {paths.Length} {HumanisedModelName}s";
+                        notification.Text = $"已导入 {current} / {paths.Length} {HumanisedModelName}";
                         notification.Progress = (float)current / paths.Length;
                     }
                 }
@@ -140,24 +140,24 @@ namespace osu.Game.Database
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})", LoggingTarget.Database);
+                    Logger.Error(e, $@"无法导入 ({Path.GetFileName(path)})", LoggingTarget.Database);
                 }
             }));
 
             if (imported.Count == 0)
             {
-                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import failed!";
+                notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} 导入失败!";
                 notification.State = ProgressNotificationState.Cancelled;
             }
             else
             {
                 notification.CompletionText = imported.Count == 1
-                    ? $"Imported {imported.First()}!"
-                    : $"Imported {imported.Count} {HumanisedModelName}s!";
+                    ? $"已导入 {imported.First()}!"
+                    : $"已导入 {imported.Count} {HumanisedModelName}!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
-                    notification.CompletionText += " Click to view.";
+                    notification.CompletionText += "点击这里查看";
                     notification.CompletionClickAction = () =>
                     {
                         PresentImport?.Invoke(imported);
@@ -397,8 +397,8 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                Text = $"Preparing to delete all {HumanisedModelName}s...",
-                CompletionText = $"Deleted all {HumanisedModelName}s!",
+                Text = $"正在准备删除所有的 {HumanisedModelName}...",
+                CompletionText = $"已删除所有的 {HumanisedModelName}!",
                 State = ProgressNotificationState.Active,
             };
 
@@ -413,7 +413,7 @@ namespace osu.Game.Database
                     // user requested abort
                     return;
 
-                notification.Text = $"Deleting {HumanisedModelName}s ({++i} of {items.Count})";
+                notification.Text = $"正在删除 {HumanisedModelName}: ({++i} / {items.Count})";
 
                 Delete(b);
 
@@ -433,7 +433,7 @@ namespace osu.Game.Database
 
             var notification = new ProgressNotification
             {
-                CompletionText = "Restored all deleted items!",
+                CompletionText = "已恢复所有被删除的皮肤/谱面/成绩!",
                 Progress = 0,
                 State = ProgressNotificationState.Active,
             };
@@ -449,7 +449,7 @@ namespace osu.Game.Database
                     // user requested abort
                     return;
 
-                notification.Text = $"Restoring ({++i} of {items.Count})";
+                notification.Text = $"正在恢复 ({++i} / {items.Count})";
 
                 Undelete(item);
 
@@ -542,14 +542,14 @@ namespace osu.Game.Database
 
             if (stable == null)
             {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                Logger.Log("找不到osu!stable的安装目录,因此导入无法进行!", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
             if (!stable.ExistsDirectory(ImportFromStablePath))
             {
                 // This handles situations like when the user does not have a Skins folder
-                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                Logger.Log($"在 {ImportFromStablePath} 下的osu!stable安装无效,因此导入无法进行!", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 

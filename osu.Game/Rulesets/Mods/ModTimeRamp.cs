@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
-        [SettingSource("Final rate", "The final speed to ramp to")]
+        [SettingSource("最高速度", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
 
         private double finalRateTime;

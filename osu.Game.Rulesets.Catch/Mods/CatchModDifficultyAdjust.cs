@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("Fruit Size", "Override a beatmap's set CS.")]
+        [SettingSource("水果大小", "Override a beatmap's set CS.")]
         public BindableNumber<float> CircleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,

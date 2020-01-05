@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Profile.Header
         private LinkFlowContainer bottomLinkContainer;
 
         private Color4 iconColour;
-
         public BottomHeaderContainer()
         {
             AutoSizeAxes = Axes.Y;
@@ -53,12 +52,12 @@ namespace osu.Game.Overlays.Profile.Header
                     Spacing = new Vector2(0, 10),
                     Children = new Drawable[]
                     {
-                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 16))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                         },
-                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 16))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -78,10 +77,10 @@ namespace osu.Game.Overlays.Profile.Header
             if (user == null) return;
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
-                topLinkContainer.AddText("Here since the beginning");
+                topLinkContainer.AddText("元老级玩家");
             else
             {
-                topLinkContainer.AddText("Joined ");
+                topLinkContainer.AddText("加入时间 ");
                 topLinkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
             }
 
@@ -89,12 +88,12 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user.IsOnline)
             {
-                topLinkContainer.AddText("Currently online");
+                topLinkContainer.AddText("当前在线");
                 addSpacer(topLinkContainer);
             }
             else if (user.LastVisit.HasValue)
             {
-                topLinkContainer.AddText("Last seen ");
+                topLinkContainer.AddText("上次在线");
                 topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
 
                 addSpacer(topLinkContainer);
@@ -102,14 +101,14 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user.PlayStyles?.Length > 0)
             {
-                topLinkContainer.AddText("Plays with ");
+                topLinkContainer.AddText("常用设备:");
                 topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
 
                 addSpacer(topLinkContainer);
             }
 
-            topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddText("发表了");
+            topLinkContainer.AddLink($@"{user.PostCount:#,##0} 篇论坛帖子", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtcol = user.Website;
 

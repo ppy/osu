@@ -25,6 +25,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         private readonly string[] defaultChannels =
         {
+            @"#chinese",
             @"#lazer",
             @"#osu",
             @"#lobby"
@@ -206,7 +207,7 @@ namespace osu.Game.Online.Chat
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
+                        target.AddNewMessages(new ErrorMessage("用法: /me [动作]"));
                         break;
                     }
 
@@ -216,7 +217,7 @@ namespace osu.Game.Online.Chat
                 case "join":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
+                        target.AddNewMessages(new ErrorMessage("用法: /join [频道]"));
                         break;
                     }
 
@@ -224,7 +225,7 @@ namespace osu.Game.Online.Chat
 
                     if (channel == null)
                     {
-                        target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
+                        target.AddNewMessages(new ErrorMessage($"频道 '{content}' 未找到."));
                         break;
                     }
 
@@ -233,11 +234,11 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
+                    target.AddNewMessages(new InfoMessage("当前支持的指令: /help, /me [动作], /join [频道]"));
                     break;
 
                 default:
-                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
+                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" 尚未支持! 请输入/help查看帮助"));
                     break;
             }
         }

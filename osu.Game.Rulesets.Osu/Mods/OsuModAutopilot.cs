@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Acronym => "AP";
         public override IconUsage Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
-        public override string Description => @"Automatic cursor movement - just follow the rhythm.";
+        public override string Description => @"跟着节奏点就好,无需移动光标.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModSpunOut), typeof(ModRelax), typeof(ModSuddenDeath), typeof(ModNoFail), typeof(ModAutoplay) };
 

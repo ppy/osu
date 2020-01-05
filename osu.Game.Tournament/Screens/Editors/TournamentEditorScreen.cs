@@ -58,13 +58,13 @@ namespace osu.Game.Tournament.Screens.Editors
                         new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Add new",
+                            Text = "添加新的",
                             Action = () => Storage.Add(new TModel())
                         },
                         new DangerousSettingsButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Text = "Clear all",
+                            Text = "清除所有",
                             Action = Storage.Clear
                         },
                     }

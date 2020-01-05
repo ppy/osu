@@ -11,8 +11,8 @@ namespace osu.Game.Screens.Select
     {
         public ImportFromStablePopup(Action importFromStable)
         {
-            HeaderText = @"You have no beatmaps!";
-            BodyText = "An existing copy of osu! was found, though.\nWould you like to import your beatmaps, skins and scores?";
+            HeaderText = @"你还没有谱面OAO!";
+            BodyText = "但是我们发现了这台机器上有另一个osu!已被安装\n是否要现在导入所有的皮肤/谱面和成绩?";
 
             Icon = FontAwesome.Solid.Plane;
 
@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Select
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"Yes please!",
+                    Text = @"是的,请立即开始!",
                     Action = importFromStable
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"No, I'd like to start from scratch",
+                    Text = @"不了,我更喜欢从头开始",
                 },
             };
         }

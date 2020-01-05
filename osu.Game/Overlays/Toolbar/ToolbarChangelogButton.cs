@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Toolbar
         public ToolbarChangelogButton()
         {
             SetIcon(FontAwesome.Solid.Bullhorn);
+            TooltipMain = "变更日志";
+            TooltipSub = "在这里查看变更日志";
         }
 
         [BackgroundDependencyLoader(true)]

@@ -8,7 +8,7 @@ namespace osu.Game.Online.Multiplayer.GameTypes
 {
     public class GameTypeVersus : GameType
     {
-        public override string Name => "Versus";
+        public override string Name => "对抗";
 
         public override Drawable GetIcon(OsuColour colours, float size)
         {

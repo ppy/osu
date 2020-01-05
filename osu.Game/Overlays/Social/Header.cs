@@ -32,12 +32,12 @@ namespace osu.Game.Overlays.Social
                 {
                     new OsuSpriteText
                     {
-                        Text = "social ",
+                        Text = "社交",
                         Font = OsuFont.GetFont(size: 25),
                     },
                     browser = new OsuSpriteText
                     {
-                        Text = "browser",
+                        Text = "玩家列表",
                         Font = OsuFont.GetFont(size: 25, weight: FontWeight.Light),
                     },
                 },
@@ -53,10 +53,10 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialTab
     {
-        [Description("All Players")]
+        [Description("所有玩家")]
         AllPlayers,
 
-        [Description("Friends")]
+        [Description("好友")]
         Friends,
         //[Description("Team Members")]
         //TeamMembers,

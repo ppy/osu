@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.OSD
                 {
                     Padding = new MarginPadding(10),
                     Name = "Description",
-                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
+                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Black),
                     Spacing = new Vector2(1, 0),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.OSD
                 },
                 ValueText = new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
+                    Font = OsuFont.GetFont(size: 28, weight: FontWeight.Light),
                     Padding = new MarginPadding { Left = 10, Right = 10 },
                     Name = "Value",
                     Anchor = Anchor.Centre,
@@ -75,8 +75,8 @@ namespace osu.Game.Overlays.OSD
                     Name = "Shortcut",
                     Alpha = 0.3f,
                     Margin = new MarginPadding { Bottom = 15 },
-                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                    Text = string.IsNullOrEmpty(shortcut) ? "NO KEY BOUND" : shortcut.ToUpperInvariant()
+                    Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                    Text = string.IsNullOrEmpty(shortcut) ? "没有快捷键" : shortcut.ToUpperInvariant()
                 },
             };
         }

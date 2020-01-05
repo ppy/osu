@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                Text = @"formerly known as",
+                                Text = @"曾用名",
                                 Font = OsuFont.GetFont(size: 10, italics: true)
                             }
                         },
