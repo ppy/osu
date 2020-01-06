@@ -120,6 +120,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
+
+            Set(OsuSetting.ColourSliderBalls, true);
         }
 
         public OsuConfigManager(Storage storage)
@@ -179,6 +181,7 @@ namespace osu.Game.Configuration
         SongSelectRightMouseScroll,
         BeatmapSkins,
         BeatmapHitsounds,
+        ColourSliderBalls,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
         ExternalLinkWarning,

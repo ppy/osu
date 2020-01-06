@@ -62,6 +62,11 @@ namespace osu.Game.Overlays.Settings.Sections
                     LabelText = "Beatmap hitsounds",
                     Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Color the sliderballs according to the color of the sliders",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ColourSliderBalls)
+                },
             };
 
             skins.ItemAdded += itemAdded;
