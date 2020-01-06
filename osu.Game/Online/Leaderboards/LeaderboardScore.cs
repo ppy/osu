@@ -367,11 +367,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected virtual void DeleteLocalScore(ScoreInfo score)
-        {
-            dialogOverlay?.Push(new LocalScoreDeleteDialog(score));
-        }
-
         public MenuItem[] ContextMenuItems
         {
             get
@@ -379,7 +374,7 @@ namespace osu.Game.Online.Leaderboards
                 List<MenuItem> items = new List<MenuItem>();
 
                 if (score.ID != 0)
-                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => DeleteLocalScore(score)));
+                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
 
                 return items.ToArray();
             }
