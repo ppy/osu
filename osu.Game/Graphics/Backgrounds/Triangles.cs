@@ -176,7 +176,8 @@ namespace osu.Game.Graphics.Backgrounds
             TriangleParticle particle = CreateTriangle();
 
             particle.Position = new Vector2(RNG.NextSingle(), randomY ? RNG.NextSingle() : 1);
-            particle.UpdateColour(colourDark, colourLight);
+            particle.ColourShade = RNG.NextSingle();
+            particle.Colour = CreateTriangleShade(particle.ColourShade);
 
             return particle;
         }
@@ -198,12 +199,18 @@ namespace osu.Game.Graphics.Backgrounds
             return new TriangleParticle { Scale = scale };
         }
 
+        /// <summary>
+        /// Creates a shade of colour for the triangles.
+        /// </summary>
+        /// <returns>The colour.</returns>
+        protected virtual Color4 CreateTriangleShade(float shade) => Interpolation.ValueAt(shade, colourDark, colourLight, 0, 1);
+
         private void updateColours()
         {
             for (int i = 0; i < parts.Count; i++)
             {
                 TriangleParticle newParticle = parts[i];
-                newParticle.UpdateColour(colourDark, colourLight);
+                newParticle.Colour = CreateTriangleShade(newParticle.ColourShade);
                 parts[i] = newParticle;
             }
         }
@@ -286,7 +293,7 @@ namespace osu.Game.Graphics.Backgrounds
             }
         }
 
-        protected class TriangleParticle : IComparable<TriangleParticle>
+        protected struct TriangleParticle : IComparable<TriangleParticle>
         {
             /// <summary>
             /// The position of the top vertex of the triangle.
@@ -297,7 +304,7 @@ namespace osu.Game.Graphics.Backgrounds
             /// The colour shade of the triangle.
             /// This is needed for colour recalculation of visible triangles when <see cref="ColourDark"/> or <see cref="ColourLight"/> is changed.
             /// </summary>
-            private readonly float colourShade = RNG.NextSingle();
+            public float ColourShade;
 
             /// <summary>
             /// The colour of the triangle.
@@ -308,11 +315,6 @@ namespace osu.Game.Graphics.Backgrounds
             /// The scale of the triangle.
             /// </summary>
             public float Scale;
-
-            public void UpdateColour(Color4 colourDark, Color4 colourLight)
-            {
-                Colour = Interpolation.ValueAt(colourShade, colourDark, colourLight, 0, 1);
-            }
 
             /// <summary>
             /// Compares two <see cref="TriangleParticle"/>s. This is a reverse comparer because when the
