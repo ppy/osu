@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osuTK;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -40,6 +41,17 @@ namespace osu.Game.Graphics.UserInterface
         {
             this.FadeOut(transition_duration, Easing.OutQuint);
             loading.Hide();
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case ScrollEvent _:
+                    return false;
+            }
+
+            return base.Handle(e);
         }
     }
 }
