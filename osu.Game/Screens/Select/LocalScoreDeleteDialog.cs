@@ -32,21 +32,21 @@ namespace osu.Game.Screens.Select
             BeatmapInfo beatmap = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
             Debug.Assert(beatmap != null);
 
-            string accuracy = string.Format(score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", score.Accuracy);
+            string accuracy = string.Format(score.Accuracy == 1 ? "{0:P0}" : "{0:P2}", score.Accuracy);
+            BodyText = $"{score.User} ({accuracy}, {score.Rank})";
 
-            BodyText = $@"{score.User}'s {accuracy} {score.Rank} Rank on {beatmap}";
-            Icon = FontAwesome.Solid.Eraser;
-            HeaderText = @"Deleting this local score. Are you sure?";
+            Icon = FontAwesome.Regular.TrashAlt;
+            HeaderText = "Confirm deletion of local score";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
                 {
-                    Text = @"Yes. Please.",
+                    Text = "Yes. Please.",
                     Action = () => scoreManager?.Delete(score)
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"No, I'm still attached.",
+                    Text = "No, I'm still attached.",
                 },
             };
         }
