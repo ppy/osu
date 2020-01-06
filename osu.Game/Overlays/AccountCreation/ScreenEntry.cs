@@ -196,7 +196,7 @@ namespace osu.Game.Overlays.AccountCreation
                         return;
                     }
 
-                    api.Login(emailTextBox.Text, passwordTextBox.Text);
+                    api.Login(usernameTextBox.Text, passwordTextBox.Text);
                 });
             });
         }
