@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
-        private readonly IBindable<bool> colorSliderBallBindable = new Bindable<bool>();
+        private readonly Bindable<bool> colorSliderBallBindable = new Bindable<bool>();
 
         public DrawableSlider(Slider s)
             : base(s)
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(OsuConfigManager config, ISkinSource skin)
         {
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
@@ -84,7 +84,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     drawableHitObject.AccentColour.Value = colour.NewValue;
             }, true);
 
-            colorSliderBallBindable.BindTo(config.GetBindable<bool>(OsuSetting.ColourSliderBalls));
+            config.BindWith(OsuSetting.ColourSliderBalls, colorSliderBallBindable);
+
+            colorSliderBallBindable.BindValueChanged(value =>
+            {
+                bool allowBallTint = (skin.GetConfig<OsuSkinConfiguration, bool>(OsuSkinConfiguration.AllowSliderBallTint)?.Value ?? false) && value.NewValue;
+                Ball.Colour = allowBallTint ? AccentColour.Value : Color4.White;
+            });
         }
 
         protected override void AddNestedHitObject(DrawableHitObject hitObject)
@@ -119,6 +125,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             tailContainer.Clear();
             repeatContainer.Clear();
             tickContainer.Clear();
+
+            colorSliderBallBindable.UnbindEvents();
         }
 
         protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)

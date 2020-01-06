@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Color the sliderballs according to the color of the sliders",
+                    LabelText = "Use combo colour as tint for slider ball",
                     Bindable = config.GetBindable<bool>(OsuSetting.ColourSliderBalls)
                 },
             };
