@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "成功率",
-                            Font = OsuFont.GetFont(size: 13)
+                            Font = OsuFont.GetFont(size: 17)
                         },
                         successRate = new Bar
                         {

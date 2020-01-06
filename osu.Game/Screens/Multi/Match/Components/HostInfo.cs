@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             if (host != null)
             {
-                linkContainer.AddText("hosted by");
+                linkContainer.AddText("房主");
                 linkContainer.NewLine();
                 linkContainer.AddUserLink(host, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
             }

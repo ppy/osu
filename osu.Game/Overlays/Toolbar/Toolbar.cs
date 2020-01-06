@@ -57,6 +57,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
+                        new ToolbarMfButton(),
                         rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
@@ -69,6 +70,7 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        //new ToolbarVideoButton(),
                         new ToolbarChangelogButton(),
                         new ToolbarDirectButton(),
                         new ToolbarChatButton(),

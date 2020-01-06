@@ -170,10 +170,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 dropdown.StatusColour = colours.Red;
                                 break;
 
-                            //case UserAction.AppearOffline:
-                            //    api.LocalUser.Value.Status.Value = new UserStatusOffline();
-                            //    dropdown.StatusColour = colours.Gray7;
-                            //    break;
+                            case UserAction.AppearOffline:
+                                api.LocalUser.Value.Status.Value = new UserStatusOffline();
+                                dropdown.StatusColour = colours.Gray7;
+                                break;
 
                             case UserAction.SignOut:
                                 api.Logout();
@@ -407,8 +407,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             [Description(@"请勿打扰")]
             DoNotDisturb,
 
-            //[Description(@"隐身")]
-            //AppearOffline,
+            [Description(@"隐身(存在问题)")]
+            AppearOffline,
 
             [Description(@"登出")]
             SignOut,

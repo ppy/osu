@@ -118,12 +118,12 @@ namespace osu.Game.Overlays.Profile.Header
                             {
                                 hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
-                                    Title = "全球排行",
+                                    Title = "全球排名",
                                     LineColour = colours.Yellow
                                 },
                                 hiddenDetailCountry = new OverlinedInfoContainer
                                 {
-                                    Title = "国家/地区排行",
+                                    Title = "国家/地区排名",
                                     LineColour = colours.Yellow
                                 },
                             }

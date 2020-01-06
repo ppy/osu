@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Edit
                             RelativeSizeAxes = Axes.Both,
                             Items = new[]
                             {
-                                new MenuItem("File")
+                                new MenuItem("文件")
                                 {
                                     Items = fileMenuItems
                                 }

@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                         AutoSizeAxes = Axes.Both,
                                                         Child = new StatusText
                                                         {
-                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                                                         }
                                                     },
                                                     beatmapTypeInfo = new BeatmapTypeInfo(),
@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private class RoomStatusNoneSelected : RoomStatus
         {
-            public override string Message => @"No Room Selected";
+            public override string Message => @"还没有选择任何房间";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray8;
         }
 

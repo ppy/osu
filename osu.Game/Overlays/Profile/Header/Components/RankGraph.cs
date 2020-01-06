@@ -247,12 +247,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
                                 {
                                     new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
-                                        Text = "全球排行"
+                                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
+                                        Text = "全球排名"
                                     },
                                     globalRankingText = new OsuSpriteText
                                     {
-                                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
+                                        Font = OsuFont.GetFont(size: 16, weight: FontWeight.Regular),
                                         Anchor = Anchor.BottomLeft,
                                         Origin = Anchor.BottomLeft,
                                     }
@@ -260,7 +260,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                             },
                             timeText = new OsuSpriteText
                             {
-                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular),
+                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular),
                             }
                         }
                     }

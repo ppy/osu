@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Notifications
                 }
             });
 
-            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 14))
+            Content.Add(textDrawable = new OsuTextFlowContainer
             {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,
