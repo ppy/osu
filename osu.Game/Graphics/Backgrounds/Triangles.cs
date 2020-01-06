@@ -36,6 +36,8 @@ namespace osu.Game.Graphics.Backgrounds
             get => colourLight;
             set
             {
+                if (colourLight == value) return;
+
                 colourLight = value;
                 updateColours();
             }
@@ -48,6 +50,8 @@ namespace osu.Game.Graphics.Backgrounds
             get => colourDark;
             set
             {
+                if (colourDark == value) return;
+
                 colourDark = value;
                 updateColours();
             }
