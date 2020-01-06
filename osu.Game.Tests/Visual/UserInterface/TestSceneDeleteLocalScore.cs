@@ -3,20 +3,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.MathUtils;
+using osu.Framework.Platform;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API;
+using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Dialog;
+using osu.Game.Rulesets;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -32,154 +38,133 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(LeaderboardScore),
         };
 
-        private readonly FailableLeaderboard leaderboard;
+        private readonly ContextMenuContainer contextMenuContainer;
+        private readonly BeatmapLeaderboard leaderboard;
+
+        private RulesetStore rulesetStore;
+        private BeatmapManager beatmapManager;
+        private ScoreManager scoreManager;
+
+        private readonly List<ScoreInfo> scores = new List<ScoreInfo>();
+        private BeatmapInfo beatmap;
 
         [Cached]
         private readonly DialogOverlay dialogOverlay;
 
         public TestSceneDeleteLocalScore()
         {
-            Add(dialogOverlay = new DialogOverlay
+            Children = new Drawable[]
             {
-                Depth = -1
-            });
-
-            Add(leaderboard = new FailableLeaderboard
-            {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Size = new Vector2(550f, 450f),
-                Scope = BeatmapLeaderboardScope.Local,
-                Beatmap = new BeatmapInfo
+                contextMenuContainer = new OsuContextMenuContainer
                 {
-                    ID = 1,
-                    Metadata = new BeatmapMetadata
+                    RelativeSizeAxes = Axes.Both,
+                    Child = leaderboard = new BeatmapLeaderboard
                     {
-                        ID = 1,
-                        Title = "TestSong",
-                        Artist = "TestArtist",
-                        Author = new User
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Size = new Vector2(550f, 450f),
+                        Scope = BeatmapLeaderboardScope.Local,
+                        Beatmap = new BeatmapInfo
                         {
-                            Username = "TestAuthor"
+                            ID = 1,
+                            Metadata = new BeatmapMetadata
+                            {
+                                ID = 1,
+                                Title = "TestSong",
+                                Artist = "TestArtist",
+                                Author = new User
+                                {
+                                    Username = "TestAuthor"
+                                },
+                            },
+                            Version = "Insane"
                         },
-                    },
-                    Version = "Insane"
+                    }
                 },
+                dialogOverlay = new DialogOverlay()
+            };
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            dependencies.Cache(rulesetStore = new RulesetStore(ContextFactory));
+            dependencies.Cache(beatmapManager = new BeatmapManager(LocalStorage, ContextFactory, rulesetStore, null, Audio, dependencies.Get<GameHost>(), Beatmap.Default));
+            dependencies.Cache(scoreManager = new ScoreManager(rulesetStore, () => beatmapManager, LocalStorage, null, ContextFactory));
+
+            beatmap = beatmapManager.Import(TestResources.GetTestBeatmapForImport()).Result.Beatmaps[0];
+
+            for (int i = 0; i < 50; i++)
+            {
+                var score = new ScoreInfo
+                {
+                    OnlineScoreID = i,
+                    Beatmap = beatmap,
+                    BeatmapInfoID = beatmap.ID,
+                    Accuracy = RNG.NextDouble(),
+                    TotalScore = RNG.Next(1, 1000000),
+                    MaxCombo = RNG.Next(1, 1000),
+                    Rank = ScoreRank.XH,
+                    User = new User { Username = "TestUser" },
+                };
+
+                scores.Add(scoreManager.Import(score).Result);
+            }
+
+            scores.Sort(Comparer<ScoreInfo>.Create((s1, s2) => s2.TotalScore.CompareTo(s1.TotalScore)));
+
+            return dependencies;
+        }
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            // Due to soft deletions, we can re-use deleted scores between test runs
+            scoreManager.Undelete(scoreManager.QueryScores(s => s.DeletePending).ToList());
+
+            leaderboard.Beatmap = beatmap;
+            leaderboard.RefreshScores();
+        });
+
+        [Test]
+        public void TestDeleteViaRightClick()
+        {
+            // Ensure the leaderboard items have finished showing up
+            AddStep("finish transforms", () => leaderboard.FinishTransforms(true));
+
+            AddStep("open menu for top score", () =>
+            {
+                InputManager.MoveMouseTo(leaderboard.ChildrenOfType<LeaderboardScore>().First());
+                InputManager.Click(MouseButton.Right);
             });
 
-            AddStep("Insert Local Scores", reset);
+            // Ensure the context menu has finished showing
+            AddStep("finish transforms", () => contextMenuContainer.FinishTransforms(true));
+
+            AddStep("click delete option", () =>
+            {
+                InputManager.MoveMouseTo(contextMenuContainer.ChildrenOfType<DrawableOsuMenuItem>().First(i => i.Item.Text.Value.ToLowerInvariant() == "delete"));
+                InputManager.Click(MouseButton.Left);
+            });
+
+            // Ensure the dialog has finished showing
+            AddStep("finish transforms", () => dialogOverlay.FinishTransforms(true));
+
+            AddStep("click delete button", () =>
+            {
+                InputManager.MoveMouseTo(dialogOverlay.ChildrenOfType<DialogButton>().First());
+                InputManager.Click(MouseButton.Left);
+            });
+
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scores[0].OnlineScoreID));
         }
 
-        private void reset()
+        [Test]
+        public void TestDeleteViaDatabase()
         {
-            leaderboard.InitialLoad = true;
-            leaderboard.RefreshScores();
-        }
-
-        private class FailableLeaderboard : BeatmapLeaderboard
-        {
-            private List<ScoreInfo> scoreList;
-
-            private Random rnd;
-
-            public bool InitialLoad;
-
-            public void DeleteScore(ScoreInfo score)
-            {
-                scoreList.Remove(score);
-                RefreshScores();
-            }
-
-            public FailableLeaderboard()
-            {
-                InitialLoad = true;
-            }
-
-            public void SetRetrievalState(PlaceholderState state)
-            {
-                PlaceholderState = state;
-            }
-
-            protected override APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback)
-            {
-                if (InitialLoad)
-                {
-                    rnd = new Random();
-
-                    scoreList = Enumerable.Range(1, 50).Select(createScore).ToList();
-                    Scores = scoreList.OrderByDescending(s => s.TotalScore).ToArray();
-
-                    InitialLoad = false;
-                }
-                else
-                {
-                    Scores = scoreList.OrderByDescending(s => s.TotalScore).ToArray();
-                }
-
-                return null;
-            }
-
-            private ScoreInfo createScore(int id) => new ScoreInfo
-            {
-                ID = id,
-                Accuracy = rnd.NextDouble(),
-                PP = rnd.Next(1, 1000000),
-                TotalScore = rnd.Next(1, 1000000),
-                MaxCombo = rnd.Next(1, 1000),
-                Rank = ScoreRank.XH,
-                User = new User { Username = "TestUser" },
-            };
-
-            protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index)
-            {
-                model.Beatmap = Beatmap;
-                return new TestLeaderboardScore(model, index, this, IsOnlineScope);
-            }
-        }
-
-        private class TestLeaderboardScore : LeaderboardScore
-        {
-            [Resolved]
-            private DialogOverlay dialogOverlay { get; set; }
-
-            private readonly FailableLeaderboard leaderboard;
-
-            public TestLeaderboardScore(ScoreInfo score, int rank, FailableLeaderboard leaderboard, bool allowHighlight = true)
-                : base(score, rank, allowHighlight)
-            {
-                this.leaderboard = leaderboard;
-            }
-
-            protected override void DeleteLocalScore(ScoreInfo score)
-            {
-                dialogOverlay?.Push(new TestLocalScoreDeleteDialog(score, leaderboard));
-            }
-        }
-
-        private class TestLocalScoreDeleteDialog : PopupDialog
-        {
-            public TestLocalScoreDeleteDialog(ScoreInfo score, FailableLeaderboard leaderboard)
-            {
-                Debug.Assert(score != null);
-
-                string accuracy = string.Format(score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", score.Accuracy);
-
-                BodyText = $@"{score.User}'s {accuracy} {score.Rank} Rank on {score.Beatmap}";
-                Icon = FontAwesome.Solid.Eraser;
-                HeaderText = @"Deleting this local score. Are you sure?";
-                Buttons = new PopupDialogButton[]
-                {
-                    new PopupDialogOkButton
-                    {
-                        Text = @"Yes. Please.",
-                        Action = () => leaderboard.DeleteScore(score)
-                    },
-                    new PopupDialogCancelButton
-                    {
-                        Text = @"No, I'm still attached.",
-                    },
-                };
-            }
+            AddStep("delete top score", () => scoreManager.Delete(scores[0]));
+            AddUntilStep("score removed from leaderboard", () => leaderboard.Scores.All(s => s.OnlineScoreID != scores[0].OnlineScoreID));
         }
     }
 }
