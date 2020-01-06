@@ -124,7 +124,7 @@ namespace osu.Game.Input.Bindings
         [Description("选择")]
         Select,
 
-        [Description("快速推出(按住)")]
+        [Description("快速退出(按住)")]
         QuickExit,
 
         // Game-wide beatmap msi ccotolle keybindings

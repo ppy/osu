@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Play.HUD
             activationDelay.BindValueChanged(v =>
             {
                 text.Text = v.NewValue > 0
-                    ? "hold for menu"
-                    : "press for menu";
+                    ? "按住这里返回菜单"
+                    : "点击此处返回菜单";
             }, true);
 
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
