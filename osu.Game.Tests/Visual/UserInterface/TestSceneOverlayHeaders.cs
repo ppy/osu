@@ -76,10 +76,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Margin = new MarginPadding(20),
                         Text = name,
                     },
-                    header.With(header =>
+                    header.With(h =>
                     {
-                        header.Anchor = Anchor.TopCentre;
-                        header.Origin = Anchor.TopCentre;
+                        h.Anchor = Anchor.TopCentre;
+                        h.Origin = Anchor.TopCentre;
                     })
                 }
             });
