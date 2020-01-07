@@ -26,16 +26,23 @@ namespace osu.Game.Tests.Online
             beatmaps.PostNotification = n => recentNotification = n as ProgressNotification;
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TestCancelDownloadRequest(bool closeFromRequest)
+        [Test]
+        public void TestCancelDownloadFromRequest()
         {
             AddStep("download beatmap", () => beatmaps.Download(test_model));
 
-            if (closeFromRequest)
-                AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_model).Cancel());
-            else
-                AddStep("cancel download from notification", () => recentNotification.Close());
+            AddStep("cancel download from request", () => beatmaps.GetExistingDownload(test_model).Cancel());
+
+            AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_model) == null);
+            AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
+        }
+
+        [Test]
+        public void TestCancelDownloadFromNotification()
+        {
+            AddStep("download beatmap", () => beatmaps.Download(test_model));
+
+            AddStep("cancel download from notification", () => recentNotification.Close());
 
             AddUntilStep("is removed from download list", () => beatmaps.GetExistingDownload(test_model) == null);
             AddAssert("is notification cancelled", () => recentNotification.State == ProgressNotificationState.Cancelled);
