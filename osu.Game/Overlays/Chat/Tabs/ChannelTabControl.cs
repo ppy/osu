@@ -98,13 +98,14 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         private void tabCloseRequested(TabItem<Channel> tab)
         {
-            int totalTabs = TabContainer.Count - 1; // account for selectorTab
-            int currentIndex = Math.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
+            var itemsList = TabContainer.TabItems.ToList();
+            int totalChannels = itemsList.Count - 1; // account for selectorTab
+            int currentIndex = itemsList.IndexOf(tab);
 
-            if (tab == SelectedTab && totalTabs > 1)
+            if (tab == SelectedTab && totalChannels > 1)
                 // Select the tab after tab-to-be-removed's index, or the tab before if current == last
-                SelectTab(TabContainer[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
-            else if (totalTabs == 1 && !selectorTab.Active.Value)
+                SelectTab(TabContainer.TabItems.ElementAt(currentIndex == (totalChannels - 1) ? currentIndex - 1 : currentIndex + 1));
+            else if (totalChannels == 1 && !selectorTab.Active.Value)
                 // Open channel selection overlay if all channel tabs will be closed after removing this tab
                 SelectTab(selectorTab);
 
