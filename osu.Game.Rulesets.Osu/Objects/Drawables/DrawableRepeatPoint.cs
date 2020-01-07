@@ -8,9 +8,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 
@@ -21,14 +19,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly RepeatPoint repeatPoint;
         private readonly DrawableSlider drawableSlider;
 
-        public readonly Bindable<ReverseArrowPulseMode> PulseMode = new Bindable<ReverseArrowPulseMode>(ReverseArrowPulseMode.Synced);
-
         private double animDuration;
 
         private readonly Drawable scaleContainer;
-
-        [Resolved(CanBeNull = true)]
-        private OsuRulesetConfigManager config { get; set; }
 
         public DrawableRepeatPoint(RepeatPoint repeatPoint, DrawableSlider drawableSlider)
             : base(repeatPoint)
@@ -51,8 +44,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             scaleBindable.BindValueChanged(scale => scaleContainer.Scale = new Vector2(scale.NewValue), true);
             scaleBindable.BindTo(HitObject.ScaleBindable);
-
-            config?.BindWith(OsuRulesetSetting.ReverseArrowPulse, PulseMode);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -65,21 +56,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             animDuration = Math.Min(300, repeatPoint.SpanDuration);
 
-            this.FadeIn(animDuration);
-
-            if (PulseMode.Value == ReverseArrowPulseMode.Stable)
-            {
-                double fadeInStart = repeatPoint.StartTime - 2 * repeatPoint.SpanDuration;
-
-                // We want first repeat arrow to start pulsing during snake in
-                if (repeatPoint.RepeatIndex == 0)
-                    fadeInStart -= repeatPoint.TimePreempt;
-
-                for (double pulseStartTime = fadeInStart; pulseStartTime < repeatPoint.StartTime; pulseStartTime += 300)
-                    this.Delay(pulseStartTime - LifetimeStart).ScaleTo(1.3f).ScaleTo(1f, Math.Min(300, repeatPoint.StartTime - pulseStartTime), Easing.Out);
-            }
-            else if (PulseMode.Value == ReverseArrowPulseMode.Off)
-                this.ScaleTo(0.5f).ScaleTo(1f, animDuration * 2, Easing.OutElasticHalf);
+            this.Animate(
+                d => d.FadeIn(animDuration),
+                d => d.ScaleTo(0.5f).ScaleTo(1f, animDuration * 2, Easing.OutElasticHalf)
+            );
         }
 
         protected override void UpdateStateTransforms(ArmedState state)
