@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Comments
     public class CommentsContainer : CompositeDrawable
     {
         private CommentableType type;
-        private long id;
+        private long? id;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
@@ -134,18 +134,18 @@ namespace osu.Game.Overlays.Comments
 
         private void resetComments()
         {
-            if (id == default)
-                return;
-
             clearComments();
             getComments();
         }
 
         private void getComments()
         {
+            if (!id.HasValue)
+                return;
+
             request?.Cancel();
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(type, id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }
