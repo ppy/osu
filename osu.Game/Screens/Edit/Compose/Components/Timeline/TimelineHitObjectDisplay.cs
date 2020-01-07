@@ -16,9 +16,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     internal class TimelineHitObjectDisplay : TimelinePart
     {
-        private IEditorBeatmap beatmap { get; }
+        private EditorBeatmap beatmap { get; }
 
-        public TimelineHitObjectDisplay(IEditorBeatmap beatmap)
+        public TimelineHitObjectDisplay(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
 
