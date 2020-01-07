@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -9,13 +10,13 @@ using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class TabControlOverlayHeader : ControllableOverlayHeader
+    public abstract class TabControlOverlayHeader<T> : ControllableOverlayHeader<T>
     {
         protected OverlayHeaderTabControl TabControl;
 
-        protected override TabControl<string> CreateTabControl() => TabControl = new OverlayHeaderTabControl();
+        protected override TabControl<T> CreateTabControl() => TabControl = new OverlayHeaderTabControl();
 
-        public class OverlayHeaderTabControl : OverlayTabControl<string>
+        public class OverlayHeaderTabControl : OverlayTabControl<T>
         {
             public OverlayHeaderTabControl()
             {
@@ -25,9 +26,15 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;
                 Height = 35;
+
+                if (typeof(T).IsEnum)
+                {
+                    foreach (var val in (T[])Enum.GetValues(typeof(T)))
+                        AddItem(val);
+                }
             }
 
-            protected override TabItem<string> CreateTabItem(string value) => new OverlayHeaderTabItem(value)
+            protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value)
             {
                 AccentColour = AccentColour,
             };
@@ -42,10 +49,10 @@ namespace osu.Game.Overlays
 
             private class OverlayHeaderTabItem : OverlayTabItem
             {
-                public OverlayHeaderTabItem(string value)
+                public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    Text.Text = value;
+                    Text.Text = value.ToString().ToLowerInvariant();
                     Text.Font = OsuFont.GetFont(size: 14);
                     Bar.ExpandedSize = 5;
                 }

@@ -9,7 +9,8 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class ControllableOverlayHeader : OverlayHeader
+    /// <typeparam name="T">The type of item to be represented by tabs in <see cref="TabControl{T}"/>.</typeparam>
+    public abstract class ControllableOverlayHeader<T> : OverlayHeader
     {
         protected Color4 ControlBackgroundColour
         {
@@ -36,6 +37,6 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected abstract TabControl<string> CreateTabControl();
+        protected abstract TabControl<T> CreateTabControl();
     }
 }
