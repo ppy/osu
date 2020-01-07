@@ -317,8 +317,8 @@ namespace osu.Game.Screens.Play
         {
             switch (e)
             {
-                case ScrollEvent _:
-                    if (ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
+                case ScrollEvent scroll:
+                    if (ReceivePositionalInputAt(scroll.ScreenSpaceCurrentMousePosition))
                         return globalAction.TriggerEvent(e);
 
                     break;

@@ -67,7 +67,7 @@ namespace osu.Game.Tests.Visual
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            currentBlueprint.UpdatePosition(e.ScreenSpaceMousePosition);
+            currentBlueprint.UpdatePosition(e.ScreenSpaceCurrentMousePosition);
             return true;
         }
 

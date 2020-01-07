@@ -387,7 +387,7 @@ namespace osu.Game.Overlays
 
             protected override bool OnDrag(DragEvent e)
             {
-                Vector2 change = e.MousePosition - e.MouseDownPosition;
+                Vector2 change = e.CurrentMousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
                 change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.7f) / change.Length;

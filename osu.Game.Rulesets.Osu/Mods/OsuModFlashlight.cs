@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 const double follow_delay = 120;
 
                 var position = FlashlightPosition;
-                var destination = e.MousePosition;
+                var destination = e.CurrentMousePosition;
 
                 FlashlightPosition = Interpolation.ValueAt(
                     Math.Clamp(Clock.ElapsedFrameTime, 0, follow_delay), position, destination, 0, follow_delay, Easing.Out);

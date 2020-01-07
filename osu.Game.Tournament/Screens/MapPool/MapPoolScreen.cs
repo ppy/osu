@@ -142,7 +142,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            var maps = mapFlows.Select(f => f.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition)));
+            var maps = mapFlows.Select(f => f.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceCurrentMousePosition)));
             var map = maps.FirstOrDefault(m => m != null);
 
             if (map != null)

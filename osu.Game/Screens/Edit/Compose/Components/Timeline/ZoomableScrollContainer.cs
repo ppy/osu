@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
                 return base.OnScroll(e);
 
-            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
+            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceCurrentMousePosition).X);
             return true;
         }
 

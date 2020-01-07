@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
+            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceCurrentMousePosition);
             return base.OnMouseMove(e);
         }
 

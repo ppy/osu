@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.Cursor
         {
             if (dragRotationState != DragRotationState.NotDragging)
             {
-                var position = e.MousePosition;
+                var position = e.CurrentMousePosition;
                 var distance = Vector2Extensions.Distance(position, positionMouseDown);
 
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
@@ -54,7 +54,7 @@ namespace osu.Game.Graphics.Cursor
                 // don't rotate when distance is zero to avoid NaN
                 if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {
-                    Vector2 offset = e.MousePosition - positionMouseDown;
+                    Vector2 offset = e.CurrentMousePosition - positionMouseDown;
                     float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
 
                     // Always rotate in the direction of least distance
@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.Cursor
             if (e.Button == MouseButton.Left && cursorRotate.Value)
             {
                 dragRotationState = DragRotationState.DragStarted;
-                positionMouseDown = e.MousePosition;
+                positionMouseDown = e.CurrentMousePosition;
             }
 
             return base.OnMouseDown(e);

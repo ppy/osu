@@ -299,7 +299,7 @@ namespace osu.Game.Overlays
         {
             if (isDragging)
             {
-                float targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
+                float targetChatHeight = startDragChatHeight - (e.CurrentMousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (ChannelSelectionOverlay.State.Value == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)

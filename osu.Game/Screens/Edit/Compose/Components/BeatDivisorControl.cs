@@ -270,13 +270,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             protected override bool OnClick(ClickEvent e)
             {
-                handleMouseInput(e.ScreenSpaceMousePosition);
+                handleMouseInput(e.ScreenSpaceCurrentMousePosition);
                 return true;
             }
 
             protected override bool OnDrag(DragEvent e)
             {
-                handleMouseInput(e.ScreenSpaceMousePosition);
+                handleMouseInput(e.ScreenSpaceCurrentMousePosition);
                 return true;
             }
 

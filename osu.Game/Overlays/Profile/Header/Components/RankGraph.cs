@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         {
             if (ranks?.Length > 1)
             {
-                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.UpdateBallPosition(e.CurrentMousePosition.X);
                 graph.ShowBar();
             }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (ranks?.Length > 1)
-                graph.UpdateBallPosition(e.MousePosition.X);
+                graph.UpdateBallPosition(e.CurrentMousePosition.X);
 
             return base.OnMouseMove(e);
         }

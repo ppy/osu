@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.Containers
         private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
         private void scrollFromMouseEvent(MouseEvent e) =>
-            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
+            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceCurrentMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
 
         private bool rightMouseDragging;
 

@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            positionalAdjust = Vector2.Distance(e.ScreenSpaceMousePosition, button.ScreenSpaceDrawQuad.Centre) / 200;
+            positionalAdjust = Vector2.Distance(e.ScreenSpaceCurrentMousePosition, button.ScreenSpaceDrawQuad.Centre) / 200;
             return base.OnMouseMove(e);
         }
 

@@ -140,7 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             if (currentPlacement != null)
             {
-                updatePlacementPosition(e.ScreenSpaceMousePosition);
+                updatePlacementPosition(e.ScreenSpaceCurrentMousePosition);
                 return true;
             }
 
@@ -436,7 +436,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             HitObject draggedObject = movementBlueprint.DrawableObject.HitObject;
 
             // The final movement position, relative to screenSpaceMovementStartPosition
-            Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+            Vector2 movePosition = startPosition + e.ScreenSpaceCurrentMousePosition - e.ScreenSpaceMouseDownPosition;
             (Vector2 snappedPosition, double snappedTime) = composer.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
             // Move the hitobjects

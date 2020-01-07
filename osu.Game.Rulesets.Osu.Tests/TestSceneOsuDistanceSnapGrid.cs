@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 base.OnMouseMove(e);
 
-                updatePosition(e.ScreenSpaceMousePosition);
+                updatePosition(e.ScreenSpaceCurrentMousePosition);
                 return true;
             }
 

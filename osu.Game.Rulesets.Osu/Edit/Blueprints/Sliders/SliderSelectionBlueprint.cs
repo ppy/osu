@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     return false; // Allow right click to be handled by context menu
 
                 case MouseButton.Left when e.ControlPressed && IsSelected:
-                    placementControlPointIndex = addControlPoint(e.MousePosition);
+                    placementControlPointIndex = addControlPoint(e.CurrentMousePosition);
                     return true; // Stop input from being handled and modifying the selection
             }
 
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Debug.Assert(placementControlPointIndex != null);
 
-            HitObject.Path.ControlPoints[placementControlPointIndex.Value].Position.Value = e.MousePosition - HitObject.Position;
+            HitObject.Path.ControlPoints[placementControlPointIndex.Value].Position.Value = e.CurrentMousePosition - HitObject.Position;
 
             return true;
         }

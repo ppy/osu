@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         public void UpdateDrag(MouseButtonEvent e)
         {
-            var dragPosition = e.ScreenSpaceMousePosition;
+            var dragPosition = e.ScreenSpaceCurrentMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
 
             var dragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);

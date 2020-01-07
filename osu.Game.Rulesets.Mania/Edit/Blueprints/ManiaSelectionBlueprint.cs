@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            ScreenSpaceDragPosition = e.ScreenSpaceCurrentMousePosition;
+            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceCurrentMousePosition);
 
             return base.OnMouseDown(e);
         }
@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             var result = base.OnDrag(e);
 
-            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            ScreenSpaceDragPosition = e.ScreenSpaceCurrentMousePosition;
+            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceCurrentMousePosition);
 
             return result;
         }
