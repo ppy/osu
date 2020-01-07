@@ -39,11 +39,6 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Cursor trail",
                     Bindable = config.GetBindable<bool>(OsuRulesetSetting.ShowCursorTrail)
                 },
-                new SettingsEnumDropdown<ReverseArrowPulseMode>
-                {
-                    LabelText = "Slider reverse arrow pulse",
-                    Bindable = config.GetBindable<ReverseArrowPulseMode>(OsuRulesetSetting.ReverseArrowPulse)
-                },
             };
         }
     }
