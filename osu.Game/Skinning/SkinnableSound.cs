@@ -96,8 +96,8 @@ namespace osu.Game.Skinning
 
                     if (adjustments != null)
                     {
-                        foreach (var adjustment in adjustments)
-                            ch.AddAdjustment(adjustment.property, adjustment.bindable);
+                        foreach (var (property, bindable) in adjustments)
+                            ch.AddAdjustment(property, bindable);
                     }
                 }
 

@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Bindables;
 using Humanizer;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -31,7 +32,7 @@ namespace osu.Game.Overlays.Comments
                     Icon = FontAwesome.Solid.Trash,
                     Size = new Vector2(14),
                 },
-                countText = new SpriteText
+                countText = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                 }

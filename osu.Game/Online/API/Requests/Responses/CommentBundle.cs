@@ -50,17 +50,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user_votes")]
         private List<long> userVotes
         {
-            set
+            set => value.ForEach(v =>
             {
-                value.ForEach(v =>
+                Comments.ForEach(c =>
                 {
-                    Comments.ForEach(c =>
-                    {
-                        if (v == c.Id)
-                            c.IsVoted = true;
-                    });
+                    if (v == c.Id)
+                        c.IsVoted = true;
                 });
-            }
+            });
         }
 
         private List<User> users;

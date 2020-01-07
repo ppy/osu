@@ -35,7 +35,7 @@ namespace osu.Game.Scoring.Legacy
             using (SerializationReader sr = new SerializationReader(stream))
             {
                 currentRuleset = GetRuleset(sr.ReadByte());
-                var scoreInfo = new LegacyScoreInfo { Ruleset = currentRuleset.RulesetInfo };
+                var scoreInfo = new ScoreInfo { Ruleset = currentRuleset.RulesetInfo };
 
                 score.ScoreInfo = scoreInfo;
 
@@ -53,12 +53,12 @@ namespace osu.Game.Scoring.Legacy
                 // MD5Hash
                 sr.ReadString();
 
-                scoreInfo.Count300 = sr.ReadUInt16();
-                scoreInfo.Count100 = sr.ReadUInt16();
-                scoreInfo.Count50 = sr.ReadUInt16();
-                scoreInfo.CountGeki = sr.ReadUInt16();
-                scoreInfo.CountKatu = sr.ReadUInt16();
-                scoreInfo.CountMiss = sr.ReadUInt16();
+                scoreInfo.SetCount300(sr.ReadUInt16());
+                scoreInfo.SetCount100(sr.ReadUInt16());
+                scoreInfo.SetCount50(sr.ReadUInt16());
+                scoreInfo.SetCountGeki(sr.ReadUInt16());
+                scoreInfo.SetCountKatu(sr.ReadUInt16());
+                scoreInfo.SetCountMiss(sr.ReadUInt16());
 
                 scoreInfo.TotalScore = sr.ReadInt32();
                 scoreInfo.MaxCombo = sr.ReadUInt16();

@@ -8,7 +8,7 @@ namespace osu.Game.Skinning
 {
     public class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
-        public SkinnableSpriteText(ISkinComponent component, Func<ISkinComponent, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.ScaleDownToFit)
+        public SkinnableSpriteText(ISkinComponent component, Func<ISkinComponent, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
             : base(component, defaultImplementation, allowFallback, confineMode)
         {
         }

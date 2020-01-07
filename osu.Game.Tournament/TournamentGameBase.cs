@@ -12,13 +12,13 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
@@ -52,10 +52,10 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
+            Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
 
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
@@ -104,7 +104,7 @@ namespace osu.Game.Tournament
                             Colour = Color4.Red,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Please make the window wider",
                             Font = OsuFont.Default.With(weight: "bold"),
@@ -128,6 +128,9 @@ namespace osu.Game.Tournament
             {
                 ladder = new LadderInfo();
             }
+
+            if (ladder.Ruleset.Value == null)
+                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
 
@@ -202,7 +205,8 @@ namespace osu.Game.Tournament
             {
                 foreach (var p in t.Players)
                 {
-                    PopulateUser(p);
+                    if (p.Username == null || p.Statistics == null)
+                        PopulateUser(p);
                     addedInfo = true;
                 }
             }
@@ -224,7 +228,7 @@ namespace osu.Game.Tournament
                     if (b.BeatmapInfo == null && b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                        req.Perform(API);
+                        API.Perform(req);
                         b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                         addedInfo = true;
@@ -243,7 +247,6 @@ namespace osu.Game.Tournament
             {
                 user.Username = res.Username;
                 user.Statistics = res.Statistics;
-                user.Username = res.Username;
                 user.Country = res.Country;
                 user.Cover = res.Cover;
 

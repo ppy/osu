@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
 {
     public class FooterButton : OsuClickableContainer
     {
-        public static readonly float SHEAR_WIDTH = 7.5f;
+        public const float SHEAR_WIDTH = 7.5f;
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 

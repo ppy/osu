@@ -38,6 +38,8 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
+        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
+
         private readonly DimmableBackground dimmable;
 
         protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground { RelativeSizeAxes = Axes.Both };
@@ -48,6 +50,7 @@ namespace osu.Game.Screens.Backgrounds
 
             InternalChild = dimmable = CreateFadeContainer();
             dimmable.EnableUserDim.BindTo(EnableUserDim);
+            dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
         }
 
@@ -73,7 +76,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    if ((Background as BeatmapBackground)?.Beatmap == beatmap)
+                    if ((Background as BeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
                         return;
 
                     cancellationSource?.Cancel();

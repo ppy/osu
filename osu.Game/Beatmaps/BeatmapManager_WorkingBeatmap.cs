@@ -42,7 +42,7 @@ namespace osu.Game.Beatmaps
                 }
             }
 
-            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            private string getPathForFile(string filename) => BeatmapSetInfo.Files.FirstOrDefault(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
             private TextureStore textureStore;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Beatmaps
             {
                 try
                 {
-                    return (trackStore ?? (trackStore = AudioManager.GetTrackStore(store))).Get(getPathForFile(Metadata.AudioFile));
+                    return (trackStore ??= AudioManager.GetTrackStore(store)).Get(getPathForFile(Metadata.AudioFile));
                 }
                 catch
                 {

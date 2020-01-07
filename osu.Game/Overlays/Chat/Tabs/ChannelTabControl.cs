@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 {
     public class ChannelTabControl : OsuTabControl<Channel>
     {
-        public static readonly float SHEAR_WIDTH = 10;
+        public const float SHEAR_WIDTH = 10;
 
         public Action<Channel> OnRequestLeave;
 

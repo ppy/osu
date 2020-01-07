@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Beatmaps;
 
@@ -41,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                     break;
             }
 
-            ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
+            static ConvertValue createConvertValue(OsuHitObject obj) => new ConvertValue
             {
                 StartTime = obj.StartTime,
-                EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
+                EndTime = obj.GetEndTime(),
                 X = obj.StackedPosition.X,
                 Y = obj.StackedPosition.Y
             };

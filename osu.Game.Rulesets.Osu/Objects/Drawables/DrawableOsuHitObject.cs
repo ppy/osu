@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected sealed override double InitialLifetimeOffset => HitObject.TimePreempt;
 
         private OsuInputManager osuActionInputManager;
-        internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
+        internal OsuInputManager OsuActionInputManager => osuActionInputManager ??= GetContainingInputManager() as OsuInputManager;
 
         protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 

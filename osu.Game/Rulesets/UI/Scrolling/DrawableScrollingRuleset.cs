@@ -15,7 +15,6 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected DrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
@@ -112,7 +111,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [BackgroundDependencyLoader]
         private void load()
         {
-            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+            double lastObjectTime = Objects.LastOrDefault()?.GetEndTime() ?? double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             if (RelativeScaleBeatLengths)
@@ -148,13 +147,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
-                var timingPoint = c as TimingControlPoint;
-                var difficultyPoint = c as DifficultyControlPoint;
-
-                if (timingPoint != null)
+                if (c is TimingControlPoint timingPoint)
                     lastTimingPoint = timingPoint;
-
-                if (difficultyPoint != null)
+                else if (c is DifficultyControlPoint difficultyPoint)
                     lastDifficultyPoint = difficultyPoint;
 
                 return new MultiplierControlPoint(c.Time)

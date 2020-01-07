@@ -91,10 +91,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private class Statistic : Container, IHasTooltip
         {
-            private readonly string name;
             private readonly OsuSpriteText value;
 
-            public string TooltipText => name;
+            public string TooltipText { get; }
 
             public string Value
             {
@@ -104,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public Statistic(IconUsage icon, string name)
             {
-                this.name = name;
+                TooltipText = name;
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 

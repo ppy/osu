@@ -16,7 +16,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
             Masking = true;
+
             CornerRadius = Size.X / 2;
+            CornerExponent = 2;
 
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

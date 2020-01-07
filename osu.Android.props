@@ -1,5 +1,6 @@
 <Project>
-<PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <WarningLevel>4</WarningLevel>
     <SchemaVersion>2.0</SchemaVersion>
@@ -16,8 +17,6 @@
     <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
-    <AndroidHttpClientHandlerType>System.Net.Http.HttpClientHandler</AndroidHttpClientHandlerType>
-    <AndroidTlsProvider>legacy</AndroidTlsProvider>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
@@ -54,7 +53,7 @@
     <Reference Include="Java.Interop" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.1010.0" />
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2019.1121.0" />
+    <PackageReference Include="ppy.osu.Game.Resources" Version="2019.1230.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2020.103.0" />
   </ItemGroup>
 </Project>

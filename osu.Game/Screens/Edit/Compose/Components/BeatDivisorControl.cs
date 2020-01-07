@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 OnUserChange(Current.Value);
             }
 
-            private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
+            private float getMappedPosition(float divisor) => MathF.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);
 
             private class Tick : CompositeDrawable
             {
