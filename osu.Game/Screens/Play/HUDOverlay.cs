@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
         private readonly ScoreProcessor scoreProcessor;
+        private readonly HealthProcessor healthProcessor;
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
@@ -63,9 +64,10 @@ namespace osu.Game.Screens.Play
 
         private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             this.scoreProcessor = scoreProcessor;
+            this.healthProcessor = healthProcessor;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -119,7 +121,10 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
             if (scoreProcessor != null)
-                BindProcessor(scoreProcessor);
+                BindScoreProcessor(scoreProcessor);
+
+            if (healthProcessor != null)
+                BindHealthProcessor(healthProcessor);
 
             if (drawableRuleset != null)
             {
@@ -288,15 +293,19 @@ namespace osu.Game.Screens.Play
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
-        protected virtual void BindProcessor(ScoreProcessor processor)
+        protected virtual void BindScoreProcessor(ScoreProcessor processor)
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
-            HealthDisplay?.Current.BindTo(processor.Health);
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
+        }
+
+        protected virtual void BindHealthProcessor(HealthProcessor processor)
+        {
+            HealthDisplay?.Current.BindTo(processor.Health);
         }
     }
 }

@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
@@ -13,9 +12,9 @@ using System;
 
 namespace osu.Game.Overlays.News
 {
-    public class NewsHeader : OverlayHeader
+    public class NewsHeader : BreadcrumbControlOverlayHeader
     {
-        private const string front_page_string = "Front Page";
+        private const string front_page_string = "frontpage";
 
         private NewsHeaderTitle title;
 
@@ -25,45 +24,45 @@ namespace osu.Game.Overlays.News
 
         public NewsHeader()
         {
-            TabControl.AddItem(front_page_string);
+            BreadcrumbControl.AddItem(front_page_string);
 
-            TabControl.Current.ValueChanged += e =>
+            BreadcrumbControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
             };
 
-            Current.ValueChanged += showArticle;
+            Current.ValueChanged += showPost;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colours)
         {
-            TabControl.AccentColour = colour.Violet;
+            BreadcrumbControl.AccentColour = colours.Violet;
+            TitleBackgroundColour = colours.GreyVioletDarker;
+            ControlBackgroundColour = colours.GreyVioletDark;
         }
 
-        private void showArticle(ValueChangedEvent<string> e)
+        private void showPost(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
-                TabControl.RemoveItem(e.OldValue);
+                BreadcrumbControl.RemoveItem(e.OldValue);
 
             if (e.NewValue != null)
             {
-                TabControl.AddItem(e.NewValue);
-                TabControl.Current.Value = e.NewValue;
+                BreadcrumbControl.AddItem(e.NewValue);
+                BreadcrumbControl.Current.Value = e.NewValue;
 
-                title.IsReadingArticle = true;
+                title.IsReadingPost = true;
             }
             else
             {
-                TabControl.Current.Value = front_page_string;
-                title.IsReadingArticle = false;
+                BreadcrumbControl.Current.Value = front_page_string;
+                title.IsReadingPost = false;
             }
         }
 
         protected override Drawable CreateBackground() => new NewsHeaderBackground();
-
-        protected override Drawable CreateContent() => new Container();
 
         protected override ScreenTitle CreateTitle() => title = new NewsHeaderTitle();
 
@@ -84,17 +83,17 @@ namespace osu.Game.Overlays.News
 
         private class NewsHeaderTitle : ScreenTitle
         {
-            private const string article_string = "Article";
+            private const string post_string = "post";
 
-            public bool IsReadingArticle
+            public bool IsReadingPost
             {
-                set => Section = value ? article_string : front_page_string;
+                set => Section = value ? post_string : front_page_string;
             }
 
             public NewsHeaderTitle()
             {
-                Title = "News";
-                IsReadingArticle = false;
+                Title = "news";
+                IsReadingPost = false;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
