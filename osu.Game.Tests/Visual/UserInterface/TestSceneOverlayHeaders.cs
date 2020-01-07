@@ -22,11 +22,12 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OverlayHeader),
-            typeof(ControllableOverlayHeader),
-            typeof(TabControlOverlayHeader),
+            typeof(ControllableOverlayHeader<>),
+            typeof(TabControlOverlayHeader<>),
             typeof(BreadcrumbControlOverlayHeader),
             typeof(TestNoControlHeader),
-            typeof(TestTabControlHeader),
+            typeof(TestStringTabControlHeader),
+            typeof(TestEnumTabControlHeader),
             typeof(TestBreadcrumbControlHeader),
         };
 
@@ -54,7 +55,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
 
             addHeader("OverlayHeader", new TestNoControlHeader());
-            addHeader("TabControlOverlayHeader", new TestTabControlHeader());
+            addHeader("TabControlOverlayHeader (string)", new TestStringTabControlHeader());
+            addHeader("TabControlOverlayHeader (enum)", new TestEnumTabControlHeader());
             addHeader("BreadcrumbControlOverlayHeader", new TestBreadcrumbControlHeader());
         }
 
@@ -69,10 +71,16 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new OsuSpriteText
                     {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
                         Margin = new MarginPadding(20),
                         Text = name,
                     },
-                    header
+                    header.With(header =>
+                    {
+                        header.Anchor = Anchor.TopCentre;
+                        header.Origin = Anchor.TopCentre;
+                    })
                 }
             });
         }
@@ -90,13 +98,13 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
-        private class TestTabControlHeader : TabControlOverlayHeader
+        private class TestStringTabControlHeader : TabControlOverlayHeader<string>
         {
             protected override Drawable CreateBackground() => new TestBackground();
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
-            public TestTabControlHeader()
+            public TestStringTabControlHeader()
             {
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");
@@ -109,6 +117,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                 ControlBackgroundColour = colours.GreyVioletDark;
                 TabControl.AccentColour = colours.Violet;
             }
+        }
+
+        private class TestEnumTabControlHeader : TabControlOverlayHeader<TestEnum>
+        {
+            protected override Drawable CreateBackground() => new TestBackground();
+
+            protected override ScreenTitle CreateTitle() => new TestTitle();
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                TitleBackgroundColour = colours.GreyVioletDarker;
+                ControlBackgroundColour = colours.GreyVioletDark;
+                TabControl.AccentColour = colours.Violet;
+            }
+        }
+
+        private enum TestEnum
+        {
+            Some,
+            Cool,
+            Tabs
         }
 
         private class TestBreadcrumbControlHeader : BreadcrumbControlOverlayHeader
