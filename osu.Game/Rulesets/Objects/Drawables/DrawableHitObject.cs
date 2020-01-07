@@ -31,9 +31,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public readonly Bindable<Color4> AccentColour = new Bindable<Color4>(Color4.Gray);
 
-        // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
-        protected virtual string SampleNamespace => null;
-
         protected SkinnableSound Samples { get; private set; }
 
         protected virtual IEnumerable<HitSampleInfo> GetSamples() => HitObject.Samples;
@@ -150,15 +147,11 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (HitObject.SampleControlPoint == null)
             {
-                throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
-                                                                                      + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
+                throw new InvalidOperationException($"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
+                                                    + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
             }
 
-            samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
-            foreach (var s in samples)
-                s.Namespace = SampleNamespace;
-
-            AddInternal(Samples = new SkinnableSound(samples));
+            AddInternal(Samples = new SkinnableSound(samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s))));
         }
 
         private void onDefaultsApplied() => apply(HitObject);
@@ -356,7 +349,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (HitObject is IHasComboInformation combo)
             {
-                var comboColours = CurrentSkin.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+                var comboColours = CurrentSkin.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
                 AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
             }
         }
@@ -382,7 +375,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
             if (Result != null && Result.HasResult)
             {
-                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+                var endTime = HitObject.GetEndTime();
 
                 if (Result.TimeOffset + endTime > Time.Current)
                 {
@@ -460,7 +453,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            var endTime = HitObject.GetEndTime();
 
             Result.TimeOffset = Math.Min(HitObject.HitWindows.WindowFor(HitResult.Miss), Time.Current - endTime);
 
@@ -495,7 +488,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (Judged)
                 return false;
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+            var endTime = HitObject.GetEndTime();
             CheckForResult(userTriggered, Time.Current - endTime);
 
             return Judged;

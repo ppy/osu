@@ -64,7 +64,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set second set", () => successRate.Beatmap = secondBeatmap);
             AddAssert("ratings set", () => successRate.Graph.Metrics == secondBeatmap.Metrics);
 
-            BeatmapInfo createBeatmap() => new BeatmapInfo
+            static BeatmapInfo createBeatmap() => new BeatmapInfo
             {
                 Metrics = new BeatmapMetrics
                 {

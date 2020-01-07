@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Objects
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-            SampleControlPoint = controlPointInfo.SamplePointAt(((this as IHasEndTime)?.EndTime ?? StartTime) + control_point_leniency);
+            SampleControlPoint = controlPointInfo.SamplePointAt(this.GetEndTime() + control_point_leniency);
 
             nestedHitObjects.Clear();
 
@@ -157,5 +157,18 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [NotNull]
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
+    }
+
+    public static class HitObjectExtensions
+    {
+        /// <summary>
+        /// Returns the end time of this object.
+        /// </summary>
+        /// <remarks>
+        /// This returns the <see cref="IHasEndTime.EndTime"/> where available, falling back to <see cref="HitObject.StartTime"/> otherwise.
+        /// </remarks>
+        /// <param name="hitObject">The object.</param>
+        /// <returns>The end time of this object.</returns>
+        public static double GetEndTime(this HitObject hitObject) => (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime;
     }
 }

@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osuTK;
@@ -12,9 +13,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public abstract class SliderBody : CompositeDrawable
     {
-        public const float DEFAULT_BORDER_SIZE = 1;
-
-        private SliderPath path;
+        private DrawableSliderPath path;
 
         protected Path Path => path;
 
@@ -80,19 +79,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         /// <summary>
-        /// Initialises a new <see cref="SliderPath"/>, releasing all resources retained by the old one.
+        /// Initialises a new <see cref="DrawableSliderPath"/>, releasing all resources retained by the old one.
         /// </summary>
         public virtual void RecyclePath()
         {
-            InternalChild = path = new SliderPath
+            InternalChild = path = CreateSliderPath().With(p =>
             {
-                Position = path?.Position ?? Vector2.Zero,
-                PathRadius = path?.PathRadius ?? 10,
-                AccentColour = path?.AccentColour ?? Color4.White,
-                BorderColour = path?.BorderColour ?? Color4.White,
-                BorderSize = path?.BorderSize ?? DEFAULT_BORDER_SIZE,
-                Vertices = path?.Vertices ?? Array.Empty<Vector2>()
-            };
+                p.Position = path?.Position ?? Vector2.Zero;
+                p.PathRadius = path?.PathRadius ?? 10;
+                p.AccentColour = path?.AccentColour ?? Color4.White;
+                p.BorderColour = path?.BorderColour ?? Color4.White;
+                p.BorderSize = path?.BorderSize ?? 1;
+                p.Vertices = path?.Vertices ?? Array.Empty<Vector2>();
+            });
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => path.ReceivePositionalInputAt(screenSpacePos);
@@ -103,77 +102,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// <param name="vertices">The vertices</param>
         protected void SetVertices(IReadOnlyList<Vector2> vertices) => path.Vertices = vertices;
 
-        private class SliderPath : SmoothPath
+        protected virtual DrawableSliderPath CreateSliderPath() => new DefaultDrawableSliderPath();
+
+        private class DefaultDrawableSliderPath : DrawableSliderPath
         {
-            private const float border_max_size = 8f;
-            private const float border_min_size = 0f;
-
-            private const float border_portion = 0.128f;
-            private const float gradient_portion = 1 - border_portion;
-
             private const float opacity_at_centre = 0.3f;
             private const float opacity_at_edge = 0.8f;
 
-            private Color4 borderColour = Color4.White;
-
-            public Color4 BorderColour
-            {
-                get => borderColour;
-                set
-                {
-                    if (borderColour == value)
-                        return;
-
-                    borderColour = value;
-
-                    InvalidateTexture();
-                }
-            }
-
-            private Color4 accentColour = Color4.White;
-
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    if (accentColour == value)
-                        return;
-
-                    accentColour = value;
-
-                    InvalidateTexture();
-                }
-            }
-
-            private float borderSize = DEFAULT_BORDER_SIZE;
-
-            public float BorderSize
-            {
-                get => borderSize;
-                set
-                {
-                    if (borderSize == value)
-                        return;
-
-                    if (value < border_min_size || value > border_max_size)
-                        return;
-
-                    borderSize = value;
-
-                    InvalidateTexture();
-                }
-            }
-
-            private float calculatedBorderPortion => BorderSize * border_portion;
-
             protected override Color4 ColourAt(float position)
             {
-                if (calculatedBorderPortion != 0f && position <= calculatedBorderPortion)
+                if (CalculatedBorderPortion != 0f && position <= CalculatedBorderPortion)
                     return BorderColour;
 
-                position -= calculatedBorderPortion;
-                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
+                position -= CalculatedBorderPortion;
+                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / GRADIENT_PORTION) * AccentColour.A);
             }
         }
     }

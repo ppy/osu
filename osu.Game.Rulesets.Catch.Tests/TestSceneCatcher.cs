@@ -11,12 +11,12 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Audio;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Blue
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Text = "custom"
                     }

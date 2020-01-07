@@ -16,8 +16,7 @@ namespace osu.Game.Storyboards.Drawables
     {
         public Storyboard Storyboard { get; private set; }
 
-        private readonly Container<DrawableStoryboardLayer> content;
-        protected override Container<DrawableStoryboardLayer> Content => content;
+        protected override Container<DrawableStoryboardLayer> Content { get; }
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
@@ -49,7 +48,7 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddInternal(content = new Container<DrawableStoryboardLayer>
+            AddInternal(Content = new Container<DrawableStoryboardLayer>
             {
                 Size = new Vector2(640, 480),
                 Anchor = Anchor.Centre,

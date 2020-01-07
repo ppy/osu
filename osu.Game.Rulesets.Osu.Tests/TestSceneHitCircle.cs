@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private Drawable testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
         {
-            positionOffset = positionOffset ?? Vector2.Zero;
+            positionOffset ??= Vector2.Zero;
 
             var circle = new HitCircle
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableHitCircle(circle, auto);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             return drawable;

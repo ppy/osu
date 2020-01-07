@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             // Flip the vertical coordinate space when scrolling downwards
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                targetPosition = targetPosition - referenceParent.DrawHeight;
+                targetPosition -= referenceParent.DrawHeight;
 
             float movementDelta = targetPosition - reference.DrawableObject.Position.Y;
 

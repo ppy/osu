@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Play
         private readonly IReadOnlyList<Mod> mods;
 
         /// <summary>
-        /// The original source (usually a <see cref="WorkingBeatmap"/>'s track).
+        /// The <see cref="WorkingBeatmap"/>'s track.
         /// </summary>
-        private IAdjustableClock sourceClock;
+        private Track track;
 
         public readonly BindableBool IsPaused = new BindableBool();
 
@@ -41,7 +41,9 @@ namespace osu.Game.Screens.Play
 
         private readonly double gameplayStartTime;
 
-        public readonly Bindable<double> UserPlaybackRate = new BindableDouble(1)
+        private readonly double firstHitObjectTime;
+
+        public readonly BindableNumber<double> UserPlaybackRate = new BindableDouble(1)
         {
             Default = 1,
             MinValue = 0.5,
@@ -66,11 +68,11 @@ namespace osu.Game.Screens.Play
             this.beatmap = beatmap;
             this.mods = mods;
             this.gameplayStartTime = gameplayStartTime;
+            firstHitObjectTime = beatmap.Beatmap.HitObjects.First().StartTime;
 
             RelativeSizeAxes = Axes.Both;
 
-            sourceClock = (IAdjustableClock)beatmap.Track ?? new StopwatchClock();
-            (sourceClock as IAdjustableAudioComponent)?.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track = beatmap.Track;
 
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
@@ -89,6 +91,11 @@ namespace osu.Game.Screens.Play
 
         private double totalOffset => userOffsetClock.Offset + platformOffsetClock.Offset;
 
+        /// <summary>
+        /// Duration before gameplay start time required before skip button displays.
+        /// </summary>
+        public const double MINIMUM_SKIP_TIME = 1000;
+
         private readonly BindableDouble pauseFreqAdjust = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
@@ -97,20 +104,32 @@ namespace osu.Game.Screens.Play
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
             userAudioOffset.BindValueChanged(offset => userOffsetClock.Offset = offset.NewValue, true);
 
-            UserPlaybackRate.ValueChanged += _ => updateRate();
+            // sane default provided by ruleset.
+            double startTime = Math.Min(0, gameplayStartTime);
 
-            Seek(Math.Min(-beatmap.BeatmapInfo.AudioLeadIn, gameplayStartTime));
+            // if a storyboard is present, it may dictate the appropriate start time by having events in negative time space.
+            // this is commonly used to display an intro before the audio track start.
+            startTime = Math.Min(startTime, beatmap.Storyboard.FirstEventTime);
+
+            // some beatmaps specify a current lead-in time which should be used instead of the ruleset-provided value when available.
+            // this is not available as an option in the live editor but can still be applied via .osu editing.
+            if (beatmap.BeatmapInfo.AudioLeadIn > 0)
+                startTime = Math.Min(startTime, firstHitObjectTime - beatmap.BeatmapInfo.AudioLeadIn);
+
+            Seek(startTime);
+
+            adjustableClock.ProcessFrame();
         }
 
         public void Restart()
         {
             Task.Run(() =>
             {
-                sourceClock.Reset();
+                track.Reset();
 
                 Schedule(() =>
                 {
-                    adjustableClock.ChangeSource(sourceClock);
+                    adjustableClock.ChangeSource(track);
                     updateRate();
 
                     if (!IsPaused.Value)
@@ -128,6 +147,23 @@ namespace osu.Game.Screens.Play
             IsPaused.Value = false;
 
             this.TransformBindableTo(pauseFreqAdjust, 1, 200, Easing.In);
+        }
+
+        /// <summary>
+        /// Skip forward to the next valid skip point.
+        /// </summary>
+        public void Skip()
+        {
+            if (GameplayClock.CurrentTime > gameplayStartTime - MINIMUM_SKIP_TIME)
+                return;
+
+            double skipTarget = gameplayStartTime - MINIMUM_SKIP_TIME;
+
+            if (GameplayClock.CurrentTime < 0 && skipTarget > 6000)
+                // double skip exception for storyboards with very long intros
+                skipTarget = 0;
+
+            Seek(skipTarget);
         }
 
         /// <summary>
@@ -159,13 +195,13 @@ namespace osu.Game.Screens.Play
         /// </summary>
         public void StopUsingBeatmapClock()
         {
-            if (sourceClock != beatmap.Track)
+            if (track != beatmap.Track)
                 return;
 
             removeSourceClockAdjustments();
 
-            sourceClock = new TrackVirtual(beatmap.Track.Length);
-            adjustableClock.ChangeSource(sourceClock);
+            track = new TrackVirtual(beatmap.Track.Length);
+            adjustableClock.ChangeSource(track);
         }
 
         protected override void Update()
@@ -176,19 +212,20 @@ namespace osu.Game.Screens.Play
             base.Update();
         }
 
+        private bool speedAdjustmentsApplied;
+
         private void updateRate()
         {
-            if (sourceClock == null) return;
+            if (track == null) return;
 
-            sourceClock.ResetSpeedAdjustments();
+            speedAdjustmentsApplied = true;
+            track.ResetSpeedAdjustments();
 
-            if (sourceClock is IHasTempoAdjust tempo)
-                tempo.TempoAdjust = UserPlaybackRate.Value;
-            else
-                sourceClock.Rate = UserPlaybackRate.Value;
+            track.AddAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            track.AddAdjustment(AdjustableProperty.Tempo, UserPlaybackRate);
 
-            foreach (var mod in mods.OfType<IApplicableToClock>())
-                mod.ApplyToClock(sourceClock);
+            foreach (var mod in mods.OfType<IApplicableToTrack>())
+                mod.ApplyToTrack(track);
         }
 
         protected override void Dispose(bool isDisposing)
@@ -196,13 +233,16 @@ namespace osu.Game.Screens.Play
             base.Dispose(isDisposing);
 
             removeSourceClockAdjustments();
-            sourceClock = null;
+            track = null;
         }
 
         private void removeSourceClockAdjustments()
         {
-            sourceClock.ResetSpeedAdjustments();
-            (sourceClock as IAdjustableAudioComponent)?.RemoveAdjustment(AdjustableProperty.Frequency, pauseFreqAdjust);
+            if (speedAdjustmentsApplied)
+            {
+                track.ResetSpeedAdjustments();
+                speedAdjustmentsApplied = false;
+            }
         }
     }
 }

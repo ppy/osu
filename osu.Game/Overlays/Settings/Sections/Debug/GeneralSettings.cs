@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                 new SettingsCheckbox
                 {
                     LabelText = "Performance logging",
-                    Bindable = frameworkConfig.GetBindable<bool>(FrameworkSetting.PerformanceLogging)
+                    Bindable = config.GetBindable<bool>(DebugSetting.PerformanceLogging)
                 },
                 new SettingsCheckbox
                 {

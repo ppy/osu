@@ -31,6 +31,12 @@ namespace osu.Game.Users.Drawables
             set => base.CornerRadius = value;
         }
 
+        public new float CornerExponent
+        {
+            get => base.CornerExponent;
+            set => base.CornerExponent = value;
+        }
+
         public new EdgeEffectParameters EdgeEffect
         {
             get => base.EdgeEffect;

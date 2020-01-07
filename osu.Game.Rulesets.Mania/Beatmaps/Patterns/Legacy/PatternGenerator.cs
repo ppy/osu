@@ -53,11 +53,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (allowSpecial && TotalColumns == 8)
             {
                 const float local_x_divisor = 512f / 7;
-                return Math.Clamp((int)Math.Floor(position / local_x_divisor), 0, 6) + 1;
+                return Math.Clamp((int)MathF.Floor(position / local_x_divisor), 0, 6) + 1;
             }
 
             float localXDivisor = 512f / TotalColumns;
-            return Math.Clamp((int)Math.Floor(position / localXDivisor), 0, TotalColumns - 1);
+            return Math.Clamp((int)MathF.Floor(position / localXDivisor), 0, TotalColumns - 1);
         }
 
         /// <summary>
@@ -147,9 +147,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         protected int FindAvailableColumn(int initialColumn, int? lowerBound = null, int? upperBound = null, Func<int, int> nextColumn = null, [InstantHandle] Func<int, bool> validation = null,
                                           params Pattern[] patterns)
         {
-            lowerBound = lowerBound ?? RandomStart;
-            upperBound = upperBound ?? TotalColumns;
-            nextColumn = nextColumn ?? (_ => GetRandomColumn(lowerBound, upperBound));
+            lowerBound ??= RandomStart;
+            upperBound ??= TotalColumns;
+            nextColumn ??= (_ => GetRandomColumn(lowerBound, upperBound));
 
             // Check for the initial column
             if (isValid(initialColumn))

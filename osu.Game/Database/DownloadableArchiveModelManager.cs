@@ -33,7 +33,8 @@ namespace osu.Game.Database
 
         private readonly MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore;
 
-        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore, IIpcHost importHost = null)
+        protected DownloadableArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, IAPIProvider api, MutableDatabaseBackedStoreWithFileIncludes<TModel, TFileModel> modelStore,
+                                                  IIpcHost importHost = null)
             : base(storage, contextFactory, modelStore, importHost)
         {
             this.api = api;
@@ -91,25 +92,13 @@ namespace osu.Game.Database
             notification.CancelRequested += () =>
             {
                 request.Cancel();
-                currentDownloads.Remove(request);
-                notification.State = ProgressNotificationState.Cancelled;
                 return true;
             };
 
             currentDownloads.Add(request);
             PostNotification?.Invoke(notification);
 
-            Task.Factory.StartNew(() =>
-            {
-                try
-                {
-                    request.Perform(api);
-                }
-                catch (Exception error)
-                {
-                    triggerFailure(error);
-                }
-            }, TaskCreationOptions.LongRunning);
+            api.PerformAsync(request);
 
             DownloadBegan?.Invoke(request);
             return true;
@@ -118,11 +107,11 @@ namespace osu.Game.Database
             {
                 DownloadFailed?.Invoke(request);
 
-                if (error is OperationCanceledException) return;
-
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
                 currentDownloads.Remove(request);
+                notification.State = ProgressNotificationState.Cancelled;
+
+                if (!(error is OperationCanceledException))
+                    Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
             }
         }
 
@@ -134,7 +123,8 @@ namespace osu.Game.Database
         /// <param name="model">The <typeparamref name="TModel"/> whose existence needs to be checked.</param>
         /// <param name="items">The usable items present in the store.</param>
         /// <returns>Whether the <typeparamref name="TModel"/> exists.</returns>
-        protected abstract bool CheckLocalAvailability(TModel model, IQueryable<TModel> items);
+        protected virtual bool CheckLocalAvailability(TModel model, IQueryable<TModel> items)
+            => model.ID > 0 && items.Any(i => i.ID == model.ID && i.Files.Any());
 
         public ArchiveDownloadRequest<TModel> GetExistingDownload(TModel model) => currentDownloads.Find(r => r.Model.Equals(model));
 

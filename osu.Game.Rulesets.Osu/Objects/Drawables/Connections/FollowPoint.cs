@@ -25,11 +25,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new Container
+            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new CircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
-                CornerRadius = width / 2,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,

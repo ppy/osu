@@ -52,6 +52,7 @@ namespace osu.Game.Tournament.Components
             currentMatch.BindTo(ladder.CurrentMatch);
 
             CornerRadius = HEIGHT / 2;
+            CornerExponent = 2;
             Masking = true;
 
             AddRangeInternal(new Drawable[]

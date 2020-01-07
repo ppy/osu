@@ -267,9 +267,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         userId.Value = user.Id.ToString();
                         userId.BindValueChanged(idString =>
                         {
-                            long parsed;
-
-                            long.TryParse(idString.NewValue, out parsed);
+                            long.TryParse(idString.NewValue, out var parsed);
 
                             user.Id = parsed;
 

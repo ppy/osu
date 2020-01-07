@@ -38,7 +38,7 @@ namespace osu.Game.Graphics
             }
         }
 
-        public Color4 ForDifficultyRating(DifficultyRating difficulty)
+        public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
         {
             switch (difficulty)
             {
@@ -56,10 +56,10 @@ namespace osu.Game.Graphics
                     return Pink;
 
                 case DifficultyRating.Expert:
-                    return Purple;
+                    return useLighterColour ? PurpleLight : Purple;
 
                 case DifficultyRating.ExpertPlus:
-                    return Gray0;
+                    return useLighterColour ? Gray9 : Gray0;
             }
         }
 

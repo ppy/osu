@@ -18,10 +18,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            InternalChild = new Container
+            InternalChild = new CircularContainer
             {
                 Masking = true,
-                CornerRadius = Size.X / 2,
                 BorderThickness = 10,
                 BorderColour = Color4.White,
                 RelativeSizeAxes = Axes.Both,

@@ -274,8 +274,8 @@ namespace osu.Game.Overlays
 
             if (allowRateAdjustments)
             {
-                foreach (var mod in mods.Value.OfType<IApplicableToClock>())
-                    mod.ApplyToClock(track);
+                foreach (var mod in mods.Value.OfType<IApplicableToTrack>())
+                    mod.ApplyToTrack(track);
             }
         }
 

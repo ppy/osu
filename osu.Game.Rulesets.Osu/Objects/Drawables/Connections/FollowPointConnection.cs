@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
             Vector2 startPosition = osuStart.EndPosition;
             Vector2 endPosition = osuEnd.Position;
-            double startTime = (osuStart as IHasEndTime)?.EndTime ?? osuStart.StartTime;
+            double startTime = osuStart.GetEndTime();
             double endTime = osuEnd.StartTime;
 
             Vector2 distanceVector = endPosition - startPosition;

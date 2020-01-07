@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.UI
 {
     public class ModIcon : Container, IHasTooltip
     {
-        public readonly BindableBool Highlighted = new BindableBool();
+        public readonly BindableBool Selected = new BindableBool();
 
         private readonly SpriteIcon modIcon;
         private readonly SpriteIcon background;
@@ -34,9 +34,11 @@ namespace osu.Game.Rulesets.UI
 
         public virtual string TooltipText { get; }
 
+        protected Mod Mod { get; private set; }
+
         public ModIcon(Mod mod)
         {
-            if (mod == null) throw new ArgumentNullException(nameof(mod));
+            Mod = mod ?? throw new ArgumentNullException(nameof(mod));
 
             type = mod.Type;
 
@@ -98,13 +100,19 @@ namespace osu.Game.Rulesets.UI
                     backgroundColour = colours.Pink;
                     highlightedColour = colours.PinkLight;
                     break;
+
+                case ModType.System:
+                    backgroundColour = colours.Gray6;
+                    highlightedColour = colours.Gray7;
+                    modIcon.Colour = colours.Yellow;
+                    break;
             }
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Highlighted.BindValueChanged(highlighted => background.Colour = highlighted.NewValue ? highlightedColour : backgroundColour, true);
+            Selected.BindValueChanged(selected => background.Colour = selected.NewValue ? highlightedColour : backgroundColour, true);
         }
     }
 }

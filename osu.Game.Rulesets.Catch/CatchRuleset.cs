@@ -16,15 +16,22 @@ using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Catch.Difficulty;
+using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using System;
 
 namespace osu.Game.Rulesets.Catch
 {
-    public class CatchRuleset : Ruleset
+    public class CatchRuleset : Ruleset, ILegacyRuleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableCatchRuleset(this, beatmap, mods);
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableCatchRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor();
+
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new CatchBeatmapConverter(beatmap, this);
+
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new CatchBeatmapProcessor(beatmap);
 
         public const string SHORT_NAME = "fruits";
@@ -51,7 +58,9 @@ namespace osu.Game.Rulesets.Catch
             else if (mods.HasFlag(LegacyMods.SuddenDeath))
                 yield return new CatchModSuddenDeath();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new CatchModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new CatchModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -98,10 +107,16 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModFlashlight(),
                     };
 
+                case ModType.Conversion:
+                    return new Mod[]
+                    {
+                        new CatchModDifficultyAdjust(),
+                    };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new CatchModAutoplay(), new ModCinema()),
+                        new MultiMod(new CatchModAutoplay(), new CatchModCinema()),
                         new CatchModRelax(),
                     };
 
@@ -112,7 +127,7 @@ namespace osu.Game.Rulesets.Catch
                     };
 
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -120,19 +135,16 @@ namespace osu.Game.Rulesets.Catch
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Catching fruit";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetCatch };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new CatchPerformanceCalculator(this, beatmap, score);
 
-        public override int? LegacyID => 2;
+        public int LegacyID => 2;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new CatchReplayFrame();
-
-        public CatchRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
     }
 }

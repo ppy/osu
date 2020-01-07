@@ -100,10 +100,13 @@ namespace osu.Game.Rulesets.UI
         public GameplayCursorContainer Cursor { get; private set; }
 
         /// <summary>
-        /// Provide an optional cursor which is to be used for gameplay.
+        /// Provide a cursor which is to be used for gameplay.
         /// </summary>
-        /// <returns>The cursor, or null if a cursor is not rqeuired.</returns>
-        protected virtual GameplayCursorContainer CreateCursor() => null;
+        /// <remarks>
+        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
+        /// </remarks>
+        /// <returns>The cursor, or null to show the menu cursor.</returns>
+        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -143,5 +146,14 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        public class InvisibleCursorContainer : GameplayCursorContainer
+        {
+            protected override Drawable CreateCursor() => new InvisibleCursor();
+
+            private class InvisibleCursor : Drawable
+            {
+            }
+        }
     }
 }

@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select
             newRoot.Filter(activeCriteria);
 
             // preload drawables as the ctor overhead is quite high currently.
-            var _ = newRoot.Drawables;
+            _ = newRoot.Drawables;
 
             root = newRoot;
             if (selectedBeatmapSet != null && !beatmapSets.Contains(selectedBeatmapSet.BeatmapSet))
@@ -587,13 +587,16 @@ namespace osu.Game.Screens.Select
                     switch (d)
                     {
                         case DrawableCarouselBeatmapSet set:
+                        {
                             lastSet = set;
 
                             set.MoveToX(set.Item.State.Value == CarouselItemState.Selected ? -100 : 0, 500, Easing.OutExpo);
                             set.MoveToY(currentY, 750, Easing.OutExpo);
                             break;
+                        }
 
                         case DrawableCarouselBeatmap beatmap:
+                        {
                             if (beatmap.Item.State.Value == CarouselItemState.Selected)
                                 scrollTarget = currentY + beatmap.DrawHeight / 2 - DrawHeight / 2;
 
@@ -619,6 +622,7 @@ namespace osu.Game.Screens.Select
                             }
 
                             break;
+                        }
                     }
                 }
 
@@ -640,10 +644,19 @@ namespace osu.Game.Screens.Select
             itemsCache.Validate();
         }
 
+        private bool firstScroll = true;
+
         private void updateScrollPosition()
         {
             if (scrollTarget != null)
             {
+                if (firstScroll)
+                {
+                    // reduce movement when first displaying the carousel.
+                    scroll.ScrollTo(scrollTarget.Value - 200, false);
+                    firstScroll = false;
+                }
+
                 scroll.ScrollTo(scrollTarget.Value);
                 scrollPositionCache.Validate();
             }
@@ -661,8 +674,8 @@ namespace osu.Game.Screens.Select
         {
             // The radius of the circle the carousel moves on.
             const float circle_radius = 3;
-            double discriminant = Math.Max(0, circle_radius * circle_radius - dist * dist);
-            float x = (circle_radius - (float)Math.Sqrt(discriminant)) * halfHeight;
+            float discriminant = MathF.Max(0, circle_radius * circle_radius - dist * dist);
+            float x = (circle_radius - MathF.Sqrt(discriminant)) * halfHeight;
 
             return 125 + x;
         }
