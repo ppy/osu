@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
 using osu.Game.Skinning;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -121,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
-            float aimRotation = MathHelper.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            float aimRotation = MathUtils.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)
                 aimRotation += aimRotation < Rotation ? 360 : -360;
 
