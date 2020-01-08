@@ -4,8 +4,13 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -20,9 +25,35 @@ namespace osu.Game.Tests.Visual.Online
         {
             var countryBindable = new Bindable<Country>();
 
-            Add(new CountryFilter
+            AddRange(new Drawable[]
             {
-                Country = { BindTarget = countryBindable }
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Gray,
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
+                    {
+                        new CountryFilter
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Country = { BindTarget = countryBindable }
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = "Some content",
+                            Margin = new MarginPadding { Vertical = 20 }
+                        }
+                    }
+                }
             });
 
             var country = new Country
