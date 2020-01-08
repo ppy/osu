@@ -86,6 +86,7 @@ namespace osu.Game.Overlays.Rankings
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
+            content.ClearTransforms();
             countryPill.ClearTransforms();
 
             if (country.NewValue == null)
