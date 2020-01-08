@@ -19,9 +19,8 @@ namespace osu.Game.Tests.Visual.Online
         public TestSceneRankingsCountryFilter()
         {
             var countryBindable = new Bindable<Country>();
-            CountryFilter filter;
 
-            Add(filter = new CountryFilter
+            Add(new CountryFilter
             {
                 Country = { BindTarget = countryBindable }
             });
