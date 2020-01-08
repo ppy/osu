@@ -4,8 +4,10 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Timing;
+using osu.Framework.MathUtils;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets.Osu;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -15,22 +17,48 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private MusicController musicController = new MusicController();
 
-        public TestSceneNowPlayingOverlay()
-        {
-            Clock = new FramedClock();
+        private WorkingBeatmap currentBeatmap;
 
-            var np = new NowPlayingOverlay
+        private NowPlayingOverlay nowPlayingOverlay;
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Beatmap.Value = CreateWorkingBeatmap(new OsuRuleset().RulesetInfo);
+
+            nowPlayingOverlay = new NowPlayingOverlay
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre
             };
 
             Add(musicController);
-            Add(np);
+            Add(nowPlayingOverlay);
+        }
 
-            AddStep(@"show", () => np.Show());
+        [Test]
+        public void TestShowHideDisable()
+        {
+            AddStep(@"show", () => nowPlayingOverlay.Show());
             AddToggleStep(@"toggle beatmap lock", state => Beatmap.Disabled = state);
-            AddStep(@"show", () => np.Hide());
+            AddStep(@"hide", () => nowPlayingOverlay.Hide());
+        }
+
+        [Test]
+        public void TestPrevTrackBehavior()
+        {
+            AddStep(@"Play track", () =>
+            {
+                musicController.NextTrack();
+                currentBeatmap = Beatmap.Value;
+            });
+
+            AddStep(@"Seek track to 6 second", () => musicController.SeekTo(6000));
+            AddUntilStep(@"Wait for current time to update", () => currentBeatmap.Track.CurrentTime > 5000);
+            AddAssert(@"Check action is restart track", () => musicController.PreviousTrack() == PreviousTrackResult.Restart);
+            AddUntilStep("Wait for current time to update", () => Precision.AlmostEquals(currentBeatmap.Track.CurrentTime, 0));
+            AddAssert(@"Check track didn't change", () => currentBeatmap == Beatmap.Value);
+            AddAssert(@"Check action is not restart", () => musicController.PreviousTrack() != PreviousTrackResult.Restart);
         }
     }
 }
