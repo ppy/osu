@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User, "喜欢的谱面"),
+                new PaginatedBeatmapContainer(BeatmapSetType.Favourite, User, "我喜欢的谱面"),
                 new PaginatedBeatmapContainer(BeatmapSetType.RankedAndApproved, User, "计入排行的谱面"),
                 new PaginatedBeatmapContainer(BeatmapSetType.Loved, User, "Loved谱面"),
                 new PaginatedBeatmapContainer(BeatmapSetType.Unranked, User, "审核中/制作中的谱面"),

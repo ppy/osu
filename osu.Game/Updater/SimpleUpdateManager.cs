@@ -46,7 +46,7 @@ namespace osu.Game.Updater
                 {
                     Notifications.Post(new SimpleNotification
                     {
-                        Text = $"osu!lazer已有新版本可用!(你的版本{version} → 最新版本{latest.TagName}).\n\n"
+                        Text = $"官方版osu!lazer已有新版本可用!(你的版本{version} → 最新版本{latest.TagName}).\n\n"
                                + "点击这里来自动安装",
                         Icon = FontAwesome.Solid.Upload,
                         Activated = () =>
