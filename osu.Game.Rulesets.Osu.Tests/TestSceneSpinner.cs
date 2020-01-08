@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private class TestDrawableSpinner : DrawableSpinner
         {
-            private bool auto;
+            private readonly bool auto;
 
             public TestDrawableSpinner(Spinner s, bool auto)
                 : base(s)
@@ -74,12 +74,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
-                if (auto && !userTriggered && Time.Current > Spinner.StartTime + Spinner.Duration / 2 && Progress < 1)
-                {
-                    // force completion only once to not break human interaction
-                    Disc.RotationAbsolute = Spinner.SpinsRequired * 360;
-                    auto = false;
-                }
+                if (auto && !userTriggered && Time.Current > Spinner.StartTime)
+                    Disc.RotationAbsolute += Progress >= 1 ? 10 : (float)(Spinner.Duration / 120);
 
                 base.CheckForResult(userTriggered, timeOffset);
             }

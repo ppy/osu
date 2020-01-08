@@ -14,6 +14,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 
@@ -23,9 +24,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         protected readonly Spinner Spinner;
 
+        private readonly Container<DrawableSpinnerTick> ticks;
+
         public readonly SpinnerDisc Disc;
         public readonly SpinnerTicks Ticks;
         public readonly SpinnerSpmCounter SpmCounter;
+        private readonly SpinnerBonusComponent bonusComponent;
 
         private readonly Container mainContainer;
 
@@ -59,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
+                ticks = new Container<DrawableSpinnerTick>(),
                 circleContainer = new Container
                 {
                     AutoSizeAxes = Axes.Both,
@@ -116,8 +121,43 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Origin = Anchor.Centre,
                     Y = 120,
                     Alpha = 0
+                },
+                bonusComponent = new SpinnerBonusComponent(this, ticks)
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Y = -120,
                 }
             };
+        }
+
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
+        {
+            base.AddNestedHitObject(hitObject);
+
+            switch (hitObject)
+            {
+                case DrawableSpinnerTick tick:
+                    ticks.Add(tick);
+                    break;
+            }
+        }
+
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            ticks.Clear();
+        }
+
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case SpinnerTick tick:
+                    return new DrawableSpinnerTick(tick);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
 
         [BackgroundDependencyLoader]
@@ -190,6 +230,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Rotation = Disc.Rotation;
             Ticks.Rotation = Disc.Rotation;
             SpmCounter.SetRotation(Disc.RotationAbsolute);
+            bonusComponent.UpdateRotation(Disc.RotationAbsolute);
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
