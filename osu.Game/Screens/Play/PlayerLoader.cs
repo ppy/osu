@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
             }).WithChildren(new Drawable[]
             {
-                MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value, content.LogoFacade)
+                MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
                 {
                     Alpha = 0,
                     Anchor = Anchor.Centre,
@@ -379,11 +379,12 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
+            private readonly Bindable<IReadOnlyList<Mod>> mods;
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
 
-            public IReadOnlyList<Mod> Mods { get; }
+            public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
             public bool Loading
             {
@@ -402,12 +403,13 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, Drawable facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
             {
                 this.beatmap = beatmap;
                 this.facade = facade;
 
-                Mods = mods;
+                this.mods = new Bindable<IReadOnlyList<Mod>>();
+                this.mods.BindTo(mods);
             }
 
             [BackgroundDependencyLoader]
@@ -494,7 +496,7 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Margin = new MarginPadding { Top = 20 },
-                                Current = { Value = Mods }
+                                Current = mods
                             }
                         },
                     }

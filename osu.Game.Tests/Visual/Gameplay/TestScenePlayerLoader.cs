@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new Task DisposalTask => base.DisposalTask;
 
-            public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods;
+            public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
