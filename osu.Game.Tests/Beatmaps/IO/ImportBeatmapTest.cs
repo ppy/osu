@@ -19,6 +19,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -579,16 +580,23 @@ namespace osu.Game.Tests.Beatmaps.IO
                         using (var writer = new StreamWriter(stream, leaveOpen: true))
                         {
                             beatmapToUpdate.BeatmapInfo.Version = "updated";
+                            beatmapToUpdate.HitObjects.Clear();
+                            beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
+
                             new LegacyBeatmapEncoder(beatmapToUpdate).Encode(writer);
                         }
 
                         stream.Seek(0, SeekOrigin.Begin);
 
-                        using (var reader = new UpdateArchiveReader<BeatmapSetInfo, BeatmapSetFileInfo>(manager.Files.Store, setToUpdate, fileToUpdate, stream))
-                            await manager.Import(setToUpdate, reader);
+                        manager.Update(setToUpdate);
+                        manager.UpdateFile(fileToUpdate, stream);
                     }
 
-                    var allBeatmaps = manager.GetAllUsableBeatmapSets();
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
+
+                    Assert.That(updatedBeatmap.BeatmapInfo.Version, Is.EqualTo("updated"));
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
+                    Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                 }
                 finally
                 {

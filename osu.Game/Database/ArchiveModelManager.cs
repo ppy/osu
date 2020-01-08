@@ -261,18 +261,24 @@ namespace osu.Game.Database
         /// <remarks>
         ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
         /// </remarks>
-        private string computeHash(ArchiveReader reader)
+        private string computeHash(TModel item, ArchiveReader reader = null)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)))
             {
-                using (Stream s = reader.GetStream(file))
+                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
             }
 
-            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : reader.Name.ComputeSHA2Hash();
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            if (reader != null)
+                return reader.Name.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         /// <summary>
@@ -302,7 +308,7 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
-                item.Hash = archive != null ? computeHash(archive) : item.Hash;
+                item.Hash = computeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
 
@@ -358,12 +364,37 @@ namespace osu.Game.Database
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
+        public void UpdateFile(TFileModel file, Stream contents)
+        {
+            using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+            {
+                var existingModels = ModelStore.ConsumableItems.Where(b => b.Files.Any(f => f.FileInfoID == file.FileInfoID)).ToList();
+
+                if (existingModels.Count == 0)
+                    throw new InvalidOperationException($"Cannot update files of models not contained by this {nameof(ArchiveModelManager<TModel, TFileModel>)}.");
+
+                using (var stream = Files.Storage.GetStream(file.FileInfo.StoragePath, FileAccess.Write, FileMode.Create))
+                    contents.CopyTo(stream);
+
+                foreach (var model in existingModels)
+                    Update(model);
+            }
+        }
+
         /// <summary>
         /// Perform an update of the specified item.
-        /// TODO: Support file changes.
+        /// TODO: Support file additions/removals.
         /// </summary>
         /// <param name="item">The item to update.</param>
-        public void Update(TModel item) => ModelStore.Update(item);
+        public void Update(TModel item)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                item.Hash = computeHash(item);
+
+                ModelStore.Update(item);
+            }
+        }
 
         /// <summary>
         /// Delete an item from the manager.
