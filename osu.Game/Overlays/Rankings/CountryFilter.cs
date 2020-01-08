@@ -86,9 +86,6 @@ namespace osu.Game.Overlays.Rankings
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
-            content.ClearTransforms();
-            countryPill.ClearTransforms();
-
             if (country.NewValue == null)
             {
                 countryPill.Collapse();
@@ -98,7 +95,8 @@ namespace osu.Game.Overlays.Rankings
             }
 
             this.ResizeHeightTo(height, duration, Easing.OutQuint);
-            content.FadeIn(duration, Easing.OutQuint).Finally(_ => countryPill.Expand());
+            content.FadeIn(duration, Easing.OutQuint);
+            countryPill.Expand();
         }
 
         private class CountryPill : CircularContainer
@@ -181,12 +179,14 @@ namespace osu.Game.Overlays.Rankings
 
             public void Expand()
             {
+                ClearTransforms();
                 AutoSizeAxes = Axes.X;
                 this.FadeIn(duration, Easing.OutQuint);
             }
 
             public void Collapse()
             {
+                ClearTransforms();
                 AutoSizeAxes = Axes.None;
                 this.ResizeWidthTo(0, duration, Easing.OutQuint);
                 this.FadeOut(duration, Easing.OutQuint);
