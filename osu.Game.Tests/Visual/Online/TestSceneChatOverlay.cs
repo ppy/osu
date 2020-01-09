@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual.Online
                     default:
                         return new TestChannelTabItem(value);
                 }
-            };
+            }
 
             public new IReadOnlyDictionary<Channel, TabItem<Channel>> TabMap => base.TabMap;
         }
