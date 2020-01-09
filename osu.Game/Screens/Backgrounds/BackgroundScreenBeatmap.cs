@@ -49,9 +49,12 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
 
             InternalChild = dimmable = CreateFadeContainer();
+
             dimmable.EnableUserDim.BindTo(EnableUserDim);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
+
+            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         [BackgroundDependencyLoader]
@@ -99,7 +102,6 @@ namespace osu.Game.Screens.Backgrounds
 
             b.Depth = newDepth;
             dimmable.Background = Background = b;
-            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         public override bool Equals(BackgroundScreen other)

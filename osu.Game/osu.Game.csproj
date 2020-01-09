@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ppy.osu.Game.Resources" Version="2019.1230.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="2020.103.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2020.109.1" />
     <PackageReference Include="Sentry" Version="1.2.0" />
     <PackageReference Include="SharpCompress" Version="0.24.0" />
     <PackageReference Include="NUnit" Version="3.12.0" />
