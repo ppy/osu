@@ -21,7 +21,7 @@ using osu.Framework.Graphics.Shapes;
 using System;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 
 namespace osu.Game.Overlays
 {
