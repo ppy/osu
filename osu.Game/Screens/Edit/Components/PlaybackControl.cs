@@ -5,6 +5,8 @@ using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,6 +26,8 @@ namespace osu.Game.Screens.Edit.Components
         private IconButton playButton;
 
         private IAdjustableClock adjustableClock;
+
+        private readonly BindableDouble playbackSpeed = new BindableDouble(1.0);
 
         [BackgroundDependencyLoader]
         private void load(IAdjustableClock adjustableClock)
@@ -46,7 +50,7 @@ namespace osu.Game.Screens.Edit.Components
                 new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
-                    Text = "播放速度",
+                    Text = "Playback speed",
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
                     Padding = new MarginPadding { Left = 45 }
@@ -62,7 +66,12 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
+            tabs.Current.ValueChanged += tempo =>
+            {
+                Beatmap.Value?.Track.ResetSpeedAdjustments();
+                playbackSpeed.Value = tempo.NewValue;
+                Beatmap.Value?.Track.AddAdjustment(AdjustableProperty.Tempo, playbackSpeed);
+            };
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

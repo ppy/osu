@@ -14,6 +14,7 @@ using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 
@@ -150,7 +151,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"请登入来查看在线排行!"));
+                        replacePlaceholder(new LoginPlaceholder());
                         break;
 
                     case PlaceholderState.NotSupporter:

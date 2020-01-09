@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Changelog
                             new OsuSpriteText
                             {
                                 Text = stream.LatestBuild.Users > 0 ? $"{stream.LatestBuild.Users:N0} {"用户".Pluralize(stream.LatestBuild.Users == 1)} 在线" : null,
-                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 10),
+                                Font = OsuFont.GetFont(weight: FontWeight.Regular, size: 14),
                                 Colour = new Color4(203, 164, 218, 255),
                             },
                         }

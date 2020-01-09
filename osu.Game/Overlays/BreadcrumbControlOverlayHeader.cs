@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
                 public ControlTabItem(string value)
                     : base(value)
                 {
-                    Text.Font = Text.Font.With(size: 14);
+                    Text.Font = Text.Font.With(size: 18);
                     Chevron.Y = 3;
                     Bar.Height = 0;
                 }

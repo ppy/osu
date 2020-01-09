@@ -9,12 +9,14 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.IO.Stores;
 using osu.Game.Audio;
+using osu.Framework.Testing;
 using osu.Game.Skinning;
 using osu.Game.Tests.Resources;
 using osu.Game.Tests.Visual;
 
 namespace osu.Game.Tests.Gameplay
 {
+    [HeadlessTest]
     public class TestSceneStoryboardSamples : OsuTestScene
     {
         [Test]

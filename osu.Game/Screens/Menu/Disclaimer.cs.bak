@@ -15,7 +15,6 @@ using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Users;
-using osu.Framework;
 
 namespace osu.Game.Screens.Menu
 {
@@ -25,8 +24,6 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
         private LinkFlowContainer supportFlow;
-
-        private LinkFlowContainer mfFlow;
 
         private Drawable heart;
 
@@ -85,35 +82,35 @@ namespace osu.Game.Screens.Menu
                             Alpha = 0,
                             Spacing = new Vector2(0, 2),
                         },
-                        mfFlow = new LinkFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            TextAnchor = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
-                            Spacing = new Vector2(0, 2),
-                        },
                     }
                 }
             };
 
             textFlow.AddText("注意!这是一个", t => t.Font = t.Font.With(Typeface.Exo, 35, FontWeight.Light));
-            textFlow.AddText("分支版本", t => t.Font = t.Font.With(Typeface.Exo, 35, FontWeight.SemiBold));
+            textFlow.AddText("早期开发版本", t => t.Font = t.Font.With(Typeface.Exo, 35, FontWeight.SemiBold));
 
-            textFlow.AddParagraph("一些功能可能不会像预期或最新版的那样工作", t => t.Font = t.Font.With(size: 25));
+            textFlow.AddParagraph("一些功能可能不会像预期的那样工作", t => t.Font = t.Font.With(size: 25));
             textFlow.NewParagraph();
 
             static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 20, weight: FontWeight.SemiBold);
 
-            textFlow.AddParagraph("如果遇到了功能问题,请下载官方最新版后检查是否仍然存在",format);
-            textFlow.AddParagraph("若问题依然存在,欢迎前往",format);
-            textFlow.AddLink("官方github页面", "https://github.com/ppy/osu/issues", creationParameters: format);
+            textFlow.AddParagraph("欢迎前往", format);
+            textFlow.AddLink("github页面", "https://github.com/ppy/osu/issues", creationParameters: format);
             textFlow.AddText("来提交问题报告", format);
+            textFlow.NewParagraph();
+            textFlow.NewParagraph();
 
-            textFlow.AddParagraph("反馈翻译问题,请前往", format);
+            textFlow.AddText("或者加入", format);
+            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
+            textFlow.AddText("来帮助开发或者关注进度!", format);
+
+            textFlow.AddParagraph("反馈该版本的翻译问题,请前往", format);
             textFlow.AddLink("mfosu的github页面", "https://github.com/MATRIX-feather/osu/issues", creationParameters: format);
             textFlow.AddText("来提交问题报告", format);
+            textFlow.NewParagraph();
+
+            textFlow.NewParagraph();
+            textFlow.NewParagraph();
             textFlow.NewParagraph();
 
             iconColour = colours.Yellow;
@@ -148,10 +145,6 @@ namespace osu.Game.Screens.Menu
                 if (supportFlow.IsPresent)
                     supportFlow.FadeInFromZero(500);
             }, true);
-
-            supportFlow.NewParagraph();
-            mfFlow.AddParagraph("基础版本 : ");
-            mfFlow.AddText(Game.Version);
         }
 
         private void animateHeart()
@@ -179,13 +172,12 @@ namespace osu.Game.Screens.Menu
                 .RotateTo(0, 160, Easing.InCirc);
 
             supportFlow.FadeOut().Delay(2000).FadeIn(500);
-            mfFlow.FadeOut().Delay(4000).FadeIn(500);
 
             animateHeart();
 
             this
                 .FadeInFromZero(500)
-                .Then(7000)
+                .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
                 .Finally(d =>

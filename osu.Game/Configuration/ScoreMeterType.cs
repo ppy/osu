@@ -18,5 +18,13 @@ namespace osu.Game.Configuration
 
         [Description("打击误差 (左右侧)")]
         HitErrorBoth,
+        [Description("打击情况 (左侧)")]
+        ColourLeft,
+
+        [Description("打击情况 (右侧)")]
+        ColourRight,
+
+        [Description("打击情况 (左右侧)")]
+        ColourBoth,
     }
 }

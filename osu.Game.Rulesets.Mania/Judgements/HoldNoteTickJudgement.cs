@@ -15,11 +15,11 @@ namespace osu.Game.Rulesets.Mania.Judgements
         {
             switch (result)
             {
-                case HitResult.Miss:
-                    return 0;
+                case HitResult.Perfect:
+                    return 0.01;
 
                 default:
-                    return 0.040;
+                    return 0;
             }
         }
     }

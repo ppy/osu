@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Origin = Anchor.Centre,
                     Texture = textures.Get(@"Gameplay/osu/disc"),
                 },
+                new KiaiFlash
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    FlashOpacity = 0.25f,
+                },
                 new TrianglesPiece
                 {
                     RelativeSizeAxes = Axes.Both,
