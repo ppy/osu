@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 
@@ -151,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
+                        replacePlaceholder(new LoginPlaceholder());
                         break;
 
                     case PlaceholderState.NotSupporter:
