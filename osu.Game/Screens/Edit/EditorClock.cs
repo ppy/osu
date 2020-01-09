@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
