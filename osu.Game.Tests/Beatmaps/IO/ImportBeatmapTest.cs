@@ -11,14 +11,10 @@ using NUnit.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Database;
 using osu.Game.IO;
-using osu.Game.IO.Archives;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
@@ -559,9 +555,9 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
-        public async Task TestUpdateBeatmapInfoContents()
+        public async Task TestUpdateBeatmapInfo()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapInfoContents)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapInfo)))
             {
                 try
                 {
@@ -589,9 +585,9 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
-        public async Task TestUpdateBeatmapFileContents()
+        public async Task TestUpdateBeatmapFile()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFileContents)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFile)))
             {
                 try
                 {
@@ -617,7 +613,51 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                         stream.Seek(0, SeekOrigin.Begin);
 
-                        manager.UpdateFile(fileToUpdate, stream);
+                        manager.UpdateFile(setToUpdate, fileToUpdate, stream);
+                    }
+
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
+
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
+                    Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestAddFile()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestAddFile)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+                    await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                    BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+                    Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
+                    BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
+
+                    using (var stream = new MemoryStream())
+                    {
+                        using (var writer = new StreamWriter(stream, leaveOpen: true))
+                        {
+                            beatmapToUpdate.HitObjects.Clear();
+                            beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
+
+                            new LegacyBeatmapEncoder(beatmapToUpdate).Encode(writer);
+                        }
+
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        manager.UpdateFile(setToUpdate, fileToUpdate, stream);
                     }
 
                     Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;

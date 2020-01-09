@@ -364,20 +364,18 @@ namespace osu.Game.Database
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
-        public void UpdateFile(TFileModel file, Stream contents)
+        public void UpdateFile(TModel model, TFileModel file, Stream contents)
         {
             using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
             {
-                var existingModels = ModelStore.ConsumableItems.Where(b => b.Files.Any(f => f.FileInfoID == file.FileInfoID)).ToList();
+                model.Files.Remove(file);
+                model.Files.Add(new TFileModel
+                {
+                    Filename = file.Filename,
+                    FileInfo = Files.Add(contents)
+                });
 
-                if (existingModels.Count == 0)
-                    throw new InvalidOperationException($"Cannot update files of models not contained by this {nameof(ArchiveModelManager<TModel, TFileModel>)}.");
-
-                using (var stream = Files.Storage.GetStream(file.FileInfo.StoragePath, FileAccess.Write, FileMode.Create))
-                    contents.CopyTo(stream);
-
-                foreach (var model in existingModels)
-                    Update(model);
+                Update(model);
             }
         }
 
