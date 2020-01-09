@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Configuration;
 using osuTK.Input;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
