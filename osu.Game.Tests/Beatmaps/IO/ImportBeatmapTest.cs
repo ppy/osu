@@ -735,56 +735,5 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
         }
-
-        private class UpdateArchiveReader<TModel, TFileModel> : ArchiveReader
-            where TModel : class, IHasFiles<TFileModel>
-            where TFileModel : INamedFileInfo, new()
-        {
-            private readonly IResourceStore<byte[]> store;
-            private readonly TModel modelToUpdate;
-            private readonly TFileModel fileToUpdate;
-            private readonly Stream newContents;
-
-            public UpdateArchiveReader(IResourceStore<byte[]> store, TModel modelToUpdate, TFileModel fileToUpdate, Stream newContents)
-                : base(string.Empty)
-            {
-                this.store = store;
-                this.modelToUpdate = modelToUpdate;
-                this.fileToUpdate = fileToUpdate;
-                this.newContents = newContents;
-            }
-
-            public override Stream GetStream(string name)
-            {
-                name = name.ToStandardisedPath();
-
-                if (name.Contains(fileToUpdate.Filename, StringComparison.Ordinal))
-                {
-                    var stream = new MemoryStream();
-
-                    newContents.Seek(0, SeekOrigin.Begin);
-                    newContents.CopyTo(stream);
-
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    return stream;
-                }
-
-                TFileModel existing = modelToUpdate.Files.FirstOrDefault(m => name.Contains(m.Filename, StringComparison.Ordinal));
-
-                if (!string.IsNullOrEmpty(existing?.FileInfo?.StoragePath))
-                    return store.GetStream(existing.FileInfo.StoragePath);
-
-                return null;
-            }
-
-            public override void Dispose()
-            {
-            }
-
-            public override IEnumerable<string> Filenames => Enumerable.Empty<string>(); // modelToUpdate.Files.Select(f => f.Filename);
-
-            public override Stream GetUnderlyingStream() => null;
-        }
     }
 }
