@@ -559,9 +559,39 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
-        public async Task TestUpdateFile()
+        public async Task TestUpdateBeatmapInfoContents()
         {
-            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateFile)))
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapInfoContents)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+                    await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                    // Update via the beatmap, not the beatmap info, to ensure correct linking
+                    BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+                    Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
+                    beatmapToUpdate.BeatmapInfo.Version = "updated";
+
+                    manager.Update(setToUpdate);
+
+                    BeatmapInfo updatedInfo = manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID);
+                    Assert.That(updatedInfo.Version, Is.EqualTo("updated"));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestUpdateBeatmapFileContents()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFileContents)))
             {
                 try
                 {
@@ -579,7 +609,6 @@ namespace osu.Game.Tests.Beatmaps.IO
                     {
                         using (var writer = new StreamWriter(stream, leaveOpen: true))
                         {
-                            beatmapToUpdate.BeatmapInfo.Version = "updated";
                             beatmapToUpdate.HitObjects.Clear();
                             beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
 
@@ -588,13 +617,11 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                         stream.Seek(0, SeekOrigin.Begin);
 
-                        manager.Update(setToUpdate);
                         manager.UpdateFile(fileToUpdate, stream);
                     }
 
                     Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
 
-                    Assert.That(updatedBeatmap.BeatmapInfo.Version, Is.EqualTo("updated"));
                     Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
                     Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                 }
