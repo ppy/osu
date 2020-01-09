@@ -47,6 +47,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             switch (e)
             {
+                // blocking scroll can cause weird behaviour when this layer is used within a ScrollContainer.
                 case ScrollEvent _:
                     return false;
             }
