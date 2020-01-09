@@ -12,7 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;

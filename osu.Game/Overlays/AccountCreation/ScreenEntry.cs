@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
