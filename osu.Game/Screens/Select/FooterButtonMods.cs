@@ -3,7 +3,7 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+// using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
@@ -34,31 +34,19 @@ namespace osu.Game.Screens.Select
 
         public FooterButtonMods()
         {
-            Add(new FillFlowContainer
+            ButtonContentContainer.Add(modDisplay = new FooterModDisplay
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Direction = FillDirection.Horizontal,
-                Shear = -SHEAR,
-                Children = new Drawable[]
-                {
-                    modDisplay = new FooterModDisplay
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        DisplayUnrankedText = false,
-                        Scale = new Vector2(0.8f)
-                    },
-                    MultiplierText = new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                        Margin = new MarginPadding { Right = 10 }
-                    }
-                },
-                AutoSizeAxes = Axes.Both,
-                Margin = new MarginPadding { Left = 70 }
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                DisplayUnrankedText = false,
+                Scale = new Vector2(0.8f)
+            });
+            ButtonContentContainer.Add(MultiplierText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Font = OsuFont.GetFont(weight: FontWeight.Bold),
+                Margin = new MarginPadding { Right = 10 }
             });
         }
 
@@ -69,7 +57,7 @@ namespace osu.Game.Screens.Select
             DeselectedColour = SelectedColour.Opacity(0.5f);
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
-            Text = @"游戏Mods";
+            Text = @"mods";
             Hotkey = Key.F1;
         }
 
@@ -92,6 +80,11 @@ namespace osu.Game.Screens.Select
                 MultiplierText.FadeColour(lowMultiplierColour, 200);
             else
                 MultiplierText.FadeColour(Color4.White, 200);
+
+            if (Current.Value?.Count > 0)
+                modDisplay.FadeIn(0);
+            else
+                modDisplay.FadeOut(0);
         }
 
         private class FooterModDisplay : ModDisplay

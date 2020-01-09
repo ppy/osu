@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Comments
                 {
                     Add(text = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: 14),
+                        Font = OsuFont.GetFont(size: 16),
                         Text = value.ToString()
                     });
                 }

@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 16) },
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),

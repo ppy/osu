@@ -167,7 +167,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetDescription() ?? value.ToString(),
-                        Font = OsuFont.GetFont(size: 14)
+                        Font = OsuFont.GetFont(size: 18)
                     },
                     Bar = new Box
                     {

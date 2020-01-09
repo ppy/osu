@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = CreateText(),
-                        Font = OsuFont.GetFont(size: 14)
+                        Font = OsuFont.GetFont(size: 18)
                     },
                     box = new Box
                     {

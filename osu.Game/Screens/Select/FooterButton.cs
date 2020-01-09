@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
@@ -80,15 +81,35 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                TextContainer = new Container
+                new Container
                 {
-                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
-                    Shear = -SHEAR,
-                    Child = SpriteText = new OsuSpriteText
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                        ButtonContentContainer = new FillFlowContainer
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Direction = FillDirection.Horizontal,
+                            Shear = -SHEAR,
+                            AutoSizeAxes = Axes.Both,
+                            Margin = new MarginPadding { Horizontal = SHEAR_WIDTH / 4 },
+                            Children = new Drawable[]
+                            {
+                                TextContainer = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                                    Child = SpriteText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    }
+                                },
+                            },
+                        },
+                    },
                 },
             };
         }

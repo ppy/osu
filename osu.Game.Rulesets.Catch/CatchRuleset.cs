@@ -111,6 +111,7 @@ namespace osu.Game.Rulesets.Catch
                     return new Mod[]
                     {
                         new CatchModDifficultyAdjust(),
+                        new CatchModMirror()
                     };
 
                 case ModType.Automation:

@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(hitObject)
         {
             RelativePositionAxes = Axes.X;
-            X = hitObject.X;
+            X = hitObject.GameplayX;
         }
 
         public Func<CatchHitObject, bool> CheckPosition;

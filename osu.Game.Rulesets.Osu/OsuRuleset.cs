@@ -131,6 +131,7 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModTarget(),
                         new OsuModDifficultyAdjust(),
+                        new OsuModMirror()
                     };
 
                 case ModType.Automation:
