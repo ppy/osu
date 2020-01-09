@@ -15,6 +15,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Online.Placeholders;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
