@@ -7,12 +7,12 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetSpotlightsRequest : APIRequest<SpotlightsArray>
+    public class GetSpotlightsRequest : APIRequest<SpotlightsCollection>
     {
         protected override string Target => "spotlights";
     }
 
-    public class SpotlightsArray
+    public class SpotlightsCollection
     {
         [JsonProperty("spotlights")]
         public List<APISpotlight> Spotlights;
