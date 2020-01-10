@@ -145,6 +145,7 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     case ChannelType.PM:
                         return new TestPrivateChannelTabItem(value);
+
                     default:
                         return new TestChannelTabItem(value);
                 }
