@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Rankings
     public class SpotlightSelector : Container
     {
         private readonly Box background;
-        private readonly OsuDropdown<APISpotlight> dropdown;
+        private readonly SpotlightsDropdown dropdown;
         private readonly DimmedLoadingLayer loading;
 
         [Resolved]
@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                dropdown = new OsuDropdown<APISpotlight>
+                dropdown = new SpotlightsDropdown
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -62,6 +62,11 @@ namespace osu.Game.Overlays.Rankings
                 loading.Hide();
             };
             api.Queue(request);
+        }
+
+        private class SpotlightsDropdown : OsuDropdown<APISpotlight>
+        {
+            protected override DropdownMenu CreateMenu() => base.CreateMenu().With(menu => menu.MaxHeight = 400);
         }
     }
 }
