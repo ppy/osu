@@ -37,3 +37,8 @@
     *   [PageTabControl](osu.Game/Graphics/UserInterface/PageTabControl.cs)
     *   [TabControlOverlayHeader](osu.Game/Overlays/TabControlOverlayHeader.cs)
     *   [EditorMenuBar](osu.Game/Screens/Edit/Components/Menus/EditorMenuBar.cs)
+## 2020/1/10:
+### 游戏
+*   从官方pr处获取的更新
+    *   [#7450 - 修复osu!direct全局按键没有被正确绑定](https://github.com/ppy/osu/pull/7450)
+*   将[direct界面的排行榜](https://dotnet.microsoft.com/download/dotnet-core/current/runtime)的字体增大
