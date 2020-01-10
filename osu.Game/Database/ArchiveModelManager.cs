@@ -366,7 +366,7 @@ namespace osu.Game.Database
 
         public void UpdateFile(TModel model, TFileModel file, Stream contents)
         {
-            using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+            using (ContextFactory.GetForWrite())
             {
                 model.Files.Remove(file);
                 model.Files.Add(new TFileModel
