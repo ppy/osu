@@ -44,6 +44,9 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         private Box bottomBackground;
         private Container screenContainer;
 
@@ -56,7 +59,6 @@ namespace osu.Game.Screens.Edit
         private EditorBeatmap editorBeatmap;
 
         private DependencyContainer dependencies;
-        private GameHost host;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
@@ -66,8 +68,6 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
         {
-            this.host = host;
-
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, () => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap)));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
@@ -291,8 +291,6 @@ namespace osu.Game.Screens.Edit
                 clock.Seek(Math.Max(0, targetTime));
             }
         }
-
-        private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
 
         private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
