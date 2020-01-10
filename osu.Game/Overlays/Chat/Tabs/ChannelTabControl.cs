@@ -105,7 +105,6 @@ namespace osu.Game.Overlays.Chat.Tabs
             }
             else
                 RemoveItem(channel);
-
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
