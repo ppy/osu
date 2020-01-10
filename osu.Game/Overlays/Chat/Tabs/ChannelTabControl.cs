@@ -73,15 +73,39 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         /// <summary>
         /// Removes a channel from the ChannelTabControl.
-        /// If the selected channel is the one that is beeing removed, the next available channel will be selected.
+        /// If the selected channel is the one that is being removed, the next available channel will be selected.
         /// </summary>
         /// <param name="channel">The channel that is going to be removed.</param>
         public void RemoveChannel(Channel channel)
         {
-            RemoveItem(channel);
-
             if (Current.Value == channel)
-                Current.Value = Items.FirstOrDefault();
+            {
+                var itemsList = Items.ToList();
+                var dropdownItemsCount = itemsList.Except(VisibleItems).Count();
+                var currentIndex = itemsList.IndexOf(channel);
+                var isNextTabSelector = itemsList.ElementAt(currentIndex + 1) == selectorTab.Value;
+
+                // If the tab being closed is the last one visible and the '+' is in the dropdown menu
+                // the '+' is always gonna be the next tab, even if there are other channels in there
+                if (dropdownItemsCount > 1 && isNextTabSelector)
+                {
+                    RemoveItem(channel);
+                    UpdateSubTree(); // This forces the next channel tab to become visible to ensure we can switch to it
+                    SelectTab(TabContainer.TabItems.ElementAt(currentIndex));
+                }
+                else
+                {
+                    // Show the ChannelSelector if the channel being removed is the last one
+                    if (isNextTabSelector && itemsList.Count == 2)
+                        SelectTab(selectorTab);
+                    else
+                        SwitchTab(isNextTabSelector ? -1 : 1);
+                    RemoveItem(channel);
+                }
+            }
+            else
+                RemoveItem(channel);
+
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
@@ -98,16 +122,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         private void tabCloseRequested(TabItem<Channel> tab)
         {
-            var itemsList = TabContainer.TabItems.ToList();
-            int totalChannels = itemsList.Count - 1; // account for selectorTab
-            int currentIndex = itemsList.IndexOf(tab);
 
-            if (tab == SelectedTab && totalChannels > 1)
-                // Select the tab after tab-to-be-removed's index, or the tab before if current == last
-                SelectTab(itemsList.ElementAt(currentIndex == (totalChannels - 1) ? currentIndex - 1 : currentIndex + 1));
-            else if (totalChannels == 1 && !selectorTab.Active.Value)
-                // Open channel selection overlay if all channel tabs will be closed after removing this tab
-                SelectTab(selectorTab);
 
             OnRequestLeave?.Invoke(tab.Value);
         }
