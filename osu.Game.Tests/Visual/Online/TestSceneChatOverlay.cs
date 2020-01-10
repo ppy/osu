@@ -141,7 +141,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             protected override TabItem<Channel> CreateTabItem(Channel value)
             {
-                switch(value.Type)
+                switch (value.Type)
                 {
                     case ChannelType.PM:
                         return new TestPrivateChannelTabItem(value);
