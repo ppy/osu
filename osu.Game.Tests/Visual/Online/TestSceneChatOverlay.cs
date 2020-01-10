@@ -1,8 +1,9 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -34,6 +35,9 @@ namespace osu.Game.Tests.Visual.Online
 
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
+
+        private IEnumerable<Channel> VisibleChannels => chatOverlay.ChannelTabControl.VisibleItems.Where(channel => channel.Name != "+");
+        private IEnumerable<Channel> JoinedChannels => chatOverlay.ChannelTabControl.Items.Where(channel => channel.Name != "+");
 
         private readonly Channel channel1 = new Channel(new User()) { Name = "test really long username" };
         private readonly Channel channel2 = new Channel(new User()) { Name = "test2" };
@@ -94,6 +98,58 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Close channel 1", () => chatOverlay.ChannelTabControl.RemoveChannel(channel1));
 
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        }
+
+        private Channel nextChannel;
+
+        [Test]
+        public void TestCloseChannelWhileActive()
+        {
+            AddUntilStep("Join until dropdown has channels", () =>
+            {
+                // Using temporary channels because they don't hide their names when not active
+                Channel toAdd = new Channel() { Name = $"test channel {JoinedChannels.Count()}", Type = ChannelType.Temporary };
+
+                ((BindableList<Channel>)channelManager.AvailableChannels).Add(toAdd);
+                channelManager.JoinChannel(toAdd);
+
+                chatOverlay.ChannelTabControl.UpdateSubTree(); // Necessary for the TabControl items to update before count check
+
+                // This test assumes only one channel being added to the dropdown
+                return VisibleChannels.Count() < JoinedChannels.Count();
+            });
+
+            AddStep("Switch to last tab", () => clickDrawable(chatOverlay.TabMap[VisibleChannels.Last()]));
+            AddAssert("Channel is last visible", () => channelManager.CurrentChannel.Value == VisibleChannels.Last());
+
+            // Closing the last channel before dropdown
+            AddStep("Close current channel", () =>
+            {
+                nextChannel = JoinedChannels.Except(VisibleChannels).First();
+                chatOverlay.ChannelTabControl.RemoveChannel(channelManager.CurrentChannel.Value);
+            });
+            AddAssert("Channel changed to next", () => channelManager.CurrentChannel.Value == nextChannel);
+
+            // Depending on the window size, one more channel needs to be closed for SelectorTab to appear
+            AddUntilStep("Close channels until selector visible", () =>
+            {
+                if (chatOverlay.ChannelTabControl.VisibleItems.Last().Name != "+")
+                {
+                    chatOverlay.ChannelTabControl.RemoveChannel(VisibleChannels.Last());
+                    chatOverlay.ChannelTabControl.UpdateSubTree();
+                    return true;
+                }
+                else return false;
+            });
+
+            // Closing the last channel with dropdown no longer present
+            AddStep("Close last when selector next", () => chatOverlay.ChannelTabControl.RemoveChannel(VisibleChannels.Last()));
+            AddAssert("Channel changed to previous", () => channelManager.CurrentChannel.Value == VisibleChannels.Last());
+
+            // Standard channel closing
+            AddStep("Switch to previous channel", () => chatOverlay.ChannelTabControl.SwitchTab(-1));
+            AddStep("Close current channel", () => chatOverlay.ChannelTabControl.RemoveChannel(channelManager.CurrentChannel.Value));
+            AddAssert("Channel changed to next", () => channelManager.CurrentChannel.Value == VisibleChannels.Last());
         }
 
         private void clickDrawable(Drawable d)
