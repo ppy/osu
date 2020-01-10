@@ -28,8 +28,8 @@ namespace osu.Game.Overlays.Rankings
 
         public readonly Bindable<APISpotlight> SelectedSpotlight = new Bindable<APISpotlight>();
 
-        private readonly InfoCoulmn startDateColumn;
-        private readonly InfoCoulmn endDateColumn;
+        private readonly InfoColumn startDateColumn;
+        private readonly InfoColumn endDateColumn;
 
         public SpotlightSelector()
         {
@@ -64,8 +64,8 @@ namespace osu.Game.Overlays.Rankings
                             Spacing = new Vector2(15, 0),
                             Children = new Drawable[]
                             {
-                                startDateColumn = new InfoCoulmn(@"Start Date"),
-                                endDateColumn = new InfoCoulmn(@"End Date"),
+                                startDateColumn = new InfoColumn(@"Start Date"),
+                                endDateColumn = new InfoColumn(@"End Date"),
                             }
                         }
                     }
@@ -105,9 +105,9 @@ namespace osu.Game.Overlays.Rankings
             endDateColumn.Value = dateToString(spotlight.NewValue.EndDate);
         }
 
-        private string dateToString(DateTimeOffset date) => $"{date.Year}-{date.Month:D2}-{date.Day:D2}";
+        private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");
 
-        private class InfoCoulmn : FillFlowContainer
+        private class InfoColumn : FillFlowContainer
         {
             public string Value
             {
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Rankings
 
             private readonly OsuSpriteText valueText;
 
-            public InfoCoulmn(string name)
+            public InfoColumn(string name)
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Vertical;
