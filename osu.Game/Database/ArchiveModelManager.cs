@@ -375,6 +375,8 @@ namespace osu.Game.Database
                     FileInfo = Files.Add(contents)
                 });
 
+                Files.Dereference(file.FileInfo);
+
                 Update(model);
             }
         }
