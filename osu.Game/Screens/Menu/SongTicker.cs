@@ -17,6 +17,8 @@ namespace osu.Game.Screens.Menu
     {
         private const int fade_duration = 800;
 
+        public bool AllowUpdates { get; set; } = true;
+
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
@@ -56,6 +58,9 @@ namespace osu.Game.Screens.Menu
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
         {
+            if (!AllowUpdates)
+                return;
+
             var metadata = working.NewValue.Metadata;
 
             title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));

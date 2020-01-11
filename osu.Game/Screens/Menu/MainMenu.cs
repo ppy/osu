@@ -237,6 +237,8 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.EnteringMode;
 
             songTicker.Hide();
+            songTicker.AllowUpdates = false;
+
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
             buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
@@ -246,7 +248,8 @@ namespace osu.Game.Screens.Menu
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            songTicker.Hide();
+
+            songTicker.AllowUpdates = true;
 
             (Background as BackgroundScreenDefault)?.Next();
 
