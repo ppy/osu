@@ -3,6 +3,7 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Users
@@ -44,15 +45,15 @@ namespace osu.Game.Users
         {
             public BeatmapInfo Beatmap { get; }
 
-            public Rulesets.RulesetInfo Ruleset { get; }
+            public RulesetInfo Ruleset { get; }
 
-            public SoloGame(BeatmapInfo info, Rulesets.RulesetInfo ruleset)
+            public SoloGame(BeatmapInfo info, RulesetInfo ruleset)
             {
                 Beatmap = info;
                 Ruleset = ruleset;
             }
 
-            public override string Status => @"Playing alone";
+            public override string Status => Ruleset.CreateInstance().PlayingVerb;
         }
 
         public class Spectating : UserActivity
