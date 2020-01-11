@@ -282,7 +282,7 @@ namespace osu.Game.Overlays
 
             // mark channel as read when channel switched
             if (e.NewValue.Messages.Any())
-                channelManager.MarkChannelAsRead(e.NewValue.Messages.Last());
+                channelManager.MarkChannelAsRead(e.NewValue);
         }
 
         private float startDragChatHeight;
