@@ -9,6 +9,7 @@ using osuTK;
 using osu.Game.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Menu
 {
@@ -57,8 +58,13 @@ namespace osu.Game.Screens.Menu
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
         {
-            title.Text = working.NewValue?.Metadata?.Title;
-            artist.Text = working.NewValue?.Metadata?.Artist;
+            if (working.NewValue?.Beatmap == null)
+                return;
+
+            var metadata = working.NewValue?.Metadata;
+
+            title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
+            artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
 
             this.FadeIn(fade_duration, Easing.OutQuint).Delay(4000).Then().FadeOut(fade_duration, Easing.OutQuint);
         }
