@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = ButtonSystemState.EnteringMode;
 
-            songTicker.Hide();
+            songTicker.FadeOut(100, Easing.OutQuint);
             songTicker.AllowUpdates = false;
 
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
