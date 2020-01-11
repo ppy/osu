@@ -56,10 +56,7 @@ namespace osu.Game.Screens.Menu
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
         {
-            if (working.NewValue?.Beatmap == null)
-                return;
-
-            var metadata = working.NewValue?.Metadata;
+            var metadata = working.NewValue.Metadata;
 
             title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
             artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
