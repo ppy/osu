@@ -448,17 +448,11 @@ namespace osu.Game.Online.Chat
 
         /// <summary>
         /// Marks the <paramref name="channel"/> as read
-        /// <see>(see <paramref name="message"/> for more information)</see>
         /// </summary>
         /// <param name="channel">The channel that will be marked as read</param>
-        /// <param name="message">The message where it will be read up to. If <see langword="null"/> was provided, the latest message of the <paramref name="channel"/> will be read.</param>
-        public void MarkChannelAsRead(Channel channel, Message message = null)
+        public void MarkChannelAsRead(Channel channel)
         {
-            if (message == null)
-                message = channel.Messages.Last();
-            else
-                Debug.Assert(channel.Id == message.Id, "Provided channel and message owner channel aren't equal.");
-
+            var message = channel.Messages.Last();
             var req = new MarkChannelAsReadRequest(channel, message);
 
             req.Success += () => channel.LastReadId = message.Id;
