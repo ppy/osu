@@ -70,6 +70,7 @@ namespace osu.Game.Screens.Menu
         private ExitConfirmOverlay exitConfirmOverlay;
 
         private ParallaxContainer buttonsContainer;
+        private SongTicker songTicker;
 
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
@@ -77,7 +78,7 @@ namespace osu.Game.Screens.Menu
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
-            AddInternal(new SongTicker
+            AddInternal(songTicker = new SongTicker
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -235,6 +236,7 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = ButtonSystemState.EnteringMode;
 
+            songTicker.Hide();
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
             buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
@@ -244,6 +246,7 @@ namespace osu.Game.Screens.Menu
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
+            songTicker.Hide();
 
             (Background as BackgroundScreenDefault)?.Next();
 
@@ -272,6 +275,7 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = ButtonSystemState.Exit;
             this.FadeOut(3000);
+            songTicker.Hide();
             return base.OnExiting(next);
         }
 
