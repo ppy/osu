@@ -69,6 +69,8 @@ namespace osu.Game.Screens.Menu
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
+        private ParallaxContainer buttonsContainer;
+
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
@@ -79,7 +81,7 @@ namespace osu.Game.Screens.Menu
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Margin = new MarginPadding { Right = 15 }
+                Margin = new MarginPadding { Right = 15, Top = 5 }
             });
 
             if (host.CanExit)
@@ -98,7 +100,7 @@ namespace osu.Game.Screens.Menu
 
             AddRangeInternal(new Drawable[]
             {
-                new ParallaxContainer
+                buttonsContainer = new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
                     Children = new Drawable[]
@@ -197,7 +199,7 @@ namespace osu.Game.Screens.Menu
                 buttons.State = ButtonSystemState.TopLevel;
 
                 this.FadeIn(FADE_IN_DURATION, Easing.OutQuint);
-                this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
+                buttonsContainer.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
@@ -234,7 +236,7 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.EnteringMode;
 
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
-            this.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
+            buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
         }
