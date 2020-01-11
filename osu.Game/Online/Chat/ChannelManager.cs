@@ -445,12 +445,22 @@ namespace osu.Game.Online.Chat
             return tcs.Task;
         }
 
-        public void MarkChannelAsRead(Message message)
+        /// <summary>
+        /// Marks the <paramref name="channel"/> as read
+        /// <see>(see <paramref name="message"/> for more information)</see>
+        /// </summary>
+        /// <param name="channel">The channel that will be marked as read</param>
+        /// <param name="message">The message where it will be read up to. If <see langword="null"/> was provided, the latest message of the <paramref name="channel"/> will be read.</param>
+        public void MarkChannelAsRead(Channel channel, Message message = null)
         {
-            var channel = JoinedChannels.Single(c => c.Id == message.ChannelId);
+            if (message == null)
+                message = channel.Messages.Last();
+
             var req = new MarkChannelAsReadRequest(channel, message);
+
             req.Success += () => channel.LastReadId = message.Id;
-            req.Failure += e => Logger.Error(e, "Failed to mark channel as read");
+            req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel.ToString()} up to '{message.ToString()}' as read");
+
             api.Queue(req);
         }
 
