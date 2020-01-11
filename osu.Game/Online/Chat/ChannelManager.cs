@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -455,6 +456,8 @@ namespace osu.Game.Online.Chat
         {
             if (message == null)
                 message = channel.Messages.Last();
+            else
+                Debug.Assert(channel.Id == message.Id, "Provided channel and message owner channel aren't equal.");
 
             var req = new MarkChannelAsReadRequest(channel, message);
 
