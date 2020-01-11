@@ -99,8 +99,8 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
-            artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
+            titleBind = localisation.GetLocalisedString(new RomanisableString(metadata.Title, metadata.TitleUnicode));
+            artistBind = localisation.GetLocalisedString(new RomanisableString(metadata.Artist, metadata.ArtistUnicode));
 
             artistBind.BindValueChanged(_ => recreateText(), true);
         }

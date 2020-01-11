@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                        Text = new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode),
                         Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
+                        Text = new RomanisableString(beatmap.Metadata.Title, beatmap.Metadata.TitleUnicode),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
                 }, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");

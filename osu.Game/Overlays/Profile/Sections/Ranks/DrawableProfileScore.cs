@@ -79,14 +79,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 new OsuSpriteText
                 {
-                    Text = new LocalisedString((
-                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                    Text = new RomanisableString(
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ",
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] "),
                     Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
                 },
                 new OsuSpriteText
                 {
-                    Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Text = new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode),
                     Padding = new MarginPadding { Top = 3 },
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                 },

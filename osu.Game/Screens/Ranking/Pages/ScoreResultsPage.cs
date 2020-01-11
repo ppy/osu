@@ -368,8 +368,8 @@ namespace osu.Game.Screens.Ranking.Pages
                         versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;
                 }
 
-                title.Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title));
-                artist.Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist));
+                title.Text = new RomanisableString(beatmap.Metadata.Title, beatmap.Metadata.TitleUnicode);
+                artist.Text = new RomanisableString(beatmap.Metadata.Artist, beatmap.Metadata.ArtistUnicode);
             }
         }
 

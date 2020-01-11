@@ -100,12 +100,12 @@ namespace osu.Game.Overlays.Direct
                                                     {
                                                         new OsuSpriteText
                                                         {
-                                                            Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
+                                                            Text = new RomanisableString(SetInfo.Metadata.Title, SetInfo.Metadata.TitleUnicode),
                                                             Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                                         },
                                                         new OsuSpriteText
                                                         {
-                                                            Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
+                                                            Text = new RomanisableString(SetInfo.Metadata.Artist, SetInfo.Metadata.ArtistUnicode),
                                                             Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                                         },
                                                     }

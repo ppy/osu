@@ -435,7 +435,7 @@ namespace osu.Game.Screens.Play
                             }),
                             new OsuSpriteText
                             {
-                                Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
+                                Text = new RomanisableString(metadata.Title, metadata.TitleUnicode),
                                 Font = OsuFont.GetFont(size: 36, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
@@ -443,7 +443,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
+                                Text = new RomanisableString(metadata.Artist, metadata.ArtistUnicode),
                                 Font = OsuFont.GetFont(size: 26, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
