@@ -447,7 +447,7 @@ namespace osu.Game.Online.Chat
 
         public void MarkChannelAsRead(Message message)
         {
-            var channel = JoinedChannels.First(c => c.Id == message.ChannelId);
+            var channel = JoinedChannels.Single(c => c.Id == message.ChannelId);
             var req = new MarkChannelAsReadRequest(channel, message);
             req.Success += () => channel.LastReadId = message.Id;
             req.Failure += e => Logger.Error(e, "Failed to mark channel as read");
