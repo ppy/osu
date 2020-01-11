@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 this.text = text;
             }
 
-            public LocalisedString Text
+            public LocalisableString Text
             {
                 set => text.Text = value;
             }

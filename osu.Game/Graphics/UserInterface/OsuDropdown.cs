@@ -12,6 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -164,7 +165,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 protected new class Content : FillFlowContainer, IHasText
                 {
-                    public string Text
+                    public LocalisableString Text
                     {
                         get => Label.Text;
                         set => Label.Text = value;
@@ -211,7 +212,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             protected readonly SpriteText Text;
 
-            protected override string Label
+            protected override LocalisableString Label
             {
                 get => Text.Text;
                 set => Text.Text = value;
