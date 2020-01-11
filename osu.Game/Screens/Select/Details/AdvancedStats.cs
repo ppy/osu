@@ -19,6 +19,7 @@ using System.Linq;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -150,7 +151,7 @@ namespace osu.Game.Screens.Select.Details
             [Resolved]
             private OsuColour colours { get; set; }
 
-            public string Title
+            public LocalisableString Title
             {
                 get => name.Text;
                 set => name.Text = value;

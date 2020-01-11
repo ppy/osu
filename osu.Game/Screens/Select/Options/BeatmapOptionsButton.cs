@@ -14,6 +14,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Game.Graphics.Containers;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Select.Options
 {
@@ -40,13 +41,13 @@ namespace osu.Game.Screens.Select.Options
             set => iconText.Icon = value;
         }
 
-        public string FirstLineText
+        public LocalisableString FirstLineText
         {
             get => firstLine.Text;
             set => firstLine.Text = value;
         }
 
-        public string SecondLineText
+        public LocalisableString SecondLineText
         {
             get => secondLine.Text;
             set => secondLine.Text = value;

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Threading;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Mods
         protected abstract Key[] ToggleKeys { get; }
         public abstract ModType ModType { get; }
 
-        public string Header
+        public LocalisableString Header
         {
             get => headerLabel.Text;
             set => headerLabel.Text = value;

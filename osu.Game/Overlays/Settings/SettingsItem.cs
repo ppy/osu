@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Settings
 
         public bool ShowsDefaultIndicator = true;
 
-        public virtual string LabelText
+        public virtual LocalisableString LabelText
         {
             get => text?.Text ?? string.Empty;
             set
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.Settings
             set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText.ToString() } : new List<string>(Keywords) { LabelText.ToString() }.ToArray();
 
         public IEnumerable<string> Keywords { get; set; }
 

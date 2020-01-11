@@ -15,6 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -39,19 +40,19 @@ namespace osu.Game.Overlays.Toolbar
             set => SetIcon(value);
         }
 
-        public string Text
+        public LocalisableString Text
         {
             get => DrawableText.Text;
             set => DrawableText.Text = value;
         }
 
-        public string TooltipMain
+        public LocalisableString TooltipMain
         {
             get => tooltip1.Text;
             set => tooltip1.Text = value;
         }
 
-        public string TooltipSub
+        public LocalisableString TooltipSub
         {
             get => tooltip2.Text;
             set => tooltip2.Text = value;

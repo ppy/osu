@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Overlays.Chat.Selection
 {
@@ -29,10 +30,10 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public bool FilteringActive { get; set; }
 
-        public string Header
+        public LocalisableString Header
         {
             get => header.Text;
-            set => header.Text = value.ToUpperInvariant();
+            set => header.Text = value;
         }
 
         public IEnumerable<Channel> Channels

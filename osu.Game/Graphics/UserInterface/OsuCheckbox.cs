@@ -7,6 +7,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -18,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
         public Color4 UncheckedColor { get; set; } = Color4.White;
         public int FadeDuration { get; set; }
 
-        public string LabelText
+        public LocalisableString LabelText
         {
             set
             {
