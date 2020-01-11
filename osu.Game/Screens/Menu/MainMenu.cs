@@ -75,6 +75,13 @@ namespace osu.Game.Screens.Menu
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
+            AddInternal(new SongTicker
+            {
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                Margin = new MarginPadding { Right = 15 }
+            });
+
             if (host.CanExit)
             {
                 AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
