@@ -80,31 +80,18 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             if (Current.Value == channel)
             {
-                var itemsList = Items.ToList();
-                var dropdownItemsCount = itemsList.Except(VisibleItems).Count();
-                var currentIndex = itemsList.IndexOf(channel);
-                var isNextTabSelector = itemsList.ElementAt(currentIndex + 1) == selectorTab.Value;
+                var items = Items.ToList();
 
-                // If the tab being closed is the last one visible and the '+' is in the dropdown menu
-                // the '+' is always gonna be the next tab, even if there are other channels in there
-                if (dropdownItemsCount > 1 && isNextTabSelector)
-                {
-                    RemoveItem(channel);
-                    UpdateSubTree(); // This forces the next channel tab to become visible to ensure we can switch to it
-                    SelectTab(TabContainer.TabItems.ElementAt(currentIndex));
-                }
+                bool nextTabIsSelector = items[items.IndexOf(channel) + 1] == selectorTab.Value;
+
+                // Show the ChannelSelector if the channel being removed is the last one
+                if (nextTabIsSelector && items.Count == 2)
+                    SelectTab(selectorTab);
                 else
-                {
-                    // Show the ChannelSelector if the channel being removed is the last one
-                    if (isNextTabSelector && itemsList.Count == 2)
-                        SelectTab(selectorTab);
-                    else
-                        SwitchTab(isNextTabSelector ? -1 : 1);
-                    RemoveItem(channel);
-                }
+                    SwitchTab(nextTabIsSelector ? -1 : 1);
             }
-            else
-                RemoveItem(channel);
+
+            RemoveItem(channel);
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
