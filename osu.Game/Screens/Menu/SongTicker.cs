@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Menu
 {
     public class SongTicker : Container
     {
-        private const int duration = 500;
+        private const int fade_duration = 800;
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Menu
             title.Text = working.NewValue?.Metadata?.Title;
             artist.Text = working.NewValue?.Metadata?.Artist;
 
-            this.FadeIn(duration, Easing.OutQuint).Delay(4000).Then().FadeOut(duration, Easing.OutQuint);
+            this.FadeIn(fade_duration, Easing.OutQuint).Delay(4000).Then().FadeOut(fade_duration, Easing.OutQuint);
         }
     }
 }
