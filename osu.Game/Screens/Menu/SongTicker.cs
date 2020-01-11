@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
-        private readonly Bindable<WorkingBeatmap> workingBeatmap = new Bindable<WorkingBeatmap>();
         private readonly OsuSpriteText title, artist;
 
         public SongTicker()
@@ -52,8 +51,7 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            workingBeatmap.BindTo(beatmap);
-            workingBeatmap.BindValueChanged(onBeatmapChanged);
+            beatmap.BindValueChanged(onBeatmapChanged);
         }
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
