@@ -107,16 +107,15 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddUntilStep("Join until dropdown has channels", () =>
             {
+                if (visibleChannels.Count() < joinedChannels.Count())
+                    return true;
+
                 // Using temporary channels because they don't hide their names when not active
                 Channel toAdd = new Channel { Name = $"test channel {joinedChannels.Count()}", Type = ChannelType.Temporary };
 
-                ((BindableList<Channel>)channelManager.AvailableChannels).Add(toAdd);
                 channelManager.JoinChannel(toAdd);
 
-                chatOverlay.ChannelTabControl.UpdateSubTree(); // Necessary for the TabControl items to update before count check
-
-                // This test assumes only one channel being added to the dropdown
-                return visibleChannels.Count() < joinedChannels.Count();
+                return false;
             });
 
             AddStep("Switch to last tab", () => clickDrawable(chatOverlay.TabMap[visibleChannels.Last()]));
@@ -133,13 +132,11 @@ namespace osu.Game.Tests.Visual.Online
             // Depending on the window size, one more channel needs to be closed for SelectorTab to appear
             AddUntilStep("Close channels until selector visible", () =>
             {
-                if (chatOverlay.ChannelTabControl.VisibleItems.Last().Name != "+")
-                {
-                    chatOverlay.ChannelTabControl.RemoveChannel(visibleChannels.Last());
-                    chatOverlay.ChannelTabControl.UpdateSubTree();
+                if (chatOverlay.ChannelTabControl.VisibleItems.Last().Name == "+")
                     return true;
-                }
-                else return false;
+
+                chatOverlay.ChannelTabControl.RemoveChannel(visibleChannels.Last());
+                return false;
             });
 
             // Closing the last channel with dropdown no longer present
