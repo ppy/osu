@@ -36,8 +36,8 @@ namespace osu.Game.Tests.Visual.Online
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
-        private IEnumerable<Channel> VisibleChannels => chatOverlay.ChannelTabControl.VisibleItems.Where(channel => channel.Name != "+");
-        private IEnumerable<Channel> JoinedChannels => chatOverlay.ChannelTabControl.Items.Where(channel => channel.Name != "+");
+        private IEnumerable<Channel> visibleChannels => chatOverlay.ChannelTabControl.VisibleItems.Where(channel => channel.Name != "+");
+        private IEnumerable<Channel> joinedChannels => chatOverlay.ChannelTabControl.Items.Where(channel => channel.Name != "+");
 
         private readonly Channel channel1 = new Channel(new User()) { Name = "test really long username" };
         private readonly Channel channel2 = new Channel(new User()) { Name = "test2" };
@@ -108,7 +108,7 @@ namespace osu.Game.Tests.Visual.Online
             AddUntilStep("Join until dropdown has channels", () =>
             {
                 // Using temporary channels because they don't hide their names when not active
-                Channel toAdd = new Channel() { Name = $"test channel {JoinedChannels.Count()}", Type = ChannelType.Temporary };
+                Channel toAdd = new Channel { Name = $"test channel {joinedChannels.Count()}", Type = ChannelType.Temporary };
 
                 ((BindableList<Channel>)channelManager.AvailableChannels).Add(toAdd);
                 channelManager.JoinChannel(toAdd);
@@ -116,16 +116,16 @@ namespace osu.Game.Tests.Visual.Online
                 chatOverlay.ChannelTabControl.UpdateSubTree(); // Necessary for the TabControl items to update before count check
 
                 // This test assumes only one channel being added to the dropdown
-                return VisibleChannels.Count() < JoinedChannels.Count();
+                return visibleChannels.Count() < joinedChannels.Count();
             });
 
-            AddStep("Switch to last tab", () => clickDrawable(chatOverlay.TabMap[VisibleChannels.Last()]));
-            AddAssert("Channel is last visible", () => channelManager.CurrentChannel.Value == VisibleChannels.Last());
+            AddStep("Switch to last tab", () => clickDrawable(chatOverlay.TabMap[visibleChannels.Last()]));
+            AddAssert("Channel is last visible", () => channelManager.CurrentChannel.Value == visibleChannels.Last());
 
             // Closing the last channel before dropdown
             AddStep("Close current channel", () =>
             {
-                nextChannel = JoinedChannels.Except(VisibleChannels).First();
+                nextChannel = joinedChannels.Except(visibleChannels).First();
                 chatOverlay.ChannelTabControl.RemoveChannel(channelManager.CurrentChannel.Value);
             });
             AddAssert("Channel changed to next", () => channelManager.CurrentChannel.Value == nextChannel);
@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 if (chatOverlay.ChannelTabControl.VisibleItems.Last().Name != "+")
                 {
-                    chatOverlay.ChannelTabControl.RemoveChannel(VisibleChannels.Last());
+                    chatOverlay.ChannelTabControl.RemoveChannel(visibleChannels.Last());
                     chatOverlay.ChannelTabControl.UpdateSubTree();
                     return true;
                 }
@@ -143,13 +143,13 @@ namespace osu.Game.Tests.Visual.Online
             });
 
             // Closing the last channel with dropdown no longer present
-            AddStep("Close last when selector next", () => chatOverlay.ChannelTabControl.RemoveChannel(VisibleChannels.Last()));
-            AddAssert("Channel changed to previous", () => channelManager.CurrentChannel.Value == VisibleChannels.Last());
+            AddStep("Close last when selector next", () => chatOverlay.ChannelTabControl.RemoveChannel(visibleChannels.Last()));
+            AddAssert("Channel changed to previous", () => channelManager.CurrentChannel.Value == visibleChannels.Last());
 
             // Standard channel closing
             AddStep("Switch to previous channel", () => chatOverlay.ChannelTabControl.SwitchTab(-1));
             AddStep("Close current channel", () => chatOverlay.ChannelTabControl.RemoveChannel(channelManager.CurrentChannel.Value));
-            AddAssert("Channel changed to next", () => channelManager.CurrentChannel.Value == VisibleChannels.Last());
+            AddAssert("Channel changed to next", () => channelManager.CurrentChannel.Value == visibleChannels.Last());
         }
 
         private void clickDrawable(Drawable d)
