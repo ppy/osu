@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.UserInterface
             set => strip.Colour = value;
         }
 
-        protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
+        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
             Direction = FillDirection.Full,
             RelativeSizeAxes = Axes.Both,
@@ -282,11 +282,6 @@ namespace osu.Game.Graphics.UserInterface
                     base.OnHoverLost(e);
                 }
             }
-        }
-
-        private class OsuTabFillFlowContainer : TabFillFlowContainer
-        {
-            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }
