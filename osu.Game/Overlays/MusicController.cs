@@ -8,7 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Bindings;
@@ -26,6 +26,11 @@ namespace osu.Game.Overlays
         private BeatmapManager beatmaps { get; set; }
 
         public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+
+        /// <summary>
+        /// Point in time after which the current track will be restarted on triggering a "previous track" action.
+        /// </summary>
+        private const double restart_cutoff_point = 5000;
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
@@ -151,11 +156,19 @@ namespace osu.Game.Overlays
         }
 
         /// <summary>
-        /// Play the previous track.
+        /// Play the previous track or restart the current track if it's current time below <see cref="restart_cutoff_point"/>
         /// </summary>
-        /// <returns>Whether the operation was successful.</returns>
-        public bool PrevTrack()
+        /// <returns>The <see cref="PreviousTrackResult"/> that indicate the decided action</returns>
+        public PreviousTrackResult PreviousTrack()
         {
+            var currentTrackPosition = current?.Track.CurrentTime;
+
+            if (currentTrackPosition >= restart_cutoff_point)
+            {
+                SeekTo(0);
+                return PreviousTrackResult.Restart;
+            }
+
             queuedDirection = TrackChangeDirection.Prev;
 
             var playable = BeatmapSets.TakeWhile(i => i.ID != current.BeatmapSetInfo.ID).LastOrDefault() ?? BeatmapSets.LastOrDefault();
@@ -166,10 +179,10 @@ namespace osu.Game.Overlays
                     working.Value = beatmaps.GetWorkingBeatmap(playable.Beatmaps.First(), beatmap.Value);
                 beatmap.Value.Track.Restart();
 
-                return true;
+                return PreviousTrackResult.Previous;
             }
 
-            return false;
+            return PreviousTrackResult.None;
         }
 
         /// <summary>
@@ -286,7 +299,7 @@ namespace osu.Game.Overlays
             {
                 case GlobalAction.MusicPlay:
                     if (TogglePause())
-                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "播放" : "暂停"));
+                        onScreenDisplay?.Display(new MusicControllerToast(IsPlaying ? "Play track" : "Pause track"));
                     return true;
 
                 case GlobalAction.MusicNext:
@@ -296,8 +309,16 @@ namespace osu.Game.Overlays
                     return true;
 
                 case GlobalAction.MusicPrev:
-                    if (PrevTrack())
-                        onScreenDisplay?.Display(new MusicControllerToast("上一首"));
+                    switch (PreviousTrack())
+                    {
+                        case PreviousTrackResult.Restart:
+                            onScreenDisplay?.Display(new MusicControllerToast("从头开始"));
+                            break;
+
+                        case PreviousTrackResult.Previous:
+                            onScreenDisplay?.Display(new MusicControllerToast("上一首"));
+                            break;
+                    }
 
                     return true;
             }
@@ -321,5 +342,12 @@ namespace osu.Game.Overlays
         None,
         Next,
         Prev
+    }
+
+    public enum PreviousTrackResult
+    {
+        None,
+        Restart,
+        Previous
     }
 }

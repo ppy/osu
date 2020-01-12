@@ -41,4 +41,18 @@
 ### 游戏
 *   从官方pr处获取的更新
     *   [#7450 - 修复osu!direct全局按键没有被正确绑定](https://github.com/ppy/osu/pull/7450)
-*   将[direct界面的排行榜](https://dotnet.microsoft.com/download/dotnet-core/current/runtime)的字体增大
+*   将[direct界面的排行榜]()的字体增大
+
+## 2020/1/11:
+*   从官方pr处获取的更新
+    *   [#7492 - 向主界面添加当前播放的音乐名](https://github.com/ppy/osu/pull/7450)
+    *   [#7485 - 观看回放时,显示当前回放的mods](https://github.com/ppy/osu/pull/7485)
+
+## 2020/1/12:
+*   从官方pr处获取的更新
+    *   [#7498 - Fix crashing when changing user status before rich presence(DiscordRPC) is initialised](https://github.com/ppy/osu/pull/7485)
+    *   [#7252 - 现在可以删除单个成绩了](https://github.com/ppy/osu/pull/7252)
+    *   [#7494 - Fix default button absorbing drag scroll on settings](https://github.com/ppy/osu/pull/7494)
+    *   [#7491 - Fix user status dropdown having no padding around items](https://github.com/ppy/osu/pull/7491)
+    *   [#7486 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7486)
+    *   [#7490 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7490)

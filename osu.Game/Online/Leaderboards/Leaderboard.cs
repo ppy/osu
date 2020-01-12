@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
@@ -143,11 +144,11 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.Unavailable:
-                        replacePlaceholder(new MessagePlaceholder(@"在线排行对这张谱面不可用!"));
+                        replacePlaceholder(new MessagePlaceholder(@"这张谱面没有在线排行榜!"));
                         break;
 
                     case PlaceholderState.NoScores:
-                        replacePlaceholder(new MessagePlaceholder(@"这里还没有记录!"));
+                        replacePlaceholder(new MessagePlaceholder(@"这里还没有成绩!"));
                         break;
 
                     case PlaceholderState.NotLoggedIn:
@@ -155,7 +156,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotSupporter:
-                        replacePlaceholder(new MessagePlaceholder(@"请成为一名osu!supporter来查看这个排行!"));
+                        replacePlaceholder(new MessagePlaceholder(@"请成为一名osu!supporter来查看该排行榜!"));
                         break;
 
                     default:
@@ -181,10 +182,14 @@ namespace osu.Game.Online.Leaderboards
                     {
                         new Drawable[]
                         {
-                            scrollContainer = new OsuScrollContainer
+                            new OsuContextMenuContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ScrollbarVisible = false,
+                                Child = scrollContainer = new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarVisible = false,
+                                }
                             }
                         },
                         new Drawable[]

@@ -14,13 +14,14 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapClearScoresDialog : PopupDialog
     {
-        private ScoreManager scoreManager;
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action onCompletion)
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
             Icon = FontAwesome.Solid.Eraser;
-            HeaderText = @"是否要清理所有的本地成绩?";
+            HeaderText = @"是否要清理所有本地成绩?";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
@@ -34,15 +35,9 @@ namespace osu.Game.Screens.Select
                 },
                 new PopupDialogCancelButton
                 {
-                    Text = @"我需要在想想",
+                    Text = @"我需要再想想",
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ScoreManager scoreManager)
-        {
-            this.scoreManager = scoreManager;
         }
     }
 }

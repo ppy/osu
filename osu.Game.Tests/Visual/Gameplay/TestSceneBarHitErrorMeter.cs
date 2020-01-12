@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Objects;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Judgements;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;

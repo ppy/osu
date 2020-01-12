@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
 
         private LogoTrackingContainer content;
 
-        private BeatmapMetadataDisplay info;
+        protected BeatmapMetadataDisplay MetadataInfo;
 
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
             }).WithChildren(new Drawable[]
             {
-                info = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value, content.LogoFacade)
+                MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
                 {
                     Alpha = 0,
                     Anchor = Anchor.Centre,
@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            info.Delay(750).FadeIn(500);
+            MetadataInfo.Delay(750).FadeIn(500);
             this.Delay(1800).Schedule(pushWhenLoaded);
 
             if (!muteWarningShownOnce.Value)
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            info.Loading = true;
+            MetadataInfo.Loading = true;
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
             loadNewPlayer();
@@ -174,7 +174,7 @@ namespace osu.Game.Screens.Play
             player.RestartCount = restartCount;
             player.RestartRequested = restartRequested;
 
-            LoadTask = LoadComponentAsync(player, _ => info.Loading = false);
+            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
         }
 
         private void contentIn()
@@ -350,7 +350,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class BeatmapMetadataDisplay : Container
+        protected class BeatmapMetadataDisplay : Container
         {
             private class MetadataLine : Container
             {
@@ -379,10 +379,12 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly IReadOnlyList<Mod> mods;
+            private readonly Bindable<IReadOnlyList<Mod>> mods;
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
+
+            public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
             public bool Loading
             {
@@ -401,11 +403,13 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, Drawable facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
             {
                 this.beatmap = beatmap;
-                this.mods = mods;
                 this.facade = facade;
+
+                this.mods = new Bindable<IReadOnlyList<Mod>>();
+                this.mods.BindTo(mods);
             }
 
             [BackgroundDependencyLoader]
@@ -476,12 +480,12 @@ namespace osu.Game.Screens.Play
                                     Bottom = 40
                                 },
                             },
-                            new MetadataLine("来源 ", metadata.Source)
+                            new MetadataLine("来源", metadata.Source)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
-                            new MetadataLine("作图者 ", metadata.AuthorString)
+                            new MetadataLine("作图者", metadata.AuthorString)
                             {
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
@@ -492,7 +496,7 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Margin = new MarginPadding { Top = 20 },
-                                Current = { Value = mods }
+                                Current = mods
                             }
                         },
                     }
@@ -506,7 +510,7 @@ namespace osu.Game.Screens.Play
         {
             public MutedNotification()
             {
-                Text = "你的游戏音量被设置到了0%! 点击这里恢复.";
+                Text = "你的游戏音量被设置到了0%!点击这里来恢复";
             }
 
             public override bool IsImportant => true;

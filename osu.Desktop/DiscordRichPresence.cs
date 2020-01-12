@@ -75,6 +75,8 @@ namespace osu.Desktop
 
         private void updateStatus()
         {
+            if(!client.IsInitialized)
+                return;
             if (status.Value is UserStatusOffline)
             {
                 client.ClearPresence();

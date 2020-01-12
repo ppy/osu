@@ -162,11 +162,6 @@ namespace osu.Game.Overlays.Settings
             }
 
             public string TooltipText => "重置为默认值";
-
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnMouseUp(MouseUpEvent e) => true;
-
             protected override bool OnClick(ClickEvent e)
             {
                 if (bindable != null && !bindable.Disabled)
