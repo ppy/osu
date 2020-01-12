@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System;
 using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
