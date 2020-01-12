@@ -88,7 +88,13 @@ namespace osu.Game.Overlays.Chat.Tabs
                 if (nextTabIsSelector && items.Count == 2)
                     SelectTab(selectorTab);
                 else
-                    SwitchTab(nextTabIsSelector ? -1 : 1);
+                {
+                    // If there are any channels in the dropdown (one item more means only selectorTab being there, so we need two)
+                    if (nextTabIsSelector && VisibleItems.Count() < Items.Count() - 1)
+                        SwitchTab(1);
+                    else
+                        SwitchTab(nextTabIsSelector ? -1 : 1);
+                }
             }
 
             RemoveItem(channel);
