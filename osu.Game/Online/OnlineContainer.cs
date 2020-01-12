@@ -32,7 +32,7 @@ namespace osu.Game.Online
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = placeholder = new LoginPlaceholder()
+                    Child = placeholder = new LoginPlaceholder(placeholder_message)
                 },
             };
         }
