@@ -451,6 +451,9 @@ namespace osu.Game.Online.Chat
         /// <param name="channel">The channel that will be marked as read</param>
         public void MarkChannelAsRead(Channel channel)
         {
+            if (channel.LastMessageId == channel.LastReadId)
+                return;
+
             var message = channel.Messages.Last();
             var req = new MarkChannelAsReadRequest(channel, message);
 
