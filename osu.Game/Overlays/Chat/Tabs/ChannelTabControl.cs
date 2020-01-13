@@ -82,19 +82,14 @@ namespace osu.Game.Overlays.Chat.Tabs
             {
                 var items = Items.ToList();
 
-                bool nextTabIsSelector = items[items.IndexOf(channel) + 1] == selectorTab.Value;
+                // Take into account selectorTab always being next if we're closing the last visible channel while dropdown contains more
+                bool isNextChannelAvailable = items[items.IndexOf(channel) + 1] == selectorTab.Value ? VisibleItems.Count() < Items.Count() - 1 : true;
 
                 // Show the ChannelSelector if the channel being removed is the last one
-                if (nextTabIsSelector && items.Count == 2)
+                if (!isNextChannelAvailable && items.Count == 2)
                     SelectTab(selectorTab);
                 else
-                {
-                    // If there are any channels in the dropdown (one item more means only selectorTab being there, so we need two)
-                    if (nextTabIsSelector && VisibleItems.Count() < Items.Count() - 1)
-                        SwitchTab(1);
-                    else
-                        SwitchTab(nextTabIsSelector ? -1 : 1);
-                }
+                    SwitchTab(isNextChannelAvailable ? 1 : -1);
             }
 
             RemoveItem(channel);
