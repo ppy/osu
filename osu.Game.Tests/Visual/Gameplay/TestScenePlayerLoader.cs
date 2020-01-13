@@ -12,7 +12,7 @@ using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -147,6 +147,18 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestModDisplayChanges()
+        {
+            var testMod = new TestMod();
+
+            AddStep("load player", () => ResetPlayer(true));
+
+            AddUntilStep("wait for loader to become current", () => loader.IsCurrentScreen());
+            AddStep("set test mod in loader", () => loader.Mods.Value = new[] { testMod });
+            AddAssert("test mod is displayed", () => (TestMod)loader.DisplayedMods.Single() == testMod);
+        }
+
+        [Test]
         public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
 
         [Test]
@@ -220,6 +232,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             public new VisualSettings VisualSettings => base.VisualSettings;
 
             public new Task DisposalTask => base.DisposalTask;
+
+            public IReadOnlyList<Mod> DisplayedMods => MetadataInfo.Mods.Value;
 
             public TestPlayerLoader(Func<Player> createPlayer)
                 : base(createPlayer)
