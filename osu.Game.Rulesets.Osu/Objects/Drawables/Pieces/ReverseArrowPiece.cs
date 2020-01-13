@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             this.repeatPoint = repeatPoint;
 
+            Divisor = 2;
+            MinimumBeatLength = 200;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
