@@ -454,7 +454,11 @@ namespace osu.Game.Online.Chat
             if (channel.LastMessageId == channel.LastReadId)
                 return;
 
-            var message = channel.Messages.Last();
+            var message = channel.Messages.LastOrDefault();
+
+            if (message == null)
+                return;
+
             var req = new MarkChannelAsReadRequest(channel, message);
 
             req.Success += () => channel.LastReadId = message.Id;
