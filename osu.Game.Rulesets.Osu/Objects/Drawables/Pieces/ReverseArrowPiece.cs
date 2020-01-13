@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
-            InternalChild = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
+            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.ReverseArrow), _ => new SpriteIcon
             {
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.Solid.ChevronRight,
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             if (Clock.CurrentTime < repeatPoint.StartTime)
-                InternalChild.ScaleTo(1.3f).ScaleTo(1f, Math.Min(timingPoint.BeatLength, repeatPoint.StartTime - Clock.CurrentTime), Easing.Out);
+                Child.ScaleTo(1.3f).ScaleTo(1f, Math.Min(timingPoint.BeatLength, repeatPoint.StartTime - Clock.CurrentTime), Easing.Out);
         }
     }
 }
