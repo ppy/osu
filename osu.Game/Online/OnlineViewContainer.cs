@@ -1,4 +1,7 @@
-﻿using osu.Framework.Allocation;
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
@@ -20,7 +23,7 @@ namespace osu.Game.Online
 
         protected override Container<Drawable> Content => content;
 
-        public OnlineViewContainer(string placeholder_message)
+        public OnlineViewContainer(string placeholderMessage)
         {
             InternalChildren = new Drawable[]
             {
@@ -32,7 +35,7 @@ namespace osu.Game.Online
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = placeholder = new LoginPlaceholder(placeholder_message)
+                    Child = placeholder = new LoginPlaceholder(placeholderMessage)
                 },
             };
         }
@@ -43,7 +46,7 @@ namespace osu.Game.Online
             {
                 case APIState.Offline:
                 case APIState.Connecting:
-                    Schedule(() =>updatePlaceholderVisibility(true));
+                    Schedule(() => updatePlaceholderVisibility(true));
                     break;
 
                 default:
@@ -52,18 +55,18 @@ namespace osu.Game.Online
             }
         }
 
-        private void updatePlaceholderVisibility(bool show_placeholder)
+        private void updatePlaceholderVisibility(bool showPlaceholder)
         {
-            if (show_placeholder)
+            if (showPlaceholder)
             {
-                    content.FadeOut(transform_time / 2, Easing.OutQuint);
-                    placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_time, Easing.OutQuint);
-                    placeholderContainer.FadeInFromZero(2 * transform_time, Easing.OutQuint);
+                content.FadeOut(transform_time / 2, Easing.OutQuint);
+                placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_time, Easing.OutQuint);
+                placeholderContainer.FadeInFromZero(2 * transform_time, Easing.OutQuint);
             }
             else
             {
-                    placeholderContainer.FadeOut(transform_time / 2, Easing.OutQuint);
-                    content.FadeIn(transform_time, Easing.OutQuint);
+                placeholderContainer.FadeOut(transform_time / 2, Easing.OutQuint);
+                content.FadeIn(transform_time, Easing.OutQuint);
             }
         }
 
