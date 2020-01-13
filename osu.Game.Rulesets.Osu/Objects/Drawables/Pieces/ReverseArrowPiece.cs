@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 RelativeSizeAxes = Axes.Both,
                 Icon = FontAwesome.Solid.ChevronRight,
                 Size = new Vector2(0.35f)
-            }, confineMode: ConfineMode.NoScaling)
+            })
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
