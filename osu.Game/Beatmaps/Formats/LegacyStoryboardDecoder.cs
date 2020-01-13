@@ -12,6 +12,7 @@ using osu.Framework.Graphics;
 using osu.Game.IO;
 using osu.Game.Storyboards;
 using osu.Game.Beatmaps.Legacy;
+using osu.Framework.Utils;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -190,7 +191,7 @@ namespace osu.Game.Beatmaps.Formats
                             {
                                 var startValue = float.Parse(split[4], CultureInfo.InvariantCulture);
                                 var endValue = split.Length > 5 ? float.Parse(split[5], CultureInfo.InvariantCulture) : startValue;
-                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathHelper.RadiansToDegrees(startValue), MathHelper.RadiansToDegrees(endValue));
+                                timelineGroup?.Rotation.Add(easing, startTime, endTime, MathUtils.RadiansToDegrees(startValue), MathUtils.RadiansToDegrees(endValue));
                                 break;
                             }
 

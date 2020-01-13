@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK.Graphics;
