@@ -18,23 +18,23 @@ namespace osu.Game.Screens.Play
 
         public bool OnPressed(T action, bool forwards)
         {
-            if (!EqualityComparer<T>.Default.Equals(action, Action))
-                return false;
+            if (EqualityComparer<T>.Default.Equals(action, Action)) {
+                IsLit = true;
+                if (forwards)
+                    Increment();
+            }
 
-            IsLit = true;
-            if (forwards)
-                Increment();
             return false;
         }
 
         public bool OnReleased(T action, bool forwards)
         {
-            if (!EqualityComparer<T>.Default.Equals(action, Action))
-                return false;
+            if (EqualityComparer<T>.Default.Equals(action, Action)) {
+                IsLit = false;
+                if (!forwards)
+                    Decrement();
+            }
 
-            IsLit = false;
-            if (!forwards)
-                Decrement();
             return false;
         }
     }
