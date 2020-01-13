@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 var items = Items.ToList();
 
                 // Take into account selectorTab always being next if we're closing the last visible channel while dropdown contains more
-                bool isNextChannelAvailable = items[items.IndexOf(channel) + 1] == selectorTab.Value ? VisibleItems.Count() < Items.Count() - 1 : true;
+                var isNextChannelAvailable = !(items[items.IndexOf(channel) + 1] == selectorTab.Value) || VisibleItems.Count() < Items.Count() - 1;
 
                 // Show the ChannelSelector if the channel being removed is the last one
                 if (!isNextChannelAvailable && items.Count == 2)
