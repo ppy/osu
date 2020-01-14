@@ -34,7 +34,13 @@ namespace osu.Game.Rulesets.UI
 
         public virtual string TooltipText { get; }
 
-        protected Mod Mod { get; set; }
+        private Mod mod;
+
+        public Mod Mod
+        {
+            get => mod;
+            set => mod = value;
+        }
 
         public ModIcon(Mod mod)
         {
