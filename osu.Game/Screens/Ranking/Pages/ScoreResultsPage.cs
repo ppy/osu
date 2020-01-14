@@ -70,7 +70,10 @@ namespace osu.Game.Screens.Ranking.Pages
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new UserHeader(Score.User)
+                        new DelayedLoadWrapper(new UserHeader(Score.User)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        })
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -370,6 +373,7 @@ namespace osu.Game.Screens.Ranking.Pages
             }
         }
 
+        [LongRunningLoad]
         private class UserHeader : Container
         {
             private readonly User user;

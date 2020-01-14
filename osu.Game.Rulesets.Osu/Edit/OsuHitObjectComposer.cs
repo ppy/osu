@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected override DrawableRuleset<OsuHitObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             => new DrawableOsuEditRuleset(ruleset, beatmap, mods);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
@@ -91,10 +91,27 @@ namespace osu.Game.Rulesets.Osu.Edit
             if (sourceIndex == -1)
                 return null;
 
-            OsuHitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
-            OsuHitObject targetObject = sourceIndex + targetOffset < EditorBeatmap.HitObjects.Count ? EditorBeatmap.HitObjects[sourceIndex + targetOffset] : null;
+            HitObject sourceObject = EditorBeatmap.HitObjects[sourceIndex];
 
-            return new OsuDistanceSnapGrid(sourceObject, targetObject);
+            int targetIndex = sourceIndex + targetOffset;
+            HitObject targetObject = null;
+
+            // Keep advancing the target object while its start time falls before the end time of the source object
+            while (true)
+            {
+                if (targetIndex >= EditorBeatmap.HitObjects.Count)
+                    break;
+
+                if (EditorBeatmap.HitObjects[targetIndex].StartTime >= sourceObject.GetEndTime())
+                {
+                    targetObject = EditorBeatmap.HitObjects[targetIndex];
+                    break;
+                }
+
+                targetIndex++;
+            }
+
+            return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject);
         }
     }
 }

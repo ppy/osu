@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.Mods
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]
-        public virtual Type[] IncompatibleMods => new Type[] { };
+        public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.
         /// </summary>
-        public virtual Mod CreateCopy() => (Mod)Activator.CreateInstance(GetType());
+        public virtual Mod CreateCopy() => (Mod)MemberwiseClone();
 
         public bool Equals(IMod other) => GetType() == other?.GetType();
     }

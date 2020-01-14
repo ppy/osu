@@ -34,12 +34,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             mods = Score.Mods;
 
-            var legacyScore = Score as LegacyScoreInfo;
-
-            fruitsHit = legacyScore?.Count300 ?? Score.Statistics[HitResult.Perfect];
-            ticksHit = legacyScore?.Count100 ?? 0;
-            tinyTicksHit = legacyScore?.Count50 ?? 0;
-            tinyTicksMissed = legacyScore?.CountKatu ?? 0;
+            fruitsHit = Score?.GetCount300() ?? Score.Statistics[HitResult.Perfect];
+            ticksHit = Score?.GetCount100() ?? 0;
+            tinyTicksHit = Score?.GetCount50() ?? 0;
+            tinyTicksMissed = Score?.GetCountKatu() ?? 0;
             misses = Score.Statistics[HitResult.Miss];
 
             // Don't count scores made with supposedly unranked mods

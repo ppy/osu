@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.UserInterface

@@ -74,13 +74,7 @@ namespace osu.Game.Overlays.Rankings
             base.LoadComplete();
         }
 
-        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope)
-        {
-            scopeText.Text = scope.NewValue.ToString();
-
-            if (scope.NewValue != RankingsScope.Performance)
-                Country.Value = null;
-        }
+        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope) => scopeText.Text = scope.NewValue.ToString();
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
@@ -89,8 +83,6 @@ namespace osu.Game.Overlays.Rankings
                 flag.Hide();
                 return;
             }
-
-            Scope.Value = RankingsScope.Performance;
 
             flag.Country = country.NewValue;
             flag.Show();

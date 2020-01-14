@@ -9,6 +9,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Mods;
 using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace osu.Game.Online.API.Requests
 {
@@ -37,10 +38,12 @@ namespace osu.Game.Online.API.Requests
 
         private void onSuccess(APILegacyScores r)
         {
+            Debug.Assert(ruleset.ID != null, "ruleset.ID != null");
+
             foreach (APILegacyScoreInfo score in r.Scores)
             {
                 score.Beatmap = beatmap;
-                score.Ruleset = ruleset;
+                score.OnlineRulesetID = ruleset.ID.Value;
             }
 
             var userScore = r.UserScore;
@@ -48,7 +51,7 @@ namespace osu.Game.Online.API.Requests
             if (userScore != null)
             {
                 userScore.Score.Beatmap = beatmap;
-                userScore.Score.Ruleset = ruleset;
+                userScore.Score.OnlineRulesetID = ruleset.ID.Value;
             }
         }
 

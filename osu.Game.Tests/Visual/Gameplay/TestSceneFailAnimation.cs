@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Array.Empty<Mod>();
+            SelectedMods.Value = Array.Empty<Mod>();
             return new FailPlayer();
         }
 
@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += (_, __) => true;
+                HealthProcessor.FailConditions += (_, __) => true;
             }
         }
     }

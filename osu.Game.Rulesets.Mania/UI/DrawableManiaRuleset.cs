@@ -14,11 +14,9 @@ using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
-using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -39,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
-        public DrawableManiaRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        public DrawableManiaRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             BarLines = new BarLineGenerator<BarLine>(Beatmap).BarLines;
@@ -66,8 +64,6 @@ namespace osu.Game.Rulesets.Mania.UI
         public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ManiaPlayfieldAdjustmentContainer();
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages);
-
-        public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
         public override int Variant => (int)(Beatmap.Stages.Count == 1 ? PlayfieldType.Single : PlayfieldType.Dual) + Beatmap.TotalColumns;
 

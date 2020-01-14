@@ -45,23 +45,25 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("beatmap")]
         private APIBeatmap apiBeatmap { get; set; }
 
+        private APIMod[] allowedModsBacking;
+
         [JsonProperty("allowed_mods")]
         private APIMod[] allowedMods
         {
             get => AllowedMods.Select(m => new APIMod { Acronym = m.Acronym }).ToArray();
-            set => _allowedMods = value;
+            set => allowedModsBacking = value;
         }
+
+        private APIMod[] requiredModsBacking;
 
         [JsonProperty("required_mods")]
         private APIMod[] requiredMods
         {
             get => RequiredMods.Select(m => new APIMod { Acronym = m.Acronym }).ToArray();
-            set => _requiredMods = value;
+            set => requiredModsBacking = value;
         }
 
         private BeatmapInfo beatmap;
-        private APIMod[] _allowedMods;
-        private APIMod[] _requiredMods;
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
@@ -70,20 +72,20 @@ namespace osu.Game.Online.Multiplayer
             Beatmap = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
             Ruleset = rulesets.GetRuleset(RulesetID);
 
-            if (_allowedMods != null)
+            if (allowedModsBacking != null)
             {
                 AllowedMods.Clear();
-                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _allowedMods.Any(m => m.Acronym == mod.Acronym)));
+                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => allowedModsBacking.Any(m => m.Acronym == mod.Acronym)));
 
-                _allowedMods = null;
+                allowedModsBacking = null;
             }
 
-            if (_requiredMods != null)
+            if (requiredModsBacking != null)
             {
                 RequiredMods.Clear();
-                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _requiredMods.Any(m => m.Acronym == mod.Acronym)));
+                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => requiredModsBacking.Any(m => m.Acronym == mod.Acronym)));
 
-                _requiredMods = null;
+                requiredModsBacking = null;
             }
         }
 

@@ -11,7 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -93,6 +93,42 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
+
+        [Test]
+        public void TestNoFilterOnSimpleResume()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
+
+        [Test]
+        public void TestFilterOnResumeAfterChange()
+        {
+            addRulesetImportStep(0);
+            addRulesetImportStep(0);
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, false));
+
+            createSongSelect();
+
+            AddStep("push child screen", () => Stack.Push(new TestSceneOsuScreenStack.TestScreen("test child")));
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+
+            AddStep("change convert setting", () => config.Set(OsuSetting.ShowConvertedBeatmaps, true));
+
+            AddStep("return", () => songSelect.MakeCurrent());
+            AddUntilStep("wait for current", () => songSelect.IsCurrentScreen());
+            AddAssert("filter count is 2", () => songSelect.FilterCount == 2);
         }
 
         [Test]
@@ -220,17 +256,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddStep("change ruleset", () =>
             {
-                Mods.ValueChanged += onModChange;
+                SelectedMods.ValueChanged += onModChange;
                 songSelect.Ruleset.ValueChanged += onRulesetChange;
 
                 Ruleset.Value = new TaikoRuleset().RulesetInfo;
 
-                Mods.ValueChanged -= onModChange;
+                SelectedMods.ValueChanged -= onModChange;
                 songSelect.Ruleset.ValueChanged -= onRulesetChange;
             });
 
             AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
-            AddAssert("empty mods", () => !Mods.Value.Any());
+            AddAssert("empty mods", () => !SelectedMods.Value.Any());
 
             void onModChange(ValueChangedEvent<IReadOnlyList<Mod>> e) => modChangeIndex = actionIndex++;
             void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex++;
@@ -239,7 +275,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         [Test]
         public void TestModsRetainedBetweenSongSelect()
         {
-            AddAssert("empty mods", () => !Mods.Value.Any());
+            AddAssert("empty mods", () => !SelectedMods.Value.Any());
 
             createSongSelect();
 
@@ -249,7 +285,7 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
-            AddAssert("mods retained", () => Mods.Value.Any());
+            AddAssert("mods retained", () => SelectedMods.Value.Any());
         }
 
         [Test]
@@ -296,7 +332,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void checkMusicPlaying(bool playing) =>
             AddUntilStep($"music {(playing ? "" : "not ")}playing", () => music.IsPlaying == playing);
 
-        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => Mods.Value = mods);
+        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => SelectedMods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
 

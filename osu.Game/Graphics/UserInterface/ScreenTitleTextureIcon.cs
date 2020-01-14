@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osuTK;
@@ -16,8 +15,6 @@ namespace osu.Game.Graphics.UserInterface
     /// </summary>
     public class ScreenTitleTextureIcon : CompositeDrawable
     {
-        private const float circle_allowance = 0.8f;
-
         private readonly string textureName;
 
         public ScreenTitleTextureIcon(string textureName)
@@ -26,38 +23,17 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, OsuColour colours)
+        private void load(TextureStore textures)
         {
-            Size = new Vector2(ScreenTitle.ICON_SIZE / circle_allowance);
+            Size = new Vector2(ScreenTitle.ICON_SIZE);
 
-            InternalChildren = new Drawable[]
+            InternalChild = new Sprite
             {
-                new CircularContainer
-                {
-                    Masking = true,
-                    BorderColour = colours.Violet,
-                    BorderThickness = 3,
-                    MaskingSmoothness = 1,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Sprite
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Texture = textures.Get(textureName),
-                            Size = new Vector2(circle_allowance),
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = colours.Violet,
-                            Alpha = 0,
-                            AlwaysPresent = true,
-                        },
-                    }
-                },
+                RelativeSizeAxes = Axes.Both,
+                Texture = textures.Get(textureName),
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                FillMode = FillMode.Fit
             };
         }
     }

@@ -10,6 +10,9 @@ namespace osu.Game.Users
 {
     public class UserStatistics
     {
+        [JsonProperty]
+        public User User;
+
         [JsonProperty(@"level")]
         public LevelInfo Level;
 

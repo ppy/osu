@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
+using osu.Game.Online.API;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -17,8 +19,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box hoveredBackground;
         private readonly Box background;
 
-        public ScoreTableRowBackground(int index)
+        private readonly int index;
+        private readonly ScoreInfo score;
+
+        public ScoreTableRowBackground(int index, ScoreInfo score)
         {
+            this.index = index;
+            this.score = score;
+
             RelativeSizeAxes = Axes.X;
             Height = 25;
 
@@ -37,16 +45,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Alpha = 0,
                 },
             };
-
-            if (index % 2 != 0)
-                background.Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, IAPIProvider api)
         {
-            hoveredBackground.Colour = colours.Gray4;
-            background.Colour = colours.Gray3;
+            var isOwnScore = api.LocalUser.Value.Id == score.UserID;
+
+            if (isOwnScore)
+                background.Colour = colours.GreenDarker;
+            else if (index % 2 == 0)
+                background.Colour = colours.Gray3;
+            else
+                background.Alpha = 0;
+
+            hoveredBackground.Colour = isOwnScore ? colours.GreenDark : colours.Gray4;
         }
 
         protected override bool OnHover(HoverEvent e)

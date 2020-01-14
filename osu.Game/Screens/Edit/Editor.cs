@@ -4,7 +4,6 @@
 using System;
 using osuTK.Graphics;
 using osu.Framework.Screens;
-using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -24,19 +23,19 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
+using osu.Game.Screens.Play;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : OsuScreen, IKeyBindingHandler<GlobalAction>
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
     {
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
-
         public override float BackgroundParallaxAmount => 0.1f;
 
         public override bool AllowBackButton => false;
@@ -51,8 +50,10 @@ namespace osu.Game.Screens.Edit
         private EditorScreen currentScreen;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-
         private EditorClock clock;
+
+        private IBeatmap playableBeatmap;
+        private EditorBeatmap editorBeatmap;
 
         private DependencyContainer dependencies;
         private GameHost host;
@@ -75,9 +76,13 @@ namespace osu.Game.Screens.Edit
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
+            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            editorBeatmap = new EditorBeatmap(playableBeatmap);
+
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
             dependencies.Cache(beatDivisor);
+            dependencies.CacheAs(editorBeatmap);
 
             EditorMenuBar menuBar;
 
@@ -250,7 +255,11 @@ namespace osu.Game.Screens.Edit
         {
             base.OnEntering(last);
 
+            // todo: temporary. we want to be applying dim using the UserDimContainer eventually.
             Background.FadeColour(Color4.DarkGray, 500);
+
+            Background.EnableUserDim.Value = false;
+            Background.BlurAmount.Value = 0;
 
             resetTrack(true);
         }
