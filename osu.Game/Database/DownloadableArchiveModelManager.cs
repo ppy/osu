@@ -92,8 +92,6 @@ namespace osu.Game.Database
             notification.CancelRequested += () =>
             {
                 request.Cancel();
-                currentDownloads.Remove(request);
-                notification.State = ProgressNotificationState.Cancelled;
                 return true;
             };
 
@@ -109,11 +107,11 @@ namespace osu.Game.Database
             {
                 DownloadFailed?.Invoke(request);
 
-                if (error is OperationCanceledException) return;
-
-                notification.State = ProgressNotificationState.Cancelled;
-                Logger.Error(error, $"{HumanisedModelName.Titleize()} download failed!");
                 currentDownloads.Remove(request);
+                notification.State = ProgressNotificationState.Cancelled;
+
+                if (!(error is OperationCanceledException))
+                    Logger.Error(error, $"{HumanisedModelName.Titleize()}下载失败!");
             }
         }
 

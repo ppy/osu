@@ -123,8 +123,6 @@ namespace osu.Game.Graphics.Containers
 
                 Masking = true;
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
-
-                ResizeTo(1);
             }
 
             [BackgroundDependencyLoader]

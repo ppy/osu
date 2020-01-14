@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -28,10 +29,16 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
 
-        private readonly FillFlowContainer childCommentsVisibilityContainer;
+        private FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
+        {
+            this.comment = comment;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
@@ -40,8 +47,6 @@ namespace osu.Game.Overlays.Comments
             LinkFlowContainer message;
             GridContainer content;
             VotePill votePill;
-
-            this.comment = comment;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -128,7 +133,7 @@ namespace osu.Game.Overlays.Comments
                                                     {
                                                         Alpha = comment.IsDeleted ? 1 : 0,
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                                        Text = @"已删除",
+                                                        Text = @"deleted",
                                                     }
                                                 }
                                             },
@@ -300,7 +305,7 @@ namespace osu.Game.Overlays.Comments
 
             protected override void OnExpandedChanged(ValueChangedEvent<bool> expanded)
             {
-                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} 回复 ({count})";
+                text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
             }
         }
 

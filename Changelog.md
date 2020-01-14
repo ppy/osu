@@ -42,7 +42,7 @@
 *   从官方pr处获取的更新
     *   [#7450 - 修复osu!direct全局按键没有被正确绑定](https://github.com/ppy/osu/pull/7450)
 *   将[direct界面的排行榜]()的字体增大
-
+//////////////////////////////////////////////////////
 ## 2020/1/11:
 *   从官方pr处获取的更新
     *   [#7492 - 向主界面添加当前播放的音乐名](https://github.com/ppy/osu/pull/7450)
@@ -50,12 +50,13 @@
 
 ## 2020/1/12:
 *   从官方pr处获取的更新
-    *   [#7498 - Fix crashing when changing user status before rich presence(DiscordRPC) is initialised](https://github.com/ppy/osu/pull/7485)
+    *   [#7498 - Fix crashing when changing user status before rich presence(DiscordRPC) is initialised](https://github.com/ppy/osu/pull/7498)
     *   [#7252 - 现在可以删除单个成绩了](https://github.com/ppy/osu/pull/7252)
     *   [#7494 - Fix default button absorbing drag scroll on settings](https://github.com/ppy/osu/pull/7494)
     *   [#7491 - Fix user status dropdown having no padding around items](https://github.com/ppy/osu/pull/7491)
     *   [#7486 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7486)
     *   [#7490 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7490)
+    *   [#6464 - Make previous track button restart current track on first click](https://github.com/ppy/osu/pull/6464)
 *   现在会从github获取mfosu的最新更新了
 
 ## 2020/1/14:
@@ -63,3 +64,11 @@
     *   [#7501 - 添加切换"正在播放"列表的快捷键](https://github.com/ppy/osu/pull/7501)
     *   [#7510 - 修复在mania下选歌界面显示不正确的键位数量](https://github.com/ppy/osu/pull/7510)
     *   [#7509 - Make gradient in NewsArticleCover be effected by hover](https://github.com/ppy/osu/pull/7509)
+    *   [#7484 - Remove remaining usage of osuTK.MathHelper](https://github.com/ppy/osu/pull/7484)
+    *   [#7497 - Move hit target bar height constant to more local class](https://github.com/ppy/osu/pull/7497)
+    *   [#7457 - Fix CommentsContainer async loading wasn't really async](https://github.com/ppy/osu/pull/7457)
+    *   [#7351 - Fix download manager potentially not handling cancel requests properly](https://github.com/ppy/osu/pull/7351)
+    *   [#7384 - Set UserAgent for API requests](https://github.com/ppy/osu/pull/7384)
+    *   [#7388 - Fix crashing TestSceneMedalOverlay](https://github.com/ppy/osu/pull/7388)
+    *   [#7472 - Downgrade NUnit adapter to fix discovery issues](https://github.com/ppy/osu/pull/7472)
+*   更新整合完毕,游戏基础版本更新至2020.112.0
