@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, () => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap)));
+                fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
@@ -205,6 +205,15 @@ namespace osu.Game.Screens.Edit
                 case Key.Right:
                     seek(e, 1);
                     return true;
+
+                case Key.S:
+                    if (e.ControlPressed)
+                    {
+                        saveBeatmap();
+                        return true;
+                    }
+
+                    break;
             }
 
             return base.OnKeyDown(e);
@@ -327,5 +336,7 @@ namespace osu.Game.Screens.Edit
             else
                 clock.SeekForward(!clock.IsRunning, amount);
         }
+
+        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
     }
 }
