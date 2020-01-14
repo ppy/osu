@@ -68,7 +68,7 @@ namespace osu.Game.Database
 
         public virtual bool SupportsImportFromStable => RuntimeInfo.IsDesktop;
 
-        public readonly FileStore Files;
+        protected readonly FileStore Files;
 
         protected readonly IDatabaseContextFactory ContextFactory;
 
