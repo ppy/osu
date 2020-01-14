@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, () => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap)));
+                fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, () => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap)));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
