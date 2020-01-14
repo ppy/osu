@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osuTK;
 using osu.Framework.Bindables;
@@ -20,15 +21,10 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool Selected = new BindableBool();
 
         private readonly SpriteIcon modIcon;
+        private readonly SpriteText modAcronym;
         private readonly SpriteIcon background;
 
         private const float size = 80;
-
-        public IconUsage Icon
-        {
-            get => modIcon.Icon;
-            set => modIcon.Icon = value;
-        }
 
         private readonly ModType type;
 
@@ -39,12 +35,16 @@ namespace osu.Game.Rulesets.UI
         public Mod Mod
         {
             get => mod;
-            set => mod = value;
+            set
+            {
+                mod = value;
+                updateMod(value);
+            }
         }
 
         public ModIcon(Mod mod)
         {
-            Mod = mod ?? throw new ArgumentNullException(nameof(mod));
+            this.mod = mod ?? throw new ArgumentNullException(nameof(mod));
 
             type = mod.Type;
 
@@ -62,15 +62,44 @@ namespace osu.Game.Rulesets.UI
                     Icon = OsuIcon.ModBg,
                     Shadow = true,
                 },
+                modAcronym = new OsuSpriteText
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Colour = OsuColour.Gray(84),
+                    Alpha = 0,
+
+                    Font = OsuFont.Numeric.With(null, size - 55),
+                    UseFullGlyphHeight = false,
+                    Text = mod.Acronym
+                },
                 modIcon = new SpriteIcon
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Colour = OsuColour.Gray(84),
                     Size = new Vector2(size - 35),
-                    Icon = mod.Icon
+                    Icon = FontAwesome.Solid.Question
                 },
             };
+
+            updateMod(mod);
+        }
+
+        private void updateMod(Mod value)
+        {
+            modAcronym.Text = value.Acronym;
+            modIcon.Icon = value.Icon ?? FontAwesome.Solid.Question;
+
+            if (value.Icon is null)
+            {
+                modIcon.FadeOut();
+                modAcronym.FadeIn();
+                return;
+            }
+
+            modIcon.FadeIn();
+            modAcronym.FadeOut();
         }
 
         private Color4 backgroundColour;

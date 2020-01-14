@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Traceable";
         public override string Acronym => "TC";
-        public override IconUsage Icon => FontAwesome.Brands.SnapchatGhost;
+        public override IconUsage? Icon => FontAwesome.Brands.SnapchatGhost;
         public override ModType Type => ModType.Fun;
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
