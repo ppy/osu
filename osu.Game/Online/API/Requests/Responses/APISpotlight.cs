@@ -26,9 +26,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"end_date")]
         public DateTimeOffset EndDate;
 
-        [JsonProperty(@"participant_count")]
-        public int ParticipantCount;
-
         public override string ToString() => Name;
     }
 }

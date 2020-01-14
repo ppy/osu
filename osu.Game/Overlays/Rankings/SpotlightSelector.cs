@@ -38,7 +38,6 @@ namespace osu.Game.Overlays.Rankings
 
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
-        private readonly InfoColumn participants;
 
         public SpotlightSelector()
         {
@@ -75,7 +74,6 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 startDateColumn = new InfoColumn(@"Start Date"),
                                 endDateColumn = new InfoColumn(@"End Date"),
-                                participants = new InfoColumn(@"Participants"),
                             }
                         }
                     }
@@ -100,7 +98,6 @@ namespace osu.Game.Overlays.Rankings
         {
             startDateColumn.Value = dateToString(spotlight.NewValue.StartDate);
             endDateColumn.Value = dateToString(spotlight.NewValue.EndDate);
-            participants.Value = spotlight.NewValue.ParticipantCount.ToString();
         }
 
         private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");
