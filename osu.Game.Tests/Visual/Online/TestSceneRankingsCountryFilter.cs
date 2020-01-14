@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Country = { BindTarget = countryBindable }
+                            Current = { BindTarget = countryBindable }
                         },
                         new OsuSpriteText
                         {

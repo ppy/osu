@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -18,68 +19,80 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryPill : CircularContainer
+    public class CountryPill : CompositeDrawable, IHasCurrentValue<Country>
     {
         private const int duration = 200;
 
+        private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
+
+        public Bindable<Country> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
+
+        private readonly Container content;
         private readonly Box background;
         private readonly UpdateableFlag flag;
         private readonly OsuSpriteText countryName;
 
-        public readonly Bindable<Country> Country = new Bindable<Country>();
-
         public CountryPill()
         {
-            AutoSizeDuration = duration;
-            AutoSizeEasing = Easing.OutQuint;
-            Height = 25;
-            Masking = true;
-            Children = new Drawable[]
+            AutoSizeAxes = Axes.Both;
+
+            InternalChild = content = new CircularContainer
             {
-                background = new Box
+                Height = 25,
+                AutoSizeDuration = duration,
+                AutoSizeEasing = Easing.OutQuint,
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both
-                },
-                new FillFlowContainer
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Y,
-                    AutoSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Horizontal = 10 },
-                    Direction = FillDirection.Horizontal,
-                    Spacing = new Vector2(8, 0),
-                    Children = new Drawable[]
+                    background = new Box
                     {
-                        new FillFlowContainer
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Y,
+                        AutoSizeAxes = Axes.X,
+                        Margin = new MarginPadding { Horizontal = 10 },
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(8, 0),
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(3, 0),
-                            Children = new Drawable[]
+                            new FillFlowContainer
                             {
-                                flag = new UpdateableFlag
+                                RelativeSizeAxes = Axes.Y,
+                                AutoSizeAxes = Axes.X,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Direction = FillDirection.Horizontal,
+                                Spacing = new Vector2(3, 0),
+                                Children = new Drawable[]
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Size = new Vector2(22, 15)
-                                },
-                                countryName = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 14)
+                                    flag = new UpdateableFlag
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Size = new Vector2(22, 15)
+                                    },
+                                    countryName = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        Font = OsuFont.GetFont(size: 14)
+                                    }
                                 }
+                            },
+                            new CloseButton
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Action = () => Current.Value = null
                             }
-                        },
-                        new CloseButton
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Action = () => Country.Value = null
                         }
                     }
                 }
@@ -95,21 +108,23 @@ namespace osu.Game.Overlays.Rankings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Country.BindValueChanged(onCountryChanged, true);
+            Current.BindValueChanged(onCountryChanged, true);
         }
 
         public void Expand()
         {
-            ClearTransforms();
-            AutoSizeAxes = Axes.X;
+            content.ClearTransforms();
+            content.AutoSizeAxes = Axes.X;
+
             this.FadeIn(duration, Easing.OutQuint);
         }
 
         public void Collapse()
         {
-            ClearTransforms();
-            AutoSizeAxes = Axes.None;
-            this.ResizeWidthTo(0, duration, Easing.OutQuint);
+            content.ClearTransforms();
+            content.AutoSizeAxes = Axes.None;
+            content.ResizeWidthTo(0, duration, Easing.OutQuint);
+
             this.FadeOut(duration, Easing.OutQuint);
         }
 

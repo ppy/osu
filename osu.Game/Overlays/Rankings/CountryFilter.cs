@@ -6,6 +6,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
@@ -13,12 +14,18 @@ using osuTK;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class CountryFilter : Container
+    public class CountryFilter : CompositeDrawable, IHasCurrentValue<Country>
     {
         private const int duration = 200;
         private const int height = 50;
 
-        public readonly Bindable<Country> Country = new Bindable<Country>();
+        private readonly BindableWithCurrent<Country> current = new BindableWithCurrent<Country>();
+
+        public Bindable<Country> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
         private readonly Box background;
         private readonly CountryPill countryPill;
@@ -27,7 +34,8 @@ namespace osu.Game.Overlays.Rankings
         public CountryFilter()
         {
             RelativeSizeAxes = Axes.X;
-            Child = content = new Container
+
+            InternalChild = content = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 Height = height,
@@ -59,7 +67,7 @@ namespace osu.Game.Overlays.Rankings
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Alpha = 0,
-                                Country = { BindTarget = Country }
+                                Current = Current
                             }
                         }
                     }
@@ -76,7 +84,7 @@ namespace osu.Game.Overlays.Rankings
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            Country.BindValueChanged(onCountryChanged, true);
+            Current.BindValueChanged(onCountryChanged, true);
         }
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
