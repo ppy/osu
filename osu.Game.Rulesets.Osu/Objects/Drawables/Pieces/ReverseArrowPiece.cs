@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osuTK;
@@ -14,12 +13,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class ReverseArrowPiece : BeatSyncedContainer
     {
-        private readonly RepeatPoint repeatPoint;
-
-        public ReverseArrowPiece(RepeatPoint repeatPoint)
+        public ReverseArrowPiece()
         {
-            this.repeatPoint = repeatPoint;
-
             Divisor = 2;
             MinimumBeatLength = 200;
 

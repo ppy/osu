@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
 
-            InternalChild = scaleContainer = new ReverseArrowPiece(repeatPoint);
+            InternalChild = scaleContainer = new ReverseArrowPiece();
         }
 
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
