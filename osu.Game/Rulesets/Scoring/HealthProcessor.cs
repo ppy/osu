@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Bindables;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Judgements;
 
 namespace osu.Game.Rulesets.Scoring

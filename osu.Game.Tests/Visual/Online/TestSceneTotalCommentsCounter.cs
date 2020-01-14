@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Overlays.Comments;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 
 namespace osu.Game.Tests.Visual.Online
 {
