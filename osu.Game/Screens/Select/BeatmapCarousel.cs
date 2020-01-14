@@ -436,7 +436,7 @@ namespace osu.Game.Screens.Select
                     break;
             }
 
-            if (direction == 0)
+            if (direction == 0 || e.AltPressed)
                 return base.OnKeyDown(e);
 
             SelectNext(direction, skipDifficulties);
