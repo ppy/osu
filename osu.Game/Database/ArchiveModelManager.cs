@@ -34,7 +34,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -366,16 +366,21 @@ namespace osu.Game.Database
 
         public void UpdateFile(TModel model, TFileModel file, Stream contents)
         {
-            using (ContextFactory.GetForWrite())
+            using (var usage = ContextFactory.GetForWrite())
             {
+                // Dereference the existing file info, since the file model will be removed.
+                Files.Dereference(file.FileInfo);
+
+                // Remove the file model.
+                usage.Context.Set<TFileModel>().Remove(file);
+
+                // Add the new file info and containing file model.
                 model.Files.Remove(file);
                 model.Files.Add(new TFileModel
                 {
                     Filename = file.Filename,
                     FileInfo = Files.Add(contents)
                 });
-
-                Files.Dereference(file.FileInfo);
 
                 Update(model);
             }
