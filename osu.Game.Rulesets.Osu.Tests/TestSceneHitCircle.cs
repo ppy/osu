@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var drawable = CreateDrawableHitCircle(circle, auto);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToDrawableHitObjects>())
+            foreach (var mod in SelectedMods.Value.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
             return drawable;

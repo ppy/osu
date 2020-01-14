@@ -1,13 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Scoring;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
@@ -16,9 +17,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 {
     public class TestSceneUserTopScoreContainer : OsuTestScene
     {
+        [Cached]
+        private readonly DialogOverlay dialogOverlay;
+
         public TestSceneUserTopScoreContainer()
         {
             UserTopScoreContainer topScoreContainer;
+
+            Add(dialogOverlay = new DialogOverlay
+            {
+                Depth = -1
+            });
 
             Add(new Container
             {
@@ -52,7 +61,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                         Accuracy = 1,
                         MaxCombo = 244,
                         TotalScore = 1707827,
-                        Mods = new Mod[] { new OsuModHidden(), new OsuModHardRock(), },
+                        Mods = new[] { new OsuModHidden().Acronym, new OsuModHardRock().Acronym, },
                         User = new User
                         {
                             Id = 6602580,

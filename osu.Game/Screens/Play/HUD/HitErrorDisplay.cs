@@ -31,7 +31,8 @@ namespace osu.Game.Screens.Play.HUD
 
             RelativeSizeAxes = Axes.Both;
 
-            processor.NewJudgement += onNewJudgement;
+            if (processor != null)
+                processor.NewJudgement += onNewJudgement;
         }
 
         [BackgroundDependencyLoader]
@@ -96,7 +97,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            processor.NewJudgement -= onNewJudgement;
+
+            if (processor != null)
+                processor.NewJudgement -= onNewJudgement;
         }
     }
 }

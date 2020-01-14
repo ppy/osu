@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep($"move mouse to control point {index}", () =>
             {
-                Vector2 position = slider.Position + slider.Path.ControlPoints[index];
+                Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position.Value;
                 InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
             });
         }

@@ -43,6 +43,11 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.KeyOverlay, configVisibility);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Visible.BindValueChanged(_ => updateVisibility());
             configVisibility.BindValueChanged(_ => updateVisibility(), true);

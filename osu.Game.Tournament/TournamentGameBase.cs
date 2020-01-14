@@ -52,10 +52,10 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
+            Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
 
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
@@ -128,6 +128,9 @@ namespace osu.Game.Tournament
             {
                 ladder = new LadderInfo();
             }
+
+            if (ladder.Ruleset.Value == null)
+                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
 
             Ruleset.BindTo(ladder.Ruleset);
 
@@ -225,7 +228,7 @@ namespace osu.Game.Tournament
                     if (b.BeatmapInfo == null && b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                        req.Perform(API);
+                        API.Perform(req);
                         b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                         addedInfo = true;

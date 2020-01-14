@@ -14,7 +14,7 @@ namespace osu.Game.Online.API
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
     public abstract class APIRequest<T> : APIRequest
     {
-        protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
+        protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
         public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
 
@@ -30,6 +30,16 @@ namespace osu.Game.Online.API
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
+
+        private class OsuJsonWebRequest<U> : JsonWebRequest<U>
+        {
+            public OsuJsonWebRequest(string uri)
+                : base(uri)
+            {
+            }
+
+            protected override string UserAgent => "osu!";
+        }
     }
 
     /// <summary>
@@ -39,7 +49,7 @@ namespace osu.Game.Online.API
     {
         protected abstract string Target { get; }
 
-        protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
+        protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
@@ -122,7 +132,7 @@ namespace osu.Game.Online.API
                     // attempt to decode a displayable error string.
                     var error = JsonConvert.DeserializeObject<DisplayableError>(responseString);
                     if (error != null)
-                        e = new Exception(error.ErrorMessage, e);
+                        e = new APIException(error.ErrorMessage, e);
                 }
                 catch
                 {
@@ -151,6 +161,24 @@ namespace osu.Game.Online.API
         {
             [JsonProperty("error")]
             public string ErrorMessage { get; set; }
+        }
+
+        private class OsuWebRequest : WebRequest
+        {
+            public OsuWebRequest(string uri)
+                : base(uri)
+            {
+            }
+
+            protected override string UserAgent => "osu!";
+        }
+    }
+
+    public class APIException : InvalidOperationException
+    {
+        public APIException(string messsage, Exception innerException)
+            : base(messsage, innerException)
+        {
         }
     }
 

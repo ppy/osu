@@ -41,6 +41,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [Resolved]
         private IAPIProvider api { get; set; }
 
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
         private GetScoresRequest getScoresRequest;
 
         protected APILegacyScores Scores
@@ -56,16 +59,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     return;
                 }
 
-                scoreTable.Scores = value.Scores;
+                var scoreInfos = value.Scores.Select(s => s.CreateScoreInfo(rulesets)).ToList();
+
+                scoreTable.Scores = scoreInfos;
                 scoreTable.Show();
 
-                var topScore = value.Scores.First();
+                var topScore = scoreInfos.First();
                 var userScore = value.UserScore;
+                var userScoreInfo = userScore?.Score.CreateScoreInfo(rulesets);
 
                 topScoresContainer.Add(new DrawableTopScore(topScore));
 
-                if (userScore != null && userScore.Score.OnlineScoreID != topScore.OnlineScoreID)
-                    topScoresContainer.Add(new DrawableTopScore(userScore.Score, userScore.Position));
+                if (userScoreInfo != null && userScoreInfo.OnlineScoreID != topScore.OnlineScoreID)
+                    topScoresContainer.Add(new DrawableTopScore(userScoreInfo, userScore.Position));
             });
         }
 

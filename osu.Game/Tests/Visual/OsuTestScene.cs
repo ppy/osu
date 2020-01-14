@@ -12,7 +12,6 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
@@ -21,6 +20,7 @@ using osu.Game.Database;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Screens;
 using osu.Game.Storyboards;
 using osu.Game.Tests.Beatmaps;
 
@@ -28,21 +28,13 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class OsuTestScene : TestScene
     {
-        [Cached(typeof(Bindable<WorkingBeatmap>))]
-        [Cached(typeof(IBindable<WorkingBeatmap>))]
-        private NonNullableBindable<WorkingBeatmap> beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
-        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
+        protected Bindable<RulesetInfo> Ruleset;
 
-        [Cached]
-        [Cached(typeof(IBindable<RulesetInfo>))]
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected Bindable<IReadOnlyList<Mod>> SelectedMods;
 
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        protected readonly Bindable<IReadOnlyList<Mod>> Mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
-
-        protected new DependencyContainer Dependencies { get; private set; }
+        protected new OsuScreenDependencies Dependencies { get; private set; }
 
         private readonly Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
@@ -72,18 +64,16 @@ namespace osu.Game.Tests.Visual
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
-            var working = new DummyWorkingBeatmap(parent.Get<AudioManager>(), parent.Get<TextureStore>());
+            Dependencies = new OsuScreenDependencies(false, base.CreateChildDependencies(parent));
 
-            beatmap = new NonNullableBindable<WorkingBeatmap>(working) { Default = working };
-            beatmap.BindValueChanged(b => ScheduleAfterChildren(() =>
-            {
-                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (b.OldValue?.TrackLoaded == true && b.OldValue?.Track != b.NewValue?.Track)
-                    b.OldValue.RecycleTrack();
-            }));
+            Beatmap = Dependencies.Beatmap;
+            Beatmap.SetDefault();
 
-            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            Ruleset = Dependencies.Ruleset;
+            Ruleset.SetDefault();
+
+            SelectedMods = Dependencies.Mods;
+            SelectedMods.SetDefault();
 
             if (!UseOnlineAPI)
             {
@@ -115,7 +105,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        protected AudioManager Audio { get; private set; }
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
@@ -123,7 +113,7 @@ namespace osu.Game.Tests.Visual
             CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
-            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, audio);
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -135,8 +125,8 @@ namespace osu.Game.Tests.Visual
         {
             base.Dispose(isDisposing);
 
-            if (beatmap?.Value.TrackLoaded == true)
-                beatmap.Value.Track.Stop();
+            if (Beatmap?.Value.TrackLoaded == true)
+                Beatmap.Value.Track.Stop();
 
             if (contextFactory.IsValueCreated)
                 contextFactory.Value.ResetDatabase();
