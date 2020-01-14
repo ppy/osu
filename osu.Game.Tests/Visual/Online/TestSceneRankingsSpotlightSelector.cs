@@ -3,6 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Rankings;
 
@@ -15,25 +19,67 @@ namespace osu.Game.Tests.Visual.Online
             typeof(SpotlightSelector),
         };
 
+        protected override bool UseOnlineAPI => true;
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        private readonly SpotlightSelector selector;
+
         public TestSceneRankingsSpotlightSelector()
         {
-            SpotlightSelector selector;
-
             Add(selector = new SpotlightSelector());
+        }
 
+        [Test]
+        public void TestLocalSpotlights()
+        {
             var spotlights = new[]
             {
-                new APISpotlight { Name = "Spotlight 1" },
-                new APISpotlight { Name = "Spotlight 2" },
-                new APISpotlight { Name = "Spotlight 3" },
+                new APISpotlight
+                {
+                    Name = "Spotlight 1",
+                    StartDate = DateTimeOffset.Now,
+                    EndDate = DateTimeOffset.Now,
+                    ParticipantCount = 100
+                },
+                new APISpotlight
+                {
+                    Name = "Spotlight 2",
+                    StartDate = DateTimeOffset.Now,
+                    EndDate = DateTimeOffset.Now,
+                    ParticipantCount = 200
+                },
+                new APISpotlight
+                {
+                    Name = "Spotlight 3",
+                    StartDate = DateTimeOffset.Now,
+                    EndDate = DateTimeOffset.Now,
+                    ParticipantCount = 300
+                },
             };
 
-            AddStep("Load spotlights", () => selector.Spotlights = spotlights);
-            AddStep("Load info", () => selector.Current.Value = new APISpotlight
+            AddStep("load spotlights", () => selector.Spotlights = spotlights);
+            AddStep("change to spotlight 3", () => selector.Current.Value = spotlights[2]);
+        }
+
+        [Test]
+        public void TestOnlineSpotlights()
+        {
+            List<APISpotlight> spotlights = null;
+
+            AddStep("retrieve spotlights", () =>
             {
-                StartDate = DateTimeOffset.Now,
-                EndDate = DateTimeOffset.Now,
-                ParticipantCount = 15155151,
+                var req = new GetSpotlightsRequest();
+                req.Success += res => spotlights = res.Spotlights;
+
+                api.Perform(req);
+            });
+
+            AddStep("set spotlights", () =>
+            {
+                if (spotlights != null)
+                    selector.Spotlights = spotlights;
             });
         }
     }
