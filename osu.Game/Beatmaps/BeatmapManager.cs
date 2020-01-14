@@ -194,6 +194,10 @@ namespace osu.Game.Beatmaps
 
                 UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
             }
+
+            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+            if (working != null)
+                workingCache.Remove(working);
         }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
