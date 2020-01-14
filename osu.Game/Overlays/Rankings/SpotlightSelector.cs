@@ -17,7 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightSelector : Container, IHasCurrentValue<APISpotlight>
+    public class SpotlightSelector : CompositeDrawable, IHasCurrentValue<APISpotlight>
     {
         private readonly Box background;
         private readonly SpotlightsDropdown dropdown;
@@ -43,7 +43,8 @@ namespace osu.Game.Overlays.Rankings
         {
             RelativeSizeAxes = Axes.X;
             Height = 100;
-            Children = new Drawable[]
+
+            InternalChildren = new Drawable[]
             {
                 background = new Box
                 {
