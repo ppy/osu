@@ -616,12 +616,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                         manager.UpdateFile(setToUpdate, fileToUpdate, stream);
                     }
 
-                    // Check that the old file has been dereferenced
-                    Assert.That(manager.Files.QueryFiles(f => f.ID == fileToUpdate.FileInfoID).SingleOrDefault(), Is.Null);
-
-                    // Ensure that the old file is deleted upon a cleanup
-                    manager.Files.Cleanup();
-                    Assert.That(new System.IO.FileInfo(manager.Files.Storage.GetFullPath(fileToUpdate.FileInfo.StoragePath)), Does.Not.Exist);
+                    // Check that the old file reference has been removed
+                    Assert.That(manager.QueryBeatmapSet(s => s.ID == setToUpdate.ID).Files.All(f => f.ID != fileToUpdate.ID));
 
                     // Check that the new file is referenced correctly by attempting a retrieval
                     Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
