@@ -9,11 +9,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -21,15 +20,19 @@ namespace osu.Game.Overlays.Rankings
     {
         private readonly Box background;
         private readonly SpotlightsDropdown dropdown;
-        private readonly DimmedLoadingLayer loading;
-
-        [Resolved]
-        private IAPIProvider api { get; set; }
 
         public readonly Bindable<APISpotlight> SelectedSpotlight = new Bindable<APISpotlight>();
 
+        public IEnumerable<APISpotlight> Spotlights
+        {
+            get => dropdown.Items;
+            set => dropdown.Items = value;
+        }
+
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
+        private readonly InfoColumn mapCountColumn;
+        private readonly InfoColumn participants;
 
         public SpotlightSelector()
         {
@@ -66,11 +69,12 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 startDateColumn = new InfoColumn(@"Start Date"),
                                 endDateColumn = new InfoColumn(@"End Date"),
+                                mapCountColumn = new InfoColumn(@"Map Count"),
+                                participants = new InfoColumn(@"Participants"),
                             }
                         }
                     }
                 },
-                loading = new DimmedLoadingLayer(),
             };
         }
 
@@ -80,29 +84,12 @@ namespace osu.Game.Overlays.Rankings
             background.Colour = colours.GreySeafoam;
         }
 
-        protected override void LoadComplete()
+        public void UpdateInfo(APISpotlight spotlight, int mapCount)
         {
-            base.LoadComplete();
-            SelectedSpotlight.BindValueChanged(onSelectionChanged);
-        }
-
-        public void FetchSpotlights()
-        {
-            loading.Show();
-
-            var request = new GetSpotlightsRequest();
-            request.Success += response =>
-            {
-                dropdown.Items = response.Spotlights;
-                loading.Hide();
-            };
-            api.Queue(request);
-        }
-
-        private void onSelectionChanged(ValueChangedEvent<APISpotlight> spotlight)
-        {
-            startDateColumn.Value = dateToString(spotlight.NewValue.StartDate);
-            endDateColumn.Value = dateToString(spotlight.NewValue.EndDate);
+            startDateColumn.Value = dateToString(spotlight.StartDate);
+            endDateColumn.Value = dateToString(spotlight.EndDate);
+            mapCountColumn.Value = mapCount.ToString();
+            participants.Value = spotlight.ParticipantCount?.ToString("N0");
         }
 
         private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");

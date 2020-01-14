@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.Online
@@ -14,15 +15,26 @@ namespace osu.Game.Tests.Visual.Online
             typeof(SpotlightSelector),
         };
 
-        protected override bool UseOnlineAPI => true;
-
         public TestSceneRankingsSpotlightSelector()
         {
             SpotlightSelector selector;
 
             Add(selector = new SpotlightSelector());
 
-            AddStep("Fetch spotlights", selector.FetchSpotlights);
+            var spotlights = new APISpotlight[]
+            {
+                new APISpotlight { Name = "Spotlight 1" },
+                new APISpotlight { Name = "Spotlight 2" },
+                new APISpotlight { Name = "Spotlight 3" },
+            };
+
+            AddStep("Load spotlights", () => selector.Spotlights = spotlights);
+            AddStep("Load info", () => selector.UpdateInfo(new APISpotlight
+            {
+                StartDate = DateTimeOffset.Now,
+                EndDate = DateTimeOffset.Now,
+                ParticipantCount = 15155151,
+            }, 18));
         }
     }
 }
