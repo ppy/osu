@@ -84,14 +84,6 @@ namespace osu.Game.Graphics.UserInterface
             set => strip.Colour = value;
         }
 
-        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
-        {
-            Direction = FillDirection.Full,
-            RelativeSizeAxes = Axes.Both,
-            Depth = -1,
-            Masking = true
-        };
-
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
