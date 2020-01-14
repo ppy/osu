@@ -57,6 +57,6 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        public string TooltipText => "View in browser";
+        public string TooltipText => "view in browser";
     }
 }
