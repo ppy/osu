@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
 
             Add(selector = new SpotlightSelector());
 
-            var spotlights = new APISpotlight[]
+            var spotlights = new[]
             {
                 new APISpotlight { Name = "Spotlight 1" },
                 new APISpotlight { Name = "Spotlight 2" },
