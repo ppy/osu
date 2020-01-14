@@ -61,6 +61,8 @@ namespace osu.Game
 
         private NotificationOverlay notifications;
 
+        private NowPlayingOverlay nowPlaying;
+
         private DirectOverlay direct;
 
         private SocialOverlay social;
@@ -624,7 +626,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new NowPlayingOverlay
+            loadComponentSingleFile(nowPlaying = new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -822,6 +824,9 @@ namespace osu.Game
 
             switch (action)
             {
+                case GlobalAction.ToggleNowPlaying:
+                    nowPlaying.ToggleVisibility();
+                    return true;
                 case GlobalAction.ToggleChat:
                     chatOverlay.ToggleVisibility();
                     return true;

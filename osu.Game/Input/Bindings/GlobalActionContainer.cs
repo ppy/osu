@@ -24,6 +24,7 @@ namespace osu.Game.Input.Bindings
 
         public IEnumerable<KeyBinding> GlobalKeyBindings => new[]
         {
+            new KeyBinding(InputKey.F6, GlobalAction.ToggleNowPlaying),
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
             new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
@@ -137,5 +138,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("播放/暂停")]
         MusicPlay,
+
+        [Description("切换正在播放列表")]
+        ToggleNowPlaying,
     }
 }

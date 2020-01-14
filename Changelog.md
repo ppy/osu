@@ -56,3 +56,10 @@
     *   [#7491 - Fix user status dropdown having no padding around items](https://github.com/ppy/osu/pull/7491)
     *   [#7486 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7486)
     *   [#7490 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7490)
+*   现在会从github获取mfosu的最新更新了
+
+## 2020/1/14:
+*   从官方pr处获取的更新
+    *   [#7501 - 添加切换"正在播放"列表的快捷键](https://github.com/ppy/osu/pull/7501)
+    *   [#7510 - 修复在mania下选歌界面显示不正确的键位数量](https://github.com/ppy/osu/pull/7510)
+    *   [#7509 - Make gradient in NewsArticleCover be effected by hover](https://github.com/ppy/osu/pull/7509)

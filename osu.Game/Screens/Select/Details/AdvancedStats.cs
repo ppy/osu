@@ -119,16 +119,8 @@ namespace osu.Game.Screens.Select.Details
             }
 
             //mania specific
-            if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
-            {
-                firstValue.Title = "键位数量";
-                firstValue.Value = ((int)MathF.Round(baseDifficulty?.CircleSize ?? 0), (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0));
-            }
-            else
-            {
-                firstValue.Title = "圆圈大小";
-                firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
-            }
+            firstValue.Title = (Beatmap?.Ruleset?.ID ?? 0) == 3 ? "键位数量" : "圆圈大小";
+            firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
 
             starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
 
