@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="osu! SDL" type="DotNetProject" factoryName=".NET Project" folderName="osu!">
-    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp3.0/osu!.dll" />
+    <option name="EXE_PATH" value="$PROJECT_DIR$/osu.Desktop/bin/Debug/netcoreapp3.1/osu!.dll" />
     <option name="PROGRAM_PARAMETERS" value="--sdl" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/osu.Desktop" />
     <option name="PASS_PARENT_ENVS" value="1" />
