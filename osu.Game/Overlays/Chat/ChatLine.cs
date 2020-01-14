@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.Chat
                 {
                     List<MenuItem> items = new List<MenuItem>
                     {
-                        new OsuMenuItem("view profile", MenuItemType.Highlighted, Action)
+                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
                     };
 
                     if (sender.Id != api.LocalUser.Value.Id)
