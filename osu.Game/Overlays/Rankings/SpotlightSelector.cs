@@ -13,15 +13,22 @@ using osu.Game.Online.API.Requests.Responses;
 using osuTK;
 using System;
 using System.Collections.Generic;
+using osu.Framework.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Rankings
 {
-    public class SpotlightSelector : Container
+    public class SpotlightSelector : Container, IHasCurrentValue<APISpotlight>
     {
         private readonly Box background;
         private readonly SpotlightsDropdown dropdown;
 
-        public readonly Bindable<APISpotlight> SelectedSpotlight = new Bindable<APISpotlight>();
+        private readonly BindableWithCurrent<APISpotlight> current = new BindableWithCurrent<APISpotlight>();
+
+        public Bindable<APISpotlight> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
         public IEnumerable<APISpotlight> Spotlights
         {
@@ -55,7 +62,7 @@ namespace osu.Game.Overlays.Rankings
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
-                            Current = SelectedSpotlight,
+                            Current = Current,
                             Depth = -float.MaxValue
                         },
                         new FillFlowContainer
@@ -84,12 +91,19 @@ namespace osu.Game.Overlays.Rankings
             background.Colour = colours.GreySeafoam;
         }
 
-        public void UpdateInfo(APISpotlight spotlight, int mapCount)
+        protected override void LoadComplete()
         {
-            startDateColumn.Value = dateToString(spotlight.StartDate);
-            endDateColumn.Value = dateToString(spotlight.EndDate);
-            mapCountColumn.Value = mapCount.ToString();
-            participants.Value = spotlight.ParticipantCount?.ToString("N0");
+            base.LoadComplete();
+
+            Current.BindValueChanged(onCurrentChanged);
+        }
+
+        private void onCurrentChanged(ValueChangedEvent<APISpotlight> spotlight)
+        {
+            startDateColumn.Value = dateToString(spotlight.NewValue.StartDate);
+            endDateColumn.Value = dateToString(spotlight.NewValue.EndDate);
+            // mapCountColumn.Value = spotlight.NewValue.ParticipantCount.ToString();
+            participants.Value = spotlight.NewValue.ParticipantCount.ToString();
         }
 
         private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");

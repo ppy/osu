@@ -29,12 +29,12 @@ namespace osu.Game.Tests.Visual.Online
             };
 
             AddStep("Load spotlights", () => selector.Spotlights = spotlights);
-            AddStep("Load info", () => selector.UpdateInfo(new APISpotlight
+            AddStep("Load info", () => selector.Current.Value = new APISpotlight
             {
                 StartDate = DateTimeOffset.Now,
                 EndDate = DateTimeOffset.Now,
                 ParticipantCount = 15155151,
-            }, 18));
+            });
         }
     }
 }
