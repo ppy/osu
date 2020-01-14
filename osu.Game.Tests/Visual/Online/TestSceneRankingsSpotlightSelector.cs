@@ -41,21 +41,18 @@ namespace osu.Game.Tests.Visual.Online
                     Name = "Spotlight 1",
                     StartDate = DateTimeOffset.Now,
                     EndDate = DateTimeOffset.Now,
-                    ParticipantCount = 100
                 },
                 new APISpotlight
                 {
                     Name = "Spotlight 2",
                     StartDate = DateTimeOffset.Now,
                     EndDate = DateTimeOffset.Now,
-                    ParticipantCount = 200
                 },
                 new APISpotlight
                 {
                     Name = "Spotlight 3",
                     StartDate = DateTimeOffset.Now,
                     EndDate = DateTimeOffset.Now,
-                    ParticipantCount = 300
                 },
             };
 
