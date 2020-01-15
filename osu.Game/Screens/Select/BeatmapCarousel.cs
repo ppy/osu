@@ -413,7 +413,8 @@ namespace osu.Game.Screens.Select
         protected override bool OnKeyDown(KeyDownEvent e)
         {
             // allow for controlling volume when alt is held.
-            // mostly for compatibility with osu-stable.
+            // this is required as the VolumeControlReceptor uses OnPressed, which is
+            // executed after all OnKeyDown events.
             if (e.AltPressed)
                 return base.OnKeyDown(e);
 
