@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK.Graphics;
 
@@ -16,24 +18,19 @@ namespace osu.Game.Overlays
         private readonly Box titleBackground;
         private readonly Box controlBackground;
         private readonly Container background;
-
-        protected Color4 TitleBackgroundColour
-        {
-            set => titleBackground.Colour = value;
-        }
-
-        protected Color4 ControlBackgroundColour
-        {
-            set => controlBackground.Colour = value;
-        }
+        private readonly ScreenTitle title;
 
         protected float BackgroundHeight
         {
             set => background.Height = value;
         }
 
-        protected OverlayHeader()
+        protected OverlayColourScheme ColourScheme { get; private set; }
+
+        protected OverlayHeader(OverlayColourScheme colourScheme)
         {
+            ColourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -60,9 +57,8 @@ namespace osu.Game.Overlays
                             titleBackground = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Gray,
                             },
-                            CreateTitle().With(title =>
+                            title = CreateTitle().With(title =>
                             {
                                 title.Margin = new MarginPadding
                                 {
@@ -90,6 +86,14 @@ namespace osu.Game.Overlays
                     CreateContent()
                 }
             });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            titleBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.15f);
+            title.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.7f);
+            controlBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.2f);
         }
 
         protected abstract Drawable CreateBackground();

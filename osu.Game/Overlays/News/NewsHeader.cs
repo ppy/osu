@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.News
         public Action ShowFrontPage;
 
         public NewsHeader()
+            : base(OverlayColourScheme.Purple)
         {
             BreadcrumbControl.AddItem(front_page_string);
 
@@ -33,14 +34,6 @@ namespace osu.Game.Overlays.News
             };
 
             Current.ValueChanged += showPost;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            BreadcrumbControl.AccentColour = colours.Violet;
-            TitleBackgroundColour = colours.GreyVioletDarker;
-            ControlBackgroundColour = colours.GreyVioletDark;
         }
 
         private void showPost(ValueChangedEvent<string> e)
@@ -97,12 +90,6 @@ namespace osu.Game.Overlays.News
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/news");
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
-            }
         }
     }
 }
