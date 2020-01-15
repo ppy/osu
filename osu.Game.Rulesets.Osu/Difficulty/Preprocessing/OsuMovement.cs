@@ -14,10 +14,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
     public class OsuMovement
     {
-        private static readonly CubicSpline correction0MovingSpline = CubicSpline.InterpolateHermiteSorted(
-                                                                            new[] { -1, -0.6, 0.3, 0.5, 1 },
-                                                                            new[] { 1, 1, 0.85, 0.6, 0 },
-                                                                            new[] { 0, 0, -0.8, -2, -0.8 });
+        private static readonly LinearSpline correction0MovingSpline = LinearSpline.InterpolateSorted(
+                                                                           new double[] { -1, 1 },
+                                                                           new double[] { 1.1, 0 });
+
         // number of coefficients in the formula
         private const int numCoeffs = 4;
 
