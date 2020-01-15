@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public override string Acronym => "M1";
         }
-        
+
         private class TestMod2 : TestMod
         {
             public override string Name => "Test mod 2";
@@ -59,7 +59,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             public override IconUsage? Icon => FontAwesome.Solid.Exclamation;
         }
-        
+
         private class TestMod3 : TestMod
         {
             public override string Name => "Test mod 3";
