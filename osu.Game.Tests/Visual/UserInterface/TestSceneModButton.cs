@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Overlays.Mods;
@@ -13,8 +12,7 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         private ModButton modButton;
 
-        [SetUp]
-        public void SetUp() => Schedule(() =>
+        public TestSceneModButton()
         {
             Children = new Drawable[]
             {
@@ -24,7 +22,9 @@ namespace osu.Game.Tests.Visual.UserInterface
                     Origin = Anchor.Centre
                 }
             };
-        });
+
+            AddStep("left click", () => modButton.SelectNext(1));
+        }
 
         private class TestMod1 : TestMod
         {
