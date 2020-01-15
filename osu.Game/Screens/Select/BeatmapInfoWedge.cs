@@ -23,6 +23,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -341,23 +342,23 @@ namespace osu.Game.Screens.Select
                 return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
             }
 
-            private OsuSpriteText[] getMapper(BeatmapMetadata metadata)
+            private LinkFlowContainer[] getMapper(BeatmapMetadata metadata)
             {
                 if (string.IsNullOrEmpty(metadata.Author?.Username))
-                    return Array.Empty<OsuSpriteText>();
+                    return Array.Empty<LinkFlowContainer>();
 
                 return new[]
                 {
-                    new OsuSpriteText
+                    new LinkFlowContainer(s =>
                     {
-                        Text = "mapped by ",
-                        Font = OsuFont.GetFont(size: 15),
-                    },
-                    new OsuSpriteText
+                        s.Shadow = false;
+                        s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
+                    }).With(d =>
                     {
-                        Text = metadata.Author.Username,
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
-                    }
+                        d.AutoSizeAxes = Axes.Both;
+                        d.AddText("mapped by ");
+                        d.AddUserLink(metadata.Author);
+                    })
                 };
             }
 
