@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.UI
                     Colour = OsuColour.Gray(84),
                     Alpha = 0,
 
-                    Font = OsuFont.Numeric.With(null, size - 55),
+                    Font = OsuFont.Numeric.With(null, size - 57.5f),
                     UseFullGlyphHeight = false,
                     Text = mod.Acronym
                 },
