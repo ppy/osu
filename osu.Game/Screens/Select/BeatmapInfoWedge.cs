@@ -262,7 +262,7 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Children = getMapper(metadata)
+                                Child = getMapper(metadata)
                             },
                             InfoLabelContainer = new FillFlowContainer
                             {
@@ -342,24 +342,21 @@ namespace osu.Game.Screens.Select
                 return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
             }
 
-            private LinkFlowContainer[] getMapper(BeatmapMetadata metadata)
+            private LinkFlowContainer getMapper(BeatmapMetadata metadata)
             {
                 if (string.IsNullOrEmpty(metadata.Author?.Username))
-                    return Array.Empty<LinkFlowContainer>();
+                    return new LinkFlowContainer();
 
-                return new[]
+                return new LinkFlowContainer(s =>
                 {
-                    new LinkFlowContainer(s =>
-                    {
-                        s.Shadow = false;
-                        s.Font = OsuFont.GetFont(size: 15);
-                    }).With(d =>
-                    {
-                        d.AutoSizeAxes = Axes.Both;
-                        d.AddText("mapped by ");
-                        d.AddUserLink(metadata.Author, text => text.Font = text.Font.With(weight: FontWeight.Bold));
-                    })
-                };
+                    s.Shadow = false;
+                    s.Font = OsuFont.GetFont(size: 15);
+                }).With(d =>
+                {
+                    d.AutoSizeAxes = Axes.Both;
+                    d.AddText("mapped by ");
+                    d.AddUserLink(metadata.Author, text => text.Font = text.Font.With(weight: FontWeight.Bold));
+                });
             }
 
             public class InfoLabel : Container, IHasTooltip
