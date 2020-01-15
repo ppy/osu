@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Edit
             if (RuntimeInfo.IsDesktop)
             {
                 fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap));
-                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, () => beatmapManager.Export(Beatmap.Value.BeatmapSetInfo)));
+                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
@@ -339,5 +339,11 @@ namespace osu.Game.Screens.Edit
         }
 
         private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+
+        private void exportBeatmap()
+        {
+            saveBeatmap();
+            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
     }
 }
