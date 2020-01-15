@@ -412,6 +412,9 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            if (e.AltPressed)
+                return base.OnKeyDown(e);
+
             int direction = 0;
             bool skipDifficulties = false;
 
@@ -436,7 +439,7 @@ namespace osu.Game.Screens.Select
                     break;
             }
 
-            if (direction == 0 || e.AltPressed)
+            if (direction == 0)
                 return base.OnKeyDown(e);
 
             SelectNext(direction, skipDifficulties);
