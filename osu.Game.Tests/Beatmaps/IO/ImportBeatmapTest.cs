@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -603,7 +604,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
                     using (var stream = new MemoryStream())
                     {
-                        using (var writer = new StreamWriter(stream, leaveOpen: true))
+                        using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
                         {
                             beatmapToUpdate.HitObjects.Clear();
                             beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
