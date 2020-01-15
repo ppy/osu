@@ -68,16 +68,37 @@ namespace osu.Game.Graphics
 
         private static float getBaseHue(OverlayColourScheme colourScheme)
         {
-            var hue = colourScheme switch
+            float hue;
+
+            switch (colourScheme)
             {
-                OverlayColourScheme.Red => 0,
-                OverlayColourScheme.Pink => 333,
-                OverlayColourScheme.Orange => 46,
-                OverlayColourScheme.Green => 115,
-                OverlayColourScheme.Purple => 255,
-                OverlayColourScheme.Blue => 200,
-                _ => 0,
-            };
+                default:
+                    throw new ArgumentException(@"Used colourScheme has no hue value!");
+
+                case OverlayColourScheme.Red:
+                    hue = 0;
+                    break;
+
+                case OverlayColourScheme.Pink:
+                    hue = 333;
+                    break;
+
+                case OverlayColourScheme.Orange:
+                    hue = 46;
+                    break;
+
+                case OverlayColourScheme.Green:
+                    hue = 115;
+                    break;
+
+                case OverlayColourScheme.Purple:
+                    hue = 255;
+                    break;
+
+                case OverlayColourScheme.Blue:
+                    hue = 200;
+                    break;
+            }
 
             return hue / 360f;
         }
