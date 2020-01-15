@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -11,6 +12,11 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaBlueprintContainer : ComposeBlueprintContainer
     {
+        public ManiaBlueprintContainer(IEnumerable<DrawableHitObject> drawableHitObjects)
+            : base(drawableHitObjects)
+        {
+        }
+
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)

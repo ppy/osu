@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuBlueprintContainer : ComposeBlueprintContainer
     {
-        public override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
+        protected override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
@@ -30,6 +31,11 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return base.CreateBlueprintFor(hitObject);
+        }
+
+        public OsuBlueprintContainer(IEnumerable<DrawableHitObject> drawableHitObjects)
+            : base(drawableHitObjects)
+        {
         }
     }
 }

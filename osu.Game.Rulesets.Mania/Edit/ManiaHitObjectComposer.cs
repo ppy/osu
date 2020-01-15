@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             return drawableRuleset;
         }
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new ManiaBlueprintContainer();
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new ManiaBlueprintContainer(drawableRuleset.Playfield.AllHitObjects);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {

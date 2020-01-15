@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
-        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer();
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer(HitObjects);
 
         protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
         {

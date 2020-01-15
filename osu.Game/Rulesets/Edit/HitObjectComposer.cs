@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Edit
         private IBeatmapProcessor beatmapProcessor;
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private BlueprintContainer blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
         private DistanceSnapGrid distanceSnapGrid;
         private readonly List<Container> layerContainers = new List<Container>();
