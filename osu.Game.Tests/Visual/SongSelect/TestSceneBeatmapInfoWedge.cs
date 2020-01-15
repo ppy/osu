@@ -7,7 +7,9 @@ using JetBrains.Annotations;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Catch;
@@ -105,7 +107,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check version", () => infoWedge.Info.VersionLabel.Text == $"{ruleset.ShortName}Version");
             AddAssert("check title", () => infoWedge.Info.TitleLabel.Text == $"{ruleset.ShortName}Source — {ruleset.ShortName}Title");
             AddAssert("check artist", () => infoWedge.Info.ArtistLabel.Text == $"{ruleset.ShortName}Artist");
-            AddAssert("check author", () => infoWedge.Info.MapperContainer.Children.OfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
+            AddAssert("check author", () =>
+                infoWedge.Info.MapperContainer.ChildrenOfType<LinkFlowContainer>().Single().ChildrenOfType<OsuSpriteText>().Any(s => s.Text == $"{ruleset.ShortName}Author"));
         }
 
         private void testInfoLabels(int expectedCount)
@@ -121,7 +124,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
-            AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
+            AddAssert("check empty author", () => infoWedge.Info.MapperContainer.Child is LinkFlowContainer);
             AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
