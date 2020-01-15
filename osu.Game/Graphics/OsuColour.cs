@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Beatmaps;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -61,6 +62,24 @@ namespace osu.Game.Graphics
                 case DifficultyRating.ExpertPlus:
                     return useLighterColour ? Gray9 : Gray0;
             }
+        }
+
+        public Color4 ForOverlayElement(OverlayColourScheme colourScheme, float saturation, float lightness, float opacity = 1) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, opacity));
+
+        private static float getBaseHue(OverlayColourScheme colourScheme)
+        {
+            var hue = colourScheme switch
+            {
+                OverlayColourScheme.Red => 0,
+                OverlayColourScheme.Pink => 333,
+                OverlayColourScheme.Orange => 46,
+                OverlayColourScheme.Green => 115,
+                OverlayColourScheme.Purple => 255,
+                OverlayColourScheme.Blue => 200,
+                _ => 0,
+            };
+
+            return hue / 360f;
         }
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
@@ -164,5 +183,15 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = FromHex(@"223034");
+    }
+
+    public enum OverlayColourScheme
+    {
+        Red,
+        Pink,
+        Orange,
+        Green,
+        Purple,
+        Blue
     }
 }
