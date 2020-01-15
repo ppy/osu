@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using Decoder = osu.Game.Beatmaps.Formats.Decoder;
 
 namespace osu.Game.Beatmaps
 {
@@ -173,6 +175,30 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
+
+        /// <summary>
+        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
+        public void Save(BeatmapInfo info, IBeatmap beatmapContent)
+        {
+            var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
+
+            using (var stream = new MemoryStream())
+            {
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new LegacyBeatmapEncoder(beatmapContent).Encode(sw);
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+            }
+
+            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+            if (working != null)
+                workingCache.Remove(working);
+        }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
 
