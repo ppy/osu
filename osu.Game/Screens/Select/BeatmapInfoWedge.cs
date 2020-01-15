@@ -352,12 +352,12 @@ namespace osu.Game.Screens.Select
                     new LinkFlowContainer(s =>
                     {
                         s.Shadow = false;
-                        s.Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15);
+                        s.Font = OsuFont.GetFont(size: 15);
                     }).With(d =>
                     {
                         d.AutoSizeAxes = Axes.Both;
                         d.AddText("mapped by ");
-                        d.AddUserLink(metadata.Author);
+                        d.AddUserLink(metadata.Author, text => text.Font = text.Font.With(weight: FontWeight.Bold));
                     })
                 };
             }
