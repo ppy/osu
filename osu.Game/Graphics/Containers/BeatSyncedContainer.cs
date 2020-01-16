@@ -34,6 +34,16 @@ namespace osu.Game.Graphics.Containers
         public double TimeSinceLastBeat { get; private set; }
 
         /// <summary>
+        /// How many beats per beatlength to trigger. Defaults to 1.
+        /// </summary>
+        public int Divisor { get; set; } = 1;
+
+        /// <summary>
+        /// An optional minimum beat length. Any beat length below this will be multiplied by two until valid.
+        /// </summary>
+        public double MinimumBeatLength { get; set; }
+
+        /// <summary>
         /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
         /// </summary>
         private const double default_beat_length = 60000.0 / 60.0;
@@ -41,6 +51,8 @@ namespace osu.Game.Graphics.Containers
         private TimingControlPoint defaultTiming;
         private EffectControlPoint defaultEffect;
         private TrackAmplitudes defaultAmplitudes;
+
+        protected bool IsBeatSyncedWithTrack { get; private set; }
 
         protected override void Update()
         {
@@ -65,26 +77,37 @@ namespace osu.Game.Graphics.Containers
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
 
                 if (timingPoint.BeatLength == 0)
+                {
+                    IsBeatSyncedWithTrack = false;
                     return;
+                }
+
+                IsBeatSyncedWithTrack = true;
             }
             else
             {
+                IsBeatSyncedWithTrack = false;
                 currentTrackTime = Clock.CurrentTime;
                 timingPoint = defaultTiming;
                 effectPoint = defaultEffect;
             }
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
+            double beatLength = timingPoint.BeatLength / Divisor;
+
+            while (beatLength < MinimumBeatLength)
+                beatLength *= 2;
+
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)
                 beatIndex--;
 
-            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
+            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % beatLength;
             if (TimeUntilNextBeat < 0)
-                TimeUntilNextBeat += timingPoint.BeatLength;
+                TimeUntilNextBeat += beatLength;
 
-            TimeSinceLastBeat = timingPoint.BeatLength - TimeUntilNextBeat;
+            TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
             if (timingPoint.Equals(lastTimingPoint) && beatIndex == lastBeat)
                 return;

@@ -60,6 +60,8 @@ namespace osu.Desktop
                 else
                     Add(new SimpleUpdateManager());
             }
+
+            LoadComponentAsync(new DiscordRichPresence(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
