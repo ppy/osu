@@ -21,7 +21,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class DownloadableArchiveModelManager<TModel, TFileModel> : ArchiveModelManager<TModel, TFileModel>, IModelDownloader<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete, IEquatable<TModel>
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         public event Action<ArchiveDownloadRequest<TModel>> DownloadBegan;
 
