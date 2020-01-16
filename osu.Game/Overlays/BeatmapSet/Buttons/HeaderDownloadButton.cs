@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled.Value ? "Download this beatmap" : "Login to download";
+        public string TooltipText => button.Enabled.Value ? "download this beatmap" : "login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
