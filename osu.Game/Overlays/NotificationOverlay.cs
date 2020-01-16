@@ -23,8 +23,6 @@ namespace osu.Game.Overlays
 
         public const float TRANSITION_LENGTH = 600;
 
-        public IEnumerable<Notification> Notifications => sections.Children.SelectMany(s => s.Notifications);
-
         private FlowContainer<NotificationSection> sections;
 
         /// <summary>
