@@ -19,10 +19,10 @@ namespace osu.Game.Beatmaps.Formats
         {
             var output = float.Parse(input, CultureInfo.InvariantCulture);
 
-            if (output < -parseLimit) throw new OverflowException("Value is too low");
-            if (output > parseLimit) throw new OverflowException("Value is too high");
+            if (output < -parseLimit) throw new OverflowException("取值过低");
+            if (output > parseLimit) throw new OverflowException("取值过高");
 
-            if (float.IsNaN(output)) throw new FormatException("Not a number");
+            if (float.IsNaN(output)) throw new FormatException("取值不是一个数字");
 
             return output;
         }
@@ -31,10 +31,10 @@ namespace osu.Game.Beatmaps.Formats
         {
             var output = double.Parse(input, CultureInfo.InvariantCulture);
 
-            if (output < -parseLimit) throw new OverflowException("Value is too low");
-            if (output > parseLimit) throw new OverflowException("Value is too high");
+            if (output < -parseLimit) throw new OverflowException("取值过低");
+            if (output > parseLimit) throw new OverflowException("取值过高");
 
-            if (double.IsNaN(output)) throw new FormatException("Not a number");
+            if (double.IsNaN(output)) throw new FormatException("取值不是一个数字");
 
             return output;
         }
@@ -43,8 +43,8 @@ namespace osu.Game.Beatmaps.Formats
         {
             var output = int.Parse(input, CultureInfo.InvariantCulture);
 
-            if (output < -parseLimit) throw new OverflowException("Value is too low");
-            if (output > parseLimit) throw new OverflowException("Value is too high");
+            if (output < -parseLimit) throw new OverflowException("取值过低");
+            if (output > parseLimit) throw new OverflowException("取值过高");
 
             return output;
         }

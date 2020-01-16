@@ -44,6 +44,9 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         private Box bottomBackground;
         private Container screenContainer;
 
@@ -56,7 +59,6 @@ namespace osu.Game.Screens.Edit
         private EditorBeatmap editorBeatmap;
 
         private DependencyContainer dependencies;
-        private GameHost host;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
@@ -66,8 +68,6 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
         {
-            this.host = host;
-
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
@@ -90,7 +90,8 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("在编辑器中打开", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("保存", MenuItemType.Standard, saveBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("导出地图", MenuItemType.Standard, exportBeatmap));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
@@ -205,6 +206,15 @@ namespace osu.Game.Screens.Edit
                 case Key.Right:
                     seek(e, 1);
                     return true;
+
+                case Key.S:
+                    if (e.ControlPressed)
+                    {
+                        saveBeatmap();
+                        return true;
+                    }
+
+                    break;
             }
 
             return base.OnKeyDown(e);
@@ -292,8 +302,6 @@ namespace osu.Game.Screens.Edit
             }
         }
 
-        private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
-
         private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
             currentScreen?.Exit();
@@ -328,6 +336,13 @@ namespace osu.Game.Screens.Edit
                 clock.SeekBackward(!clock.IsRunning, amount);
             else
                 clock.SeekForward(!clock.IsRunning, amount);
+        }
+        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+
+                private void exportBeatmap()
+        {
+            saveBeatmap();
+            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
         }
     }
 }

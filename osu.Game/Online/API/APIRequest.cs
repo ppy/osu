@@ -163,15 +163,6 @@ namespace osu.Game.Online.API
             public string ErrorMessage { get; set; }
         }
 
-        private class OsuWebRequest : WebRequest
-        {
-            public OsuWebRequest(string uri)
-                : base(uri)
-            {
-            }
-
-            protected override string UserAgent => "osu!";
-        }
     }
 
     public class APIException : InvalidOperationException

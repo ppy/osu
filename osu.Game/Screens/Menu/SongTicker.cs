@@ -17,10 +17,11 @@ namespace osu.Game.Screens.Menu
     {
         private const int fade_duration = 800;
 
+        public bool AllowUpdates { get; set; } = true;
+
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
-        private readonly Bindable<WorkingBeatmap> workingBeatmap = new Bindable<WorkingBeatmap>();
         private readonly OsuSpriteText title, artist;
 
         public SongTicker()
@@ -52,16 +53,15 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            workingBeatmap.BindTo(beatmap);
-            workingBeatmap.BindValueChanged(onBeatmapChanged);
+            beatmap.BindValueChanged(onBeatmapChanged);
         }
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
         {
-            if (working.NewValue?.Beatmap == null)
+            if (!AllowUpdates)
                 return;
 
-            var metadata = working.NewValue?.Metadata;
+            var metadata = working.NewValue.Metadata;
 
             title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
             artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));

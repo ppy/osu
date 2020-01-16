@@ -405,7 +405,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             [Description(@"请勿打扰")]
             DoNotDisturb,
 
-            [Description(@"隐身(存在问题)")]
+            [Description(@"隐身")]
             AppearOffline,
 
             [Description(@"登出")]

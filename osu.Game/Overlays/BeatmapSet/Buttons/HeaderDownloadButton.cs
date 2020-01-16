@@ -146,12 +146,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "下载",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
                                 Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "不带视频" : string.Empty,
-                                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
                         };
                         this.FadeIn(200);

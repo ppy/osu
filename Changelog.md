@@ -31,6 +31,7 @@
     *   [#7451 - Mark storyboard sample retrieval test headless](https://github.com/ppy/osu/pull/7451)
     *   [#7464 - Remove unused variable on DifficultyIcon](https://github.com/ppy/osu/pull/7464)
     *   [#7458 - Allow scrolling through DimmedLoadingLayer](https://github.com/ppy/osu/pull/7464)
+
 *   字体增大
     *   [OsuTabControl](osu.Game/Graphics/UserInterface/OsuTabControl.cs)
     *   [OsuTabControlCheckbox](osu.Game/Screens/Edit/Components/Menus/EditorMenuBar.cs)
@@ -50,13 +51,13 @@
 
 ## 2020/1/12:
 *   从官方pr处获取的更新
-    *   [#7498 - Fix crashing when changing user status before rich presence(DiscordRPC) is initialised](https://github.com/ppy/osu/pull/7498)
+    *   [#7498 - 修复了在DiscordRPC初始化完成前改变玩家状态会导致的崩溃](https://github.com/ppy/osu/pull/7498)
     *   [#7252 - 现在可以删除单个成绩了](https://github.com/ppy/osu/pull/7252)
     *   [#7494 - Fix default button absorbing drag scroll on settings](https://github.com/ppy/osu/pull/7494)
     *   [#7491 - Fix user status dropdown having no padding around items](https://github.com/ppy/osu/pull/7491)
     *   [#7486 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7486)
     *   [#7490 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7490)
-    *   [#6464 - Make previous track button restart current track on first click](https://github.com/ppy/osu/pull/6464)
+    *   [#6464 - 使上一个曲目按钮在第一次单击时重新启动当前曲目](https://github.com/ppy/osu/pull/6464)
 *   现在会从github获取mfosu的最新更新了
 
 ## 2020/1/14:
@@ -72,3 +73,9 @@
     *   [#7388 - Fix crashing TestSceneMedalOverlay](https://github.com/ppy/osu/pull/7388)
     *   [#7472 - Downgrade NUnit adapter to fix discovery issues](https://github.com/ppy/osu/pull/7472)
 *   更新整合完毕,游戏基础版本更新至2020.112.0
+## 2020/1/15:
+*   从官方pr处获取的更新:
+    *   [#7528 - 允许在歌曲选择界面通过Alt键调整音量](https://github.com/ppy/osu/pull/7528)
+    *   [#7532 - 实现在编辑器内保存对谱面的更改](https://github.com/ppy/osu/pull/7532)
+    *   [#7543 - Fix user agent missing in registration request](https://github.com/ppy/osu/pull/7543)
+    *   [#7535 - Implement exporting beatmap package as .osz](https://github.com/ppy/osu/pull/7535)

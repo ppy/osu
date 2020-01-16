@@ -7,13 +7,11 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using osu.Game.Storyboards;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Statistics;
-using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
@@ -74,21 +72,6 @@ namespace osu.Game.Beatmaps
             }
 
             return AudioManager.Tracks.GetVirtual(length);
-        }
-
-        /// <summary>
-        /// Saves the <see cref="Beatmaps.Beatmap"/>.
-        /// </summary>
-        /// <returns>The absolute path of the output file.</returns>
-        public string Save()
-        {
-            string directory = Path.Combine(Path.GetTempPath(), @"osu!");
-            Directory.CreateDirectory(directory);
-
-            var path = Path.Combine(directory, Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
-            using (var sw = new StreamWriter(path))
-                sw.WriteLine(Beatmap.Serialize());
-            return path;
         }
 
         /// <summary>

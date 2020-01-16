@@ -6,7 +6,7 @@ using osu.Framework.IO.Network;
 
 namespace osu.Game.Online.API
 {
-    public class RegistrationRequest : WebRequest
+    public class RegistrationRequest : OsuWebRequest
     {
         internal string Username;
         internal string Email;
