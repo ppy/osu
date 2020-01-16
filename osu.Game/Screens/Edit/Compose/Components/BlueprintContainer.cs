@@ -208,7 +208,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removeBlueprintFor(HitObject hitObject)
         {
-            var blueprint = selectionBlueprints.Single(m => m.DrawableObject.HitObject == hitObject);
+            var blueprint = selectionBlueprints.SingleOrDefault(m => m.DrawableObject.HitObject == hitObject);
             if (blueprint == null)
                 return;
 
