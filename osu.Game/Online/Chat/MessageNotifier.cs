@@ -51,7 +51,6 @@ namespace osu.Game.Online.Chat
             localUser = api.LocalUser;
 
             // Listen for new messages
-
             channelManager.JoinedChannels.ItemsAdded += (joinedChannels) =>
             {
                 foreach (var channel in joinedChannels)
@@ -65,12 +64,9 @@ namespace osu.Game.Online.Chat
             };
         }
 
-        private void channel_NewMessagesArrived(IEnumerable<Message> messages, bool populated)
+        private void channel_NewMessagesArrived(IEnumerable<Message> messages)
         {
             if (messages == null || !messages.Any())
-                return;
-
-            if (!populated)
                 return;
 
             HandleMessages(messages.First().ChannelId, messages);
@@ -94,7 +90,7 @@ namespace osu.Game.Online.Chat
 
         public void HandleMessages(Channel channel, IEnumerable<Message> messages)
         {
-            // don't show if visible or not visible
+            // don't show if the ChatOverlay and the channel is visible.
             if (IsActive && channelManager.CurrentChannel.Value == channel)
                 return;
 
@@ -108,26 +104,36 @@ namespace osu.Game.Online.Chat
 
                 void onClick()
                 {
-                    chatOverlay.ScrollToAndHighlightMessage(channel, message);
+                    notificationOverlay.Hide();
                     chatOverlay.Show();
+                    channelManager.CurrentChannel.Value = channel;
                 }
+
+                
 
                 if (notifyOnChat.Value && channel.Type == ChannelType.PM)
                 {
-                    var existingNotification = notificationOverlay.Notifications.OfType<PrivateMessageNotification>().FirstOrDefault(n => n.Username == message.Sender.Username);
+                    // Scheduling because of possible "race-condition" (NotificationOverlay didn't add the notification yet).
+                    Schedule(() =>
+                    {
+                        var existingNotification = notificationOverlay.Notifications.OfType<PrivateMessageNotification>()
+                                                                                .FirstOrDefault(n => n.Username == message.Sender.Username);
 
-                    if (existingNotification == null)
-                    {
-                        var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
-                        notificationOverlay?.Post(notification);
-                    }
-                    else
-                    {
-                        existingNotification.MessageCount++;
-                    }
+                        if (existingNotification == null)
+                        {
+                            var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
+                            notificationOverlay?.Post(notification);
+                        }
+                        else
+                        {
+                            existingNotification.MessageCount++;
+                        }
+                    });
+                    
 
                     continue;
                 }
+
                 if (notifyOnMention.Value && anyCaseInsensitive(words, localUsername))
                 {
                     var notification = new MentionNotification(message.Sender.Username, onClick);
@@ -135,6 +141,7 @@ namespace osu.Game.Online.Chat
 
                     continue;
                 }
+
                 if (!string.IsNullOrWhiteSpace(highlightWords.Value))
                 {
                     var matchedWord = hasCaseInsensitive(words, getWords(highlightWords.Value));
@@ -144,6 +151,40 @@ namespace osu.Game.Online.Chat
                         var notification = new HighlightNotification(message.Sender.Username, matchedWord, onClick);
                         notificationOverlay?.Post(notification);
                     }
+                }
+            }
+
+            //making sure if the notification drawer bugs out, we merge it afterwards again.
+            Schedule(() => mergeNotifications()); 
+        }
+
+        /// <summary>
+        /// Checks current notifications if they aren't merged, and merges them together again.
+        /// </summary>
+        private void mergeNotifications()
+        {
+            if (notificationOverlay == null)
+            {
+                return;
+            }
+
+            var pmn = notificationOverlay.Notifications.OfType<PrivateMessageNotification>();
+
+            foreach (var notification in pmn)
+            {
+                var duplicates = pmn.Where(n => n.Username == notification.Username);
+
+                if (duplicates.Count() < 2)
+                    continue;
+
+                var first = duplicates.First();
+                foreach (var notification2 in duplicates)
+                {
+                    if (notification2 == first)
+                        continue;
+
+                    first.MessageCount += notification2.MessageCount;
+                    notification2.Close();
                 }
             }
         }
@@ -171,14 +212,12 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay)
+            private void load(OsuColour colours)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
-                    notificationOverlay.Hide();
                     onClick?.Invoke();
-
                     return true;
                 };
             }
@@ -202,6 +241,7 @@ namespace osu.Game.Online.Chat
                 set
                 {
                     messageCount = value;
+
                     if (messageCount > 1)
                     {
                         Text = $"You received {messageCount} private messages from '{Username}'. Click to read it!";
@@ -220,15 +260,12 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
+            private void load(OsuColour colours)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
                     onClick?.Invoke();
-
                     return true;
                 };
             }
@@ -248,15 +285,12 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, NotificationOverlay notificationOverlay, ChatOverlay chatOverlay)
+            private void load(OsuColour colours)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
                     onClick?.Invoke();
-
                     return true;
                 };
             }

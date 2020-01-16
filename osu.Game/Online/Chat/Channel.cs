@@ -44,7 +44,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// An event that fires when new messages arrived.
         /// </summary>
-        public event Action<IEnumerable<Message>, bool> NewMessagesArrived;
+        public event Action<IEnumerable<Message>> NewMessagesArrived;
 
         /// <summary>
         /// An event that fires when a pending message gets resolved.
@@ -57,11 +57,6 @@ namespace osu.Game.Online.Chat
         public event Action<Message> MessageRemoved;
 
         public bool ReadOnly => false; //todo not yet used.
-
-        /// <summary>
-        /// Determines if the channel's previous messages have been loaded.
-        /// </summary>
-        public bool Populated { get; set; } = false;
 
         public override string ToString() => Name;
 
@@ -110,7 +105,7 @@ namespace osu.Game.Online.Chat
             pendingMessages.Add(message);
             Messages.Add(message);
 
-            NewMessagesArrived?.Invoke(new[] { message }, Populated);
+            NewMessagesArrived?.Invoke(new[] { message });
         }
 
         public bool MessagesLoaded;
@@ -133,11 +128,8 @@ namespace osu.Game.Online.Chat
 
                 purgeOldMessages();
 
-                NewMessagesArrived?.Invoke(messages, Populated);
+                NewMessagesArrived?.Invoke(messages);
             }
-
-            if (!Populated)
-                Populated = true;
         }
 
         /// <summary>
