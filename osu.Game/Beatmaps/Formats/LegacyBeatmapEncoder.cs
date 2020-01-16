@@ -63,7 +63,7 @@ namespace osu.Game.Beatmaps.Formats
             writer.WriteLine(FormattableString.Invariant($"PreviewTime: {beatmap.Metadata.PreviewTime}"));
             // Todo: Not all countdown types are supported by lazer yet
             writer.WriteLine(FormattableString.Invariant($"Countdown: {(beatmap.BeatmapInfo.Countdown ? '1' : '0')}"));
-            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank(beatmap.ControlPointInfo.SamplePoints[0].SampleBank)}"));
+            writer.WriteLine(FormattableString.Invariant($"SampleSet: {toLegacySampleBank(beatmap.ControlPointInfo.SamplePointAt(double.MinValue).SampleBank)}"));
             writer.WriteLine(FormattableString.Invariant($"StackLeniency: {beatmap.BeatmapInfo.StackLeniency}"));
             writer.WriteLine(FormattableString.Invariant($"Mode: {beatmap.BeatmapInfo.RulesetID}"));
             writer.WriteLine(FormattableString.Invariant($"LetterboxInBreaks: {(beatmap.BeatmapInfo.LetterboxInBreaks ? '1' : '0')}"));
