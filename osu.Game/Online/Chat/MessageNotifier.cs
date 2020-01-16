@@ -42,6 +42,8 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public bool IsActive => chatOverlay?.IsPresent == true;
 
+        private List<PrivateMessageNotification> privateMessageNotifications = new List<PrivateMessageNotification>();
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
         {
@@ -96,11 +98,16 @@ namespace osu.Game.Online.Chat
 
             foreach (var message in messages)
             {
-                var words = getWords(message.Content);
+                // ignore messages that already have been read
+                if (message.Id < channel.LastReadId)
+                    return;
+
                 var localUsername = localUser.Value.Username;
 
                 if (message.Sender.Username == localUsername)
                     continue;
+
+                var words = getWords(message.Content);
 
                 void onClick()
                 {
@@ -109,20 +116,19 @@ namespace osu.Game.Online.Chat
                     channelManager.CurrentChannel.Value = channel;
                 }
 
-                
-
                 if (notifyOnChat.Value && channel.Type == ChannelType.PM)
                 {
                     // Scheduling because of possible "race-condition" (NotificationOverlay didn't add the notification yet).
                     Schedule(() =>
                     {
-                        var existingNotification = notificationOverlay.Notifications.OfType<PrivateMessageNotification>()
-                                                                                .FirstOrDefault(n => n.Username == message.Sender.Username);
+                        var existingNotification = privateMessageNotifications.OfType<PrivateMessageNotification>()
+                                                                              .FirstOrDefault(n => n.Username == message.Sender.Username);
 
                         if (existingNotification == null)
                         {
                             var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
                             notificationOverlay?.Post(notification);
+                            privateMessageNotifications.Add(notification);
                         }
                         else
                         {
@@ -130,7 +136,6 @@ namespace osu.Game.Online.Chat
                         }
                     });
                     
-
                     continue;
                 }
 
@@ -196,9 +201,9 @@ namespace osu.Game.Online.Chat
         /// </summary>
         private static string hasCaseInsensitive(IEnumerable<string> x, IEnumerable<string> y) => x.FirstOrDefault(x2 => anyCaseInsensitive(y, x2));
 
-        private static bool anyCaseInsensitive(IEnumerable<string> x, string y) => x.Any(x2 => x2.Equals(y, StringComparison.InvariantCultureIgnoreCase));
+        private static bool anyCaseInsensitive(IEnumerable<string> x, string y) => x.Any(x2 => x2.Equals(y, StringComparison.OrdinalIgnoreCase));
 
-        private class HighlightNotification : SimpleNotification
+        public class HighlightNotification : SimpleNotification
         {
             public HighlightNotification(string highlighter, string word, Action onClick)
             {
@@ -223,7 +228,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private class PrivateMessageNotification : SimpleNotification
+        public class PrivateMessageNotification : SimpleNotification
         {
             public PrivateMessageNotification(string username, Action onClick)
             {
@@ -260,18 +265,22 @@ namespace osu.Game.Online.Chat
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, MessageNotifier notifier)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
                     onClick?.Invoke();
+
+                    if (notifier.privateMessageNotifications.Contains(this))
+                        notifier.privateMessageNotifications.Remove(this);
+
                     return true;
                 };
             }
         }
 
-        private class MentionNotification : SimpleNotification
+        public class MentionNotification : SimpleNotification
         {
             public MentionNotification(string username, Action onClick)
             {

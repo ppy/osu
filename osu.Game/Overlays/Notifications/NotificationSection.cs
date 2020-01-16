@@ -21,8 +21,6 @@ namespace osu.Game.Overlays.Notifications
 
         private FlowContainer<Notification> notifications;
 
-        public IEnumerable<Notification> Notifications => notifications.Children;
-
         public int DisplayedCount => notifications.Count(n => !n.WasClosed);
         public int UnreadCount => notifications.Count(n => !n.WasClosed && !n.Read);
 
