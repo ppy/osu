@@ -8,17 +8,12 @@ using System.Linq;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Graphics;
-using osu.Game.Online.API;
-using osu.Game.Configuration;
-using osu.Game.Users;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Sprites;
@@ -67,7 +62,7 @@ namespace osu.Game.Overlays.Chat
                 },
             };
 
-            newMessagesArrived(Channel.Messages, Channel.Populated);
+            newMessagesArrived(Channel.Messages);
 
             Channel.NewMessagesArrived += newMessagesArrived;
             Channel.MessageRemoved += messageRemoved;
@@ -97,7 +92,7 @@ namespace osu.Game.Overlays.Chat
             Colour = colours.ChatBlue.Lighten(0.7f),
         };
 
-        private void newMessagesArrived(IEnumerable<Message> newMessages, bool populated)
+        private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             bool shouldScrollToEnd = scroll.IsScrolledToEnd(10) || !chatLines.Any() || newMessages.Any(m => m is LocalMessage);
 
@@ -155,16 +150,6 @@ namespace osu.Game.Overlays.Chat
                 found.Message = updated;
                 ChatLineFlow.Add(found);
             }
-        }
-
-        public void ScrollToAndHighlightMessage(Message message)
-        {
-            if (message is null)
-                return;
-
-            var chatLine = findChatLine(message);
-            scroll.ScrollTo(chatLine);
-            chatLine.FlashColour(HighlightColour, 7500, Easing.InExpo);
         }
 
         private void messageRemoved(Message removed)

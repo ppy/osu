@@ -22,7 +22,6 @@ using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
 using osu.Framework.Graphics.Sprites;
-using System;
 
 namespace osu.Game.Overlays
 {
@@ -60,8 +59,6 @@ namespace osu.Game.Overlays
 
         private Container channelSelectionContainer;
         protected ChannelSelectionOverlay ChannelSelectionOverlay;
-
-        private Message highlightingMessage { get; set; }
 
         public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos)
                                                                  || (ChannelSelectionOverlay.State.Value == Visibility.Visible && ChannelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos));
@@ -255,14 +252,16 @@ namespace osu.Game.Overlays
             if (ChannelTabControl.Current.Value != e.NewValue)
                 Scheduler.Add(() => ChannelTabControl.Current.Value = e.NewValue);
 
-            var loaded = GetChannelDrawable(e.NewValue);
+            var loaded = loadedChannels.Find(drawable => drawable.Channel == e.NewValue);
 
             if (loaded == null)
             {
                 currentChannelContainer.FadeOut(500, Easing.OutQuint);
                 loading.Show();
 
-                loaded = loadChannelDrawable(e.NewValue);
+                loaded = new DrawableChannel(e.NewValue);
+                loadedChannels.Add(loaded);
+
                 LoadComponentAsync(loaded, l =>
                 {
                     if (currentChannel.Value != e.NewValue)
@@ -273,12 +272,6 @@ namespace osu.Game.Overlays
                     currentChannelContainer.Clear(false);
                     currentChannelContainer.Add(loaded);
                     currentChannelContainer.FadeIn(500, Easing.OutQuint);
-
-                    if (highlightingMessage != null && highlightingMessage.ChannelId == e.NewValue.Id)
-                    {
-                        loaded.ScrollToAndHighlightMessage(highlightingMessage);
-                        highlightingMessage = null;
-                    }
                 });
             }
             else
@@ -444,34 +437,6 @@ namespace osu.Game.Overlays
                 channelManager.PostMessage(text);
 
             textbox.Text = string.Empty;
-        }
-
-        /// <summary>
-        /// Returns the loaded drawable for a channel. Creates new instance if <paramref name="createIfUnloaded"/> is true. Otherwise returns null if not found.
-        /// </summary>
-        public DrawableChannel GetChannelDrawable(Channel channel, bool createIfUnloaded = false)
-        {
-            var result = loadedChannels.Find(drawable => drawable.Channel == channel);
-
-            if (createIfUnloaded && result == null)
-            {
-                result = loadChannelDrawable(channel);
-            }
-
-            return result;
-        }
-
-        private DrawableChannel loadChannelDrawable(Channel channel)
-        {
-            var loaded = new DrawableChannel(channel);
-            loadedChannels.Add(loaded);
-            return loaded;
-        }
-
-        public void ScrollToAndHighlightMessage(Channel channel, Message message)
-        {
-            highlightingMessage = message;
-            channelManager.CurrentChannel.Value = channel;
         }
 
         private class TabsArea : Container
