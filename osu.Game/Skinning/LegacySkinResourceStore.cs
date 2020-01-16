@@ -34,7 +34,7 @@ namespace osu.Game.Skinning
         }
 
         private string getPathForFile(string filename) =>
-            source.Files.Find(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase))?.FileInfo.StoragePath;
+            source.Files.Find(f => string.Equals(f.Filename, filename, StringComparison.OrdinalIgnoreCase))?.FileInfo.StoragePath;
 
         public override IEnumerable<string> GetAvailableResources() => source.Files.Select(f => f.Filename);
     }

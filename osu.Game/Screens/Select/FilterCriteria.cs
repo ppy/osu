@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select
 
             public string SearchTerm;
 
-            public bool Equals(OptionalTextFilter other) => SearchTerm?.Equals(other.SearchTerm) ?? true;
+            public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
         }
     }
 }

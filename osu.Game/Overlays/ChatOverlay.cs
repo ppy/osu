@@ -171,6 +171,7 @@ namespace osu.Game.Overlays
                                     d.Origin = Anchor.BottomLeft;
                                     d.RelativeSizeAxes = Axes.Both;
                                     d.OnRequestLeave = channelManager.LeaveChannel;
+                                    d.IsSwitchable = true;
                                 }),
                             }
                         },
@@ -279,6 +280,10 @@ namespace osu.Game.Overlays
                 currentChannelContainer.Clear(false);
                 currentChannelContainer.Add(loaded);
             }
+
+            // mark channel as read when channel switched
+            if (e.NewValue.Messages.Any())
+                channelManager.MarkChannelAsRead(e.NewValue);
         }
 
         private float startDragChatHeight;

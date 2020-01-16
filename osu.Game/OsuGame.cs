@@ -39,6 +39,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
@@ -61,6 +62,8 @@ namespace osu.Game
         private MessageNotifier messageNotifier;
 
         private NotificationOverlay notifications;
+
+        private NowPlayingOverlay nowPlaying;
 
         private DirectOverlay direct;
 
@@ -206,6 +209,7 @@ namespace osu.Game
 
             Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeFade);
 
+            SelectedMods.BindValueChanged(modsChanged);
             Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
@@ -405,7 +409,27 @@ namespace osu.Game
                     oldBeatmap.Track.Completed -= currentTrackCompleted;
             }
 
+            updateModDefaults();
+
             nextBeatmap?.LoadBeatmapAsync();
+        }
+
+        private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            updateModDefaults();
+        }
+
+        private void updateModDefaults()
+        {
+            BeatmapDifficulty baseDifficulty = Beatmap.Value.BeatmapInfo.BaseDifficulty;
+
+            if (baseDifficulty != null && SelectedMods.Value.Any(m => m is IApplicableToDifficulty))
+            {
+                var adjustedDifficulty = baseDifficulty.Clone();
+
+                foreach (var mod in SelectedMods.Value.OfType<IApplicableToDifficulty>())
+                    mod.ReadFromDifficulty(adjustedDifficulty);
+            }
         }
 
         private void currentTrackCompleted() => Schedule(() =>
@@ -605,7 +629,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
-            loadComponentSingleFile(new NowPlayingOverlay
+            loadComponentSingleFile(nowPlaying = new NowPlayingOverlay
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Anchor = Anchor.TopRight,
@@ -803,6 +827,10 @@ namespace osu.Game
 
             switch (action)
             {
+                case GlobalAction.ToggleNowPlaying:
+                    nowPlaying.ToggleVisibility();
+                    return true;
+
                 case GlobalAction.ToggleChat:
                     chatOverlay.ToggleVisibility();
                     return true;

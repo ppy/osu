@@ -18,14 +18,16 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Skinning;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
-        public readonly RulesetInfo RulesetInfo;
+        public RulesetInfo RulesetInfo { get; internal set; }
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
                                                     // Confine all mods of each mod type into a single IEnumerable<Mod>
@@ -42,15 +44,22 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="mods">The legacy enum which will be converted</param>
         /// <returns>An enumerable of constructed <see cref="Mod"/>s</returns>
-        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => new Mod[] { };
+        public virtual IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods) => Array.Empty<Mod>();
 
         public ModAutoplay GetAutoplayMod() => GetAllMods().OfType<ModAutoplay>().First();
 
         public virtual ISkin CreateLegacySkinProvider(ISkinSource source) => null;
 
-        protected Ruleset(RulesetInfo rulesetInfo = null)
+        protected Ruleset()
         {
-            RulesetInfo = rulesetInfo ?? createRulesetInfo();
+            RulesetInfo = new RulesetInfo
+            {
+                Name = Description,
+                ShortName = ShortName,
+                ID = (this as ILegacyRuleset)?.LegacyID,
+                InstantiationInfo = GetType().AssemblyQualifiedName,
+                Available = true,
+            };
         }
 
         /// <summary>
@@ -61,6 +70,18 @@ namespace osu.Game.Rulesets
         /// <exception cref="BeatmapInvalidForRulesetException">Unable to successfully load the beatmap to be usable with this ruleset.</exception>
         /// <returns></returns>
         public abstract DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+
+        /// <summary>
+        /// Creates a <see cref="ScoreProcessor"/> for this <see cref="Ruleset"/>.
+        /// </summary>
+        /// <returns>The score processor.</returns>
+        public virtual ScoreProcessor CreateScoreProcessor() => new ScoreProcessor();
+
+        /// <summary>
+        /// Creates a <see cref="HealthProcessor"/> for this <see cref="Ruleset"/>.
+        /// </summary>
+        /// <returns>The health processor.</returns>
+        public virtual HealthProcessor CreateHealthProcessor(double drainStartTime) => new DrainingHealthProcessor(drainStartTime);
 
         /// <summary>
         /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
@@ -84,7 +105,7 @@ namespace osu.Game.Rulesets
 
         public virtual Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.Solid.QuestionCircle };
 
-        public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly.Location), @"Resources");
+        public virtual IResourceStore<byte[]> CreateResourceStore() => new NamespacedResourceStore<byte[]>(new DllResourceStore(GetType().Assembly), @"Resources");
 
         public abstract string Description { get; }
 
@@ -97,14 +118,14 @@ namespace osu.Game.Rulesets
         public virtual IRulesetConfigManager CreateConfig(SettingsStore settings) => null;
 
         /// <summary>
-        /// Do not override this unless you are a legacy mode.
-        /// </summary>
-        public virtual int? LegacyID => null;
-
-        /// <summary>
         /// A unique short name to reference this ruleset in online requests.
         /// </summary>
         public abstract string ShortName { get; }
+
+        /// <summary>
+        /// The playing verb to be shown in the <see cref="UserActivity.SoloGame.Status"/>.
+        /// </summary>
+        public virtual string PlayingVerb => "Playing solo";
 
         /// <summary>
         /// A list of available variant ids.
@@ -116,7 +137,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <param name="variant">A variant.</param>
         /// <returns>A list of valid <see cref="KeyBinding"/>s.</returns>
-        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new KeyBinding[] { };
+        public virtual IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => Array.Empty<KeyBinding>();
 
         /// <summary>
         /// Gets the name for a key binding variant. This is used for display in the settings overlay.
@@ -131,18 +152,5 @@ namespace osu.Game.Rulesets
         /// </summary>
         /// <returns>An empty frame for the current ruleset, or null if unsupported.</returns>
         public virtual IConvertibleReplayFrame CreateConvertibleReplayFrame() => null;
-
-        /// <summary>
-        /// Create a ruleset info based on this ruleset.
-        /// </summary>
-        /// <returns>A filled <see cref="RulesetInfo"/>.</returns>
-        private RulesetInfo createRulesetInfo() => new RulesetInfo
-        {
-            Name = Description,
-            ShortName = ShortName,
-            InstantiationInfo = GetType().AssemblyQualifiedName,
-            ID = LegacyID,
-            Available = true
-        };
     }
 }

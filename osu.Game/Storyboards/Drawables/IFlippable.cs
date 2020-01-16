@@ -6,13 +6,13 @@ using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public interface IFlippable : ITransformable
+    internal interface IFlippable : ITransformable
     {
         bool FlipH { get; set; }
         bool FlipV { get; set; }
     }
 
-    public class TransformFlipH : Transform<bool, IFlippable>
+    internal class TransformFlipH : Transform<bool, IFlippable>
     {
         private bool valueAt(double time)
             => time < EndTime ? StartValue : EndValue;
@@ -23,7 +23,7 @@ namespace osu.Game.Storyboards.Drawables
         protected override void ReadIntoStartValue(IFlippable d) => StartValue = d.FlipH;
     }
 
-    public class TransformFlipV : Transform<bool, IFlippable>
+    internal class TransformFlipV : Transform<bool, IFlippable>
     {
         private bool valueAt(double time)
             => time < EndTime ? StartValue : EndValue;
@@ -34,7 +34,7 @@ namespace osu.Game.Storyboards.Drawables
         protected override void ReadIntoStartValue(IFlippable d) => StartValue = d.FlipV;
     }
 
-    public static class FlippableExtensions
+    internal static class FlippableExtensions
     {
         /// <summary>
         /// Adjusts <see cref="IFlippable.FlipH"/> after a delay.

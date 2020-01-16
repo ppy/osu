@@ -5,13 +5,13 @@ using System;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableFailOverride, IApplicableToScoreProcessor
+    public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableFailOverride, IApplicableToHealthProcessor
     {
         public override string Name => "Easy";
         public override string Acronym => "EZ";
@@ -19,11 +19,20 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHardRock), typeof(ModDifficultyAdjust) };
 
-        private int retries = 2;
+        [SettingSource("Extra Lives", "Number of extra lives")]
+        public Bindable<int> Retries { get; } = new BindableInt(2)
+        {
+            MinValue = 0,
+            MaxValue = 10
+        };
+
+        private int retries;
 
         private BindableNumber<double> health;
+
+        public void ReadFromDifficulty(BeatmapDifficulty difficulty) { }
 
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
@@ -32,6 +41,8 @@ namespace osu.Game.Rulesets.Mods
             difficulty.ApproachRate *= ratio;
             difficulty.DrainRate *= ratio;
             difficulty.OverallDifficulty *= ratio;
+
+            retries = Retries.Value;
         }
 
         public bool AllowFail
@@ -49,11 +60,9 @@ namespace osu.Game.Rulesets.Mods
 
         public bool RestartOnFail => false;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            health = scoreProcessor.Health.GetBoundCopy();
+            health = healthProcessor.Health.GetBoundCopy();
         }
-
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
     }
 }
