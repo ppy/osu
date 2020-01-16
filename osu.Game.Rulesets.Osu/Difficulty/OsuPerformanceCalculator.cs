@@ -268,7 +268,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return modifiedAcc;
         }
 
-        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.126;
+        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.129f;
 
         private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.115f;
 
