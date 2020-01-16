@@ -10,20 +10,16 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestSceneModButton : OsuTestScene
     {
-        private ModButton modButton;
-
         public TestSceneModButton()
         {
             Children = new Drawable[]
             {
-                modButton = new ModButton(new MultiMod(new TestMod1(), new TestMod2(), new TestMod3(), new TestMod4()))
+                new ModButton(new MultiMod(new TestMod1(), new TestMod2(), new TestMod3(), new TestMod4()))
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
                 }
             };
-
-            AddStep("left click", () => modButton.SelectNext(1));
         }
 
         private class TestMod1 : TestMod
