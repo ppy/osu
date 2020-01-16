@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         public event Action<IEnumerable<HitObject>> SelectionChanged;
 
-        protected DragBox DragBox;
+        protected DragBox DragBox { get; private set; }
 
         private SelectionBlueprintContainer selectionBlueprints;
 
@@ -49,19 +49,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             RelativeSizeAxes = Axes.Both;
         }
 
-        /// <summary>
-        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
-        /// </summary>
-        protected virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
-
-        /// <summary>
-        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        protected virtual SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => null;
-
-        protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -73,7 +60,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DragBox = CreateDragBox(select),
                 selectionHandler,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
-                DragBox.CreateProxy().With(p => p.Depth = int.MinValue)
+                DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
             foreach (var obj in beatmap.HitObjects)
@@ -87,6 +74,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
             beatmap.HitObjectAdded += AddBlueprintFor;
             beatmap.HitObjectRemoved += removeBlueprintFor;
         }
+
+        /// <summary>
+        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
+        /// </summary>
+        protected virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
+
+        /// <summary>
+        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
+        protected virtual SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => null;
+
+        protected virtual DragBox CreateDragBox(Action<RectangleF> performSelect) => new DragBox(performSelect);
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {

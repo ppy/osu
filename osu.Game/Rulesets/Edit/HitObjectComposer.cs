@@ -147,8 +147,6 @@ namespace osu.Game.Rulesets.Edit
             blueprintContainer.SelectionChanged += selectionChanged;
         }
 
-        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -234,6 +232,8 @@ namespace osu.Game.Rulesets.Edit
         public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+
+        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
 
         protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 

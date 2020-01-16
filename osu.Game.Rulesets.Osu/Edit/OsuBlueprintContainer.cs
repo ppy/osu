@@ -14,6 +14,11 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuBlueprintContainer : ComposeBlueprintContainer
     {
+        public OsuBlueprintContainer(IEnumerable<DrawableHitObject> drawableHitObjects)
+            : base(drawableHitObjects)
+        {
+        }
+
         protected override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
@@ -31,11 +36,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return base.CreateBlueprintFor(hitObject);
-        }
-
-        public OsuBlueprintContainer(IEnumerable<DrawableHitObject> drawableHitObjects)
-            : base(drawableHitObjects)
-        {
         }
     }
 }
