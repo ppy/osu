@@ -62,13 +62,13 @@ namespace osu.Game.Online
         {
             if (showPlaceholder)
             {
-                content.FadeOut(transform_time / 2, Easing.OutQuint);
+                content.FadeOut(150, Easing.OutQuint);
                 placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_time, Easing.OutQuint);
                 placeholderContainer.FadeInFromZero(2 * transform_time, Easing.OutQuint);
             }
             else
             {
-                placeholderContainer.FadeOut(transform_time / 2, Easing.OutQuint);
+                placeholderContainer.FadeOut(150, Easing.OutQuint);
                 content.FadeIn(transform_time, Easing.OutQuint);
             }
         }
