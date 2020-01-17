@@ -23,6 +23,9 @@ namespace osu.Game.Online
 
         protected override Container<Drawable> Content => content;
 
+        [Resolved]
+        protected IAPIProvider API { get; private set; }
+
         public OnlineViewContainer(string placeholderMessage)
         {
             InternalChildren = new Drawable[]
@@ -35,12 +38,12 @@ namespace osu.Game.Online
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = placeholder = new LoginPlaceholder(placeholderMessage)
+                    Child = placeholder = new LoginPlaceholder($@"Please sign in to {placeholderMessage}")
                 },
             };
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        public virtual void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
             {
@@ -70,10 +73,16 @@ namespace osu.Game.Online
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        protected override void LoadComplete()
         {
-            api.Register(this);
+            API?.Register(this);
+            base.LoadComplete();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            API?.Unregister(this);
+            base.Dispose(isDisposing);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual.Online
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = onlineView = new OnlineViewContainer(@"Please login to view dummy test content")
+                Child = onlineView = new OnlineViewContainer(@"view dummy test content")
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
