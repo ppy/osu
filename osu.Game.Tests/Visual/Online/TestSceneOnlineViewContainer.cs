@@ -18,8 +18,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneOnlineViewContainer : OsuTestScene
     {
-        private OnlineViewContainer onlineView;
-        private Box box;
+        private readonly OnlineViewContainer onlineView;
 
         public TestSceneOnlineViewContainer()
         {
@@ -31,7 +30,7 @@ namespace osu.Game.Tests.Visual.Online
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        box = new Box
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.Blue.Opacity(0.8f),
@@ -51,25 +50,13 @@ namespace osu.Game.Tests.Visual.Online
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("set status to offline", () =>
-            {
-                (API as DummyAPIAccess).State = APIState.Offline;
-            });
+            AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
 
-            AddAssert("children are hidden", () =>
-            {
-                return !onlineView.Children.First().Parent.IsPresent;
-            });
+            AddAssert("children are hidden", () => !onlineView.Children.First().Parent.IsPresent);
 
-            AddStep("set status to online", () =>
-            {
-                (API as DummyAPIAccess).State = APIState.Online;
-            });
+            AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
 
-            AddAssert("children are visible", () =>
-            {
-                return onlineView.Children.First().Parent.IsPresent;
-            });
+            AddAssert("children are visible", () => onlineView.Children.First().Parent.IsPresent);
         }
     }
 }
