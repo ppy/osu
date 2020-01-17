@@ -59,8 +59,8 @@ namespace osu.Game.Tests.Online
 
             public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new System.NotImplementedException();
 
-            public override string Description { get; }
-            public override string ShortName { get; }
+            public override string Description { get; } = string.Empty;
+            public override string ShortName { get; } = string.Empty;
         }
 
         private class TestMod : Mod
