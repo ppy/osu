@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -62,7 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             waitForCurrent();
             pushNext();
             waitForCurrent();
-            AddAssert(@"only 2 items", () => breadcrumbs.Items.Count() == 2);
+            AddAssert(@"only 2 items", () => breadcrumbs.Items.Count == 2);
             AddStep(@"exit current", () => screenStack.CurrentScreen.Exit());
             AddAssert(@"current screen is first", () => startScreen == screenStack.CurrentScreen);
         }

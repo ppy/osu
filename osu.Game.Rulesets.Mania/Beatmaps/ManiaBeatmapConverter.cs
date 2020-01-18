@@ -5,7 +5,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
