@@ -41,10 +41,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             switch (type)
             {
                 default:
-                    return new ProfileScore(model.CreateScoreInfo(Rulesets));
+                    return new DrawableProfileScore(model.CreateScoreInfo(Rulesets));
 
                 case ScoreType.Best:
-                    return new ProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, ItemsContainer.Count));
+                    return new DrawableProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, ItemsContainer.Count));
             }
         }
     }

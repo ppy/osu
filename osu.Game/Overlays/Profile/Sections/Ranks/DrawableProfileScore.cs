@@ -20,7 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class ProfileScore : CompositeDrawable
+    public class DrawableProfileScore : CompositeDrawable
     {
         private const int performance_width = 80;
         private const int content_padding = 10;
@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public ProfileScore(ScoreInfo score)
+        public DrawableProfileScore(ScoreInfo score)
         {
             Score = score;
 
