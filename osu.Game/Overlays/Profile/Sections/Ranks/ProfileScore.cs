@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -104,7 +105,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Origin = Anchor.CentreRight,
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(10),
+                                Spacing = new Vector2(15),
                                 Children = new Drawable[]
                                 {
                                     CreateRightContent().With(c =>
@@ -165,12 +166,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             });
         }
 
+        [NotNull]
         protected virtual Drawable CreateRightContent() => CreateDrawableAccuracy();
 
-        protected OsuSpriteText CreateDrawableAccuracy(float textSize = 16) => new OsuSpriteText
+        protected OsuSpriteText CreateDrawableAccuracy() => new OsuSpriteText
         {
             Text = $"{Score.Accuracy:P2}",
-            Font = OsuFont.GetFont(size: textSize, weight: FontWeight.Bold, italics: true),
+            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
             Colour = colours.Yellow,
         };
 
@@ -181,6 +183,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 return new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
                     Children = new[]
                     {
                         new OsuSpriteText
