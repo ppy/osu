@@ -13,7 +13,6 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Threading;
-using System.Collections.Generic;
 
 namespace osu.Game.Overlays
 {

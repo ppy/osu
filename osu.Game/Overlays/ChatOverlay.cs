@@ -259,7 +259,7 @@ namespace osu.Game.Overlays
             if (ChannelTabControl.Current.Value != e.NewValue)
                 Scheduler.Add(() => ChannelTabControl.Current.Value = e.NewValue);
 
-            var loaded = loadedChannels.Find(drawable => drawable.Channel == e.NewValue);
+            var loaded = loadedChannels.Find(d => d.Channel == e.NewValue);
 
             if (loaded == null)
             {
@@ -268,7 +268,6 @@ namespace osu.Game.Overlays
 
                 loaded = new DrawableChannel(e.NewValue);
                 loadedChannels.Add(loaded);
-
                 LoadComponentAsync(loaded, l =>
                 {
                     if (currentChannel.Value != e.NewValue)
