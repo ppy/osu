@@ -42,7 +42,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public bool IsActive => chatOverlay?.IsPresent == true;
 
-        private List<PrivateMessageNotification> privateMessageNotifications = new List<PrivateMessageNotification>();
+        private readonly List<PrivateMessageNotification> privateMessageNotifications = new List<PrivateMessageNotification>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
@@ -204,8 +204,7 @@ namespace osu.Game.Online.Chat
             public int MessageCount
             {
                 get => messageCount;
-                set => Text = (messageCount = value) > 1 ? $"You received {messageCount} private messages from '{Username}'. Click to read it!"
-                                                         : $"You received a private message from '{Username}'. Click to read it!";
+                set => Text = (messageCount = value) > 1 ? $"You received {messageCount} private messages from '{Username}'. Click to read it!" : $"You received a private message from '{Username}'. Click to read it!";
             }
 
             public string Username { get; set; }
