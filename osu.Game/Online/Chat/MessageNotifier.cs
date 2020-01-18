@@ -118,24 +118,20 @@ namespace osu.Game.Online.Chat
 
                 if (notifyOnChat.Value && channel.Type == ChannelType.PM)
                 {
-                    // Scheduling because of possible "race-condition" (NotificationOverlay didn't add the notification yet).
-                    Schedule(() =>
-                    {
-                        var existingNotification = privateMessageNotifications.OfType<PrivateMessageNotification>()
-                                                                              .FirstOrDefault(n => n.Username == message.Sender.Username);
+                    var existingNotification = privateMessageNotifications.OfType<PrivateMessageNotification>()
+                                                                             .FirstOrDefault(n => n.Username == message.Sender.Username);
 
-                        if (existingNotification == null)
-                        {
-                            var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
-                            notificationOverlay?.Post(notification);
-                            privateMessageNotifications.Add(notification);
-                        }
-                        else
-                        {
-                            existingNotification.MessageCount++;
-                        }
-                    });
-                    
+                    if (existingNotification == null)
+                    {
+                        var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
+                        notificationOverlay?.Post(notification);
+                        privateMessageNotifications.Add(notification);
+                    }
+                    else
+                    {
+                        existingNotification.MessageCount++;
+                    }
+
                     continue;
                 }
 
@@ -156,40 +152,6 @@ namespace osu.Game.Online.Chat
                         var notification = new HighlightNotification(message.Sender.Username, matchedWord, onClick);
                         notificationOverlay?.Post(notification);
                     }
-                }
-            }
-
-            //making sure if the notification drawer bugs out, we merge it afterwards again.
-            Schedule(() => mergeNotifications()); 
-        }
-
-        /// <summary>
-        /// Checks current notifications if they aren't merged, and merges them together again.
-        /// </summary>
-        private void mergeNotifications()
-        {
-            if (notificationOverlay == null)
-            {
-                return;
-            }
-
-            var pmn = notificationOverlay.Notifications.OfType<PrivateMessageNotification>();
-
-            foreach (var notification in pmn)
-            {
-                var duplicates = pmn.Where(n => n.Username == notification.Username);
-
-                if (duplicates.Count() < 2)
-                    continue;
-
-                var first = duplicates.First();
-                foreach (var notification2 in duplicates)
-                {
-                    if (notification2 == first)
-                        continue;
-
-                    first.MessageCount += notification2.MessageCount;
-                    notification2.Close();
                 }
             }
         }
