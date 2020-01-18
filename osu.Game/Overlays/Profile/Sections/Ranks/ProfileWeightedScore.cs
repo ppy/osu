@@ -34,7 +34,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Spacing = new Vector2(15, 0),
                     Children = new Drawable[]
                     {
-                        CreateDrawableAccuracy(),
+                        new Container
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            Width = 60,
+                            Child = CreateDrawableAccuracy()
+                        },
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
