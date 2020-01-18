@@ -281,7 +281,7 @@ namespace osu.Game.Scoring.Legacy
         public class BeatmapNotFoundException : Exception
         {
             public BeatmapNotFoundException()
-                : base("No corresponding beatmap for the score could be found.")
+                : base("导入成绩时发生错误 : 找不到对应的谱面")
             {
             }
         }

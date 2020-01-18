@@ -53,10 +53,10 @@
 *   从官方pr处获取的更新
     *   [#7498 - 修复了在DiscordRPC初始化完成前改变玩家状态会导致的崩溃](https://github.com/ppy/osu/pull/7498)
     *   [#7252 - 现在可以删除单个成绩了](https://github.com/ppy/osu/pull/7252)
-    *   [#7494 - Fix default button absorbing drag scroll on settings](https://github.com/ppy/osu/pull/7494)
-    *   [#7491 - Fix user status dropdown having no padding around items](https://github.com/ppy/osu/pull/7491)
-    *   [#7486 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7486)
-    *   [#7490 - 更新osu.Framework版本](https://github.com/ppy/osu/pull/7490)
+    *   [#7494 - *修复默认按钮吸收设置上的拖动滚动](https://github.com/ppy/osu/pull/7494)
+    *   [#7491 - *修复用户状态下拉菜单项没有填充的问题](https://github.com/ppy/osu/pull/7491)
+    *   [#7486 - 更新Framework](https://github.com/ppy/osu/pull/7486)
+    *   [#7490 - 更新Framework](https://github.com/ppy/osu/pull/7490)
     *   [#6464 - 使上一个曲目按钮在第一次单击时重新启动当前曲目](https://github.com/ppy/osu/pull/6464)
 *   现在会从github获取mfosu的最新更新了
 
@@ -64,18 +64,28 @@
 *   从官方pr处获取的更新
     *   [#7501 - 添加切换"正在播放"列表的快捷键](https://github.com/ppy/osu/pull/7501)
     *   [#7510 - 修复在mania下选歌界面显示不正确的键位数量](https://github.com/ppy/osu/pull/7510)
-    *   [#7509 - Make gradient in NewsArticleCover be effected by hover](https://github.com/ppy/osu/pull/7509)
-    *   [#7484 - Remove remaining usage of osuTK.MathHelper](https://github.com/ppy/osu/pull/7484)
-    *   [#7497 - Move hit target bar height constant to more local class](https://github.com/ppy/osu/pull/7497)
-    *   [#7457 - Fix CommentsContainer async loading wasn't really async](https://github.com/ppy/osu/pull/7457)
-    *   [#7351 - Fix download manager potentially not handling cancel requests properly](https://github.com/ppy/osu/pull/7351)
-    *   [#7384 - Set UserAgent for API requests](https://github.com/ppy/osu/pull/7384)
-    *   [#7388 - Fix crashing TestSceneMedalOverlay](https://github.com/ppy/osu/pull/7388)
-    *   [#7472 - Downgrade NUnit adapter to fix discovery issues](https://github.com/ppy/osu/pull/7472)
+    *   [#7509 - *使新闻文章封面中的渐变受到悬停的影响](https://github.com/ppy/osu/pull/7509)
+    *   [#7484 - 移除osuTK.MathHelper的剩余引用](https://github.com/ppy/osu/pull/7484)
+    *   [#7497 - *将命中目标栏高度恒定移到更多本地类](https://github.com/ppy/osu/pull/7497)
+    *   [#7457 - 修复 CommentsContainer 的异步加载并不是真正的异步](https://github.com/ppy/osu/pull/7457)
+    *   [#7351 - *修复下载管理器可能无法正确处理取消请求](https://github.com/ppy/osu/pull/7351)
+    *   [#7384 - 为API请求设置UserAgent](https://github.com/ppy/osu/pull/7384)
+    *   [#7388 - *修复崩溃的TestSceneMedalOverlay](https://github.com/ppy/osu/pull/7388)
+    *   [#7472 - *降级NUnit适配器以修复discovery的问题](https://github.com/ppy/osu/pull/7472)
 *   更新整合完毕,游戏基础版本更新至2020.112.0
 ## 2020/1/15:
 *   从官方pr处获取的更新:
     *   [#7528 - 允许在歌曲选择界面通过Alt键调整音量](https://github.com/ppy/osu/pull/7528)
     *   [#7532 - 实现在编辑器内保存对谱面的更改](https://github.com/ppy/osu/pull/7532)
-    *   [#7543 - Fix user agent missing in registration request](https://github.com/ppy/osu/pull/7543)
-    *   [#7535 - Implement exporting beatmap package as .osz](https://github.com/ppy/osu/pull/7535)
+    *   [#7543 - *解决注册请求中缺少UserAgent的问题](https://github.com/ppy/osu/pull/7543)
+    *   [#7535 - 实现将谱面导出为 .osz 格式](https://github.com/ppy/osu/pull/7535)
+*   翻译补全:
+    *   [补全了在导入成绩时找不到对应谱面时的报错信息](osu.Game/Scoring/Legacy/LegacyScoreParser.cs)
+## 2020/1/18:
+*   从官方pr处获取的更新:
+    *   [#7544 - 修复聊天频道控件的 test scene](https://github.com/ppy/osu/pull/7544)
+    *   [#7549 - 修复json网络请求拥有不正确的UserAgent](https://github.com/ppy/osu/pull/7549)
+    *   [#7555 - 更新Framework](https://github.com/ppy/osu/pull/7555)
+    *   [#7556 - 移除了Traceable的mod图标(Remove usage of snapchat icon)](https://github.com/ppy/osu/pull/7556)
+*   翻译优化
+    *   将[选歌界面下方mod按钮](osu.Game/Screens/Select/FooterButtonMods.cs)处的mods复原为"`游戏Mods`"

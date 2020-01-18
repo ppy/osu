@@ -81,7 +81,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             RemoveItem(channel);
 
             if (Current.Value == channel)
-                Current.Value = Items.FirstOrDefault();
+                {
+                // Prefer non-selector channels first
+                Current.Value = Items.FirstOrDefault(c => !(c is ChannelSelectorTabItem.ChannelSelectorTabChannel)) ?? Items.FirstOrDefault();
+            }
         }
 
         protected override void SelectTab(TabItem<Channel> tab)

@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Select
             DeselectedColour = SelectedColour.Opacity(0.5f);
             lowMultiplierColour = colours.Red;
             highMultiplierColour = colours.Green;
-            Text = @"mods";
+            Text = @"游戏Mods";
             Hotkey = Key.F1;
         }
 

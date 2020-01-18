@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Menu
 
             this
                 .FadeInFromZero(500)
-                .Then(7000)
+                .Then(5000)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
                 .Finally(d =>
