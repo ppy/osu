@@ -345,7 +345,7 @@ namespace osu.Game.Overlays
             BeatmapSets = null;
             ResultAmounts = null;
             
-            beatmapSetPager.Reset();
+            beatmapSetPager?.Reset();
 
             queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
