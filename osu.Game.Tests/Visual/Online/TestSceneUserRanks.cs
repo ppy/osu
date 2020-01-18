@@ -20,7 +20,12 @@ namespace osu.Game.Tests.Visual.Online
     {
         protected override bool UseOnlineAPI => true;
 
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(DrawableProfileScore), typeof(RanksSection) };
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ProfileScore),
+            typeof(ProfileWeightedScore),
+            typeof(RanksSection)
+        };
 
         public TestSceneUserRanks()
         {
