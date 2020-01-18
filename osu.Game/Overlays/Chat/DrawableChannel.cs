@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.Chat
         public readonly Channel Channel;
         protected FillFlowContainer ChatLineFlow;
         private OsuScrollContainer scroll;
-        public ColourInfo HighlightColour { get; set; }
 
         [Resolved]
         private OsuColour colours { get; set; }
@@ -40,8 +39,6 @@ namespace osu.Game.Overlays.Chat
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            HighlightColour = colours.Blue;
-
             Child = new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,

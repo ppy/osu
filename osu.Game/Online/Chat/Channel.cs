@@ -126,18 +126,17 @@ namespace osu.Game.Online.Chat
         {
             messages = messages.Except(Messages).ToArray();
 
-            if (messages.Length != 0)
-            {
-                Messages.AddRange(messages);
+            if (messages.Length == 0) return;
 
-                var maxMessageId = messages.Max(m => m.Id);
-                if (maxMessageId > LastMessageId)
-                    LastMessageId = maxMessageId;
+            Messages.AddRange(messages);
 
-                purgeOldMessages();
+            var maxMessageId = messages.Max(m => m.Id);
+            if (maxMessageId > LastMessageId)
+                LastMessageId = maxMessageId;
 
-                NewMessagesArrived?.Invoke(messages);
-            }
+            purgeOldMessages();
+
+            NewMessagesArrived?.Invoke(messages);
         }
 
         /// <summary>

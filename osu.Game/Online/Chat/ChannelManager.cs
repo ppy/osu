@@ -49,6 +49,7 @@ namespace osu.Game.Online.Chat
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
+
         public readonly BindableBool HighPollRate = new BindableBool();
 
         public ChannelManager()
@@ -246,15 +247,7 @@ namespace osu.Game.Online.Chat
             var channels = JoinedChannels.ToList();
 
             foreach (var group in messages.GroupBy(m => m.ChannelId))
-            {
-                var channel = channels.Find(c => c.Id == group.Key);
-
-                if (channel == null)
-                    continue;
-
-                var groupArray = group.ToArray();
-                channel.AddNewMessages(groupArray);
-            }
+                channels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
         }
 
         private void initializeChannels()
