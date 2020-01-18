@@ -48,7 +48,7 @@ namespace osu.Desktop.Updater
 
             try
             {
-                if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/ppy/osu", @"osulazer", null, null, true);
+                if (updateManager == null) updateManager = await UpdateManager.GitHubUpdateManager(@"https://github.com/MATRIX-feather/osu", @"osulazer", null, null, true);
 
                 var info = await updateManager.CheckForUpdate(!useDeltaPatching);
                 if (info.ReleasesToApply.Count == 0)
