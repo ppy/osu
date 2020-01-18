@@ -166,6 +166,9 @@ namespace osu.Game.Overlays
             this.rulesets = rulesets;
             this.previewTrackManager = previewTrackManager;
 
+            beatmapSetPager = new BeatmapSetPager(rulesets);
+            beatmapSetPager.PageFetch += onPageFetch;
+
             resultCountsContainer.Colour = colours.Yellow;
         }
 
@@ -179,7 +182,8 @@ namespace osu.Game.Overlays
                                     "Tag".ToQuantity(ResultAmounts.Tags);
         }
 
-        private IEnumerable<DirectPanel> createPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets) {
+        private IEnumerable<DirectPanel> createPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets)
+        {
             return sets.Select<BeatmapSetInfo, DirectPanel>(b =>
             {
                 switch (displayStyle)
@@ -197,7 +201,8 @@ namespace osu.Game.Overlays
             });
         }
 
-        private void addPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets) {
+        private void addPanels(PanelDisplayStyle displayStyle, IEnumerable<BeatmapSetInfo> sets)
+        {
             if (BeatmapSets == null)
                 return;
 
@@ -244,28 +249,103 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             // Queries are allowed to be run only on the first pop-in
-            if (getSetsRequest == null)
+            if (!beatmapSetPager.IsFetching)
                 queueUpdateSearch();
         }
 
-        private SearchBeatmapSetsRequest getSetsRequest;
-
         private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
-        private int currentPage = 1;
-        private bool isLastPageLoaded = false;
 
         private ScheduledDelegate queryChangedDebounce;
         private ScheduledDelegate addPageDebounce;
         private PreviewTrackManager previewTrackManager;
+        private BeatmapSetPager beatmapSetPager;
+
+        private class BeatmapSetPager
+        {
+            public event PageFetchHandler PageFetch;
+
+            private readonly RulesetStore rulesets;
+
+            private SearchBeatmapSetsRequest getSetsRequest;
+
+            private int currentPage = 1;
+
+            public bool IsLastPageFetched { get; private set; } = false;
+            public bool IsFetching => getSetsRequest != null;
+
+            public BeatmapSetPager(RulesetStore rulesets)
+            {
+                this.rulesets = rulesets;
+            }
+
+            public SearchBeatmapSetsRequest FetchNextPage(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+            {
+                if (getSetsRequest != null)
+                    return null;
+
+                getSetsRequest = new SearchBeatmapSetsRequest(
+                    query,
+                    ruleset,
+                    currentPage,
+                    searchCategory,
+                    sortCriteria,
+                    direction);
+
+                getSetsRequest.Success += response =>
+                {
+                    Task.Run(() =>
+                    {
+                        var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+
+                        if (sets.Count <= 0) IsLastPageFetched = true;
+
+                        PageFetch?.Invoke(currentPage, sets);
+                        
+                        getSetsRequest = null;
+                        currentPage++;
+                    });
+                };
+
+                return getSetsRequest;
+            }
+
+            public void Reset()
+            {
+                IsLastPageFetched = false;
+
+                currentPage = 1;
+
+                getSetsRequest?.Cancel();
+                getSetsRequest = null;
+            }
+
+            public delegate void PageFetchHandler(int page, List<BeatmapSetInfo> sets);
+        }
+
+        private void onPageFetch(int page, List<BeatmapSetInfo> sets)
+        {
+            if (page > 1)
+            {
+                BeatmapSets = BeatmapSets.Concat(sets);
+                addPanels(Filter.DisplayStyleControl.DisplayStyle.Value, sets);
+            }
+            else
+            {
+                BeatmapSets = sets;
+                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+            }
+
+            Schedule(() => addPageDebounce = Scheduler.AddDelayed(() => { 
+                addPageDebounce = null;
+            }, 500));
+        }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {
             BeatmapSets = null;
             ResultAmounts = null;
-            currentPage = 1;
-            isLastPageLoaded = false;
-
-            getSetsRequest?.Cancel();
+            
+            beatmapSetPager?.Reset();
 
             queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
@@ -273,25 +353,16 @@ namespace osu.Game.Overlays
 
         private void queueAddPage()
         {
-            if (getSetsRequest != null)
+            if (beatmapSetPager.IsFetching)
                 return;
 
             if (addPageDebounce != null)
                 return;
             
-            if (isLastPageLoaded)
+            if (beatmapSetPager.IsLastPageFetched)
                 return;
             
-            currentPage++;
             updateSearch();
-
-            getSetsRequest.Success += response =>
-            {
-                addPageDebounce = Scheduler.AddDelayed(() =>
-                {
-                    addPageDebounce = null;
-                }, 500);
-            };
         }
 
         private void updateSearch()
@@ -307,44 +378,20 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            getSetsRequest = new SearchBeatmapSetsRequest(
+            var getSetsRequest = beatmapSetPager?.FetchNextPage(
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
-                currentPage,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)
-
-            getSetsRequest.Success += response =>
-            {
-                Task.Run(() =>
-                {
-                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
-
-                    // may not need scheduling; loads async internally.
-                    Schedule(() =>
-                    {
-                        if (sets.Count <= 0) isLastPageLoaded = true;
-
-                        if (currentPage > 1)
-                        {
-                            BeatmapSets = BeatmapSets.Concat(sets);
-                            addPanels(Filter.DisplayStyleControl.DisplayStyle.Value, sets);
-                        }
-                        else
-                        {
-                            BeatmapSets = sets;
-                            recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-                        }
-                        
-                        getSetsRequest = null;
-                    });
-                });
-            };
+            
+            if (getSetsRequest == null)
+                return;
 
             API.Queue(getSetsRequest);
         }
 
-        protected override void Update() {
+        protected override void Update()
+        {
             base.Update();
 
             if (panels == null)
