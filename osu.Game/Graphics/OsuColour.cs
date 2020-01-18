@@ -74,7 +74,7 @@ namespace osu.Game.Graphics
             switch (colourScheme)
             {
                 default:
-                    throw new ArgumentException(@"Used colourScheme has no hue value!");
+                    throw new ArgumentException($@"{colourScheme} colour scheme does not provide a hue value in {nameof(getBaseHue)}.");
 
                 case OverlayColourScheme.Red:
                     hue = 0;
