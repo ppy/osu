@@ -66,6 +66,7 @@ namespace osu.Game.Graphics
 
         public Color4 ForOverlayElement(OverlayColourScheme colourScheme, float saturation, float lightness, float opacity = 1) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, opacity));
 
+        // See https://github.com/ppy/osu-web/blob/4218c288292d7c810b619075471eaea8bbb8f9d8/app/helpers.php#L1463
         private static float getBaseHue(OverlayColourScheme colourScheme)
         {
             float hue;
