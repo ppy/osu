@@ -53,13 +53,13 @@ namespace osu.Game.Online.Chat
             localUser = api.LocalUser;
 
             // Listen for new messages
-            channelManager.JoinedChannels.ItemsAdded += (joinedChannels) =>
+            channelManager.JoinedChannels.ItemsAdded += joinedChannels =>
             {
                 foreach (var channel in joinedChannels)
                     channel.NewMessagesArrived += channel_NewMessagesArrived;
             };
 
-            channelManager.JoinedChannels.ItemsRemoved += (leftChannels) =>
+            channelManager.JoinedChannels.ItemsRemoved += leftChannels =>
             {
                 foreach (var channel in leftChannels)
                     channel.NewMessagesArrived -= channel_NewMessagesArrived;
@@ -92,7 +92,7 @@ namespace osu.Game.Online.Chat
 
         public void HandleMessages(Channel channel, IEnumerable<Message> messages)
         {
-            // don't show if the ChatOverlay and the channel is visible.
+            // don't show if the ChatOverlay and the target channel is visible.
             if (IsActive && channelManager.CurrentChannel.Value == channel)
                 return;
 
@@ -118,8 +118,7 @@ namespace osu.Game.Online.Chat
 
                 if (notifyOnChat.Value && channel.Type == ChannelType.PM)
                 {
-                    var existingNotification = privateMessageNotifications.OfType<PrivateMessageNotification>()
-                                                                             .FirstOrDefault(n => n.Username == message.Sender.Username);
+                    var existingNotification = privateMessageNotifications.FirstOrDefault(n => n.Username == message.Sender.Username);
 
                     if (existingNotification == null)
                     {
@@ -200,24 +199,13 @@ namespace osu.Game.Online.Chat
                 this.onClick = onClick;
             }
 
-            private int messageCount = 0;
+            private int messageCount;
 
             public int MessageCount
             {
                 get => messageCount;
-                set
-                {
-                    messageCount = value;
-
-                    if (messageCount > 1)
-                    {
-                        Text = $"You received {messageCount} private messages from '{Username}'. Click to read it!";
-                    }
-                    else
-                    {
-                        Text = $"You received a private message from '{Username}'. Click to read it!";
-                    }
-                }
+                set => Text = (messageCount = value) > 1 ? $"You received {messageCount} private messages from '{Username}'. Click to read it!"
+                                                         : $"You received a private message from '{Username}'. Click to read it!";
             }
 
             public string Username { get; set; }
