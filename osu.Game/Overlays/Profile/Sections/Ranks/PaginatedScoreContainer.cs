@@ -15,14 +15,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
     {
-        private readonly bool includeWeight;
         private readonly ScoreType type;
 
-        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
+        public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing)
             : base(user, header, missing)
         {
             this.type = type;
-            this.includeWeight = includeWeight;
 
             ItemsPerPage = 5;
 
@@ -43,10 +41,10 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             switch (type)
             {
                 default:
-                    return new DrawablePerformanceScore(model.CreateScoreInfo(Rulesets), includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
+                    return new ProfileScore(model.CreateScoreInfo(Rulesets));
 
-                case ScoreType.Recent:
-                    return new DrawableTotalScore(model.CreateScoreInfo(Rulesets));
+                case ScoreType.Best:
+                    return new ProfileWeightedScore(model.CreateScoreInfo(Rulesets), Math.Pow(0.95, ItemsContainer.Count));
             }
         }
     }
