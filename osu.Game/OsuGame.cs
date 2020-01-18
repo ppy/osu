@@ -59,8 +59,6 @@ namespace osu.Game
 
         private ChannelManager channelManager;
 
-        private MessageNotifier messageNotifier;
-
         private NotificationOverlay notifications;
 
         private NowPlayingOverlay nowPlaying;
@@ -615,7 +613,7 @@ namespace osu.Game
             loadComponentSingleFile(direct = new DirectOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(social = new SocialOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal, true);
-            loadComponentSingleFile(messageNotifier = new MessageNotifier(), AddInternal, true);
+            loadComponentSingleFile(new MessageNotifier(), AddInternal, true);
             loadComponentSingleFile(chatOverlay = new ChatOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(Settings = new SettingsOverlay { GetToolbarHeight = () => ToolbarOffset }, leftFloatingOverlayContent.Add, true);
             var changelogOverlay = loadComponentSingleFile(new ChangelogOverlay(), overlayContent.Add, true);
