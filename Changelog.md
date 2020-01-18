@@ -89,3 +89,13 @@
     *   [#7556 - 移除了Traceable的mod图标(Remove usage of snapchat icon)](https://github.com/ppy/osu/pull/7556)
 *   翻译优化
     *   将[选歌界面下方mod按钮](osu.Game/Screens/Select/FooterButtonMods.cs)处的mods复原为"`游戏Mods`"
+
+*   整合更新
+    *   [#7425 - *为通道读取状态实现缺少的API代码](https://github.com/ppy/osu/pull/7425)
+    *   [#7523 - *删除TournamentFont中的重复条件](https://github.com/ppy/osu/pull/7423)
+    *   [#6991 - 添加对 `--sdl` 参数的支持](https://github.com/ppy/osu/pull/6991)
+    *   [#7434 - 添加滑条折返箭头的动画](https://github.com/ppy/osu/pull/7434)
+    *   [#7537 - *使无图标的mod显示首字母缩写词](https://github.com/ppy/osu/pull/7537)
+    *   [#7474 - 添加Benchmark项目](https://github.com/ppy/osu/pull/7474)
+    *   [#7479 - 在排行榜实现按国家分类(Implement CountryFilter component for RankingsOverlay)](https://github.com/ppy/osu/pull/7479)
+    *   [#7534 - 修复tooltip语法](https://github.com/ppy/osu/pull/7534)

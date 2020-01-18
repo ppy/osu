@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Perfect";
         public override string Acronym => "PF";
-        public override IconUsage Icon => OsuIcon.ModPerfect;
+        public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override string Description => "不SS,便重试";
 
         protected override bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => result.Type != result.Judgement.MaxResult;

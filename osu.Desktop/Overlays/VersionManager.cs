@@ -61,7 +61,7 @@ namespace osu.Desktop.Overlays
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.Numeric.With(size: 16),//翻译时修改
                             Colour = colours.Yellow,
-                            Text = @"2020.112.0+matrixfeather 1"
+                            Text = @"2020.118.0+matrixfeather 1"
                         },
                         new Sprite
                         {

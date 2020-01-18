@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Autopilot";
         public override string Acronym => "AP";
-        public override IconUsage Icon => OsuIcon.ModAutopilot;
+        public override IconUsage? Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;
         public override string Description => @"跟着节奏点就好,无需移动光标.";
         public override double ScoreMultiplier => 1;

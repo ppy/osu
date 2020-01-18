@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Text = @"你需要成为一名osu!supporter来查看好友和国内/区内排名!",
                         Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     },
-                    text = new LinkFlowContainer(t => t.Font = t.Font.With(size: 12))
+                    text = new LinkFlowContainer(t => t.Font = t.Font.With(size: 18))
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
@@ -41,9 +41,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             };
 
-            text.AddText("Click ");
-            text.AddLink("here", "/home/support");
-            text.AddText(" to see all the fancy features that you can get!");
+            text.AddText("点击");
+            text.AddLink("这里", "/home/support");
+            text.AddText("来查看你可以得到的所有超棒功能!");
         }
     }
 }

@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "蒙上你的眼睛";
         public override string Acronym => "BL";
 
-        public override IconUsage Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override bool Ranked => false;

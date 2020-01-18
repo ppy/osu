@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Autoplay";
         public override string Acronym => "AT";
-        public override IconUsage Icon => OsuIcon.ModAuto;
+        public override IconUsage? Icon => OsuIcon.ModAuto;
         public override ModType Type => ModType.Automation;
         public override string Description => "来观看精彩绝伦的自动表演";
         public override double ScoreMultiplier => 1;

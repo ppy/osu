@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Spin In";
         public override string Acronym => "SI";
-        public override IconUsage Icon => FontAwesome.Solid.Undo;
+        public override IconUsage? Icon => FontAwesome.Solid.Undo;
         public override ModType Type => ModType.Fun;
         public override string Description => "没有缩圈,圆圈会螺旋进入";
         public override double ScoreMultiplier => 1;

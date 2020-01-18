@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Relax";
         public override string Acronym => "RX";
         public override string Description => @"你不用点击,只需移动,让你用来点击的手指放松一下";
-        public override IconUsage Icon => OsuIcon.ModRelax;
+        public override IconUsage? Icon => OsuIcon.ModRelax;
         public override ModType Type => ModType.Automation;
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModNoFail), typeof(ModSuddenDeath) };

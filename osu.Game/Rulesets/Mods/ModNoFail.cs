@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "No Fail";
         public override string Acronym => "NF";
-        public override IconUsage Icon => OsuIcon.ModNofail;
+        public override IconUsage? Icon => OsuIcon.ModNofail;
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "无论如何,你也失败不了";
         public override double ScoreMultiplier => 0.5;

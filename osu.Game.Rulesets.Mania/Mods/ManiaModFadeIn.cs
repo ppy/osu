@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Fade In";
         public override string Acronym => "FI";
-        public override IconUsage Icon => OsuIcon.ModHidden;
+        public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"上隐模式!";
         public override double ScoreMultiplier => 1;
