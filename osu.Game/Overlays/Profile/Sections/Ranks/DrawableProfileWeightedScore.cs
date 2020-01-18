@@ -10,11 +10,11 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class ProfileWeightedScore : ProfileScore
+    public class DrawableProfileWeightedScore : DrawableProfileScore
     {
         private readonly double weight;
 
-        public ProfileWeightedScore(ScoreInfo score, double weight)
+        public DrawableProfileWeightedScore(ScoreInfo score, double weight)
             : base(score)
         {
             this.weight = weight;
