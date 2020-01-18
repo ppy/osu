@@ -106,7 +106,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(15),
-                                Children = new Drawable[]
+                                Children = new[]
                                 {
                                     CreateRightContent().With(c =>
                                     {
