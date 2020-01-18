@@ -345,7 +345,7 @@ namespace osu.Game.Overlays
             BeatmapSets = null;
             ResultAmounts = null;
             
-            beatmapSetPager?.Reset();
+            beatmapSetPager.Reset();
 
             queryChangedDebounce?.Cancel();
             queryChangedDebounce = Scheduler.AddDelayed(updateSearch, queryTextChanged ? 500 : 100);
@@ -378,7 +378,7 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            var getSetsRequest = beatmapSetPager?.FetchNextPage(
+            var getSetsRequest = beatmapSetPager.FetchNextPage(
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
