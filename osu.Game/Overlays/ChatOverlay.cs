@@ -221,8 +221,14 @@ namespace osu.Game.Overlays
                 // TODO: consider scheduling bindable callbacks to not perform when overlay is not present.
                 channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
                 channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
+
+                bool channelSelected = channelManager.CurrentChannel.Value != null;
+
                 foreach (Channel channel in channelManager.JoinedChannels)
-                    ChannelTabControl.AddChannel(channel);
+                    ChannelTabControl.AddChannel(channel, !channelSelected);
+
+                if (channelSelected)
+                    ChannelTabControl.Current.Value = channelManager.CurrentChannel.Value;
 
                 channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
                 channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
