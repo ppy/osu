@@ -52,17 +52,21 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override void TransferSettings(BeatmapDifficulty difficulty)
         {
-            base.TransferSettings(difficulty);
+            // base.TransferSettings(difficulty);
 
             TransferSetting(CircleSize, difficulty.CircleSize);
+            TransferSetting(DrainRate, difficulty.DrainRate);
+            TransferSetting(OverallDifficulty, difficulty.OverallDifficulty);
             TransferSetting(ApproachRate, difficulty.ApproachRate);
         }
 
         protected override void ApplySettings(BeatmapDifficulty difficulty)
         {
-            base.ApplySettings(difficulty);
+            // base.ApplySettings(difficulty);
 
             difficulty.CircleSize = CircleSize.Value;
+            difficulty.DrainRate = DrainRate.Value;
+            difficulty.OverallDifficulty = OverallDifficulty.Value;
             difficulty.ApproachRate = ApproachRate.Value;
         }
     }
