@@ -209,11 +209,11 @@ namespace osu.Game.Overlays
             {
                 if (panels == null)
                     return;
-                
+
                 panels.AddRange(newPanels);
             });
         }
-        
+
         private void recreatePanels(PanelDisplayStyle displayStyle)
         {
             if (panels != null)
@@ -307,7 +307,7 @@ namespace osu.Game.Overlays
                     if (sets.Count <= 0) IsLastPageFetched = true;
 
                     PageFetch?.Invoke(currentPage, sets);
-                    
+
                     getSetsRequest = null;
                     currentPage++;
                 };
@@ -350,7 +350,7 @@ namespace osu.Game.Overlays
         {
             BeatmapSets = null;
             ResultAmounts = null;
-            
+
             beatmapSetPager?.Reset();
 
             queryChangedDebounce?.Cancel();
@@ -364,15 +364,15 @@ namespace osu.Game.Overlays
 
             if (beatmapSetPager.IsLastPageFetched)
                 return;
-            
+
             if (beatmapSetPager.IsFetching)
                 return;
 
             if (addPageDebounce != null)
                 return;
-            
+
             var getSetsRequest = beatmapSetPager.FetchNextPage();
-            
+
             if (getSetsRequest == null)
                 return;
 
@@ -399,9 +399,9 @@ namespace osu.Game.Overlays
                 ((FilterControl)Filter).Ruleset.Value,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)
-            
+
             beatmapSetPager.PageFetch += onPageFetch;
-            
+
             addPageDebounce?.Cancel();
             addPageDebounce = null;
 
@@ -420,7 +420,7 @@ namespace osu.Game.Overlays
 
             if (!scroll.IsScrolledToEnd(500f))
                 return;
-                        
+
             queueAddPage();
         }
 
