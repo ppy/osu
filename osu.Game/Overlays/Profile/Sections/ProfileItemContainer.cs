@@ -5,16 +5,20 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using System.Collections.Generic;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class ProfileItemContainer : OsuHoverContainer
+    public class ProfileItemContainer : Container
     {
-        protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+        private const int hover_duration = 200;
+
         protected override Container<Drawable> Content => content;
+
+        private Color4 idleColour;
+        private Color4 hoverColour;
 
         private readonly Box background;
         private readonly Container content;
@@ -22,11 +26,10 @@ namespace osu.Game.Overlays.Profile.Sections
         public ProfileItemContainer()
         {
             RelativeSizeAxes = Axes.Both;
-            Enabled.Value = true; //manually enabled, because we have no action
             Masking = true;
             CornerRadius = 6;
 
-            base.Content.AddRange(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 background = new Box
                 {
@@ -42,8 +45,20 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            IdleColour = colours.GreySeafoam;
-            HoverColour = colours.GreySeafoamLight;
+            background.Colour = idleColour = colours.GreySeafoam;
+            hoverColour = colours.GreySeafoamLight;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            background.FadeColour(hoverColour, hover_duration, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            background.FadeColour(idleColour, hover_duration, Easing.OutQuint);
         }
     }
 }
