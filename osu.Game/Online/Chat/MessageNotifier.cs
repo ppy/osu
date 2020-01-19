@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -144,7 +145,7 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private static string[] getWords(string input) => input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        private static IEnumerable<string> getWords(string input) => Regex.Matches(input, @"\w+").Select(c => c.Value);
 
         /// <summary>
         /// Finds the first matching string/word in both <paramref name="x"/> and <paramref name="y"/> (case-insensitive)
