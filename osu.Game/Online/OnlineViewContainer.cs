@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.Placeholders;
 
@@ -15,12 +16,13 @@ namespace osu.Game.Online
     /// </summary>
     public class OnlineViewContainer : Container, IOnlineComponent
     {
-        private readonly Container content;
         private readonly Container placeholderContainer;
         private readonly Placeholder placeholder;
+        private readonly LoadingAnimation loading;
 
         private const int transform_time = 300;
 
+        private readonly Container content;
         protected override Container<Drawable> Content => content;
 
         [Resolved]
@@ -40,6 +42,10 @@ namespace osu.Game.Online
                     Alpha = 0,
                     Child = placeholder = new LoginPlaceholder($@"Please sign in to {placeholderMessage}")
                 },
+                loading = new LoadingAnimation
+                {
+                    Alpha = 0,
+                }
             };
         }
 
@@ -47,29 +53,43 @@ namespace osu.Game.Online
         {
             switch (state)
             {
-                case APIState.Offline:
+                case APIState.Failing:
                 case APIState.Connecting:
-                    Schedule(() => updatePlaceholderVisibility(true));
+                    Schedule(() => UpdatePlaceholderVisibility(PlaceholderStatus.Connecting));
                     break;
 
-                default:
-                    Schedule(() => updatePlaceholderVisibility(false));
+                case APIState.Offline:
+                    Schedule(() => UpdatePlaceholderVisibility(PlaceholderStatus.Offline));
+                    break;
+
+                case APIState.Online:
+                    Schedule(() => UpdatePlaceholderVisibility(PlaceholderStatus.Online));
                     break;
             }
         }
 
-        private void updatePlaceholderVisibility(bool showPlaceholder)
+        protected void UpdatePlaceholderVisibility(PlaceholderStatus status)
         {
-            if (showPlaceholder)
+            switch (status)
             {
-                content.FadeOut(150, Easing.OutQuint);
-                placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_time, Easing.OutQuint);
-                placeholderContainer.FadeInFromZero(2 * transform_time, Easing.OutQuint);
-            }
-            else
-            {
-                placeholderContainer.FadeOut(150, Easing.OutQuint);
-                content.FadeIn(transform_time, Easing.OutQuint);
+                case PlaceholderStatus.Offline:
+                    Content.FadeOut(150, Easing.OutQuint);
+                    placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_time, Easing.OutQuint);
+                    placeholderContainer.FadeInFromZero(2 * transform_time, Easing.OutQuint);
+                    loading.Hide();
+                    break;
+
+                case PlaceholderStatus.Online:
+                    placeholderContainer.FadeOut(150, Easing.OutQuint);
+                    Content.FadeIn(transform_time, Easing.OutQuint);
+                    loading.Hide();
+                    break;
+
+                case PlaceholderStatus.Connecting:
+                    loading.Show();
+                    placeholderContainer.FadeOut(150, Easing.OutQuint);
+                    Content.FadeOut(150, Easing.OutQuint);
+                    break;
             }
         }
 
@@ -83,6 +103,13 @@ namespace osu.Game.Online
         {
             API?.Unregister(this);
             base.Dispose(isDisposing);
+        }
+
+        protected enum PlaceholderStatus
+        {
+            Offline,
+            Online,
+            Connecting,
         }
     }
 }
