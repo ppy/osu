@@ -150,14 +150,12 @@ namespace osu.Game.Overlays.Chat
 
         private void messageRemoved(Message removed)
         {
-            findChatLine(removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
+            chatLines.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
 
         private IEnumerable<ChatLine> chatLines => ChatLineFlow.Children.OfType<ChatLine>();
 
         private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
-
-        private ChatLine findChatLine(Message message) => chatLines.FirstOrDefault(c => c.Message == message);
 
         public class DaySeparator : Container
         {
