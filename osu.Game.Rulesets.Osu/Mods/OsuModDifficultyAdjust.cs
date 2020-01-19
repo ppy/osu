@@ -20,6 +20,26 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = 5,
         };
 
+        [SettingSource("Drain Rate", "Override a beatmap's set HP.")]
+        new public BindableNumber<float> DrainRate { get; } = new BindableFloat
+        {
+            Precision = 0.1f,
+            MinValue = 1,
+            MaxValue = 10,
+            Default = 5,
+            Value = 5,
+        };
+
+        [SettingSource("Overall Difficulty", "Override a beatmap's set OD.")]
+        new public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
+        {
+            Precision = 0.1f,
+            MinValue = 1,
+            MaxValue = 10,
+            Default = 5,
+            Value = 5,
+        };
+
         [SettingSource("Approach Rate", "Override a beatmap's set AR.")]
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
