@@ -57,6 +57,10 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
 
             AddAssert("children are visible", () => onlineView.Children.First().Parent.IsPresent);
+
+            AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
+
+            AddAssert("children are hidden", () => !onlineView.Children.First().Parent.IsPresent);
         }
     }
 }
