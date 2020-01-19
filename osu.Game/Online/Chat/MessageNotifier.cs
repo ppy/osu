@@ -103,46 +103,50 @@ namespace osu.Game.Online.Chat
                 if (message.Id < channel.LastReadId)
                     return;
 
+                // ignore messages from yourself
                 var localUsername = localUser.Value.Username;
 
                 if (message.Sender.Username == localUsername)
                     continue;
 
-                var words = getWords(message.Content);
-
-                void onClick()
-                {
-                    notificationOverlay.Hide();
-                    chatOverlay.Show();
-                    channelManager.CurrentChannel.Value = channel;
-                }
-
-                if (notifyOnChat.Value && channel.Type == ChannelType.PM)
-                {
-                    var existingNotification = privateMessageNotifications.FirstOrDefault(n => n.Username == message.Sender.Username);
-
-                    if (existingNotification == null)
-                    {
-                        var notification = new PrivateMessageNotification(message.Sender.Username, onClick);
-                        notificationOverlay?.Post(notification);
-                        privateMessageNotifications.Add(notification);
-                    }
-                    else
-                    {
-                        existingNotification.MessageCount++;
-                    }
-
+                if (checkForPMs(channel, message))
                     continue;
-                }
 
-                if (notifyOnMention.Value && anyCaseInsensitive(words, localUsername))
-                {
-                    var notification = new MentionNotification(message.Sender.Username, onClick);
-                    notificationOverlay?.Post(notification);
-
-                    continue;
-                }
+                // change output to bool again if another "message processor" is added.
+                checkForMentions(channel, message, localUsername);
             }
+        }
+
+        private bool checkForPMs(Channel channel, Message message)
+        {
+            if (!notifyOnChat.Value || channel.Type != ChannelType.PM)
+                return false;
+
+            var existingNotification = privateMessageNotifications.FirstOrDefault(n => n.Username == message.Sender.Username);
+
+            if (existingNotification == null)
+            {
+                var notification = new PrivateMessageNotification(message.Sender.Username, channel);
+                notificationOverlay?.Post(notification);
+                privateMessageNotifications.Add(notification);
+            }
+            else
+            {
+                existingNotification.MessageCount++;
+            }
+
+            return true;
+        }
+
+        private void checkForMentions(Channel channel, Message message, string username)
+        {
+            var words = getWords(message.Content);
+
+            if (!notifyOnMention.Value || !anyCaseInsensitive(words, username))
+                return;
+
+            var notification = new MentionNotification(message.Sender.Username, channel);
+            notificationOverlay?.Post(notification);
         }
 
         private static IEnumerable<string> getWords(string input) => Regex.Matches(input, @"\w+").Select(c => c.Value);
@@ -158,12 +162,12 @@ namespace osu.Game.Online.Chat
 
         public class PrivateMessageNotification : SimpleNotification
         {
-            public PrivateMessageNotification(string username, Action onClick)
+            public PrivateMessageNotification(string username, Channel channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
                 Username = username;
                 MessageCount = 1;
-                this.onClick = onClick;
+                Channel = channel;
             }
 
             private int messageCount;
@@ -176,17 +180,19 @@ namespace osu.Game.Online.Chat
 
             public string Username { get; set; }
 
-            private readonly Action onClick;
+            public Channel Channel { get; set; }
 
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, MessageNotifier notifier)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager, MessageNotifier notifier)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
-                    onClick?.Invoke();
+                    notificationOverlay.Hide();
+                    chatOverlay.Show();
+                    channelManager.CurrentChannel.Value = Channel;
 
                     if (notifier.privateMessageNotifications.Contains(this))
                         notifier.privateMessageNotifications.Remove(this);
@@ -198,24 +204,27 @@ namespace osu.Game.Online.Chat
 
         public class MentionNotification : SimpleNotification
         {
-            public MentionNotification(string username, Action onClick)
+            public MentionNotification(string username, Channel channel)
             {
                 Icon = FontAwesome.Solid.At;
                 Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
-                this.onClick = onClick;
+                Channel = channel;
             }
 
-            private readonly Action onClick;
+            public Channel Channel { get; set; }
 
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
             {
                 IconBackgound.Colour = colours.PurpleDark;
                 Activated = delegate
                 {
-                    onClick?.Invoke();
+                    notificationOverlay.Hide();
+                    chatOverlay.Show();
+                    channelManager.CurrentChannel.Value = Channel;
+
                     return true;
                 };
             }
