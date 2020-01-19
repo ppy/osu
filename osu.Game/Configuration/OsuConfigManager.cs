@@ -194,7 +194,6 @@ namespace osu.Game.Configuration
         IntroSequence,
         ChatHighlightName,
         ChatMessageNotification,
-        HighlightWords,
         UIHoldActivationDelay,
         HitLighting,
         MenuBackgroundSource

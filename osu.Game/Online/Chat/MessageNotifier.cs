@@ -50,7 +50,6 @@ namespace osu.Game.Online.Chat
         {
             notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
             notifyOnChat = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
-            highlightWords = config.GetBindable<string>(OsuSetting.HighlightWords);
             localUser = api.LocalUser;
 
             // Listen for new messages
