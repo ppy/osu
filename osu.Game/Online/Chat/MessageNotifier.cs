@@ -141,17 +141,6 @@ namespace osu.Game.Online.Chat
 
                     continue;
                 }
-
-                if (!string.IsNullOrWhiteSpace(highlightWords.Value))
-                {
-                    var matchedWord = hasCaseInsensitive(words, getWords(highlightWords.Value));
-
-                    if (matchedWord != null)
-                    {
-                        var notification = new HighlightNotification(message.Sender.Username, matchedWord, onClick);
-                        notificationOverlay?.Post(notification);
-                    }
-                }
             }
         }
 
@@ -164,30 +153,7 @@ namespace osu.Game.Online.Chat
 
         private static bool anyCaseInsensitive(IEnumerable<string> x, string y) => x.Any(x2 => x2.Equals(y, StringComparison.OrdinalIgnoreCase));
 
-        public class HighlightNotification : SimpleNotification
-        {
-            public HighlightNotification(string highlighter, string word, Action onClick)
-            {
-                Icon = FontAwesome.Solid.Highlighter;
-                Text = $"'{word}' was mentioned in chat by '{highlighter}'. Click to find out why!";
-                this.onClick = onClick;
-            }
 
-            private readonly Action onClick;
-
-            public override bool IsImportant => false;
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                IconBackgound.Colour = colours.PurpleDark;
-                Activated = delegate
-                {
-                    onClick?.Invoke();
-                    return true;
-                };
-            }
-        }
 
         public class PrivateMessageNotification : SimpleNotification
         {
