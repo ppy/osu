@@ -222,13 +222,10 @@ namespace osu.Game.Overlays
                 channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
                 channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
 
-                bool channelSelected = channelManager.CurrentChannel.Value != null;
-
                 foreach (Channel channel in channelManager.JoinedChannels)
-                    ChannelTabControl.AddChannel(channel, !channelSelected);
+                    ChannelTabControl.AddChannel(channel);
 
-                if (channelSelected)
-                    ChannelTabControl.Current.Value = channelManager.CurrentChannel.Value;
+                ChannelTabControl.Current.Value = channelManager.CurrentChannel.Value ?? channelManager.JoinedChannels.First();
 
                 channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
                 channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
