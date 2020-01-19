@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Child = new OsuContextMenuContainer
             {
