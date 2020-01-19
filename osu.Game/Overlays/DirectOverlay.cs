@@ -293,17 +293,14 @@ namespace osu.Game.Overlays
 
                 getSetsRequest.Success += response =>
                 {
-                    Task.Run(() =>
-                    {
-                        var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
-                        if (sets.Count <= 0) IsLastPageFetched = true;
+                    if (sets.Count <= 0) IsLastPageFetched = true;
 
-                        PageFetch?.Invoke(currentPage, sets);
-                        
-                        getSetsRequest = null;
-                        currentPage++;
-                    });
+                    PageFetch?.Invoke(currentPage, sets);
+                    
+                    getSetsRequest = null;
+                    currentPage++;
                 };
 
                 return getSetsRequest;
@@ -324,20 +321,20 @@ namespace osu.Game.Overlays
 
         private void onPageFetch(int page, List<BeatmapSetInfo> sets)
         {
-            if (page > 1)
-            {
-                BeatmapSets = BeatmapSets.Concat(sets);
-                addPanels(Filter.DisplayStyleControl.DisplayStyle.Value, sets);
-            }
-            else
-            {
-                BeatmapSets = sets;
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
-            }
+            Schedule(() => {
+                if (page > 1)
+                {
+                    BeatmapSets = BeatmapSets.Concat(sets);
+                    addPanels(Filter.DisplayStyleControl.DisplayStyle.Value, sets);
+                }
+                else
+                {
+                    BeatmapSets = sets;
+                    recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                }
 
-            Schedule(() => addPageDebounce = Scheduler.AddDelayed(() => { 
-                addPageDebounce = null;
-            }, 500));
+                addPageDebounce = Scheduler.AddDelayed(() => addPageDebounce = null, 500);
+            });
         }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
