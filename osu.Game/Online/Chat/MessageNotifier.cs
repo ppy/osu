@@ -36,7 +36,6 @@ namespace osu.Game.Online.Chat
 
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnChat;
-        private Bindable<string> highlightWords;
         private Bindable<User> localUser;
 
         /// <summary>
@@ -158,8 +157,6 @@ namespace osu.Game.Online.Chat
         private static string hasCaseInsensitive(IEnumerable<string> x, IEnumerable<string> y) => x.FirstOrDefault(x2 => anyCaseInsensitive(y, x2));
 
         private static bool anyCaseInsensitive(IEnumerable<string> x, string y) => x.Any(x2 => x2.Equals(y, StringComparison.OrdinalIgnoreCase));
-
-
 
         public class PrivateMessageNotification : SimpleNotification
         {
