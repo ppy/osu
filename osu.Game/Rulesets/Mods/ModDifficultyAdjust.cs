@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override IconUsage Icon => FontAwesome.Solid.Hammer;
+        public override IconUsage? Icon => FontAwesome.Solid.Hammer;
 
         public override double ScoreMultiplier => 1.0;
 
