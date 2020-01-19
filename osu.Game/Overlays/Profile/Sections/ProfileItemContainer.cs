@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class ProfileItemBackground : OsuHoverContainer
+    public class ProfileItemContainer : OsuHoverContainer
     {
         protected override IEnumerable<Drawable> EffectTargets => new[] { background };
         protected override Container<Drawable> Content => content;
@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections
         private readonly Box background;
         private readonly Container content;
 
-        public ProfileItemBackground()
+        public ProfileItemContainer()
         {
             RelativeSizeAxes = Axes.Both;
             Enabled.Value = true; //manually enabled, because we have no action

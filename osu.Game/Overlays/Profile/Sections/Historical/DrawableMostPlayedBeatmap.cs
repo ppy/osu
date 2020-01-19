@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             CornerRadius = corner_radius,
                             Children = new Drawable[]
                             {
-                                new ProfileItemBackground
+                                new ProfileItemContainer
                                 {
                                     Child = new Container
                                     {
