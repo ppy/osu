@@ -166,9 +166,6 @@ namespace osu.Game.Overlays
             this.rulesets = rulesets;
             this.previewTrackManager = previewTrackManager;
 
-            beatmapSetPager = new BeatmapSetPager(rulesets);
-            beatmapSetPager.PageFetch += onPageFetch;
-
             resultCountsContainer.Colour = colours.Yellow;
         }
 
@@ -249,7 +246,7 @@ namespace osu.Game.Overlays
             base.PopIn();
 
             // Queries are allowed to be run only on the first pop-in
-            if (!beatmapSetPager.IsFetching)
+            if (beatmapSetPager == null)
                 queueUpdateSearch();
         }
 
@@ -266,6 +263,12 @@ namespace osu.Game.Overlays
 
             private readonly RulesetStore rulesets;
 
+            private readonly string query;
+            private readonly RulesetInfo ruleset;
+            private readonly BeatmapSearchCategory searchCategory;
+            private readonly DirectSortCriteria sortCriteria;
+            private readonly SortDirection sortDirection;
+
             private SearchBeatmapSetsRequest getSetsRequest;
 
             private int currentPage = 1;
@@ -273,12 +276,18 @@ namespace osu.Game.Overlays
             public bool IsLastPageFetched { get; private set; } = false;
             public bool IsFetching => getSetsRequest != null;
 
-            public BeatmapSetPager(RulesetStore rulesets)
+            public BeatmapSetPager(RulesetStore rulesets, string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection sortDirection = SortDirection.Descending)
             {
                 this.rulesets = rulesets;
+
+                this.query = query;
+                this.ruleset = ruleset;
+                this.searchCategory = searchCategory;
+                this.sortCriteria = sortCriteria;
+                this.sortDirection = sortDirection;
             }
 
-            public SearchBeatmapSetsRequest FetchNextPage(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
+            public SearchBeatmapSetsRequest FetchNextPage()
             {
                 if (getSetsRequest != null)
                     return null;
@@ -289,7 +298,7 @@ namespace osu.Game.Overlays
                     currentPage,
                     searchCategory,
                     sortCriteria,
-                    direction);
+                    sortDirection);
 
                 getSetsRequest.Success += response =>
                 {
@@ -350,16 +359,24 @@ namespace osu.Game.Overlays
 
         private void queueAddPage()
         {
+            if (beatmapSetPager == null)
+                return;
+
+            if (beatmapSetPager.IsLastPageFetched)
+                return;
+            
             if (beatmapSetPager.IsFetching)
                 return;
 
             if (addPageDebounce != null)
                 return;
             
-            if (beatmapSetPager.IsLastPageFetched)
-                return;
+            var getSetsRequest = beatmapSetPager.FetchNextPage();
             
-            updateSearch();
+            if (getSetsRequest == null)
+                return;
+
+            API.Queue(getSetsRequest);
         }
 
         private void updateSearch()
@@ -375,16 +392,20 @@ namespace osu.Game.Overlays
 
             previewTrackManager.StopAnyPlaying(this);
 
-            var getSetsRequest = beatmapSetPager.FetchNextPage(
+            beatmapSetPager?.Reset();
+            beatmapSetPager = new BeatmapSetPager(
+                rulesets,
                 currentQuery.Value,
                 ((FilterControl)Filter).Ruleset.Value,
                 Filter.DisplayStyleControl.Dropdown.Current.Value,
                 Filter.Tabs.Current.Value); //todo: sort direction (?)
             
-            if (getSetsRequest == null)
-                return;
+            beatmapSetPager.PageFetch += onPageFetch;
+            
+            addPageDebounce?.Cancel();
+            addPageDebounce = null;
 
-            API.Queue(getSetsRequest);
+            queueAddPage();
         }
 
         protected override void Update()
