@@ -59,17 +59,12 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         /// <summary>
         /// Adds a channel to the ChannelTabControl.
-        /// The first channel added will automaticly selected if <paramref name="setChannel"/> is true.
         /// </summary>
         /// <param name="channel">The channel that is going to be added.</param>
-        /// <param name="setChannel">If the current channel should be changed if none was selected before</param>
-        public void AddChannel(Channel channel, bool setChannel = true)
+        public void AddChannel(Channel channel)
         {
             if (!Items.Contains(channel))
                 AddItem(channel);
-
-            if (Current.Value == null && setChannel)
-                Current.Value = channel;
         }
 
         /// <summary>
