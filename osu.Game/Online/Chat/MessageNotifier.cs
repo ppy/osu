@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -175,7 +176,11 @@ namespace osu.Game.Online.Chat
             public int MessageCount
             {
                 get => messageCount;
-                set => Text = (messageCount = value) > 1 ? $"You received {messageCount} private messages from '{Username}'. Click to read it!" : $"You received a private message from '{Username}'. Click to read it!";
+                set
+                {
+                    messageCount = value;
+                    Text = $"You received {"private message".ToQuantity(messageCount)} from '{Username}'. Click to read it!";
+                }
             }
 
             public string Username { get; set; }
