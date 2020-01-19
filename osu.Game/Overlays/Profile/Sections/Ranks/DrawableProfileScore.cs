@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new ProfileItemBackground
+            AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
                 {

@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(DrawableProfileScore),
             typeof(DrawableProfileWeightedScore),
-            typeof(ProfileItemBackground),
+            typeof(ProfileItemContainer),
         };
 
         public TestSceneUserProfileScores()
