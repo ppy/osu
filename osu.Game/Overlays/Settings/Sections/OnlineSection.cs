@@ -17,8 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 new WebSettings(),
-                new AlertsAndPrivacySettings(),
-                new InGameChatSettings()
+                new AlertsAndPrivacySettings()
             };
         }
     }

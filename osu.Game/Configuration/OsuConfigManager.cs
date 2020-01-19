@@ -52,8 +52,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ChatHighlightName, true);
             Set(OsuSetting.ChatMessageNotification, true);
 
-            Set(OsuSetting.HighlightWords, string.Empty);
-
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
