@@ -225,7 +225,7 @@ namespace osu.Game.Overlays
                 foreach (Channel channel in channelManager.JoinedChannels)
                     ChannelTabControl.AddChannel(channel);
 
-                ChannelTabControl.Current.Value = channelManager.CurrentChannel.Value ?? channelManager.JoinedChannels.First();
+                ChannelTabControl.Current.Value = channelManager.CurrentChannel.Value ?? channelManager.JoinedChannels.FirstOrDefault();
 
                 channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
                 channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
