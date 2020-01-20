@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
             set => background.Height = value;
         }
 
-        protected OverlayColourScheme ColourScheme { get; private set; }
+        protected OverlayColourScheme ColourScheme { get; }
 
         protected OverlayHeader(OverlayColourScheme colourScheme)
         {
