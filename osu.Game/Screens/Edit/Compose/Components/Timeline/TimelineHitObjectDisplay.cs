@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -19,32 +18,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     internal class TimelineHitObjectDisplay : BlueprintContainer
     {
-        private EditorBeatmap beatmap { get; }
-
-        private readonly TimelinePart content;
-
         public TimelineHitObjectDisplay(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
-
-            this.beatmap = beatmap;
-
-            AddInternal(content = new TimelinePart { RelativeSizeAxes = Axes.Both });
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            foreach (var h in beatmap.HitObjects)
-                add(h);
+        protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
-            beatmap.HitObjectAdded += add;
-            beatmap.HitObjectRemoved += remove;
-            beatmap.StartTimeChanged += h =>
+        protected class TimelineSelectionBlueprintContainer : SelectionBlueprintContainer
+        {
+            protected override Container<SelectionBlueprint> Content { get; }
+
+            public TimelineSelectionBlueprintContainer()
             {
-                remove(h);
-                add(h);
-            };
+                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+            }
         }
 
         protected override void LoadComplete()
@@ -53,24 +41,19 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             DragBox.Alpha = 0;
         }
 
-        private void remove(HitObject h)
+        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
-            foreach (var d in content.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
-                d.Expire();
-        }
+            //var yOffset = content.Count(d => d.X == h.StartTime);
+            var yOffset = 0;
 
-        private void add(HitObject h)
-        {
-            var yOffset = content.Count(d => d.X == h.StartTime);
-
-            content.Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS });
+            return new TimelineHitObjectRepresentation(hitObject) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS };
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             base.OnMouseDown(e);
 
-            return false; // tempoerary until we correctly handle selections.
+            return false; // temporary until we correctly handle selections.
         }
 
         protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new NoDragDragBox(performSelect);
@@ -85,15 +68,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             public override bool UpdateDrag(MouseButtonEvent e) => false;
         }
 
-        private class TimelineHitObjectRepresentation : CompositeDrawable
+        private class TimelineHitObjectRepresentation : SelectionBlueprint
         {
             public const float THICKNESS = 3;
 
-            public readonly HitObject HitObject;
-
             public TimelineHitObjectRepresentation(HitObject hitObject)
+                : base(hitObject)
             {
-                HitObject = hitObject;
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
 

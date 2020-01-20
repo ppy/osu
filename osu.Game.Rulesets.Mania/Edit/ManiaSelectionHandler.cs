@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
@@ -72,8 +73,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
                 delta -= moveEvent.Blueprint.DrawableObject.Parent.DrawHeight;
 
-            foreach (var b in SelectedBlueprints)
+            foreach (var selectionBlueprint in SelectedBlueprints)
             {
+                var b = (OverlaySelectionBlueprint)selectionBlueprint;
+
                 var hitObject = b.DrawableObject;
                 var objectParent = (HitObjectContainer)hitObject.Parent;
 

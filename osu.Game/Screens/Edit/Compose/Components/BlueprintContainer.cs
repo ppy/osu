@@ -59,13 +59,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 DragBox = CreateDragBox(select),
                 selectionHandler,
-                selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
+                selectionBlueprints = CreateSelectionBlueprintContainer(),
                 DragBox.CreateProxy().With(p => p.Depth = float.MinValue)
             });
 
             foreach (var obj in beatmap.HitObjects)
                 AddBlueprintFor(obj);
         }
+
+        protected virtual SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override void LoadComplete()
         {
@@ -118,7 +120,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (clickedBlueprint == null)
                 return false;
 
-            adjustableClock?.Seek(clickedBlueprint.DrawableObject.HitObject.StartTime);
+            adjustableClock?.Seek(clickedBlueprint.HitObject.StartTime);
             return true;
         }
 
@@ -208,7 +210,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void removeBlueprintFor(HitObject hitObject)
         {
-            var blueprint = selectionBlueprints.SingleOrDefault(m => m.DrawableObject.HitObject == hitObject);
+            var blueprint = selectionBlueprints.SingleOrDefault(m => m.HitObject == hitObject);
             if (blueprint == null)
                 return;
 
@@ -346,8 +348,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 return false;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
-            movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.DrawableObject.HitObject.StartTime).First();
-            screenSpaceMovementStartPosition = movementBlueprint.DrawableObject.ToScreenSpace(movementBlueprint.DrawableObject.OriginPosition);
+            movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
+            screenSpaceMovementStartPosition = movementBlueprint.SelectionPoint; // todo: unsure if correct
 
             return true;
         }
@@ -365,14 +367,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             Debug.Assert(screenSpaceMovementStartPosition != null);
 
             Vector2 startPosition = screenSpaceMovementStartPosition.Value;
-            HitObject draggedObject = movementBlueprint.DrawableObject.HitObject;
+            HitObject draggedObject = movementBlueprint.HitObject;
 
             // The final movement position, relative to screenSpaceMovementStartPosition
             Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
             (Vector2 snappedPosition, double snappedTime) = snapProvider.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
             // Move the hitobjects
-            if (!selectionHandler.HandleMovement(new MoveSelectionEvent(movementBlueprint, startPosition, ToScreenSpace(snappedPosition))))
+            if (!selectionHandler.HandleMovement(new MoveSelectionEvent((OverlaySelectionBlueprint)movementBlueprint, startPosition, ToScreenSpace(snappedPosition))))
                 return true;
 
             // Apply the start time at the newly snapped-to position
@@ -411,29 +413,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             }
         }
 
-        private class SelectionBlueprintContainer : Container<SelectionBlueprint>
+        protected class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {
             public IEnumerable<SelectionBlueprint> AliveBlueprints => AliveInternalChildren.Cast<SelectionBlueprint>();
-
-            protected override int Compare(Drawable x, Drawable y)
-            {
-                if (!(x is SelectionBlueprint xBlueprint) || !(y is SelectionBlueprint yBlueprint))
-                    return base.Compare(x, y);
-
-                return Compare(xBlueprint, yBlueprint);
-            }
-
-            public int Compare(SelectionBlueprint x, SelectionBlueprint y)
-            {
-                // dpeth is used to denote selected status (we always want selected blueprints to handle input first).
-                int d = x.Depth.CompareTo(y.Depth);
-                if (d != 0)
-                    return d;
-
-                // Put earlier hitobjects towards the end of the list, so they handle input first
-                int i = y.DrawableObject.HitObject.StartTime.CompareTo(x.DrawableObject.HitObject.StartTime);
-                return i == 0 ? CompareReverseChildID(x, y) : i;
-            }
         }
     }
 }

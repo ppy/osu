@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class ManiaSelectionBlueprint : SelectionBlueprint
+    public class ManiaSelectionBlueprint : OverlaySelectionBlueprint
     {
         public Vector2 ScreenSpaceDragPosition { get; private set; }
         public Vector2 DragPosition { get; private set; }

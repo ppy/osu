@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
-        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.DrawableObject.HitObject);
+        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
         private Drawable outline;
 
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void deleteSelected()
         {
             foreach (var h in selectedBlueprints.ToList())
-                placementHandler.Delete(h.DrawableObject.HitObject);
+                placementHandler.Delete(h.HitObject);
         }
 
         #endregion
