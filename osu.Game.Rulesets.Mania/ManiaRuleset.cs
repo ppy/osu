@@ -179,6 +179,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Smashing keys";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);

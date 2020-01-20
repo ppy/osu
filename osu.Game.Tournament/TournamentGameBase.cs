@@ -52,7 +52,7 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
+            Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
             AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
             AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
@@ -223,9 +223,12 @@ namespace osu.Game.Tournament
 
             foreach (var r in ladder.Rounds)
             {
-                foreach (var b in r.Beatmaps)
+                foreach (var b in r.Beatmaps.ToList())
                 {
-                    if (b.BeatmapInfo == null && b.ID > 0)
+                    if (b.BeatmapInfo != null)
+                        continue;
+
+                    if (b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                         API.Perform(req);
@@ -233,6 +236,10 @@ namespace osu.Game.Tournament
 
                         addedInfo = true;
                     }
+
+                    if (b.BeatmapInfo == null)
+                        // if online population couldn't be performed, ensure we don't leave a null value behind
+                        r.Beatmaps.Remove(b);
                 }
             }
 

@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Flashlight";
         public override string Acronym => "FL";
-        public override IconUsage Icon => OsuIcon.ModFlashlight;
+        public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;

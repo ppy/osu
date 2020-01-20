@@ -14,9 +14,9 @@ namespace osu.Game.Online.API
     /// <typeparam name="T">Type of the response (used for deserialisation).</typeparam>
     public abstract class APIRequest<T> : APIRequest
     {
-        protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
+        protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
+        public T Result => ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
 
         protected APIRequest()
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Online.API
     {
         protected abstract string Target { get; }
 
-        protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
+        protected virtual WebRequest CreateWebRequest() => new OsuWebRequest(Uri);
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
