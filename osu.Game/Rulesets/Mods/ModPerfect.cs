@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModPerfect : ModSuddenDeath
     {
-        public override string Name => "Perfect";
+        public override string Name => "完美";
         public override string Acronym => "PF";
         public override IconUsage? Icon => OsuIcon.ModPerfect;
         public override string Description => "不SS,便重试";

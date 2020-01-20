@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModAutopilot : Mod, IApplicableFailOverride, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
-        public override string Name => "Autopilot";
+        public override string Name => "自动移动";
         public override string Acronym => "AP";
         public override IconUsage? Icon => OsuIcon.ModAutopilot;
         public override ModType Type => ModType.Automation;

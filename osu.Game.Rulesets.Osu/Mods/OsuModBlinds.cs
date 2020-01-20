@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
-        public override string Name => "Blinds";
+        public override string Name => "致盲";
         public override string Description => "蒙上你的眼睛";
         public override string Acronym => "BL";
 

@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Mods
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
     {
-        public override string Name => "Autoplay";
+        public override string Name => "自动";
         public override string Acronym => "AT";
         public override IconUsage? Icon => OsuIcon.ModAuto;
         public override ModType Type => ModType.Automation;

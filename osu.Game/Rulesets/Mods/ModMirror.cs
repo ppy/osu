@@ -5,7 +5,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModMirror : Mod
     {
-        public override string Name => "Mirror";
+        public override string Name => "镜像";
         public override string Acronym => "MR";
         public override string Description => "镜像模式!";
         public override ModType Type => ModType.Conversion;

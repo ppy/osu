@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModNightcore<TObject> : ModDoubleTime, IApplicableToDrawableRuleset<TObject>
         where TObject : HitObject
     {
-        public override string Name => "Nightcore";
+        public override string Name => "夜核";
         public override string Acronym => "NC";
         public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "动次打次动次打次";

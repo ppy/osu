@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModFadeIn : Mod
     {
-        public override string Name => "Fade In";
+        public override string Name => "渐入";
         public override string Acronym => "FI";
         public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;

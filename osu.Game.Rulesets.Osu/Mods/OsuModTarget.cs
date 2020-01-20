@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModTarget : Mod
     {
-        public override string Name => "Target";
+        public override string Name => "打靶";
         public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.ModTarget;

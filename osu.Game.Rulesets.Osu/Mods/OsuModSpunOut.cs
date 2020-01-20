@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModSpunOut : Mod
     {
-        public override string Name => "Spun Out";
+        public override string Name => "自动转盘";
         public override string Acronym => "SO";
         public override IconUsage? Icon => OsuIcon.ModSpunout;
         public override ModType Type => ModType.DifficultyReduction;

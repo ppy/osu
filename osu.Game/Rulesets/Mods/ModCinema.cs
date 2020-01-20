@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
 
     public class ModCinema : ModAutoplay, IApplicableToHUD, IApplicableToPlayer
     {
-        public override string Name => "Cinema";
+        public override string Name => "剧院";
         public override string Acronym => "CN";
         public override IconUsage? Icon => OsuIcon.ModCinema;
         public override string Description => "剧院模式";

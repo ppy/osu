@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModFlashlight : Mod
     {
-        public override string Name => "Flashlight";
+        public override string Name => "电筒";
         public override string Acronym => "FL";
         public override IconUsage? Icon => OsuIcon.ModFlashlight;
         public override ModType Type => ModType.DifficultyIncrease;

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModDoubleTime : ModRateAdjust
     {
-        public override string Name => "Double Time";
+        public override string Name => "倍速";
         public override string Acronym => "DT";
         public override IconUsage? Icon => OsuIcon.ModDoubletime;
         public override ModType Type => ModType.DifficultyIncrease;

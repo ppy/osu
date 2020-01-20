@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
     {
-        public override string Name => "Transform";
+        public override string Name => "位移";
         public override string Acronym => "TR";
         public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;

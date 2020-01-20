@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModEasy : Mod, IApplicableToDifficulty, IApplicableFailOverride, IApplicableToHealthProcessor
     {
-        public override string Name => "Easy";
+        public override string Name => "简单";
         public override string Acronym => "EZ";
         public override IconUsage? Icon => OsuIcon.ModEasy;
         public override ModType Type => ModType.DifficultyReduction;

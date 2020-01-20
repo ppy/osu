@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModTraceable : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
-        public override string Name => "Traceable";
+        public override string Name => "追溯";
         public override string Acronym => "TC";
         public override ModType Type => ModType.Fun;
         public override string Description => "注意缩圈,意念打图";

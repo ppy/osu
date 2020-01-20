@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModGrow : OsuModObjectScaleTween
     {
-        public override string Name => "Grow";
+        public override string Name => "生长";
 
         public override string Acronym => "GR";
 

@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModNoFail : ModBlockFail
     {
-        public override string Name => "No Fail";
+        public override string Name => "不死";
         public override string Acronym => "NF";
         public override IconUsage? Icon => OsuIcon.ModNofail;
         public override ModType Type => ModType.DifficultyReduction;

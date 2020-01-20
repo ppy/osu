@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModSpinIn : Mod, IApplicableToDrawableHitObjects, IReadFromConfig
     {
-        public override string Name => "Spin In";
+        public override string Name => "螺旋";
         public override string Acronym => "SI";
         public override IconUsage? Icon => FontAwesome.Solid.Undo;
         public override ModType Type => ModType.Fun;

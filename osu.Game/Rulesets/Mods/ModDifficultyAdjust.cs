@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModDifficultyAdjust : Mod, IApplicableToDifficulty
     {
-        public override string Name => @"Difficulty Adjust";
+        public override string Name => @"难度调整";
 
         public override string Description => @"调整谱面的难度设定";
 

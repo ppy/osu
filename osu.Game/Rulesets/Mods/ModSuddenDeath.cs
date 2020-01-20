@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModSuddenDeath : Mod, IApplicableToHealthProcessor, IApplicableFailOverride
     {
-        public override string Name => "Sudden Death";
+        public override string Name => "无伤";
         public override string Acronym => "SD";
         public override IconUsage? Icon => OsuIcon.ModSuddendeath;
         public override ModType Type => ModType.DifficultyIncrease;

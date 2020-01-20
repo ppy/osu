@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModRandom : Mod, IApplicableToBeatmap
     {
-        public override string Name => "Random";
+        public override string Name => "随机";
         public override string Acronym => "RD";
         public override ModType Type => ModType.Conversion;
         public override IconUsage? Icon => OsuIcon.Dice;

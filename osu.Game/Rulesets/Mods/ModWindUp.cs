@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public class ModWindUp : ModTimeRamp
     {
-        public override string Name => "Wind Up";
+        public override string Name => "递增";
         public override string Acronym => "WU";
         public override string Description => "你能坚持住吗?";
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleUp;

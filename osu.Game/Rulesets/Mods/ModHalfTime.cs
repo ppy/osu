@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
 {
     public abstract class ModHalfTime : ModRateAdjust
     {
-        public override string Name => "Half Time";
+        public override string Name => "缓速";
         public override string Acronym => "HT";
         public override IconUsage? Icon => OsuIcon.ModHalftime;
         public override ModType Type => ModType.DifficultyReduction;

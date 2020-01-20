@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModDeflate : OsuModObjectScaleTween
     {
-        public override string Name => "Deflate";
+        public override string Name => "缩小";
 
         public override string Acronym => "DF";
 
