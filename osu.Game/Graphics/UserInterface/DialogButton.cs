@@ -232,11 +232,11 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (Selected.Value)
                 colourContainer.ResizeWidthTo(hover_width, click_duration, Easing.In);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)
