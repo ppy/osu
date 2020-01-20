@@ -474,6 +474,7 @@ namespace osu.Game.Overlays.Mods
             {
                 if (State.Value == Visibility.Visible) sampleOn?.Play();
                 DeselectTypes(selectedMod.IncompatibleMods, true);
+                if (selectedMod.RequiresConfiguration) ModSettingsContainer.Alpha = 1;
             }
             else
             {
