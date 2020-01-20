@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -25,6 +24,7 @@ namespace osu.Game.Overlays.Profile
         private DetailHeaderContainer detailHeaderContainer;
 
         public ProfileHeader()
+            : base(OverlayColourScheme.Green)
         {
             BackgroundHeight = 150;
 
@@ -34,14 +34,6 @@ namespace osu.Game.Overlays.Profile
             TabControl.AddItem("modding");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            TabControl.AccentColour = colours.Seafoam;
-            TitleBackgroundColour = colours.GreySeafoamDarker;
-            ControlBackgroundColour = colours.GreySeafoam;
         }
 
         protected override Drawable CreateBackground() =>
@@ -107,12 +99,6 @@ namespace osu.Game.Overlays.Profile
             {
                 Title = "player";
                 Section = "info";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Seafoam;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");

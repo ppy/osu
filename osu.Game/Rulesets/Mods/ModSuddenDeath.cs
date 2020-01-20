@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Sudden Death";
         public override string Acronym => "SD";
-        public override IconUsage Icon => OsuIcon.ModSuddendeath;
+        public override IconUsage? Icon => OsuIcon.ModSuddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Miss and fail.";
         public override double ScoreMultiplier => 1;

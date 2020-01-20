@@ -54,10 +54,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
-            addHeader("OverlayHeader", new TestNoControlHeader());
-            addHeader("TabControlOverlayHeader (string)", new TestStringTabControlHeader());
-            addHeader("TabControlOverlayHeader (enum)", new TestEnumTabControlHeader());
-            addHeader("BreadcrumbControlOverlayHeader", new TestBreadcrumbControlHeader());
+            addHeader("Blue OverlayHeader", new TestNoControlHeader(OverlayColourScheme.Blue));
+            addHeader("Green TabControlOverlayHeader (string)", new TestStringTabControlHeader(OverlayColourScheme.Green));
+            addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(OverlayColourScheme.Pink));
+            addHeader("Red BreadcrumbControlOverlayHeader", new TestBreadcrumbControlHeader(OverlayColourScheme.Red));
         }
 
         private void addHeader(string name, OverlayHeader header)
@@ -91,10 +91,9 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            public TestNoControlHeader(OverlayColourScheme colourScheme)
+                : base(colourScheme)
             {
-                TitleBackgroundColour = colours.GreyVioletDarker;
             }
         }
 
@@ -104,34 +103,24 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
-            public TestStringTabControlHeader()
+            public TestStringTabControlHeader(OverlayColourScheme colourScheme)
+                : base(colourScheme)
             {
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                TitleBackgroundColour = colours.GreyVioletDarker;
-                ControlBackgroundColour = colours.GreyVioletDark;
-                TabControl.AccentColour = colours.Violet;
             }
         }
 
         private class TestEnumTabControlHeader : TabControlOverlayHeader<TestEnum>
         {
+            public TestEnumTabControlHeader(OverlayColourScheme colourScheme)
+                : base(colourScheme)
+            {
+            }
+
             protected override Drawable CreateBackground() => new TestBackground();
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                TitleBackgroundColour = colours.GreyVioletDarker;
-                ControlBackgroundColour = colours.GreyVioletDark;
-                TabControl.AccentColour = colours.Violet;
-            }
         }
 
         private enum TestEnum
@@ -147,19 +136,12 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
-            public TestBreadcrumbControlHeader()
+            public TestBreadcrumbControlHeader(OverlayColourScheme colourScheme)
+                : base(colourScheme)
             {
                 BreadcrumbControl.AddItem("tab1");
                 BreadcrumbControl.AddItem("tab2");
                 BreadcrumbControl.Current.Value = "tab2";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                TitleBackgroundColour = colours.GreyVioletDarker;
-                ControlBackgroundColour = colours.GreyVioletDark;
-                BreadcrumbControl.AccentColour = colours.Violet;
             }
         }
 
@@ -184,12 +166,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             {
                 Title = "title";
                 Section = "section";
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

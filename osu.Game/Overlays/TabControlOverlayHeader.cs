@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -15,6 +16,17 @@ namespace osu.Game.Overlays
         protected OverlayHeaderTabControl TabControl;
 
         protected override TabControl<T> CreateTabControl() => TabControl = new OverlayHeaderTabControl();
+
+        protected TabControlOverlayHeader(OverlayColourScheme colourScheme)
+            : base(colourScheme)
+        {
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            TabControl.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.75f);
+        }
 
         public class OverlayHeaderTabControl : OverlayTabControl<T>
         {
