@@ -177,17 +177,19 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             // don't do anything until the last button is released.
             if (!HasFocus || e.HasAnyButtonPressed)
-                return base.OnMouseUp(e);
+            {
+                base.OnMouseUp(e);
+                return;
+            }
 
             if (bindTarget.IsHovered)
                 finalise();
             else
                 updateBindTarget();
-            return true;
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -311,14 +313,6 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 Text = "Clear";
                 Size = new Vector2(80, 20);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                base.OnMouseUp(e);
-
-                // without this, the mouse up triggers a finalise (and deselection) of the current binding target.
-                return true;
             }
 
             [BackgroundDependencyLoader]

@@ -163,7 +163,9 @@ namespace osu.Game.Screens.Play
         // Don't let mouse down events through the overlay or people can click circles while paused.
         protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnMouseUp(MouseUpEvent e) => true;
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+        }
 
         protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
