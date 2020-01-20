@@ -11,6 +11,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
+    /// <summary>
+    /// <see cref="OverlayHeader"/> which contains <see cref="TabControl{T}"/>.
+    /// </summary>
     /// <typeparam name="T">The type of item to be represented by tabs in <see cref="TabControl{T}"/>.</typeparam>
     public abstract class ControllableOverlayHeader<T> : OverlayHeader
     {
