@@ -13,7 +13,8 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using NUnit.Framework;
 using osu.Game.Graphics;
-using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -25,19 +26,27 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(OverlayRulesetTabItem),
         };
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private readonly OverlayRulesetSelector selector;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public TestSceneOverlayRulesetSelector()
         {
-            Add(selector = new OverlayRulesetSelector
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Current = ruleset,
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 5),
+                Children = new[]
+                {
+                    selector = new OverlayRulesetSelector(OverlayColourScheme.Green) { Current = ruleset },
+                    new OverlayRulesetSelector(OverlayColourScheme.Blue) { Current = ruleset },
+                    new OverlayRulesetSelector(OverlayColourScheme.Orange) { Current = ruleset },
+                    new OverlayRulesetSelector(OverlayColourScheme.Pink) { Current = ruleset },
+                    new OverlayRulesetSelector(OverlayColourScheme.Purple) { Current = ruleset },
+                    new OverlayRulesetSelector(OverlayColourScheme.Red) { Current = ruleset }
+                }
             });
         }
 
@@ -55,13 +64,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Select catch", () => ruleset.Value = new CatchRuleset().RulesetInfo);
             AddAssert("Check catch selected", () => selector.Current.Value.Equals(new CatchRuleset().RulesetInfo));
-        }
-
-        [Test]
-        public void TestColours()
-        {
-            AddStep("Set colour to blue", () => selector.AccentColour = colours.Blue);
-            AddAssert("Check colour is blue", () => selector.AccentColour == colours.Blue);
         }
     }
 }
