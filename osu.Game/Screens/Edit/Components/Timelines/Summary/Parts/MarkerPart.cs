@@ -33,10 +33,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         protected override bool OnDragStart(DragStartEvent e) => true;
 
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-        }
-
         protected override void OnDrag(DragEvent e)
         {
             seekToPosition(e.ScreenSpaceMousePosition);
