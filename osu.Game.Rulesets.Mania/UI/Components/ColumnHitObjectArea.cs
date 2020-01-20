@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 {
     public class ColumnHitObjectArea : CompositeDrawable, IHasAccentColour
     {
-        private const float hit_target_bar_height = 2;
-
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private readonly Drawable hitTarget;
@@ -67,6 +65,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         private class DefaultHitTarget : CompositeDrawable, IHasAccentColour
         {
+            private const float hit_target_bar_height = 2;
+
             private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
             private readonly Container hitTargetLine;

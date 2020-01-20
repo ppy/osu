@@ -12,8 +12,10 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
+using osu.Game.Online.Placeholders;
 using osuTK;
 using osuTK.Graphics;
 
@@ -150,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new MessagePlaceholder(@"Please sign in to view online leaderboards!"));
+                        replacePlaceholder(new LoginPlaceholder());
                         break;
 
                     case PlaceholderState.NotSupporter:
@@ -180,10 +182,14 @@ namespace osu.Game.Online.Leaderboards
                     {
                         new Drawable[]
                         {
-                            scrollContainer = new OsuScrollContainer
+                            new OsuContextMenuContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                ScrollbarVisible = false,
+                                Child = scrollContainer = new OsuScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarVisible = false,
+                                }
                             }
                         },
                         new Drawable[]

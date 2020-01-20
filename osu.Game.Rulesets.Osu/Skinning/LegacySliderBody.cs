@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK.Graphics;

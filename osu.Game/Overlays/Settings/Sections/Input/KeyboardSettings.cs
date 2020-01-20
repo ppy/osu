@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsButton
                 {
                     Text = "Key configuration",
-                    TooltipText = "Change global shortcut keys and gameplay bindings",
+                    TooltipText = "change global shortcut keys and gameplay bindings",
                     Action = keyConfig.ToggleVisibility
                 },
             };

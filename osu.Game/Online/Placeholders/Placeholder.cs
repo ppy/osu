@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Online.Leaderboards
+namespace osu.Game.Online.Placeholders
 {
     public abstract class Placeholder : OsuTextFlowContainer, IEquatable<Placeholder>
     {
