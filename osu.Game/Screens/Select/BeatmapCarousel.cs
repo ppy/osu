@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Configuration;
 using osuTK.Input;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -412,6 +412,12 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            // allow for controlling volume when alt is held.
+            // this is required as the VolumeControlReceptor uses OnPressed, which is
+            // executed after all OnKeyDown events.
+            if (e.AltPressed)
+                return base.OnKeyDown(e);
+
             int direction = 0;
             bool skipDifficulties = false;
 
