@@ -225,21 +225,21 @@ namespace osu.Game.Tournament
             {
                 foreach (var b in r.Beatmaps.ToList())
                 {
-                    if (b.BeatmapInfo == null)
+                    if (b.BeatmapInfo != null)
+                        continue;
+
+                    if (b.ID > 0)
                     {
-                        if (b.ID > 0)
-                        {
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                            API.Perform(req);
-                            b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                        var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                        API.Perform(req);
+                        b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
-                            addedInfo = true;
-                        }
-
-                        if (b.BeatmapInfo == null)
-                            // if online population couldn't be performed, ensure we don't leave a null value behind
-                            r.Beatmaps.Remove(b);
+                        addedInfo = true;
                     }
+
+                    if (b.BeatmapInfo == null)
+                        // if online population couldn't be performed, ensure we don't leave a null value behind
+                        r.Beatmaps.Remove(b);
                 }
             }
 
