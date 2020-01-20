@@ -7,14 +7,14 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// An event which occurs when a <see cref="SelectionBlueprint"/> is moved.
+    /// An event which occurs when a <see cref="OverlaySelectionBlueprint"/> is moved.
     /// </summary>
     public class MoveSelectionEvent
     {
         /// <summary>
-        /// The <see cref="SelectionBlueprint"/> that triggered this <see cref="MoveSelectionEvent"/>.
+        /// The <see cref="OverlaySelectionBlueprint"/> that triggered this <see cref="MoveSelectionEvent"/>.
         /// </summary>
-        public readonly SelectionBlueprint Blueprint;
+        public readonly OverlaySelectionBlueprint Blueprint;
 
         /// <summary>
         /// The starting screen-space position of the hitobject.
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public readonly Vector2 InstantDelta;
 
-        public MoveSelectionEvent(SelectionBlueprint blueprint, Vector2 screenSpaceStartPosition, Vector2 screenSpacePosition)
+        public MoveSelectionEvent(OverlaySelectionBlueprint blueprint, Vector2 screenSpaceStartPosition, Vector2 screenSpacePosition)
         {
             Blueprint = blueprint;
             ScreenSpaceStartPosition = screenSpaceStartPosition;

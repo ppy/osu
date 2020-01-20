@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        protected void AddBlueprint(SelectionBlueprint blueprint)
+        protected void AddBlueprint(OverlaySelectionBlueprint blueprint)
         {
             Add(blueprint.With(d =>
             {
