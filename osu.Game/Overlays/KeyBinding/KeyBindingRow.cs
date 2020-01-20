@@ -216,12 +216,15 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
-            if (!HasFocus) return base.OnKeyUp(e);
+            if (!HasFocus)
+            {
+                base.OnKeyUp(e);
+                return;
+            }
 
             finalise();
-            return true;
         }
 
         protected override bool OnJoystickPress(JoystickPressEvent e)
