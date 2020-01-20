@@ -21,6 +21,8 @@ using osu.Game.Rulesets.Taiko.Difficulty;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
 using System;
+using osu.Game.Rulesets.Taiko.Skinning;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
@@ -33,6 +35,8 @@ namespace osu.Game.Rulesets.Taiko
         public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TaikoHealthProcessor();
 
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new TaikoLegacySkinTransformer(source);
 
         public const string SHORT_NAME = "taiko";
 
@@ -134,6 +138,8 @@ namespace osu.Game.Rulesets.Taiko
         public override string Description => "osu!taiko";
 
         public override string ShortName => SHORT_NAME;
+
+        public override string PlayingVerb => "Bashing drums";
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 

@@ -175,6 +175,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Clicking circles";
+
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
         public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);

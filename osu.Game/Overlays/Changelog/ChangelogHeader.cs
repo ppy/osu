@@ -15,7 +15,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : OverlayHeader
+    public class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
@@ -23,12 +23,13 @@ namespace osu.Game.Overlays.Changelog
 
         public UpdateStreamBadgeArea Streams;
 
-        private const string listing_string = "Listing";
+        private const string listing_string = "listing";
 
         public ChangelogHeader()
+            : base(OverlayColourScheme.Purple)
         {
-            TabControl.AddItem(listing_string);
-            TabControl.Current.ValueChanged += e =>
+            BreadcrumbControl.AddItem(listing_string);
+            BreadcrumbControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
@@ -43,25 +44,17 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            TabControl.AccentColour = colours.Violet;
-            TitleBackgroundColour = colours.GreyVioletDarker;
-            ControlBackgroundColour = colours.GreyVioletDark;
-        }
-
         private ChangelogHeaderTitle title;
 
         private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
             if (e.OldValue != null)
-                TabControl.RemoveItem(e.OldValue.ToString());
+                BreadcrumbControl.RemoveItem(e.OldValue.ToString());
 
             if (e.NewValue != null)
             {
-                TabControl.AddItem(e.NewValue.ToString());
-                TabControl.Current.Value = e.NewValue.ToString();
+                BreadcrumbControl.AddItem(e.NewValue.ToString());
+                BreadcrumbControl.Current.Value = e.NewValue.ToString();
 
                 Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == e.NewValue.UpdateStream.Name);
 
@@ -69,7 +62,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                TabControl.Current.Value = listing_string;
+                BreadcrumbControl.Current.Value = listing_string;
                 Streams.Current.Value = null;
                 title.Version = null;
             }
@@ -115,12 +108,6 @@ namespace osu.Game.Overlays.Changelog
             {
                 Title = "changelog";
                 Version = null;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

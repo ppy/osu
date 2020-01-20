@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Objects.Legacy
