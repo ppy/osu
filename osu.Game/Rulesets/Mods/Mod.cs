@@ -61,6 +61,12 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool Ranked => false;
 
         /// <summary>
+        /// Returns true if this mod requires configuration. If true, opens mod customisation menu every time user enables mod.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool RequiresConfiguration => false;
+
+        /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]
