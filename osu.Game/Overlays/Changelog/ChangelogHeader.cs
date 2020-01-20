@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.Changelog
         private const string listing_string = "listing";
 
         public ChangelogHeader()
+            : base(OverlayColourScheme.Purple)
         {
             BreadcrumbControl.AddItem(listing_string);
             BreadcrumbControl.Current.ValueChanged += e =>
@@ -41,14 +42,6 @@ namespace osu.Game.Overlays.Changelog
                 if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
                     Current.Value = e.NewValue.LatestBuild;
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            BreadcrumbControl.AccentColour = colours.Violet;
-            TitleBackgroundColour = colours.GreyVioletDarker;
-            ControlBackgroundColour = colours.GreyVioletDark;
         }
 
         private ChangelogHeaderTitle title;
@@ -115,12 +108,6 @@ namespace osu.Game.Overlays.Changelog
             {
                 Title = "changelog";
                 Version = null;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");

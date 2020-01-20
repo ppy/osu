@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override IconUsage Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override bool Ranked => false;

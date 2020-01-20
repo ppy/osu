@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
@@ -19,6 +20,10 @@ namespace osu.Game.Overlays.News
 {
     public class NewsArticleCover : Container
     {
+        private const int hover_duration = 300;
+
+        private readonly Box gradient;
+
         public NewsArticleCover(ArticleInfo info)
         {
             RelativeSizeAxes = Axes.X;
@@ -47,11 +52,11 @@ namespace osu.Game.Overlays.News
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new Box
+                gradient = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.6f)),
-                    Alpha = 1f,
+                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.1f), Color4.Black.Opacity(0.7f)),
+                    Alpha = 0
                 },
                 new DateContainer(info.Time)
                 {
@@ -88,6 +93,18 @@ namespace osu.Game.Overlays.News
             };
 
             bg.OnLoadComplete += d => d.FadeIn(250, Easing.In);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            gradient.FadeIn(hover_duration, Easing.OutQuint);
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            base.OnHoverLost(e);
+            gradient.FadeOut(hover_duration, Easing.OutQuint);
         }
 
         [LongRunningLoad]
