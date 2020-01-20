@@ -108,9 +108,6 @@ namespace osu.Game.Overlays.Chat.Tabs
             selectorTab.Active.Value = false;
         }
 
-        // Invert switching direction due to reverse internal tab order
-        public override void SwitchTab(int direction, bool wrap = true) => base.SwitchTab(-direction, wrap);
-
         protected override TabFillFlowContainer CreateTabFlow() => new ChannelTabFillFlowContainer
         {
             Direction = FillDirection.Full,
