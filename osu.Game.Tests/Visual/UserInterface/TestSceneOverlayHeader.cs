@@ -17,7 +17,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneOverlayHeaders : OsuTestScene
+    public class TestSceneOverlayHeader : OsuTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly FillFlowContainer flow;
 
-        public TestSceneOverlayHeaders()
+        public TestSceneOverlayHeader()
         {
             AddRange(new Drawable[]
             {
