@@ -80,7 +80,7 @@
   <ItemGroup Label="Transitive Dependencies">
     <PackageReference Include="Humanizer" Version="2.7.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="3.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ppy.osu.Framework" Version="2020.118.0" />
     <PackageReference Include="SharpCompress" Version="0.24.0" />
