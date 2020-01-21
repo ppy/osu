@@ -49,15 +49,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return new TimelineHitObjectRepresentation(hitObject) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS };
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            base.OnMouseDown(e);
-
-            return false; // temporary until we correctly handle selections.
-        }
-
-        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new NoDragDragBox(performSelect);
-
         internal class NoDragDragBox : DragBox
         {
             public NoDragDragBox(Action<RectangleF> performSelect)
@@ -73,6 +64,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             private Circle circle;
 
             public const float THICKNESS = 3;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || circle.ReceivePositionalInputAt(screenSpacePos);
 
             public TimelineHitObjectRepresentation(HitObject hitObject)
                 : base(hitObject)
