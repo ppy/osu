@@ -106,6 +106,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             selectedBlueprints.Add(blueprint);
             editorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+
+            UpdateVisibility();
         }
 
         /// <summary>
@@ -144,8 +146,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DeselectAll?.Invoke();
                 blueprint.Select();
             }
-
-            UpdateVisibility();
         }
 
         private void deleteSelected()
