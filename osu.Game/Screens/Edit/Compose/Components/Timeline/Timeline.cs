@@ -10,11 +10,15 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class Timeline : ZoomableScrollContainer
+    [Cached(typeof(IDistanceSnapProvider))]
+    public class Timeline : ZoomableScrollContainer, IDistanceSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
@@ -161,6 +165,52 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             handlingDragInput = false;
             if (trackWasPlaying)
                 adjustableClock.Start();
+        }
+
+        [Resolved]
+        private BindableBeatDivisor beatDivisor { get; set; }
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, time);
+
+        public float GetBeatSnapDistanceAt(double referenceTime)
+        {
+            DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
+            return (float)(100 * beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatDivisor.Value);
+        }
+
+        public float DurationToDistance(double referenceTime, double duration)
+        {
+            double beatLength = beatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
+            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
+        }
+
+        public double DistanceToDuration(double referenceTime, float distance)
+        {
+            double beatLength = beatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
+            return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
+        }
+
+        public double GetSnappedDurationFromDistance(double referenceTime, float distance)
+            => beatSnap(referenceTime, DistanceToDuration(referenceTime, distance));
+
+        public float GetSnappedDistanceFromDistance(double referenceTime, float distance)
+            => DurationToDistance(referenceTime, beatSnap(referenceTime, DistanceToDuration(referenceTime, distance)));
+
+        /// <summary>
+        /// Snaps a duration to the closest beat of a timing point applicable at the reference time.
+        /// </summary>
+        /// <param name="referenceTime">The time of the timing point which <paramref name="duration"/> resides in.</param>
+        /// <param name="duration">The duration to snap.</param>
+        /// <returns>A value that represents <paramref name="duration"/> snapped to the closest beat of the timing point.</returns>
+        private double beatSnap(double referenceTime, double duration)
+        {
+            double beatLength = beatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
+
+            // A 1ms offset prevents rounding errors due to minute variations in duration
+            return (int)((duration + 1) / beatLength) * beatLength;
         }
     }
 }
