@@ -28,5 +28,7 @@ namespace osu.Game.Rulesets.Edit
         public override Vector2 SelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
         public override Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
+
+        public override Vector2 GetInstantDelta(Vector2 screenSpacePosition) => DrawableObject.Parent.ToLocalSpace(screenSpacePosition) - DrawableObject.Position;
     }
 }
