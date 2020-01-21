@@ -123,7 +123,7 @@ namespace osu.Game.Online.Chat
 
             if (existingNotification == null)
             {
-                var notification = new PrivateMessageNotification(message.Sender.Username, channel, (n) => privateMessageNotifications.Remove(n));
+                var notification = new PrivateMessageNotification(message.Sender.Username, channel, n => privateMessageNotifications.Remove(n));
 
                 notificationOverlay?.Post(notification);
                 privateMessageNotifications.Add(notification);
