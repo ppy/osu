@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
 
             AlwaysPresent = true;
-            Alpha = 0;
+            OnDeselected();
         }
 
         private SelectionState state;
@@ -64,12 +64,12 @@ namespace osu.Game.Rulesets.Edit
                 switch (state)
                 {
                     case SelectionState.Selected:
-                        Show();
+                        OnSelected();
                         Selected?.Invoke(this);
                         break;
 
                     case SelectionState.NotSelected:
-                        Hide();
+                        OnDeselected();
                         Deselected?.Invoke(this);
                         break;
                 }
@@ -77,6 +77,10 @@ namespace osu.Game.Rulesets.Edit
                 StateChanged?.Invoke(state);
             }
         }
+
+        protected virtual void OnDeselected() => Hide();
+
+        protected virtual void OnSelected() => Show();
 
         // When not selected, input is only required for the blueprint itself to receive IsHovering
         protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;

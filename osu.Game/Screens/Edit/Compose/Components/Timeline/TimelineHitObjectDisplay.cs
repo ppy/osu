@@ -70,6 +70,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class TimelineHitObjectRepresentation : SelectionBlueprint
         {
+            private Circle circle;
+
             public const float THICKNESS = 3;
 
             public TimelineHitObjectRepresentation(HitObject hitObject)
@@ -104,7 +106,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     });
                 }
 
-                AddInternal(new Circle
+                AddInternal(circle = new Circle
                 {
                     Size = new Vector2(16),
                     Anchor = Anchor.CentreLeft,
@@ -116,6 +118,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     BorderThickness = THICKNESS,
                 });
             }
+
+            protected override void OnSelected() => circle.BorderColour = Color4.Orange;
+
+            protected override void OnDeselected() => circle.BorderColour = Color4.Black;
         }
     }
 }
