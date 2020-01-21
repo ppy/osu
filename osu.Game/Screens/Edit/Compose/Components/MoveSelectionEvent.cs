@@ -12,9 +12,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class MoveSelectionEvent
     {
         /// <summary>
-        /// The <see cref="OverlaySelectionBlueprint"/> that triggered this <see cref="MoveSelectionEvent"/>.
+        /// The <see cref="SelectionBlueprint"/> that triggered this <see cref="MoveSelectionEvent"/>.
         /// </summary>
-        public readonly OverlaySelectionBlueprint Blueprint;
+        public readonly SelectionBlueprint Blueprint;
 
         /// <summary>
         /// The starting screen-space position of the hitobject.
@@ -34,13 +34,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </remarks>
         public readonly Vector2 InstantDelta;
 
-        public MoveSelectionEvent(OverlaySelectionBlueprint blueprint, Vector2 screenSpaceStartPosition, Vector2 screenSpacePosition)
+        public MoveSelectionEvent(SelectionBlueprint blueprint, Vector2 screenSpaceStartPosition, Vector2 screenSpacePosition)
         {
             Blueprint = blueprint;
             ScreenSpaceStartPosition = screenSpaceStartPosition;
             ScreenSpacePosition = screenSpacePosition;
 
-            InstantDelta = Blueprint.DrawableObject.Parent.ToLocalSpace(ScreenSpacePosition) - Blueprint.DrawableObject.Position;
+            InstantDelta = Blueprint.GetInstantDelta(ScreenSpacePosition);
         }
     }
 }
