@@ -85,31 +85,31 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModHidden();
 
             if (mods.HasFlag(LegacyMods.Key1))
-                yield return new ManiaModKey1();
+                yield return new ManiaKeyMod { KeyCount = { Value = 1 } };
 
             if (mods.HasFlag(LegacyMods.Key2))
-                yield return new ManiaModKey2();
+                yield return new ManiaKeyMod { KeyCount = { Value = 2 } };
 
             if (mods.HasFlag(LegacyMods.Key3))
-                yield return new ManiaModKey3();
+                yield return new ManiaKeyMod { KeyCount = { Value = 3 } };
 
             if (mods.HasFlag(LegacyMods.Key4))
-                yield return new ManiaModKey4();
+                yield return new ManiaKeyMod { KeyCount = { Value = 4 } };
 
             if (mods.HasFlag(LegacyMods.Key5))
-                yield return new ManiaModKey5();
+                yield return new ManiaKeyMod { KeyCount = { Value = 5 } };
 
             if (mods.HasFlag(LegacyMods.Key6))
-                yield return new ManiaModKey6();
+                yield return new ManiaKeyMod { KeyCount = { Value = 6 } };
 
             if (mods.HasFlag(LegacyMods.Key7))
-                yield return new ManiaModKey7();
+                yield return new ManiaKeyMod { KeyCount = { Value = 7 } };
 
             if (mods.HasFlag(LegacyMods.Key8))
-                yield return new ManiaModKey8();
+                yield return new ManiaKeyMod { KeyCount = { Value = 8 } };
 
             if (mods.HasFlag(LegacyMods.Key9))
-                yield return new ManiaModKey9();
+                yield return new ManiaKeyMod { KeyCount = { Value = 9 } };
 
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
@@ -143,15 +143,7 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new MultiMod(new ManiaModKey4(),
-                            new ManiaModKey5(),
-                            new ManiaModKey6(),
-                            new ManiaModKey7(),
-                            new ManiaModKey8(),
-                            new ManiaModKey9(),
-                            new ManiaModKey1(),
-                            new ManiaModKey2(),
-                            new ManiaModKey3()),
+                        new ManiaKeyMod(),
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
