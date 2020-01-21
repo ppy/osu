@@ -16,7 +16,7 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayTabControl<T> : OsuTabControl<T>
     {
-        private readonly Bar bar;
+        private readonly TabControlBar bar;
 
         protected float BarHeight
         {
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
 
-            AddInternal(bar = new Bar
+            AddInternal(bar = new TabControlBar
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 2,
@@ -139,7 +139,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private class Bar : CompositeDrawable, IHasAccentColour
+        private class TabControlBar : CompositeDrawable, IHasAccentColour
         {
             public Color4 AccentColour
             {
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays
 
             private readonly Box background;
 
-            public Bar()
+            public TabControlBar()
             {
                 AddInternal(background = new Box
                 {
