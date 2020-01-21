@@ -258,7 +258,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!allowDeselection && selectionHandler.SelectedBlueprints.Any(s => s.IsHovered))
                 return;
 
-            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveBlueprints)
+            foreach (SelectionBlueprint blueprint in selectionBlueprints.AliveChildren)
             {
                 if (blueprint.IsHovered)
                 {
@@ -415,7 +415,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {
-            public IEnumerable<SelectionBlueprint> AliveBlueprints => AliveInternalChildren.Cast<SelectionBlueprint>();
+            //todo: remove
         }
     }
 }
