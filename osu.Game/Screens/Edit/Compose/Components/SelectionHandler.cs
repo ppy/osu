@@ -102,7 +102,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint becoming selected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        internal void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
+        internal void HandleSelected(SelectionBlueprint blueprint)
+        {
+            selectedBlueprints.Add(blueprint);
+            editorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+        }
 
         /// <summary>
         /// Handle a blueprint becoming deselected.
@@ -111,6 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
+            editorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
             if (selectedBlueprints.Count == 0)

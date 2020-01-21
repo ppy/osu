@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -41,6 +42,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
+        private readonly BindableList<HitObject> selectedHitObjects = new BindableList<HitObject>();
+
         [Resolved(canBeNull: true)]
         private IDistanceSnapProvider snapProvider { get; set; }
 
@@ -65,6 +68,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var obj in beatmap.HitObjects)
                 AddBlueprintFor(obj);
+
+            selectedHitObjects.BindTo(beatmap.SelectedHitObjects);
+            selectedHitObjects.ItemsAdded += objects =>
+            {
+                foreach (var o in objects)
+                    selectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Select();
+            };
+
+            selectedHitObjects.ItemsRemoved += objects =>
+            {
+                foreach (var o in objects)
+                    selectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+            };
         }
 
         protected virtual SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
@@ -315,6 +331,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             selectionHandler.HandleSelected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 1);
+            beatmap.SelectedHitObjects.Add(blueprint.HitObject);
 
             SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
@@ -323,6 +340,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             selectionHandler.HandleDeselected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 0);
+            beatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
