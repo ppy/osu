@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Drawable outline;
 
         [Resolved(CanBeNull = true)]
-        private IPlacementHandler placementHandler { get; set; }
+        private EditorBeatmap editorBeatmap { get; set; }
 
         public SelectionHandler()
         {
@@ -146,7 +146,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void deleteSelected()
         {
             foreach (var h in selectedBlueprints.ToList())
-                placementHandler.Delete(h.HitObject);
+                editorBeatmap.Remove(h.HitObject);
         }
 
         #endregion
