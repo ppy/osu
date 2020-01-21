@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly Mod testCustomisableMod = new TestModCustomisable1();
 
-        private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable3();
+        private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable2();
 
         [Test]
         public void TestButtonShowsOnCustomisableMod()
@@ -61,6 +61,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             createModSelect();
 
             AddStep("open", () => modSelect.Show());
+            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
             AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
         }
@@ -110,8 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                         return new Mod[]
                         {
                             new TestModCustomisable1(),
-                            new TestModCustomisable2(),
-                            new TestModCustomisable3()
+                            new TestModCustomisable2()
                         };
                     }
 
@@ -141,13 +141,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             public override string Name => "Customisable Mod 2";
 
             public override string Acronym => "CM2";
-        }
-
-        private class TestModCustomisable3 : TestModCustomisable
-        {
-            public override string Name => "Customisable Mod 3";
-
-            public override string Acronym => "CM3";
 
             public override bool RequiresConfiguration => true;
         }
