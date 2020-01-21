@@ -92,7 +92,7 @@ namespace osu.Game.Online.Chat
 
         public void HandleMessages(Channel channel, IEnumerable<Message> messages)
         {
-            // don't show if the ChatOverlay and the target channel is visible.
+            // Only send notifications, if ChatOverlay and the target channel aren't visible.
             if (IsActive && channelManager.CurrentChannel.Value == channel)
                 return;
 
@@ -102,7 +102,6 @@ namespace osu.Game.Online.Chat
                 if (message.Id < channel.LastReadId)
                     return;
 
-                // ignore messages from yourself
                 if (message.Sender.Id == localUser.Value.Id)
                     continue;
 
