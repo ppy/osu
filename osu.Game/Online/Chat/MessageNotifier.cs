@@ -137,9 +137,7 @@ namespace osu.Game.Online.Chat
 
         private void checkForMentions(Channel channel, Message message, string username)
         {
-            var words = getWords(message.Content);
-
-            if (!notifyOnMention.Value || !anyCaseInsensitive(words, username))
+            if (!notifyOnMention.Value || !anyCaseInsensitive(getWords(message.Content), username))
                 return;
 
             var notification = new MentionNotification(message.Sender.Username, channel);
