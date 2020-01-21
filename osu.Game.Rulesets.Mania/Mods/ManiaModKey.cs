@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaKeyMod : Mod, IApplicableToBeatmapConverter
+    public class ManiaModKey : Mod, IApplicableToBeatmapConverter
     {
         public override string Name => "Keycount adjust";
         public override string Acronym => "XK";

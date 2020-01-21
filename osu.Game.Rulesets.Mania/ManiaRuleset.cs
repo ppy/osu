@@ -85,31 +85,31 @@ namespace osu.Game.Rulesets.Mania
                 yield return new ManiaModHidden();
 
             if (mods.HasFlag(LegacyMods.Key1))
-                yield return new ManiaKeyMod { KeyCount = { Value = 1 } };
+                yield return new ManiaModKey { KeyCount = { Value = 1 } };
 
             if (mods.HasFlag(LegacyMods.Key2))
-                yield return new ManiaKeyMod { KeyCount = { Value = 2 } };
+                yield return new ManiaModKey { KeyCount = { Value = 2 } };
 
             if (mods.HasFlag(LegacyMods.Key3))
-                yield return new ManiaKeyMod { KeyCount = { Value = 3 } };
+                yield return new ManiaModKey { KeyCount = { Value = 3 } };
 
             if (mods.HasFlag(LegacyMods.Key4))
-                yield return new ManiaKeyMod { KeyCount = { Value = 4 } };
+                yield return new ManiaModKey { KeyCount = { Value = 4 } };
 
             if (mods.HasFlag(LegacyMods.Key5))
-                yield return new ManiaKeyMod { KeyCount = { Value = 5 } };
+                yield return new ManiaModKey { KeyCount = { Value = 5 } };
 
             if (mods.HasFlag(LegacyMods.Key6))
-                yield return new ManiaKeyMod { KeyCount = { Value = 6 } };
+                yield return new ManiaModKey { KeyCount = { Value = 6 } };
 
             if (mods.HasFlag(LegacyMods.Key7))
-                yield return new ManiaKeyMod { KeyCount = { Value = 7 } };
+                yield return new ManiaModKey { KeyCount = { Value = 7 } };
 
             if (mods.HasFlag(LegacyMods.Key8))
-                yield return new ManiaKeyMod { KeyCount = { Value = 8 } };
+                yield return new ManiaModKey { KeyCount = { Value = 8 } };
 
             if (mods.HasFlag(LegacyMods.Key9))
-                yield return new ManiaKeyMod { KeyCount = { Value = 9 } };
+                yield return new ManiaModKey { KeyCount = { Value = 9 } };
 
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new ManiaModNoFail();
@@ -143,7 +143,7 @@ namespace osu.Game.Rulesets.Mania
                 case ModType.Conversion:
                     return new Mod[]
                     {
-                        new ManiaKeyMod(),
+                        new ManiaModKey(),
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
