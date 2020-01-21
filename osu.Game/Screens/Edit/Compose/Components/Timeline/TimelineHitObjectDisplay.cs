@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
             //var yOffset = content.Count(d => d.X == h.StartTime);
-            var yOffset = 0;
+            //var yOffset = 0;
 
-            return new TimelineHitObjectRepresentation(hitObject) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS };
+            return new TimelineHitObjectRepresentation(hitObject);
         }
 
         internal class NoDragDragBox : DragBox
