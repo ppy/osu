@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class TimelineHitObjectRepresentation : SelectionBlueprint
         {
-            private Circle circle;
+            private readonly Circle circle;
 
             public const float THICKNESS = 3;
 
