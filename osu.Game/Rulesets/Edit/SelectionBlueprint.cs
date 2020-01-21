@@ -121,6 +121,6 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
 
-        public Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
+        public virtual Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
     }
 }
