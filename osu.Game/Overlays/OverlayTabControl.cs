@@ -13,34 +13,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public abstract class OverlayTabControl<T> : TabControl<T>
+    public abstract class OverlayTabControl<T> : OsuTabControl<T>
     {
         private readonly Box bar;
 
-        private Color4 accentColour = Color4.White;
-
-        public Color4 AccentColour
+        public new Color4 AccentColour
         {
-            get => accentColour;
-            set
-            {
-                if (accentColour == value)
-                    return;
-
-                accentColour = value;
-                bar.Colour = value;
-
-                foreach (TabItem<T> tabItem in TabContainer)
-                {
-                    ((OverlayTabItem)tabItem).AccentColour = value;
-                }
-            }
-        }
-
-        public new MarginPadding Padding
-        {
-            get => TabContainer.Padding;
-            set => TabContainer.Padding = value;
+            get => base.AccentColour;
+            set => base.AccentColour = bar.Colour = value;
         }
 
         protected float BarHeight
@@ -66,7 +46,7 @@ namespace osu.Game.Overlays
 
         protected override TabItem<T> CreateTabItem(T value) => new OverlayTabItem(value);
 
-        protected class OverlayTabItem : TabItem<T>
+        protected class OverlayTabItem : TabItem<T>, IHasAccentColour
         {
             protected readonly ExpandingBar Bar;
             protected readonly OsuSpriteText Text;
