@@ -40,11 +40,15 @@ namespace osu.Game.Rulesets.Edit
 
         protected SelectionBlueprint(HitObject hitObject)
         {
-            this.HitObject = hitObject;
+            HitObject = hitObject;
             RelativeSizeAxes = Axes.Both;
+        }
 
-            AlwaysPresent = true;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             OnDeselected();
+            AlwaysPresent = true;
         }
 
         private SelectionState state;
@@ -116,5 +120,7 @@ namespace osu.Game.Rulesets.Edit
         /// The screen-space quad that outlines this <see cref="OverlaySelectionBlueprint"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
+
+        public Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
     }
 }
