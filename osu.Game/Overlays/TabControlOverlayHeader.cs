@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -48,6 +48,7 @@ namespace osu.Game.Overlays
             controlBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.2f);
         }
 
+        [NotNull]
         protected virtual OsuTabControl<T> CreateTabControl() => new OverlayHeaderTabControl();
 
         public class OverlayHeaderTabControl : OverlayTabControl<T>
