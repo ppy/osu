@@ -79,7 +79,7 @@ namespace osu.Game.Online.Chat
         /// </remarks>
         public void HandleMessages(long channelId, IEnumerable<Message> messages)
         {
-            var channel = channelManager.JoinedChannels.FirstOrDefault(c => c.Id == channelId);
+            var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == channelId);
 
             if (channel == null)
             {
