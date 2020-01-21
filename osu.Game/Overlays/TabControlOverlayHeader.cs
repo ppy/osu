@@ -5,28 +5,50 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Overlays
 {
-    public abstract class TabControlOverlayHeader<T> : ControllableOverlayHeader<T>
+    /// <summary>
+    /// <see cref="OverlayHeader"/> which contains <see cref="OsuTabControl{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of item to be represented by tabs in <see cref="OsuTabControl{T}"/>.</typeparam>
+    public abstract class TabControlOverlayHeader<T> : OverlayHeader
     {
-        protected OverlayHeaderTabControl TabControl;
+        protected OsuTabControl<T> TabControl;
 
-        protected override TabControl<T> CreateTabControl() => TabControl = new OverlayHeaderTabControl();
+        private readonly Box controlBackground;
 
         protected TabControlOverlayHeader(OverlayColourScheme colourScheme)
             : base(colourScheme)
         {
+            HeaderInfo.Add(new Container
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Children = new Drawable[]
+                {
+                    controlBackground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    TabControl = CreateTabControl().With(control => control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN })
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             TabControl.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.75f);
+            controlBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.2f);
         }
+
+        protected virtual OsuTabControl<T> CreateTabControl() => new OverlayHeaderTabControl();
 
         public class OverlayHeaderTabControl : OverlayTabControl<T>
         {
@@ -38,18 +60,9 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomLeft;
                 Origin = Anchor.BottomLeft;
                 Height = 35;
-
-                if (typeof(T).IsEnum)
-                {
-                    foreach (var val in (T[])Enum.GetValues(typeof(T)))
-                        AddItem(val);
-                }
             }
 
-            protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value)
-            {
-                AccentColour = AccentColour,
-            };
+            protected override TabItem<T> CreateTabItem(T value) => new OverlayHeaderTabItem(value);
 
             protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
             {

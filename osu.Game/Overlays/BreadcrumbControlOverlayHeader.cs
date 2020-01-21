@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
@@ -9,21 +8,13 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public abstract class BreadcrumbControlOverlayHeader : ControllableOverlayHeader<string>
+    public abstract class BreadcrumbControlOverlayHeader : TabControlOverlayHeader<string>
     {
-        protected OverlayHeaderBreadcrumbControl BreadcrumbControl;
-
-        protected override TabControl<string> CreateTabControl() => BreadcrumbControl = new OverlayHeaderBreadcrumbControl();
+        protected override OsuTabControl<string> CreateTabControl() => new OverlayHeaderBreadcrumbControl();
 
         protected BreadcrumbControlOverlayHeader(OverlayColourScheme colourScheme)
             : base(colourScheme)
         {
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            BreadcrumbControl.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.75f);
         }
 
         public class OverlayHeaderBreadcrumbControl : BreadcrumbControl<string>

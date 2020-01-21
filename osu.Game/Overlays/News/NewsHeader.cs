@@ -25,9 +25,9 @@ namespace osu.Game.Overlays.News
         public NewsHeader()
             : base(OverlayColourScheme.Purple)
         {
-            BreadcrumbControl.AddItem(front_page_string);
+            TabControl.AddItem(front_page_string);
 
-            BreadcrumbControl.Current.ValueChanged += e =>
+            TabControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
@@ -39,18 +39,18 @@ namespace osu.Game.Overlays.News
         private void showPost(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
-                BreadcrumbControl.RemoveItem(e.OldValue);
+                TabControl.RemoveItem(e.OldValue);
 
             if (e.NewValue != null)
             {
-                BreadcrumbControl.AddItem(e.NewValue);
-                BreadcrumbControl.Current.Value = e.NewValue;
+                TabControl.AddItem(e.NewValue);
+                TabControl.Current.Value = e.NewValue;
 
                 title.IsReadingPost = true;
             }
             else
             {
-                BreadcrumbControl.Current.Value = front_page_string;
+                TabControl.Current.Value = front_page_string;
                 title.IsReadingPost = false;
             }
         }

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
@@ -15,13 +16,7 @@ namespace osu.Game.Overlays
 {
     public abstract class OverlayTabControl<T> : OsuTabControl<T>
     {
-        private readonly Box bar;
-
-        public new Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set => base.AccentColour = bar.Colour = value;
-        }
+        private readonly Bar bar;
 
         protected float BarHeight
         {
@@ -33,7 +28,7 @@ namespace osu.Game.Overlays
             TabContainer.Masking = false;
             TabContainer.Spacing = new Vector2(15, 0);
 
-            AddInternal(bar = new Box
+            AddInternal(bar = new Bar
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 2,
@@ -141,6 +136,25 @@ namespace osu.Game.Overlays
             {
                 Bar.Collapse();
                 Text.FadeColour(AccentColour, 120, Easing.InQuad);
+            }
+        }
+
+        private class Bar : CompositeDrawable, IHasAccentColour
+        {
+            public Color4 AccentColour
+            {
+                get => background.Colour;
+                set => background.Colour = value;
+            }
+
+            private readonly Box background;
+
+            public Bar()
+            {
+                AddInternal(background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both
+                });
             }
         }
     }
