@@ -96,7 +96,7 @@ namespace osu.Game.Online.Chat
             if (IsActive && channelManager.CurrentChannel.Value == channel)
                 return;
 
-            foreach (var message in messages)
+            foreach (var message in messages.OrderByDescending(m => m.Id))
             {
                 // ignore messages that already have been read
                 if (message.Id < channel.LastReadId)
