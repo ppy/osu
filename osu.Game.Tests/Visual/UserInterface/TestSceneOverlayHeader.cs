@@ -22,7 +22,6 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(OverlayHeader),
-            typeof(ControllableOverlayHeader<>),
             typeof(TabControlOverlayHeader<>),
             typeof(BreadcrumbControlOverlayHeader),
             typeof(TestNoControlHeader),
@@ -139,9 +138,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             public TestBreadcrumbControlHeader(OverlayColourScheme colourScheme)
                 : base(colourScheme)
             {
-                BreadcrumbControl.AddItem("tab1");
-                BreadcrumbControl.AddItem("tab2");
-                BreadcrumbControl.Current.Value = "tab2";
+                TabControl.AddItem("tab1");
+                TabControl.AddItem("tab2");
+                TabControl.Current.Value = "tab2";
             }
         }
 

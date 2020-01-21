@@ -17,6 +17,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -75,6 +76,7 @@ namespace osu.Game.Graphics.UserInterface
                     dropdown.AccentColour = value;
                 foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
                     i.AccentColour = value;
+                InternalChildren.OfType<IHasAccentColour>().ForEach(c => c.AccentColour = value);
             }
         }
 
