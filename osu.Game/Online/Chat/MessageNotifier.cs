@@ -105,6 +105,7 @@ namespace osu.Game.Online.Chat
                 if (message.Sender.Id == localUser.Value.Id)
                     continue;
 
+                // check for private messages first, if true, skip checking mentions to prevent duplicate notifications about the same message.
                 if (checkForPMs(channel, message))
                     continue;
 
