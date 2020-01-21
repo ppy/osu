@@ -122,7 +122,8 @@ namespace osu.Game.Online.Chat
 
             if (existingNotification == null)
             {
-                var notification = new PrivateMessageNotification(message.Sender.Username, channel);
+                var notification = new PrivateMessageNotification(message.Sender.Username, channel, (n) => privateMessageNotifications.Remove(n));
+
                 notificationOverlay?.Post(notification);
                 privateMessageNotifications.Add(notification);
             }
@@ -154,12 +155,13 @@ namespace osu.Game.Online.Chat
 
         public class PrivateMessageNotification : SimpleNotification
         {
-            public PrivateMessageNotification(string username, Channel channel)
+            public PrivateMessageNotification(string username, Channel channel, Action<PrivateMessageNotification> onRemove)
             {
                 Icon = FontAwesome.Solid.Envelope;
                 Username = username;
                 MessageCount = 1;
                 Channel = channel;
+                OnRemove = onRemove;
             }
 
             private int messageCount;
@@ -178,22 +180,27 @@ namespace osu.Game.Online.Chat
 
             public Channel Channel { get; set; }
 
+            public Action<PrivateMessageNotification> OnRemove { get; set; }
+
             public override bool IsImportant => false;
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager, MessageNotifier notifier)
+            private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
             {
                 IconBackgound.Colour = colours.PurpleDark;
+
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
                     chatOverlay.Show();
                     channelManager.CurrentChannel.Value = Channel;
 
-                    if (notifier.privateMessageNotifications.Contains(this))
-                        notifier.privateMessageNotifications.Remove(this);
-
                     return true;
+                };
+
+                Closed += delegate
+                {
+                    OnRemove.Invoke(this);
                 };
             }
         }
@@ -215,6 +222,7 @@ namespace osu.Game.Online.Chat
             private void load(OsuColour colours, ChatOverlay chatOverlay, NotificationOverlay notificationOverlay, ChannelManager channelManager)
             {
                 IconBackgound.Colour = colours.PurpleDark;
+
                 Activated = delegate
                 {
                     notificationOverlay.Hide();
