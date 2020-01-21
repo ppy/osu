@@ -99,7 +99,7 @@ namespace osu.Game.Online.Chat
             foreach (var message in messages.OrderByDescending(m => m.Id))
             {
                 // ignore messages that already have been read
-                if (message.Id < channel.LastReadId)
+                if (message.Id <= channel.LastReadId)
                     return;
 
                 if (message.Sender.Id == localUser.Value.Id)
