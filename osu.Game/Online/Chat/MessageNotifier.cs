@@ -103,16 +103,14 @@ namespace osu.Game.Online.Chat
                     return;
 
                 // ignore messages from yourself
-                var localUsername = localUser.Value.Username;
-
-                if (message.Sender.Username == localUsername)
+                if (message.Sender.Id == localUser.Value.Id)
                     continue;
 
                 if (checkForPMs(channel, message))
                     continue;
 
                 // change output to bool again if another "message processor" is added.
-                checkForMentions(channel, message, localUsername);
+                checkForMentions(channel, message, localUser.Value.Username);
             }
         }
 
