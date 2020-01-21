@@ -65,6 +65,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public const float THICKNESS = 3;
 
+            private const float circle_size = 16;
+
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || circle.ReceivePositionalInputAt(screenSpacePos);
 
             public TimelineHitObjectRepresentation(HitObject hitObject)
@@ -101,7 +103,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
                 AddInternal(circle = new Circle
                 {
-                    Size = new Vector2(16),
+                    Size = new Vector2(circle_size),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.Centre,
                     RelativePositionAxes = Axes.X,
