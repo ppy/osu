@@ -129,11 +129,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             // Special case for when a drag happened instead of a click
             Schedule(() => endClickSelection());
-            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -161,29 +160,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (e.Button == MouseButton.Right)
-                return false;
+                return;
 
             if (!moveCurrentSelection(e))
                 dragBox.UpdateDrag(e);
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             if (e.Button == MouseButton.Right)
-                return false;
+                return;
 
             if (!finishSelectionMovement())
             {
                 dragBox.FadeOut(250, Easing.OutQuint);
                 selectionHandler.UpdateVisibility();
             }
-
-            return true;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
