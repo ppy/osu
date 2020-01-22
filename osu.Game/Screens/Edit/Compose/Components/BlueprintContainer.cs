@@ -152,15 +152,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            if (!beginSelectionMovement())
-            {
-                if (!DragBox.UpdateDrag(e))
-                    return false;
+            if (beginSelectionMovement())
+                return true;
 
-                DragBox.FadeIn(250, Easing.OutQuint);
+            if (DragBox.HandleDrag(e))
+            {
+                DragBox.Show();
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         protected override bool OnDrag(DragEvent e)
@@ -168,13 +169,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            if (!moveCurrentSelection(e))
-            {
-                if (!DragBox.UpdateDrag(e))
-                    return false;
-            }
+            if (DragBox.State == Visibility.Visible)
+                return DragBox.HandleDrag(e);
 
-            return true;
+            return moveCurrentSelection(e);
         }
 
         protected override bool OnDragEnd(DragEndEvent e)
@@ -182,13 +180,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            if (!finishSelectionMovement())
+            if (DragBox.State == Visibility.Visible)
             {
-                DragBox.FadeOut(250, Easing.OutQuint);
+                DragBox.Hide();
                 selectionHandler.UpdateVisibility();
+                return true;
             }
 
-            return true;
+            return finishSelectionMovement();
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

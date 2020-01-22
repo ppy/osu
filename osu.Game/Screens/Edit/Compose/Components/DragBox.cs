@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// <summary>
     /// A box that displays the drag selection and provides selection events for users to handle.
     /// </summary>
-    public class DragBox : CompositeDrawable
+    public class DragBox : CompositeDrawable, IStateful<Visibility>
     {
         protected readonly Action<RectangleF> PerformSelection;
 
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         /// <param name="e">The mouse event.</param>
         /// <returns>Whether the event should be handled and blocking.</returns>
-        public virtual bool UpdateDrag(MouseButtonEvent e)
+        public virtual bool HandleDrag(MouseButtonEvent e)
         {
             var dragPosition = e.ScreenSpaceMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
@@ -76,5 +77,26 @@ namespace osu.Game.Screens.Edit.Compose.Components
             PerformSelection?.Invoke(dragRectangle);
             return true;
         }
+
+        private Visibility state;
+
+        public Visibility State
+        {
+            get => state;
+            set
+            {
+                if (value == state) return;
+
+                state = value;
+                this.FadeTo(state == Visibility.Hidden ? 0 : 1, 250, Easing.OutQuint);
+                StateChanged?.Invoke(state);
+            }
+        }
+
+        public override void Hide() => State = Visibility.Hidden;
+
+        public override void Show() => State = Visibility.Visible;
+
+        public event Action<Visibility> StateChanged;
     }
 }
