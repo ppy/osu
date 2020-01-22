@@ -240,13 +240,15 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickRelease(JoystickReleaseEvent e)
+        protected override void OnJoystickRelease(JoystickReleaseEvent e)
         {
             if (!HasFocus)
-                return base.OnJoystickRelease(e);
+            {
+                base.OnJoystickRelease(e);
+                return;
+            }
 
             finalise();
-            return true;
         }
 
         private void clear()
