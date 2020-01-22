@@ -38,11 +38,6 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> notifyOnChat;
         private Bindable<User> localUser;
 
-        /// <summary>
-        /// Determines if the user is able to see incoming messages.
-        /// </summary>
-        public bool IsActive => chatOverlay?.IsPresent == true;
-
         private readonly List<PrivateMessageNotification> privateMessageNotifications = new List<PrivateMessageNotification>();
 
         [BackgroundDependencyLoader]
@@ -93,7 +88,7 @@ namespace osu.Game.Online.Chat
         public void HandleMessages(Channel channel, IEnumerable<Message> messages)
         {
             // Only send notifications, if ChatOverlay and the target channel aren't visible.
-            if (IsActive && channelManager.CurrentChannel.Value == channel)
+            if (chatOverlay?.IsPresent == true && channelManager.CurrentChannel.Value == channel)
                 return;
 
             foreach (var message in messages.OrderByDescending(m => m.Id))
