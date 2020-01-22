@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -147,9 +146,9 @@ namespace osu.Game.Online.Chat
                 Text = $"You received a private message from '{Username}'. Click to read it!";
             }
 
-            public string Username { get; set; }
+            public string Username { get; }
 
-            public Channel Channel { get; set; }
+            public Channel Channel { get; }
 
             public Action<PrivateMessageNotification> OnRemove { get; set; }
 
@@ -180,7 +179,7 @@ namespace osu.Game.Online.Chat
                 Channel = channel;
             }
 
-            public Channel Channel { get; set; }
+            public Channel Channel { get; }
 
             public override bool IsImportant => false;
 
