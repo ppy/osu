@@ -196,8 +196,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e) => false;
-
         public bool OnPressed(PlatformAction action)
         {
             switch (action.ActionType)
