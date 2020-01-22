@@ -17,12 +17,19 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
+        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+
+        public Color4 AccentColour
+        {
+            get => accentColour.Value;
+            set => accentColour.Value = value;
+        }
+
         private readonly Box strip;
 
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
@@ -60,24 +67,22 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == default)
+            if (accentColour.Value == default)
                 AccentColour = colours.Blue;
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
+        protected override void LoadComplete()
         {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                if (Dropdown is IHasAccentColour dropdown)
-                    dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
-                    i.AccentColour = value;
-                InternalChildren.OfType<IHasAccentColour>().ForEach(c => c.AccentColour = value);
-            }
+            base.LoadComplete();
+            accentColour.BindValueChanged(OnAccentColourChanged, true);
+        }
+
+        protected virtual void OnAccentColourChanged(ValueChangedEvent<Color4> colour)
+        {
+            if (Dropdown is IHasAccentColour dropdown)
+                dropdown.AccentColour = colour.NewValue;
+            foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                i.AccentColour = colour.NewValue;
         }
 
         public Color4 StripColour
