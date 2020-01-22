@@ -92,6 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             private readonly Circle circle;
 
+            private Container extensionBar;
+
             public const float THICKNESS = 3;
 
             private const float circle_size = 16;
@@ -109,11 +111,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 X = (float)hitObject.StartTime;
 
                 RelativePositionAxes = Axes.X;
+
                 RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
 
                 if (hitObject is IHasEndTime)
                 {
-                    AddInternal(new Container
+                    AddInternal(extensionBar = new Container
                     {
                         CornerRadius = 2,
                         Masking = true,
@@ -143,9 +147,32 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 });
             }
 
-            protected override void OnSelected() => circle.BorderColour = Color4.Orange;
+            protected override void OnSelected()
+            {
+                circle.BorderColour = Color4.Orange;
+                if (extensionBar != null)
+                    extensionBar.Colour = Color4.Orange;
+            }
 
-            protected override void OnDeselected() => circle.BorderColour = Color4.Black;
+            protected override void OnDeselected()
+            {
+                circle.BorderColour = Color4.Black;
+                if (extensionBar != null)
+                    extensionBar.Colour = Color4.Black;
+            }
+
+            public override Quad SelectionQuad
+            {
+                get
+                {
+                    // correctly include the circle in the selection quad region, as it is usually outside the blueprint itself.
+                    var circleQuad = circle.ScreenSpaceDrawQuad;
+                    var actualQuad = ScreenSpaceDrawQuad;
+
+                    return new Quad(circleQuad.TopLeft, Vector2.ComponentMax(actualQuad.TopRight, circleQuad.TopRight),
+                        circleQuad.BottomLeft, Vector2.ComponentMax(actualQuad.BottomRight, circleQuad.BottomRight));
+                }
+            }
         }
     }
 }
