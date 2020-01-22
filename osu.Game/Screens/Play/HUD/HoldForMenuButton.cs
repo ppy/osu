@@ -276,11 +276,10 @@ namespace osu.Game.Screens.Play.HUD
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 if (!e.HasAnyButtonPressed)
                     AbortConfirm();
-                return true;
             }
         }
     }
