@@ -38,8 +38,6 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> notifyOnChat;
         private Bindable<User> localUser;
 
-        private readonly List<PrivateMessageNotification> privateMessageNotifications = new List<PrivateMessageNotification>();
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
         {
@@ -114,19 +112,9 @@ namespace osu.Game.Online.Chat
             if (!notifyOnChat.Value || channel.Type != ChannelType.PM)
                 return false;
 
-            var existingNotification = privateMessageNotifications.FirstOrDefault(n => n.Username == message.Sender.Username);
+            var notification = new PrivateMessageNotification(message.Sender.Username, channel);
 
-            if (existingNotification == null)
-            {
-                var notification = new PrivateMessageNotification(message.Sender.Username, channel, n => privateMessageNotifications.Remove(n));
-
-                notificationOverlay?.Post(notification);
-                privateMessageNotifications.Add(notification);
-            }
-            else
-            {
-                existingNotification.MessageCount++;
-            }
+            notificationOverlay?.Post(notification);
 
             return true;
         }
@@ -151,25 +139,12 @@ namespace osu.Game.Online.Chat
 
         public class PrivateMessageNotification : SimpleNotification
         {
-            public PrivateMessageNotification(string username, Channel channel, Action<PrivateMessageNotification> onRemove)
+            public PrivateMessageNotification(string username, Channel channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
                 Username = username;
-                MessageCount = 1;
                 Channel = channel;
-                OnRemove = onRemove;
-            }
-
-            private int messageCount;
-
-            public int MessageCount
-            {
-                get => messageCount;
-                set
-                {
-                    messageCount = value;
-                    Text = $"You received {"private message".ToQuantity(messageCount)} from '{Username}'. Click to read it!";
-                }
+                Text = $"You received a private message from '{Username}'. Click to read it!";
             }
 
             public string Username { get; set; }
@@ -192,11 +167,6 @@ namespace osu.Game.Online.Chat
                     channelManager.CurrentChannel.Value = Channel;
 
                     return true;
-                };
-
-                Closed += delegate
-                {
-                    OnRemove.Invoke(this);
                 };
             }
         }
