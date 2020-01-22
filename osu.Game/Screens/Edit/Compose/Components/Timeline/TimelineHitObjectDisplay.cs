@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     internal class TimelineHitObjectDisplay : BlueprintContainer
     {
+        private DragEvent lastDragEvent;
+
         public TimelineHitObjectDisplay(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
@@ -50,9 +52,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override void Update()
         {
-            if (IsDragged && lastDragEvent != null)
-                // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
-                DragBox.UpdateDrag(lastDragEvent);
+            // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
+            if (IsDragged)
+                OnDrag(lastDragEvent);
 
             base.Update();
         }
