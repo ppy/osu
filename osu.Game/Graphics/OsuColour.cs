@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Beatmaps;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics
@@ -35,6 +36,20 @@ namespace osu.Game.Graphics
                         Convert.ToByte(hex.Substring(2, 2), 16),
                         Convert.ToByte(hex.Substring(4, 2), 16),
                         255);
+
+                case 4:
+                    return new Color4(
+                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(3, 1), 16) * 17));
+
+                case 8:
+                    return new Color4(
+                        Convert.ToByte(hex.Substring(0, 2), 16),
+                        Convert.ToByte(hex.Substring(2, 2), 16),
+                        Convert.ToByte(hex.Substring(4, 2), 16),
+                        Convert.ToByte(hex.Substring(6, 2), 16));
             }
         }
 
@@ -61,6 +76,46 @@ namespace osu.Game.Graphics
                 case DifficultyRating.ExpertPlus:
                     return useLighterColour ? Gray9 : Gray0;
             }
+        }
+
+        public Color4 ForOverlayElement(OverlayColourScheme colourScheme, float saturation, float lightness, float opacity = 1) => Color4.FromHsl(new Vector4(getBaseHue(colourScheme), saturation, lightness, opacity));
+
+        // See https://github.com/ppy/osu-web/blob/4218c288292d7c810b619075471eaea8bbb8f9d8/app/helpers.php#L1463
+        private static float getBaseHue(OverlayColourScheme colourScheme)
+        {
+            float hue;
+
+            switch (colourScheme)
+            {
+                default:
+                    throw new ArgumentException($@"{colourScheme} colour scheme does not provide a hue value in {nameof(getBaseHue)}.");
+
+                case OverlayColourScheme.Red:
+                    hue = 0;
+                    break;
+
+                case OverlayColourScheme.Pink:
+                    hue = 333;
+                    break;
+
+                case OverlayColourScheme.Orange:
+                    hue = 46;
+                    break;
+
+                case OverlayColourScheme.Green:
+                    hue = 115;
+                    break;
+
+                case OverlayColourScheme.Purple:
+                    hue = 255;
+                    break;
+
+                case OverlayColourScheme.Blue:
+                    hue = 200;
+                    break;
+            }
+
+            return hue / 360f;
         }
 
         // See https://github.com/ppy/osu-web/blob/master/resources/assets/less/colors.less
@@ -164,5 +219,15 @@ namespace osu.Game.Graphics
         public readonly Color4 ChatBlue = FromHex(@"17292e");
 
         public readonly Color4 ContextMenuGray = FromHex(@"223034");
+    }
+
+    public enum OverlayColourScheme
+    {
+        Red,
+        Pink,
+        Orange,
+        Green,
+        Purple,
+        Blue
     }
 }
