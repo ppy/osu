@@ -16,7 +16,7 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new OsuJsonWebRequest<T>(Uri);
 
-        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
+        public T Result => ((OsuJsonWebRequest<T>)WebRequest).ResponseObject;
 
         protected APIRequest()
         {
@@ -30,16 +30,6 @@ namespace osu.Game.Online.API
         /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
         /// </summary>
         public new event APISuccessHandler<T> Success;
-
-        private class OsuJsonWebRequest<U> : JsonWebRequest<U>
-        {
-            public OsuJsonWebRequest(string uri)
-                : base(uri)
-            {
-            }
-
-            protected override string UserAgent => "osu!";
-        }
     }
 
     /// <summary>

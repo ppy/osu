@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Hidden";
         public override string Acronym => "HD";
-        public override IconUsage Icon => OsuIcon.ModHidden;
+        public override IconUsage? Icon => OsuIcon.ModHidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;
 
