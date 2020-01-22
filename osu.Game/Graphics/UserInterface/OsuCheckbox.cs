@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 if (labelText != null)
-                    labelText.Text = value;
+                    labelText.Text = value.ToString(); // TODO: Change labelText to sprite text once it supports line wrapping
             }
         }
 
