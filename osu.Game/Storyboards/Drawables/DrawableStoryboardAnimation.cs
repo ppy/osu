@@ -15,7 +15,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
-        public StoryboardAnimation Animation { get; private set; }
+        public StoryboardAnimation Animation { get; }
 
         private bool flipH;
 
