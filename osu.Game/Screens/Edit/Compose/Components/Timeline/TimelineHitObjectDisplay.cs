@@ -63,6 +63,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private class CustomDragBox : DragBox
         {
+            private Vector2 lastMouseDown;
+            private float localMouseDown;
+
             public CustomDragBox(Action<RectangleF> performSelect)
                 : base(performSelect)
             {
@@ -76,7 +79,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool UpdateDrag(MouseButtonEvent e)
             {
-                float selection1 = e.MouseDownPosition.X;
+                // store the original position of the mouse down, as we may be scrolled during selection.
+                if (lastMouseDown != e.ScreenSpaceMouseDownPosition)
+                {
+                    lastMouseDown = e.ScreenSpaceMouseDownPosition;
+                    localMouseDown = e.MouseDownPosition.X;
+                }
+
+                float selection1 = localMouseDown;
                 float selection2 = e.MousePosition.X;
 
                 Box.X = Math.Min(selection1, selection2);
