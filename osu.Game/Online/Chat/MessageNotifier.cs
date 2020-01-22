@@ -128,7 +128,7 @@ namespace osu.Game.Online.Chat
             notificationOverlay?.Post(notification);
         }
 
-        private static IEnumerable<string> getWords(string input) => Regex.Matches(input, @"\w+", RegexOptions.Compiled).Select(c => c.Value);
+        private IEnumerable<string> getWords(string input) => Regex.Matches(input, @"\w+", RegexOptions.Compiled).Select(c => c.Value);
 
         /// <summary>
         /// Finds the first matching string/word in both <paramref name="x"/> and <paramref name="y"/> (case-insensitive)
