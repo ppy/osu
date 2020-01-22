@@ -99,7 +99,9 @@ namespace osu.Game.Graphics.Containers
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         protected override void UpdateState(ValueChangedEvent<Visibility> state)
         {

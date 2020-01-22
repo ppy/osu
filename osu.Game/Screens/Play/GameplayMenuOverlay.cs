@@ -247,16 +247,8 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public bool OnReleased(GlobalAction action)
+        public void OnReleased(GlobalAction action)
         {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                case GlobalAction.Select:
-                    return true;
-            }
-
-            return false;
         }
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
