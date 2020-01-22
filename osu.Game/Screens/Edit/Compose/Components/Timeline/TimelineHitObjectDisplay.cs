@@ -21,6 +21,17 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public TimelineHitObjectDisplay(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
+
+            Height = 0.4f;
+
+            AddInternal(new Box
+            {
+                Colour = Color4.Black,
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.1f,
+            });
         }
 
         protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
@@ -49,14 +60,32 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return new TimelineHitObjectRepresentation(hitObject);
         }
 
-        internal class NoDragDragBox : DragBox
+        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new CustomDragBox(performSelect);
+
+        internal class CustomDragBox : DragBox
         {
-            public NoDragDragBox(Action<RectangleF> performSelect)
+            public CustomDragBox(Action<RectangleF> performSelect)
                 : base(performSelect)
             {
             }
 
-            public override bool UpdateDrag(MouseButtonEvent e) => false;
+            protected override Drawable CreateBox() => new Box
+            {
+                RelativeSizeAxes = Axes.Y,
+                Alpha = 0.3f
+            };
+
+            public override bool UpdateDrag(MouseButtonEvent e)
+            {
+                float selection1 = e.MouseDownPosition.X;
+                float selection2 = e.MousePosition.X;
+
+                Box.X = Math.Min(selection1, selection2);
+                Box.Width = Math.Abs(selection1 - selection2);
+
+                PerformSelection?.Invoke(Box.ScreenSpaceDrawQuad.AABBFloat);
+                return true;
+            }
         }
 
         private class TimelineHitObjectRepresentation : SelectionBlueprint
