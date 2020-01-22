@@ -259,16 +259,14 @@ namespace osu.Game.Screens.Play.HUD
                 return false;
             }
 
-            public bool OnReleased(GlobalAction action)
+            public void OnReleased(GlobalAction action)
             {
                 switch (action)
                 {
                     case GlobalAction.Back:
                         AbortConfirm();
-                        return true;
+                        break;
                 }
-
-                return false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)

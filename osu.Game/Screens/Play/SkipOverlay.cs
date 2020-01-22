@@ -143,7 +143,9 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private class FadeContainer : Container, IStateful<Visibility>
         {
