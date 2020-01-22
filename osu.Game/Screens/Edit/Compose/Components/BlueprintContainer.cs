@@ -109,6 +109,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             beginClickSelection(e);
+
+            prepareSelectionMovement();
+
             return e.Button == MouseButton.Left;
         }
 
@@ -144,6 +147,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             // Special case for when a drag happened instead of a click
             Schedule(() => endClickSelection());
+
+            finishSelectionMovement();
+
             return e.Button == MouseButton.Left;
         }
 
@@ -152,7 +158,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (e.Button == MouseButton.Right)
                 return false;
 
-            if (beginSelectionMovement())
+            if (movementBlueprint != null)
                 return true;
 
             if (DragBox.HandleDrag(e))
@@ -184,10 +190,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 DragBox.Hide();
                 selectionHandler.UpdateVisibility();
-                return true;
             }
 
-            return finishSelectionMovement();
+            return true;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -348,14 +353,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region Selection Movement
 
-        private Vector2? screenSpaceMovementStartPosition;
+        private Vector2? movementBlueprintOriginalPosition;
         private SelectionBlueprint movementBlueprint;
 
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
         /// </summary>
         /// <returns>Whether movement began.</returns>
-        private bool beginSelectionMovement()
+        private bool prepareSelectionMovement()
         {
             Debug.Assert(movementBlueprint == null);
 
@@ -366,7 +371,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
             movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
-            screenSpaceMovementStartPosition = movementBlueprint.SelectionPoint; // todo: unsure if correct
+            movementBlueprintOriginalPosition = movementBlueprint.SelectionPoint; // todo: unsure if correct
 
             return true;
         }
@@ -381,13 +386,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprint == null)
                 return false;
 
-            Debug.Assert(screenSpaceMovementStartPosition != null);
+            Debug.Assert(movementBlueprintOriginalPosition != null);
 
-            Vector2 startPosition = screenSpaceMovementStartPosition.Value;
             HitObject draggedObject = movementBlueprint.HitObject;
 
             // The final movement position, relative to screenSpaceMovementStartPosition
-            Vector2 movePosition = startPosition + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+            Vector2 movePosition = movementBlueprintOriginalPosition.Value + e.ScreenSpaceMousePosition - e.ScreenSpaceMouseDownPosition;
+
             (Vector2 snappedPosition, double snappedTime) = snapProvider.GetSnappedPosition(ToLocalSpace(movePosition), draggedObject.StartTime);
 
             // Move the hitobjects
@@ -411,7 +416,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (movementBlueprint == null)
                 return false;
 
-            screenSpaceMovementStartPosition = null;
+            movementBlueprintOriginalPosition = null;
             movementBlueprint = null;
 
             return true;
