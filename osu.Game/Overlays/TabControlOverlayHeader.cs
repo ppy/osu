@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
                 public OverlayHeaderTabItem(T value)
                     : base(value)
                 {
-                    Text.Text = value.ToString().ToLowerInvariant();
+                    Text.Text = value.ToString().ToLower();
                     Text.Font = OsuFont.GetFont(size: 14);
                     Bar.ExpandedSize = 5;
                 }
