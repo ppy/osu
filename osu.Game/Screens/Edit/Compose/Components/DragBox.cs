@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
     /// </summary>
     public class DragBox : CompositeDrawable
     {
-        private readonly Action<RectangleF> performSelection;
+        protected readonly Action<RectangleF> PerformSelection;
 
-        private Drawable box;
+        protected Drawable Box;
 
         /// <summary>
         /// Creates a new <see cref="DragBox"/>.
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <param name="performSelection">A delegate that performs drag selection.</param>
         public DragBox(Action<RectangleF> performSelection)
         {
-            this.performSelection = performSelection;
+            PerformSelection = performSelection;
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -37,18 +37,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            InternalChild = box = new Container
-            {
-                Masking = true,
-                BorderColour = Color4.White,
-                BorderThickness = SelectionHandler.BORDER_RADIUS,
-                Child = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.1f
-                }
-            };
+            InternalChild = Box = CreateBox();
         }
+
+        protected virtual Drawable CreateBox() => new Container
+        {
+            Masking = true,
+            BorderColour = Color4.White,
+            BorderThickness = SelectionHandler.BORDER_RADIUS,
+            Child = new Box
+            {
+                RelativeSizeAxes = Axes.Both,
+                Alpha = 0.1f
+            }
+        };
 
         /// <summary>
         /// Handle a forwarded mouse event.
@@ -68,10 +70,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             var topLeft = ToLocalSpace(dragRectangle.TopLeft);
             var bottomRight = ToLocalSpace(dragRectangle.BottomRight);
 
-            box.Position = topLeft;
-            box.Size = bottomRight - topLeft;
+            Box.Position = topLeft;
+            Box.Size = bottomRight - topLeft;
 
-            performSelection?.Invoke(dragRectangle);
+            PerformSelection?.Invoke(dragRectangle);
             return true;
         }
     }
