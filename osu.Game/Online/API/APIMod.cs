@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Humanizer;
@@ -38,7 +39,7 @@ namespace osu.Game.Online.API
             Mod resultMod = ruleset.GetAllMods().FirstOrDefault(m => m.Acronym == Acronym);
 
             if (resultMod == null)
-                return null; // Todo: Maybe throw exception?
+                throw new InvalidOperationException($"There is no mod in the ruleset ({ruleset.ShortName}) matching the acronym {Acronym}.");
 
             foreach (var (_, property) in resultMod.GetSettingsSourceProperties())
             {
