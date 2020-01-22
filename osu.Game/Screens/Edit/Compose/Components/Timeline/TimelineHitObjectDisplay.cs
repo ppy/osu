@@ -67,6 +67,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
         }
 
+        protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
+
+        internal class TimelineSelectionHandler : SelectionHandler
+        {
+            public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
+        }
+
         protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject);
 
         protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
@@ -212,6 +219,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         circleQuad.BottomLeft, Vector2.ComponentMax(actualQuad.BottomRight, circleQuad.BottomRight));
                 }
             }
+
+            public override Vector2 SelectionPoint => ScreenSpaceDrawQuad.TopLeft;
         }
     }
 }

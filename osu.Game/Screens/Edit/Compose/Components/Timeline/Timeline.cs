@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
 
-        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, time);
+        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, (position.X / Content.DrawWidth) * track.Length);
 
         public float GetBeatSnapDistanceAt(double referenceTime)
         {
