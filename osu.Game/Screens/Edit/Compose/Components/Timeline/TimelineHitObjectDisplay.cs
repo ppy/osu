@@ -52,6 +52,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return base.OnDrag(e);
         }
 
+        protected override bool OnDragEnd(DragEndEvent e)
+        {
+            lastDragEvent = null;
+            return base.OnDragEnd(e);
+        }
+
         protected override void Update()
         {
             // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
@@ -81,7 +87,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Alpha = 0.3f
             };
 
-            public override bool UpdateDrag(MouseButtonEvent e)
+            public override bool HandleDrag(MouseButtonEvent e)
             {
                 // store the original position of the mouse down, as we may be scrolled during selection.
                 if (lastMouseDown != e.ScreenSpaceMouseDownPosition)
