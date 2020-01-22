@@ -36,6 +36,20 @@ namespace osu.Game.Graphics
                         Convert.ToByte(hex.Substring(2, 2), 16),
                         Convert.ToByte(hex.Substring(4, 2), 16),
                         255);
+
+                case 4:
+                    return new Color4(
+                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(3, 1), 16) * 17));
+
+                case 8:
+                    return new Color4(
+                        Convert.ToByte(hex.Substring(0, 2), 16),
+                        Convert.ToByte(hex.Substring(2, 2), 16),
+                        Convert.ToByte(hex.Substring(4, 2), 16),
+                        Convert.ToByte(hex.Substring(6, 2), 16));
             }
         }
 
