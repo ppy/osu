@@ -59,16 +59,16 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Update();
         }
 
-        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectRepresentation(hitObject);
+        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject);
 
-        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new CustomDragBox(performSelect);
+        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
 
-        private class CustomDragBox : DragBox
+        private class TimelineDragBox : DragBox
         {
             private Vector2 lastMouseDown;
             private float localMouseDown;
 
-            public CustomDragBox(Action<RectangleF> performSelect)
+            public TimelineDragBox(Action<RectangleF> performSelect)
                 : base(performSelect)
             {
             }
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private class TimelineHitObjectRepresentation : SelectionBlueprint
+        private class TimelineHitObjectBlueprint : SelectionBlueprint
         {
             private readonly Circle circle;
 
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || circle.ReceivePositionalInputAt(screenSpacePos);
 
-            public TimelineHitObjectRepresentation(HitObject hitObject)
+            public TimelineHitObjectBlueprint(HitObject hitObject)
                 : base(hitObject)
             {
                 Anchor = Anchor.CentreLeft;
