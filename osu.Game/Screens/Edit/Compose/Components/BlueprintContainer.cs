@@ -215,7 +215,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => false;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         protected override void Update()
         {

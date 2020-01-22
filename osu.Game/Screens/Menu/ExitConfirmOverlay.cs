@@ -24,16 +24,13 @@ namespace osu.Game.Screens.Menu
             return false;
         }
 
-        public bool OnReleased(GlobalAction action)
+        public void OnReleased(GlobalAction action)
         {
             if (action == GlobalAction.Back)
             {
                 if (!Fired)
                     AbortConfirm();
-                return true;
             }
-
-            return false;
         }
     }
 }
