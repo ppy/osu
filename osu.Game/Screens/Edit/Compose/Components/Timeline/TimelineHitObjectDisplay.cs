@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using JetBrains.Annotations;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -115,6 +117,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             private readonly Container extensionBar;
 
+            [UsedImplicitly]
+            private readonly Bindable<double> startTime;
+
             public const float THICKNESS = 3;
 
             private const float circle_size = 16;
@@ -127,9 +132,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
 
-                Width = (float)(hitObject.GetEndTime() - hitObject.StartTime);
-
-                X = (float)hitObject.StartTime;
+                startTime = hitObject.StartTimeBindable.GetBoundCopy();
+                startTime.BindValueChanged(time => X = (float)time.NewValue, true);
 
                 RelativePositionAxes = Axes.X;
 
@@ -166,6 +170,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     BorderColour = Color4.Black,
                     BorderThickness = THICKNESS,
                 });
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                // no bindable so we perform this every update
+                Width = (float)(HitObject.GetEndTime() - HitObject.StartTime);
             }
 
             protected override void OnSelected()
