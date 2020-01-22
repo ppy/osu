@@ -36,33 +36,32 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
-        protected class TimelineSelectionBlueprintContainer : SelectionBlueprintContainer
-        {
-            protected override Container<SelectionBlueprint> Content { get; }
-
-            public TimelineSelectionBlueprintContainer()
-            {
-                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
-            }
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
             DragBox.Alpha = 0;
         }
 
-        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
+        protected override bool OnDrag(DragEvent e)
         {
-            //var yOffset = content.Count(d => d.X == h.StartTime);
-            //var yOffset = 0;
-
-            return new TimelineHitObjectRepresentation(hitObject);
+            lastDragEvent = e;
+            return base.OnDrag(e);
         }
+
+        protected override void Update()
+        {
+            if (IsDragged && lastDragEvent != null)
+                // trigger every frame so drags continue to update selection while playback is scrolling the timeline.
+                DragBox.UpdateDrag(lastDragEvent);
+
+            base.Update();
+        }
+
+        protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectRepresentation(hitObject);
 
         protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new CustomDragBox(performSelect);
 
-        internal class CustomDragBox : DragBox
+        private class CustomDragBox : DragBox
         {
             public CustomDragBox(Action<RectangleF> performSelect)
                 : base(performSelect)
@@ -88,11 +87,21 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
+        protected class TimelineSelectionBlueprintContainer : SelectionBlueprintContainer
+        {
+            protected override Container<SelectionBlueprint> Content { get; }
+
+            public TimelineSelectionBlueprintContainer()
+            {
+                AddInternal(new TimelinePart<SelectionBlueprint>(Content = new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both }) { RelativeSizeAxes = Axes.Both });
+            }
+        }
+
         private class TimelineHitObjectRepresentation : SelectionBlueprint
         {
             private readonly Circle circle;
 
-            private Container extensionBar;
+            private readonly Container extensionBar;
 
             public const float THICKNESS = 3;
 
