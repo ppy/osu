@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(_ => refetchComments());
+            Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }
 
@@ -129,6 +129,10 @@ namespace osu.Game.Overlays.Comments
         {
             this.type = type;
             this.id = id;
+
+            if (!IsLoaded)
+                return;
+
             refetchComments();
         }
 
