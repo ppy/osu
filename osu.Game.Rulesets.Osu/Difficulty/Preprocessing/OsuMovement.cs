@@ -407,7 +407,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             double correctionHidden = 0;
             if (hidden)
             {
-                correctionHidden = 0.03 + 0.05 * SpecialFunctions.Logistic((noteDensity - 5) / 1.5);
+                correctionHidden = 0.02 + 0.12 * SpecialFunctions.Logistic((noteDensity - 7.5) / 2.5);
             }
 
 
