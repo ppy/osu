@@ -87,7 +87,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         #endregion
 
