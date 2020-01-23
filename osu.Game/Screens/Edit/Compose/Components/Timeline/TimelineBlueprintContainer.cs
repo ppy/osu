@@ -82,14 +82,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override SelectionHandler CreateSelectionHandler() => new TimelineSelectionHandler();
 
-        internal class TimelineSelectionHandler : SelectionHandler
-        {
-            public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
-        }
-
         protected override SelectionBlueprint CreateBlueprintFor(HitObject hitObject) => new TimelineHitObjectBlueprint(hitObject);
 
         protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new TimelineDragBox(performSelect);
+
+        internal class TimelineSelectionHandler : SelectionHandler
+        {
+            // for now we always allow movement. snapping is provided by the Timeline's "distance" snap implementation
+            public override bool HandleMovement(MoveSelectionEvent moveEvent) => true;
+        }
 
         private class TimelineDragBox : DragBox
         {
