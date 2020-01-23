@@ -3,6 +3,7 @@
 
 using System;
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +21,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     internal class TimelineBlueprintContainer : BlueprintContainer
     {
+        [Resolved(CanBeNull = true)]
+        private Timeline timeline { get; set; }
+
         private DragEvent lastDragEvent;
 
         public TimelineBlueprintContainer(EditorBeatmap beatmap)
@@ -48,6 +52,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         protected override bool OnDrag(DragEvent e)
         {
+            if (timeline != null)
+            {
+                var timelineQuad = timeline.ScreenSpaceDrawQuad;
+                var mouseX = e.ScreenSpaceMousePosition.X;
+
+                // scroll if in a drag and dragging outside visible extents
+                if (mouseX > timelineQuad.TopRight.X)
+                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopRight.X) / 10 * Clock.ElapsedFrameTime));
+                else if (mouseX < timelineQuad.TopLeft.X)
+                    timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
+            }
+
             lastDragEvent = e;
             return base.OnDrag(e);
         }
