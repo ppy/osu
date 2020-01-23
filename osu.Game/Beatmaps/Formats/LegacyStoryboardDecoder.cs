@@ -332,6 +332,5 @@ namespace osu.Game.Beatmaps.Formats
                     break;
             }
         }
-
     }
 }

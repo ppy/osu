@@ -301,7 +301,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case LegacyEventType.Background:
                     string bgFilename = split[2];
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(bgFilename); ;
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(bgFilename);
                     break;
 
                 case LegacyEventType.Video:
