@@ -38,12 +38,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static (double, double, double[], double[], double[], double, double[], double[], string)
             CalculateAimAttributes(List<OsuHitObject> hitObjects,
                                    double clockRate,
-                                   List<Vector<double>> strainHistory)
+                                   List<Vector<double>> strainHistory,
+                                   List<double> noteDensities)
         {
             List<OsuMovement> movements = createMovements(hitObjects, clockRate, strainHistory);
+            List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
+                                                                hidden: true, noteDensities: noteDensities);
 
             double fcProbTP = calculateFCProbTP(movements);
+            double fcProbTPHidden = calculateFCProbTP(movementsHidden);
             double fcTimeTP = calculateFCTimeTP(movements);
+
+            double hiddenFactor = fcProbTPHidden / fcProbTP;
 
             string graphText = generateGraphText(movements, fcProbTP);
 
@@ -52,10 +58,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             (var cheeseLevels, var cheeseFactors) = calculateCheeseLevelsVSCheeseFactors(movements, fcProbTP);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTP);
 
-            return (fcProbTP, fcTimeTP, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
+            return (fcProbTP, hiddenFactor, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
         }
 
-        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory)
+        private static List<OsuMovement> createMovements(List<OsuHitObject> hitObjects, double clockRate, List<Vector<double>> strainHistory,
+                                                         bool hidden = false, List<double> noteDensities = null)
         {
             OsuMovement.Initialize();
             var movements = new List<OsuMovement>();
@@ -75,7 +82,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var obj3 = i < hitObjects.Count - 1 ? hitObjects[i + 1] : null;
                 var tapStrain = strainHistory[i];
 
-                movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate));
+                if (hidden)
+                    movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate,
+                                                                   hidden: true, noteDensity: noteDensities[i]));
+                else
+                    movements.AddRange(OsuMovement.ExtractMovement(obj0, obj1, obj2, obj3, tapStrain, clockRate));
+
+                
             }
             return movements;
         }

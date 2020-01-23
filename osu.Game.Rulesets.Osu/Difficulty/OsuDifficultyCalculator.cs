@@ -45,6 +45,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
 
+            double preemptNoClockRate = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
+            var noteDensities = NoteDensity.CalculateNoteDensities(hitObjects, preemptNoClockRate);
+
+
             // Tap
             (var tapDiff, var streamNoteCount, var mashLevels, var tapSkills, var strainHistory) =
                 Tap.CalculateTapAttributes(hitObjects, clockRate);
@@ -53,9 +57,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double fingerControlDiff = FingerControl.CalculateFingerControlDiff(hitObjects, clockRate);
 
             // Aim
-            (var aimDiff, var fcTimeTP, var comboTPs, var missTPs, var missCounts,
+            (var aimDiff, var aimHiddenFactor, var comboTPs, var missTPs, var missCounts,
              var cheeseNoteCount, var cheeseLevels, var cheeseFactors, var graphText) =
-                Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory);
+                Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory, noteDensities);
 
             // graph for aim
             string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}.txt");
@@ -94,6 +98,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 AimSR = aimSR,
                 AimDiff = aimDiff,
+                AimHiddenFactor = aimHiddenFactor,
                 ComboTPs = comboTPs,
                 MissTPs = missTPs,
                 MissCounts = missCounts,

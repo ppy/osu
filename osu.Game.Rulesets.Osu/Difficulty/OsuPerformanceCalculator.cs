@@ -127,21 +127,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Combine combo based throughput and miss count based throughput
             double tp = Math.Pow(comboTP, comboWeight) * Math.Pow(missTP, 1 - comboWeight);
 
+            // HD
+            if (mods.Any(h => h is OsuModHidden))
+                tp *= Attributes.AimHiddenFactor;
 
+            // Account for cheesing
             double modifiedAcc = getModifiedAcc();
-
             double accOnCheeseNotes = 1 - (1 - modifiedAcc) * Math.Sqrt(totalHits / Attributes.CheeseNoteCount);
 
             // accOnCheeseNotes can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnCheeseNotes is close to 1
             double accOnCheeseNotesPositive = Math.Exp(accOnCheeseNotes - 1);
-
             double urOnCheeseNotes = 10 * greatWindow / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCheeseNotesPositive));
-
             double cheeseLevel = SpecialFunctions.Logistic(((urOnCheeseNotes * Attributes.AimDiff) - 3200) / 2000);
-
             double cheeseFactor = LinearSpline.InterpolateSorted(Attributes.CheeseLevels, Attributes.CheeseFactors)
                                   .Interpolate(cheeseLevel);
+
 
 
             if (mods.Any(m => m is OsuModTouchDevice))
@@ -162,9 +163,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             aimValue *= approachRateFactor;
 
-            // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
-            if (mods.Any(h => h is OsuModHidden))
-                aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
             if (mods.Any(h => h is OsuModFlashlight))
             {

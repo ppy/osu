@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         }
 
         public static List<OsuMovement> ExtractMovement(OsuHitObject obj0, OsuHitObject obj1, OsuHitObject obj2, OsuHitObject obj3,
-                           Vector<double> tapStrain, double clockRate)
+                           Vector<double> tapStrain, double clockRate, bool hidden = false, double noteDensity = 0)
         {
             
             var movement = new OsuMovement();
@@ -403,7 +403,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             else
                 d12StackedNerf = d12;
 
-            // Correction #8 - Stacked wiggle fix
+            // Correction #8 - Hidden Mod
+            double correctionHidden = 0;
+            if (hidden)
+            {
+                correctionHidden = 0.05 + 0.05 * SpecialFunctions.Logistic((noteDensity - 5) / 1.5);
+            }
+
+
+            // Correction #9 - Stacked wiggle fix
             if (obj0 != null && obj3 != null)
             {
                 var d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
@@ -421,7 +429,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
-                                       (1 + tapCorrection);
+                                       (1 + tapCorrection) * (1 + correctionHidden);
 
             movement.D = d12WithCorrection;
             movement.MT = t12;

@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public double AimSR;
         public double AimDiff;
+        public double AimHiddenFactor;
         public double[] ComboTPs;
         public double[] MissTPs;
         public double[] MissCounts;
