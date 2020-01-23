@@ -122,11 +122,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             // Special case for when a drag happened instead of a click
             Schedule(() => endClickSelection());
-            return e.Button == MouseButton.Left;
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -145,32 +144,25 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (e.Button == MouseButton.Right)
-                return false;
+                return;
 
             if (!moveCurrentSelection(e))
-            {
-                if (!DragBox.UpdateDrag(e))
-                    return false;
-            }
-
-            return true;
+                DragBox.UpdateDrag(e);
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             if (e.Button == MouseButton.Right)
-                return false;
+                return;
 
             if (!finishSelectionMovement())
             {
                 DragBox.FadeOut(250, Easing.OutQuint);
                 selectionHandler.UpdateVisibility();
             }
-
-            return true;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -188,8 +180,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e) => false;
-
         public bool OnPressed(PlatformAction action)
         {
             switch (action.ActionType)
@@ -202,7 +192,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => false;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         #region Blueprint Addition/Removal
 
