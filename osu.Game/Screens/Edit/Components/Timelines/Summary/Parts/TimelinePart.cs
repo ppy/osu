@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// <summary>
     /// Represents a part of the summary timeline..
     /// </summary>
-    public abstract class TimelinePart : Container
+    public class TimelinePart : Container
     {
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
         protected override Container<Drawable> Content => timeline;
 
-        protected TimelinePart()
+        public TimelinePart()
         {
             AddInternal(timeline = new Container { RelativeSizeAxes = Axes.Both });
 

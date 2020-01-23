@@ -171,17 +171,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Hitting = true;
         }
 
-        public bool OnReleased(ManiaAction action)
+        public void OnReleased(ManiaAction action)
         {
             if (AllJudged)
-                return false;
+                return;
 
             if (action != Action.Value)
-                return false;
+                return;
 
             // Make sure a hold was started
             if (HoldStartTime == null)
-                return false;
+                return;
 
             Tail.UpdateResult();
             endHold();
@@ -189,8 +189,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // If the key has been released too early, the user should not receive full score for the release
             if (!Tail.IsHit)
                 HasBroken = true;
-
-            return true;
         }
 
         private void endHold()

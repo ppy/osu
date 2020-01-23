@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
-    "configurations": [{
+    "configurations": [
+        {
             "name": "osu! (Debug)",
             "type": "coreclr",
             "request": "launch",
@@ -50,7 +51,8 @@
                 }
             },
             "console": "internalConsole"
-        }, {
+        },
+        {
             "name": "osu! (Tests, Release)",
             "type": "coreclr",
             "request": "launch",
@@ -137,6 +139,19 @@
                     "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
+            "console": "internalConsole"
+        },
+        {
+            "name": "Benchmark",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Game.Benchmarks/bin/Release/netcoreapp3.1/osu.Game.Benchmarks.dll",
+            "args": [
+                "--filter",
+                "*"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build benchmarks",
             "console": "internalConsole"
         },
         {
