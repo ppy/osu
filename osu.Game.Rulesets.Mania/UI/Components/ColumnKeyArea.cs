@@ -115,11 +115,10 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             return false;
         }
 
-        public bool OnReleased(ManiaAction action)
+        public void OnReleased(ManiaAction action)
         {
             if (action == this.action.Value)
                 keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
-            return false;
         }
     }
 }
