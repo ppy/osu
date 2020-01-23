@@ -40,7 +40,7 @@ namespace osu.Game.Online
                 {
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = placeholder = new LoginPlaceholder($@"Please sign in to {placeholderMessage}")
+                    Child = placeholder = new LoginPlaceholder(placeholderMessage)
                 },
                 loading = new LoadingAnimation
                 {
