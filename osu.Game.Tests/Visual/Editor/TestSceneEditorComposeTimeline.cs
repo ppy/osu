@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual.Editor
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TimelineArea),
-            typeof(TimelineHitObjectDisplay),
+            typeof(TimelineBlueprintContainer),
             typeof(Timeline),
             typeof(TimelineButton),
             typeof(CentreMarker)
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Editor
                 },
                 new TimelineArea
                 {
-                    Child = new TimelineHitObjectDisplay(editorBeatmap),
+                    Child = new TimelineBlueprintContainer(editorBeatmap),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,

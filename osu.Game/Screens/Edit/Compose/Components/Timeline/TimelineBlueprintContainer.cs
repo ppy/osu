@@ -18,11 +18,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineHitObjectDisplay : BlueprintContainer
+    internal class TimelineBlueprintContainer : BlueprintContainer
     {
         private DragEvent lastDragEvent;
 
-        public TimelineHitObjectDisplay(EditorBeatmap beatmap)
+        public TimelineBlueprintContainer(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
