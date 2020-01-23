@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         protected DragBox DragBox { get; private set; }
 
-        private SelectionBlueprintContainer selectionBlueprints;
+        private Container<SelectionBlueprint> selectionBlueprints;
 
         private SelectionHandler selectionHandler;
 
@@ -83,7 +83,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        protected virtual SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+        protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
+            new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both };
 
         protected override void LoadComplete()
         {
@@ -429,11 +430,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 beatmap.HitObjectAdded -= AddBlueprintFor;
                 beatmap.HitObjectRemoved -= removeBlueprintFor;
             }
-        }
-
-        protected class SelectionBlueprintContainer : Container<SelectionBlueprint>
-        {
-            //todo: remove
         }
     }
 }
