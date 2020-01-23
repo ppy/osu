@@ -353,12 +353,11 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return;
 
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
-            return true;
         }
 
         protected override bool OnClick(ClickEvent e)
