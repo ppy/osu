@@ -143,10 +143,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             endUserDrag();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         private void beginUserDrag()

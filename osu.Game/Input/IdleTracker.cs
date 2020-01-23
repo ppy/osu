@@ -50,7 +50,7 @@ namespace osu.Game.Input
 
         public bool OnPressed(PlatformAction action) => updateLastInteractionTime();
 
-        public bool OnReleased(PlatformAction action) => updateLastInteractionTime();
+        public void OnReleased(PlatformAction action) => updateLastInteractionTime();
 
         protected override bool Handle(UIEvent e)
         {

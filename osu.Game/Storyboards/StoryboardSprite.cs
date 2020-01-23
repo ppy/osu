@@ -16,7 +16,7 @@ namespace osu.Game.Storyboards
         private readonly List<CommandLoop> loops = new List<CommandLoop>();
         private readonly List<CommandTrigger> triggers = new List<CommandTrigger>();
 
-        public string Path { get; set; }
+        public string Path { get; }
         public bool IsDrawable => HasCommands;
 
         public Anchor Origin;

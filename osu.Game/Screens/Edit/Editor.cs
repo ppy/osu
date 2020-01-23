@@ -253,7 +253,9 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         public override void OnResuming(IScreen last)
         {

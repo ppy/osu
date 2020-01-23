@@ -55,14 +55,12 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
-            var result = base.OnDrag(e);
+            base.OnDrag(e);
 
             ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
             DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
-
-            return result;
         }
 
         public override void Show()
