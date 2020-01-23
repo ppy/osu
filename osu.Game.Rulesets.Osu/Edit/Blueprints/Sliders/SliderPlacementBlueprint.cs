@@ -106,11 +106,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (state == PlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)

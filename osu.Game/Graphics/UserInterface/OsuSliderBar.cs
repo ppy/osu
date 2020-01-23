@@ -128,10 +128,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void OnUserChange(T value)
