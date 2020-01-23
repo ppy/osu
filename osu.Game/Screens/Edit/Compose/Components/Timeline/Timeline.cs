@@ -148,10 +148,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             endUserDrag();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         private void beginUserDrag()
@@ -177,7 +177,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
         {
             var targetTime = (position.X / Content.DrawWidth) * track.Length;
-            return (position, beatSnapProvider.SnapTime(targetTime, targetTime, beatSnapProvider.BeatDivisor));
+            return (position, beatSnapProvider.SnapTime(targetTime, targetTime));
         }
 
         public float GetBeatSnapDistanceAt(double referenceTime) => throw new NotImplementedException();

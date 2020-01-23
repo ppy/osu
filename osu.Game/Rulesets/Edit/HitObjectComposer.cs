@@ -264,21 +264,21 @@ namespace osu.Game.Rulesets.Edit
 
         public override float DurationToDistance(double referenceTime, double duration)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime, beatSnapProvider.BeatDivisor);
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
         }
 
         public override double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime, beatSnapProvider.BeatDivisor);
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance), beatSnapProvider.BeatDivisor);
+            => beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance));
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance), beatSnapProvider.BeatDivisor));
+            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance)));
 
         protected override void Dispose(bool isDisposing)
         {

@@ -15,7 +15,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardSprite : Sprite, IFlippable, IVectorScalable
     {
-        public StoryboardSprite Sprite { get; private set; }
+        public StoryboardSprite Sprite { get; }
 
         private bool flipH;
 

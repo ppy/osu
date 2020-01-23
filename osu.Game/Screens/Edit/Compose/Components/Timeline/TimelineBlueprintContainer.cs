@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             DragBox.Alpha = 0;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (timeline != null)
             {
@@ -64,14 +64,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     timeline.ScrollBy((float)((mouseX - timelineQuad.TopLeft.X) / 10 * Clock.ElapsedFrameTime));
             }
 
+            base.OnDrag(e);
             lastDragEvent = e;
-            return base.OnDrag(e);
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
+            base.OnDragEnd(e);
             lastDragEvent = null;
-            return base.OnDragEnd(e);
         }
 
         protected override void Update()
