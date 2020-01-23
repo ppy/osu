@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
         }
 
-        protected override SelectionBlueprintContainer CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
+        protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override void LoadComplete()
         {
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        protected class TimelineSelectionBlueprintContainer : SelectionBlueprintContainer
+        protected class TimelineSelectionBlueprintContainer : Container<SelectionBlueprint>
         {
             protected override Container<SelectionBlueprint> Content { get; }
 
