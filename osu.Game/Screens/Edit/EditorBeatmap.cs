@@ -8,11 +8,12 @@ using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap : IBeatmap
+    public class EditorBeatmap : IBeatmap, IBeatSnapProvider
     {
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
@@ -31,11 +32,14 @@ namespace osu.Game.Screens.Edit
 
         public readonly IBeatmap PlayableBeatmap;
 
+        private readonly BindableBeatDivisor beatDivisor;
+
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap)
+        public EditorBeatmap(IBeatmap playableBeatmap, BindableBeatDivisor beatDivisor = null)
         {
             PlayableBeatmap = playableBeatmap;
+            this.beatDivisor = beatDivisor;
 
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
@@ -121,5 +125,17 @@ namespace osu.Game.Screens.Edit
 
             return list.Count - 1;
         }
+
+        public double SnapTime(double referenceTime, double duration)
+        {
+            double beatLength = GetBeatLengthAtTime(referenceTime);
+
+            // A 1ms offset prevents rounding errors due to minute variations in duration
+            return (int)((duration + 1) / beatLength) * beatLength;
+        }
+
+        public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
+
+        public int BeatDivisor => beatDivisor?.Value ?? 1;
     }
 }
