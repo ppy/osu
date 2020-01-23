@@ -38,6 +38,7 @@ namespace osu.Game.Overlays.Comments
         private readonly FillFlowContainer content;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
+        private readonly TotalCommentsCounter commentCounter;
 
         public CommentsContainer()
         {
@@ -56,6 +57,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        commentCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -133,6 +135,7 @@ namespace osu.Game.Overlays.Comments
             if (!IsLoaded)
                 return;
 
+            commentCounter.Current.Value = 0;
             refetchComments();
         }
 
@@ -198,6 +201,8 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
+
+                commentCounter.Current.Value = response.Total;
 
                 moreButton.FadeTo(response.HasMore ? 1 : 0);
             }, loadCancellation.Token);
