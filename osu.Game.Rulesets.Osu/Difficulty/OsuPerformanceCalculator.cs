@@ -63,20 +63,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
-            greatWindow = 79.5f - 6 * Attributes.OverallDifficulty;
+            greatWindow = 79.5 - 6 * Attributes.OverallDifficulty;
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
                 return 0;
 
             // Custom multipliers for NoFail and SpunOut.
-            double multiplier = 2.14f; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
+            double multiplier = 2.14; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things
 
             if (mods.Any(m => m is OsuModNoFail))
-                multiplier *= 0.90f;
+                multiplier *= 0.90;
 
             if (mods.Any(m => m is OsuModSpunOut))
-                multiplier *= 0.95f;
+                multiplier *= 0.95;
 
             double aimValue = computeAimValue();
             double tapValue = computeTapValue();
@@ -145,40 +145,40 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                tp = Math.Min(tp, 1.47f * Math.Pow(tp, 0.8f));
+                tp = Math.Min(tp, 1.47 * Math.Pow(tp, 0.8));
 
             double aimValue = tpToPP(tp * cheeseFactor);
 
             // penalize misses
-            aimValue *= Math.Pow(0.96f, effectiveMissCount);
+            aimValue *= Math.Pow(0.96, effectiveMissCount);
 
             // Buff very high AR and low AR
-            double approachRateFactor = 1.0f;
-            double ar11lengthBuff = 0.8f * (SpecialFunctions.Logistic(totalHits / 500f) - 0.5f);
-            if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33f) / 0.67f;
-            else if (Attributes.ApproachRate < 8.0f)
-                approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
+            double approachRateFactor = 1.0;
+            double ar11lengthBuff = 0.8 * (SpecialFunctions.Logistic(totalHits / 500) - 0.5);
+            if (Attributes.ApproachRate > 10.33)
+                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33) / 0.67;
+            else if (Attributes.ApproachRate < 8.0)
+                approachRateFactor += 0.01 * (8.0 - Attributes.ApproachRate);
 
             aimValue *= approachRateFactor;
 
             // We want to give more reward for lower AR when it comes to aim and HD. This nerfs high AR and buffs lower AR.
             if (mods.Any(h => h is OsuModHidden))
-                aimValue *= 1.0f + 0.04f * (12.0f - Attributes.ApproachRate);
+                aimValue *= 1.0 + 0.04 * (12.0 - Attributes.ApproachRate);
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
+                aimValue *= 1.0 + 0.35 * Math.Min(1.0, totalHits / 200.0) +
                             (totalHits > 200
-                                ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
-                                  (totalHits > 500 ? (totalHits - 500) / 2000.0f : 0.0f)
-                                : 0.0f);
+                                ? 0.3 * Math.Min(1.0, (totalHits - 200) / 300.0) +
+                                  (totalHits > 500 ? (totalHits - 500) / 2000.0 : 0.0)
+                                : 0.0);
             }
 
             // Scale the aim value down with accuracy
             double accLeniency = greatWindow * Attributes.AimDiff / 300;
-            double accPenalty = (0.09f / (accuracy - 1.3f) + 0.3f) * (accLeniency + 1.5f);
+            double accPenalty = (0.09 / (accuracy - 1.3) + 0.3) * (accLeniency + 1.5);
             aimValue *= Math.Exp(-accPenalty);
 
             return aimValue;
@@ -206,22 +206,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double tapValue = tapSkillToPP(tapSkill);
 
             // Buff very high acc on streams
-            double accBuff = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2f;
+            double accBuff = Math.Exp((accOnStreams - 1) * 60) * tapValue * 0.2;
             tapValue += accBuff;
 
             // Scale tap value down with accuracy
-            double accFactor = 0.5 + 0.5 * (SpecialFunctions.Logistic((accuracy - 0.65f) / 0.1f) + SpecialFunctions.Logistic(-3.5f));
+            double accFactor = 0.5 + 0.5 * (SpecialFunctions.Logistic((accuracy - 0.65) / 0.1) + SpecialFunctions.Logistic(-3.5));
             tapValue *= accFactor;
 
             // Penalize misses and 50s exponentially
-            tapValue *= Math.Pow(0.93f, countMiss);
-            tapValue *= Math.Pow(0.98f, countMeh);
+            tapValue *= Math.Pow(0.93, countMiss);
+            tapValue *= Math.Pow(0.98, countMeh);
 
             // Buff very high AR
-            double approachRateFactor = 1.0f;
-            double ar11lengthBuff = 0.8f * (SpecialFunctions.Logistic(totalHits / 500f) - 0.5f);
-            if (Attributes.ApproachRate > 10.33f)
-                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33f) / 0.67f;
+            double approachRateFactor = 1.0;
+            double ar11lengthBuff = 0.8 * (SpecialFunctions.Logistic(totalHits / 500) - 0.5);
+            if (Attributes.ApproachRate > 10.33)
+                approachRateFactor += ar11lengthBuff * (Attributes.ApproachRate - 10.33) / 0.67;
 
             tapValue *= approachRateFactor;
 
@@ -235,8 +235,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double modifiedAcc = getModifiedAcc();
 
             // technically accOnCircles = modifiedAcc
-            // -0.003f exists so that the difference between 99.5% and 100% is not too big
-            double accOnCircles = modifiedAcc - 0.003f;
+            // -0.003 exists so that the difference between 99.5% and 100% is not too big
+            double accOnCircles = modifiedAcc - 0.003;
 
             // accOnCircles can be negative. The formula below ensures a positive acc while
             // preserving the value when accOnCircles is close to 1
@@ -244,15 +244,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // add 20 to greatWindow to nerf high OD
             double deviationOnCircles = (greatWindow + 20) / (Math.Sqrt(2) * SpecialFunctions.ErfInv(accOnCirclesPositive));
-            double accuracyValue = Math.Pow(deviationOnCircles, -2.2f) * Math.Pow(fingerControlDiff, 0.5f) * 46000;
+            double accuracyValue = Math.Pow(deviationOnCircles, -2.2) * Math.Pow(fingerControlDiff, 0.5) * 46000;
 
-            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0f);
+            double lengthFactor = SpecialFunctions.Logistic(Attributes.Length / 60.0);
             accuracyValue *= lengthFactor;
 
             if (mods.Any(m => m is OsuModHidden))
-                accuracyValue *= 1.08f;
+                accuracyValue *= 1.08;
             if (mods.Any(m => m is OsuModFlashlight))
-                accuracyValue *= 1.02f;
+                accuracyValue *= 1.02;
 
             return accuracyValue;
         }
@@ -268,9 +268,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return modifiedAcc;
         }
 
-        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.129f;
+        private double tpToPP(double tp) => Math.Pow(tp, skillToPPExponent) * 0.129;
 
-        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.115f;
+        private double tapSkillToPP(double tapSkill) => Math.Pow(tapSkill, skillToPPExponent) * 0.115;
 
         private double fingerControlDiffToPP(double fingerControlDiff) => Math.Pow(fingerControlDiff, skillToPPExponent);
 
