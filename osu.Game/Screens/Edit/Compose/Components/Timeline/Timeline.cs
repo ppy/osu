@@ -18,6 +18,7 @@ using osuTK;
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     [Cached(typeof(IDistanceSnapProvider))]
+    [Cached]
     public class Timeline : ZoomableScrollContainer, IDistanceSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
