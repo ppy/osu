@@ -90,19 +90,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         protected override bool OnDragStart(DragStartEvent e) => placementControlPointIndex != null;
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             Debug.Assert(placementControlPointIndex != null);
 
             HitObject.Path.ControlPoints[placementControlPointIndex.Value].Position.Value = e.MousePosition - HitObject.Position;
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             placementControlPointIndex = null;
-            return true;
         }
 
         private BindableList<PathControlPoint> controlPoints => HitObject.Path.ControlPoints;

@@ -16,6 +16,9 @@ namespace osu.Game.Overlays.Volume
 
         public bool OnPressed(GlobalAction action) => ActionRequested?.Invoke(action) ?? false;
         public bool OnScroll(GlobalAction action, float amount, bool isPrecise) => ScrollActionRequested?.Invoke(action, amount, isPrecise) ?? false;
-        public bool OnReleased(GlobalAction action) => false;
+
+        public void OnReleased(GlobalAction action)
+        {
+        }
     }
 }
