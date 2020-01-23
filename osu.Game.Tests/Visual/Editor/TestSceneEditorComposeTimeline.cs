@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -38,9 +39,10 @@ namespace osu.Game.Tests.Visual.Editor
         {
             Beatmap.Value = new WaveformTestBeatmap(audio);
 
-            var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap);
+            var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap, BeatDivisor);
 
             Dependencies.Cache(editorBeatmap);
+            Dependencies.CacheAs<IBeatSnapProvider>(editorBeatmap);
 
             Children = new Drawable[]
             {
