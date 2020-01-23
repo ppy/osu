@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Comments
         {
             this.type = type;
             this.id = id;
-            Sort.TriggerChange();
+            refetchComments();
         }
 
         private void refetchComments()
