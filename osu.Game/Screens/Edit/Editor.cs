@@ -26,6 +26,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
@@ -34,7 +35,8 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    [Cached(typeof(IBeatSnapProvider))]
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IBeatSnapProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -77,11 +79,14 @@ namespace osu.Game.Screens.Edit
             clock.ChangeSource(sourceClock);
 
             playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
-            editorBeatmap = new EditorBeatmap(playableBeatmap);
+            editorBeatmap = new EditorBeatmap(playableBeatmap, beatDivisor);
 
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
+
+            // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
+
             dependencies.CacheAs(editorBeatmap);
 
             EditorMenuBar menuBar;
@@ -345,5 +350,11 @@ namespace osu.Game.Screens.Edit
             saveBeatmap();
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
         }
+
+        public double SnapTime(double referenceTime, double duration, int beatDivisor) => editorBeatmap.SnapTime(referenceTime, duration, beatDivisor);
+
+        public double GetBeatLengthAtTime(double referenceTime, int beatDivisor) => editorBeatmap.GetBeatLengthAtTime(referenceTime, beatDivisor);
+
+        public int BeatDivisor => beatDivisor.Value;
     }
 }
