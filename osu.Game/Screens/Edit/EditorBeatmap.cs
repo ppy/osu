@@ -126,15 +126,15 @@ namespace osu.Game.Screens.Edit
             return list.Count - 1;
         }
 
-        public double SnapTime(double referenceTime, double duration, int beatDivisor)
+        public double SnapTime(double referenceTime, double duration)
         {
-            double beatLength = GetBeatLengthAtTime(referenceTime, beatDivisor);
+            double beatLength = GetBeatLengthAtTime(referenceTime);
 
             // A 1ms offset prevents rounding errors due to minute variations in duration
             return (int)((duration + 1) / beatLength) * beatLength;
         }
 
-        public double GetBeatLengthAtTime(double referenceTime, int beatDivisor) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
+        public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
 
         public int BeatDivisor => beatDivisor?.Value ?? 1;
     }
