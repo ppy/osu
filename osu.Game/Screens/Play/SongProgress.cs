@@ -46,7 +46,6 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => AllowSeeking.Value;
 
         private double firstHitTime => objects.First().StartTime;
-        private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
         private IEnumerable<HitObject> objects;
 
@@ -92,7 +91,6 @@ namespace osu.Game.Screens.Play
                 },
                 bar = new SongProgressBar(bottom_bar_height, graph_height, handle_size)
                 {
-                    Alpha = 0,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     OnSeek = time => RequestSeek?.Invoke(time),
@@ -104,6 +102,9 @@ namespace osu.Game.Screens.Play
         private void load(OsuColour colours, GameplayClock clock, OsuConfigManager config)
         {
             base.LoadComplete();
+
+            if (clock != null)
+                gameplayClock = clock;
 
             config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 
@@ -151,8 +152,7 @@ namespace osu.Game.Screens.Play
 
         private void updateBarVisibility()
         {
-            bar.FadeTo(AllowSeeking.Value ? 1 : 0, transition_duration, Easing.In);
-            this.MoveTo(new Vector2(0, AllowSeeking.Value ? 0 : bottom_bar_height), transition_duration, Easing.In);
+            bar.ShowHandle = AllowSeeking.Value;
 
             updateInfoMargin();
         }

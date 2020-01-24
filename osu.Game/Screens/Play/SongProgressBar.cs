@@ -21,6 +21,22 @@ namespace osu.Game.Screens.Play
         private readonly Container handleBase;
         private readonly Container handleContainer;
 
+        private bool showHandle;
+
+        public bool ShowHandle
+        {
+            get => showHandle;
+            set
+            {
+                if (value == showHandle)
+                    return;
+
+                showHandle = value;
+
+                handleBase.FadeTo(showHandle ? 1 : 0, 200);
+            }
+        }
+
         public Color4 FillColour
         {
             set => fill.Colour = value;
@@ -75,6 +91,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Width = 2,
+                    Alpha = 0,
                     Colour = Color4.White,
                     Position = new Vector2(2, 0),
                     Children = new Drawable[]
@@ -128,7 +145,11 @@ namespace osu.Game.Screens.Play
         protected override void OnUserChange(double value)
         {
             scheduledSeek?.Cancel();
-            scheduledSeek = Schedule(() => OnSeek?.Invoke(value));
+            scheduledSeek = Schedule(() =>
+            {
+                if (showHandle)
+                    OnSeek?.Invoke(value);
+            });
         }
     }
 }
