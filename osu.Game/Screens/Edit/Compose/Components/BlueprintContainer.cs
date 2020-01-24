@@ -83,9 +83,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
-            new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both };
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -93,6 +90,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             beatmap.HitObjectAdded += AddBlueprintFor;
             beatmap.HitObjectRemoved += removeBlueprintFor;
         }
+
+        protected virtual Container<SelectionBlueprint> CreateSelectionBlueprintContainer() =>
+            new Container<SelectionBlueprint> { RelativeSizeAxes = Axes.Both };
 
         /// <summary>
         /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.

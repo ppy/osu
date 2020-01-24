@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private DragEvent lastDragEvent;
 
-        public TimelineBlueprintContainer(EditorBeatmap beatmap)
+        public TimelineBlueprintContainer()
         {
             RelativeSizeAxes = Axes.Both;
             Anchor = Anchor.Centre;
@@ -39,13 +39,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             });
         }
 
-        protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
             DragBox.Alpha = 0;
         }
+
+        protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
 
         protected override void OnDrag(DragEvent e)
         {
