@@ -135,13 +135,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
-
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         protected override bool OnDragStart(DragStartEvent e) => e.Button == MouseButton.Left;
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
@@ -158,11 +156,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
                 ControlPoint.Position.Value += e.Delta;
-
-            return true;
         }
-
-        protected override bool OnDragEnd(DragEndEvent e) => true;
 
         /// <summary>
         /// Updates the state of the circular control point marker.

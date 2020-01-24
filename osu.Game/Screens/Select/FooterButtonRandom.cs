@@ -44,11 +44,11 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
             secondaryActive = e.ShiftPressed;
             updateText();
-            return base.OnKeyUp(e);
+            base.OnKeyUp(e);
         }
 
         private void updateText()

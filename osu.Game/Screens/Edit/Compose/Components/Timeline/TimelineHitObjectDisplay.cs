@@ -1,11 +1,14 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
@@ -14,15 +17,19 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    internal class TimelineHitObjectDisplay : TimelinePart
+    internal class TimelineHitObjectDisplay : BlueprintContainer
     {
         private EditorBeatmap beatmap { get; }
+
+        private readonly TimelinePart content;
 
         public TimelineHitObjectDisplay(EditorBeatmap beatmap)
         {
             RelativeSizeAxes = Axes.Both;
 
             this.beatmap = beatmap;
+
+            AddInternal(content = new TimelinePart { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
@@ -40,17 +47,42 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             };
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            DragBox.Alpha = 0;
+        }
+
         private void remove(HitObject h)
         {
-            foreach (var d in Children.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
+            foreach (var d in content.OfType<TimelineHitObjectRepresentation>().Where(c => c.HitObject == h))
                 d.Expire();
         }
 
         private void add(HitObject h)
         {
-            var yOffset = Children.Count(d => d.X == h.StartTime);
+            var yOffset = content.Count(d => d.X == h.StartTime);
 
-            Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS });
+            content.Add(new TimelineHitObjectRepresentation(h) { Y = -yOffset * TimelineHitObjectRepresentation.THICKNESS });
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            base.OnMouseDown(e);
+
+            return false; // tempoerary until we correctly handle selections.
+        }
+
+        protected override DragBox CreateDragBox(Action<RectangleF> performSelect) => new NoDragDragBox(performSelect);
+
+        internal class NoDragDragBox : DragBox
+        {
+            public NoDragDragBox(Action<RectangleF> performSelect)
+                : base(performSelect)
+            {
+            }
+
+            public override bool UpdateDrag(MouseButtonEvent e) => false;
         }
 
         private class TimelineHitObjectRepresentation : CompositeDrawable
