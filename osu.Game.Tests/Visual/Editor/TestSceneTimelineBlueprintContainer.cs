@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
@@ -22,12 +23,11 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Editor
 {
     [TestFixture]
-    public class TestSceneEditorComposeTimeline : EditorClockTestScene
+    public class TestSceneTimelineBlueprintContainer : EditorClockTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TimelineArea),
-            typeof(TimelineHitObjectDisplay),
             typeof(Timeline),
             typeof(TimelineButton),
             typeof(CentreMarker)
@@ -38,9 +38,10 @@ namespace osu.Game.Tests.Visual.Editor
         {
             Beatmap.Value = new WaveformTestBeatmap(audio);
 
-            var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap);
+            var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap, BeatDivisor);
 
             Dependencies.Cache(editorBeatmap);
+            Dependencies.CacheAs<IBeatSnapProvider>(editorBeatmap);
 
             Children = new Drawable[]
             {
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual.Editor
                 },
                 new TimelineArea
                 {
-                    Child = new TimelineHitObjectDisplay(editorBeatmap),
+                    Child = new TimelineBlueprintContainer(),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
