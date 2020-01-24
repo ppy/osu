@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Edit
     /// </summary>
     public abstract class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
     {
+        public readonly HitObject HitObject;
+
         /// <summary>
         /// Invoked when this <see cref="SelectionBlueprint"/> has been selected.
         /// </summary>
@@ -30,26 +32,24 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         public event Action<SelectionBlueprint> Deselected;
 
-        /// <summary>
-        /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
-        /// </summary>
-        public readonly DrawableHitObject DrawableObject;
-
-        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
         [Resolved(CanBeNull = true)]
         private HitObjectComposer composer { get; set; }
 
-        protected SelectionBlueprint(DrawableHitObject drawableObject)
+        protected SelectionBlueprint(HitObject hitObject)
         {
-            DrawableObject = drawableObject;
+            HitObject = hitObject;
 
             RelativeSizeAxes = Axes.Both;
-
             AlwaysPresent = true;
-            Alpha = 0;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateState();
         }
 
         private SelectionState state;
@@ -66,58 +66,68 @@ namespace osu.Game.Rulesets.Edit
 
                 state = value;
 
-                switch (state)
-                {
-                    case SelectionState.Selected:
-                        Show();
-                        Selected?.Invoke(this);
-                        break;
-
-                    case SelectionState.NotSelected:
-                        Hide();
-                        Deselected?.Invoke(this);
-                        break;
-                }
+                if (IsLoaded)
+                    updateState();
 
                 StateChanged?.Invoke(state);
             }
         }
 
+        private void updateState()
+        {
+            switch (state)
+            {
+                case SelectionState.Selected:
+                    OnSelected();
+                    Selected?.Invoke(this);
+                    break;
+
+                case SelectionState.NotSelected:
+                    OnDeselected();
+                    Deselected?.Invoke(this);
+                    break;
+            }
+        }
+
+        protected virtual void OnDeselected() => Hide();
+
+        protected virtual void OnSelected() => Show();
+
         // When not selected, input is only required for the blueprint itself to receive IsHovering
         protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;
 
         /// <summary>
-        /// Selects this <see cref="SelectionBlueprint"/>, causing it to become visible.
+        /// Selects this <see cref="OverlaySelectionBlueprint"/>, causing it to become visible.
         /// </summary>
         public void Select() => State = SelectionState.Selected;
 
         /// <summary>
-        /// Deselects this <see cref="SelectionBlueprint"/>, causing it to become invisible.
+        /// Deselects this <see cref="OverlaySelectionBlueprint"/>, causing it to become invisible.
         /// </summary>
         public void Deselect() => State = SelectionState.NotSelected;
 
         public bool IsSelected => State == SelectionState.Selected;
 
         /// <summary>
-        /// Updates the <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
+        /// Updates the <see cref="Objects.HitObject"/>, invoking <see cref="Objects.HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
-        protected void UpdateHitObject() => composer?.UpdateHitObject(DrawableObject.HitObject);
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
+        protected void UpdateHitObject() => composer?.UpdateHitObject(HitObject);
 
         /// <summary>
-        /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="SelectionBlueprint"/>.
+        /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="OverlaySelectionBlueprint"/>.
         /// </summary>
         public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
+        /// The screen-space point that causes this <see cref="OverlaySelectionBlueprint"/> to be selected.
         /// </summary>
-        public virtual Vector2 SelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
+        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
-        /// The screen-space quad that outlines this <see cref="SelectionBlueprint"/> for selections.
+        /// The screen-space quad that outlines this <see cref="OverlaySelectionBlueprint"/> for selections.
         /// </summary>
-        public virtual Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
+        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
+
+        public virtual Vector2 GetInstantDelta(Vector2 screenSpacePosition) => Parent.ToLocalSpace(screenSpacePosition) - Position;
     }
 }
