@@ -52,6 +52,7 @@ namespace osu.Game.Overlays
         }
 
         public SocialOverlay()
+            : base(OverlayColourScheme.Pink)
         {
             Waves.FirstWaveColour = OsuColour.FromHex(@"cb5fa0");
             Waves.SecondWaveColour = OsuColour.FromHex(@"b04384");

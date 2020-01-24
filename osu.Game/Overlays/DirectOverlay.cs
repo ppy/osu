@@ -84,6 +84,7 @@ namespace osu.Game.Overlays
         }
 
         public DirectOverlay()
+            : base(OverlayColourScheme.Blue)
         {
             // osu!direct colours are not part of the standard palette
 

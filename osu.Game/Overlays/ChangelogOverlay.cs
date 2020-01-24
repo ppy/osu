@@ -36,6 +36,11 @@ namespace osu.Game.Overlays
 
         private List<APIUpdateStream> streams;
 
+        public ChangelogOverlay()
+            : base(OverlayColourScheme.Purple)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {

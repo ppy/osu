@@ -18,8 +18,12 @@ namespace osu.Game.Overlays
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        protected FullscreenOverlay()
+        private readonly OverlayColourScheme colourScheme;
+
+        protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             Waves.FirstWaveColour = OsuColour.Gray(0.4f);
             Waves.SecondWaveColour = OsuColour.Gray(0.3f);
             Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
@@ -39,6 +43,17 @@ namespace osu.Game.Overlays
                 Type = EdgeEffectType.Shadow,
                 Radius = 10
             };
+        }
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            dependencies.Cache(new OverlayColourProvider(colourScheme));
         }
 
         public override void Show()
