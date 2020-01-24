@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Game.Overlays.Comments;
 using osu.Framework.Utils;
+using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             var count = new BindableInt();
 
-            Add(new TotalCommentsCounter
+            Add(new TotalCommentsCounter(OverlayColourScheme.Blue)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

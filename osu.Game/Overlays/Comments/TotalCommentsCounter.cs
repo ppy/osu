@@ -18,9 +18,14 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableInt Current = new BindableInt();
 
         private readonly SpriteText counter;
+        private readonly OsuSpriteText text;
+        private readonly Box pillBackground;
+        private readonly OverlayColourScheme colourScheme;
 
-        public TotalCommentsCounter()
+        public TotalCommentsCounter(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
             Height = 50;
             AddInternal(new FillFlowContainer
@@ -33,7 +38,7 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -48,10 +53,9 @@ namespace osu.Game.Overlays.Comments
                         Masking = true,
                         Children = new Drawable[]
                         {
-                            new Box
+                            pillBackground = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.Gray(0.05f)
                             },
                             counter = new OsuSpriteText
                             {
@@ -69,7 +73,9 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            counter.Colour = colours.BlueLighter;
+            text.Colour = colours.ForOverlayElement(colourScheme, 0.4f, 0.8f);
+            pillBackground.Colour = colours.ForOverlayElement(colourScheme, 0.1f, 0.1f);
+            counter.Colour = colours.ForOverlayElement(colourScheme, 0.1f, 0.6f);
         }
 
         protected override void LoadComplete()

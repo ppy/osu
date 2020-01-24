@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        commentCounter = new TotalCommentsCounter(),
+                        commentCounter = new TotalCommentsCounter(OverlayColourScheme.Purple),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
