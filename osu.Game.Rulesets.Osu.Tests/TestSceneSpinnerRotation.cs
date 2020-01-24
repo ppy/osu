@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     EndTime = 6000,
                 },
                 // placeholder object to avoid hitting the results screen
-                new HitObject
+                new HitCircle
                 {
                     StartTime = 99999,
                 }

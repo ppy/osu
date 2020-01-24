@@ -22,8 +22,9 @@ namespace osu.Desktop
         {
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
+            bool useSdl = args.Contains("--sdl");
 
-            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
+            using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true, useSdl: useSdl))
             {
                 host.ExceptionThrown += handleException;
 

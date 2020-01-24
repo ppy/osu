@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Nightcore";
         public override string Acronym => "NC";
-        public override IconUsage Icon => OsuIcon.ModNightcore;
+        public override IconUsage? Icon => OsuIcon.ModNightcore;
         public override string Description => "Uguuuuuuuu...";
 
         private readonly BindableNumber<double> tempoAdjust = new BindableDouble(1);

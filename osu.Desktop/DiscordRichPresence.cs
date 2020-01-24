@@ -1,6 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
 using osu.Framework.Allocation;
@@ -43,6 +45,10 @@ namespace osu.Desktop
             };
 
             client.OnReady += onReady;
+
+            // safety measure for now, until we performance test / improve backoff for failed connections.
+            client.OnConnectionFailed += (_, __) => client.Deinitialize();
+
             client.OnError += (_, e) => Logger.Log($"An error occurred with Discord RPC Client: {e.Code} {e.Message}", LoggingTarget.Network);
 
             (user = provider.LocalUser.GetBoundCopy()).BindValueChanged(u =>
@@ -69,6 +75,9 @@ namespace osu.Desktop
 
         private void updateStatus()
         {
+            if (!client.IsInitialized)
+                return;
+
             if (status.Value is UserStatusOffline)
             {
                 client.ClearPresence();
@@ -77,8 +86,8 @@ namespace osu.Desktop
 
             if (status.Value is UserStatusOnline && activity.Value != null)
             {
-                presence.State = activity.Value.Status;
-                presence.Details = getDetails(activity.Value);
+                presence.State = truncate(activity.Value.Status);
+                presence.Details = truncate(getDetails(activity.Value));
             }
             else
             {
@@ -94,6 +103,27 @@ namespace osu.Desktop
             presence.Assets.SmallImageText = ruleset.Value.Name;
 
             client.SetPresence(presence);
+        }
+
+        private static readonly int ellipsis_length = Encoding.UTF8.GetByteCount(new[] { '…' });
+
+        private string truncate(string str)
+        {
+            if (Encoding.UTF8.GetByteCount(str) <= 128)
+                return str;
+
+            ReadOnlyMemory<char> strMem = str.AsMemory();
+
+            do
+            {
+                strMem = strMem[..^1];
+            } while (Encoding.UTF8.GetByteCount(strMem.Span) + ellipsis_length > 128);
+
+            return string.Create(strMem.Length + 1, strMem, (span, mem) =>
+            {
+                mem.Span.CopyTo(span);
+                span[^1] = '…';
+            });
         }
 
         private string getDetails(UserActivity activity)

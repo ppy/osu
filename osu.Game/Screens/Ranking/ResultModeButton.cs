@@ -92,6 +92,6 @@ namespace osu.Game.Screens.Ranking
 
         protected override void OnDeactivated() => colouredPart.FadeColour(inactiveColour, 200, Easing.OutQuint);
 
-        public string TooltipText { get; private set; }
+        public string TooltipText { get; }
     }
 }

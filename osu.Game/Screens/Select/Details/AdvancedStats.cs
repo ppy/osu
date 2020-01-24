@@ -10,12 +10,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System;
 using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
+using osu.Framework.Threading;
+using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Screens.Select.Details
 {
@@ -69,7 +71,37 @@ namespace osu.Game.Screens.Select.Details
         {
             base.LoadComplete();
 
-            mods.BindValueChanged(_ => updateStatistics(), true);
+            mods.BindValueChanged(modsChanged, true);
+        }
+
+        private readonly List<ISettingsItem> references = new List<ISettingsItem>();
+
+        private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
+        {
+            // TODO: find a more permanent solution for this if/when it is needed in other components.
+            // this is generating drawables for the only purpose of storing bindable references.
+            foreach (var r in references)
+                r.Dispose();
+
+            references.Clear();
+
+            ScheduledDelegate debounce = null;
+
+            foreach (var mod in mods.NewValue.OfType<IApplicableToDifficulty>())
+            {
+                foreach (var setting in mod.CreateSettingsControls().OfType<ISettingsItem>())
+                {
+                    setting.SettingChanged += () =>
+                    {
+                        debounce?.Cancel();
+                        debounce = Scheduler.AddDelayed(updateStatistics, 100);
+                    };
+
+                    references.Add(setting);
+                }
+            }
+
+            updateStatistics();
         }
 
         private void updateStatistics()
@@ -85,17 +117,9 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            //mania specific
-            if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
-            {
-                firstValue.Title = "Key Amount";
-                firstValue.Value = ((int)MathF.Round(baseDifficulty?.CircleSize ?? 0), (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0));
-            }
-            else
-            {
-                firstValue.Title = "Circle Size";
-                firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
-            }
+            // Account for mania differences
+            firstValue.Title = (Beatmap?.Ruleset?.ID ?? 0) == 3 ? "Key Amount" : "Circle Size";
+            firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
 
             starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
 
