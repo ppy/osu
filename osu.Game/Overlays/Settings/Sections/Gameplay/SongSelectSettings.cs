@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     KeyboardStep = 0.1f,
                     Keywords = new[] { "star", "difficulty" }
                 },
-                new SettingsSlider<double, StarSlider>
+                new SettingsSlider<double, MaximumStarsSlider>
                 {
                     LabelText = "up to",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
@@ -47,6 +47,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
+        }
+
+        private class MaximumStarsSlider : StarSlider
+        {
+            public override string TooltipText => Current.IsDefault ? "no limit" : base.TooltipText;
         }
 
         private class StarSlider : OsuSliderBar<double>
