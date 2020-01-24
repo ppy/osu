@@ -110,7 +110,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             beginClickSelection(e);
-
             prepareSelectionMovement();
 
             return e.Button == MouseButton.Left;
@@ -356,21 +355,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Attempts to begin the movement of any selected blueprints.
         /// </summary>
-        /// <returns>Whether movement began.</returns>
-        private bool prepareSelectionMovement()
+        private void prepareSelectionMovement()
         {
-            Debug.Assert(movementBlueprint == null);
+            if (!selectionHandler.SelectedBlueprints.Any())
+                return;
 
             // Any selected blueprint that is hovered can begin the movement of the group, however only the earliest hitobject is used for movement
             // A special case is added for when a click selection occurred before the drag
             if (!clickSelectionBegan && !selectionHandler.SelectedBlueprints.Any(b => b.IsHovered))
-                return false;
+                return;
 
             // Movement is tracked from the blueprint of the earliest hitobject, since it only makes sense to distance snap from that hitobject
             movementBlueprint = selectionHandler.SelectedBlueprints.OrderBy(b => b.HitObject.StartTime).First();
             movementBlueprintOriginalPosition = movementBlueprint.SelectionPoint; // todo: unsure if correct
-
-            return true;
         }
 
         /// <summary>
