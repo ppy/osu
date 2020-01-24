@@ -23,7 +23,6 @@ namespace osu.Game.Overlays.News
         public Action ShowFrontPage;
 
         public NewsHeader()
-            : base(OverlayColourScheme.Purple)
         {
             BreadcrumbControl.AddItem(front_page_string);
 
