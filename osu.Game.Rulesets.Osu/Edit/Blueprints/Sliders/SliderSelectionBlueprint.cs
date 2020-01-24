@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
         };
 
-        public override Vector2 SelectionPoint => HeadBlueprint.SelectionPoint;
+        public override Vector2 SelectionPoint => ((DrawableSlider)DrawableObject).HeadCircle.ScreenSpaceDrawQuad.Centre;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BodyPiece.ReceivePositionalInputAt(screenSpacePos);
 
