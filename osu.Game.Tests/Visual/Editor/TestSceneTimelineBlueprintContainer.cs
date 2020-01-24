@@ -23,12 +23,11 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual.Editor
 {
     [TestFixture]
-    public class TestSceneEditorComposeTimeline : EditorClockTestScene
+    public class TestSceneTimelineBlueprintContainer : EditorClockTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TimelineArea),
-            typeof(TimelineBlueprintContainer),
             typeof(Timeline),
             typeof(TimelineButton),
             typeof(CentreMarker)
