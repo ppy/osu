@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
                 // the buff starts decreasing at AR10 and reaches 0 at AR11
                 if (Attributes.ApproachRate > 10)
-                    hiddenFactor = 1 + (1 - (Attributes.ApproachRate - 10)) * (hiddenFactor - 1);
+                    hiddenFactor = 1 + Math.Max(1 - 2 * (Attributes.ApproachRate - 10), 0) * (hiddenFactor - 1);
 
                 tp *= hiddenFactor;
             }
