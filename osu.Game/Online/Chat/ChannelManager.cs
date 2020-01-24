@@ -213,8 +213,27 @@ namespace osu.Game.Online.Chat
                     PostMessage(content, true);
                     break;
 
+                case "join":
+                    if (string.IsNullOrWhiteSpace(content))
+                    {
+                        target.AddNewMessages(new ErrorMessage("Usage: /join [channel]"));
+                        break;
+                    }
+
+                    var channel = availableChannels.FirstOrDefault(c => c.Name == content || c.Name == $"#{content}");
+
+                    if (channel == null)
+                    {
+                        target.AddNewMessages(new ErrorMessage($"Channel '{content}' not found."));
+                        break;
+                    }
+
+                    JoinChannel(channel);
+                    CurrentChannel.Value = channel;
+                    break;
+
                 case "help":
-                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action], /join [channel]"));
                     break;
 
                 default:
@@ -424,6 +443,28 @@ namespace osu.Game.Online.Chat
             api.Queue(fetchReq);
 
             return tcs.Task;
+        }
+
+        /// <summary>
+        /// Marks the <paramref name="channel"/> as read
+        /// </summary>
+        /// <param name="channel">The channel that will be marked as read</param>
+        public void MarkChannelAsRead(Channel channel)
+        {
+            if (channel.LastMessageId == channel.LastReadId)
+                return;
+
+            var message = channel.Messages.LastOrDefault();
+
+            if (message == null)
+                return;
+
+            var req = new MarkChannelAsReadRequest(channel, message);
+
+            req.Success += () => channel.LastReadId = message.Id;
+            req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel} up to '{message}' as read");
+
+            api.Queue(req);
         }
 
         [BackgroundDependencyLoader]

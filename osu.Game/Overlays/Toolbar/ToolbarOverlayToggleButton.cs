@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Toolbar
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = OsuColour.Gray(150).Opacity(180),
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Depth = 2,
                 Alpha = 0,
             });

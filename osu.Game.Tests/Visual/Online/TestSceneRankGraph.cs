@@ -69,28 +69,22 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("null user", () => graph.User.Value = null);
+            AddStep("null user", () => graph.Statistics.Value = null);
             AddStep("rank only", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 123456 },
-                        PP = 12345,
-                    }
+                    Ranks = new UserStatistics.UserRanks { Global = 123456 },
+                    PP = 12345,
                 };
             });
 
             AddStep("with rank history", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 89000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = data,
@@ -100,13 +94,10 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("with zero values", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 89000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 89000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = dataWithZeros,
@@ -116,13 +107,10 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("small amount of data", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = smallData,
@@ -132,13 +120,10 @@ namespace osu.Game.Tests.Visual.Online
 
             AddStep("graph with edges", () =>
             {
-                graph.User.Value = new User
+                graph.Statistics.Value = new UserStatistics
                 {
-                    Statistics = new UserStatistics
-                    {
-                        Ranks = new UserStatistics.UserRanks { Global = 12000 },
-                        PP = 12345,
-                    },
+                    Ranks = new UserStatistics.UserRanks { Global = 12000 },
+                    PP = 12345,
                     RankHistory = new User.RankHistoryData
                     {
                         Data = edgyData,

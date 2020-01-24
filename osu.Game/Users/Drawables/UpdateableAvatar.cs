@@ -5,7 +5,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Framework.Graphics.Transforms;
 
 namespace osu.Game.Users.Drawables
 {
@@ -32,13 +31,17 @@ namespace osu.Game.Users.Drawables
             set => base.CornerRadius = value;
         }
 
+        public new float CornerExponent
+        {
+            get => base.CornerExponent;
+            set => base.CornerExponent = value;
+        }
+
         public new EdgeEffectParameters EdgeEffect
         {
             get => base.EdgeEffect;
             set => base.EdgeEffect = value;
         }
-
-        protected override bool TransformImmediately { get; }
 
         /// <summary>
         /// Whether to show a default guest representation on null user (as opposed to nothing).
@@ -50,13 +53,10 @@ namespace osu.Game.Users.Drawables
         /// </summary>
         public readonly BindableBool OpenOnClick = new BindableBool(true);
 
-        public UpdateableAvatar(User user = null, bool hideImmediately = false)
+        public UpdateableAvatar(User user = null)
         {
-            TransformImmediately = hideImmediately;
             User = user;
         }
-
-        protected override TransformSequence<Drawable> ApplyHideTransforms(Drawable drawable) => TransformImmediately ? drawable?.FadeOut() : base.ApplyHideTransforms(drawable);
 
         protected override Drawable CreateDrawable(User user)
         {

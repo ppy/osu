@@ -172,7 +172,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 : this(new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(1),
                 })
             {
             }

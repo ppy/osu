@@ -81,14 +81,16 @@ namespace osu.Game.Tournament.Screens.Ladder
             LadderInfo.Matches.ItemsRemoved += matches =>
             {
                 foreach (var p in matches)
-                foreach (var d in MatchesContainer.Where(d => d.Match == p))
-                    d.Expire();
+                {
+                    foreach (var d in MatchesContainer.Where(d => d.Match == p))
+                        d.Expire();
+                }
 
                 layout.Invalidate();
             };
         }
 
-        private Cached layout = new Cached();
+        private readonly Cached layout = new Cached();
 
         protected override void Update()
         {

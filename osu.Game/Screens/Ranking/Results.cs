@@ -19,6 +19,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -33,6 +34,9 @@ namespace osu.Game.Screens.Ranking
         private ParallaxContainer backgroundParallax;
 
         private ResultModeTabControl modeChangeButtons;
+
+        [Resolved(canBeNull: true)]
+        private Player player { get; set; }
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -100,10 +104,7 @@ namespace osu.Game.Screens.Ranking
 
         public override bool OnExiting(IScreen next)
         {
-            allCircles.ForEach(c =>
-            {
-                c.ScaleTo(0, transition_time, Easing.OutSine);
-            });
+            allCircles.ForEach(c => c.ScaleTo(0, transition_time, Easing.OutSine));
 
             Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
@@ -115,150 +116,163 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            InternalChildren = new Drawable[]
+            InternalChild = new AspectContainer
             {
-                new AspectContainer
+                RelativeSizeAxes = Axes.Y,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Height = overscan,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Height = overscan,
-                    Children = new Drawable[]
+                    circleOuterBackground = new CircularContainer
                     {
-                        circleOuterBackground = new CircularContainer
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Masking = true,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Masking = true,
-                            Children = new Drawable[]
+                            new Box
                             {
-                                new Box
-                                {
-                                    Alpha = 0.2f,
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
-                                }
+                                Alpha = 0.2f,
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.Black,
                             }
-                        },
-                        circleOuter = new CircularContainer
+                        }
+                    },
+                    circleOuter = new CircularContainer
+                    {
+                        Size = new Vector2(circle_outer_scale),
+                        EdgeEffect = new EdgeEffectParameters
                         {
-                            Size = new Vector2(circle_outer_scale),
-                            EdgeEffect = new EdgeEffectParameters
+                            Colour = Color4.Black.Opacity(0.4f),
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 15,
+                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
                             {
-                                Colour = Color4.Black.Opacity(0.4f),
-                                Type = EdgeEffectType.Shadow,
-                                Radius = 15,
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.White,
                             },
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Masking = true,
-                            Children = new Drawable[]
+                            backgroundParallax = new ParallaxContainer
                             {
-                                new Box
+                                RelativeSizeAxes = Axes.Both,
+                                ParallaxAmount = 0.01f,
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White,
-                                },
-                                backgroundParallax = new ParallaxContainer
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    ParallaxAmount = 0.01f,
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Children = new Drawable[]
+                                    new Sprite
                                     {
-                                        new Sprite
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Alpha = 0.2f,
-                                            Texture = Beatmap.Value.Background,
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            FillMode = FillMode.Fill
-                                        }
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0.2f,
+                                        Texture = Beatmap.Value.Background,
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                        FillMode = FillMode.Fill
                                     }
-                                },
-                                modeChangeButtons = new ResultModeTabControl
-                                {
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = 50,
-                                    Margin = new MarginPadding { Bottom = 110 },
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.BottomCentre,
-                                    Text = $"{Score.MaxCombo}x",
-                                    RelativePositionAxes = Axes.X,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
-                                    X = 0.1f,
-                                    Colour = colours.BlueDarker,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
-                                    Text = "max combo",
-                                    Font = OsuFont.GetFont(size: 20),
-                                    RelativePositionAxes = Axes.X,
-                                    X = 0.1f,
-                                    Colour = colours.Gray6,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.BottomCentre,
-                                    Text = $"{Score.Accuracy:P2}",
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
-                                    RelativePositionAxes = Axes.X,
-                                    X = 0.9f,
-                                    Colour = colours.BlueDarker,
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
-                                    Text = "accuracy",
-                                    Font = OsuFont.GetFont(size: 20),
-                                    RelativePositionAxes = Axes.X,
-                                    X = 0.9f,
-                                    Colour = colours.Gray6,
-                                },
-                            }
-                        },
-                        circleInner = new CircularContainer
-                        {
-                            Size = new Vector2(0.6f),
-                            EdgeEffect = new EdgeEffectParameters
-                            {
-                                Colour = Color4.Black.Opacity(0.4f),
-                                Type = EdgeEffectType.Shadow,
-                                Radius = 15,
+                                }
                             },
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Masking = true,
-                            Children = new Drawable[]
+                            modeChangeButtons = new ResultModeTabControl
                             {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White,
-                                },
-                            }
+                                Anchor = Anchor.BottomCentre,
+                                Origin = Anchor.BottomCentre,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 50,
+                                Margin = new MarginPadding { Bottom = 110 },
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.BottomCentre,
+                                Text = $"{Score.MaxCombo}x",
+                                RelativePositionAxes = Axes.X,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
+                                X = 0.1f,
+                                Colour = colours.BlueDarker,
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.TopCentre,
+                                Text = "max combo",
+                                Font = OsuFont.GetFont(size: 20),
+                                RelativePositionAxes = Axes.X,
+                                X = 0.1f,
+                                Colour = colours.Gray6,
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.BottomCentre,
+                                Text = $"{Score.Accuracy:P2}",
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
+                                RelativePositionAxes = Axes.X,
+                                X = 0.9f,
+                                Colour = colours.BlueDarker,
+                            },
+                            new OsuSpriteText
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                Origin = Anchor.TopCentre,
+                                Text = "accuracy",
+                                Font = OsuFont.GetFont(size: 20),
+                                RelativePositionAxes = Axes.X,
+                                X = 0.9f,
+                                Colour = colours.Gray6,
+                            },
+                        }
+                    },
+                    circleInner = new CircularContainer
+                    {
+                        Size = new Vector2(0.6f),
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Colour = Color4.Black.Opacity(0.4f),
+                            Type = EdgeEffectType.Shadow,
+                            Radius = 15,
+                        },
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = Color4.White,
+                            },
                         }
                     }
                 }
             };
 
-            foreach (var t in CreateResultPages())
-                modeChangeButtons.AddItem(t);
-            modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
+            if (player != null)
+            {
+                AddInternal(new HotkeyRetryOverlay
+                {
+                    Action = () =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        player?.Restart();
+                    },
+                });
+            }
+
+            var pages = CreateResultPages();
+
+            foreach (var p in pages)
+                modeChangeButtons.AddItem(p);
+
+            modeChangeButtons.Current.Value = pages.FirstOrDefault();
 
             modeChangeButtons.Current.BindValueChanged(page =>
             {

@@ -103,13 +103,13 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     Children = new Drawable[]
                     {
-                        warmupButton = new OsuButton
+                        warmupButton = new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle warmup",
                             Action = () => warmup.Toggle()
                         },
-                        new OsuButton
+                        new TourneyButton
                         {
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle chat",

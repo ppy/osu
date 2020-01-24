@@ -19,6 +19,8 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneUserProfileOverlay : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         private readonly TestUserProfileOverlay profile;
 
         [Resolved]
@@ -50,12 +52,12 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     Current = 727,
                     Progress = 69,
-                }
-            },
-            RankHistory = new User.RankHistoryData
-            {
-                Mode = @"osu",
-                Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
+                RankHistory = new User.RankHistoryData
+                {
+                    Mode = @"osu",
+                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+                },
             },
             Badges = new[]
             {
@@ -68,7 +70,7 @@ namespace osu.Game.Tests.Visual.Online
             },
             Title = "osu!volunteer",
             Colour = "ff0000",
-            Achievements = new User.UserAchievement[0],
+            Achievements = Array.Empty<User.UserAchievement>(),
         };
 
         public TestSceneUserProfileOverlay()
@@ -103,6 +105,15 @@ namespace osu.Game.Tests.Visual.Online
                 Id = 3103765,
                 Country = new Country { FullName = @"Japan", FlagName = @"JP" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+            }, api.IsLoggedIn));
+
+            AddStep("Show bancho", () => profile.ShowUser(new User
+            {
+                Username = @"BanchoBot",
+                Id = 3,
+                IsBot = true,
+                Country = new Country { FullName = @"Saint Helena", FlagName = @"SH" },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c4.jpg"
             }, api.IsLoggedIn));
 
             AddStep("Hide", profile.Hide);

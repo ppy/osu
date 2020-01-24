@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -20,7 +21,7 @@ using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
-    public abstract class SettingsItem<T> : Container, IFilterable
+    public abstract class SettingsItem<T> : Container, IFilterable, ISettingsItem
     {
         protected abstract Drawable CreateControl();
 
@@ -34,8 +35,6 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText text;
 
-        private readonly RestoreDefaultValueButton restoreDefaultButton;
-
         public bool ShowsDefaultIndicator = true;
 
         public virtual string LabelText
@@ -46,38 +45,22 @@ namespace osu.Game.Overlays.Settings
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText());
-                    FlowContent.SetLayoutPosition(text, -1);
+                    FlowContent.Insert(-1, text = new OsuSpriteText());
                 }
 
                 text.Text = value;
             }
         }
 
-        // hold a reference to the provided bindable so we don't have to in every settings section.
-        private Bindable<T> bindable;
-
         public virtual Bindable<T> Bindable
         {
-            get => bindable;
-
-            set
-            {
-                if (bindable != null)
-                    controlWithCurrent?.Current.UnbindFrom(bindable);
-
-                bindable = value;
-                controlWithCurrent?.Current.BindTo(bindable);
-
-                if (ShowsDefaultIndicator)
-                {
-                    restoreDefaultButton.Bindable = bindable.GetBoundCopy();
-                    restoreDefaultButton.Bindable.TriggerChange();
-                }
-            }
+            get => controlWithCurrent.Current;
+            set => controlWithCurrent.Current = value;
         }
 
-        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
+        public virtual IEnumerable<string> FilterTerms => Keywords == null ? new[] { LabelText } : new List<string>(Keywords) { LabelText }.ToArray();
+
+        public IEnumerable<string> Keywords { get; set; }
 
         public bool MatchingFilter
         {
@@ -86,8 +69,12 @@ namespace osu.Game.Overlays.Settings
 
         public bool FilteringActive { get; set; }
 
+        public event Action SettingChanged;
+
         protected SettingsItem()
         {
+            RestoreDefaultValueButton restoreDefaultButton;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsPanel.CONTENT_MARGINS };
@@ -103,13 +90,17 @@ namespace osu.Game.Overlays.Settings
                     Child = Control = CreateControl()
                 },
             };
-        }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
+            // all bindable logic is in constructor intentionally to support "CreateSettingsControls" being used in a context it is
+            // never loaded, but requires bindable storage.
             if (controlWithCurrent != null)
+            {
+                controlWithCurrent.Current.ValueChanged += _ => SettingChanged?.Invoke();
                 controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+
+                if (ShowsDefaultIndicator)
+                    restoreDefaultButton.Bindable = controlWithCurrent.Current;
+            }
         }
 
         private class RestoreDefaultValueButton : Container, IHasTooltip
@@ -124,6 +115,8 @@ namespace osu.Game.Overlays.Settings
                     bindable = value;
                     bindable.ValueChanged += _ => UpdateState();
                     bindable.DisabledChanged += _ => UpdateState();
+                    bindable.DefaultChanged += _ => UpdateState();
+                    UpdateState();
                 }
             }
 
@@ -168,11 +161,7 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public string TooltipText => "Revert to default";
-
-            protected override bool OnMouseDown(MouseDownEvent e) => true;
-
-            protected override bool OnMouseUp(MouseUpEvent e) => true;
+            public string TooltipText => "revert to default";
 
             protected override bool OnClick(ClickEvent e)
             {

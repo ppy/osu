@@ -27,11 +27,13 @@ namespace osu.Game.Rulesets.Catch.Objects
                 return;
 
             for (double i = StartTime; i <= EndTime; i += spacing)
+            {
                 AddNested(new Banana
                 {
                     Samples = Samples,
                     StartTime = i
                 });
+            }
         }
 
         public double EndTime => StartTime + Duration;

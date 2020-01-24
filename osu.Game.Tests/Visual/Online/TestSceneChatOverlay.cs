@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual.Online
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
-        private readonly Channel channel1 = new Channel(new User()) { Name = "test1" };
+        private readonly Channel channel1 = new Channel(new User()) { Name = "test really long username" };
         private readonly Channel channel2 = new Channel(new User()) { Name = "test2" };
 
         [SetUp]

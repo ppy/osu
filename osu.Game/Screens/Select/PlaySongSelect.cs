@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Select
             {
                 ValidForResume = false;
                 Edit();
-            }, Key.Number3);
+            }, Key.Number4);
         }
 
         public override void OnResuming(IScreen last)

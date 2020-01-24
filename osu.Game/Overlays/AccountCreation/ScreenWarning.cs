@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.AccountCreation
             multiAccountExplanationText.AddText("? osu! has a policy of ");
             multiAccountExplanationText.AddText("one account per person!", cp => cp.Colour = colours.Yellow);
             multiAccountExplanationText.AddText(" Please be aware that creating more than one account per person may result in ");
-            multiAccountExplanationText.AddText("permanent deactivation of accounts", cp => cp.Colour = colours.Yellow);
+            multiAccountExplanationText.AddText("permanent deactivation of accounts", cp => cp.Colour = colours.Yellow);
             multiAccountExplanationText.AddText(".");
 
             furtherAssistance.AddText("Need further assistance? Contact us via our ");

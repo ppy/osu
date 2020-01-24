@@ -4,59 +4,84 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public abstract class HitObjectComposer : CompositeDrawable
+    [Cached(Type = typeof(IPlacementHandler))]
+    public abstract class HitObjectComposer<TObject> : HitObjectComposer, IPlacementHandler
+        where TObject : HitObject
     {
-        public IEnumerable<DrawableHitObject> HitObjects => DrawableRuleset.Playfield.AllHitObjects;
+        protected IRulesetConfigManager Config { get; private set; }
 
         protected readonly Ruleset Ruleset;
 
-        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        [Resolved]
+        protected IFrameBasedClock EditorClock { get; private set; }
 
-        protected IRulesetConfigManager Config { get; private set; }
+        [Resolved]
+        protected EditorBeatmap EditorBeatmap { get; private set; }
 
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
+
+        [Resolved]
+        private IBeatSnapProvider beatSnapProvider { get; set; }
+
+        private IBeatmapProcessor beatmapProcessor;
+
+        private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
+        private ComposeBlueprintContainer blueprintContainer;
+        private Container distanceSnapGridContainer;
+        private DistanceSnapGrid distanceSnapGrid;
         private readonly List<Container> layerContainers = new List<Container>();
-
-        protected DrawableEditRuleset DrawableRuleset { get; private set; }
-
-        private BlueprintContainer blueprintContainer;
 
         private InputManager inputManager;
 
-        internal HitObjectComposer(Ruleset ruleset)
+        protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindable<WorkingBeatmap> beatmap, IFrameBasedClock framedClock)
+        private void load(IFrameBasedClock framedClock)
         {
-            Beatmap.BindTo(beatmap);
+            beatmapProcessor = Ruleset.CreateBeatmapProcessor(EditorBeatmap.PlayableBeatmap);
+
+            EditorBeatmap.HitObjectAdded += addHitObject;
+            EditorBeatmap.HitObjectRemoved += removeHitObject;
+            EditorBeatmap.StartTimeChanged += UpdateHitObject;
+
+            Config = Dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
             try
             {
-                DrawableRuleset = CreateDrawableRuleset();
-                DrawableRuleset.Clock = framedClock;
+                drawableRulesetWrapper = new DrawableEditRulesetWrapper<TObject>(CreateDrawableRuleset(Ruleset, EditorBeatmap.PlayableBeatmap))
+                {
+                    Clock = framedClock,
+                    ProcessCustomClock = false
+                };
             }
             catch (Exception e)
             {
@@ -64,11 +89,13 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            var layerBelowRuleset = DrawableRuleset.CreatePlayfieldAdjustmentContainer();
-            layerBelowRuleset.Child = new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both };
+            var layerBelowRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChildren(new Drawable[]
+            {
+                distanceSnapGridContainer = new Container { RelativeSizeAxes = Axes.Both },
+                new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
+            });
 
-            var layerAboveRuleset = DrawableRuleset.CreatePlayfieldAdjustmentContainer();
-            layerAboveRuleset.Child = blueprintContainer = new BlueprintContainer();
+            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(blueprintContainer = CreateBlueprintContainer());
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -98,7 +125,7 @@ namespace osu.Game.Rulesets.Edit
                             Children = new Drawable[]
                             {
                                 layerBelowRuleset,
-                                DrawableRuleset,
+                                drawableRulesetWrapper,
                                 layerAboveRuleset
                             }
                         }
@@ -111,11 +138,13 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => blueprintContainer.CurrentTool = t))
-                                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
+                CompositionTools.Select(t => new RadioButton(t.Name, () => selectTool(t)))
+                                .Prepend(new RadioButton("Select", () => selectTool(null)))
                                 .ToList();
 
             toolboxCollection.Items[0].Select();
+
+            blueprintContainer.SelectionChanged += selectionChanged;
         }
 
         protected override void LoadComplete()
@@ -125,14 +154,14 @@ namespace osu.Game.Rulesets.Edit
             inputManager = GetContainingInputManager();
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        private double lastGridUpdateTime;
+
+        protected override void Update()
         {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            base.Update();
 
-            dependencies.CacheAs(this);
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
-
-            return dependencies;
+            if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
+                showGridFor(Enumerable.Empty<HitObject>());
         }
 
         protected override void UpdateAfterChildren()
@@ -141,53 +170,171 @@ namespace osu.Game.Rulesets.Edit
 
             layerContainers.ForEach(l =>
             {
-                l.Anchor = DrawableRuleset.Playfield.Anchor;
-                l.Origin = DrawableRuleset.Playfield.Origin;
-                l.Position = DrawableRuleset.Playfield.Position;
-                l.Size = DrawableRuleset.Playfield.Size;
+                l.Anchor = drawableRulesetWrapper.Playfield.Anchor;
+                l.Origin = drawableRulesetWrapper.Playfield.Origin;
+                l.Position = drawableRulesetWrapper.Playfield.Position;
+                l.Size = drawableRulesetWrapper.Playfield.Size;
             });
         }
+
+        private void selectionChanged(IEnumerable<HitObject> selectedHitObjects)
+        {
+            var hitObjects = selectedHitObjects.ToArray();
+
+            if (!hitObjects.Any())
+                distanceSnapGridContainer.Hide();
+            else
+                showGridFor(hitObjects);
+        }
+
+        private void selectTool(HitObjectCompositionTool tool)
+        {
+            blueprintContainer.CurrentTool = tool;
+
+            if (tool == null)
+                distanceSnapGridContainer.Hide();
+            else
+                showGridFor(Enumerable.Empty<HitObject>());
+        }
+
+        private void showGridFor(IEnumerable<HitObject> selectedHitObjects)
+        {
+            distanceSnapGridContainer.Clear();
+            distanceSnapGrid = CreateDistanceSnapGrid(selectedHitObjects);
+
+            if (distanceSnapGrid != null)
+            {
+                distanceSnapGridContainer.Child = distanceSnapGrid;
+                distanceSnapGridContainer.Show();
+            }
+
+            lastGridUpdateTime = EditorClock.CurrentTime;
+        }
+
+        private ScheduledDelegate scheduledUpdate;
+
+        public override void UpdateHitObject(HitObject hitObject)
+        {
+            scheduledUpdate?.Cancel();
+            scheduledUpdate = Schedule(() =>
+            {
+                beatmapProcessor?.PreProcess();
+                hitObject?.ApplyDefaults(EditorBeatmap.ControlPointInfo, EditorBeatmap.BeatmapInfo.BaseDifficulty);
+                beatmapProcessor?.PostProcess();
+            });
+        }
+
+        private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
+
+        private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
+
+        public override IEnumerable<DrawableHitObject> HitObjects => drawableRulesetWrapper.Playfield.AllHitObjects;
+        public override bool CursorInPlacementArea => drawableRulesetWrapper.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+
+        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
+
+        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
+
+        public void BeginPlacement(HitObject hitObject)
+        {
+            if (distanceSnapGrid != null)
+                hitObject.StartTime = GetSnappedPosition(distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position), hitObject.StartTime).time;
+        }
+
+        public void EndPlacement(HitObject hitObject)
+        {
+            EditorBeatmap.Add(hitObject);
+
+            adjustableClock.Seek(hitObject.StartTime);
+
+            showGridFor(Enumerable.Empty<HitObject>());
+        }
+
+        public void Delete(HitObject hitObject) => EditorBeatmap.Remove(hitObject);
+
+        public override (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => distanceSnapGrid?.GetSnappedPosition(position) ?? (position, time);
+
+        public override float GetBeatSnapDistanceAt(double referenceTime)
+        {
+            DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatSnapProvider.BeatDivisor);
+        }
+
+        public override float DurationToDistance(double referenceTime, double duration)
+        {
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
+        }
+
+        public override double DistanceToDuration(double referenceTime, float distance)
+        {
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
+        }
+
+        public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
+            => beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance));
+
+        public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
+            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance)));
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (EditorBeatmap != null)
+            {
+                EditorBeatmap.HitObjectAdded -= addHitObject;
+                EditorBeatmap.HitObjectRemoved -= removeHitObject;
+            }
+        }
+    }
+
+    [Cached(typeof(HitObjectComposer))]
+    [Cached(typeof(IDistanceSnapProvider))]
+    public abstract class HitObjectComposer : CompositeDrawable, IDistanceSnapProvider
+    {
+        internal HitObjectComposer()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
+
+        /// <summary>
+        /// All the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        public abstract IEnumerable<DrawableHitObject> HitObjects { get; }
 
         /// <summary>
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
-        public virtual bool CursorInPlacementArea => DrawableRuleset.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public abstract bool CursorInPlacementArea { get; }
 
         /// <summary>
-        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
+        /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
         /// </summary>
-        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(DrawableRuleset.Add(hitObject));
-
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(DrawableRuleset.Remove(hitObject));
-
-        internal abstract DrawableEditRuleset CreateDrawableRuleset();
-
-        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+        /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
+        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>.</returns>
+        [CanBeNull]
+        protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
         /// <summary>
-        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
+        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
+        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
+        public abstract void UpdateHitObject([CanBeNull] HitObject hitObject);
 
-        /// <summary>
-        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
-        /// </summary>
-        public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
-    }
+        public abstract (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time);
 
-    public abstract class HitObjectComposer<TObject> : HitObjectComposer
-        where TObject : HitObject
-    {
-        protected HitObjectComposer(Ruleset ruleset)
-            : base(ruleset)
-        {
-        }
+        public abstract float GetBeatSnapDistanceAt(double referenceTime);
 
-        internal override DrawableEditRuleset CreateDrawableRuleset()
-            => new DrawableEditRuleset<TObject>(CreateDrawableRuleset(Ruleset, Beatmap.Value, Array.Empty<Mod>()));
+        public abstract float DurationToDistance(double referenceTime, double duration);
 
-        protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, WorkingBeatmap beatmap, IReadOnlyList<Mod> mods);
+        public abstract double DistanceToDuration(double referenceTime, float distance);
+
+        public abstract double GetSnappedDurationFromDistance(double referenceTime, float distance);
+
+        public abstract float GetSnappedDistanceFromDistance(double referenceTime, float distance);
     }
 }

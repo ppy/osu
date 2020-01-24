@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings
         protected abstract string Header { get; }
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
-        public IEnumerable<string> FilterTerms => new[] { Header };
+        public virtual IEnumerable<string> FilterTerms => new[] { Header };
 
         public bool MatchingFilter
         {

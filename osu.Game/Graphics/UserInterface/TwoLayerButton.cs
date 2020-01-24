@@ -15,6 +15,7 @@ using System;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Screens.Select;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -28,7 +29,9 @@ namespace osu.Game.Graphics.UserInterface
         private const int transform_time = 600;
         private const int pulse_length = 250;
 
-        private const float shear = 0.1f;
+        private const float shear_width = 5f;
+
+        private static readonly Vector2 shear = new Vector2(shear_width / Footer.HEIGHT, 0);
 
         public static readonly Vector2 SIZE_EXTENDED = new Vector2(140, 50);
         public static readonly Vector2 SIZE_RETRACTED = new Vector2(100, 50);
@@ -56,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                 c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
                 c2.Origin = c2.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
 
-                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear * 0.5f : 0;
+                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear.X * 0.5f : 0;
 
                 Remove(c1);
                 Remove(c2);
@@ -70,6 +73,7 @@ namespace osu.Game.Graphics.UserInterface
         public TwoLayerButton()
         {
             Size = SIZE_RETRACTED;
+            Shear = shear;
 
             Children = new Drawable[]
             {
@@ -82,7 +86,6 @@ namespace osu.Game.Graphics.UserInterface
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffectParameters
@@ -105,6 +108,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
+                            Shear = -shear,
                         },
                     }
                 },
@@ -119,7 +123,6 @@ namespace osu.Game.Graphics.UserInterface
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Shear = new Vector2(shear, 0),
                             Masking = true,
                             MaskingSmoothness = 2,
                             EdgeEffect = new EdgeEffectParameters
@@ -144,6 +147,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
+                            Shear = -shear,
                         }
                     }
                 },
@@ -188,7 +192,6 @@ namespace osu.Game.Graphics.UserInterface
             var flash = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Shear = new Vector2(shear, 0),
                 Colour = Color4.White.Opacity(0.5f),
             };
             Add(flash);

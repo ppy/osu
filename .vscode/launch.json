@@ -1,18 +1,19 @@
 {
     "version": "0.2.0",
-    "configurations": [{
+    "configurations": [
+        {
             "name": "osu! (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.2/osu!.dll"
+                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp3.1/osu!.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -23,13 +24,13 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.2/osu!.dll"
+                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp3.1/osu!.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -40,29 +41,30 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.2/osu.Game.Tests.dll"
+                "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp3.1/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Debug)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
-        }, {
+        },
+        {
             "name": "osu! (Tests, Release)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.2/osu.Game.Tests.dll"
+                "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp3.1/osu.Game.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Release)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -73,14 +75,14 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.2/osu!.dll",
+                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp3.1/osu!.dll",
                 "--tournament"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -91,14 +93,14 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.2/osu!.dll",
+                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp3.1/osu!.dll",
                 "--tournament"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -109,14 +111,14 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp2.2/osu.Game.Tournament.Tests.dll",
+                "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1/osu.Game.Tournament.Tests.dll",
                 "--tournament"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tournament tests (Debug)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
             "console": "internalConsole"
@@ -127,16 +129,29 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp2.2/osu.Game.Tournament.Tests.dll",
+                "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1/osu.Game.Tournament.Tests.dll",
                 "--tournament"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tournament tests (Release)",
             "linux": {
                 "env": {
-                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp2.2:${env:LD_LIBRARY_PATH}"
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tournament.Tests/bin/Debug/netcoreapp3.1:${env:LD_LIBRARY_PATH}"
                 }
             },
+            "console": "internalConsole"
+        },
+        {
+            "name": "Benchmark",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceRoot}/osu.Game.Benchmarks/bin/Release/netcoreapp3.1/osu.Game.Benchmarks.dll",
+            "args": [
+                "--filter",
+                "*"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build benchmarks",
             "console": "internalConsole"
         },
         {

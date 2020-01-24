@@ -35,7 +35,20 @@ namespace osu.Game.Beatmaps
         [NotMapped]
         public BeatmapSetMetrics Metrics { get; set; }
 
+        /// <summary>
+        /// The maximum star difficulty of all beatmaps in this set.
+        /// </summary>
         public double MaxStarDifficulty => Beatmaps?.Max(b => b.StarDifficulty) ?? 0;
+
+        /// <summary>
+        /// The maximum playable length in milliseconds of all beatmaps in this set.
+        /// </summary>
+        public double MaxLength => Beatmaps?.Max(b => b.Length) ?? 0;
+
+        /// <summary>
+        /// The maximum BPM of all beatmaps in this set.
+        /// </summary>
+        public double MaxBPM => Beatmaps?.Max(b => b.BPM) ?? 0;
 
         [NotMapped]
         public bool DeletePending { get; set; }
@@ -50,6 +63,21 @@ namespace osu.Game.Beatmaps
 
         public bool Protected { get; set; }
 
-        public bool Equals(BeatmapSetInfo other) => OnlineBeatmapSetID == other?.OnlineBeatmapSetID;
+        public bool Equals(BeatmapSetInfo other)
+        {
+            if (other == null)
+                return false;
+
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
+
+            if (OnlineBeatmapSetID.HasValue && other.OnlineBeatmapSetID.HasValue)
+                return OnlineBeatmapSetID == other.OnlineBeatmapSetID;
+
+            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
+                return Hash == other.Hash;
+
+            return ReferenceEquals(this, other);
+        }
     }
 }

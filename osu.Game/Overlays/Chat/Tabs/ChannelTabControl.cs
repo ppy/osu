@@ -9,13 +9,12 @@ using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
     public class ChannelTabControl : OsuTabControl<Channel>
     {
-        public static readonly float SHEAR_WIDTH = 10;
+        public const float SHEAR_WIDTH = 10;
 
         public Action<Channel> OnRequestLeave;
 
@@ -25,18 +24,10 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public ChannelTabControl()
         {
-            TabContainer.Margin = new MarginPadding { Left = 50 };
+            Padding = new MarginPadding { Left = 50 };
+
             TabContainer.Spacing = new Vector2(-SHEAR_WIDTH, 0);
             TabContainer.Masking = false;
-
-            AddInternal(new SpriteIcon
-            {
-                Icon = FontAwesome.Solid.Comments,
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
-                Size = new Vector2(20),
-                Margin = new MarginPadding(10),
-            });
 
             AddTabItem(selectorTab = new ChannelSelectorTabItem());
 
@@ -90,7 +81,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             RemoveItem(channel);
 
             if (Current.Value == channel)
-                Current.Value = Items.FirstOrDefault();
+            {
+                // Prefer non-selector channels first
+                Current.Value = Items.FirstOrDefault(c => !(c is ChannelSelectorTabItem.ChannelSelectorTabChannel)) ?? Items.FirstOrDefault();
+            }
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
@@ -108,7 +102,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         private void tabCloseRequested(TabItem<Channel> tab)
         {
             int totalTabs = TabContainer.Count - 1; // account for selectorTab
-            int currentIndex = MathHelper.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
+            int currentIndex = Math.Clamp(TabContainer.IndexOf(tab), 1, totalTabs);
 
             if (tab == SelectedTab && totalTabs > 1)
                 // Select the tab after tab-to-be-removed's index, or the tab before if current == last

@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Screens.Schedule;
 
 namespace osu.Game.Tournament.Tests.Screens
 {
-    public class TestSceneScheduleScreen : OsuTestScene
+    public class TestSceneScheduleScreen : TournamentTestScene
     {
         [BackgroundDependencyLoader]
         private void load()

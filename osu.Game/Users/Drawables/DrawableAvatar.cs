@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Users.Drawables
 {
+    [LongRunningLoad]
     public class DrawableAvatar : Container
     {
         /// <summary>
@@ -73,7 +74,7 @@ namespace osu.Game.Users.Drawables
 
         private class ClickableArea : OsuClickableContainer
         {
-            public override string TooltipText => Enabled.Value ? @"View Profile" : null;
+            public override string TooltipText => Enabled.Value ? @"view profile" : null;
 
             protected override bool OnClick(ClickEvent e)
             {

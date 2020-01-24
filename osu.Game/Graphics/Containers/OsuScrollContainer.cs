@@ -27,11 +27,12 @@ namespace osu.Game.Graphics.Containers
 
         private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
-        private void scrollToRelative(float value) => ScrollTo(Clamp((value - Scrollbar.DrawSize[ScrollDim] / 2) / Scrollbar.Size[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
+        private void scrollFromMouseEvent(MouseEvent e) =>
+            ScrollTo(Clamp(ToLocalSpace(e.ScreenSpaceMousePosition)[ScrollDim] / DrawSize[ScrollDim]) * Content.DrawSize[ScrollDim], true, DistanceDecayOnRightMouseScrollbar);
 
-        private bool mouseScrollBarDragging;
+        private bool rightMouseDragging;
 
-        protected override bool IsDragging => base.IsDragging || mouseScrollBarDragging;
+        protected override bool IsDragging => base.IsDragging || rightMouseDragging;
 
         public OsuScrollContainer(Direction scrollDirection = Direction.Vertical)
             : base(scrollDirection)
@@ -42,44 +43,53 @@ namespace osu.Game.Graphics.Containers
         {
             if (shouldPerformRightMouseScroll(e))
             {
-                scrollToRelative(e.MousePosition[ScrollDim]);
+                scrollFromMouseEvent(e);
                 return true;
             }
 
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
-            if (mouseScrollBarDragging)
+            if (rightMouseDragging)
             {
-                scrollToRelative(e.MousePosition[ScrollDim]);
-                return true;
+                scrollFromMouseEvent(e);
+                return;
             }
 
-            return base.OnDrag(e);
+            base.OnDrag(e);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
         {
             if (shouldPerformRightMouseScroll(e))
             {
-                mouseScrollBarDragging = true;
+                rightMouseDragging = true;
                 return true;
             }
 
             return base.OnDragStart(e);
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
-            if (mouseScrollBarDragging)
+            if (rightMouseDragging)
             {
-                mouseScrollBarDragging = false;
-                return true;
+                rightMouseDragging = false;
+                return;
             }
 
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
+        }
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            // allow for controlling volume when alt is held.
+            // mostly for compatibility with osu-stable.
+            if (e.AltPressed) return false;
+
+            return base.OnScroll(e);
         }
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new OsuScrollbar(direction);
@@ -97,7 +107,7 @@ namespace osu.Game.Graphics.Containers
             public OsuScrollbar(Direction scrollDir)
                 : base(scrollDir)
             {
-                Blending = BlendingMode.Additive;
+                Blending = BlendingParameters.Additive;
 
                 CornerRadius = 5;
 
@@ -113,8 +123,6 @@ namespace osu.Game.Graphics.Containers
 
                 Masking = true;
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
-
-                ResizeTo(1);
             }
 
             [BackgroundDependencyLoader]
@@ -154,13 +162,13 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
-                if (e.Button != MouseButton.Left) return false;
+                if (e.Button != MouseButton.Left) return;
 
                 box.FadeColour(Color4.White, 100);
 
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
         }
     }

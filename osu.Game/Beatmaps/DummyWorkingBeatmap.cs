@@ -7,6 +7,7 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -44,17 +45,19 @@ namespace osu.Game.Beatmaps
 
         protected override Texture GetBackground() => textures?.Get(@"Backgrounds/bg4");
 
+        protected override VideoSprite GetVideo() => null;
+
         protected override Track GetTrack() => GetVirtualTrack();
 
         private class DummyRulesetInfo : RulesetInfo
         {
-            public override Ruleset CreateInstance() => new DummyRuleset(this);
+            public override Ruleset CreateInstance() => new DummyRuleset();
 
             private class DummyRuleset : Ruleset
             {
-                public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
+                public override IEnumerable<Mod> GetModsFor(ModType type) => Array.Empty<Mod>();
 
-                public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+                public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
                 {
                     throw new NotImplementedException();
                 }
@@ -67,18 +70,13 @@ namespace osu.Game.Beatmaps
 
                 public override string ShortName => "dummy";
 
-                public DummyRuleset(RulesetInfo rulesetInfo = null)
-                    : base(rulesetInfo)
-                {
-                }
-
                 private class DummyBeatmapConverter : IBeatmapConverter
                 {
                     public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
 
                     public IBeatmap Beatmap { get; set; }
 
-                    public bool CanConvert => true;
+                    public bool CanConvert() => true;
 
                     public IBeatmap Convert()
                     {

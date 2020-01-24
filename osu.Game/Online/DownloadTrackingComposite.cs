@@ -11,7 +11,7 @@ using osu.Game.Online.API;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A component which tracks a <see cref="TModel"/> through potential download/import/deletion.
+    /// A component which tracks a <typeparamref name="TModel"/> through potential download/import/deletion.
     /// </summary>
     public abstract class DownloadTrackingComposite<TModel, TModelManager> : CompositeDrawable
         where TModel : class, IEquatable<TModel>
@@ -22,11 +22,11 @@ namespace osu.Game.Online
         private TModelManager manager;
 
         /// <summary>
-        /// Holds the current download state of the <see cref="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
+        /// Holds the current download state of the <typeparamref name="TModel"/>, whether is has already been downloaded, is in progress, or is not downloaded.
         /// </summary>
         protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
 
-        protected readonly Bindable<double> Progress = new Bindable<double>();
+        protected readonly BindableNumber<double> Progress = new BindableNumber<double> { MinValue = 0, MaxValue = 1 };
 
         protected DownloadTrackingComposite(TModel model = null)
         {
@@ -48,20 +48,22 @@ namespace osu.Game.Online
                     attachDownload(manager.GetExistingDownload(modelInfo.NewValue));
             }, true);
 
-            manager.DownloadBegan += download =>
-            {
-                if (download.Model.Equals(Model.Value))
-                    attachDownload(download);
-            };
-
-            manager.DownloadFailed += download =>
-            {
-                if (download.Model.Equals(Model.Value))
-                    attachDownload(null);
-            };
-
+            manager.DownloadBegan += downloadBegan;
+            manager.DownloadFailed += downloadFailed;
             manager.ItemAdded += itemAdded;
             manager.ItemRemoved += itemRemoved;
+        }
+
+        private void downloadBegan(ArchiveDownloadRequest<TModel> request)
+        {
+            if (request.Model.Equals(Model.Value))
+                attachDownload(request);
+        }
+
+        private void downloadFailed(ArchiveDownloadRequest<TModel> request)
+        {
+            if (request.Model.Equals(Model.Value))
+                attachDownload(null);
         }
 
         private ArchiveDownloadRequest<TModel> attachedRequest;
@@ -126,8 +128,10 @@ namespace osu.Game.Online
 
             if (manager != null)
             {
-                manager.DownloadBegan -= attachDownload;
+                manager.DownloadBegan -= downloadBegan;
+                manager.DownloadFailed -= downloadFailed;
                 manager.ItemAdded -= itemAdded;
+                manager.ItemRemoved -= itemRemoved;
             }
 
             State.UnbindAll();

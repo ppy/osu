@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
+        protected override bool Autoplay => true;
+
         [Test]
         public void TestHyperDash()
         {
@@ -38,8 +40,10 @@ namespace osu.Game.Rulesets.Catch.Tests
             beatmap.HitObjects.Add(new Fruit { StartTime = 1008, X = 56 / 512f, });
 
             for (int i = 0; i < 512; i++)
+            {
                 if (i % 5 < 3)
                     beatmap.HitObjects.Add(new Fruit { X = i % 10 < 5 ? 0.02f : 0.98f, StartTime = 2000 + i * 100, NewCombo = i % 8 == 0 });
+            }
 
             return beatmap;
         }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
@@ -13,13 +14,12 @@ namespace osu.Game.Rulesets.UI.Scrolling
     public class ScrollingHitObjectContainer : HitObjectContainer
     {
         private readonly IBindable<double> timeRange = new BindableDouble();
-
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        private Cached initialStateCache = new Cached();
+        private readonly Cached initialStateCache = new Cached();
 
         public ScrollingHitObjectContainer()
         {
@@ -45,8 +45,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public override bool Remove(DrawableHitObject hitObject)
         {
             var result = base.Remove(hitObject);
+
             if (result)
+            {
                 initialStateCache.Invalidate();
+                hitObjectInitialStateCache.Remove(hitObject);
+            }
+
             return result;
         }
 
@@ -66,6 +71,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!initialStateCache.IsValid)
             {
+                foreach (var cached in hitObjectInitialStateCache.Values)
+                    cached.Invalidate();
+
                 switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
@@ -81,27 +89,75 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 scrollingInfo.Algorithm.Reset();
 
                 foreach (var obj in Objects)
+                {
+                    computeLifetimeStartRecursive(obj);
                     computeInitialStateRecursive(obj);
+                }
+
                 initialStateCache.Validate();
             }
         }
 
-        private void computeInitialStateRecursive(DrawableHitObject hitObject)
+        private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
-            if (hitObject.HitObject is IHasEndTime endTime)
+            foreach (var obj in hitObject.NestedHitObjects)
+                computeLifetimeStartRecursive(obj);
+        }
+
+        private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
+
+        private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
+        {
+            float originAdjustment = 0.0f;
+
+            // calculate the dimension of the part of the hitobject that should already be visible
+            // when the hitobject origin first appears inside the scrolling container
+            switch (direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    originAdjustment = hitObject.OriginPosition.Y;
+                    break;
+
+                case ScrollingDirection.Down:
+                    originAdjustment = hitObject.DrawHeight - hitObject.OriginPosition.Y;
+                    break;
+
+                case ScrollingDirection.Left:
+                    originAdjustment = hitObject.OriginPosition.X;
+                    break;
+
+                case ScrollingDirection.Right:
+                    originAdjustment = hitObject.DrawWidth - hitObject.OriginPosition.X;
+                    break;
+            }
+
+            var adjustedStartTime = scrollingInfo.Algorithm.TimeAt(-originAdjustment, hitObject.HitObject.StartTime, timeRange.Value, scrollLength);
+            return scrollingInfo.Algorithm.GetDisplayStartTime(adjustedStartTime, timeRange.Value);
+        }
+
+        // Cant use AddOnce() since the delegate is re-constructed every invocation
+        private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
+        {
+            if (!hitObjectInitialStateCache.TryGetValue(hitObject, out var cached))
+                cached = hitObjectInitialStateCache[hitObject] = new Cached();
+
+            if (cached.IsValid)
+                return;
+
+            if (hitObject.HitObject is IHasEndTime e)
             {
                 switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
                         break;
 
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
                         break;
                 }
             }
@@ -113,7 +169,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 // Nested hitobjects don't need to scroll, but they do need accurate positions
                 updatePosition(obj, hitObject.HitObject.StartTime);
             }
-        }
+
+            cached.Validate();
+        });
 
         protected override void UpdateAfterChildrenLife()
         {

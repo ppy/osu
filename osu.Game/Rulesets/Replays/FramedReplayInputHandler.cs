@@ -7,7 +7,6 @@ using JetBrains.Annotations;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
-using osuTK;
 
 namespace osu.Game.Rulesets.Replays
 {
@@ -52,7 +51,7 @@ namespace osu.Game.Rulesets.Replays
 
         private int? currentFrameIndex;
 
-        private int nextFrameIndex => currentFrameIndex.HasValue ? MathHelper.Clamp(currentFrameIndex.Value + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1) : 0;
+        private int nextFrameIndex => currentFrameIndex.HasValue ? Math.Clamp(currentFrameIndex.Value + (currentDirection > 0 ? 1 : -1), 0, Frames.Count - 1) : 0;
 
         protected FramedReplayInputHandler(Replay replay)
         {
@@ -84,7 +83,7 @@ namespace osu.Game.Rulesets.Replays
         /// When set, we will ensure frames executed by nested drawables are frame-accurate to replay data.
         /// Disabling this can make replay playback smoother (useful for autoplay, currently).
         /// </summary>
-        public bool FrameAccuratePlayback = true;
+        public bool FrameAccuratePlayback = false;
 
         protected bool HasFrames => Frames.Count > 0;
 

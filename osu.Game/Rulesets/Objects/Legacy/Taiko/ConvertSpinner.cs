@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 {
@@ -14,6 +15,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 
         public double Duration => EndTime - StartTime;
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

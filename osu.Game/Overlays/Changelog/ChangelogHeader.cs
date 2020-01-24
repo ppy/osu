@@ -7,17 +7,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
-using osuTK;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogHeader : OverlayHeader
+    public class ChangelogHeader : BreadcrumbControlOverlayHeader
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
@@ -25,12 +23,13 @@ namespace osu.Game.Overlays.Changelog
 
         public UpdateStreamBadgeArea Streams;
 
-        private const string listing_string = "Listing";
+        private const string listing_string = "listing";
 
         public ChangelogHeader()
+            : base(OverlayColourScheme.Purple)
         {
-            TabControl.AddItem(listing_string);
-            TabControl.Current.ValueChanged += e =>
+            BreadcrumbControl.AddItem(listing_string);
+            BreadcrumbControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
@@ -45,23 +44,17 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            TabControl.AccentColour = colours.Violet;
-        }
-
         private ChangelogHeaderTitle title;
 
         private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
             if (e.OldValue != null)
-                TabControl.RemoveItem(e.OldValue.ToString());
+                BreadcrumbControl.RemoveItem(e.OldValue.ToString());
 
             if (e.NewValue != null)
             {
-                TabControl.AddItem(e.NewValue.ToString());
-                TabControl.Current.Value = e.NewValue.ToString();
+                BreadcrumbControl.AddItem(e.NewValue.ToString());
+                BreadcrumbControl.Current.Value = e.NewValue.ToString();
 
                 Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == e.NewValue.UpdateStream.Name);
 
@@ -69,7 +62,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                TabControl.Current.Value = listing_string;
+                BreadcrumbControl.Current.Value = listing_string;
                 Streams.Current.Value = null;
                 title.Version = null;
             }
@@ -113,58 +106,11 @@ namespace osu.Game.Overlays.Changelog
 
             public ChangelogHeaderTitle()
             {
-                Title = "Changelog";
+                Title = "changelog";
                 Version = null;
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.Violet;
-            }
-
-            protected override Drawable CreateIcon() => new ChangelogIcon();
-
-            internal class ChangelogIcon : CompositeDrawable
-            {
-                private const float circle_allowance = 0.8f;
-
-                [BackgroundDependencyLoader]
-                private void load(TextureStore textures, OsuColour colours)
-                {
-                    Size = new Vector2(ICON_SIZE / circle_allowance);
-
-                    InternalChildren = new Drawable[]
-                    {
-                        new CircularContainer
-                        {
-                            Masking = true,
-                            BorderColour = colours.Violet,
-                            BorderThickness = 3,
-                            MaskingSmoothness = 1,
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
-                            {
-                                new Sprite
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Texture = textures.Get(@"Icons/changelog"),
-                                    Size = new Vector2(circle_allowance),
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                },
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colours.Violet,
-                                    Alpha = 0,
-                                    AlwaysPresent = true,
-                                },
-                            }
-                        },
-                    };
-                }
-            }
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/changelog");
         }
     }
 }

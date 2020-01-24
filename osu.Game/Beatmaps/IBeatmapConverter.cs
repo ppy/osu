@@ -25,7 +25,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Whether <see cref="Beatmap"/> can be converted by this <see cref="IBeatmapConverter"/>.
         /// </summary>
-        bool CanConvert { get; }
+        bool CanConvert();
 
         /// <summary>
         /// Converts <see cref="Beatmap"/>.

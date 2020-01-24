@@ -17,6 +17,8 @@ namespace osu.Game.Tests.Visual.Gameplay
     {
         private bool exitAction;
 
+        protected override double TimePerAction => 100; // required for the early exit test, since hold-to-confirm delay is 200ms
+
         [BackgroundDependencyLoader]
         private void load()
         {

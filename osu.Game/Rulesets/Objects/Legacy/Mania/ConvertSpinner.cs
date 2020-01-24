@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Mania
 {
@@ -16,6 +17,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
 
         public float X { get; set; }
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

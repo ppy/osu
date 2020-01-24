@@ -225,9 +225,7 @@ namespace osu.Game.Tournament.Screens.Editors
                         beatmapId.Value = Model.ID.ToString();
                         beatmapId.BindValueChanged(idString =>
                         {
-                            int parsed;
-
-                            int.TryParse(idString.NewValue, out parsed);
+                            int.TryParse(idString.NewValue, out var parsed);
 
                             Model.ID = parsed;
 
@@ -266,12 +264,14 @@ namespace osu.Game.Tournament.Screens.Editors
                         drawableContainer.Clear();
 
                         if (Model.BeatmapInfo != null)
+                        {
                             drawableContainer.Child = new TournamentBeatmapPanel(Model.BeatmapInfo, Model.Mods)
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
                                 Width = 300
                             };
+                        }
                     }
                 }
             }

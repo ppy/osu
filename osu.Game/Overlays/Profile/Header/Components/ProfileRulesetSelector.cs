@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -15,6 +17,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
     public class ProfileRulesetSelector : RulesetSelector
     {
         private Color4 accentColour = Color4.White;
+
+        public readonly Bindable<User> User = new Bindable<User>();
 
         public ProfileRulesetSelector()
         {
@@ -32,24 +36,17 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 ((ProfileRulesetTabItem)tabItem).AccentColour = accentColour;
         }
 
-        public void SetDefaultRuleset(RulesetInfo ruleset)
+        protected override void LoadComplete()
         {
-            // Todo: This method shouldn't exist, but bindables don't provide the concept of observing a change to the default value
-            foreach (TabItem<RulesetInfo> tabItem in TabContainer)
-                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.ID == ruleset.ID;
+            base.LoadComplete();
+
+            User.BindValueChanged(u => SetDefaultRuleset(Rulesets.GetRuleset(u.NewValue?.PlayMode ?? "osu")), true);
         }
 
-        public void SelectDefaultRuleset()
+        public void SetDefaultRuleset(RulesetInfo ruleset)
         {
-            // Todo: This method shouldn't exist, but bindables don't provide the concept of observing a change to the default value
             foreach (TabItem<RulesetInfo> tabItem in TabContainer)
-            {
-                if (((ProfileRulesetTabItem)tabItem).IsDefault)
-                {
-                    Current.Value = ((ProfileRulesetTabItem)tabItem).Value;
-                    return;
-                }
-            }
+                ((ProfileRulesetTabItem)tabItem).IsDefault = ((ProfileRulesetTabItem)tabItem).Value.ID == ruleset.ID;
         }
 
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new ProfileRulesetTabItem(value)
