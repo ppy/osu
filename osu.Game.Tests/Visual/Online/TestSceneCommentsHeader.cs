@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
@@ -24,7 +25,7 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneCommentsHeader()
         {
-            Add(new CommentsHeader
+            Add(new CommentsHeader(OverlayColourScheme.Blue)
             {
                 Sort = { BindTarget = sort },
                 ShowDeleted = { BindTarget = showDeleted }

@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Comments
                     Children = new Drawable[]
                     {
                         commentCounter = new TotalCommentsCounter(OverlayColourScheme.Purple),
-                        new CommentsHeader
+                        new CommentsHeader(OverlayColourScheme.Purple)
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }

@@ -13,6 +13,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -29,18 +30,31 @@ namespace osu.Game.Overlays.Comments
             Spacing = new Vector2(5, 0),
         };
 
-        public SortTabControl()
+        public SortTabControl(OverlayColourScheme colourScheme)
         {
             AutoSizeAxes = Axes.Both;
+
+            TabContainer.ForEach(tab => ((SortTabItem)tab).ColourScheme = colourScheme);
         }
 
         private class SortTabItem : TabItem<CommentsSortCriteria>
         {
+            public OverlayColourScheme ColourScheme { get; set; }
+
+            private readonly CommentsSortCriteria value;
+
             public SortTabItem(CommentsSortCriteria value)
                 : base(value)
             {
+                this.value = value;
+
                 AutoSizeAxes = Axes.Both;
-                Child = new TabButton(value) { Active = { BindTarget = Active } };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Child = new TabButton(value, ColourScheme) { Active = { BindTarget = Active } };
             }
 
             protected override void OnActivated()
@@ -60,7 +74,8 @@ namespace osu.Game.Overlays.Comments
 
                 private readonly SpriteText text;
 
-                public TabButton(CommentsSortCriteria value)
+                public TabButton(CommentsSortCriteria value, OverlayColourScheme colourScheme)
+                    : base(colourScheme)
                 {
                     Add(text = new OsuSpriteText
                     {
@@ -78,7 +93,7 @@ namespace osu.Game.Overlays.Comments
                         updateBackgroundState();
 
                         text.Font = text.Font.With(weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium);
-                        text.Colour = active.NewValue ? colours.BlueLighter : Color4.White;
+                        text.Colour = active.NewValue ? colours.ForOverlayElement(ColourScheme, 0.4f, 0.8f) : Color4.White;
                     }, true);
                 }
 

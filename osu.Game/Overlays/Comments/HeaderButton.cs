@@ -17,11 +17,15 @@ namespace osu.Game.Overlays.Comments
 
         protected override Container<Drawable> Content => content;
 
+        protected OverlayColourScheme ColourScheme { get; }
+
         private readonly Box background;
         private readonly Container content;
 
-        public HeaderButton()
+        public HeaderButton(OverlayColourScheme colourScheme)
         {
+            ColourScheme = colourScheme;
+
             AutoSizeAxes = Axes.X;
             Height = 20;
             Masking = true;
@@ -47,7 +51,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray4;
+            background.Colour = colours.ForOverlayElement(ColourScheme, 0.1f, 0.25f);
         }
 
         protected override bool OnHover(HoverEvent e)

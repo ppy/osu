@@ -22,9 +22,12 @@ namespace osu.Game.Overlays.Comments
         public readonly BindableBool ShowDeleted = new BindableBool();
 
         private readonly Box background;
+        private readonly OverlayColourScheme colourScheme;
 
-        public CommentsHeader()
+        public CommentsHeader(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
             Height = 40;
 
@@ -56,7 +59,7 @@ namespace osu.Game.Overlays.Comments
                                     Font = OsuFont.GetFont(size: font_size),
                                     Text = @"Sort by"
                                 },
-                                new SortTabControl
+                                new SortTabControl(colourScheme)
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -64,7 +67,7 @@ namespace osu.Game.Overlays.Comments
                                 }
                             }
                         },
-                        new ShowDeletedButton
+                        new ShowDeletedButton(colourScheme)
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
@@ -78,7 +81,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray3;
+            background.Colour = colours.ForOverlayElement(colourScheme, 0.1f, 0.2f);
         }
 
         private class ShowDeletedButton : HeaderButton
@@ -87,7 +90,8 @@ namespace osu.Game.Overlays.Comments
 
             private readonly SpriteIcon checkboxIcon;
 
-            public ShowDeletedButton()
+            public ShowDeletedButton(OverlayColourScheme colourScheme)
+                : base(colourScheme)
             {
                 Add(new FillFlowContainer
                 {
