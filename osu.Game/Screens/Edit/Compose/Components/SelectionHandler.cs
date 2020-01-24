@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Drawable outline;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IPlacementHandler placementHandler { get; set; }
 
         public SelectionHandler()
@@ -87,7 +87,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         #endregion
 

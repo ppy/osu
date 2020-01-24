@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -19,12 +18,11 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Traceable";
         public override string Acronym => "TC";
-        public override IconUsage Icon => FontAwesome.Brands.SnapchatGhost;
         public override ModType Type => ModType.Fun;
         public override string Description => "Put your faith in the approach circles...";
         public override double ScoreMultiplier => 1;
 
-        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModeObjectScaleTween) };
+        public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden), typeof(OsuModSpinIn), typeof(OsuModObjectScaleTween) };
         private Bindable<bool> increaseFirstObjectVisibility = new Bindable<bool>();
 
         public void ReadFromConfig(OsuConfigManager config)

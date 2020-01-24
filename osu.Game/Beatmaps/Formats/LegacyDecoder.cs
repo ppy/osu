@@ -77,8 +77,6 @@ namespace osu.Game.Beatmaps.Formats
             return line;
         }
 
-        private bool hasComboColours;
-
         private void handleColours(T output, string line)
         {
             var pair = SplitKeyVal(line);
@@ -105,14 +103,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
-                if (!hasComboColours)
-                {
-                    // remove default colours.
-                    tHasComboColours.ComboColours.Clear();
-                    hasComboColours = true;
-                }
-
-                tHasComboColours.ComboColours.Add(colour);
+                tHasComboColours.AddComboColours(colour);
             }
             else
             {

@@ -48,11 +48,9 @@ namespace osu.Game.Beatmaps.Drawables
             InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
         }
 
-        public string TooltipText { get; set; }
-
         public ITooltip GetCustomTooltip() => new DifficultyIconTooltip();
 
-        public object TooltipContent { get; set; }
+        public object TooltipContent { get; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
