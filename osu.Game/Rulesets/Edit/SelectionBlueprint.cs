@@ -41,14 +41,15 @@ namespace osu.Game.Rulesets.Edit
         protected SelectionBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
+
             RelativeSizeAxes = Axes.Both;
+            AlwaysPresent = true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            OnDeselected();
-            AlwaysPresent = true;
+            base.LoadComplete();
+            updateState();
         }
 
         private SelectionState state;
@@ -65,20 +66,26 @@ namespace osu.Game.Rulesets.Edit
 
                 state = value;
 
-                switch (state)
-                {
-                    case SelectionState.Selected:
-                        OnSelected();
-                        Selected?.Invoke(this);
-                        break;
-
-                    case SelectionState.NotSelected:
-                        OnDeselected();
-                        Deselected?.Invoke(this);
-                        break;
-                }
+                if (IsLoaded)
+                    updateState();
 
                 StateChanged?.Invoke(state);
+            }
+        }
+
+        private void updateState()
+        {
+            switch (state)
+            {
+                case SelectionState.Selected:
+                    OnSelected();
+                    Selected?.Invoke(this);
+                    break;
+
+                case SelectionState.NotSelected:
+                    OnDeselected();
+                    Deselected?.Invoke(this);
+                    break;
             }
         }
 
