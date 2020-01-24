@@ -7,8 +7,8 @@ using Newtonsoft.Json;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.IO.Network;
 using osu.Framework.Platform;
+using osu.Game.Online.API;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Updater
@@ -36,7 +36,7 @@ namespace osu.Game.Updater
         {
             try
             {
-                var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+                var releases = new OsuJsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
 
                 await releases.PerformAsync();
 
