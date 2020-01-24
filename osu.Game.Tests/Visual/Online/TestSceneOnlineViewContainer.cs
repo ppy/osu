@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Online.API;
 using osuTK.Graphics;
@@ -18,49 +17,75 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneOnlineViewContainer : OsuTestScene
     {
-        private readonly OnlineViewContainer onlineView;
+        private readonly TestOnlineViewContainer onlineView;
 
         public TestSceneOnlineViewContainer()
         {
             Child = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = onlineView = new OnlineViewContainer(@"Please sign in to view dummy test content")
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Blue.Opacity(0.8f),
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "dummy online content",
-                            RelativeSizeAxes = Axes.Both,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        }
-                    }
-                }
+                Child = onlineView = new TestOnlineViewContainer()
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private class TestOnlineViewContainer : OnlineViewContainer
+        {
+            public new Container<Drawable> Content => base.Content;
+
+            public new LoadingAnimation LoadingAnimation => base.LoadingAnimation;
+
+            public TestOnlineViewContainer()
+                : base(@"Please sign in to view dummy test content")
+            {
+                RelativeSizeAxes = Axes.Both;
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Blue.Opacity(0.8f),
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = "dummy online content",
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+            }
+        }
+
+        [Test]
+        public void TestOnlineStateVisibility()
+        {
+            AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
+
+            AddAssert("children are visible", () => onlineView.Content.IsPresent);
+            AddAssert("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
+        }
+
+        [Test]
+        public void TestOfflineStateVisibility()
         {
             AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
 
-            AddAssert("children are hidden", () => !onlineView.Children.First().Parent.IsPresent);
+            AddAssert("children are hidden", () => !onlineView.Content.IsPresent);
+            AddAssert("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
+        }
 
-            AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
-
-            AddAssert("children are visible", () => onlineView.Children.First().Parent.IsPresent);
-
+        [Test]
+        public void TestConnectingStateVisibility()
+        {
             AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
 
-            AddAssert("children are hidden", () => !onlineView.Children.First().Parent.IsPresent);
+            AddAssert("children are hidden", () => !onlineView.Content.IsPresent);
+            AddAssert("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+
+            AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
+
+            AddAssert("children are hidden", () => !onlineView.Content.IsPresent);
+            AddAssert("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
         }
     }
 }
