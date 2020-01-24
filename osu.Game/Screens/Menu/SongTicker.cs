@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -16,8 +16,6 @@ namespace osu.Game.Screens.Menu
     public class SongTicker : Container
     {
         private const int fade_duration = 800;
-
-        public bool AllowUpdates { get; set; } = true;
 
         [Resolved]
         private Bindable<WorkingBeatmap> beatmap { get; set; }
@@ -58,8 +56,7 @@ namespace osu.Game.Screens.Menu
 
         private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
         {
-            if (!AllowUpdates)
-                return;
+            var metadata = beatmap.Value.Metadata;
 
             var metadata = working.NewValue.Metadata;
 
