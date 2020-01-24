@@ -66,6 +66,7 @@ namespace osu.Game.Tests.Visual.Editor
             Dependencies.CacheAs<IAdjustableClock>(clock);
             Dependencies.CacheAs<IFrameBasedClock>(clock);
             Dependencies.CacheAs(editorBeatmap);
+            Dependencies.CacheAs<IBeatSnapProvider>(editorBeatmap);
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }

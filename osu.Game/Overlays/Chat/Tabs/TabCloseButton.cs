@@ -34,10 +34,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)

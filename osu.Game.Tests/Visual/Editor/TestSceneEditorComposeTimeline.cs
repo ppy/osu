@@ -40,6 +40,8 @@ namespace osu.Game.Tests.Visual.Editor
 
             var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap);
 
+            Dependencies.Cache(editorBeatmap);
+
             Children = new Drawable[]
             {
                 new FillFlowContainer
