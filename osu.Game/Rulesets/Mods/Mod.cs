@@ -61,6 +61,12 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool Ranked => false;
 
         /// <summary>
+        /// Whether this mod requires configuration to apply changes to the game.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool RequiresConfiguration => false;
+
+        /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]
