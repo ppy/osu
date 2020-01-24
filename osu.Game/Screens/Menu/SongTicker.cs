@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Menu
         private Bindable<WorkingBeatmap> beatmap { get; set; }
 
         private readonly OsuSpriteText title, artist;
+
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
         public SongTicker()
         {
@@ -51,19 +53,20 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmap.BindValueChanged(onBeatmapChanged);
+
+            beatmap.BindValueChanged(_ => Scheduler.AddOnce(show), true);
         }
 
-        private void onBeatmapChanged(ValueChangedEvent<WorkingBeatmap> working)
+        private void show()
         {
             var metadata = beatmap.Value.Metadata;
-
-            var metadata = working.NewValue.Metadata;
 
             title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
             artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
 
-            this.FadeIn(fade_duration, Easing.OutQuint).Delay(4000).Then().FadeOut(fade_duration, Easing.OutQuint);
+            this.FadeInFromZero(fade_duration)
+                .Delay(4000)
+                .Then().FadeOut(fade_duration);
         }
     }
 }
