@@ -163,30 +163,9 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             centre.Width = 2.5f;
             colourBars.Add(centre);
 
-            Color4 getColour(HitResult result)
-            {
-                switch (result)
-                {
-                    case HitResult.Meh:
-                        return colours.Yellow;
-
-                    case HitResult.Ok:
-                        return colours.Green;
-
-                    case HitResult.Good:
-                        return colours.GreenLight;
-
-                    case HitResult.Great:
-                        return colours.Blue;
-
-                    default:
-                        return colours.BlueLight;
-                }
-            }
-
             Drawable createColourBar(HitResult result, float height, bool first = false)
             {
-                var colour = getColour(result);
+                var colour = GetColourForHitResult(result);
 
                 if (first)
                 {
@@ -201,7 +180,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = getColour(result),
+                                Colour = colour,
                                 Height = height * gradient_start
                             },
                             new Box
