@@ -205,7 +205,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
         }
     }
 }

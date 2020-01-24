@@ -36,7 +36,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             //disable keyboard controls
             public bool OnPressed(CatchAction action) => true;
-            public bool OnReleased(CatchAction action) => true;
+
+            public void OnReleased(CatchAction action)
+            {
+            }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
