@@ -12,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Header
         private OsuSpriteText usernameText;
         private ExternalLinkButton openUserExternally;
         private OsuSpriteText titleText;
-        private DrawableFlag userFlag;
+        private UpdateableFlag userFlag;
         private OsuSpriteText userCountryText;
         private FillFlowContainer userStats;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarker,
+                    Colour = colours.GreySeafoamDark,
                 },
                 new FillFlowContainer
                 {
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Profile.Header
                     AutoSizeAxes = Axes.X,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         avatar = new UpdateableAvatar
                         {
@@ -59,6 +60,7 @@ namespace osu.Game.Overlays.Profile.Header
                             Masking = true,
                             CornerRadius = avatar_size * 0.25f,
                             OpenOnClick = { Value = false },
+                            ShowGuestOnNull = false,
                         },
                         new Container
                         {
@@ -70,18 +72,30 @@ namespace osu.Game.Overlays.Profile.Header
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        usernameText = new OsuSpriteText
+                                        new FillFlowContainer
                                         {
-                                            Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                usernameText = new OsuSpriteText
+                                                {
+                                                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Regular)
+                                                },
+                                                openUserExternally = new ExternalLinkButton
+                                                {
+                                                    Margin = new MarginPadding { Left = 5 },
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Origin = Anchor.CentreLeft,
+                                                },
+                                            }
                                         },
-                                        openUserExternally = new ExternalLinkButton
+                                        titleText = new OsuSpriteText
                                         {
-                                            Margin = new MarginPadding { Left = 5 },
-                                            Anchor = Anchor.CentreLeft,
-                                            Origin = Anchor.CentreLeft,
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
                                         },
                                     }
                                 },
@@ -93,10 +107,6 @@ namespace osu.Game.Overlays.Profile.Header
                                     AutoSizeAxes = Axes.Both,
                                     Children = new Drawable[]
                                     {
-                                        titleText = new OsuSpriteText
-                                        {
-                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Regular)
-                                        },
                                         supporterTag = new SupporterIcon
                                         {
                                             Height = 20,
@@ -107,25 +117,27 @@ namespace osu.Game.Overlays.Profile.Header
                                             RelativeSizeAxes = Axes.X,
                                             Height = 1.5f,
                                             Margin = new MarginPadding { Top = 10 },
-                                            Colour = colours.CommunityUserGrayGreenLighter,
+                                            Colour = colours.GreySeafoamLighter,
                                         },
-                                        new Container
+                                        new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
                                             Margin = new MarginPadding { Top = 5 },
+                                            Direction = FillDirection.Horizontal,
                                             Children = new Drawable[]
                                             {
-                                                userFlag = new DrawableFlag
+                                                userFlag = new UpdateableFlag
                                                 {
-                                                    Size = new Vector2(30, 20)
+                                                    Size = new Vector2(30, 20),
+                                                    ShowPlaceholderOnNull = false,
                                                 },
                                                 userCountryText = new OsuSpriteText
                                                 {
                                                     Font = OsuFont.GetFont(size: 17.5f, weight: FontWeight.Regular),
-                                                    Margin = new MarginPadding { Left = 40 },
+                                                    Margin = new MarginPadding { Left = 10 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Colour = colours.CommunityUserGrayGreenLighter,
+                                                    Colour = colours.GreySeafoamLighter,
                                                 }
                                             }
                                         },
@@ -162,6 +174,7 @@ namespace osu.Game.Overlays.Profile.Header
             titleText.Colour = OsuColour.FromHex(user?.Colour ?? "fff");
 
             userStats.Clear();
+
             if (user?.Statistics != null)
             {
                 userStats.Add(new UserStatsLine("Ranked Score", user.Statistics.RankedScore.ToString("#,##0")));

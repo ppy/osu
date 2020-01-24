@@ -102,7 +102,7 @@ namespace osu.Game.IO.Legacy
         }
 
         /// <summary> Writes a generic IDictionary to the buffer. </summary>
-        public void Write<T, U>(IDictionary<T, U> d)
+        public void Write<TKey, TValue>(IDictionary<TKey, TValue> d)
         {
             if (d == null)
             {
@@ -111,7 +111,8 @@ namespace osu.Game.IO.Legacy
             else
             {
                 Write(d.Count);
-                foreach (KeyValuePair<T, U> kvp in d)
+
+                foreach (KeyValuePair<TKey, TValue> kvp in d)
                 {
                     WriteObject(kvp.Key);
                     WriteObject(kvp.Value);

@@ -10,9 +10,18 @@ namespace osu.Game.Online.API
     {
         private string filename;
 
+        /// <summary>
+        /// Used to set the extension of the file returned by this request.
+        /// </summary>
+        protected virtual string FileExtension { get; } = @".tmp";
+
         protected override WebRequest CreateWebRequest()
         {
-            var request = new FileWebRequest(filename = Path.GetTempFileName(), Uri);
+            var file = Path.GetTempFileName();
+
+            File.Move(file, filename = Path.ChangeExtension(file, FileExtension));
+
+            var request = new FileWebRequest(filename, Uri);
             request.DownloadProgress += request_Progress;
             return request;
         }

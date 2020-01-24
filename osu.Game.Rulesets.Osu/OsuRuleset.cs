@@ -14,7 +14,6 @@ using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
@@ -24,15 +23,26 @@ using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.Skinning;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Skinning;
+using System;
 
 namespace osu.Game.Rulesets.Osu
 {
-    public class OsuRuleset : Ruleset
+    public class OsuRuleset : Ruleset, ILegacyRuleset
     {
-        public override DrawableRuleset CreateDrawableRulesetWith(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new DrawableOsuRuleset(this, beatmap, mods);
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableOsuRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor();
+
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap, this);
+
         public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
+
+        public const string SHORT_NAME = "osu";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -49,10 +59,17 @@ namespace osu.Game.Rulesets.Osu
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new OsuModDoubleTime();
 
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new OsuModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new OsuModSuddenDeath();
+
             if (mods.HasFlag(LegacyMods.Autopilot))
                 yield return new OsuModAutopilot();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new OsuModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new OsuModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -73,17 +90,11 @@ namespace osu.Game.Rulesets.Osu
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new OsuModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new OsuModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new OsuModRelax();
 
             if (mods.HasFlag(LegacyMods.SpunOut))
                 yield return new OsuModSpunOut();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new OsuModSuddenDeath();
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
@@ -104,6 +115,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
                         new OsuModSpunOut(),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -113,28 +125,41 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHidden(),
                         new MultiMod(new OsuModFlashlight(), new OsuModBlinds()),
                     };
+
                 case ModType.Conversion:
                     return new Mod[]
                     {
                         new OsuModTarget(),
+                        new OsuModDifficultyAdjust(),
                     };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
+                        new MultiMod(new OsuModAutoplay(), new OsuModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                     };
+
                 case ModType.Fun:
                     return new Mod[]
                     {
                         new OsuModTransform(),
                         new OsuModWiggle(),
-                        new OsuModGrow(),
-                        new MultiMod(new ModWindUp<OsuHitObject>(), new ModWindDown<OsuHitObject>()),
+                        new OsuModSpinIn(),
+                        new MultiMod(new OsuModGrow(), new OsuModDeflate()),
+                        new MultiMod(new ModWindUp(), new ModWindDown()),
+                        new OsuModTraceable(),
                     };
+
+                case ModType.System:
+                    return new Mod[]
+                    {
+                        new OsuModTouchDevice(),
+                    };
+
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
@@ -148,19 +173,18 @@ namespace osu.Game.Rulesets.Osu
 
         public override string Description => "osu!";
 
-        public override string ShortName => "osu";
+        public override string ShortName => SHORT_NAME;
+
+        public override string PlayingVerb => "Clicking circles";
 
         public override RulesetSettingsSubsection CreateSettings() => new OsuSettingsSubsection(this);
 
-        public override int? LegacyID => 0;
+        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new OsuLegacySkinTransformer(source);
+
+        public int LegacyID => 0;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new OsuReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new OsuRulesetConfigManager(settings, RulesetInfo);
-
-        public OsuRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
     }
 }

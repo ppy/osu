@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Utils;
 
@@ -17,7 +18,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// The peak strain for each <see cref="DifficultyCalculator.SectionLength"/> section of the beatmap.
         /// </summary>
-        public IList<double> StrainPeaks => strainPeaks;
+        public IReadOnlyList<double> StrainPeaks => strainPeaks;
 
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
@@ -84,13 +85,12 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// </summary>
         public double DifficultyValue()
         {
-            strainPeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
             double difficulty = 0;
             double weight = 1;
 
             // Difficulty is the weighted sum of the highest strains from every section.
-            foreach (double strain in strainPeaks)
+            // We're sorting from highest to lowest strain.
+            foreach (double strain in strainPeaks.OrderByDescending(d => d))
             {
                 difficulty += strain * weight;
                 weight *= DecayWeight;

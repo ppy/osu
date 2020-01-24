@@ -15,14 +15,13 @@ namespace osu.Game.Graphics.UserInterface
     public class BreadcrumbControl<T> : OsuTabControl<T>
     {
         private const float padding = 10;
-        private const float item_chevron_size = 10;
 
         protected override TabItem<T> CreateTabItem(T value) => new BreadcrumbTabItem(value)
         {
             AccentColour = AccentColour,
         };
 
-        protected override float StripWidth() => base.StripWidth() - (padding + item_chevron_size);
+        protected override float StripWidth => base.StripWidth - TabContainer.FirstOrDefault()?.Padding.Right ?? 0;
 
         public BreadcrumbControl()
         {
@@ -41,8 +40,10 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        private class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
+        protected class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
+            protected virtual float ChevronSize => 10;
+
             public event Action<Visibility> StateChanged;
 
             public readonly SpriteIcon Chevron;
@@ -52,7 +53,6 @@ namespace osu.Game.Graphics.UserInterface
 
             public override bool HandleNonPositionalInput => State == Visibility.Visible;
             public override bool HandlePositionalInput => State == Visibility.Visible;
-            public override bool IsRemovable => true;
 
             private Visibility state;
 
@@ -82,17 +82,21 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
+            public override void Hide() => State = Visibility.Hidden;
+
+            public override void Show() => State = Visibility.Visible;
+
             public BreadcrumbTabItem(T value)
                 : base(value)
             {
                 Text.Font = Text.Font.With(size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };
-                Padding = new MarginPadding { Right = padding + item_chevron_size };
+                Padding = new MarginPadding { Right = padding + ChevronSize };
                 Add(Chevron = new SpriteIcon
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreLeft,
-                    Size = new Vector2(item_chevron_size),
+                    Size = new Vector2(ChevronSize),
                     Icon = FontAwesome.Solid.ChevronRight,
                     Margin = new MarginPadding { Left = padding },
                     Alpha = 0f,

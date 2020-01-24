@@ -9,6 +9,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -20,6 +21,11 @@ namespace osu.Game.Graphics.UserInterface
     {
         private SampleChannel sampleHover;
 
+        /// <summary>
+        /// Length of debounce for hover sound playback, in milliseconds. Default is 50ms.
+        /// </summary>
+        public double HoverDebounceTime { get; } = 50;
+
         protected readonly HoverSampleSet SampleSet;
 
         public HoverSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
@@ -28,16 +34,24 @@ namespace osu.Game.Graphics.UserInterface
             RelativeSizeAxes = Axes.Both;
         }
 
+        private ScheduledDelegate playDelegate;
+
         protected override bool OnHover(HoverEvent e)
         {
-            sampleHover?.Play();
+            playDelegate?.Cancel();
+
+            if (HoverDebounceTime <= 0)
+                sampleHover?.Play();
+            else
+                playDelegate = Scheduler.AddDelayed(() => sampleHover?.Play(), HoverDebounceTime);
+
             return base.OnHover(e);
         }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = audio.Samples.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
     }
 

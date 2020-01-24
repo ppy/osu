@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
@@ -25,7 +26,7 @@ namespace osu.Game.Beatmaps
 
         public IBeatmap Beatmap { get; }
 
-        protected BeatmapConverter(IBeatmap beatmap)
+        protected BeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
         {
             Beatmap = beatmap;
         }
@@ -33,7 +34,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Whether <see cref="Beatmap"/> can be converted by this <see cref="BeatmapConverter{T}"/>.
         /// </summary>
-        public bool CanConvert => !Beatmap.HitObjects.Any() || ValidConversionTypes.All(t => Beatmap.HitObjects.Any(t.IsInstanceOfType));
+        public abstract bool CanConvert();
 
         /// <summary>
         /// Converts <see cref="Beatmap"/>.
@@ -91,11 +92,6 @@ namespace osu.Game.Beatmaps
 
             return result;
         }
-
-        /// <summary>
-        /// The types of HitObjects that can be converted to be used for this Beatmap.
-        /// </summary>
-        protected abstract IEnumerable<Type> ValidConversionTypes { get; }
 
         /// <summary>
         /// Creates the <see cref="Beatmap{T}"/> that will be returned by this <see cref="BeatmapProcessor"/>.

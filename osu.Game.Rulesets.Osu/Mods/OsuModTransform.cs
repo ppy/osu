@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";
-        public override IconUsage Icon => FontAwesome.Solid.ArrowsAlt;
+        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
 
                 Vector2 originalPosition = drawable.Position;
-                Vector2 appearOffset = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance;
+                Vector2 appearOffset = new Vector2(MathF.Cos(theta), MathF.Sin(theta)) * appearDistance;
 
                 //the - 1 and + 1 prevents the hit objects to appear in the wrong position.
                 double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;

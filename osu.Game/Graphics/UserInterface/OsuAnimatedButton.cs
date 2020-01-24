@@ -19,14 +19,14 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuAnimatedButton : OsuClickableContainer
     {
         /// <summary>
-        /// The colour that should be flashed when the <see cref="IconButton"/> is clicked.
+        /// The colour that should be flashed when the <see cref="OsuAnimatedButton"/> is clicked.
         /// </summary>
         protected Color4 FlashColour = Color4.White.Opacity(0.3f);
 
         private Color4 hoverColour = Color4.White.Opacity(0.1f);
 
         /// <summary>
-        /// The background colour of the <see cref="IconButton"/> while it is hovered.
+        /// The background colour of the <see cref="OsuAnimatedButton"/> while it is hovered.
         /// </summary>
         protected Color4 HoverColour
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = HoverColour,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                         Alpha = 0,
                     },
                 }
@@ -74,6 +74,12 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            if (AutoSizeAxes != Axes.None)
+            {
+                content.RelativeSizeAxes = (Axes.Both & ~AutoSizeAxes);
+                content.AutoSizeAxes = AutoSizeAxes;
+            }
+
             Enabled.BindValueChanged(enabled => this.FadeColour(enabled.NewValue ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
         }
 
@@ -101,10 +107,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
     }
 }

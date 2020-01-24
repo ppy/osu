@@ -30,21 +30,24 @@ namespace osu.Game.Graphics.Cursor
             private readonly OsuSpriteText text;
             private bool instantMovement = true;
 
-            public override string TooltipText
+            public override bool SetContent(object content)
             {
-                set
-                {
-                    if (value == text.Text) return;
+                if (!(content is string contentString))
+                    return false;
 
-                    text.Text = value;
-                    if (IsPresent)
-                    {
-                        AutoSizeDuration = 250;
-                        background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
-                    }
-                    else
-                        AutoSizeDuration = 0;
+                if (contentString == text.Text) return true;
+
+                text.Text = contentString;
+
+                if (IsPresent)
+                {
+                    AutoSizeDuration = 250;
+                    background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
                 }
+                else
+                    AutoSizeDuration = 0;
+
+                return true;
             }
 
             public OsuTooltip()

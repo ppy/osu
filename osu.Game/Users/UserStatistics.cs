@@ -4,11 +4,15 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Scoring;
+using static osu.Game.Users.User;
 
 namespace osu.Game.Users
 {
     public class UserStatistics
     {
+        [JsonProperty]
+        public User User;
+
         [JsonProperty(@"level")]
         public LevelInfo Level;
 
@@ -85,14 +89,19 @@ namespace osu.Game.Users
                     {
                         case ScoreRank.XH:
                             return SSPlus;
+
                         case ScoreRank.X:
                             return SS;
+
                         case ScoreRank.SH:
                             return SPlus;
+
                         case ScoreRank.S:
                             return S;
+
                         case ScoreRank.A:
                             return A;
+
                         default:
                             throw new ArgumentException($"API does not return {rank.ToString()}");
                     }
@@ -108,5 +117,7 @@ namespace osu.Game.Users
             [JsonProperty(@"country")]
             public int? Country;
         }
+
+        public RankHistoryData RankHistory;
     }
 }

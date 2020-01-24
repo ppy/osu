@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 
@@ -33,6 +34,13 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
+        private CancellationTokenSource modsLoadCts;
+
+        /// <summary>
+        /// True when all mod icons have completed loading.
+        /// </summary>
+        public bool ModIconsLoaded { get; private set; } = true;
+
         public IEnumerable<Mod> Mods
         {
             set
@@ -48,12 +56,32 @@ namespace osu.Game.Overlays.Mods
                     };
                 }).ToArray();
 
-                ButtonsContainer.Children = modContainers;
+                modsLoadCts?.Cancel();
+
+                if (modContainers.Length == 0)
+                {
+                    ModIconsLoaded = true;
+                    headerLabel.Hide();
+                    Hide();
+                    return;
+                }
+
+                ModIconsLoaded = false;
+
+                LoadComponentsAsync(modContainers, c =>
+                {
+                    ModIconsLoaded = true;
+                    ButtonsContainer.ChildrenEnumerable = c;
+                }, (modsLoadCts = new CancellationTokenSource()).Token);
+
                 buttons = modContainers.OfType<ModButton>().ToArray();
+
+                headerLabel.FadeIn(200);
+                this.FadeIn(200);
             }
         }
 
-        private ModButton[] buttons = { };
+        private ModButton[] buttons = Array.Empty<ModButton>();
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -77,12 +105,14 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
             int delay = 0;
+
             foreach (var button in buttons)
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
 
                 foreach (var type in modTypes)
+                {
                     if (type.IsInstanceOfType(selected))
                     {
                         if (immediate)
@@ -90,6 +120,7 @@ namespace osu.Game.Overlays.Mods
                         else
                             Scheduler.AddDelayed(button.Deselect, delay += 50);
                     }
+                }
             }
         }
 
@@ -129,13 +160,14 @@ namespace osu.Game.Overlays.Mods
                 },
                 ButtonsContainer = new FillFlowContainer<ModButtonEmpty>
                 {
-                    AutoSizeAxes = Axes.Both,
+                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Spacing = new Vector2(50f, 0f),
                     Margin = new MarginPadding
                     {
-                        Top = 6,
+                        Top = 20,
                     },
                     AlwaysPresent = true
                 },

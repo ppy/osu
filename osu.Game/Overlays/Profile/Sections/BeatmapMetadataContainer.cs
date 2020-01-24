@@ -4,30 +4,24 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
     /// <summary>
     /// Display artist/title/mapper information, commonly used as the left portion of a profile or score display row (see <see cref="DrawableProfileRow"/>).
     /// </summary>
-    public class BeatmapMetadataContainer : OsuHoverContainer, IHasTooltip
+    public abstract class BeatmapMetadataContainer : OsuHoverContainer
     {
         private readonly BeatmapInfo beatmap;
 
-        public BeatmapMetadataContainer(BeatmapInfo beatmap)
+        protected BeatmapMetadataContainer(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
-            AutoSizeAxes = Axes.Both;
-            TooltipText = $"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title}";
-        }
 
-        public string TooltipText { get; }
+            AutoSizeAxes = Axes.Both;
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapSetOverlay beatmapSetOverlay)
@@ -43,23 +37,10 @@ namespace osu.Game.Overlays.Profile.Sections
             Child = new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Children = new Drawable[]
-                {
-                    new OsuSpriteText
-                    {
-                        Text = new LocalisedString((
-                            $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                            $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
-                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                        Padding = new MarginPadding { Top = 3 },
-                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
-                    },
-                },
+                Children = CreateText(beatmap),
             };
         }
+
+        protected abstract Drawable[] CreateText(BeatmapInfo beatmap);
     }
 }

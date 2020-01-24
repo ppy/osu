@@ -85,6 +85,7 @@ namespace osu.Game.IO.Legacy
             for (int i = 0; i < count; i++)
             {
                 T obj = new T();
+
                 try
                 {
                     obj.ReadFromStream(sr);
@@ -115,13 +116,13 @@ namespace osu.Game.IO.Legacy
         }
 
         /// <summary> Reads a generic Dictionary from the buffer. </summary>
-        public IDictionary<T, U> ReadDictionary<T, U>()
+        public IDictionary<TKey, TValue> ReadDictionary<TKey, TValue>()
         {
             int count = ReadInt32();
             if (count < 0) return null;
 
-            IDictionary<T, U> d = new Dictionary<T, U>();
-            for (int i = 0; i < count; i++) d[(T)ReadObject()] = (U)ReadObject();
+            IDictionary<TKey, TValue> d = new Dictionary<TKey, TValue>();
+            for (int i = 0; i < count; i++) d[(TKey)ReadObject()] = (TValue)ReadObject();
             return d;
         }
 
@@ -129,50 +130,69 @@ namespace osu.Game.IO.Legacy
         public object ReadObject()
         {
             ObjType t = (ObjType)ReadByte();
+
             switch (t)
             {
                 case ObjType.boolType:
                     return ReadBoolean();
+
                 case ObjType.byteType:
                     return ReadByte();
+
                 case ObjType.uint16Type:
                     return ReadUInt16();
+
                 case ObjType.uint32Type:
                     return ReadUInt32();
+
                 case ObjType.uint64Type:
                     return ReadUInt64();
+
                 case ObjType.sbyteType:
                     return ReadSByte();
+
                 case ObjType.int16Type:
                     return ReadInt16();
+
                 case ObjType.int32Type:
                     return ReadInt32();
+
                 case ObjType.int64Type:
                     return ReadInt64();
+
                 case ObjType.charType:
                     return ReadChar();
+
                 case ObjType.stringType:
                     return base.ReadString();
+
                 case ObjType.singleType:
                     return ReadSingle();
+
                 case ObjType.doubleType:
                     return ReadDouble();
+
                 case ObjType.decimalType:
                     return ReadDecimal();
+
                 case ObjType.dateTimeType:
                     return ReadDateTime();
+
                 case ObjType.byteArrayType:
                     return ReadByteArray();
+
                 case ObjType.charArrayType:
                     return ReadCharArray();
+
                 case ObjType.otherType:
                     return DynamicDeserializer.Deserialize(BaseStream);
+
                 default:
                     return null;
             }
         }
 
-        public class DynamicDeserializer
+        public static class DynamicDeserializer
         {
             private static VersionConfigToNamespaceAssemblyObjectBinder versionBinder;
             private static BinaryFormatter formatter;
@@ -206,9 +226,7 @@ namespace osu.Game.IO.Legacy
 
                 public override Type BindToType(string assemblyName, string typeName)
                 {
-                    Type typeToDeserialize;
-
-                    if (cache.TryGetValue(assemblyName + typeName, out typeToDeserialize))
+                    if (cache.TryGetValue(assemblyName + typeName, out var typeToDeserialize))
                         return typeToDeserialize;
 
                     List<Type> tmpTypes = new List<Type>();
@@ -241,6 +259,7 @@ namespace osu.Game.IO.Legacy
 
                     string toAssemblyName = assemblyName.Split(',')[0];
                     Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
                     foreach (Assembly a in assemblies)
                     {
                         if (a.FullName.Split(',')[0] == toAssemblyName)

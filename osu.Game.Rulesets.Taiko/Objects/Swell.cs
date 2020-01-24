@@ -4,6 +4,7 @@
 using System;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
@@ -33,5 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         }
 
         public override Judgement CreateJudgement() => new TaikoSwellJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

@@ -17,20 +17,40 @@ namespace osu.Game.Rulesets.UI
     /// </summary>
     public class FrameStabilityContainer : Container, IHasReplayHandler
     {
-        public FrameStabilityContainer()
+        private readonly double gameplayStartTime;
+
+        /// <summary>
+        /// The number of frames (per parent frame) which can be run in an attempt to catch-up to real-time.
+        /// </summary>
+        public int MaxCatchUpFrames { get; set; } = 5;
+
+        /// <summary>
+        /// Whether to enable frame-stable playback.
+        /// </summary>
+        internal bool FrameStablePlayback = true;
+
+        [Cached]
+        public GameplayClock GameplayClock { get; }
+
+        public FrameStabilityContainer(double gameplayStartTime = double.MinValue)
         {
             RelativeSizeAxes = Axes.Both;
-            gameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+
+            GameplayClock = new GameplayClock(framedClock = new FramedClock(manualClock = new ManualClock()));
+
+            this.gameplayStartTime = gameplayStartTime;
         }
 
         private readonly ManualClock manualClock;
 
         private readonly FramedClock framedClock;
 
-        [Cached]
-        private GameplayClock gameplayClock;
-
         private IFrameBasedClock parentGameplayClock;
+
+        /// <summary>
+        /// The current direction of playback to be exposed to frame stable children.
+        /// </summary>
+        private int direction;
 
         [BackgroundDependencyLoader(true)]
         private void load(GameplayClock clock)
@@ -38,7 +58,7 @@ namespace osu.Game.Rulesets.UI
             if (clock != null)
             {
                 parentGameplayClock = clock;
-                gameplayClock.IsPaused.BindTo(clock.IsPaused);
+                GameplayClock.IsPaused.BindTo(clock.IsPaused);
             }
         }
 
@@ -64,8 +84,6 @@ namespace osu.Game.Rulesets.UI
 
         private bool isAttached => ReplayInputHandler != null;
 
-        private const int max_catch_up_updates_per_frame = 50;
-
         private const double sixty_frame_time = 1000.0 / 60;
 
         private bool firstConsumption = true;
@@ -73,11 +91,11 @@ namespace osu.Game.Rulesets.UI
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
-            validState = !gameplayClock.IsPaused.Value;
+            validState = !GameplayClock.IsPaused.Value;
 
             int loops = 0;
 
-            while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
+            while (validState && requireMoreUpdateLoops && loops++ < MaxCatchUpFrames)
             {
                 updateClock();
 
@@ -97,25 +115,28 @@ namespace osu.Game.Rulesets.UI
                 setClock(); // LoadComplete may not be run yet, but we still want the clock.
 
             validState = true;
-
-            manualClock.Rate = parentGameplayClock.Rate;
-            manualClock.IsRunning = parentGameplayClock.IsRunning;
+            requireMoreUpdateLoops = false;
 
             var newProposedTime = parentGameplayClock.CurrentTime;
 
             try
             {
+                if (!FrameStablePlayback)
+                    return;
+
                 if (firstConsumption)
                 {
                     // On the first update, frame-stability seeking would result in unexpected/unwanted behaviour.
                     // Instead we perform an initial seek to the proposed time.
-                    manualClock.CurrentTime = newProposedTime;
 
-                    // do a second process to clear out ElapsedTime
+                    // process frame (in addition to finally clause) to clear out ElapsedTime
+                    manualClock.CurrentTime = newProposedTime;
                     framedClock.ProcessFrame();
 
                     firstConsumption = false;
                 }
+                else if (manualClock.CurrentTime < gameplayStartTime)
+                    manualClock.CurrentTime = newProposedTime = Math.Min(gameplayStartTime, newProposedTime);
                 else if (Math.Abs(manualClock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
                     newProposedTime = newProposedTime > manualClock.CurrentTime
@@ -123,11 +144,7 @@ namespace osu.Game.Rulesets.UI
                         : Math.Max(newProposedTime, manualClock.CurrentTime - sixty_frame_time);
                 }
 
-                if (!isAttached)
-                {
-                    manualClock.CurrentTime = newProposedTime;
-                }
-                else
+                if (isAttached)
                 {
                     double? newTime = ReplayInputHandler.SetFrameFromTime(newProposedTime);
 
@@ -135,19 +152,24 @@ namespace osu.Game.Rulesets.UI
                     {
                         // we shouldn't execute for this time value. probably waiting on more replay data.
                         validState = false;
-
                         requireMoreUpdateLoops = true;
-                        manualClock.CurrentTime = newProposedTime;
                         return;
                     }
 
-                    manualClock.CurrentTime = newTime.Value;
+                    newProposedTime = newTime.Value;
                 }
-
-                requireMoreUpdateLoops = manualClock.CurrentTime != parentGameplayClock.CurrentTime;
             }
             finally
             {
+                if (newProposedTime != manualClock.CurrentTime)
+                    direction = newProposedTime > manualClock.CurrentTime ? 1 : -1;
+
+                manualClock.CurrentTime = newProposedTime;
+                manualClock.Rate = Math.Abs(parentGameplayClock.Rate) * direction;
+                manualClock.IsRunning = parentGameplayClock.IsRunning;
+
+                requireMoreUpdateLoops |= manualClock.CurrentTime != parentGameplayClock.CurrentTime;
+
                 // The manual clock time has changed in the above code. The framed clock now needs to be updated
                 // to ensure that the its time is valid for our children before input is processed
                 framedClock.ProcessFrame();
@@ -160,7 +182,7 @@ namespace osu.Game.Rulesets.UI
             if (parentGameplayClock == null)
                 parentGameplayClock = Clock;
 
-            Clock = gameplayClock;
+            Clock = GameplayClock;
             ProcessCustomClock = false;
         }
 

@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDark
+                    Colour = colours.GreySeafoam
                 },
                 new FillFlowContainer
                 {
@@ -134,17 +134,17 @@ namespace osu.Game.Overlays.Profile.Header
 
             DetailsVisible.BindValueChanged(visible =>
             {
-                hiddenDetailContainer.Alpha = visible.NewValue ? 1 : 0;
-                expandedDetailContainer.Alpha = visible.NewValue ? 0 : 1;
-            }, true);
+                hiddenDetailContainer.FadeTo(visible.NewValue ? 0 : 1, 200, Easing.OutQuint);
+                expandedDetailContainer.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
+            });
 
             User.BindValueChanged(user => updateDisplay(user.NewValue));
         }
 
         private void updateDisplay(User user)
         {
-            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
-            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
+            hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
+            hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
         }
     }
 }

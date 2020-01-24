@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,138 +14,94 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : Container
+    public class ProfileHeader : TabControlOverlayHeader
     {
-        private readonly UserCoverBackground coverContainer;
-        private readonly ProfileHeaderTabControl infoTabControl;
-
-        private const float cover_height = 150;
-        private const float cover_info_height = 75;
-
-        public ProfileHeader()
-        {
-            CentreHeaderContainer centreHeaderContainer;
-            DetailHeaderContainer detailHeaderContainer;
-
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            Children = new Drawable[]
-            {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = cover_height,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        coverContainer = new UserCoverBackground
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(OsuColour.FromHex("222").Opacity(0.8f), OsuColour.FromHex("222").Opacity(0.2f))
-                        },
-                    }
-                },
-                new Container
-                {
-                    Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN },
-                    Y = cover_height,
-                    Height = cover_info_height,
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.BottomLeft,
-                    Depth = -float.MaxValue,
-                    Children = new Drawable[]
-                    {
-                        new ProfileHeaderTitle
-                        {
-                            X = -ScreenTitle.ICON_WIDTH,
-                        },
-                        infoTabControl = new ProfileHeaderTabControl
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
-                            Height = cover_info_height - 30,
-                            Margin = new MarginPadding { Left = -UserProfileOverlay.CONTENT_X_MARGIN },
-                            Padding = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN }
-                        }
-                    }
-                },
-                new FillFlowContainer
-                {
-                    Margin = new MarginPadding { Top = cover_height },
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
-                    {
-                        new TopHeaderContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
-                        },
-                        centreHeaderContainer = new CentreHeaderContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
-                        },
-                        detailHeaderContainer = new DetailHeaderContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
-                        },
-                        new MedalHeaderContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
-                        },
-                        new BottomHeaderContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            User = { BindTarget = User },
-                        },
-                    }
-                }
-            };
-
-            infoTabControl.AddItem("Info");
-            infoTabControl.AddItem("Modding");
-
-            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Alpha = visible.NewValue ? 1 : 0, true);
-            User.ValueChanged += e => updateDisplay(e.NewValue);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            infoTabControl.AccentColour = colours.CommunityUserGreen;
-        }
+        private UserCoverBackground coverContainer;
 
         public Bindable<User> User = new Bindable<User>();
 
-        private void updateDisplay(User user)
+        private CentreHeaderContainer centreHeaderContainer;
+        private DetailHeaderContainer detailHeaderContainer;
+
+        public ProfileHeader()
+            : base(OverlayColourScheme.Green)
         {
-            coverContainer.User = user;
+            BackgroundHeight = 150;
+
+            User.ValueChanged += e => updateDisplay(e.NewValue);
+
+            TabControl.AddItem("info");
+            TabControl.AddItem("modding");
+
+            centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
+
+        protected override Drawable CreateBackground() =>
+            new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    coverContainer = new UserCoverBackground
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = ColourInfo.GradientVertical(OsuColour.FromHex("222").Opacity(0.8f), OsuColour.FromHex("222").Opacity(0.2f))
+                    },
+                }
+            };
+
+        protected override Drawable CreateContent() => new FillFlowContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Direction = FillDirection.Vertical,
+            Children = new Drawable[]
+            {
+                new TopHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+                centreHeaderContainer = new CentreHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+                detailHeaderContainer = new DetailHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+                new MedalHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+                new BottomHeaderContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    User = { BindTarget = User },
+                },
+            }
+        };
+
+        protected override ScreenTitle CreateTitle() => new ProfileHeaderTitle();
+
+        private void updateDisplay(User user) => coverContainer.User = user;
 
         private class ProfileHeaderTitle : ScreenTitle
         {
             public ProfileHeaderTitle()
             {
-                Title = "Player";
-                Section = "Info";
+                Title = "player";
+                Section = "info";
             }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                AccentColour = colours.CommunityUserGreen;
-            }
+            protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");
         }
     }
 }

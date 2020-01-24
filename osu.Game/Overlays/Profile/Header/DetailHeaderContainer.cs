@@ -4,14 +4,12 @@
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Header.Components;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -26,14 +24,40 @@ namespace osu.Game.Overlays.Profile.Header
         private OverlinedInfoContainer ppInfo;
         private OverlinedInfoContainer detailGlobalRank;
         private OverlinedInfoContainer detailCountryRank;
+        private FillFlowContainer fillFlow;
         private RankGraph rankGraph;
 
         public readonly Bindable<User> User = new Bindable<User>();
+
+        private bool expanded = true;
+
+        public bool Expanded
+        {
+            set
+            {
+                if (expanded == value) return;
+
+                expanded = value;
+
+                if (fillFlow == null) return;
+
+                fillFlow.ClearTransforms();
+
+                if (expanded)
+                    fillFlow.AutoSizeAxes = Axes.Y;
+                else
+                {
+                    fillFlow.AutoSizeAxes = Axes.None;
+                    fillFlow.ResizeHeightTo(0, 200, Easing.OutQuint);
+                }
+            }
+        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             AutoSizeAxes = Axes.Y;
+
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             InternalChildren = new Drawable[]
@@ -41,12 +65,15 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.CommunityUserGrayGreenDarkest,
+                    Colour = colours.GreySeafoamDarker,
                 },
-                new FillFlowContainer
+                fillFlow = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = expanded ? Axes.Y : Axes.None,
+                    AutoSizeDuration = 200,
+                    AutoSizeEasing = Easing.OutQuint,
+                    Masking = true,
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(0, 20),
@@ -89,6 +116,7 @@ namespace osu.Game.Overlays.Profile.Header
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Direction = FillDirection.Horizontal,
+                                    Spacing = new Vector2(5),
                                     Children = new[]
                                     {
                                         scoreRankInfos[ScoreRank.XH] = new ScoreRankInfo(ScoreRank.XH),
@@ -148,16 +176,14 @@ namespace osu.Game.Overlays.Profile.Header
             foreach (var scoreRankInfo in scoreRankInfos)
                 scoreRankInfo.Value.RankCount = user?.Statistics?.GradesCount[scoreRankInfo.Key] ?? 0;
 
-            detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
-            detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
+            detailGlobalRank.Content = user?.Statistics?.Ranks.Global?.ToString("\\##,##0") ?? "-";
+            detailCountryRank.Content = user?.Statistics?.Ranks.Country?.ToString("\\##,##0") ?? "-";
 
-            rankGraph.User.Value = user;
+            rankGraph.Statistics.Value = user?.Statistics;
         }
 
         private class ScoreRankInfo : CompositeDrawable
         {
-            private readonly ScoreRank rank;
-            private readonly Sprite rankSprite;
             private readonly OsuSpriteText rankCount;
 
             public int RankCount
@@ -167,8 +193,6 @@ namespace osu.Game.Overlays.Profile.Header
 
             public ScoreRankInfo(ScoreRank rank)
             {
-                this.rank = rank;
-
                 AutoSizeAxes = Axes.Both;
                 InternalChild = new FillFlowContainer
                 {
@@ -177,10 +201,10 @@ namespace osu.Game.Overlays.Profile.Header
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        rankSprite = new Sprite
+                        new DrawableRank(rank)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit
+                            RelativeSizeAxes = Axes.X,
+                            Height = 30,
                         },
                         rankCount = new OsuSpriteText
                         {
@@ -190,12 +214,6 @@ namespace osu.Game.Overlays.Profile.Header
                         }
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                rankSprite.Texture = textures.Get($"Grades/{rank.GetDescription()}");
             }
         }
     }

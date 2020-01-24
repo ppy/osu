@@ -1,22 +1,22 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests.Responses;
+using System.Collections.Generic;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class PaginatedScoreContainer : PaginatedContainer
+    public class PaginatedScoreContainer : PaginatedContainer<APILegacyScoreInfo>
     {
         private readonly bool includeWeight;
         private readonly ScoreType type;
-        private GetUserScoresRequest request;
 
         public PaginatedScoreContainer(ScoreType type, Bindable<User> user, string header, string missing, bool includeWeight = false)
             : base(user, header, missing)
@@ -29,53 +29,25 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             ItemsContainer.Direction = FillDirection.Vertical;
         }
 
-        protected override void ShowMore()
-        {
-            base.ShowMore();
+        protected override APIRequest<List<APILegacyScoreInfo>> CreateRequest() =>
+            new GetUserScoresRequest(User.Value.Id, type, VisiblePages++, ItemsPerPage);
 
-            request = new GetUserScoresRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
-            request.Success += scores => Schedule(() =>
+        protected override int GetCount(User user) => type switch
+        {
+            ScoreType.Firsts => user.ScoresFirstCount,
+            _ => 0
+        };
+
+        protected override Drawable CreateDrawableItem(APILegacyScoreInfo model)
+        {
+            switch (type)
             {
-                foreach (var s in scores)
-                    s.Ruleset = Rulesets.GetRuleset(s.RulesetID);
+                default:
+                    return new DrawablePerformanceScore(model.CreateScoreInfo(Rulesets), includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null);
 
-                if (!scores.Any() && VisiblePages == 1)
-                {
-                    ShowMoreButton.Hide();
-                    ShowMoreLoading.Hide();
-                    MissingText.Show();
-                    return;
-                }
-
-                IEnumerable<DrawableProfileScore> drawableScores;
-
-                switch (type)
-                {
-                    default:
-                        drawableScores = scores.Select(score => new DrawablePerformanceScore(score, includeWeight ? Math.Pow(0.95, ItemsContainer.Count) : (double?)null));
-                        break;
-                    case ScoreType.Recent:
-                        drawableScores = scores.Select(score => new DrawableTotalScore(score));
-                        break;
-                }
-
-                LoadComponentsAsync(drawableScores, s =>
-                {
-                    MissingText.Hide();
-                    ShowMoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
-                    ShowMoreLoading.Hide();
-
-                    ItemsContainer.AddRange(s);
-                });
-            });
-
-            Api.Queue(request);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            request?.Cancel();
+                case ScoreType.Recent:
+                    return new DrawableTotalScore(model.CreateScoreInfo(Rulesets));
+            }
         }
     }
 }

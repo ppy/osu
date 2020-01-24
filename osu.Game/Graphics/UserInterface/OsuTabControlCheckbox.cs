@@ -37,6 +37,8 @@ namespace osu.Game.Graphics.UserInterface
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
                 }
+
+                updateFade();
             }
         }
 
@@ -47,39 +49,6 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private const float transition_length = 500;
-
-        private void fadeIn()
-        {
-            box.FadeIn(transition_length, Easing.OutQuint);
-            text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
-        }
-
-        private void fadeOut()
-        {
-            box.FadeOut(transition_length, Easing.OutQuint);
-            text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            fadeIn();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            if (!Current.Value)
-                fadeOut();
-
-            base.OnHoverLost(e);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            if (accentColour == null)
-                AccentColour = colours.Blue;
-        }
 
         public OsuTabControlCheckbox()
         {
@@ -95,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold) },
+                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),
@@ -112,22 +81,42 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.White,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                }
+                },
+                new HoverClickSounds()
             };
 
             Current.ValueChanged += selected =>
             {
-                if (selected.NewValue)
-                {
-                    fadeIn();
-                    icon.Icon = FontAwesome.Regular.CheckCircle;
-                }
-                else
-                {
-                    fadeOut();
-                    icon.Icon = FontAwesome.Regular.Circle;
-                }
+                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
+                text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            if (accentColour == null)
+                AccentColour = colours.Blue;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFade();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            if (!Current.Value)
+                updateFade();
+
+            base.OnHoverLost(e);
+        }
+
+        private void updateFade()
+        {
+            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
         }
     }
 }

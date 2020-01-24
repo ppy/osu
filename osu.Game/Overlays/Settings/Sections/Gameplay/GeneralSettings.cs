@@ -31,13 +31,34 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Lighten playfield during breaks",
+                    Bindable = config.GetBindable<bool>(OsuSetting.LightenDuringBreaks)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show score overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Show difficulty graph on progress bar",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show health display even when you can't fail",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
+                    Keywords = new[] { "hp", "bar" }
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                },
+                new SettingsEnumDropdown<ScoreMeterType>
+                {
+                    LabelText = "Score meter type",
+                    Bindable = config.GetBindable<ScoreMeterType>(OsuSetting.ScoreMeter)
                 },
                 new SettingsEnumDropdown<ScoringMode>
                 {

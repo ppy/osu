@@ -31,13 +31,15 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Display beatmaps from",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
-                    KeyboardStep = 0.1f
+                    KeyboardStep = 0.1f,
+                    Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "up to",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
-                    KeyboardStep = 0.1f
+                    KeyboardStep = 0.1f,
+                    Keywords = new[] { "star", "difficulty" }
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {

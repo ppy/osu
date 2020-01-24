@@ -10,3 +10,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("osu.Game.Rulesets.Catch.Tests")]
 [assembly: InternalsVisibleTo("osu.Game.Rulesets.Catch.Tests.Dynamic")]
 [assembly: InternalsVisibleTo("osu.Game.Rulesets.Catch.Tests.iOS")]
+[assembly: InternalsVisibleTo("osu.Game.Rulesets.Catch.Tests.Android")]

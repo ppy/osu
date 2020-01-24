@@ -40,9 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Colour = new Color4(255, 204, 33, 255),
             });
 
-            bool isMajor = barLine.BeatIndex % (int)barLine.ControlPoint.TimeSignature == 0;
-
-            if (isMajor)
+            if (barLine.Major)
             {
                 AddInternal(new EquilateralTriangle
                 {
@@ -65,11 +63,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 });
             }
 
-            if (!isMajor && barLine.BeatIndex % 2 == 1)
+            if (!barLine.Major)
                 Alpha = 0.2f;
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateInitialTransforms()
+        {
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
         {
         }
     }

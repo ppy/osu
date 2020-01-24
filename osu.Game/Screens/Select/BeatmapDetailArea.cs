@@ -27,8 +27,8 @@ namespace osu.Game.Screens.Select
             set
             {
                 beatmap = value;
-                Leaderboard.Beatmap = beatmap?.BeatmapInfo;
                 Details.Beatmap = beatmap?.BeatmapInfo;
+                Leaderboard.Beatmap = beatmap is DummyWorkingBeatmap ? null : beatmap?.BeatmapInfo;
             }
         }
 
@@ -36,11 +36,18 @@ namespace osu.Game.Screens.Select
         {
             AddRangeInternal(new Drawable[]
             {
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
+                },
                 new BeatmapDetailAreaTabControl
                 {
                     RelativeSizeAxes = Axes.X,
                     OnFilter = (tab, mods) =>
                     {
+                        Leaderboard.FilterMods = mods;
+
                         switch (tab)
                         {
                             case BeatmapDetailTab.Details:
@@ -55,11 +62,6 @@ namespace osu.Game.Screens.Select
                                 break;
                         }
                     },
-                },
-                content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = BeatmapDetailAreaTabControl.HEIGHT },
                 },
             });
 

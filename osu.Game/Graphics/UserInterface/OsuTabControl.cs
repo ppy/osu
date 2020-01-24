@@ -15,7 +15,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -28,8 +28,12 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabItem<T> CreateTabItem(T value) => new OsuTabItem(value);
 
-        protected virtual float StripWidth() => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
-        protected virtual float StripHeight() => 1;
+        protected virtual float StripWidth => TabContainer.Children.Sum(c => c.IsPresent ? c.DrawWidth + TabContainer.Spacing.X : 0) - TabContainer.Spacing.X;
+
+        /// <summary>
+        /// Whether entries should be automatically populated if <typeparamref name="T"/> is an <see cref="Enum"/> type.
+        /// </summary>
+        protected virtual bool AddEnumEntriesAutomatically => true;
 
         private static bool isEnumType => typeof(T).IsEnum;
 
@@ -41,13 +45,15 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Height = StripHeight(),
+                Height = 1,
                 Colour = Color4.White.Opacity(0),
             });
 
-            if (isEnumType)
+            if (isEnumType && AddEnumEntriesAutomatically)
+            {
                 foreach (var val in (T[])Enum.GetValues(typeof(T)))
                     AddItem(val);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -92,7 +98,7 @@ namespace osu.Game.Graphics.UserInterface
 
             // dont bother calculating if the strip is invisible
             if (strip.Colour.MaxAlpha > 0)
-                strip.Width = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth(), 0, 500, Easing.OutQuint);
+                strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth, 0, 500, Easing.OutQuint);
         }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
@@ -210,7 +216,7 @@ namespace osu.Game.Graphics.UserInterface
                     MaxHeight = 400;
                 }
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item) { AccentColour = AccentColour };
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuTabDropdownMenuItem(item) { AccentColour = AccentColour };
 
                 private class DrawableOsuTabDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {

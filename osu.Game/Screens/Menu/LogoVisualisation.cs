@@ -19,6 +19,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Utils;
 
 namespace osu.Game.Screens.Menu
 {
@@ -47,7 +48,7 @@ namespace osu.Game.Screens.Menu
         private const float visualiser_rounds = 5;
 
         /// <summary>
-        /// How much should each bar go down each milisecond (based on a full bar).
+        /// How much should each bar go down each millisecond (based on a full bar).
         /// </summary>
         private const float decay_per_milisecond = 0.0024f;
 
@@ -76,7 +77,7 @@ namespace osu.Game.Screens.Menu
         public LogoVisualisation()
         {
             texture = Texture.WhitePixel;
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
         }
 
         [BackgroundDependencyLoader]
@@ -96,13 +97,13 @@ namespace osu.Game.Screens.Menu
             var track = beatmap.Value.TrackLoaded ? beatmap.Value.Track : null;
             var effect = beatmap.Value.BeatmapLoaded ? beatmap.Value.Beatmap.ControlPointInfo.EffectPointAt(track?.CurrentTime ?? Time.Current) : null;
 
-            float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes ?? new float[256];
+            float[] temporalAmplitudes = track?.CurrentAmplitudes.FrequencyAmplitudes;
 
             for (int i = 0; i < bars_per_visualiser; i++)
             {
                 if (track?.IsRunning ?? false)
                 {
-                    float targetAmplitude = temporalAmplitudes[(i + indexOffset) % bars_per_visualiser] * (effect?.KiaiMode == true ? 1 : 0.5f);
+                    float targetAmplitude = (temporalAmplitudes?[(i + indexOffset) % bars_per_visualiser] ?? 0) * (effect?.KiaiMode == true ? 1 : 0.5f);
                     if (targetAmplitude > frequencyAmplitudes[i])
                         frequencyAmplitudes[i] = targetAmplitude;
                 }
@@ -115,7 +116,6 @@ namespace osu.Game.Screens.Menu
             }
 
             indexOffset = (indexOffset + index_change) % bars_per_visualiser;
-            Scheduler.AddDelayed(updateAmplitudes, time_between_updates);
         }
 
         private void updateColour()
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
             Color4 defaultColour = Color4.White.Opacity(0.2f);
 
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? defaultColour;
+                AccentColour = skin.Value.GetConfig<GlobalSkinColour, Color4>(GlobalSkinColour.MenuGlow)?.Value ?? defaultColour;
             else
                 AccentColour = defaultColour;
         }
@@ -131,7 +131,9 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateAmplitudes();
+
+            var delayed = Scheduler.AddDelayed(updateAmplitudes, time_between_updates, true);
+            delayed.PerformRepeatCatchUpExecutions = false;
         }
 
         protected override void Update()
@@ -139,6 +141,7 @@ namespace osu.Game.Screens.Menu
             base.Update();
 
             float decayFactor = (float)Time.Elapsed * decay_per_milisecond;
+
             for (int i = 0; i < bars_per_visualiser; i++)
             {
                 //3% of extra bar length to make it a little faster when bar is almost at it's minimum
@@ -159,7 +162,7 @@ namespace osu.Game.Screens.Menu
             private IShader shader;
             private Texture texture;
 
-            //Asuming the logo is a circle, we don't need a second dimension.
+            //Assuming the logo is a circle, we don't need a second dimension.
             private float size;
 
             private Color4 colour;
@@ -188,7 +191,6 @@ namespace osu.Game.Screens.Menu
                 base.Draw(vertexAction);
 
                 shader.Bind();
-                texture.TextureGL.Bind();
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
@@ -204,13 +206,13 @@ namespace osu.Game.Screens.Menu
                             if (audioData[i] < amplitude_dead_zone)
                                 continue;
 
-                            float rotation = MathHelper.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
-                            float rotationCos = (float)Math.Cos(rotation);
-                            float rotationSin = (float)Math.Sin(rotation);
+                            float rotation = MathUtils.DegreesToRadians(i / (float)bars_per_visualiser * 360 + j * 360 / visualiser_rounds);
+                            float rotationCos = MathF.Cos(rotation);
+                            float rotationSin = MathF.Sin(rotation);
                             //taking the cos and sin to the 0..1 range
                             var barPosition = new Vector2(rotationCos / 2 + 0.5f, rotationSin / 2 + 0.5f) * size;
 
-                            var barSize = new Vector2(size * (float)Math.Sqrt(2 * (1 - Math.Cos(MathHelper.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
+                            var barSize = new Vector2(size * MathF.Sqrt(2 * (1 - MathF.Cos(MathUtils.DegreesToRadians(360f / bars_per_visualiser)))) / 2f, bar_length * audioData[i]);
                             //The distance between the position and the sides of the bar.
                             var bottomOffset = new Vector2(-rotationSin * barSize.X / 2, rotationCos * barSize.X / 2);
                             //The distance between the bottom side of the bar and the top side.
@@ -223,7 +225,8 @@ namespace osu.Game.Screens.Menu
                                 Vector2Extensions.Transform(barPosition + bottomOffset + amplitudeOffset, DrawInfo.Matrix)
                             );
 
-                            texture.DrawQuad(
+                            DrawQuad(
+                                texture,
                                 rectangle,
                                 colourInfo,
                                 null,

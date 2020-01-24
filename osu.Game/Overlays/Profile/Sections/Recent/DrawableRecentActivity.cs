@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (activity.Type)
             {
                 case RecentActivityType.Rank:
-                    return new DrawableRank(activity.ScoreRank)
+                    return new UpdateableRank(activity.ScoreRank)
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 60,
@@ -66,11 +66,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 case RecentActivityType.Achievement:
-                    return new MedalIcon(activity.Achievement.Slug)
+                    return new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fit,
+                    })
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 60,
-                        FillMode = FillMode.Fit,
                     };
 
                 default:

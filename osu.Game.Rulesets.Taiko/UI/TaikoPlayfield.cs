@@ -44,9 +44,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
         internal readonly HitTarget HitTarget;
 
-        private readonly Container topLevelHitContainer;
-
-        private readonly Container barlineContainer;
+        private readonly ProxyContainer topLevelHitContainer;
+        private readonly ProxyContainer barlineContainer;
 
         private readonly Container overlayBackgroundContainer;
         private readonly Container backgroundContainer;
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     FillMode = FillMode.Fit,
-                                    Blending = BlendingMode.Additive,
+                                    Blending = BlendingParameters.Additive,
                                 },
                                 HitTarget = new HitTarget
                                 {
@@ -108,7 +107,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 }
                             }
                         },
-                        barlineContainer = new Container
+                        barlineContainer = new ProxyContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
@@ -127,14 +126,14 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            Blending = BlendingMode.Additive
+                            Blending = BlendingParameters.Additive
                         },
                         judgementContainer = new JudgementContainer<DrawableTaikoJudgement>
                         {
                             Name = "Judgements",
                             RelativeSizeAxes = Axes.Y,
                             Margin = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            Blending = BlendingMode.Additive
+                            Blending = BlendingParameters.Additive
                         },
                     }
                 },
@@ -183,7 +182,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         }
                     }
                 },
-                topLevelHitContainer = new Container
+                topLevelHitContainer = new ProxyContainer
                 {
                     Name = "Top level hit objects",
                     RelativeSizeAxes = Axes.Both,
@@ -212,6 +211,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case DrawableBarLine barline:
                     barlineContainer.Add(barline.CreateProxy());
                     break;
+
                 case DrawableTaikoHitObject taikoObject:
                     topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
                     break;
@@ -232,6 +232,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     if (result.IsHit)
                         hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
+
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                     {
@@ -253,6 +254,16 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     break;
             }
+        }
+
+        private class ProxyContainer : LifetimeManagementContainer
+        {
+            public new MarginPadding Padding
+            {
+                set => base.Padding = value;
+            }
+
+            public void Add(Drawable proxy) => AddInternal(proxy);
         }
     }
 }

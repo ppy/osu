@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using osu.Desktop.Overlays;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
 using osuTK.Input;
@@ -18,6 +17,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
 using osu.Game.Screens.Menu;
+using osu.Game.Updater;
 
 namespace osu.Desktop
 {
@@ -39,9 +39,9 @@ namespace osu.Desktop
                 if (Host is DesktopGameHost desktopHost)
                     return new StableStorage(desktopHost);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Logger.Error(e, "Error while searching for stable install");
+                Logger.Log("Could not find a stable install", LoggingTarget.Runtime, LogLevel.Important);
             }
 
             return null;
@@ -53,17 +53,15 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
-                {
-                    Add(v);
-                    v.State = Visibility.Visible;
-                });
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
                 if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
                     Add(new SquirrelUpdateManager());
                 else
                     Add(new SimpleUpdateManager());
             }
+
+            LoadComponentAsync(new DiscordRichPresence(), Add);
         }
 
         protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
@@ -72,14 +70,13 @@ namespace osu.Desktop
 
             switch (newScreen)
             {
-                case Intro _:
+                case IntroScreen _:
                 case MainMenu _:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Visible;
+                    versionManager?.Show();
                     break;
+
                 default:
-                    if (versionManager != null)
-                        versionManager.State = Visibility.Hidden;
+                    versionManager?.Hide();
                     break;
             }
         }
@@ -87,6 +84,7 @@ namespace osu.Desktop
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
+
             if (host.Window is DesktopGameWindow desktopWindow)
             {
                 desktopWindow.CursorState |= CursorState.Hidden;
@@ -116,14 +114,14 @@ namespace osu.Desktop
         {
             protected override string LocateBasePath()
             {
-                bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+                static bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
 
                 string stableInstallPath;
 
                 try
                 {
                     using (RegistryKey key = Registry.ClassesRoot.OpenSubKey("osu"))
-                        stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(String.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
+                        stableInstallPath = key?.OpenSubKey(@"shell\open\command")?.GetValue(string.Empty).ToString().Split('"')[1].Replace("osu!.exe", "");
 
                     if (checkExists(stableInstallPath))
                         return stableInstallPath;

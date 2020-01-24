@@ -1,9 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,24 +27,23 @@ namespace osu.Game.Screens.Edit.Components
 
         private IAdjustableClock adjustableClock;
 
+        private readonly BindableNumber<double> tempo = new BindableDouble(1);
+
         [BackgroundDependencyLoader]
         private void load(IAdjustableClock adjustableClock)
         {
             this.adjustableClock = adjustableClock;
-
-            PlaybackTabControl tabs;
 
             Children = new Drawable[]
             {
                 playButton = new IconButton
                 {
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.Centre,
+                    Origin = Anchor.CentreLeft,
                     Scale = new Vector2(1.4f),
                     IconScale = new Vector2(1.4f),
                     Icon = FontAwesome.Regular.PlayCircle,
                     Action = togglePause,
-                    Padding = new MarginPadding { Left = 20 }
                 },
                 new OsuSpriteText
                 {
@@ -58,11 +60,18 @@ namespace osu.Game.Screens.Edit.Components
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Padding = new MarginPadding { Left = 45 },
-                    Child = tabs = new PlaybackTabControl(),
+                    Child = new PlaybackTabControl { Current = tempo },
                 }
             };
 
-            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
+            Track?.AddAdjustment(AdjustableProperty.Tempo, tempo);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Track?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -106,6 +115,8 @@ namespace osu.Game.Screens.Edit.Components
                 TabContainer.Spacing = Vector2.Zero;
 
                 tempo_values.ForEach(AddItem);
+
+                Current.Value = tempo_values.Last();
             }
 
             public class PlaybackTabItem : TabItem<double>
