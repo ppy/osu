@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
+using osu.Game.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -13,12 +14,14 @@ namespace osu.Game.Beatmaps.Drawables
         private Drawable displayedCover;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 if (IsLoaded)
@@ -27,12 +30,14 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         private BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover;
+
         public BeatmapSetCoverType CoverType
         {
-            get { return coverType; }
+            get => coverType;
             set
             {
                 if (value == coverType) return;
+
                 coverType = value;
 
                 if (IsLoaded)
@@ -45,7 +50,7 @@ namespace osu.Game.Beatmaps.Drawables
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black,
+                Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.1f)),
             };
         }
 
@@ -63,16 +68,19 @@ namespace osu.Game.Beatmaps.Drawables
 
             if (beatmapSet != null)
             {
+                BeatmapSetCover cover;
+
                 Add(displayedCover = new DelayedLoadWrapper(
-                    new BeatmapSetCover(beatmapSet, coverType)
+                    cover = new BeatmapSetCover(beatmapSet, coverType)
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fill,
-                        OnLoadComplete = d => d.FadeInFromZero(400, Easing.Out),
                     })
                 );
+
+                cover.OnLoadComplete += d => d.FadeInFromZero(400, Easing.Out);
             }
         }
     }

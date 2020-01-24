@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osuTK;
@@ -25,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             Size = new Vector2(12);
             InternalChild = new SpriteIcon
             {
-                Icon = FontAwesome.fa_external_link,
+                Icon = FontAwesome.Solid.ExternalLinkAlt,
                 RelativeSizeAxes = Axes.Both
             };
         }
@@ -51,11 +52,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnClick(ClickEvent e)
         {
-            if(Link != null)
+            if (Link != null)
                 host.OpenUrlExternally(Link);
             return true;
         }
 
-        public string TooltipText => "View in browser";
+        public string TooltipText => "view in browser";
     }
 }

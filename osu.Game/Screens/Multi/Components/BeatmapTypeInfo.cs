@@ -1,70 +1,67 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Multiplayer;
+using osu.Game.Graphics.Containers;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class BeatmapTypeInfo : FillFlowContainer
+    public class BeatmapTypeInfo : MultiplayerComposite
     {
-        private readonly ModeTypeInfo modeTypeInfo;
-        private readonly BeatmapTitle beatmapTitle;
-        private readonly OsuSpriteText beatmapAuthor;
-
-        public BeatmapInfo Beatmap
-        {
-            set
-            {
-                modeTypeInfo.Beatmap = beatmapTitle.Beatmap = value;
-                beatmapAuthor.Text = value == null ? string.Empty : $"mapped by {value.Metadata.Author}";
-            }
-        }
-
-        public GameType Type
-        {
-            set { modeTypeInfo.Type = value; }
-        }
-
         public BeatmapTypeInfo()
         {
             AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
-            LayoutDuration = 100;
-            Spacing = new Vector2(5f, 0f);
-
-            Children = new Drawable[]
-            {
-                modeTypeInfo = new ModeTypeInfo(),
-                new Container
-                {
-                    AutoSizeAxes = Axes.X,
-                    Height = 30,
-                    Margin = new MarginPadding { Left = 5 },
-                    Children = new Drawable[]
-                    {
-                        beatmapTitle = new BeatmapTitle(),
-                        beatmapAuthor = new OsuSpriteText
-                        {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            TextSize = 14,
-                        },
-                    },
-                },
-            };
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            beatmapAuthor.Colour = colours.Gray9;
+            LinkFlowContainer beatmapAuthor;
+
+            InternalChild = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                LayoutDuration = 100,
+                Spacing = new Vector2(5, 0),
+                Children = new Drawable[]
+                {
+                    new ModeTypeInfo(),
+                    new Container
+                    {
+                        AutoSizeAxes = Axes.X,
+                        Height = 30,
+                        Margin = new MarginPadding { Left = 5 },
+                        Children = new Drawable[]
+                        {
+                            new BeatmapTitle(),
+                            beatmapAuthor = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                AutoSizeAxes = Axes.Both
+                            },
+                        },
+                    },
+                }
+            };
+
+            CurrentItem.BindValueChanged(item =>
+            {
+                beatmapAuthor.Clear();
+
+                var beatmap = item.NewValue?.Beatmap;
+
+                if (beatmap != null)
+                {
+                    beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
+                    beatmapAuthor.AddUserLink(beatmap.Metadata.Author);
+                }
+            }, true);
         }
     }
 }

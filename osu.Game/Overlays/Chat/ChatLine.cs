@@ -1,27 +1,252 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
-using osuTK;
-using osuTK.Graphics;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
-using osu.Framework.Graphics.Cursor;
-using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics.UserInterface;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Chat
 {
-    public class ChatLine : Container
+    public class ChatLine : CompositeDrawable
     {
+        public const float LEFT_PADDING = default_message_padding + default_horizontal_padding * 2;
+
+        private const float default_message_padding = 200;
+
+        protected virtual float MessagePadding => default_message_padding;
+
+        private const float default_timestamp_padding = 65;
+
+        protected virtual float TimestampPadding => default_timestamp_padding;
+
+        private const float default_horizontal_padding = 15;
+
+        protected virtual float HorizontalPadding => default_horizontal_padding;
+
+        protected virtual float TextSize => 20;
+
+        private Color4 customUsernameColour;
+
+        private OsuSpriteText timestamp;
+
+        public ChatLine(Message message)
+        {
+            Message = message;
+            Padding = new MarginPadding { Left = HorizontalPadding, Right = HorizontalPadding };
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+        }
+
+        [Resolved(CanBeNull = true)]
+        private ChannelManager chatManager { get; set; }
+
+        private Message message;
+        private OsuSpriteText username;
+
+        public LinkFlowContainer ContentFlow { get; private set; }
+
+        public Message Message
+        {
+            get => message;
+            set
+            {
+                if (message == value) return;
+
+                message = MessageFormatter.FormatMessage(value);
+
+                if (!IsLoaded)
+                    return;
+
+                updateMessageContent();
+            }
+        }
+
+        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            customUsernameColour = colours.ChatBlue;
+
+            bool hasBackground = senderHasBackground;
+
+            Drawable effectedUsername = username = new OsuSpriteText
+            {
+                Shadow = false,
+                Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
+                Truncate = true,
+                EllipsisString = "… :",
+                Font = OsuFont.GetFont(size: TextSize, weight: FontWeight.Bold, italics: true),
+                Anchor = Anchor.TopRight,
+                Origin = Anchor.TopRight,
+                MaxWidth = MessagePadding - TimestampPadding
+            };
+
+            if (hasBackground)
+            {
+                // Background effect
+                effectedUsername = new Container
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Masking = true,
+                    CornerRadius = 4,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Roundness = 1,
+                        Offset = new Vector2(0, 3),
+                        Radius = 3,
+                        Colour = Color4.Black.Opacity(0.3f),
+                        Type = EdgeEffectType.Shadow,
+                    },
+                    // Drop shadow effect
+                    Child = new Container
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Masking = true,
+                        CornerRadius = 4,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Radius = 1,
+                            Colour = OsuColour.FromHex(message.Sender.Colour),
+                            Type = EdgeEffectType.Shadow,
+                        },
+                        Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 },
+                        Y = 3,
+                        Child = username,
+                    }
+                };
+            }
+
+            InternalChildren = new Drawable[]
+            {
+                new Container
+                {
+                    Size = new Vector2(MessagePadding, TextSize),
+                    Children = new Drawable[]
+                    {
+                        timestamp = new OsuSpriteText
+                        {
+                            Shadow = false,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Font = OsuFont.GetFont(size: TextSize * 0.75f, weight: FontWeight.SemiBold, fixedWidth: true)
+                        },
+                        new MessageSender(message.Sender)
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Origin = Anchor.TopRight,
+                            Anchor = Anchor.TopRight,
+                            Child = effectedUsername,
+                        },
+                    }
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Left = MessagePadding + HorizontalPadding },
+                    Children = new Drawable[]
+                    {
+                        ContentFlow = new LinkFlowContainer(t =>
+                        {
+                            t.Shadow = false;
+
+                            if (Message.IsAction)
+                            {
+                                t.Font = OsuFont.GetFont(italics: true);
+
+                                if (senderHasBackground)
+                                    t.Colour = OsuColour.FromHex(message.Sender.Colour);
+                            }
+
+                            t.Font = t.Font.With(size: TextSize);
+                        })
+                        {
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                        }
+                    }
+                }
+            };
+
+            updateMessageContent();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            FinishTransforms(true);
+        }
+
+        private void updateMessageContent()
+        {
+            this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
+            timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
+
+            timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
+            username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
+
+            // remove non-existent channels from the link list
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
+
+            ContentFlow.Clear();
+            ContentFlow.AddLinks(message.DisplayContent, message.Links);
+        }
+
+        private class MessageSender : OsuClickableContainer, IHasContextMenu
+        {
+            private readonly User sender;
+
+            private Action startChatAction;
+
+            [Resolved]
+            private IAPIProvider api { get; set; }
+
+            public MessageSender(User sender)
+            {
+                this.sender = sender;
+            }
+
+            [BackgroundDependencyLoader(true)]
+            private void load(UserProfileOverlay profile, ChannelManager chatManager)
+            {
+                Action = () => profile?.ShowUser(sender);
+                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
+            }
+
+            public MenuItem[] ContextMenuItems
+            {
+                get
+                {
+                    List<MenuItem> items = new List<MenuItem>
+                    {
+                        new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action)
+                    };
+
+                    if (sender.Id != api.LocalUser.Value.Id)
+                        items.Add(new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction));
+
+                    return items.ToArray();
+                }
+            }
+        }
+
         private static readonly Color4[] username_colours =
         {
             OsuColour.FromHex("588c7e"),
@@ -60,202 +285,5 @@ namespace osu.Game.Overlays.Chat
             OsuColour.FromHex("812a96"),
             OsuColour.FromHex("992861"),
         };
-
-        public const float LEFT_PADDING = message_padding + padding * 2;
-
-        private const float padding = 15;
-        private const float message_padding = 200;
-        private const float action_padding = 3;
-        private const float text_size = 20;
-
-        private Color4 customUsernameColour;
-
-        private OsuSpriteText timestamp;
-
-        public ChatLine(Message message)
-        {
-            Message = message;
-
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
-            Padding = new MarginPadding { Left = padding, Right = padding };
-        }
-
-        private ChannelManager chatManager;
-
-        private Message message;
-        private OsuSpriteText username;
-        private LinkFlowContainer contentFlow;
-
-        public LinkFlowContainer ContentFlow => contentFlow;
-
-        public Message Message
-        {
-            get => message;
-            set
-            {
-                if (message == value) return;
-
-                message = MessageFormatter.FormatMessage(value);
-
-                if (!IsLoaded)
-                    return;
-
-                updateMessageContent();
-            }
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, ChannelManager chatManager)
-        {
-            this.chatManager = chatManager;
-            customUsernameColour = colours.ChatBlue;
-        }
-
-        private bool senderHasBackground => !string.IsNullOrEmpty(message.Sender.Colour);
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            bool hasBackground = senderHasBackground;
-
-            Drawable effectedUsername = username = new OsuSpriteText
-            {
-                Font = @"Exo2.0-BoldItalic",
-                Colour = hasBackground ? customUsernameColour : username_colours[message.Sender.Id % username_colours.Length],
-                TextSize = text_size,
-            };
-
-            if (hasBackground)
-            {
-                // Background effect
-                effectedUsername = new Container
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Masking = true,
-                    CornerRadius = 4,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Roundness = 1,
-                        Offset = new Vector2(0, 3),
-                        Radius = 3,
-                        Colour = Color4.Black.Opacity(0.3f),
-                        Type = EdgeEffectType.Shadow,
-                    },
-                    // Drop shadow effect
-                    Child = new Container
-                    {
-                        AutoSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = 4,
-                        EdgeEffect = new EdgeEffectParameters
-                        {
-                            Radius = 1,
-                            Colour = OsuColour.FromHex(message.Sender.Colour),
-                            Type = EdgeEffectType.Shadow,
-                        },
-                        Padding = new MarginPadding { Left = 3, Right = 3, Bottom = 1, Top = -3 },
-                        Y = 3,
-                        Child = username,
-                    }
-                };
-            }
-
-            Children = new Drawable[]
-            {
-                new Container
-                {
-                    Size = new Vector2(message_padding, text_size),
-                    Children = new Drawable[]
-                    {
-                        timestamp = new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Font = @"Exo2.0-SemiBold",
-                            FixedWidth = true,
-                            TextSize = text_size * 0.75f,
-                        },
-                        new MessageSender(message.Sender)
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Origin = Anchor.TopRight,
-                            Anchor = Anchor.TopRight,
-                            Child = effectedUsername,
-                        },
-                    }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Left = message_padding + padding },
-                    Children = new Drawable[]
-                    {
-                        contentFlow = new LinkFlowContainer(t =>
-                        {
-                            if (Message.IsAction)
-                            {
-                                t.Font = @"Exo2.0-MediumItalic";
-
-                                if (senderHasBackground)
-                                    t.Colour = OsuColour.FromHex(message.Sender.Colour);
-                            }
-
-                            t.TextSize = text_size;
-                        })
-                        {
-                            AutoSizeAxes = Axes.Y,
-                            RelativeSizeAxes = Axes.X,
-                        }
-                    }
-                }
-            };
-
-            updateMessageContent();
-            FinishTransforms(true);
-        }
-
-        private void updateMessageContent()
-        {
-            this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
-            timestamp.FadeTo(message is LocalEchoMessage ? 0 : 1, 500, Easing.OutQuint);
-
-            timestamp.Text = $@"{message.Timestamp.LocalDateTime:HH:mm:ss}";
-            username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
-
-            // remove non-existent channels from the link list
-            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
-
-            contentFlow.Clear();
-            contentFlow.AddLinks(message.DisplayContent, message.Links);
-        }
-
-        private class MessageSender : OsuClickableContainer, IHasContextMenu
-        {
-            private readonly User sender;
-
-            private Action startChatAction;
-
-            public MessageSender(User sender)
-            {
-                this.sender = sender;
-            }
-
-            [BackgroundDependencyLoader(true)]
-            private void load(UserProfileOverlay profile, ChannelManager chatManager)
-            {
-                Action = () => profile?.ShowUser(sender);
-                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
-            }
-
-            public MenuItem[] ContextMenuItems => new MenuItem[]
-            {
-                new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
-                new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction),
-            };
-        }
     }
 }

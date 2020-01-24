@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                     centre = new Sprite
                     {
@@ -124,7 +124,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                         RelativeSizeAxes = Axes.Both,
                         Size = new Vector2(0.7f),
                         Alpha = 0,
-                        Blending = BlendingMode.Additive
+                        Blending = BlendingParameters.Additive
                     }
                 };
             }
@@ -132,10 +132,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             [BackgroundDependencyLoader]
             private void load(TextureStore textures, OsuColour colours)
             {
-                rim.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
-                rimHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
-                centre.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
-                centreHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+                rim.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-outer");
+                rimHit.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-outer-hit");
+                centre.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-inner");
+                centreHit.Texture = textures.Get(@"Gameplay/taiko/taiko-drum-inner-hit");
 
                 rimHit.Colour = colours.Blue;
                 centreHit.Colour = colours.Pink;
@@ -187,7 +187,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return false;
             }
 
-            public bool OnReleased(TaikoAction action) => false;
+            public void OnReleased(TaikoAction action)
+            {
+            }
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -18,8 +19,8 @@ namespace osu.Game.Overlays.Profile.Sections
         private const int fade_duration = 200;
 
         private Box underscoreLine;
-        private readonly Box coloredBackground;
-        private readonly Container background;
+        private Box coloredBackground;
+        private Container background;
 
         /// <summary>
         /// A visual element displayed to the left of <see cref="LeftFlowContainer"/> content.
@@ -35,6 +36,19 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             RelativeSizeAxes = Axes.X;
             Height = 60;
+
+            Content = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Anchor = Anchor.TopCentre,
+                Origin = Anchor.TopCentre,
+                Width = 0.97f,
+            };
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colour)
+        {
             InternalChildren = new Drawable[]
             {
                 background = new Container
@@ -52,21 +66,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     },
                     Child = coloredBackground = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                Content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Width = 0.97f,
-                },
-            };
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colour)
-        {
-            AddRange(new Drawable[]
-            {
+                Content,
                 underscoreLine = new Box
                 {
                     Anchor = Anchor.BottomCentre,
@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     Origin = Anchor.CentreRight,
                     Direction = FillDirection.Vertical,
                 },
-            });
+            };
 
             coloredBackground.Colour = underscoreLine.Colour = colour.Gray4;
         }

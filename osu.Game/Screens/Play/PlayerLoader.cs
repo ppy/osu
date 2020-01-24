@@ -1,22 +1,34 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
+using osu.Framework.Input;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
+using osu.Game.Overlays;
+using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Menu;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -24,144 +36,200 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
-        private static readonly Vector2 background_blur = new Vector2(15);
+        protected const float BACKGROUND_BLUR = 15;
+
+        private readonly Func<Player> createPlayer;
 
         private Player player;
 
-        private BeatmapMetadataDisplay info;
+        private LogoTrackingContainer content;
+
+        protected BeatmapMetadataDisplay MetadataInfo;
 
         private bool hideOverlays;
-        protected override bool HideOverlaysOnEnter => hideOverlays;
+        public override bool HideOverlaysOnEnter => hideOverlays;
 
-        private Task loadTask;
+        protected override UserActivity InitialActivity => null; //shows the previous screen status
 
-        public PlayerLoader(Player player)
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        protected override bool PlayResumeSound => false;
+
+        protected Task LoadTask { get; private set; }
+
+        protected Task DisposalTask { get; private set; }
+
+        private InputManager inputManager;
+        private IdleTracker idleTracker;
+
+        [Resolved(CanBeNull = true)]
+        private NotificationOverlay notificationOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private VolumeOverlay volumeOverlay { get; set; }
+
+        [Resolved]
+        private AudioManager audioManager { get; set; }
+
+        private Bindable<bool> muteWarningShownOnce;
+
+        public PlayerLoader(Func<Player> createPlayer)
         {
-            this.player = player;
+            this.createPlayer = createPlayer;
+        }
 
-            player.RestartRequested = () =>
-            {
-                hideOverlays = true;
-                ValidForResume = true;
-            };
+        private void restartRequested()
+        {
+            hideOverlays = true;
+            ValidForResume = true;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(SessionStatics sessionStatics)
         {
-            Add(info = new BeatmapMetadataDisplay(Beatmap.Value)
+            muteWarningShownOnce = sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce);
+
+            InternalChild = (content = new LogoTrackingContainer
             {
-                Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            });
-
-            Add(new FillFlowContainer<PlayerSettingsGroup>
+                RelativeSizeAxes = Axes.Both,
+            }).WithChildren(new Drawable[]
             {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 20),
-                Margin = new MarginPadding(25),
-                Children = new PlayerSettingsGroup[]
+                MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
                 {
-                    visualSettings = new VisualSettings(),
-                    new InputSettings()
-                }
+                    Alpha = 0,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                new FillFlowContainer<PlayerSettingsGroup>
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(0, 20),
+                    Margin = new MarginPadding(25),
+                    Children = new PlayerSettingsGroup[]
+                    {
+                        VisualSettings = new VisualSettings(),
+                        new InputSettings()
+                    }
+                },
+                idleTracker = new IdleTracker(750)
             });
-
-            loadTask = LoadComponentAsync(player, playerLoaded);
         }
 
-        private void playerLoaded(Player player) => info.Loading = false;
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
-        protected override void OnResuming(Screen last)
+            inputManager = GetContainingInputManager();
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            loadNewPlayer();
+
+            content.ScaleTo(0.7f);
+            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
+
+            contentIn();
+
+            MetadataInfo.Delay(750).FadeIn(500);
+            this.Delay(1800).Schedule(pushWhenLoaded);
+
+            if (!muteWarningShownOnce.Value)
+            {
+                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
+                {
+                    notificationOverlay?.Post(new MutedNotification());
+                    muteWarningShownOnce.Value = true;
+                }
+            }
+        }
+
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
             contentIn();
 
-            info.Loading = true;
+            MetadataInfo.Loading = true;
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            loadTask = LoadComponentAsync(player = new Player
-            {
-                RestartCount = player.RestartCount + 1,
-                RestartRequested = player.RestartRequested,
-            }, playerLoaded);
+            loadNewPlayer();
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
 
+        private void loadNewPlayer()
+        {
+            var restartCount = player?.RestartCount + 1 ?? 0;
+
+            player = createPlayer();
+            player.RestartCount = restartCount;
+            player.RestartRequested = restartRequested;
+
+            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
+        }
+
         private void contentIn()
         {
-            Content.ScaleTo(1, 650, Easing.OutQuint);
-            Content.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint);
+            content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Content.ScaleTo(0.7f, 300, Easing.InQuint);
-            Content.FadeOut(250);
-        }
+            // Ensure the logo is no longer tracking before we scale the content
+            content.StopTracking();
 
-        protected override void OnEntering(Screen last)
-        {
-            base.OnEntering(last);
-
-            Content.ScaleTo(0.7f);
-
-            contentIn();
-
-            info.Delay(750).FadeIn(500);
-            this.Delay(1800).Schedule(pushWhenLoaded);
+            content.ScaleTo(0.7f, 300, Easing.InQuint);
+            content.FadeOut(250);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.Both;
+            const double duration = 300;
 
-            logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
-            logo.MoveTo(new Vector2(0.5f), 300, Easing.In);
+            if (!resuming)
+            {
+                logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
+            }
+
+            logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
             logo.FadeIn(350);
 
-            logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
+            Scheduler.AddDelayed(() =>
+            {
+                if (this.IsCurrentScreen())
+                    content.StartTracking(logo, resuming ? 0 : 500, Easing.InOutExpo);
+            }, resuming ? 0 : 500);
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+            content.StopTracking();
         }
 
         private ScheduledDelegate pushDebounce;
-        private VisualSettings visualSettings;
+        protected VisualSettings VisualSettings;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
+        // Here because IsHovered will not update unless we do so.
+        public override bool HandlePositionalInput => true;
 
-        protected override bool OnHover(HoverEvent e)
-        {
-            // restore our screen defaults
-            InitializeBackgroundElements();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            if (GetContainingInputManager().HoveredDrawables.Contains(visualSettings))
-            {
-                // show user setting preview
-                UpdateBackgroundElements();
-            }
-            base.OnHoverLost(e);
-        }
-
-        protected override void InitializeBackgroundElements()
-        {
-            Background?.FadeTo(1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            Background?.BlurTo(background_blur, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-        }
+        private bool readyForPush => player.LoadState == LoadState.Ready && (IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             try
             {
@@ -182,18 +250,18 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(250).Schedule(() =>
                     {
-                        if (!IsCurrentScreen) return;
+                        if (!this.IsCurrentScreen()) return;
 
-                        loadTask = null;
+                        LoadTask = null;
 
                         //By default, we want to load the player and never be returned to.
                         //Note that this may change if the player we load requested a re-run.
                         ValidForResume = false;
 
                         if (player.LoadedBeatmapSuccessfully)
-                            Push(player);
+                            this.Push(player);
                         else
-                            Exit();
+                            this.Exit();
                     });
                 }, 500);
             }
@@ -209,17 +277,21 @@ namespace osu.Game.Screens.Play
             pushDebounce = null;
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
+            BackgroundBrightnessReduction = false;
             base.OnSuspending(next);
             cancelLoad();
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            Content.ScaleTo(0.7f, 150, Easing.InQuint);
+            content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
+
+            Background.EnableUserDim.Value = false;
+            BackgroundBrightnessReduction = false;
 
             return base.OnExiting(next);
         }
@@ -231,11 +303,54 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                loadTask?.ContinueWith(_ => player.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
             }
         }
 
-        private class BeatmapMetadataDisplay : Container
+        private bool backgroundBrightnessReduction;
+
+        protected bool BackgroundBrightnessReduction
+        {
+            get => backgroundBrightnessReduction;
+            set
+            {
+                if (value == backgroundBrightnessReduction)
+                    return;
+
+                backgroundBrightnessReduction = value;
+
+                Background.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200);
+            }
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!this.IsCurrentScreen())
+                return;
+
+            // We need to perform this check here rather than in OnHover as any number of children of VisualSettings
+            // may also be handling the hover events.
+            if (inputManager.HoveredDrawables.Contains(VisualSettings))
+            {
+                // Preview user-defined background dim and blur when hovered on the visual settings panel.
+                Background.EnableUserDim.Value = true;
+                Background.BlurAmount.Value = 0;
+
+                BackgroundBrightnessReduction = false;
+            }
+            else
+            {
+                // Returns background dim and blur to the values specified by PlayerLoader.
+                Background.EnableUserDim.Value = false;
+                Background.BlurAmount.Value = BACKGROUND_BLUR;
+
+                BackgroundBrightnessReduction = true;
+            }
+        }
+
+        protected class BeatmapMetadataDisplay : Container
         {
             private class MetadataLine : Container
             {
@@ -264,8 +379,12 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
+            private readonly Bindable<IReadOnlyList<Mod>> mods;
+            private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
+
+            public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
             public bool Loading
             {
@@ -284,15 +403,19 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
             {
                 this.beatmap = beatmap;
+                this.facade = facade;
+
+                this.mods = new Bindable<IReadOnlyList<Mod>>();
+                this.mods.BindTo(mods);
             }
 
             [BackgroundDependencyLoader]
             private void load()
             {
-                var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
+                var metadata = beatmap.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
                 AutoSizeAxes = Axes.Both;
                 Children = new Drawable[]
@@ -303,21 +426,25 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
                         Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
+                            facade.With(d =>
+                            {
+                                d.Anchor = Anchor.TopCentre;
+                                d.Origin = Anchor.TopCentre;
+                            }),
                             new OsuSpriteText
                             {
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
-                                TextSize = 36,
-                                Font = @"Exo2.0-MediumItalic",
+                                Font = OsuFont.GetFont(size: 36, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
+                                Margin = new MarginPadding { Top = 15 },
                             },
                             new OsuSpriteText
                             {
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                TextSize = 26,
-                                Font = @"Exo2.0-MediumItalic",
+                                Font = OsuFont.GetFont(size: 26, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
@@ -345,8 +472,7 @@ namespace osu.Game.Screens.Play
                             new OsuSpriteText
                             {
                                 Text = beatmap?.BeatmapInfo?.Version,
-                                TextSize = 26,
-                                Font = @"Exo2.0-MediumItalic",
+                                Font = OsuFont.GetFont(size: 26, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 Margin = new MarginPadding
@@ -364,11 +490,47 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
+                            new ModDisplay
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                AutoSizeAxes = Axes.Both,
+                                Margin = new MarginPadding { Top = 20 },
+                                Current = mods
+                            }
                         },
                     }
                 };
 
                 Loading = true;
+            }
+        }
+
+        private class MutedNotification : SimpleNotification
+        {
+            public MutedNotification()
+            {
+                Text = "Your music volume is set to 0%! Click here to restore it.";
+            }
+
+            public override bool IsImportant => true;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
+            {
+                Icon = FontAwesome.Solid.VolumeMute;
+                IconBackgound.Colour = colours.RedDark;
+
+                Activated = delegate
+                {
+                    notificationOverlay.Hide();
+
+                    volumeOverlay.IsMuted.Value = false;
+                    audioManager.Volume.SetDefault();
+                    audioManager.VolumeTrack.SetDefault();
+
+                    return true;
+                };
             }
         }
     }

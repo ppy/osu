@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -26,12 +26,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
 
             // Consider all non-timing points as the same type
             cpi.SamplePoints.Select(c => (ControlPoint)c)
-                .Concat(cpi.EffectPoints)
-                .Concat(cpi.DifficultyPoints)
-                .Distinct()
-                // Non-timing points should not be added where there are timing points
-                .Where(c => cpi.TimingPointAt(c.Time).Time != c.Time)
-                .ForEach(addNonTimingPoint);
+               .Concat(cpi.EffectPoints)
+               .Concat(cpi.DifficultyPoints)
+               .Distinct()
+               // Non-timing points should not be added where there are timing points
+               .Where(c => cpi.TimingPointAt(c.Time).Time != c.Time)
+               .ForEach(addNonTimingPoint);
         }
 
         private void addTimingPoint(ControlPoint controlPoint) => Add(new TimingPointVisualisation(controlPoint));

@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -10,11 +10,11 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarMusicButton()
         {
-            Icon = FontAwesome.fa_music;
+            Icon = FontAwesome.Solid.Music;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MusicController music)
+        private void load(NowPlayingOverlay music)
         {
             StateContainer = music;
         }

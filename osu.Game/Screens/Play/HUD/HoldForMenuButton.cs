@@ -1,16 +1,19 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -22,6 +25,8 @@ namespace osu.Game.Screens.Play.HUD
     public class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
         private readonly Button button;
 
@@ -41,23 +46,37 @@ namespace osu.Game.Screens.Play.HUD
             {
                 text = new OsuSpriteText
                 {
-                    Text = "hold for menu",
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
                 button = new Button
                 {
                     HoverGained = () => text.FadeIn(500, Easing.OutQuint),
-                    HoverLost = () => text.FadeOut(500, Easing.OutQuint)
+                    HoverLost = () => text.FadeOut(500, Easing.OutQuint),
+                    IsPaused = { BindTarget = IsPaused }
                 }
             };
             AutoSizeAxes = Axes.Both;
         }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
+        private Bindable<float> activationDelay;
+
         protected override void LoadComplete()
         {
+            activationDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
+            activationDelay.BindValueChanged(v =>
+            {
+                text.Text = v.NewValue > 0
+                    ? "hold for menu"
+                    : "press for menu";
+            }, true);
+
             text.FadeInFromZero(500, Easing.OutQuint).Delay(1500).FadeOut(500, Easing.OutQuint);
+
             base.LoadComplete();
         }
 
@@ -69,6 +88,11 @@ namespace osu.Game.Screens.Play.HUD
             return base.OnMouseMove(e);
         }
 
+        public bool PauseOnFocusLost
+        {
+            set => button.PauseOnFocusLost = value;
+        }
+
         protected override void Update()
         {
             base.Update();
@@ -76,9 +100,11 @@ namespace osu.Game.Screens.Play.HUD
             if (text.Alpha > 0 || button.Progress.Value > 0 || button.IsHovered)
                 Alpha = 1;
             else
+            {
                 Alpha = Interpolation.ValueAt(
-                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 200),
-                    Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+                    Math.Clamp(Clock.ElapsedFrameTime, 0, 200),
+                    Alpha, Math.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
+            }
         }
 
         private class Button : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
@@ -87,37 +113,17 @@ namespace osu.Game.Screens.Play.HUD
             private CircularProgress circularProgress;
             private Circle overlayCircle;
 
+            public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
             protected override bool AllowMultipleFires => true;
 
             public Action HoverGained;
             public Action HoverLost;
 
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        BeginConfirm();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        AbortConfirm();
-                        return true;
-                }
-
-                return false;
-            }
+            private readonly IBindable<bool> gameActive = new Bindable<bool>(true);
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, Framework.Game game)
             {
                 Size = new Vector2(60);
 
@@ -152,18 +158,26 @@ namespace osu.Game.Screens.Play.HUD
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Size = new Vector2(15),
-                            Icon = FontAwesome.fa_close
+                            Icon = FontAwesome.Solid.Times
                         },
                     }
                 };
 
                 bind();
+
+                gameActive.BindTo(game.IsActive);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                gameActive.BindValueChanged(_ => updateActive(), true);
             }
 
             private void bind()
             {
                 circularProgress.Current.BindTo(Progress);
-                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.2f);
+                Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
             }
 
             private bool pendingAnimation;
@@ -178,7 +192,7 @@ namespace osu.Game.Screens.Play.HUD
                 // avoid starting a new confirm call until we finish animating.
                 pendingAnimation = true;
 
-                Progress.Value = 0;
+                AbortConfirm();
 
                 overlayCircle.ScaleTo(0, 100)
                              .Then().FadeOut().ScaleTo(1).FadeIn(500)
@@ -207,6 +221,54 @@ namespace osu.Game.Screens.Play.HUD
                 base.OnHoverLost(e);
             }
 
+            private bool pauseOnFocusLost = true;
+
+            public bool PauseOnFocusLost
+            {
+                set
+                {
+                    if (pauseOnFocusLost == value)
+                        return;
+
+                    pauseOnFocusLost = value;
+                    if (IsLoaded)
+                        updateActive();
+                }
+            }
+
+            private void updateActive()
+            {
+                if (!pauseOnFocusLost || IsPaused.Value) return;
+
+                if (gameActive.Value)
+                    AbortConfirm();
+                else
+                    BeginConfirm();
+            }
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        if (!pendingAnimation)
+                            BeginConfirm();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        AbortConfirm();
+                        break;
+                }
+            }
+
             protected override bool OnMouseDown(MouseDownEvent e)
             {
                 if (!pendingAnimation && e.CurrentState.Mouse.Buttons.Count() == 1)
@@ -214,11 +276,10 @@ namespace osu.Game.Screens.Play.HUD
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 if (!e.HasAnyButtonPressed)
                     AbortConfirm();
-                return true;
             }
         }
     }

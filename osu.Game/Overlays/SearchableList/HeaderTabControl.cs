@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
@@ -19,9 +19,10 @@ namespace osu.Game.Overlays.SearchableList
 
         private class HeaderTabItem : OsuTabItem
         {
-            public HeaderTabItem(T value) : base(value)
+            public HeaderTabItem(T value)
+                : base(value)
             {
-                Text.TextSize = 16;
+                Text.Font = Text.Font.With(size: 16);
             }
         }
     }

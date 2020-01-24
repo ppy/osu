@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -20,9 +20,9 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat.Selection
 {
-    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
+    public class ChannelSelectionOverlay : WaveOverlayContainer
     {
-        public static readonly float WIDTH_PADDING = 170;
+        public const float WIDTH_PADDING = 170;
 
         private const float transition_duration = 500;
 
@@ -32,12 +32,19 @@ namespace osu.Game.Overlays.Chat.Selection
         private readonly SearchTextBox search;
         private readonly SearchContainer<ChannelSection> sectionsFlow;
 
+        protected override bool DimMainContent => false;
+
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
         public ChannelSelectionOverlay()
         {
             RelativeSizeAxes = Axes.X;
+
+            Waves.FirstWaveColour = OsuColour.FromHex("353535");
+            Waves.SecondWaveColour = OsuColour.FromHex("434343");
+            Waves.ThirdWaveColour = OsuColour.FromHex("515151");
+            Waves.FourthWaveColour = OsuColour.FromHex("595959");
 
             Children = new Drawable[]
             {
@@ -105,22 +112,17 @@ namespace osu.Game.Overlays.Chat.Selection
                                 new OsuSpriteText
                                 {
                                     Text = @"Chat Channels",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
-                                search = new HeaderSearchTextBox
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    PlaceholderText = @"Search",
-                                    Exit = Hide,
-                                },
+                                search = new HeaderSearchTextBox { RelativeSizeAxes = Axes.X },
                             },
                         },
                     },
                 },
             };
 
-            search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
+            search.Current.ValueChanged += term => sectionsFlow.SearchTerm = term.NewValue;
         }
 
         public void UpdateAvailableChannels(IEnumerable<Channel> channels)
@@ -159,7 +161,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(search);
+            search.TakeFocus();
             base.OnFocus(e);
         }
 
@@ -185,8 +187,12 @@ namespace osu.Game.Overlays.Chat.Selection
 
         private class HeaderSearchTextBox : SearchTextBox
         {
-            protected override Color4 BackgroundFocused => Color4.Black.Opacity(0.2f);
-            protected override Color4 BackgroundUnfocused => Color4.Black.Opacity(0.2f);
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                BackgroundFocused = Color4.Black.Opacity(0.2f);
+                BackgroundUnfocused = Color4.Black.Opacity(0.2f);
+            }
         }
     }
 }

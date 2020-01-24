@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -9,21 +9,36 @@ using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Rulesets.Taiko.Replays;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Difficulty;
+using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Scoring;
+using System;
+using osu.Game.Rulesets.Taiko.Skinning;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Taiko
 {
-    public class TaikoRuleset : Ruleset
+    public class TaikoRuleset : Ruleset, ILegacyRuleset
     {
-        public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new TaikoRulesetContainer(this, beatmap);
-        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap);
+        public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new DrawableTaikoRuleset(this, beatmap, mods);
+
+        public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor();
+
+        public override HealthProcessor CreateHealthProcessor(double drainStartTime) => new TaikoHealthProcessor();
+
+        public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TaikoBeatmapConverter(beatmap, this);
+
+        public override ISkin CreateLegacySkinProvider(ISkinSource source) => new TaikoLegacySkinTransformer(source);
+
+        public const string SHORT_NAME = "taiko";
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
@@ -42,7 +57,14 @@ namespace osu.Game.Rulesets.Taiko
             else if (mods.HasFlag(LegacyMods.DoubleTime))
                 yield return new TaikoModDoubleTime();
 
-            if (mods.HasFlag(LegacyMods.Autoplay))
+            if (mods.HasFlag(LegacyMods.Perfect))
+                yield return new TaikoModPerfect();
+            else if (mods.HasFlag(LegacyMods.SuddenDeath))
+                yield return new TaikoModSuddenDeath();
+
+            if (mods.HasFlag(LegacyMods.Cinema))
+                yield return new TaikoModCinema();
+            else if (mods.HasFlag(LegacyMods.Autoplay))
                 yield return new TaikoModAutoplay();
 
             if (mods.HasFlag(LegacyMods.Easy))
@@ -63,14 +85,8 @@ namespace osu.Game.Rulesets.Taiko
             if (mods.HasFlag(LegacyMods.NoFail))
                 yield return new TaikoModNoFail();
 
-            if (mods.HasFlag(LegacyMods.Perfect))
-                yield return new TaikoModPerfect();
-
             if (mods.HasFlag(LegacyMods.Relax))
                 yield return new TaikoModRelax();
-
-            if (mods.HasFlag(LegacyMods.SuddenDeath))
-                yield return new TaikoModSuddenDeath();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)
@@ -84,6 +100,7 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModNoFail(),
                         new MultiMod(new TaikoModHalfTime(), new TaikoModDaycore()),
                     };
+
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
@@ -93,34 +110,45 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
+
+                case ModType.Conversion:
+                    return new Mod[]
+                    {
+                        new TaikoModDifficultyAdjust(),
+                    };
+
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new TaikoModAutoplay(), new ModCinema()),
+                        new MultiMod(new TaikoModAutoplay(), new TaikoModCinema()),
                         new TaikoModRelax(),
                     };
+
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ModWindUp(), new ModWindDown())
+                    };
+
                 default:
-                    return new Mod[] { };
+                    return Array.Empty<Mod>();
             }
         }
 
         public override string Description => "osu!taiko";
 
-        public override string ShortName => "taiko";
+        public override string ShortName => SHORT_NAME;
 
-        public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_taiko_o };
+        public override string PlayingVerb => "Bashing drums";
+
+        public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetTaiko };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(this, beatmap);
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new TaikoPerformanceCalculator(this, beatmap, score);
 
-        public override int? LegacyID => 1;
+        public int LegacyID => 1;
 
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new TaikoReplayFrame();
-
-        public TaikoRuleset(RulesetInfo rulesetInfo = null)
-            : base(rulesetInfo)
-        {
-        }
     }
 }

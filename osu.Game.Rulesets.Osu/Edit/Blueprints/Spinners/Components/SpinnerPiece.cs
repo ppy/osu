@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,17 +12,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
-    public class SpinnerPiece : HitObjectPiece
+    public class SpinnerPiece : BlueprintPiece<Spinner>
     {
-        private readonly Spinner spinner;
         private readonly CircularContainer circle;
         private readonly RingPiece ring;
 
-        public SpinnerPiece(Spinner spinner)
-            : base(spinner)
+        public SpinnerPiece()
         {
-            this.spinner = spinner;
-
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
@@ -44,21 +40,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
                     Origin = Anchor.Centre
                 }
             };
-
-            ring.Scale = new Vector2(spinner.Scale);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            StackHeightBindable.BindValueChanged(_ => updatePosition());
-            ScaleBindable.BindValueChanged(v => ring.Scale = new Vector2(v), true);
         }
 
-        private void updatePosition() => Position = spinner.Position;
+        public override void UpdateFrom(Spinner hitObject)
+        {
+            base.UpdateFrom(hitObject);
+
+            ring.Scale = new Vector2(hitObject.Scale);
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => circle.ReceivePositionalInputAt(screenSpacePos);
     }

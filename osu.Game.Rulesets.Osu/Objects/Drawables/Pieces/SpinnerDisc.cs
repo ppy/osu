@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -8,6 +8,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
+using osu.Framework.Utils;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -17,8 +18,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get { return background.AccentColour; }
-            set { background.AccentColour = value; }
+            get => background.AccentColour;
+            set => background.AccentColour = value;
         }
 
         private readonly SpinnerBackground background;
@@ -43,12 +44,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         private bool tracking;
+
         public bool Tracking
         {
-            get { return tracking; }
+            get => tracking;
             set
             {
                 if (value == tracking) return;
+
                 tracking = value;
 
                 background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
@@ -56,12 +59,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool complete;
+
         public bool Complete
         {
-            get { return complete; }
+            get => complete;
             set
             {
                 if (value == complete) return;
+
                 complete = value;
 
                 updateCompleteTick();
@@ -89,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            var thisAngle = -(float)MathHelper.RadiansToDegrees(Math.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
+            var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
             bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
 
@@ -107,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     lastAngle -= 360;
 
                 currentRotation += thisAngle - lastAngle;
-                RotationAbsolute += Math.Abs(thisAngle - lastAngle);
+                RotationAbsolute += Math.Abs(thisAngle - lastAngle) * Math.Sign(Clock.ElapsedFrameTime);
             }
 
             lastAngle = thisAngle;

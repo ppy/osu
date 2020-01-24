@@ -1,39 +1,51 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableJuiceStream : DrawableCatchHitObject<JuiceStream>
     {
+        private readonly Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation;
         private readonly Container dropletContainer;
 
-        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation = null)
+        public DrawableJuiceStream(JuiceStream s, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> createDrawableRepresentation = null)
             : base(s)
         {
+            this.createDrawableRepresentation = createDrawableRepresentation;
             RelativeSizeAxes = Axes.Both;
             Origin = Anchor.BottomLeft;
             X = 0;
 
-            InternalChild = dropletContainer = new Container { RelativeSizeAxes = Axes.Both, };
-
-            foreach (var o in s.NestedHitObjects.Cast<CatchHitObject>())
-                AddNested(getVisualRepresentation?.Invoke(o));
+            AddInternal(dropletContainer = new Container { RelativeSizeAxes = Axes.Both, });
         }
 
-        protected override void AddNested(DrawableHitObject h)
+        protected override void AddNestedHitObject(DrawableHitObject hitObject)
         {
-            var catchObject = (DrawableCatchHitObject)h;
+            base.AddNestedHitObject(hitObject);
+            dropletContainer.Add(hitObject);
+        }
 
-            catchObject.CheckPosition = o => CheckPosition?.Invoke(o) ?? false;
+        protected override void ClearNestedHitObjects()
+        {
+            base.ClearNestedHitObjects();
+            dropletContainer.Clear();
+        }
 
-            dropletContainer.Add(h);
-            base.AddNested(h);
+        protected override DrawableHitObject CreateNestedHitObject(HitObject hitObject)
+        {
+            switch (hitObject)
+            {
+                case CatchHitObject catchObject:
+                    return createDrawableRepresentation?.Invoke(catchObject)?.With(o => ((DrawableCatchHitObject)o).CheckPosition = p => CheckPosition?.Invoke(p) ?? false);
+            }
+
+            return base.CreateNestedHitObject(hitObject);
         }
     }
 }

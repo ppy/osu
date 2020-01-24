@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
 using osu.Game.Overlays;
@@ -19,7 +19,7 @@ namespace osu.Game.Online.API.Requests
 
         public SearchBeatmapSetsRequest(string query, RulesetInfo ruleset, BeatmapSearchCategory searchCategory = BeatmapSearchCategory.Any, DirectSortCriteria sortCriteria = DirectSortCriteria.Ranked, SortDirection direction = SortDirection.Descending)
         {
-            this.query = System.Uri.EscapeDataString(query);
+            this.query = string.IsNullOrEmpty(query) ? string.Empty : System.Uri.EscapeDataString(query);
             this.ruleset = ruleset;
             this.searchCategory = searchCategory;
             this.sortCriteria = sortCriteria;
@@ -27,23 +27,25 @@ namespace osu.Game.Online.API.Requests
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={(int)searchCategory}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
+        protected override string Target => $@"beatmapsets/search?q={query}&m={ruleset.ID ?? 0}&s={searchCategory.ToString().ToLowerInvariant()}&sort={sortCriteria.ToString().ToLowerInvariant()}_{directionString}";
     }
 
     public enum BeatmapSearchCategory
     {
-        Any = 7,
+        Any,
 
-        [Description("Ranked & Approved")]
-        RankedApproved = 0,
-        Approved = 1,
-        Loved = 8,
-        Favourites = 2,
-        Qualified = 3,
-        Pending = 4,
-        Graveyard = 5,
+        [Description("Has Leaderboard")]
+        Leaderboard,
+        Ranked,
+        Qualified,
+        Loved,
+        Favourites,
+
+        [Description("Pending & WIP")]
+        Pending,
+        Graveyard,
 
         [Description("My Maps")]
-        MyMaps = 6,
+        Mine,
     }
 }

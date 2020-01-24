@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Play
@@ -26,7 +25,7 @@ namespace osu.Game.Screens.Play
                     return;
 
                 var firstHit = objects.First().StartTime;
-                var lastHit = objects.Max(o => (o as IHasEndTime)?.EndTime ?? o.StartTime);
+                var lastHit = objects.Max(o => o.GetEndTime());
 
                 if (lastHit == 0)
                     lastHit = objects.Last().StartTime;
@@ -35,7 +34,7 @@ namespace osu.Game.Screens.Play
 
                 foreach (var h in objects)
                 {
-                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+                    var endTime = h.GetEndTime();
 
                     Debug.Assert(endTime >= h.StartTime);
 

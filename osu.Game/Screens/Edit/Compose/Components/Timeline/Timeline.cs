@@ -1,9 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
@@ -32,11 +32,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock adjustableClock, OsuColour colours)
         {
             this.adjustableClock = adjustableClock;
 
-            Child = waveform = new WaveformGraph
+            Add(waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Colour = colours.Blue.Opacity(0.2f),
@@ -44,18 +44,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 MidColour = colours.BlueDark,
                 HighColour = colours.BlueDarker,
                 Depth = float.MaxValue
-            };
+            });
 
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker());
 
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
+            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
             Beatmap.BindValueChanged(b =>
             {
-                waveform.Waveform = b.Waveform;
-                track = b.Track;
+                waveform.Waveform = b.NewValue.Waveform;
+                track = b.NewValue.Track;
             }, true);
         }
 
@@ -143,10 +143,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             endUserDrag();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         private void beginUserDrag()

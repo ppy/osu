@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects;
@@ -14,7 +14,7 @@ namespace osu.Game.Beatmaps
     /// <summary>
     /// A Beatmap containing converted HitObjects.
     /// </summary>
-    public class Beatmap<T> : IBeatmap
+    public class Beatmap<T> : IBeatmap<T>
         where T : HitObject
     {
         public BeatmapInfo BeatmapInfo { get; set; } = new BeatmapInfo
@@ -36,17 +36,13 @@ namespace osu.Game.Beatmaps
 
         public List<BreakPeriod> Breaks { get; set; } = new List<BreakPeriod>();
 
-        /// <summary>
-        /// Total amount of break time in the beatmap.
-        /// </summary>
         [JsonIgnore]
         public double TotalBreakTime => Breaks.Sum(b => b.Duration);
 
-        /// <summary>
-        /// The HitObjects this Beatmap contains.
-        /// </summary>
         [JsonConverter(typeof(TypedListConverter<HitObject>))]
-        public List<T> HitObjects = new List<T>();
+        public List<T> HitObjects { get; set; } = new List<T>();
+
+        IReadOnlyList<T> IBeatmap<T>.HitObjects => HitObjects;
 
         IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
 
@@ -60,5 +56,7 @@ namespace osu.Game.Beatmaps
     public class Beatmap : Beatmap<HitObject>
     {
         public new Beatmap Clone() => (Beatmap)base.Clone();
+
+        public override string ToString() => BeatmapInfo?.ToString() ?? base.ToString();
     }
 }

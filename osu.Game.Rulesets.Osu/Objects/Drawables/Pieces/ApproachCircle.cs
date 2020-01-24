@@ -1,17 +1,19 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class ApproachCircle : Container
     {
+        public override bool RemoveWhenNotAlive => false;
+
         public ApproachCircle()
         {
             Anchor = Anchor.Centre;
@@ -23,7 +25,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Child = new SkinnableDrawable("Play/osu/approachcircle", name => new Sprite { Texture = textures.Get(name) });
+            Child = new SkinnableApproachCircle();
+        }
+
+        private class SkinnableApproachCircle : SkinnableSprite
+        {
+            public SkinnableApproachCircle()
+                : base("Gameplay/osu/approachcircle")
+            {
+            }
+
+            protected override Drawable CreateDefault(ISkinComponent component)
+            {
+                var drawable = base.CreateDefault(component);
+
+                // account for the sprite being used for the default approach circle being taken from stable,
+                // when hitcircles have 5px padding on each size. this should be removed if we update the sprite.
+                drawable.Scale = new Vector2(128 / 118f);
+
+                return drawable;
+            }
         }
     }
 }

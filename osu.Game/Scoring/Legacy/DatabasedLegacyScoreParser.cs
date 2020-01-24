@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -22,6 +22,6 @@ namespace osu.Game.Scoring.Legacy
         }
 
         protected override Ruleset GetRuleset(int rulesetId) => rulesets.GetRuleset(rulesetId).CreateInstance();
-        protected override WorkingBeatmap GetBeatmap(string md5Hash) => beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(b => b.MD5Hash == md5Hash));
+        protected override WorkingBeatmap GetBeatmap(string md5Hash) => beatmaps.GetWorkingBeatmap(beatmaps.QueryBeatmap(b => !b.BeatmapSet.DeletePending && b.MD5Hash == md5Hash));
     }
 }

@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -140,8 +140,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Venera",
-                            TextSize = 0.16f * circleSize
+                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,
@@ -169,16 +168,16 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = "Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = name
                         }
                     }
                 }
             };
-            Bindable.ValueChanged += newVolume =>
+            Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
-                    newVolume,
+                    volume.NewValue,
                     400,
                     Easing.OutQuint);
             };
@@ -218,7 +217,7 @@ namespace osu.Game.Overlays.Volume
 
         public double Volume
         {
-            get => Bindable;
+            get => Bindable.Value;
             private set => Bindable.Value = value;
         }
 

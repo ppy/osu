@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public Vector2 ScreenSpaceDragPosition { get; private set; }
         public Vector2 DragPosition { get; private set; }
 
-        protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
+        public new DrawableManiaHitObject DrawableObject => (DrawableManiaHitObject)base.DrawableObject;
 
         protected IClock EditorClock { get; private set; }
 
@@ -28,8 +28,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
 
-        public ManiaSelectionBlueprint(DrawableHitObject hitObject)
-            : base(hitObject)
+        public ManiaSelectionBlueprint(DrawableHitObject drawableObject)
+            : base(drawableObject)
         {
             RelativeSizeAxes = Axes.None;
         }
@@ -44,36 +44,34 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
+            Position = Parent.ToLocalSpace(DrawableObject.ToScreenSpace(Vector2.Zero));
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
-            var result = base.OnDrag(e);
+            base.OnDrag(e);
 
             ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
-            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
-
-            return result;
+            DragPosition = DrawableObject.ToLocalSpace(e.ScreenSpaceMousePosition);
         }
 
         public override void Show()
         {
-            HitObject.AlwaysAlive = true;
+            DrawableObject.AlwaysAlive = true;
             base.Show();
         }
 
         public override void Hide()
         {
-            HitObject.AlwaysAlive = false;
+            DrawableObject.AlwaysAlive = false;
             base.Hide();
         }
     }

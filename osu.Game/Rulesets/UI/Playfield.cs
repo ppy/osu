@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,8 +7,8 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
@@ -57,12 +57,24 @@ namespace osu.Game.Rulesets.UI
             hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        private WorkingBeatmap beatmap;
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
+
+        [Resolved]
+        private IReadOnlyList<Mod> mods { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load()
         {
-            this.beatmap = beatmap.Value;
+            Cursor = CreateCursor();
+
+            if (Cursor != null)
+            {
+                // initial showing of the cursor will be handed by MenuCursorContainer (via DrawableRuleset's IProvideCursor implementation).
+                Cursor.Hide();
+
+                AddInternal(Cursor);
+            }
         }
 
         /// <summary>
@@ -81,6 +93,20 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
         public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+
+        /// <summary>
+        /// The cursor currently being used by this <see cref="Playfield"/>. May be null if no cursor is provided.
+        /// </summary>
+        public GameplayCursorContainer Cursor { get; private set; }
+
+        /// <summary>
+        /// Provide a cursor which is to be used for gameplay.
+        /// </summary>
+        /// <remarks>
+        /// The default provided cursor is invisible when inside the bounds of the <see cref="Playfield"/>.
+        /// </remarks>
+        /// <returns>The cursor, or null to show the menu cursor.</returns>
+        protected virtual GameplayCursorContainer CreateCursor() => new InvisibleCursorContainer();
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -107,14 +133,27 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
-                foreach (var mod in beatmap.Mods.Value)
+            {
+                foreach (var mod in mods)
+                {
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
+                }
+            }
         }
 
         /// <summary>
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        public class InvisibleCursorContainer : GameplayCursorContainer
+        {
+            protected override Drawable CreateCursor() => new InvisibleCursor();
+
+            private class InvisibleCursor : Drawable
+            {
+            }
+        }
     }
 }

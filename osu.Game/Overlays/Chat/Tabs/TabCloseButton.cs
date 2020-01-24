@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.75f),
-                Icon = FontAwesome.fa_close,
+                Icon = FontAwesome.Solid.TimesCircle,
                 RelativeSizeAxes = Axes.Both,
             };
         }
@@ -34,10 +34,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)

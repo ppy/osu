@@ -1,9 +1,8 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osuTK;
@@ -49,13 +48,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         private double originalStartTime;
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        public override void UpdatePosition(Vector2 screenSpacePosition)
         {
-            base.OnMouseMove(e);
+            base.UpdatePosition(screenSpacePosition);
 
             if (PlacementBegun)
             {
-                var endTime = TimeAt(e.ScreenSpaceMousePosition);
+                var endTime = TimeAt(screenSpacePosition);
 
                 HitObject.StartTime = endTime < originalStartTime ? endTime : originalStartTime;
                 HitObject.Duration = Math.Abs(endTime - originalStartTime);
@@ -65,10 +64,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 headPiece.Width = tailPiece.Width = SnappedWidth;
                 headPiece.X = tailPiece.X = SnappedMousePosition.X;
 
-                originalStartTime = HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
+                originalStartTime = HitObject.StartTime = TimeAt(screenSpacePosition);
             }
-
-            return true;
         }
     }
 }

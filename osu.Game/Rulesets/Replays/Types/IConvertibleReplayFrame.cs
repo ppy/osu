@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Replays.Legacy;
@@ -14,8 +14,9 @@ namespace osu.Game.Rulesets.Replays.Types
         /// <summary>
         /// Populates this <see cref="ReplayFrame"/> using values from a <see cref="LegacyReplayFrame"/>.
         /// </summary>
-        /// <param name="legacyFrame">The <see cref="LegacyReplayFrame"/> to extract values from.</param>
+        /// <param name="currentFrame">The <see cref="LegacyReplayFrame"/> to extract values from.</param>
         /// <param name="beatmap">The beatmap.</param>
-        void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap);
+        /// <param name="lastFrame">The last post-conversion <see cref="ReplayFrame"/>, used to fill in missing delta information. May be null.</param>
+        void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null);
     }
 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,8 +17,11 @@ namespace osu.Game.Screens.Play.HUD
         public bool ReplayLoaded;
 
         public readonly PlaybackSettings PlaybackSettings;
+
         public readonly VisualSettings VisualSettings;
+
         //public readonly CollectionSettings CollectionSettings;
+
         //public readonly DiscussionSettings DiscussionSettings;
 
         public PlayerSettingsOverlay()
@@ -42,15 +45,13 @@ namespace osu.Game.Screens.Play.HUD
                     VisualSettings = new VisualSettings { Expanded = false }
                 }
             };
-
-            State = Visibility.Visible;
         }
 
         protected override void PopIn() => this.FadeIn(fade_duration);
         protected override void PopOut() => this.FadeOut(fade_duration);
 
         //We want to handle keyboard inputs all the time in order to trigger ToggleVisibility() when not visible
-        public override bool HandleNonPositionalInput => true;
+        public override bool PropagateNonPositionalInputSubTree => true;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

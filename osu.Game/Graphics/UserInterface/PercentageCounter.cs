@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
-            DisplayedCountSpriteText.FixedWidth = true;
+            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             Current.Value = DisplayedCount = 1.0f;
         }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Increment(double amount)
         {
-            Current.Value = Current + amount;
+            Current.Value += amount;
         }
     }
 }

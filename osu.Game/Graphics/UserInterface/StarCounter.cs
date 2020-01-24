@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using System;
 using System.Linq;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -41,10 +42,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float CountStars
         {
-            get
-            {
-                return countStars;
-            }
+            get => countStars;
 
             set
             {
@@ -102,6 +100,7 @@ namespace osu.Game.Graphics.UserInterface
         public void StopAnimation()
         {
             int i = 0;
+
             foreach (var star in stars.Children)
             {
                 star.ClearTransforms(true);
@@ -122,6 +121,7 @@ namespace osu.Game.Graphics.UserInterface
         private void transformCount(float newValue)
         {
             int i = 0;
+
             foreach (var star in stars.Children)
             {
                 star.ClearTransforms(true);
@@ -137,6 +137,7 @@ namespace osu.Game.Graphics.UserInterface
         private class Star : Container
         {
             public readonly SpriteIcon Icon;
+
             public Star()
             {
                 Size = new Vector2(star_size);
@@ -144,7 +145,7 @@ namespace osu.Game.Graphics.UserInterface
                 Child = Icon = new SpriteIcon
                 {
                     Size = new Vector2(star_size),
-                    Icon = FontAwesome.fa_star,
+                    Icon = FontAwesome.Solid.Star,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 };

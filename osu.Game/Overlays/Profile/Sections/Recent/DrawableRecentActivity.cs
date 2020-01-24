@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,13 +10,13 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Online.Leaderboards;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class DrawableRecentActivity : DrawableProfileRow
     {
-        private APIAccess api;
+        private IAPIProvider api;
 
         private readonly APIRecentActivity activity;
 
@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(IAPIProvider api)
         {
             this.api = api;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 
             RightFlowContainer.Add(new DrawableDate(activity.CreatedAt)
             {
-                TextSize =  13,
+                Font = OsuFont.GetFont(size: 13),
                 Colour = OsuColour.Gray(0xAA),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             switch (activity.Type)
             {
                 case RecentActivityType.Rank:
-                    return new DrawableRank(activity.ScoreRank)
+                    return new UpdateableRank(activity.ScoreRank)
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 60,
@@ -66,11 +66,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     };
 
                 case RecentActivityType.Achievement:
-                    return new MedalIcon(activity.Achievement.Slug)
+                    return new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        FillMode = FillMode.Fit,
+                    })
                     {
                         RelativeSizeAxes = Axes.Y,
                         Width = 60,
-                        FillMode = FillMode.Fit,
                     };
 
                 default:

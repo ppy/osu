@@ -1,15 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Storyboards.Drawables;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace osu.Game.Storyboards
 {
-    public class Storyboard : IDisposable
+    public class Storyboard
     {
         private readonly Dictionary<string, StoryboardLayer> layers = new Dictionary<string, StoryboardLayer>();
         public IEnumerable<StoryboardLayer> Layers => layers.Values;
@@ -17,6 +16,8 @@ namespace osu.Game.Storyboards
         public BeatmapInfo BeatmapInfo = new BeatmapInfo();
 
         public bool HasDrawable => Layers.Any(l => l.Elements.Any(e => e.IsDrawable));
+
+        public double FirstEventTime => Layers.Min(l => l.Elements.FirstOrDefault()?.StartTime ?? 0);
 
         public Storyboard()
         {
@@ -28,8 +29,7 @@ namespace osu.Game.Storyboards
 
         public StoryboardLayer GetLayer(string name)
         {
-            StoryboardLayer layer;
-            if (!layers.TryGetValue(name, out layer))
+            if (!layers.TryGetValue(name, out var layer))
                 layers[name] = layer = new StoryboardLayer(name, layers.Values.Min(l => l.Depth) - 1);
 
             return layer;
@@ -56,29 +56,5 @@ namespace osu.Game.Storyboards
             drawable.Width = drawable.Height * (BeatmapInfo.WidescreenStoryboard ? 16 / 9f : 4 / 3f);
             return drawable;
         }
-
-        #region Disposal
-
-        ~Storyboard()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private bool isDisposed;
-
-        protected virtual void Dispose(bool isDisposing)
-        {
-            if (isDisposed)
-                return;
-            isDisposed = true;
-        }
-
-        #endregion
     }
 }

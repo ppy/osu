@@ -1,108 +1,34 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
     public class FilterControl : SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory>
     {
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-        private FillFlowContainer<RulesetToggleButton> modeButtons;
+        private DirectRulesetSelector rulesetSelector;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"384552");
         protected override DirectSortCriteria DefaultTab => DirectSortCriteria.Ranked;
+        protected override BeatmapSearchCategory DefaultCategory => BeatmapSearchCategory.Leaderboard;
 
-        protected override Drawable CreateSupplementaryControls()
-        {
-            modeButtons = new FillFlowContainer<RulesetToggleButton>
-            {
-                AutoSizeAxes = Axes.Both,
-                Spacing = new Vector2(10f, 0f),
-            };
+        protected override Drawable CreateSupplementaryControls() => rulesetSelector = new DirectRulesetSelector();
 
-            return modeButtons;
-        }
+        public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
 
         [BackgroundDependencyLoader(true)]
-        private void load(RulesetStore rulesets, OsuColour colours, Bindable<RulesetInfo> ruleset)
+        private void load(OsuColour colours, Bindable<RulesetInfo> ruleset)
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
-
-            Ruleset.Value = ruleset ?? rulesets.GetRuleset(0);
-            foreach (var r in rulesets.AvailableRulesets)
-                modeButtons.Add(new RulesetToggleButton(Ruleset, r));
-        }
-
-        private class RulesetToggleButton : OsuClickableContainer
-        {
-            private Drawable icon
-            {
-                get => iconContainer.Icon;
-                set => iconContainer.Icon = value;
-            }
-
-            private RulesetInfo ruleset;
-
-            public RulesetInfo Ruleset
-            {
-                get => ruleset;
-                set
-                {
-                    ruleset = value;
-                    icon = Ruleset.CreateInstance().CreateIcon();
-                }
-            }
-
-            private readonly Bindable<RulesetInfo> bindable;
-
-            private readonly ConstrainedIconContainer iconContainer;
-
-            private void Bindable_ValueChanged(RulesetInfo obj)
-            {
-                iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
-            }
-
-            public override bool HandleNonPositionalInput => !bindable.Disabled && base.HandleNonPositionalInput;
-            public override bool HandlePositionalInput => !bindable.Disabled && base.HandlePositionalInput;
-
-            public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
-            {
-                this.bindable = bindable;
-                AutoSizeAxes = Axes.Both;
-
-                Children = new[]
-                {
-                    iconContainer = new ConstrainedIconContainer
-                    {
-                        Origin = Anchor.TopLeft,
-                        Anchor = Anchor.TopLeft,
-                        Size = new Vector2(32),
-                    }
-                };
-
-                Ruleset = ruleset;
-                bindable.ValueChanged += Bindable_ValueChanged;
-                Bindable_ValueChanged(bindable.Value);
-                Action = () => bindable.Value = Ruleset;
-            }
-
-            protected override void Dispose(bool isDisposing)
-            {
-                if (bindable != null)
-                    bindable.ValueChanged -= Bindable_ValueChanged;
-                base.Dispose(isDisposing);
-            }
+            rulesetSelector.Current.BindTo(ruleset);
         }
     }
 
@@ -116,5 +42,6 @@ namespace osu.Game.Overlays.Direct
         Ranked,
         Rating,
         Plays,
+        Favourites,
     }
 }

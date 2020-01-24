@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Graphics.Backgrounds;
 
@@ -12,15 +12,15 @@ namespace osu.Game.Screens.Backgrounds
         public BackgroundScreenCustom(string textureName)
         {
             this.textureName = textureName;
-            Add(new Background(textureName));
+            AddInternal(new Background(textureName));
         }
 
         public override bool Equals(BackgroundScreen other)
         {
-            var backgroundScreenCustom = other as BackgroundScreenCustom;
-            if (backgroundScreenCustom == null) return false;
+            if (other is BackgroundScreenCustom backgroundScreenCustom)
+                return base.Equals(other) && textureName == backgroundScreenCustom.textureName;
 
-            return base.Equals(other) && textureName == backgroundScreenCustom.textureName;
+            return false;
         }
     }
 }

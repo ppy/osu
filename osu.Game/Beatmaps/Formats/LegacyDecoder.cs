@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.IO;
 using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -21,11 +21,12 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, T output)
+        protected override void ParseStreamInto(LineBufferedReader stream, T output)
         {
             Section section = Section.None;
 
             string line;
+
             while ((line = stream.ReadLine()) != null)
             {
                 if (ShouldSkipLine(line))
@@ -33,9 +34,9 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
-                    if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
+                    if (!Enum.TryParse(line[1..^1], out section))
                     {
-                        Logger.Log($"Unknown section \"{line}\" in {output}");
+                        Logger.Log($"Unknown section \"{line}\" in \"{output}\"");
                         section = Section.None;
                     }
 
@@ -48,12 +49,12 @@ namespace osu.Game.Beatmaps.Formats
                 }
                 catch (Exception e)
                 {
-                    Logger.Error(e, $"Failed to process line \"{line}\" into {output}");
+                    Logger.Log($"Failed to process line \"{line}\" into \"{output}\": {e.Message}", LoggingTarget.Runtime, LogLevel.Important);
                 }
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.AsSpan().TrimStart().StartsWith("//".AsSpan(), StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
@@ -72,10 +73,9 @@ namespace osu.Game.Beatmaps.Formats
             var index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
+
             return line;
         }
-
-        private bool hasComboColours;
 
         private void handleColours(T output, string line)
         {
@@ -94,7 +94,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
             }
-            catch (Exception e)
+            catch
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
@@ -103,18 +103,12 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasComboColours tHasComboColours)) return;
 
-                if (!hasComboColours)
-                {
-                    // remove default colours.
-                    tHasComboColours.ComboColours.Clear();
-                    hasComboColours = true;
-                }
-
-                tHasComboColours.ComboColours.Add(colour);
+                tHasComboColours.AddComboColours(colour);
             }
             else
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
+
                 tHasCustomColours.CustomColours[pair.Key] = colour;
             }
         }
@@ -145,54 +139,21 @@ namespace osu.Game.Beatmaps.Formats
             Fonts
         }
 
-        internal enum LegacySampleBank
+        internal class LegacyDifficultyControlPoint : DifficultyControlPoint
         {
-            None = 0,
-            Normal = 1,
-            Soft = 2,
-            Drum = 3
-        }
-
-        internal enum EventType
-        {
-            Background = 0,
-            Video = 1,
-            Break = 2,
-            Colour = 3,
-            Sprite = 4,
-            Sample = 5,
-            Animation = 6
-        }
-
-        internal enum LegacyOrigins
-        {
-            TopLeft,
-            Centre,
-            CentreLeft,
-            TopRight,
-            BottomCentre,
-            TopCentre,
-            Custom,
-            CentreRight,
-            BottomLeft,
-            BottomRight
-        }
-
-        internal enum StoryLayer
-        {
-            Background = 0,
-            Fail = 1,
-            Pass = 2,
-            Foreground = 3
+            public LegacyDifficultyControlPoint()
+            {
+                SpeedMultiplierBindable.Precision = double.Epsilon;
+            }
         }
 
         internal class LegacySampleControlPoint : SampleControlPoint
         {
             public int CustomSampleBank;
 
-            public override SampleInfo ApplyTo(SampleInfo sampleInfo)
+            public override HitSampleInfo ApplyTo(HitSampleInfo hitSampleInfo)
             {
-                var baseInfo = base.ApplyTo(sampleInfo);
+                var baseInfo = base.ApplyTo(hitSampleInfo);
 
                 if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
                     baseInfo.Suffix = CustomSampleBank.ToString();
@@ -200,10 +161,9 @@ namespace osu.Game.Beatmaps.Formats
                 return baseInfo;
             }
 
-            public override bool EquivalentTo(ControlPoint other)
-                => base.EquivalentTo(other)
-                   && other is LegacySampleControlPoint legacy
-                   && CustomSampleBank == legacy.CustomSampleBank;
+            public override bool EquivalentTo(ControlPoint other) =>
+                base.EquivalentTo(other) && other is LegacySampleControlPoint otherTyped &&
+                CustomSampleBank == otherTyped.CustomSampleBank;
         }
     }
 }

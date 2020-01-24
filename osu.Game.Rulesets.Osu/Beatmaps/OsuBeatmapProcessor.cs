@@ -1,10 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
@@ -23,60 +25,73 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
             var osuBeatmap = (Beatmap<OsuHitObject>)Beatmap;
 
-            // Reset stacking
-            foreach (var h in osuBeatmap.HitObjects)
-                h.StackHeight = 0;
+            if (osuBeatmap.HitObjects.Count > 0)
+            {
+                // Reset stacking
+                foreach (var h in osuBeatmap.HitObjects)
+                    h.StackHeight = 0;
 
-            if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)
-                applyStacking(osuBeatmap);
-            else
-                applyStackingOld(osuBeatmap);
+                if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)
+                    applyStacking(osuBeatmap, 0, osuBeatmap.HitObjects.Count - 1);
+                else
+                    applyStackingOld(osuBeatmap);
+            }
         }
 
-        private void applyStacking(Beatmap<OsuHitObject> beatmap)
+        private void applyStacking(Beatmap<OsuHitObject> beatmap, int startIndex, int endIndex)
         {
-            // Extend the end index to include objects they are stacked on
-            int extendedEndIndex = beatmap.HitObjects.Count - 1;
-            for (int i = beatmap.HitObjects.Count - 1; i >= 0; i--)
+            if (startIndex > endIndex) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be greater than {nameof(endIndex)}.");
+            if (startIndex < 0) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be less than 0.");
+            if (endIndex < 0) throw new ArgumentOutOfRangeException(nameof(endIndex), $"{nameof(endIndex)} cannot be less than 0.");
+
+            int extendedEndIndex = endIndex;
+
+            if (endIndex < beatmap.HitObjects.Count - 1)
             {
-                int stackBaseIndex = i;
-                for (int n = stackBaseIndex + 1; n < beatmap.HitObjects.Count; n++)
+                // Extend the end index to include objects they are stacked on
+                for (int i = endIndex; i >= startIndex; i--)
                 {
-                    OsuHitObject stackBaseObject = beatmap.HitObjects[stackBaseIndex];
-                    if (stackBaseObject is Spinner) break;
+                    int stackBaseIndex = i;
 
-                    OsuHitObject objectN = beatmap.HitObjects[n];
-                    if (objectN is Spinner)
-                        continue;
-
-                    double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
-                    double stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
-
-                    if (objectN.StartTime - endTime > stackThreshold)
-                        //We are no longer within stacking range of the next object.
-                        break;
-
-                    if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance ||
-                        stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance)
+                    for (int n = stackBaseIndex + 1; n < beatmap.HitObjects.Count; n++)
                     {
-                        stackBaseIndex = n;
+                        OsuHitObject stackBaseObject = beatmap.HitObjects[stackBaseIndex];
+                        if (stackBaseObject is Spinner) break;
 
-                        // HitObjects after the specified update range haven't been reset yet
-                        objectN.StackHeight = 0;
+                        OsuHitObject objectN = beatmap.HitObjects[n];
+                        if (objectN is Spinner)
+                            continue;
+
+                        double endTime = stackBaseObject.GetEndTime();
+                        double stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
+
+                        if (objectN.StartTime - endTime > stackThreshold)
+                            //We are no longer within stacking range of the next object.
+                            break;
+
+                        if (Vector2Extensions.Distance(stackBaseObject.Position, objectN.Position) < stack_distance
+                            || (stackBaseObject is Slider && Vector2Extensions.Distance(stackBaseObject.EndPosition, objectN.Position) < stack_distance))
+                        {
+                            stackBaseIndex = n;
+
+                            // HitObjects after the specified update range haven't been reset yet
+                            objectN.StackHeight = 0;
+                        }
                     }
-                }
 
-                if (stackBaseIndex > extendedEndIndex)
-                {
-                    extendedEndIndex = stackBaseIndex;
-                    if (extendedEndIndex == beatmap.HitObjects.Count - 1)
-                        break;
+                    if (stackBaseIndex > extendedEndIndex)
+                    {
+                        extendedEndIndex = stackBaseIndex;
+                        if (extendedEndIndex == beatmap.HitObjects.Count - 1)
+                            break;
+                    }
                 }
             }
 
             //Reverse pass for stack calculation.
-            int extendedStartIndex = 0;
-            for (int i = extendedEndIndex; i > 0; i--)
+            int extendedStartIndex = startIndex;
+
+            for (int i = extendedEndIndex; i > startIndex; i--)
             {
                 int n = i;
                 /* We should check every note which has not yet got a stack.
@@ -106,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         OsuHitObject objectN = beatmap.HitObjects[n];
                         if (objectN is Spinner) continue;
 
-                        double endTime = (objectN as IHasEndTime)?.EndTime ?? objectN.StartTime;
+                        double endTime = objectN.GetEndTime();
 
                         if (objectI.StartTime - endTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
@@ -127,6 +142,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Slider && Vector2Extensions.Distance(objectN.EndPosition, objectI.Position) < stack_distance)
                         {
                             int offset = objectI.StackHeight - objectN.StackHeight + 1;
+
                             for (int j = n + 1; j <= i; j++)
                             {
                                 //For each object which was declared under this slider, we will offset it to appear *below* the slider end (rather than above).
@@ -155,7 +171,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     /* We have hit the first slider in a possible stack.
                         * From this point on, we ALWAYS stack positive regardless.
                         */
-                    while (--n >= 0)
+                    while (--n >= startIndex)
                     {
                         OsuHitObject objectN = beatmap.HitObjects[n];
                         if (objectN is Spinner) continue;
@@ -183,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 if (currHitObject.StackHeight != 0 && !(currHitObject is Slider))
                     continue;
 
-                double startTime = (currHitObject as IHasEndTime)?.EndTime ?? currHitObject.StartTime;
+                double startTime = currHitObject.GetEndTime();
                 int sliderStack = 0;
 
                 for (int j = i + 1; j < beatmap.HitObjects.Count; j++)
@@ -193,17 +209,22 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     if (beatmap.HitObjects[j].StartTime - stackThreshold > startTime)
                         break;
 
+                    // The start position of the hitobject, or the position at the end of the path if the hitobject is a slider
+                    Vector2 position2 = currHitObject is Slider currSlider
+                        ? currSlider.Position + currSlider.Path.PositionAt(1)
+                        : currHitObject.Position;
+
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[i].StartTime;
+                        startTime = beatmap.HitObjects[j].GetEndTime();
                     }
-                    else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.EndPosition) < stack_distance)
+                    else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
                         //Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[i].StartTime;
+                        startTime = beatmap.HitObjects[j].GetEndTime();
                     }
                 }
             }

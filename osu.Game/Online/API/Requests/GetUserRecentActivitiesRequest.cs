@@ -1,23 +1,22 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserRecentActivitiesRequest : APIRequest<List<APIRecentActivity>>
+    public class GetUserRecentActivitiesRequest : PaginatedAPIRequest<List<APIRecentActivity>>
     {
         private readonly long userId;
-        private readonly int offset;
 
-        public GetUserRecentActivitiesRequest(long userId, int offset = 0)
+        public GetUserRecentActivitiesRequest(long userId, int page = 0, int itemsPerPage = 5)
+            : base(page, itemsPerPage)
         {
             this.userId = userId;
-            this.offset = offset;
         }
 
-        protected override string Target => $"users/{userId}/recent_activity?offset={offset}";
+        protected override string Target => $"users/{userId}/recent_activity";
     }
 
     public enum RecentActivityType
@@ -43,5 +42,6 @@ namespace osu.Game.Online.API.Requests
         Ranked,
         Approved,
         Qualified,
+        Loved
     }
 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -9,23 +9,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.SearchableList
 {
     public abstract class SearchableListHeader<T> : Container
+        where T : struct, Enum
     {
         public readonly HeaderTabControl<T> Tabs;
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
         protected abstract Drawable CreateHeaderText();
-        protected abstract FontAwesome Icon { get; }
+        protected abstract IconUsage Icon { get; }
 
         protected SearchableListHeader()
         {
-            if (!typeof(T).IsEnum)
-                throw new InvalidOperationException("BrowseHeader only supports enums as the generic type argument");
-
             RelativeSizeAxes = Axes.X;
             Height = 90;
 

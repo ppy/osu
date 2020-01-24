@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         public double Distance => Path.Distance;
 
-        public List<List<SampleInfo>> NodeSamples { get; set; }
+        public List<IList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
         public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;

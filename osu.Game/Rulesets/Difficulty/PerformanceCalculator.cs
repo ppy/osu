@@ -1,10 +1,10 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
@@ -26,8 +26,7 @@ namespace osu.Game.Rulesets.Difficulty
             Ruleset = ruleset;
             Score = score;
 
-            beatmap.Mods.Value = score.Mods;
-            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo, score.Mods);
 
             Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
 
@@ -36,9 +35,9 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected virtual void ApplyMods(Mod[] mods)
         {
-            var clock = new StopwatchClock();
-            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
-            TimeRate = clock.Rate;
+            var track = new TrackVirtual(10000);
+            mods.OfType<IApplicableToTrack>().ForEach(m => m.ApplyToTrack(track));
+            TimeRate = track.Rate;
         }
 
         public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);

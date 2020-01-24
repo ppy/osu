@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -39,12 +39,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             ApplyResult(r => r.Type = HitResult.Great);
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateStateTransforms(ArmedState state)
         {
             switch (state)
             {
                 case ArmedState.Hit:
-                    this.ScaleTo(0, 100, Easing.OutQuint).Expire();
+                    this.ScaleTo(0, 100, Easing.OutQuint);
                     break;
             }
         }

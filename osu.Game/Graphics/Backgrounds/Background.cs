@@ -1,28 +1,35 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Transforms;
+using osuTK;
 
 namespace osu.Game.Graphics.Backgrounds
 {
-    public class Background : BufferedContainer
+    /// <summary>
+    /// A background which offers blurring via a <see cref="BufferedContainer"/> on demand.
+    /// </summary>
+    public class Background : CompositeDrawable
     {
-        public Sprite Sprite;
+        private const float blur_scale = 0.5f;
+
+        public readonly Sprite Sprite;
 
         private readonly string textureName;
 
+        private BufferedContainer bufferedContainer;
+
         public Background(string textureName = @"")
         {
-            CacheDrawnFrameBuffer = true;
-
             this.textureName = textureName;
             RelativeSizeAxes = Axes.Both;
 
-            Add(Sprite = new Sprite
+            AddInternal(Sprite = new Sprite
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -36,6 +43,33 @@ namespace osu.Game.Graphics.Backgrounds
         {
             if (!string.IsNullOrEmpty(textureName))
                 Sprite.Texture = textures.Get(textureName);
+        }
+
+        public Vector2 BlurSigma => bufferedContainer?.BlurSigma / blur_scale ?? Vector2.Zero;
+
+        /// <summary>
+        /// Smoothly adjusts <see cref="IBufferedContainer.BlurSigma"/> over time.
+        /// </summary>
+        /// <returns>A <see cref="TransformSequence{T}"/> to which further transforms can be added.</returns>
+        public void BlurTo(Vector2 newBlurSigma, double duration = 0, Easing easing = Easing.None)
+        {
+            if (bufferedContainer == null && newBlurSigma != Vector2.Zero)
+            {
+                RemoveInternal(Sprite);
+
+                AddInternal(bufferedContainer = new BufferedContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    CacheDrawnFrameBuffer = true,
+                    RedrawOnScale = false,
+                    Child = Sprite
+                });
+            }
+
+            if (bufferedContainer != null)
+                bufferedContainer.FrameBufferScale = newBlurSigma == Vector2.Zero ? Vector2.One : new Vector2(blur_scale);
+
+            bufferedContainer?.BlurTo(newBlurSigma * blur_scale, duration, easing);
         }
     }
 }

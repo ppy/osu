@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
@@ -23,12 +23,12 @@ namespace osu.Game.Rulesets.Taiko.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame currentFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
-            if (legacyFrame.MouseRight1) Actions.Add(TaikoAction.LeftRim);
-            if (legacyFrame.MouseRight2) Actions.Add(TaikoAction.RightRim);
-            if (legacyFrame.MouseLeft1) Actions.Add(TaikoAction.LeftCentre);
-            if (legacyFrame.MouseLeft2) Actions.Add(TaikoAction.RightCentre);
+            if (currentFrame.MouseRight1) Actions.Add(TaikoAction.LeftRim);
+            if (currentFrame.MouseRight2) Actions.Add(TaikoAction.RightRim);
+            if (currentFrame.MouseLeft1) Actions.Add(TaikoAction.LeftCentre);
+            if (currentFrame.MouseLeft2) Actions.Add(TaikoAction.RightCentre);
         }
     }
 }

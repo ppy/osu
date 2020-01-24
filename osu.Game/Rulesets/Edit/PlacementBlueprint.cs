@@ -1,15 +1,16 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose;
 using osuTK;
@@ -57,7 +58,7 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IAdjustableClock clock)
+        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock clock)
         {
             this.beatmap.BindTo(beatmap);
 
@@ -75,6 +76,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (state == value)
                     return;
+
                 state = value;
 
                 if (state == PlacementState.Shown)
@@ -89,8 +91,10 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has started.
         /// </summary>
-        protected void BeginPlacement()
+        /// <param name="startTime">The start time of <see cref="HitObject"/> at the placement point. If null, the current clock time is used.</param>
+        protected void BeginPlacement(double? startTime = null)
         {
+            HitObject.StartTime = startTime ?? EditorClock.CurrentTime;
             placementHandler.BeginPlacement(HitObject);
             PlacementBegun = true;
         }
@@ -107,7 +111,14 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Invokes <see cref="HitObject.ApplyDefaults"/>, refreshing <see cref="HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
+        /// Updates the position of this <see cref="PlacementBlueprint"/> to a new screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        public abstract void UpdatePosition(Vector2 screenSpacePosition);
+
+        /// <summary>
+        /// Invokes <see cref="Objects.HitObject.ApplyDefaults(ControlPointInfo,BeatmapDifficulty)"/>,
+        /// refreshing <see cref="Objects.HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
         /// </summary>
         protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
 
@@ -121,8 +132,10 @@ namespace osu.Game.Rulesets.Edit
             {
                 case ScrollEvent _:
                     return false;
-                case MouseEvent _:
+
+                case MouseButtonEvent _:
                     return true;
+
                 default:
                     return false;
             }
