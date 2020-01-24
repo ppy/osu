@@ -71,6 +71,7 @@ namespace osu.Game.Beatmaps.Formats
                 lineSpan = lineSpan.Slice(1);
                 ++depth;
             }
+
             line = line.Substring(depth);
 
             decodeVariables(ref line);
