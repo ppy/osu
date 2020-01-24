@@ -85,6 +85,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.HitLighting, true);
 
             Set(OsuSetting.ShowInterface, true);
+            Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
@@ -150,6 +151,7 @@ namespace osu.Game.Configuration
         ScoreMeter,
         FloatingComments,
         ShowInterface,
+        ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         MouseDisableButtons,
         MouseDisableWheel,
