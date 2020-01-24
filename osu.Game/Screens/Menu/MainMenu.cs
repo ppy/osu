@@ -78,7 +78,21 @@ namespace osu.Game.Screens.Menu
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
-            AddRangeInternal(new Drawable[]
+            if (host.CanExit)
+            {
+                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
+                {
+                    Action = () =>
+                    {
+                        if (holdDelay.Value > 0)
+                            confirmAndExit();
+                        else
+                            this.Exit();
+                    }
+                });
+            }
+
+            AddRangeInternal(new[]
             {
                 buttonsContainer = new ParallaxContainer
                 {
@@ -101,22 +115,9 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
-                }
+                },
+                exitConfirmOverlay.CreateProxy()
             });
-
-            if (host.CanExit)
-            {
-                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
-                {
-                    Action = () =>
-                    {
-                        if (holdDelay.Value > 0)
-                            confirmAndExit();
-                        else
-                            this.Exit();
-                    }
-                });
-            }
 
             buttons.StateChanged += state =>
             {
