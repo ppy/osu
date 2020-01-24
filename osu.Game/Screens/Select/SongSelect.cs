@@ -88,22 +88,22 @@ namespace osu.Game.Screens.Select
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
 
-        private const float panel_overflow = 1.2f;
-
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
 
-            AddRangeInternal(new[]
+            AddRangeInternal(new Drawable[]
             {
-                new ParallaxContainer
+                new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
-                    Masking = true,
-                    ParallaxAmount = 0.005f,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 250,
+                },
+                new VerticalMaskingContainer
+                {
+                    Children = new Drawable[]
                     {
                         new GridContainer // used for max width implementation
                         {
@@ -117,44 +117,14 @@ namespace osu.Game.Screens.Select
                             {
                                 new Drawable[]
                                 {
-                                    new WedgeBackground
+                                    new ParallaxContainer
                                     {
+                                        ParallaxAmount = 0.005f,
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Right = -150 },
-                                    },
-                                    null
-                                }
-                            }
-                        }
-                    }
-                },
-                new GridContainer // used for max width implementation
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    ColumnDimensions = new[]
-                    {
-                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 650),
-                    },
-                    Content = new[]
-                    {
-                        new Drawable[]
-                        {
-                            new Container
-                            {
-                                Origin = Anchor.BottomLeft,
-                                Anchor = Anchor.BottomLeft,
-                                RelativeSizeAxes = Axes.Both,
-
-                                Children = new Drawable[]
-                                {
-                                    beatmapInfoWedge = new BeatmapInfoWedge
-                                    {
-                                        Height = WEDGE_HEIGHT,
-                                        RelativeSizeAxes = Axes.X,
-                                        Margin = new MarginPadding
+                                        Child = new WedgeBackground
                                         {
-                                            Top = left_area_padding,
-                                            Right = left_area_padding,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = -150 },
                                         },
                                     },
                                     new Container
@@ -162,92 +132,80 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.Both,
                                         Padding = new MarginPadding
                                         {
-                                            Bottom = Footer.HEIGHT,
-                                            Top = WEDGE_HEIGHT + left_area_padding,
-                                            Left = left_area_padding,
-                                            Right = left_area_padding * 2,
+                                            Top = FilterControl.HEIGHT,
+                                            Bottom = Footer.HEIGHT
                                         },
+                                        Child = Carousel = new BeatmapCarousel
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            RelativeSizeAxes = Axes.Both,
+                                            SelectionChanged = updateSelectedBeatmap,
+                                            BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                        },
+                                    }
+                                },
+                            }
+                        },
+                        FilterControl = new FilterControl
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = FilterControl.HEIGHT,
+                            FilterChanged = ApplyFilterToCarousel,
+                            Background = { Width = 2 },
+                        },
+                        new GridContainer // used for max width implementation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 650),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        RelativeSizeAxes = Axes.Both,
+
                                         Children = new Drawable[]
                                         {
-                                            BeatmapDetails = new BeatmapDetailArea
+                                            beatmapInfoWedge = new BeatmapInfoWedge
+                                            {
+                                                Height = WEDGE_HEIGHT,
+                                                RelativeSizeAxes = Axes.X,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = left_area_padding,
+                                                    Right = left_area_padding,
+                                                },
+                                            },
+                                            new Container
                                             {
                                                 RelativeSizeAxes = Axes.Both,
-                                                Padding = new MarginPadding { Top = 10, Right = 5 },
+                                                Padding = new MarginPadding
+                                                {
+                                                    Bottom = Footer.HEIGHT,
+                                                    Top = WEDGE_HEIGHT + left_area_padding,
+                                                    Left = left_area_padding,
+                                                    Right = left_area_padding * 2,
+                                                },
+                                                Child = BeatmapDetails = new BeatmapDetailArea
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Padding = new MarginPadding { Top = 10, Right = 5 },
+                                                },
                                             },
                                         }
                                     },
-                                }
-                            },
-                        },
+                                },
+                            }
+                        }
                     }
                 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = panel_overflow, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Width = 1 / panel_overflow,
-                        Children = new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Top = FilterControl.HEIGHT,
-                                    Bottom = Footer.HEIGHT
-                                },
-                                Children = new Drawable[]
-                                {
-                                    new GridContainer // used for max width implementation
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        ColumnDimensions = new[]
-                                        {
-                                            new Dimension(),
-                                            new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
-                                        },
-                                        Content = new[]
-                                        {
-                                            new Drawable[]
-                                            {
-                                                null,
-                                                Carousel = new BeatmapCarousel
-                                                {
-                                                    Anchor = Anchor.CentreRight,
-                                                    Origin = Anchor.CentreRight,
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    SelectionChanged = updateSelectedBeatmap,
-                                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
-                                                },
-                                            }
-                                        }
-                                    },
-                                }
-                            },
-                            FilterControl = new FilterControl
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = FilterControl.HEIGHT,
-                                FilterChanged = ApplyFilterToCarousel,
-                                Background = { Width = 2 },
-                            },
-                        }
-                    },
-                },
-                new ResetScrollContainer(() => Carousel.ScrollToSelected())
-                {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 250,
-                },
-                beatmapInfoWedge.CreateProxy()
             });
 
             if (ShowFooter)
@@ -763,6 +721,29 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
+        }
+
+        private class VerticalMaskingContainer : Container
+        {
+            private const float panel_overflow = 1.2f;
+
+            protected override Container<Drawable> Content { get; }
+
+            public VerticalMaskingContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Masking = true;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                InternalChild = Content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 1 / panel_overflow,
+                };
+            }
         }
 
         private class ResetScrollContainer : Container
