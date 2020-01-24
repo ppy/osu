@@ -18,5 +18,14 @@ namespace osu.Game.Configuration
 
         [Description("Hit Error (both)")]
         HitErrorBoth,
+
+        [Description("Colour (left)")]
+        ColourLeft,
+
+        [Description("Colour (right)")]
+        ColourRight,
+
+        [Description("Colour (both)")]
+        ColourBoth,
     }
 }
