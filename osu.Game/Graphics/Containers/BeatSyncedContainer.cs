@@ -1,9 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -33,50 +33,114 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double TimeSinceLastBeat { get; private set; }
 
+        /// <summary>
+        /// How many beats per beatlength to trigger. Defaults to 1.
+        /// </summary>
+        public int Divisor { get; set; } = 1;
+
+        /// <summary>
+        /// An optional minimum beat length. Any beat length below this will be multiplied by two until valid.
+        /// </summary>
+        public double MinimumBeatLength { get; set; }
+
+        /// <summary>
+        /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
+        /// </summary>
+        private const double default_beat_length = 60000.0 / 60.0;
+
+        private TimingControlPoint defaultTiming;
+        private EffectControlPoint defaultEffect;
+        private TrackAmplitudes defaultAmplitudes;
+
+        protected bool IsBeatSyncedWithTrack { get; private set; }
+
         protected override void Update()
         {
-            if (!Beatmap.Value.TrackLoaded || !Beatmap.Value.BeatmapLoaded) return;
+            Track track = null;
+            IBeatmap beatmap = null;
 
-            var track = Beatmap.Value.Track;
-            var beatmap = Beatmap.Value.Beatmap;
+            double currentTrackTime;
+            TimingControlPoint timingPoint;
+            EffectControlPoint effectPoint;
 
-            if (track == null || beatmap == null)
-                return;
+            if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
+            {
+                track = Beatmap.Value.Track;
+                beatmap = Beatmap.Value.Beatmap;
+            }
 
-            double currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
+            if (track != null && beatmap != null && track.IsRunning)
+            {
+                currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
 
-            TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
-            EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
+                timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
+                effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
 
-            if (timingPoint.BeatLength == 0)
-                return;
+                if (timingPoint.BeatLength == 0)
+                {
+                    IsBeatSyncedWithTrack = false;
+                    return;
+                }
 
-            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / timingPoint.BeatLength);
+                IsBeatSyncedWithTrack = true;
+            }
+            else
+            {
+                IsBeatSyncedWithTrack = false;
+                currentTrackTime = Clock.CurrentTime;
+                timingPoint = defaultTiming;
+                effectPoint = defaultEffect;
+            }
+
+            double beatLength = timingPoint.BeatLength / Divisor;
+
+            while (beatLength < MinimumBeatLength)
+                beatLength *= 2;
+
+            int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
 
             // The beats before the start of the first control point are off by 1, this should do the trick
             if (currentTrackTime < timingPoint.Time)
                 beatIndex--;
 
-            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % timingPoint.BeatLength;
+            TimeUntilNextBeat = (timingPoint.Time - currentTrackTime) % beatLength;
             if (TimeUntilNextBeat < 0)
-                TimeUntilNextBeat += timingPoint.BeatLength;
+                TimeUntilNextBeat += beatLength;
 
-            TimeSinceLastBeat = timingPoint.BeatLength - TimeUntilNextBeat;
+            TimeSinceLastBeat = beatLength - TimeUntilNextBeat;
 
             if (timingPoint.Equals(lastTimingPoint) && beatIndex == lastBeat)
                 return;
 
             using (BeginDelayedSequence(-TimeSinceLastBeat, true))
-                OnNewBeat(beatIndex, timingPoint, effectPoint, track.CurrentAmplitudes);
+                OnNewBeat(beatIndex, timingPoint, effectPoint, track?.CurrentAmplitudes ?? defaultAmplitudes);
 
             lastBeat = beatIndex;
             lastTimingPoint = timingPoint;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             Beatmap.BindTo(beatmap);
+
+            defaultTiming = new TimingControlPoint
+            {
+                BeatLength = default_beat_length,
+            };
+
+            defaultEffect = new EffectControlPoint
+            {
+                KiaiMode = false,
+                OmitFirstBarLine = false
+            };
+
+            defaultAmplitudes = new TrackAmplitudes
+            {
+                FrequencyAmplitudes = new float[256],
+                LeftChannel = 0,
+                RightChannel = 0
+            };
         }
 
         protected virtual void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)

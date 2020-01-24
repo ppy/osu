@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
@@ -24,61 +24,31 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteIcon icon;
 
         private Color4? accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour.GetValueOrDefault(); }
+            get => accentColour.GetValueOrDefault();
             set
             {
                 accentColour = value;
 
-                if (Current)
+                if (Current.Value)
                 {
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
                 }
+
+                updateFade();
             }
         }
 
         public string Text
         {
-            get { return text.Text; }
-            set { text.Text = value; }
+            get => text.Text;
+            set => text.Text = value;
         }
 
         private const float transition_length = 500;
-
-        private void fadeIn()
-        {
-            box.FadeIn(transition_length, Easing.OutQuint);
-            text.FadeColour(Color4.White, transition_length, Easing.OutQuint);
-        }
-
-        private void fadeOut()
-        {
-            box.FadeOut(transition_length, Easing.OutQuint);
-            text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            fadeIn();
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            if (!Current)
-                fadeOut();
-
-            base.OnHoverLost(e);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            if (accentColour == null)
-                AccentColour = colours.Blue;
-        }
 
         public OsuTabControlCheckbox()
         {
@@ -94,15 +64,11 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
-                        },
+                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),
-                            Icon = FontAwesome.fa_circle_o,
+                            Icon = FontAwesome.Regular.Circle,
                             Shadow = true,
                         },
                     },
@@ -115,22 +81,42 @@ namespace osu.Game.Graphics.UserInterface
                     Colour = Color4.White,
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
-                }
+                },
+                new HoverClickSounds()
             };
 
-            Current.ValueChanged += v =>
+            Current.ValueChanged += selected =>
             {
-                if (v)
-                {
-                    fadeIn();
-                    icon.Icon = FontAwesome.fa_check_circle_o;
-                }
-                else
-                {
-                    fadeOut();
-                    icon.Icon = FontAwesome.fa_circle_o;
-                }
+                icon.Icon = selected.NewValue ? FontAwesome.Regular.CheckCircle : FontAwesome.Regular.Circle;
+                text.Font = text.Font.With(weight: selected.NewValue ? FontWeight.Bold : FontWeight.Medium);
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            if (accentColour == null)
+                AccentColour = colours.Blue;
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            updateFade();
+            return base.OnHover(e);
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            if (!Current.Value)
+                updateFade();
+
+            base.OnHoverLost(e);
+        }
+
+        private void updateFade()
+        {
+            box.FadeTo(IsHovered ? 1 : 0, transition_length, Easing.OutQuint);
+            text.FadeColour(IsHovered ? Color4.White : AccentColour, transition_length, Easing.OutQuint);
         }
     }
 }

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -12,6 +12,7 @@ namespace osu.Game.Overlays.Social
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"47253a");
         protected override SocialSortCriteria DefaultTab => SocialSortCriteria.Rank;
+        protected override SortDirection DefaultCategory => SortDirection.Ascending;
 
         public FilterControl()
         {

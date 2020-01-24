@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics.UserInterface;
@@ -11,9 +11,8 @@ namespace osu.Game.Graphics.UserInterface
         public readonly MenuItemType Type;
 
         public OsuMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-            : base(text)
+            : this(text, type, null)
         {
-            Type = type;
         }
 
         public OsuMenuItem(string text, MenuItemType type, Action action)

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -11,6 +11,12 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public class Judgement
     {
+        /// <summary>
+        /// The default health increase for a maximum judgement, as a proportion of total health.
+        /// By default, each maximum judgement restores 5% of total health.
+        /// </summary>
+        protected const double DEFAULT_MAX_HEALTH_INCREASE = 0.05;
+
         /// <summary>
         /// The maximum <see cref="HitResult"/> that can be achieved.
         /// </summary>
@@ -32,6 +38,11 @@ namespace osu.Game.Rulesets.Judgements
         public int MaxNumericResult => NumericResultFor(MaxResult);
 
         /// <summary>
+        /// The health increase for the maximum achievable result.
+        /// </summary>
+        public double MaxHealthIncrease => HealthIncreaseFor(MaxResult);
+
+        /// <summary>
         /// Retrieves the numeric score representation of a <see cref="HitResult"/>.
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to find the numeric score representation for.</param>
@@ -50,7 +61,32 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
         /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
-        protected virtual double HealthIncreaseFor(HitResult result) => 0;
+        protected virtual double HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return -DEFAULT_MAX_HEALTH_INCREASE;
+
+                case HitResult.Meh:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.05;
+
+                case HitResult.Ok:
+                    return -DEFAULT_MAX_HEALTH_INCREASE * 0.01;
+
+                case HitResult.Good:
+                    return DEFAULT_MAX_HEALTH_INCREASE * 0.3;
+
+                case HitResult.Great:
+                    return DEFAULT_MAX_HEALTH_INCREASE;
+
+                case HitResult.Perfect:
+                    return DEFAULT_MAX_HEALTH_INCREASE * 1.05;
+
+                default:
+                    return 0;
+            }
+        }
 
         /// <summary>
         /// Retrieves the numeric health increase of a <see cref="JudgementResult"/>.
@@ -58,5 +94,7 @@ namespace osu.Game.Rulesets.Judgements
         /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
         /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
         public double HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
+
+        public override string ToString() => $"AffectsCombo:{AffectsCombo} MaxResult:{MaxResult} MaxScore:{MaxNumericResult}";
     }
 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
@@ -13,22 +13,33 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         public override bool IsSwitchable => false;
 
-        public ChannelSelectorTabItem(Channel value) : base(value)
+        protected override bool IsBoldWhenActive => false;
+
+        public ChannelSelectorTabItem()
+            : base(new ChannelSelectorTabChannel())
         {
             Depth = float.MaxValue;
             Width = 45;
 
             Icon.Alpha = 0;
 
-            Text.TextSize = 45;
-            TextBold.TextSize = 45;
+            Text.Font = Text.Font.With(size: 45);
+            Text.Truncate = false;
         }
 
         [BackgroundDependencyLoader]
-        private new void load(OsuColour colour)
+        private void load(OsuColour colour)
         {
             BackgroundInactive = colour.Gray2;
             BackgroundActive = colour.Gray3;
+        }
+
+        public class ChannelSelectorTabChannel : Channel
+        {
+            public ChannelSelectorTabChannel()
+            {
+                Name = "+";
+            }
         }
     }
 }

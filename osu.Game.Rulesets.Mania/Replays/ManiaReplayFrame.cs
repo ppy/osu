@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Mania.Replays
             Actions.AddRange(actions);
         }
 
-        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap)
+        public void ConvertFrom(LegacyReplayFrame legacyFrame, IBeatmap beatmap, ReplayFrame lastFrame = null)
         {
             // We don't need to fully convert, just create the converter
-            var converter = new ManiaBeatmapConverter(beatmap);
+            var converter = new ManiaBeatmapConverter(beatmap, new ManiaRuleset());
 
             // NB: Via co-op mod, osu-stable can have two stages with floor(col/2) and ceil(col/2) columns. This will need special handling
             // elsewhere in the game if we do choose to support the old co-op mod anyway. For now, assume that there is only one stage.
@@ -39,6 +39,7 @@ namespace osu.Game.Rulesets.Mania.Replays
 
             int activeColumns = (int)(legacyFrame.MouseX ?? 0);
             int counter = 0;
+
             while (activeColumns > 0)
             {
                 var isSpecial = stage.IsSpecialColumn(counter);

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -12,10 +12,6 @@ namespace osu.Game.Online.Chat
     {
         [JsonProperty(@"message_id")]
         public readonly long? Id;
-
-        //todo: this should be inside sender.
-        [JsonProperty(@"sender_id")]
-        public long UserId;
 
         [JsonProperty(@"channel_id")]
         public long ChannelId;

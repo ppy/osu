@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
@@ -28,35 +29,32 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             CornerRadius = 5;
             Masking = true;
 
-            InternalChild = headPiece = new NotePiece();
-        }
+            AddInternal(headPiece = new NotePiece());
 
-        protected override void OnDirectionChanged(ScrollingDirection direction)
-        {
-            base.OnDirectionChanged(direction);
-
-            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
-        }
-
-        public override Color4 AccentColour
-        {
-            get { return base.AccentColour; }
-            set
+            AccentColour.BindValueChanged(colour =>
             {
-                base.AccentColour = value;
-                headPiece.AccentColour = AccentColour;
+                headPiece.AccentColour = colour.NewValue;
 
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = AccentColour.Lighten(1f).Opacity(0.6f),
+                    Colour = colour.NewValue.Lighten(1f).Opacity(0.2f),
                     Radius = 10,
                 };
-            }
+            }, true);
+        }
+
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
+        {
+            base.OnDirectionChanged(e);
+
+            headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -79,6 +77,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual void OnReleased(ManiaAction action)
+        {
+        }
     }
 }

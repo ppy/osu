@@ -1,15 +1,16 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Storyboards.Drawables
 {
-    public class DrawableStoryboardLayer : Container
+    public class DrawableStoryboardLayer : LifetimeManagementContainer
     {
-        public StoryboardLayer Layer { get; private set; }
+        public StoryboardLayer Layer { get; }
         public bool Enabled;
 
         public override bool IsPresent => Enabled && base.IsPresent;
@@ -24,12 +25,14 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(CancellationToken? cancellationToken)
         {
             foreach (var element in Layer.Elements)
             {
+                cancellationToken?.ThrowIfCancellationRequested();
+
                 if (element.IsDrawable)
-                    Add(element.CreateDrawable());
+                    AddInternal(element.CreateDrawable());
             }
         }
     }

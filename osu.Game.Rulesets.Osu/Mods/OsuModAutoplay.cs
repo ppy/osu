@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).Append(typeof(OsuModSpunOut)).ToArray();
 
-        protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
+        public override Score CreateReplayScore(IBeatmap beatmap) => new Score
         {
             ScoreInfo = new ScoreInfo { User = new User { Username = "Autoplay" } },
             Replay = new OsuAutoGenerator(beatmap).Generate()

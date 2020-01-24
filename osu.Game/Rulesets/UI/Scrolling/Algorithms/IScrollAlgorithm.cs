@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         /// </remarks>
         /// <param name="time">The point in time.</param>
         /// <param name="timeRange">The amount of visible time.</param>
-        /// <returns>The time at which <paramref name="time"/> enters <see cref="timeRange"/>.</returns>
+        /// <returns>The time at which <paramref name="time"/> enters <paramref name="timeRange"/>.</returns>
         double GetDisplayStartTime(double time, double timeRange);
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         /// <param name="startTime">The start time.</param>
         /// <param name="endTime">The end time.</param>
         /// <param name="timeRange">The amount of visible time.</param>
-        /// <param name="scrollLength">The absolute spatial length through <see cref="timeRange"/>.</param>
+        /// <param name="scrollLength">The absolute spatial length through <paramref name="timeRange"/>.</param>
         /// <returns>The absolute spatial length.</returns>
         float GetLength(double startTime, double endTime, double timeRange, float scrollLength);
 
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         /// <param name="time">The time to compute the spatial position of.</param>
         /// <param name="currentTime">The current time.</param>
         /// <param name="timeRange">The amount of visible time.</param>
-        /// <param name="scrollLength">The absolute spatial length through <see cref="timeRange"/>.</param>
+        /// <param name="scrollLength">The absolute spatial length through <paramref name="timeRange"/>.</param>
         /// <returns>The absolute spatial position.</returns>
         float PositionAt(double time, double currentTime, double timeRange, float scrollLength);
 
@@ -42,8 +42,8 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         /// <param name="position">The absolute spatial position.</param>
         /// <param name="currentTime">The current time.</param>
         /// <param name="timeRange">The amount of visible time.</param>
-        /// <param name="scrollLength">The absolute spatial length through <see cref="timeRange"/>.</param>
-        /// <returns>The time at which <see cref="PositionAt(t)"/> == <paramref name="position"/>.</returns>
+        /// <param name="scrollLength">The absolute spatial length through <paramref name="timeRange"/>.</param>
+        /// <returns>The time at which <see cref="PositionAt(double,double,double,float)"/> == <paramref name="position"/>.</returns>
         double TimeAt(float position, double currentTime, double timeRange, float scrollLength);
 
         /// <summary>

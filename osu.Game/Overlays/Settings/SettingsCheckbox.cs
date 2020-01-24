@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -10,12 +10,14 @@ namespace osu.Game.Overlays.Settings
     {
         private OsuCheckbox checkbox;
 
+        private string labelText;
+
         protected override Drawable CreateControl() => checkbox = new OsuCheckbox();
 
         public override string LabelText
         {
-            get { return checkbox.LabelText; }
-            set { checkbox.LabelText = value; }
+            get => labelText;
+            set => checkbox.LabelText = labelText = value;
         }
     }
 }

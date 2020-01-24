@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -136,12 +136,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 AddColumn(column);
             }
 
-            Direction.BindValueChanged(d =>
+            Direction.BindValueChanged(dir =>
             {
                 barLineContainer.Padding = new MarginPadding
                 {
-                    Top = d == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
-                    Bottom = d == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
+                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
                 };
             }, true);
         }
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayResult || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             judgements.Clear();

@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
-using osuTK.Graphics;
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Music
 {
@@ -31,7 +31,6 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 40,
-                            Exit = () => ExitRequested?.Invoke(),
                         },
                         new CollectionsDropdown<PlaylistCollection>
                         {
@@ -45,30 +44,22 @@ namespace osu.Game.Overlays.Music
             Search.Current.ValueChanged += current_ValueChanged;
         }
 
-        private void current_ValueChanged(string newValue) => FilterChanged?.Invoke(newValue);
-
-        public Action ExitRequested;
+        private void current_ValueChanged(ValueChangedEvent<string> e) => FilterChanged?.Invoke(e.NewValue);
 
         public Action<string> FilterChanged;
 
         public class FilterTextBox : SearchTextBox
         {
-            private Color4 backgroundColour;
-
-            protected override Color4 BackgroundUnfocused => backgroundColour;
-            protected override Color4 BackgroundFocused => backgroundColour;
             protected override bool AllowCommit => true;
 
-            public FilterTextBox()
+            [BackgroundDependencyLoader]
+            private void load()
             {
                 Masking = true;
                 CornerRadius = 5;
-            }
 
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                backgroundColour = colours.Gray2;
+                BackgroundUnfocused = OsuColour.Gray(0.06f);
+                BackgroundFocused = OsuColour.Gray(0.12f);
             }
         }
     }

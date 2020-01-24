@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -40,9 +40,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 Colour = new Color4(255, 204, 33, 255),
             });
 
-            bool isMajor = barLine.BeatIndex % (int)barLine.ControlPoint.TimeSignature == 0;
-
-            if (isMajor)
+            if (barLine.Major)
             {
                 AddInternal(new EquilateralTriangle
                 {
@@ -65,11 +63,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 });
             }
 
-            if (!isMajor && barLine.BeatIndex % 2 == 1)
+            if (!barLine.Major)
                 Alpha = 0.2f;
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void UpdateInitialTransforms()
+        {
+        }
+
+        protected override void UpdateStateTransforms(ArmedState state)
         {
         }
     }

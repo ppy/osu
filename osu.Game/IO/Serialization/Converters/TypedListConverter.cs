@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -65,6 +65,7 @@ namespace osu.Game.IO.Serialization.Converters
 
             var lookupTable = new List<string>();
             var objects = new List<JObject>();
+
             foreach (var item in list)
             {
                 var type = item.GetType();
@@ -75,6 +76,7 @@ namespace osu.Game.IO.Serialization.Converters
                     typeString += $", {assemblyName.Version}";
 
                 int typeId = lookupTable.IndexOf(typeString);
+
                 if (typeId == -1)
                 {
                     lookupTable.Add(typeString);

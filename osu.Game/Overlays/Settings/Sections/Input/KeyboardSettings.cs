@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 
@@ -9,13 +9,14 @@ namespace osu.Game.Overlays.Settings.Sections.Input
     {
         protected override string Header => "Keyboard";
 
-        public KeyboardSettings(KeyBindingOverlay keyConfig)
+        public KeyboardSettings(KeyBindingPanel keyConfig)
         {
             Children = new Drawable[]
             {
                 new SettingsButton
                 {
                     Text = "Key configuration",
+                    TooltipText = "change global shortcut keys and gameplay bindings",
                     Action = keyConfig.ToggleVisibility
                 },
             };

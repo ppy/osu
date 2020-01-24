@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
@@ -15,9 +15,11 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -48,10 +50,15 @@ namespace osu.Game.Screens.Select.Carousel
             Children = new Drawable[]
             {
                 new DelayedLoadUnloadWrapper(() =>
-                    new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        OnLoadComplete = d => d.FadeInFromZero(1000, Easing.OutQuint),
+                        var background = new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        };
+
+                        background.OnLoadComplete += d => d.FadeInFromZero(1000, Easing.OutQuint);
+
+                        return background;
                     }, 300, 5000
                 ),
                 new FillFlowContainer
@@ -63,16 +70,14 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         new OsuSpriteText
                         {
-                            Font = @"Exo2.0-BoldItalic",
                             Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                            TextSize = 22,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
                             Shadow = true,
                         },
                         new OsuSpriteText
                         {
-                            Font = @"Exo2.0-SemiBoldItalic",
                             Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                            TextSize = 17,
+                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
                             Shadow = true,
                         },
                         new FillFlowContainer
@@ -91,10 +96,11 @@ namespace osu.Game.Screens.Select.Carousel
                                     TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                     Status = beatmapSet.Status
                                 },
-                                new FillFlowContainer<FilterableDifficultyIcon>
+                                new FillFlowContainer<DifficultyIcon>
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Children = ((CarouselBeatmapSet)Item).Beatmaps.Select(b => new FilterableDifficultyIcon(b)).ToList()
+                                    Spacing = new Vector2(3),
+                                    ChildrenEnumerable = getDifficultyIcons(),
                                 },
                             }
                         }
@@ -103,13 +109,24 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
+        private const int maximum_difficulty_icons = 18;
+
+        private IEnumerable<DifficultyIcon> getDifficultyIcons()
+        {
+            var beatmaps = ((CarouselBeatmapSet)Item).Beatmaps.ToList();
+
+            return beatmaps.Count > maximum_difficulty_icons
+                ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
+                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
+        }
+
         public MenuItem[] ContextMenuItems
         {
             get
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item.State == CarouselItemState.NotSelected)
+                if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.OnlineBeatmapSetID != null)
@@ -129,6 +146,7 @@ namespace osu.Game.Screens.Select.Carousel
             public PanelBackground(WorkingBeatmap working)
             {
                 CacheDrawnFrameBuffer = true;
+                RedrawOnScale = false;
 
                 Children = new Drawable[]
                 {
@@ -139,10 +157,10 @@ namespace osu.Game.Screens.Select.Carousel
                         Origin = Anchor.Centre,
                         FillMode = FillMode.Fill,
                     },
-                    new FillFlowContainer
+                    // Todo: This should be a fill flow, but has invalidation issues (see https://github.com/ppy/osu-framework/issues/223)
+                    new Container
                     {
                         Depth = -1,
-                        Direction = FillDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),
@@ -153,6 +171,7 @@ namespace osu.Game.Screens.Select.Carousel
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.Both,
                                 Colour = Color4.Black,
                                 Width = 0.4f,
                             },
@@ -160,20 +179,26 @@ namespace osu.Game.Screens.Select.Carousel
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(Color4.Black, new Color4(0f, 0f, 0f, 0.9f)),
                                 Width = 0.05f,
+                                X = 0.4f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.9f), new Color4(0f, 0f, 0f, 0.1f)),
                                 Width = 0.2f,
+                                X = 0.45f,
                             },
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                RelativePositionAxes = Axes.Both,
                                 Colour = ColourInfo.GradientHorizontal(new Color4(0f, 0f, 0f, 0.1f), new Color4(0, 0, 0, 0)),
                                 Width = 0.05f,
+                                X = 0.65f,
                             },
                         }
                     },
@@ -189,8 +214,30 @@ namespace osu.Game.Screens.Select.Carousel
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
-                filtered.ValueChanged += v => Schedule(() => this.FadeTo(v ? 0.1f : 1, 100));
+                filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
+            }
+        }
+
+        public class FilterableGroupedDifficultyIcon : GroupedDifficultyIcon
+        {
+            private readonly List<CarouselBeatmap> items;
+
+            public FilterableGroupedDifficultyIcon(List<CarouselBeatmap> items, RulesetInfo ruleset)
+                : base(items.Select(i => i.Beatmap).ToList(), ruleset, Color4.White)
+            {
+                this.items = items;
+
+                foreach (var item in items)
+                    item.Filtered.BindValueChanged(_ => Scheduler.AddOnce(updateFilteredDisplay));
+
+                updateFilteredDisplay();
+            }
+
+            private void updateFilteredDisplay()
+            {
+                // for now, fade the whole group based on the ratio of hidden items.
+                this.FadeTo(1 - 0.9f * ((float)items.Count(i => i.Filtered.Value) / items.Count), 100);
             }
         }
     }

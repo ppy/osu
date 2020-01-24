@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -10,19 +10,16 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : HitObjectPiece
+    public class HitCirclePiece : BlueprintPiece<HitCircle>
     {
-        private readonly HitCircle hitCircle;
-
-        public HitCirclePiece(HitCircle hitCircle)
-            : base(hitCircle)
+        public HitCirclePiece()
         {
-            this.hitCircle = hitCircle;
             Origin = Anchor.Centre;
 
-            Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
-            Scale = new Vector2(hitCircle.Scale);
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
+
             CornerRadius = Size.X / 2;
+            CornerExponent = 2;
 
             InternalChild = new RingPiece();
         }
@@ -31,12 +28,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
-
-            PositionBindable.BindValueChanged(_ => UpdatePosition(), true);
-            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
-            ScaleBindable.BindValueChanged(v => Scale = new Vector2(v), true);
         }
 
-        protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
+        public override void UpdateFrom(HitCircle hitObject)
+        {
+            base.UpdateFrom(hitObject);
+
+            Scale = new Vector2(hitObject.Scale);
+        }
     }
 }

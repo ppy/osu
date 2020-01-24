@@ -1,15 +1,15 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Skinning
 {
-    public class SkinnableSpriteText : SkinnableDrawable<SpriteText>, IHasText
+    public class SkinnableSpriteText : SkinnableDrawable, IHasText
     {
-        public SkinnableSpriteText(string name, Func<string, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
-            : base(name, defaultImplementation, allowFallback, restrictSize)
+        public SkinnableSpriteText(ISkinComponent component, Func<ISkinComponent, SpriteText> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, ConfineMode confineMode = ConfineMode.NoScaling)
+            : base(component, defaultImplementation, allowFallback, confineMode)
         {
         }
 
@@ -30,6 +30,7 @@ namespace osu.Game.Skinning
             {
                 if (text == value)
                     return;
+
                 text = value;
 
                 if (Drawable is IHasText textDrawable)

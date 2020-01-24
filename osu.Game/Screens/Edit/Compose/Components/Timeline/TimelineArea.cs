@@ -1,26 +1,29 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineArea : CompositeDrawable
+    public class TimelineArea : Container
     {
-        private readonly Timeline timeline;
+        private readonly Timeline timeline = new Timeline { RelativeSizeAxes = Axes.Both };
 
-        public TimelineArea()
+        protected override Container<Drawable> Content => timeline;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Masking = true;
             CornerRadius = 5;
 
-            OsuCheckbox hitObjectsCheckbox;
-            OsuCheckbox hitSoundsCheckbox;
             OsuCheckbox waveformCheckbox;
 
             InternalChildren = new Drawable[]
@@ -59,8 +62,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {
-                                            hitObjectsCheckbox = new OsuCheckbox { LabelText = "Hit objects" },
-                                            hitSoundsCheckbox = new OsuCheckbox { LabelText = "Hit sounds" },
                                             waveformCheckbox = new OsuCheckbox { LabelText = "Waveform" }
                                         }
                                     }
@@ -90,8 +91,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                             {
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
-                                                Icon = FontAwesome.fa_search_plus,
-                                                Action = () => timeline.Zoom++
+                                                Icon = FontAwesome.Solid.SearchPlus,
+                                                Action = () => changeZoom(1)
                                             },
                                             new TimelineButton
                                             {
@@ -99,14 +100,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                                 Origin = Anchor.BottomLeft,
                                                 RelativeSizeAxes = Axes.Y,
                                                 Height = 0.5f,
-                                                Icon = FontAwesome.fa_search_minus,
-                                                Action = () => timeline.Zoom--
+                                                Icon = FontAwesome.Solid.SearchMinus,
+                                                Action = () => changeZoom(-1)
                                             },
                                         }
                                     }
                                 }
                             },
-                            timeline = new Timeline { RelativeSizeAxes = Axes.Both }
+                            timeline
                         },
                     },
                     ColumnDimensions = new[]
@@ -118,11 +119,11 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
             };
 
-            hitObjectsCheckbox.Current.Value = true;
-            hitSoundsCheckbox.Current.Value = true;
             waveformCheckbox.Current.Value = true;
 
             timeline.WaveformVisible.BindTo(waveformCheckbox.Current);
         }
+
+        private void changeZoom(float change) => timeline.Zoom += change;
     }
 }

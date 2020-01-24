@@ -1,14 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
@@ -30,28 +31,20 @@ namespace osu.Game.Rulesets.Edit
         public event Action<SelectionBlueprint> Deselected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has requested selection.
-        /// Will fire even if already selected. Does not actually perform selection.
-        /// </summary>
-        public event Action<SelectionBlueprint, InputState> SelectionRequested;
-
-        /// <summary>
-        /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
-        /// </summary>
-        public event Action<SelectionBlueprint, DragEvent> DragRequested;
-
-        /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
         /// </summary>
-        public readonly DrawableHitObject HitObject;
+        public readonly DrawableHitObject DrawableObject;
 
-        protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == SelectionState.Selected;
+        protected override bool ShouldBeAlive => (DrawableObject.IsAlive && DrawableObject.IsPresent) || State == SelectionState.Selected;
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        protected SelectionBlueprint(DrawableHitObject hitObject)
+        [Resolved(CanBeNull = true)]
+        private HitObjectComposer composer { get; set; }
+
+        protected SelectionBlueprint(DrawableHitObject drawableObject)
         {
-            HitObject = hitObject;
+            DrawableObject = drawableObject;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -68,22 +61,30 @@ namespace osu.Game.Rulesets.Edit
             get => state;
             set
             {
-                if (state == value) return;
+                if (state == value)
+                    return;
 
                 state = value;
+
                 switch (state)
                 {
                     case SelectionState.Selected:
                         Show();
                         Selected?.Invoke(this);
                         break;
+
                     case SelectionState.NotSelected:
                         Hide();
                         Deselected?.Invoke(this);
                         break;
                 }
+
+                StateChanged?.Invoke(state);
             }
         }
+
+        // When not selected, input is only required for the blueprint itself to receive IsHovering
+        protected override bool ShouldBeConsideredForInput(Drawable child) => State == SelectionState.Selected;
 
         /// <summary>
         /// Selects this <see cref="SelectionBlueprint"/>, causing it to become visible.
@@ -97,51 +98,26 @@ namespace osu.Game.Rulesets.Edit
 
         public bool IsSelected => State == SelectionState.Selected;
 
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObject.ReceivePositionalInputAt(screenSpacePos);
+        /// <summary>
+        /// Updates the <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
+        /// </summary>
+        protected void UpdateHitObject() => composer?.UpdateHitObject(DrawableObject.HitObject);
 
-        private bool selectionRequested;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => DrawableObject.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            selectionRequested = false;
-
-            if (State == SelectionState.NotSelected)
-            {
-                SelectionRequested?.Invoke(this, e.CurrentState);
-                selectionRequested = true;
-            }
-
-            return IsSelected;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (State == SelectionState.Selected && !selectionRequested)
-            {
-                selectionRequested = true;
-                SelectionRequested?.Invoke(this, e.CurrentState);
-                return true;
-            }
-
-            return base.OnClick(e);
-        }
-
-        protected override bool OnDragStart(DragStartEvent e) => true;
-
-        protected override bool OnDrag(DragEvent e)
-        {
-            DragRequested?.Invoke(this, e);
-            return true;
-        }
+        /// <summary>
+        /// The <see cref="MenuItem"/>s to be displayed in the context menu for this <see cref="SelectionBlueprint"/>.
+        /// </summary>
+        public virtual MenuItem[] ContextMenuItems => Array.Empty<MenuItem>();
 
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
         /// </summary>
-        public virtual Vector2 SelectionPoint => HitObject.ScreenSpaceDrawQuad.Centre;
+        public virtual Vector2 SelectionPoint => DrawableObject.ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="SelectionBlueprint"/> for selections.
         /// </summary>
-        public virtual Quad SelectionQuad => HitObject.ScreenSpaceDrawQuad;
+        public virtual Quad SelectionQuad => DrawableObject.ScreenSpaceDrawQuad;
     }
 }

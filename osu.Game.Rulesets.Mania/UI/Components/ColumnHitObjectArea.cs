@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK.Graphics;
@@ -16,30 +18,17 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 {
     public class ColumnHitObjectArea : CompositeDrawable, IHasAccentColour
     {
-        private const float hit_target_height = 10;
-        private const float hit_target_bar_height = 2;
-
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        private readonly Container hitTargetLine;
-        private readonly Drawable hitTargetBar;
+        private readonly Drawable hitTarget;
 
         public ColumnHitObjectArea(HitObjectContainer hitObjectContainer)
         {
             InternalChildren = new[]
             {
-                hitTargetBar = new Box
+                hitTarget = new DefaultHitTarget
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = hit_target_height,
-                    Colour = Color4.Black
-                },
-                hitTargetLine = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = hit_target_bar_height,
-                    Masking = true,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
                 hitObjectContainer
             };
@@ -49,19 +38,12 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private void load(IScrollingInfo scrollingInfo)
         {
             direction.BindTo(scrollingInfo.Direction);
-            direction.BindValueChanged(direction =>
+            direction.BindValueChanged(dir =>
             {
-                Anchor anchor = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
 
-                hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
-                hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
+                hitTarget.Anchor = hitTarget.Origin = anchor;
             }, true);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            updateColours();
         }
 
         private Color4 accentColour;
@@ -73,23 +55,91 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
-                updateColours();
+                if (hitTarget is IHasAccentColour colouredHitTarget)
+                    colouredHitTarget.AccentColour = accentColour;
             }
         }
 
-        private void updateColours()
+        private class DefaultHitTarget : CompositeDrawable, IHasAccentColour
         {
-            if (!IsLoaded)
-                return;
+            private const float hit_target_bar_height = 2;
 
-            hitTargetLine.EdgeEffect = new EdgeEffectParameters
+            private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
+            private readonly Container hitTargetLine;
+            private readonly Drawable hitTargetBar;
+
+            public DefaultHitTarget()
             {
-                Type = EdgeEffectType.Glow,
-                Radius = 5,
-                Colour = accentColour.Opacity(0.5f),
-            };
+                InternalChildren = new[]
+                {
+                    hitTargetBar = new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = NotePiece.NOTE_HEIGHT,
+                        Alpha = 0.6f,
+                        Colour = Color4.Black
+                    },
+                    hitTargetLine = new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = hit_target_bar_height,
+                        Masking = true,
+                        Child = new Box { RelativeSizeAxes = Axes.Both }
+                    },
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(IScrollingInfo scrollingInfo)
+            {
+                direction.BindTo(scrollingInfo.Direction);
+                direction.BindValueChanged(dir =>
+                {
+                    Anchor anchor = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+
+                    hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
+                    hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
+                }, true);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                updateColours();
+            }
+
+            private Color4 accentColour;
+
+            public Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    if (accentColour == value)
+                        return;
+
+                    accentColour = value;
+
+                    updateColours();
+                }
+            }
+
+            private void updateColours()
+            {
+                if (!IsLoaded)
+                    return;
+
+                hitTargetLine.EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Radius = 5,
+                    Colour = accentColour.Opacity(0.5f),
+                };
+            }
         }
     }
 }

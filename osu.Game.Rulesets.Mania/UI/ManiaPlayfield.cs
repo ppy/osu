@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Mania.UI
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
-            Size = new Vector2(1, 0.8f);
-
             GridContainer playfieldGrid;
             AddInternal(playfieldGrid = new GridContainer
             {
@@ -40,6 +38,7 @@ namespace osu.Game.Rulesets.Mania.UI
             var normalColumnAction = ManiaAction.Key1;
             var specialColumnAction = ManiaAction.Special1;
             int firstColumnIndex = 0;
+
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
@@ -94,9 +93,10 @@ namespace osu.Game.Rulesets.Mania.UI
         private ManiaStage getStageByColumn(int column)
         {
             int sum = 0;
+
             foreach (var stage in stages)
             {
-                sum = sum + stage.Columns.Count;
+                sum += stage.Columns.Count;
                 if (sum > column)
                     return stage;
             }

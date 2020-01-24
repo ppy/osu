@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Tests.Resources;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.IO.Archives;
 
 namespace osu.Game.Tests.Beatmaps.IO
@@ -17,7 +18,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadBeatmaps()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 string[] expected =
@@ -44,13 +45,13 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadMetadata()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
 
                 Beatmap beatmap;
 
-                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                using (var stream = new LineBufferedReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                     beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
 
                 var meta = beatmap.Metadata;
@@ -72,9 +73,10 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadFile()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
+
                 using (var stream = new StreamReader(
                     reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
                 {

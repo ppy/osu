@@ -1,0 +1,19 @@
+osu file format v14
+
+[General]
+StackLeniency: 0.4
+Mode: 0
+
+[Difficulty]
+CircleSize:4
+OverallDifficulty:7
+ApproachRate:8
+SliderMultiplier:1.6
+SliderTickRate:4
+
+[TimingPoints]
+369,327.868852459016,4,2,2,32,1,0
+
+[HitObjects]
+// A slider with an un-even amount of ticks
+127,194,369,6,0,L|429:193,7,293.333333333333

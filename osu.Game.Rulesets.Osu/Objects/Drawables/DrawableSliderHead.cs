@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Game.Rulesets.Objects;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -13,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     public class DrawableSliderHead : DrawableHitCircle
     {
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+        private readonly IBindable<int> pathVersion = new Bindable<int>();
 
         private readonly Slider slider;
 
@@ -27,17 +26,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private void load()
         {
             positionBindable.BindTo(HitObject.PositionBindable);
-            pathBindable.BindTo(slider.PathBindable);
+            pathVersion.BindTo(slider.Path.Version);
 
             positionBindable.BindValueChanged(_ => updatePosition());
-            pathBindable.BindValueChanged(_ => updatePosition(), true);
+            pathVersion.BindValueChanged(_ => updatePosition(), true);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
+            double completionProgress = Math.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             //todo: we probably want to reconsider this before adding scoring, but it looks and feels nice.
             if (!IsHit)

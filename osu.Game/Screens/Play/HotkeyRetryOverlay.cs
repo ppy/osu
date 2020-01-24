@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Input.Bindings;
 using osu.Game.Input.Bindings;
@@ -17,12 +17,11 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        public bool OnReleased(GlobalAction action)
+        public void OnReleased(GlobalAction action)
         {
-            if (action != GlobalAction.QuickRetry) return false;
+            if (action != GlobalAction.QuickRetry) return;
 
             AbortConfirm();
-            return true;
         }
     }
 }

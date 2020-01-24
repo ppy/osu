@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 FillColour
         {
-            set { fill.FadeColour(value, 150, Easing.OutQuint); }
+            set => fill.FadeColour(value, 150, Easing.OutQuint);
         }
 
         public Color4 BackgroundColour
@@ -32,12 +32,12 @@ namespace osu.Game.Graphics.UserInterface
 
         public double EndTime
         {
-            set { CurrentNumber.MaxValue = value; }
+            set => CurrentNumber.MaxValue = value;
         }
 
         public double CurrentTime
         {
-            set { CurrentNumber.Value = value; }
+            set => CurrentNumber.Value = value;
         }
 
         public ProgressBar()
@@ -62,6 +62,6 @@ namespace osu.Game.Graphics.UserInterface
             fill.Width = value * UsableWidth;
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }

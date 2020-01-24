@@ -1,21 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Beatmaps;
+using osu.Framework.Localisation;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public abstract class DrawableProfileScore : DrawableProfileRow
     {
-        private readonly ScoreModsContainer modsContainer;
+        private readonly FillFlowContainer modsContainer;
         protected readonly ScoreInfo Score;
 
         protected DrawableProfileScore(ScoreInfo score)
@@ -26,12 +29,12 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             Height = 60;
             Children = new Drawable[]
             {
-                modsContainer = new ScoreModsContainer
+                modsContainer = new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Y,
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Width = 60,
+                    Spacing = new Vector2(1),
                     Margin = new MarginPadding { Right = 160 }
                 }
             };
@@ -46,25 +49,48 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
-                TextSize = 11,
-                Font = "Exo2.0-RegularItalic"
+                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
-            RightFlowContainer.Add(text);
-            RightFlowContainer.SetLayoutPosition(text, 1);
+            RightFlowContainer.Insert(1, text);
 
-            LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
+            LeftFlowContainer.Add(new ProfileScoreBeatmapMetadataContainer(Score.Beatmap));
             LeftFlowContainer.Add(new DrawableDate(Score.Date));
 
             foreach (Mod mod in Score.Mods)
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
-        protected override Drawable CreateLeftVisual() => new DrawableRank(Score.Rank)
+        protected override Drawable CreateLeftVisual() => new UpdateableRank(Score.Rank)
         {
             RelativeSizeAxes = Axes.Y,
             Width = 60,
             FillMode = FillMode.Fit,
         };
+
+        private class ProfileScoreBeatmapMetadataContainer : BeatmapMetadataContainer
+        {
+            public ProfileScoreBeatmapMetadataContainer(BeatmapInfo beatmap)
+                : base(beatmap)
+            {
+            }
+
+            protected override Drawable[] CreateText(BeatmapInfo beatmap) => new Drawable[]
+            {
+                new OsuSpriteText
+                {
+                    Text = new LocalisedString((
+                        $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
+                        $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
+                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
+                },
+                new OsuSpriteText
+                {
+                    Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                    Padding = new MarginPadding { Top = 3 },
+                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
+                },
+            };
+        }
     }
 }

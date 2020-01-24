@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -60,7 +60,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new AudioDeviceSettingsDropdown()
+                dropdown = new AudioDeviceSettingsDropdown
+                {
+                    Keywords = new[] { "speaker", "headphone", "output" }
+                }
             };
 
             updateItems();
@@ -73,7 +76,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private class AudioDeviceSettingsDropdown : SettingsDropdown<string>
         {
-            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl { Items = Items };
+            protected override OsuDropdown<string> CreateDropdown() => new AudioDeviceDropdownControl();
 
             private class AudioDeviceDropdownControl : DropdownControl
             {

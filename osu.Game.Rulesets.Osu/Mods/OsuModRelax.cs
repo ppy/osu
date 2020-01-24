@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
@@ -13,12 +14,10 @@ using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IApplicableFailOverride, IUpdatableByPlayfield, IApplicableToRulesetContainer<OsuHitObject>
+    public class OsuModRelax : ModRelax, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
-
-        public bool AllowFail => false;
 
         public void Update(Playfield playfield)
         {
@@ -37,11 +36,16 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 if (time < osuHit.HitObject.StartTime - relax_leniency) continue;
 
-                if (osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime || osuHit.IsHit)
+                if ((osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime) || osuHit.IsHit)
                     continue;
 
-                requiresHit |= osuHit is DrawableHitCircle && osuHit.IsHovered && osuHit.HitObject.HitWindows.CanBeHit(relativetime);
-                requiresHold |= osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered) || osuHit is DrawableSpinner;
+                if (osuHit is DrawableHitCircle && osuHit.IsHovered)
+                {
+                    Debug.Assert(osuHit.HitObject.HitWindows != null);
+                    requiresHit |= osuHit.HitObject.HitWindows.CanBeHit(relativetime);
+                }
+
+                requiresHold |= (osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered)) || osuHit is DrawableSpinner;
             }
 
             if (requiresHit)
@@ -79,10 +83,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             state.Apply(osuInputManager.CurrentState, osuInputManager);
         }
 
-        public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)rulesetContainer.KeyBindingInputManager;
+            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
             osuInputManager.AllowUserPresses = false;
         }
     }

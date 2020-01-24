@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -16,22 +16,25 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class Details : FillFlowContainer
     {
+        protected readonly UserRatings Ratings;
+
         private readonly PreviewButton preview;
         private readonly BasicStats basic;
         private readonly AdvancedStats advanced;
-        private readonly UserRatings ratings;
 
         private BeatmapSetInfo beatmapSet;
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 basic.BeatmapSet = preview.BeatmapSet = BeatmapSet;
+                updateDisplay();
             }
         }
 
@@ -39,19 +42,18 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
 
                 basic.Beatmap = advanced.Beatmap = beatmap = value;
-                updateDisplay();
             }
         }
 
         private void updateDisplay()
         {
-            ratings.Metrics = Beatmap?.Metrics;
+            Ratings.Metrics = BeatmapSet?.Metrics;
         }
 
         public Details()
@@ -86,7 +88,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
                 new DetailBox
                 {
-                    Child = ratings = new UserRatings
+                    Child = Ratings = new UserRatings
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 95,

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -7,12 +7,13 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {
-    public class OsuSelectionBlueprint : SelectionBlueprint
+    public abstract class OsuSelectionBlueprint<T> : SelectionBlueprint
+        where T : OsuHitObject
     {
-        protected OsuHitObject OsuObject => (OsuHitObject)HitObject.HitObject;
+        protected T HitObject => (T)DrawableObject.HitObject;
 
-        public OsuSelectionBlueprint(DrawableHitObject hitObject)
-            : base(hitObject)
+        protected OsuSelectionBlueprint(DrawableHitObject drawableObject)
+            : base(drawableObject)
         {
         }
     }

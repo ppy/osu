@@ -1,37 +1,41 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Rulesets;
 using osu.Game.Users;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace osu.Game.Overlays.Profile.Sections
 {
-    public class PaginatedContainer : FillFlowContainer
+    public abstract class PaginatedContainer<TModel> : FillFlowContainer
     {
-        protected readonly FillFlowContainer ItemsContainer;
-        protected readonly OsuHoverContainer ShowMoreButton;
-        protected readonly LoadingAnimation ShowMoreLoading;
-        protected readonly OsuSpriteText MissingText;
+        private readonly ProfileShowMoreButton moreButton;
+        private readonly OsuSpriteText missingText;
+        private APIRequest<List<TModel>> retrievalRequest;
+        private CancellationTokenSource loadCancellation;
+        private readonly BindableInt count = new BindableInt();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         protected int VisiblePages;
         protected int ItemsPerPage;
 
         protected readonly Bindable<User> User = new Bindable<User>();
-
-        protected APIAccess Api;
-        protected APIRequest RetrievalRequest;
+        protected readonly FillFlowContainer ItemsContainer;
         protected RulesetStore Rulesets;
 
-        public PaginatedContainer(Bindable<User> user, string header, string missing)
+        protected PaginatedContainer(Bindable<User> user, string header, string missing)
         {
             User.BindTo(user);
 
@@ -41,42 +45,46 @@ namespace osu.Game.Overlays.Profile.Sections
 
             Children = new Drawable[]
             {
-                new OsuSpriteText
+                new FillFlowContainer
                 {
-                    TextSize = 15,
-                    Text = header,
-                    Font = "Exo2.0-RegularItalic",
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(5, 0),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Text = header,
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                        },
+                        new CounterPill
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Current = { BindTarget = count }
+                        }
+                    }
                 },
                 ItemsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding { Bottom = 10 }
+                    Spacing = new Vector2(0, 2),
                 },
-                ShowMoreButton = new OsuHoverContainer
+                moreButton = new ProfileShowMoreButton
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Alpha = 0,
-                    Action = ShowMore,
-                    AutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Child = new OsuSpriteText
-                    {
-                        TextSize = 14,
-                        Text = "show more",
-                        Padding = new MarginPadding {Vertical = 10, Horizontal = 15 },
-                    }
+                    Margin = new MarginPadding { Top = 10 },
+                    Action = showMore,
                 },
-                ShowMoreLoading = new LoadingAnimation
+                missingText = new OsuSpriteText
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Size = new Vector2(14),
-                },
-                MissingText = new OsuSpriteText
-                {
-                    TextSize = 14,
+                    Font = OsuFont.GetFont(size: 15),
                     Text = missing,
                     Alpha = 0,
                 },
@@ -84,29 +92,69 @@ namespace osu.Game.Overlays.Profile.Sections
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, RulesetStore rulesets)
+        private void load(RulesetStore rulesets)
         {
-            Api = api;
             Rulesets = rulesets;
 
             User.ValueChanged += onUserChanged;
             User.TriggerChange();
         }
 
-        private void onUserChanged(User newUser)
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
+            loadCancellation?.Cancel();
+            retrievalRequest?.Cancel();
+
             VisiblePages = 0;
             ItemsContainer.Clear();
-            ShowMoreButton.Hide();
 
-            if (newUser != null)
-                ShowMore();
+            if (e.NewValue != null)
+            {
+                showMore();
+                count.Value = GetCount(e.NewValue);
+            }
         }
 
-        protected virtual void ShowMore()
+        private void showMore()
         {
-            ShowMoreLoading.Show();
-            ShowMoreButton.Hide();
+            loadCancellation = new CancellationTokenSource();
+
+            retrievalRequest = CreateRequest();
+            retrievalRequest.Success += UpdateItems;
+
+            api.Queue(retrievalRequest);
+        }
+
+        protected virtual void UpdateItems(List<TModel> items) => Schedule(() =>
+        {
+            if (!items.Any() && VisiblePages == 1)
+            {
+                moreButton.Hide();
+                moreButton.IsLoading = false;
+                missingText.Show();
+                return;
+            }
+
+            LoadComponentsAsync(items.Select(CreateDrawableItem).Where(d => d != null), drawables =>
+            {
+                missingText.Hide();
+                moreButton.FadeTo(items.Count == ItemsPerPage ? 1 : 0);
+                moreButton.IsLoading = false;
+
+                ItemsContainer.AddRange(drawables);
+            }, loadCancellation.Token);
+        });
+
+        protected virtual int GetCount(User user) => 0;
+
+        protected abstract APIRequest<List<TModel>> CreateRequest();
+
+        protected abstract Drawable CreateDrawableItem(TModel model);
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            retrievalRequest?.Cancel();
         }
     }
 }

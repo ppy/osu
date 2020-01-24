@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Audio;
@@ -19,21 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Audio
         {
             this.controlPoints = controlPoints;
 
-            IEnumerable<SampleControlPoint> samplePoints;
-            if (controlPoints.SamplePoints.Count == 0)
-                // Get the default sample point
-                samplePoints = new[] { controlPoints.SamplePointAt(double.MinValue) };
-            else
-                samplePoints = controlPoints.SamplePoints;
+            IEnumerable<SampleControlPoint> samplePoints = controlPoints.SamplePoints.Count == 0 ? new[] { controlPoints.SamplePointAt(double.MinValue) } : controlPoints.SamplePoints;
 
             foreach (var s in samplePoints)
             {
                 var centre = s.GetSampleInfo();
-                var rim = s.GetSampleInfo(SampleInfo.HIT_CLAP);
-
-                // todo: this is ugly
-                centre.Namespace = "taiko";
-                rim.Namespace = "taiko";
+                var rim = s.GetSampleInfo(HitSampleInfo.HIT_CLAP);
 
                 mappings[s.Time] = new DrumSample
                 {
@@ -43,9 +34,9 @@ namespace osu.Game.Rulesets.Taiko.Audio
             }
         }
 
-        private SkinnableSound addSound(SampleInfo sampleInfo)
+        private SkinnableSound addSound(HitSampleInfo hitSampleInfo)
         {
-            var drawable = new SkinnableSound(sampleInfo);
+            var drawable = new SkinnableSound(hitSampleInfo);
             Sounds.Add(drawable);
             return drawable;
         }

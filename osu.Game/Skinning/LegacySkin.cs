@@ -1,191 +1,197 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
-using osu.Game.Database;
-using osu.Game.Graphics.Sprites;
-using osuTK;
+using osu.Game.Audio;
+using osu.Game.IO;
+using osu.Game.Rulesets.Scoring;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
     public class LegacySkin : Skin
     {
+        [CanBeNull]
         protected TextureStore Textures;
 
-        protected SampleManager Samples;
+        [CanBeNull]
+        protected IResourceStore<SampleChannel> Samples;
+
+        public new LegacySkinConfiguration Configuration
+        {
+            get => base.Configuration as LegacySkinConfiguration;
+            set => base.Configuration = value;
+        }
 
         public LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager)
             : this(skin, new LegacySkinResourceStore<SkinFileInfo>(skin, storage), audioManager, "skin.ini")
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename) : base(skin)
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+            : base(skin)
         {
-            Stream stream = storage.GetStream(filename);
-            if (stream != null)
-                using (StreamReader reader = new StreamReader(stream))
-                    Configuration = new LegacySkinDecoder().Decode(reader);
-            else
-                Configuration = new SkinConfiguration();
+            Stream stream = storage?.GetStream(filename);
 
-            Samples = audioManager.GetSampleManager(storage);
-            Textures = new TextureStore(new TextureLoaderStore(storage));
+            if (stream != null)
+            {
+                using (LineBufferedReader reader = new LineBufferedReader(stream))
+                    Configuration = new LegacySkinDecoder().Decode(reader);
+            }
+            else
+                Configuration = new LegacySkinConfiguration { LegacyVersion = LegacySkinConfiguration.LATEST_VERSION };
+
+            if (storage != null)
+            {
+                Samples = audioManager?.GetSampleStore(storage);
+                Textures = new TextureStore(new TextureLoaderStore(storage));
+            }
         }
 
-        public override Drawable GetDrawableComponent(string componentName)
+        protected override void Dispose(bool isDisposing)
         {
-            switch (componentName)
+            base.Dispose(isDisposing);
+            Textures?.Dispose();
+            Samples?.Dispose();
+        }
+
+        public override IBindable<TValue> GetConfig<TLookup, TValue>(TLookup lookup)
+        {
+            switch (lookup)
             {
-                case "Play/Miss":
-                    componentName = "hit0";
+                case GlobalSkinConfiguration global:
+                    switch (global)
+                    {
+                        case GlobalSkinConfiguration.ComboColours:
+                            var comboColours = Configuration.ComboColours;
+                            if (comboColours != null)
+                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(comboColours));
+
+                            break;
+                    }
+
                     break;
-                case "Play/Meh":
-                    componentName = "hit50";
+
+                case GlobalSkinColour colour:
+                    return SkinUtils.As<TValue>(getCustomColour(colour.ToString()));
+
+                case LegacySkinConfiguration.LegacySetting legacy:
+                    switch (legacy)
+                    {
+                        case LegacySkinConfiguration.LegacySetting.Version:
+                            if (Configuration.LegacyVersion is decimal version)
+                                return SkinUtils.As<TValue>(new Bindable<decimal>(version));
+
+                            break;
+                    }
+
                     break;
-                case "Play/Good":
-                    componentName = "hit100";
+
+                case SkinCustomColourLookup customColour:
+                    return SkinUtils.As<TValue>(getCustomColour(customColour.Lookup.ToString()));
+
+                default:
+                    try
+                    {
+                        if (Configuration.ConfigDictionary.TryGetValue(lookup.ToString(), out var val))
+                        {
+                            // special case for handling skins which use 1 or 0 to signify a boolean state.
+                            if (typeof(TValue) == typeof(bool))
+                                val = val == "1" ? "true" : "false";
+
+                            var bindable = new Bindable<TValue>();
+                            if (val != null)
+                                bindable.Parse(val);
+                            return bindable;
+                        }
+                    }
+                    catch
+                    {
+                    }
+
                     break;
-                case "Play/Great":
-                    componentName = "hit300";
-                    break;
-                case "Play/osu/number-text":
-                    return !hasFont(Configuration.HitCircleFont) ? null : new LegacySpriteText(Textures, Configuration.HitCircleFont) { Scale = new Vector2(0.96f) };
             }
 
-            var texture = GetTexture(componentName);
+            return null;
+        }
 
-            if (texture == null)
-                return null;
+        private IBindable<Color4> getCustomColour(string lookup) => Configuration.CustomColours.TryGetValue(lookup, out var col) ? new Bindable<Color4>(col) : null;
 
-            return new Sprite { Texture = texture };
+        public override Drawable GetDrawableComponent(ISkinComponent component)
+        {
+            switch (component)
+            {
+                case GameplaySkinComponent<HitResult> resultComponent:
+                    switch (resultComponent.Component)
+                    {
+                        case HitResult.Miss:
+                            return this.GetAnimation("hit0", true, false);
+
+                        case HitResult.Meh:
+                            return this.GetAnimation("hit50", true, false);
+
+                        case HitResult.Good:
+                            return this.GetAnimation("hit100", true, false);
+
+                        case HitResult.Great:
+                            return this.GetAnimation("hit300", true, false);
+                    }
+
+                    break;
+            }
+
+            return this.GetAnimation(component.LookupName, false, false);
         }
 
         public override Texture GetTexture(string componentName)
         {
-            float ratio = 2;
+            componentName = getFallbackName(componentName);
 
-            var texture = Textures.Get($"{componentName}@2x");
+            float ratio = 2;
+            var texture = Textures?.Get($"{componentName}@2x");
+
             if (texture == null)
             {
                 ratio = 1;
-                texture = Textures.Get(componentName);
+                texture = Textures?.Get(componentName);
             }
 
             if (texture != null)
-                texture.ScaleAdjust = ratio / 0.72f; // brings sizing roughly in-line with stable
+                texture.ScaleAdjust = ratio;
 
             return texture;
         }
 
-        public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
-
-        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
-
-        protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
-            where T : INamedFileInfo
+        public override SampleChannel GetSample(ISampleInfo sampleInfo)
         {
-            private readonly IHasFiles<T> source;
-            private readonly IResourceStore<byte[]> underlyingStore;
-
-            private string getPathForFile(string filename)
+            foreach (var lookup in sampleInfo.LookupNames)
             {
-                bool hasExtension = filename.Contains('.');
+                var sample = Samples?.Get(lookup);
 
-                string lastPiece = filename.Split('/').Last();
-
-                var file = source.Files.FirstOrDefault(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), lastPiece, StringComparison.InvariantCultureIgnoreCase));
-                return file?.FileInfo.StoragePath;
+                if (sample != null)
+                    return sample;
             }
 
-            public LegacySkinResourceStore(IHasFiles<T> source, IResourceStore<byte[]> underlyingStore)
-            {
-                this.source = source;
-                this.underlyingStore = underlyingStore;
-            }
+            if (sampleInfo is HitSampleInfo hsi)
+                // Try fallback to non-bank samples.
+                return Samples?.Get(hsi.Name);
 
-            public Stream GetStream(string name)
-            {
-                string path = getPathForFile(name);
-                return path == null ? null : underlyingStore.GetStream(path);
-            }
-
-            byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
-
-            public Task<byte[]> GetAsync(string name)
-            {
-                string path = getPathForFile(name);
-                return path == null ? Task.FromResult<byte[]>(null) : underlyingStore.GetAsync(path);
-            }
-
-            #region IDisposable Support
-
-            private bool isDisposed;
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!isDisposed)
-                {
-                    isDisposed = true;
-                }
-            }
-
-            ~LegacySkinResourceStore()
-            {
-                Dispose(false);
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            #endregion
+            return null;
         }
 
-        private class LegacySpriteText : OsuSpriteText
+        private string getFallbackName(string componentName)
         {
-            private readonly TextureStore textures;
-            private readonly string font;
-
-            public LegacySpriteText(TextureStore textures, string font)
-            {
-                this.textures = textures;
-                this.font = font;
-
-                Shadow = false;
-                UseFullGlyphHeight = false;
-            }
-
-            protected override Texture GetTextureForCharacter(char c)
-            {
-                string textureName = $"{font}-{c}";
-
-                // Approximate value that brings character sizing roughly in-line with stable
-                float ratio = 36;
-
-                var texture = textures.Get($"{textureName}@2x");
-                if (texture == null)
-                {
-                    ratio = 18;
-                    texture = textures.Get(textureName);
-                }
-
-                if (texture != null)
-                    texture.ScaleAdjust = ratio;
-
-                return texture;
-            }
+            string lastPiece = componentName.Split('/').Last();
+            return componentName.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
         }
     }
 }

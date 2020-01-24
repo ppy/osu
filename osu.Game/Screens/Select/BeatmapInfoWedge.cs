@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -8,29 +8,32 @@ using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Select
 {
-    public class BeatmapInfoWedge : OverlayContainer
+    public class BeatmapInfoWedge : VisibilityContainer
     {
-        private static readonly Vector2 wedged_container_shear = new Vector2(0.15f, 0);
+        private const float shear_width = 36.75f;
+
+        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGED_CONTAINER_SIZE.Y, 0);
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
@@ -58,8 +61,6 @@ namespace osu.Game.Screens.Select
             ruleset.BindTo(parentRuleset);
             ruleset.ValueChanged += _ => updateDisplay();
         }
-
-        protected override bool BlockPositionalInput => false;
 
         protected override void PopIn()
         {
@@ -97,7 +98,7 @@ namespace osu.Game.Screens.Select
         {
             void removeOldInfo()
             {
-                State = beatmap == null ? Visibility.Hidden : Visibility.Visible;
+                State.Value = beatmap == null ? Visibility.Hidden : Visibility.Visible;
 
                 Info?.FadeOut(250);
                 Info?.Expire();
@@ -140,6 +141,7 @@ namespace osu.Game.Screens.Select
             private readonly RulesetInfo ruleset;
 
             public BufferedWedgeInfo(WorkingBeatmap beatmap, RulesetInfo userRuleset)
+                : base(pixelSnapping: true)
             {
                 this.beatmap = beatmap;
                 ruleset = userRuleset ?? beatmap.BeatmapInfo.Ruleset;
@@ -151,8 +153,9 @@ namespace osu.Game.Screens.Select
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-                PixelSnapping = true;
                 CacheDrawnFrameBuffer = true;
+                RedrawOnScale = false;
+
                 RelativeSizeAxes = Axes.Both;
 
                 titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
@@ -197,15 +200,17 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
                         Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
-                        AutoSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = 10, Left = 25, Right = shear_width * 2.5f },
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
                             VersionLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapInfo.Version,
-                                TextSize = 24,
+                                Font = OsuFont.GetFont(size: 24, italics: true),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
                         }
                     },
@@ -215,7 +220,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding { Top = 14, Left = 10, Right = 18, Bottom = 20 },
+                        Padding = new MarginPadding { Top = 14, Right = shear_width / 2 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
@@ -232,21 +237,24 @@ namespace osu.Game.Screens.Select
                         Name = "Centre-aligned metadata",
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.TopLeft,
-                        Y = -22,
+                        Y = -7,
                         Direction = FillDirection.Vertical,
-                        Margin = new MarginPadding { Top = 15, Left = 25, Right = 10, Bottom = 20 },
-                        AutoSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Left = 25, Right = shear_width },
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
                         Children = new Drawable[]
                         {
                             TitleLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
-                                TextSize = 28,
+                                Font = OsuFont.GetFont(size: 28, italics: true),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
                             ArtistLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
-                                TextSize = 17,
+                                Font = OsuFont.GetFont(size: 17, italics: true),
+                                RelativeSizeAxes = Axes.X,
+                                Truncate = true,
                             },
                             MapperContainer = new FillFlowContainer
                             {
@@ -266,8 +274,8 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                titleBinding.BindValueChanged(value => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(value => setMetadata(metadata.Source), true);
+                titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
+                artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)
@@ -289,20 +297,17 @@ namespace osu.Game.Screens.Select
 
                 if (b?.HitObjects?.Any() == true)
                 {
-                    HitObject lastObject = b.HitObjects.LastOrDefault();
-                    double endTime = (lastObject as IHasEndTime)?.EndTime ?? lastObject?.StartTime ?? 0;
-
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "Length",
-                        Icon = FontAwesome.fa_clock_o,
-                        Content = TimeSpan.FromMilliseconds(endTime - b.HitObjects.First().StartTime).ToString(@"m\:ss"),
+                        Icon = FontAwesome.Regular.Clock,
+                        Content = TimeSpan.FromMilliseconds(b.BeatmapInfo.Length).ToString(@"m\:ss"),
                     }));
 
                     labels.Add(new InfoLabel(new BeatmapStatistic
                     {
                         Name = "BPM",
-                        Icon = FontAwesome.fa_circle,
+                        Icon = FontAwesome.Regular.Circle,
                         Content = getBPMRange(b),
                     }));
 
@@ -311,12 +316,12 @@ namespace osu.Game.Screens.Select
                     try
                     {
                         // Try to get the beatmap with the user's ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset);
+                        playableBeatmap = beatmap.GetPlayableBeatmap(ruleset, Array.Empty<Mod>());
                     }
                     catch (BeatmapInvalidForRulesetException)
                     {
                         // Can't be converted to the user's ruleset, so use the beatmap's own ruleset
-                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset);
+                        playableBeatmap = beatmap.GetPlayableBeatmap(beatmap.BeatmapInfo.Ruleset, Array.Empty<Mod>());
                     }
 
                     labels.AddRange(playableBeatmap.GetStatistics().Select(s => new InfoLabel(s)));
@@ -345,23 +350,20 @@ namespace osu.Game.Screens.Select
                 {
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Medium",
                         Text = "mapped by ",
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(size: 15),
                     },
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Bold",
-                        // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                         Text = metadata.Author.Username,
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     }
                 };
             }
 
             public class InfoLabel : Container, IHasTooltip
             {
-                public string TooltipText { get; private set; }
+                public string TooltipText { get; }
 
                 public InfoLabel(BeatmapStatistic statistic)
                 {
@@ -383,7 +385,7 @@ namespace osu.Game.Screens.Select
                                     Origin = Anchor.Centre,
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.FromHex(@"441288"),
-                                    Icon = FontAwesome.fa_square,
+                                    Icon = FontAwesome.Solid.Square,
                                     Rotation = 45,
                                 },
                                 new SpriteIcon
@@ -402,40 +404,43 @@ namespace osu.Game.Screens.Select
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Colour = new Color4(255, 221, 85, 255),
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                             Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,
-                            TextSize = 17,
                         }
                     };
                 }
             }
 
-            private class DifficultyColourBar : DifficultyColouredContainer
+            private class DifficultyColourBar : Container
             {
+                private readonly BeatmapInfo beatmap;
+
                 public DifficultyColourBar(BeatmapInfo beatmap)
-                    : base(beatmap)
                 {
+                    this.beatmap = beatmap;
                 }
 
                 [BackgroundDependencyLoader]
-                private void load()
+                private void load(OsuColour colours)
                 {
                     const float full_opacity_ratio = 0.7f;
+
+                    var difficultyColour = colours.ForDifficultyRating(beatmap.DifficultyRating);
 
                     Children = new Drawable[]
                     {
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = AccentColour,
+                            Colour = difficultyColour,
                             Width = full_opacity_ratio,
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                             RelativePositionAxes = Axes.Both,
-                            Colour = AccentColour,
+                            Colour = difficultyColour,
                             Alpha = 0.5f,
                             X = full_opacity_ratio,
                             Width = 1 - full_opacity_ratio,

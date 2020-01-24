@@ -1,16 +1,20 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
+    /// <summary>
+    /// A single follow point positioned between two adjacent <see cref="DrawableOsuHitObject"/>s.
+    /// </summary>
     public class FollowPoint : Container
     {
         private const float width = 8;
@@ -21,11 +25,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         {
             Origin = Anchor.Centre;
 
-            Child = new SkinnableDrawable("Play/osu/followpoint", _ => new Container
+            Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.FollowPoint), _ => new CircularContainer
             {
                 Masking = true,
                 AutoSizeAxes = Axes.Both,
-                CornerRadius = width / 2,
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
@@ -35,12 +38,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                 Child = new Box
                 {
                     Size = new Vector2(width),
-                    Blending = BlendingMode.Additive,
+                    Blending = BlendingParameters.Additive,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Alpha = 0.5f,
                 }
-            }, restrictSize: false);
+            }, confineMode: ConfineMode.NoScaling);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osuTK.Graphics;
@@ -18,14 +18,15 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            Blending = BlendingMode.Additive;
+            Blending = BlendingParameters.Additive;
             Colour = Color4.White.Opacity(0.9f);
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;

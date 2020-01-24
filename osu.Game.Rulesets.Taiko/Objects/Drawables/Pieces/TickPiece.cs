@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,9 +23,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         private const float tick_size = 0.35f;
 
         private bool filled;
+
         public bool Filled
         {
-            get { return filled; }
+            get => filled;
             set
             {
                 filled = value;

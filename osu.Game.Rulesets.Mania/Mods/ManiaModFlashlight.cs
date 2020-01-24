@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
 
-            protected override void OnComboChange(int newCombo)
+            protected override void OnComboChange(ValueChangedEvent<int> e)
             {
             }
 

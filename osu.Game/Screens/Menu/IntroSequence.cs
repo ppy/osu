@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osuTK;
@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Menu
         public IntroSequence()
         {
             RelativeSizeAxes = Axes.Both;
+            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
@@ -57,7 +58,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Children = new []
+                    Children = new[]
                     {
                         lineTopLeft = new Box
                         {
@@ -102,9 +103,8 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.Centre,
                     Text = "welcome",
                     Padding = new MarginPadding { Bottom = 10 },
-                    Font = @"Exo2.0-Light",
+                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
                     Alpha = 0,
-                    TextSize = 42,
                     Spacing = new Vector2(5),
                 },
                 new CircularContainer

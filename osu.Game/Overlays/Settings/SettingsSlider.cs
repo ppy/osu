@@ -1,36 +1,37 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsSlider<T> : SettingsSlider<T, OsuSliderBar<T>>
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
     }
 
-    public class SettingsSlider<T, U> : SettingsItem<T>
-        where T : struct, IEquatable<T>, IComparable, IConvertible
-        where U : OsuSliderBar<T>, new()
+    public class SettingsSlider<TValue, TSlider> : SettingsItem<TValue>
+        where TValue : struct, IEquatable<TValue>, IComparable<TValue>, IConvertible
+        where TSlider : OsuSliderBar<TValue>, new()
     {
-        protected override Drawable CreateControl() => new U
+        protected override Drawable CreateControl() => new TSlider
         {
             Margin = new MarginPadding { Top = 5, Bottom = 5 },
             RelativeSizeAxes = Axes.X
         };
 
-        public float KeyboardStep;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public bool TransferValueOnCommit
         {
-            var slider = Control as U;
-            if (slider != null)
-                slider.KeyboardStep = KeyboardStep;
+            get => ((TSlider)Control).TransferValueOnCommit;
+            set => ((TSlider)Control).TransferValueOnCommit = value;
+        }
+
+        public float KeyboardStep
+        {
+            get => ((TSlider)Control).KeyboardStep;
+            set => ((TSlider)Control).KeyboardStep = value;
         }
     }
 }

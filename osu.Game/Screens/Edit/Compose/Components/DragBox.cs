@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -18,11 +18,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class DragBox : CompositeDrawable
     {
         private readonly Action<RectangleF> performSelection;
-
-        /// <summary>
-        /// Invoked when the drag selection has finished.
-        /// </summary>
-        public event Action DragEnd;
 
         private Drawable box;
 
@@ -55,13 +50,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            this.FadeIn(250, Easing.OutQuint);
-            return true;
-        }
-
-        protected override bool OnDrag(DragEvent e)
+        /// <summary>
+        /// Handle a forwarded mouse event.
+        /// </summary>
+        /// <param name="e">The mouse event.</param>
+        /// <returns>Whether the event should be handled and blocking.</returns>
+        public virtual bool UpdateDrag(MouseButtonEvent e)
         {
             var dragPosition = e.ScreenSpaceMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
@@ -78,13 +72,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             box.Size = bottomRight - topLeft;
 
             performSelection?.Invoke(dragRectangle);
-            return true;
-        }
-
-        protected override bool OnDragEnd(DragEndEvent e)
-        {
-            this.FadeOut(250, Easing.OutQuint);
-            DragEnd?.Invoke();
             return true;
         }
     }
