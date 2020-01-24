@@ -127,9 +127,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Combine combo based throughput and miss count based throughput
             double tp = Math.Pow(comboTP, comboWeight) * Math.Pow(missTP, 1 - comboWeight);
 
-            // HD
+            // Hidden mod
             if (mods.Any(h => h is OsuModHidden))
-                tp *= Attributes.AimHiddenFactor;
+            {
+                double hiddenFactor = Attributes.AimHiddenFactor;
+
+                // the buff starts decreasing at AR10 and reaches 0 at AR11
+                if (Attributes.ApproachRate > 10)
+                    hiddenFactor = 1 + (1 - (Attributes.ApproachRate - 10)) * (hiddenFactor - 1);
+
+                tp *= hiddenFactor;
+            }
+                
 
             // Account for cheesing
             double modifiedAcc = getModifiedAcc();
