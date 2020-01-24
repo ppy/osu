@@ -36,6 +36,7 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         public RankingsOverlay()
+            : base(OverlayColourScheme.Green)
         {
             Children = new Drawable[]
             {
