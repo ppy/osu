@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Menu
             title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
             artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
 
-            this.FadeInFromZero(fade_duration)
+            this.FadeInFromZero(fade_duration / 2f)
                 .Delay(4000)
                 .Then().FadeOut(fade_duration);
         }
