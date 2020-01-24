@@ -69,29 +69,18 @@ namespace osu.Game.Screens.Menu
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
+        private ParallaxContainer buttonsContainer;
+        private SongTicker songTicker;
+
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
-            if (host.CanExit)
-            {
-                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
-                {
-                    Action = () =>
-                    {
-                        if (holdDelay.Value > 0)
-                            confirmAndExit();
-                        else
-                            this.Exit();
-                    }
-                });
-            }
-
             AddRangeInternal(new Drawable[]
             {
-                new ParallaxContainer
+                buttonsContainer = new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
                     Children = new Drawable[]
@@ -107,7 +96,27 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
+                songTicker = new SongTicker
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Margin = new MarginPadding { Right = 15, Top = 5 }
+                }
             });
+
+            if (host.CanExit)
+            {
+                AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
+                {
+                    Action = () =>
+                    {
+                        if (holdDelay.Value > 0)
+                            confirmAndExit();
+                        else
+                            this.Exit();
+                    }
+                });
+            }
 
             buttons.StateChanged += state =>
             {
@@ -190,7 +199,7 @@ namespace osu.Game.Screens.Menu
                 buttons.State = ButtonSystemState.TopLevel;
 
                 this.FadeIn(FADE_IN_DURATION, Easing.OutQuint);
-                this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
+                buttonsContainer.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
@@ -227,7 +236,7 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.EnteringMode;
 
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
-            this.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
+            buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
         }
@@ -262,6 +271,9 @@ namespace osu.Game.Screens.Menu
             }
 
             buttons.State = ButtonSystemState.Exit;
+
+            songTicker.Hide();
+
             this.FadeOut(3000);
             return base.OnExiting(next);
         }
