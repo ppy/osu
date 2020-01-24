@@ -105,11 +105,26 @@ namespace osu.Game.Screens.Select
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        new WedgeBackground
+                        new GridContainer // used for max width implementation
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = -150 },
-                            Size = new Vector2(0.5f, 1),
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new WedgeBackground
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding { Right = -150 },
+                                    },
+                                    null
+                                }
+                            }
                         }
                     }
                 },
