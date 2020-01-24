@@ -22,12 +22,20 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
+        protected readonly Bindable<Color4> AccentColourBindable = new Bindable<Color4>();
 
         public Color4 AccentColour
         {
-            get => accentColour.Value;
-            set => accentColour.Value = value;
+            get => AccentColourBindable.Value;
+            set
+            {
+                AccentColourBindable.Value = value;
+
+                if (Dropdown is IHasAccentColour dropdown)
+                    dropdown.AccentColour = value;
+                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                    i.AccentColour = value;
+            }
         }
 
         private readonly Box strip;
@@ -67,22 +75,8 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour.Value == default)
+            if (AccentColour == default)
                 AccentColour = colours.Blue;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            accentColour.BindValueChanged(OnAccentColourChanged, true);
-        }
-
-        protected virtual void OnAccentColourChanged(ValueChangedEvent<Color4> colour)
-        {
-            if (Dropdown is IHasAccentColour dropdown)
-                dropdown.AccentColour = colour.NewValue;
-            foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
-                i.AccentColour = colour.NewValue;
         }
 
         public Color4 StripColour
