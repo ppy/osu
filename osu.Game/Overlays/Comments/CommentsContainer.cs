@@ -27,21 +27,22 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
         private readonly Box background;
+        private readonly Box footerBackground;
         private readonly FillFlowContainer content;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
         private readonly TotalCommentsCounter commentCounter;
+        private readonly OverlayColourScheme colourScheme;
 
-        public CommentsContainer()
+        public CommentsContainer(OverlayColourScheme colourScheme)
         {
+            this.colourScheme = colourScheme;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
@@ -57,8 +58,8 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        commentCounter = new TotalCommentsCounter(OverlayColourScheme.Purple),
-                        new CommentsHeader(OverlayColourScheme.Purple)
+                        commentCounter = new TotalCommentsCounter(colourScheme),
+                        new CommentsHeader(colourScheme)
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
@@ -75,10 +76,9 @@ namespace osu.Game.Overlays.Comments
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
+                                footerBackground = new Box
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.2f)
+                                    RelativeSizeAxes = Axes.Both
                                 },
                                 new FillFlowContainer
                                 {
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Comments
                                         {
                                             AutoSizeAxes = Axes.Y,
                                             RelativeSizeAxes = Axes.X,
-                                            Child = moreButton = new CommentsShowMoreButton
+                                            Child = moreButton = new CommentsShowMoreButton(colourScheme)
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
@@ -114,9 +114,10 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuColour colours)
         {
-            background.Colour = colours.Gray2;
+            background.Colour = colours.ForOverlayElement(colourScheme, 0.1f, 0.15f);
+            footerBackground.Colour = colours.ForOverlayElement(colourScheme, 0.1f, 0.2f);
         }
 
         protected override void LoadComplete()

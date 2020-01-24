@@ -8,6 +8,7 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
+using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Visual.Online
             Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = comments = new CommentsContainer()
+                Child = comments = new CommentsContainer(OverlayColourScheme.Purple)
             });
 
             AddStep("Big Black comments", () => comments.ShowComments(CommentableType.Beatmapset, 41823));
@@ -46,7 +47,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Idle state", () =>
             {
                 scroll.Clear();
-                scroll.Add(comments = new CommentsContainer());
+                scroll.Add(comments = new CommentsContainer(OverlayColourScheme.Purple));
             });
         }
     }
