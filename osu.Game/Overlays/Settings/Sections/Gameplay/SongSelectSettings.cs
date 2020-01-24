@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
@@ -10,11 +12,20 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
 {
     public class SongSelectSettings : SettingsSubsection
     {
+        private Bindable<double> minStars;
+        private Bindable<double> maxStars;
+
         protected override string Header => "Song Select";
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
+            minStars = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum);
+            maxStars = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum);
+
+            minStars.ValueChanged += min => maxStars.Value = Math.Max(min.NewValue, maxStars.Value);
+            maxStars.ValueChanged += max => minStars.Value = Math.Min(max.NewValue, minStars.Value);
+
             Children = new Drawable[]
             {
                 new SettingsCheckbox
