@@ -4,9 +4,9 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Framework.Testing;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 using osuTK;
@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestCaseLogoTransitions : ScreenTestCase
+    public class TestCaseLogoTransitions : ScreenTestScene
     {
         [Cached]
         private OsuLogo logo;
@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddInternal(new SpriteText
+                AddInternal(new OsuSpriteText
                 {
                     Text = screenText,
                     Colour = Color4.White,
