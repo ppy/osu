@@ -25,7 +25,12 @@ namespace osu.Game.Screens.Select
         public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
-        public OptionalRange<double> UserStarDifficulty;
+
+        public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
+        {
+            IsLowerInclusive = true,
+            IsUpperInclusive = true
+        };
 
         public string[] SearchTerms = Array.Empty<string>();
 
