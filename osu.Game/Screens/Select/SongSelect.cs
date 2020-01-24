@@ -681,7 +681,9 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Select;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {

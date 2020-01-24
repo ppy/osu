@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action){}
 
         private class LocalScrollingInfo : IScrollingInfo
         {

@@ -92,7 +92,7 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
             {
@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.Cursor
                 dragRotationState = DragRotationState.NotDragging;
             }
 
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void PopIn()

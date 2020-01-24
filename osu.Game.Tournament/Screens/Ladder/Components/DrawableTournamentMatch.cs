@@ -289,16 +289,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
-            if (base.OnDrag(e)) return true;
+           base.OnDrag(e);
 
             Selected = true;
             this.MoveToOffset(e.Delta);
 
             var pos = Position;
             Match.Position.Value = new Point((int)pos.X, (int)pos.Y);
-            return true;
         }
 
         public void Remove()

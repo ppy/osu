@@ -143,7 +143,9 @@ namespace osu.Game.Screens.Play
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private class FadeContainer : Container, IStateful<Visibility>
         {
@@ -202,10 +204,9 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 Show();
-                return true;
             }
 
             public override void Hide() => State = Visibility.Hidden;
@@ -280,9 +281,9 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.7f,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 16),//第一次翻译时修改
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                                 Origin = Anchor.Centre,
-                                Text = @"跳过",
+                                Text = @"SKIP",
                             },
                         }
                     }
@@ -311,10 +312,10 @@ namespace osu.Game.Screens.Play
                 return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
 
             protected override bool OnClick(ClickEvent e)

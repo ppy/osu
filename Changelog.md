@@ -103,3 +103,20 @@
     *   [M] [#7474 - 添加Benchmark项目](https://github.com/ppy/osu/pull/7474)
     *   [M] [#7479 - 在排行榜实现按国家分类(Implement CountryFilter component for RankingsOverlay)](https://github.com/ppy/osu/pull/7479)
     *   [M] [#7534 - 修复tooltip语法](https://github.com/ppy/osu/pull/7534)
+
+## 2020/1/20:
+*   添加了游戏Mods的翻译
+*   [将游戏Mods按钮文本字体变大](osu.Game/Overlays/Mods/ModButton.cs)
+*   整合更新
+    *   [M] [#7561 - 修复在比赛段的一个硬崩溃如果一局中包含一个空谱面](https://github.com/ppy/osu/pull/7561)
+    *   [M] [#7564 - Update license year](https://github.com/ppy/osu/pull/7564)
+
+## 2020/1/22:
+*   整合更新
+    *   [M] [#7582 - Allow parsing hex colour codes with alpha](https://github.com/ppy/osu/pull/7582)
+
+## 2020/1/24
+*   整合更新
+    *   [M] [#7585, #7587 - Apply OnRelease method signature refactorings, 更新framework]()
+        * [#7585](https://github.com/ppy/osu/pull/7585) 
+        * [#7587](https://github.com/ppy/osu/pull/7587)

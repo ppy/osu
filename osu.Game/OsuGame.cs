@@ -880,7 +880,9 @@ namespace osu.Game
 
         #endregion
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private Container overlayContent;
 

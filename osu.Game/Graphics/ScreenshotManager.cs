@@ -67,7 +67,7 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action){}
 
         private volatile int screenShotTasks;
 

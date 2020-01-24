@@ -187,7 +187,9 @@ namespace osu.Game.Rulesets.Taiko.UI
                 return false;
             }
 
-            public bool OnReleased(TaikoAction action) => false;
+            public void OnReleased(TaikoAction action)
+            {
+            }
         }
     }
 }

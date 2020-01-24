@@ -139,10 +139,10 @@ namespace osu.Game.Screens.Select
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)

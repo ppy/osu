@@ -385,7 +385,7 @@ namespace osu.Game.Overlays
                 return true;
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
@@ -393,13 +393,12 @@ namespace osu.Game.Overlays
                 change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.7f) / change.Length;
 
                 this.MoveTo(change);
-                return true;
             }
 
-            protected override bool OnDragEnd(DragEndEvent e)
+            protected override void OnDragEnd(DragEndEvent e)
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                return base.OnDragEnd(e);
+                base.OnDragEnd(e);
             }
         }
 

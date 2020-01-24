@@ -326,7 +326,7 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action){}
 
         public class MusicControllerToast : Toast
         {

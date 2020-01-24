@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
 
@@ -172,8 +172,6 @@ namespace osu.Game.Overlays.Mods
                         break;
                 }
             }
-
-            return true;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -286,7 +284,7 @@ namespace osu.Game.Overlays.Mods
                     Y = 75,
                     Origin = Anchor.TopCentre,
                     Anchor = Anchor.TopCentre,
-                    Font = OsuFont.GetFont(size: 18)
+                    Font = OsuFont.GetFont(size: 22)
                 },
                 new HoverClickSounds(buttons: new[] { MouseButton.Left, MouseButton.Right })
             };

@@ -80,7 +80,7 @@ namespace osu.Game.Tournament
             {
                 new TourneyButton
                 {
-                    Text = "保存更改",
+                    Text = "Save Changes",
                     Width = 140,
                     Height = 50,
                     Depth = float.MinValue,
@@ -106,7 +106,7 @@ namespace osu.Game.Tournament
                         },
                         new OsuSpriteText
                         {
-                            Text = "窗口太窄了,拉宽一些",
+                            Text = "Please make the window wider",
                             Font = OsuFont.Default.With(weight: "bold"),
                             Colour = Color4.White,
                             Padding = new MarginPadding(20)
@@ -223,9 +223,12 @@ namespace osu.Game.Tournament
 
             foreach (var r in ladder.Rounds)
             {
-                foreach (var b in r.Beatmaps)
+                foreach (var b in r.Beatmaps.ToList())
                 {
-                    if (b.BeatmapInfo == null && b.ID > 0)
+                    if (b.BeatmapInfo != null)
+                        continue;
+
+                    if (b.ID > 0)
                     {
                         var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
                         API.Perform(req);
@@ -233,6 +236,10 @@ namespace osu.Game.Tournament
 
                         addedInfo = true;
                     }
+
+                    if (b.BeatmapInfo == null)
+                        // if online population couldn't be performed, ensure we don't leave a null value behind
+                        r.Beatmaps.Remove(b);
                 }
             }
 
@@ -296,7 +303,7 @@ namespace osu.Game.Tournament
 
         private class TournamentInputManager : UserInputManager
         {
-            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {
                 switch (button)
                 {
@@ -304,7 +311,7 @@ namespace osu.Game.Tournament
                         return new RightMouseManager(button);
                 }
 
-                return base.CreateButtonManagerFor(button);
+                return base.CreateButtonEventManagerFor(button);
             }
 
             private class RightMouseManager : MouseButtonEventManager

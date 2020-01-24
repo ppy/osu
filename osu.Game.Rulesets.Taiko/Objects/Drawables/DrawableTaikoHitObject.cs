@@ -77,7 +77,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public Drawable CreateProxiedContent() => proxiedContent.CreateProxy();
 
         public abstract bool OnPressed(TaikoAction action);
-        public virtual bool OnReleased(TaikoAction action) => false;
+        public virtual void OnReleased(TaikoAction action)
+        {
+        }
 
         public override double LifetimeStart
         {

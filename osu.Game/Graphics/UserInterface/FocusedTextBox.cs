@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterface
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action){}
 
         public override bool RequestsFocus => HoldFocus;
     }

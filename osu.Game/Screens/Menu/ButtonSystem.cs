@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action){}
 
         private bool goBack()
         {
