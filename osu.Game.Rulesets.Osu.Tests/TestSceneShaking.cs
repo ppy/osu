@@ -1,23 +1,25 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using System.Diagnostics;
+using osu.Framework.Utils;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestSceneShaking : TestSceneHitCircle
     {
-        public override void Add(Drawable drawable)
+        protected override TestDrawableHitCircle CreateDrawableHitCircle(HitCircle circle, bool auto)
         {
-            base.Add(drawable);
+            var drawableHitObject = base.CreateDrawableHitCircle(circle, auto);
 
-            if (drawable is TestDrawableHitCircle hitObject)
-            {
-                Scheduler.AddDelayed(() => hitObject.TriggerJudgement(),
-                    hitObject.HitObject.StartTime - (hitObject.HitObject.HitWindows.HalfWindowFor(HitResult.Miss) + RNG.Next(0, 300)) - Time.Current);
-            }
+            Debug.Assert(drawableHitObject.HitObject.HitWindows != null);
+
+            double delay = drawableHitObject.HitObject.StartTime - (drawableHitObject.HitObject.HitWindows.WindowFor(HitResult.Miss) + RNG.Next(0, 300)) - Time.Current;
+            Scheduler.AddDelayed(() => drawableHitObject.TriggerJudgement(), delay);
+
+            return drawableHitObject;
         }
     }
 }

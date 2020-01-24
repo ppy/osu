@@ -4,9 +4,8 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Tests.Beatmaps;
 
@@ -20,17 +19,14 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [NonParallelizable]
         [TestCase("basic")]
         [TestCase("slider-generating-drumroll")]
-        public new void Test(string name)
-        {
-            base.Test(name);
-        }
+        public void Test(string name) => base.Test(name);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
             yield return new ConvertValue
             {
                 StartTime = hitObject.StartTime,
-                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
+                EndTime = hitObject.GetEndTime(),
                 IsRim = hitObject is RimHit,
                 IsCentre = hitObject is CentreHit,
                 IsDrumRoll = hitObject is DrumRoll,

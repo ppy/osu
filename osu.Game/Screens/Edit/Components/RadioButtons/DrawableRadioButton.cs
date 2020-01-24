@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
                 Scale = new Vector2(0.5f),
                 X = 10,
                 Masking = true,
-                Blending = BlendingMode.Additive,
+                Blending = BlendingParameters.Additive,
                 Child = new Box { RelativeSizeAxes = Axes.Both }
             };
         }

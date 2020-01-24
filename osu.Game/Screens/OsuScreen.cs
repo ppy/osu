@@ -87,6 +87,8 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
+        public virtual bool AllowRateAdjustments => true;
+
         public Bindable<WorkingBeatmap> Beatmap { get; private set; }
 
         public Bindable<RulesetInfo> Ruleset { get; private set; }

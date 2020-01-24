@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Menu
                                         {
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
-                                            Blending = BlendingMode.Additive,
+                                            Blending = BlendingParameters.Additive,
                                             Alpha = 0
                                         }
                                     }
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Menu
                                                                 flashLayer = new Box
                                                                 {
                                                                     RelativeSizeAxes = Axes.Both,
-                                                                    Blending = BlendingMode.Additive,
+                                                                    Blending = BlendingParameters.Additive,
                                                                     Colour = Color4.White,
                                                                     Alpha = 0,
                                                                 },
@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Menu
         }
 
         /// <summary>
-        /// Schedule a new extenral animation. Handled queueing and finishing previous animations in a sane way.
+        /// Schedule a new external animation. Handled queueing and finishing previous animations in a sane way.
         /// </summary>
         /// <param name="action">The animation to be performed</param>
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
@@ -353,12 +353,11 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
-            if (e.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return;
 
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
-            return true;
         }
 
         protected override bool OnClick(ClickEvent e)

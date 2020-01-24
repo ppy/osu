@@ -67,9 +67,36 @@ namespace osu.Game.Beatmaps
         public int FavouriteCount { get; set; }
 
         /// <summary>
+        /// Whether this beatmap set has been favourited by the current user.
+        /// </summary>
+        public bool HasFavourited { get; set; }
+
+        /// <summary>
         /// The availability of this beatmap set.
         /// </summary>
         public BeatmapSetOnlineAvailability Availability { get; set; }
+
+        /// <summary>
+        /// The song genre of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineGenre Genre { get; set; }
+
+        /// <summary>
+        /// The song language of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineLanguage Language { get; set; }
+    }
+
+    public class BeatmapSetOnlineGenre
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class BeatmapSetOnlineLanguage
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class BeatmapSetOnlineCovers

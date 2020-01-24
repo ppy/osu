@@ -27,6 +27,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(Comments),
         };
 
+        protected override bool UseOnlineAPI => true;
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -65,6 +67,34 @@ namespace osu.Game.Tests.Visual.Online
             {
                 changelog.ShowListing();
                 changelog.Show();
+            });
+
+            AddStep(@"Ensure HTML string unescaping", () =>
+            {
+                changelog.ShowBuild(new APIChangelogBuild
+                {
+                    Version = "2019.920.0",
+                    DisplayVersion = "2019.920.0",
+                    UpdateStream = new APIUpdateStream
+                    {
+                        Name = "Test",
+                        DisplayName = "Test"
+                    },
+                    ChangelogEntries = new List<APIChangelogEntry>
+                    {
+                        new APIChangelogEntry
+                        {
+                            Category = "Testing HTML strings unescaping",
+                            Title = "Ensuring HTML strings are being unescaped",
+                            MessageHtml = "&quot;&quot;&quot;This text should appear triple-quoted&quot;&quot;&quot;    &gt;_&lt;",
+                            GithubUser = new APIChangelogUser
+                            {
+                                DisplayName = "Dummy",
+                                OsuUsername = "Dummy",
+                            }
+                        },
+                    }
+                });
             });
         }
     }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,16 +16,10 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistOverlay : OverlayContainer
+    public class PlaylistOverlay : VisibilityContainer
     {
         private const float transition_duration = 600;
         private const float playlist_height = 510;
-
-        /// <summary>
-        /// Invoked when the order of an item in the list has changed.
-        /// The second parameter indicates the new index of the item.
-        /// </summary>
-        public Action<BeatmapSetInfo, int> OrderChanged;
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private BeatmapManager beatmaps;
@@ -65,13 +58,11 @@ namespace osu.Game.Overlays.Music
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
                             Selected = itemSelected,
-                            OrderChanged = (s, i) => OrderChanged?.Invoke(s, i)
                         },
                         filter = new FilterControl
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ExitRequested = Hide,
                             FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },

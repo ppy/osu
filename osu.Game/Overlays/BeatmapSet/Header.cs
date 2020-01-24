@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -16,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Overlays.Direct;
+using osu.Game.Rulesets;
 using osuTK;
 using osuTK.Graphics;
 
@@ -39,6 +41,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public bool DownloadButtonsVisible => downloadButtonsContainer.Any();
 
+        public readonly BeatmapRulesetSelector RulesetSelector;
         public readonly BeatmapPicker Picker;
 
         private readonly FavouriteButton favouriteButton;
@@ -46,6 +49,9 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly FillFlowContainer fadeContent;
 
         private readonly LoadingAnimation loading;
+
+        [Cached(typeof(IBindable<RulesetInfo>))]
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         public Header()
         {
@@ -69,12 +75,18 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = tabs_height,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         tabsBg = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
+                        RulesetSelector = new BeatmapRulesetSelector
+                        {
+                            Current = ruleset,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+                        }
                     },
                 },
                 new Container
@@ -161,7 +173,10 @@ namespace osu.Game.Overlays.BeatmapSet
                                             Margin = new MarginPadding { Top = 10 },
                                             Children = new Drawable[]
                                             {
-                                                favouriteButton = new FavouriteButton(),
+                                                favouriteButton = new FavouriteButton
+                                                {
+                                                    BeatmapSet = { BindTarget = BeatmapSet }
+                                                },
                                                 downloadButtonsContainer = new FillFlowContainer
                                                 {
                                                     RelativeSizeAxes = Axes.Both,
@@ -220,7 +235,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
+                Picker.BeatmapSet = RulesetSelector.BeatmapSet = author.BeatmapSet = beatmapAvailability.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
                 cover.BeatmapSet = setInfo.NewValue;
 
                 if (setInfo.NewValue == null)

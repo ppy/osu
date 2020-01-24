@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                     },
                 }
             };

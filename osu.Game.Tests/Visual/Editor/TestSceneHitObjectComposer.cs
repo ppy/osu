@@ -16,15 +16,14 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Editor
 {
     [TestFixture]
-    [Cached(Type = typeof(IPlacementHandler))]
-    public class TestSceneHitObjectComposer : OsuTestScene, IPlacementHandler
+    public class TestSceneHitObjectComposer : EditorClockTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -38,8 +37,6 @@ namespace osu.Game.Tests.Visual.Editor
             typeof(HitCircleSelectionBlueprint),
             typeof(HitCirclePlacementBlueprint),
         };
-
-        private HitObjectComposer composer;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -63,19 +60,15 @@ namespace osu.Game.Tests.Visual.Editor
                 },
             });
 
+            var editorBeatmap = new EditorBeatmap(Beatmap.Value.GetPlayableBeatmap(new OsuRuleset().RulesetInfo));
+
             var clock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
             Dependencies.CacheAs<IAdjustableClock>(clock);
             Dependencies.CacheAs<IFrameBasedClock>(clock);
+            Dependencies.CacheAs(editorBeatmap);
+            Dependencies.CacheAs<IBeatSnapProvider>(editorBeatmap);
 
-            Child = composer = new OsuHitObjectComposer(new OsuRuleset());
+            Child = new OsuHitObjectComposer(new OsuRuleset());
         }
-
-        public void BeginPlacement(HitObject hitObject)
-        {
-        }
-
-        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
-
-        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
     }
 }

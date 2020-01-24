@@ -18,9 +18,5 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             MainObject = mainObject;
         }
-
-        protected override void UpdateState(ArmedState state)
-        {
-        }
     }
 }

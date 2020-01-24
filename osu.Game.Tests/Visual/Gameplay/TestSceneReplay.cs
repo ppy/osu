@@ -26,12 +26,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddUntilStep("score above zero", () => ((ScoreAccessibleReplayPlayer)Player).ScoreProcessor.TotalScore.Value > 0);
             AddUntilStep("key counter counted keys", () => ((ScoreAccessibleReplayPlayer)Player).HUDOverlay.KeyCounter.Children.Any(kc => kc.CountPresses > 0));
+            AddAssert("cannot fail", () => !((ScoreAccessibleReplayPlayer)Player).AllowFail);
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
+            public new bool AllowFail => base.AllowFail;
 
             protected override bool PauseOnFocusLost => false;
 

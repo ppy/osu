@@ -1,19 +1,27 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Screens.Play;
+using osuTK;
 
 namespace osu.Game.Screens.Backgrounds
 {
     public class BackgroundScreenBeatmap : BackgroundScreen
     {
+        /// <summary>
+        /// The amount of blur to apply when full user blur is requested.
+        /// </summary>
+        public const float USER_BLUR_FACTOR = 25;
+
         protected Background Background;
 
         private WorkingBeatmap beatmap;
@@ -30,16 +38,23 @@ namespace osu.Game.Screens.Backgrounds
         /// </summary>
         public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
-        private readonly UserDimContainer fadeContainer;
+        internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
-        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
+        private readonly DimmableBackground dimmable;
+
+        protected virtual DimmableBackground CreateFadeContainer() => new DimmableBackground { RelativeSizeAxes = Axes.Both };
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
-            InternalChild = fadeContainer = CreateFadeContainer();
-            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
-            fadeContainer.BlurAmount.BindTo(BlurAmount);
+
+            InternalChild = dimmable = CreateFadeContainer();
+
+            dimmable.EnableUserDim.BindTo(EnableUserDim);
+            dimmable.IsBreakTime.BindTo(IsBreakTime);
+            dimmable.BlurAmount.BindTo(BlurAmount);
+
+            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         [BackgroundDependencyLoader]
@@ -64,7 +79,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    if ((Background as BeatmapBackground)?.Beatmap == beatmap)
+                    if ((Background as BeatmapBackground)?.Beatmap.BeatmapInfo.BackgroundEquals(beatmap?.BeatmapInfo) ?? false)
                         return;
 
                     cancellationSource?.Cancel();
@@ -86,8 +101,7 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             b.Depth = newDepth;
-            fadeContainer.Background = Background = b;
-            StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
+            dimmable.Background = Background = b;
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -97,19 +111,68 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        protected class BeatmapBackground : Background
+        public class DimmableBackground : UserDimContainer
         {
-            public readonly WorkingBeatmap Beatmap;
+            /// <summary>
+            /// The amount of blur to be applied to the background in addition to user-specified blur.
+            /// </summary>
+            /// <remarks>
+            /// Used in contexts where there can potentially be both user and screen-specified blurring occuring at the same time, such as in <see cref="PlayerLoader"/>
+            /// </remarks>
+            public readonly Bindable<float> BlurAmount = new Bindable<float>();
 
-            public BeatmapBackground(WorkingBeatmap beatmap)
+            public Background Background
             {
-                Beatmap = beatmap;
+                get => background;
+                set
+                {
+                    background?.Expire();
+
+                    base.Add(background = value);
+                    background.BlurTo(blurTarget, 0, Easing.OutQuint);
+                }
             }
 
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private Bindable<double> userBlurLevel { get; set; }
+
+            private Background background;
+
+            public override void Add(Drawable drawable)
             {
-                Sprite.Texture = Beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
+                if (drawable is Background)
+                    throw new InvalidOperationException($"Use {nameof(Background)} to set a background.");
+
+                base.Add(drawable);
+            }
+
+            /// <summary>
+            /// As an optimisation, we add the two blur portions to be applied rather than actually applying two separate blurs.
+            /// </summary>
+            private Vector2 blurTarget => EnableUserDim.Value
+                ? new Vector2(BlurAmount.Value + (float)userBlurLevel.Value * USER_BLUR_FACTOR)
+                : new Vector2(BlurAmount.Value);
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                userBlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                userBlurLevel.ValueChanged += _ => UpdateVisuals();
+                BlurAmount.ValueChanged += _ => UpdateVisuals();
+            }
+
+            protected override bool ShowDimContent => !ShowStoryboard.Value || !StoryboardReplacesBackground.Value || !ShowVideo.Value; // The background needs to be hidden in the case of it being replaced by the storyboard
+
+            protected override void UpdateVisuals()
+            {
+                base.UpdateVisuals();
+
+                Background?.BlurTo(blurTarget, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             }
         }
     }

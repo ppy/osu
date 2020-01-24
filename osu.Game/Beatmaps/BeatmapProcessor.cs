@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
@@ -45,25 +44,6 @@ namespace osu.Game.Beatmaps
 
         public virtual void PostProcess()
         {
-            void updateNestedCombo(HitObject obj, int comboIndex, int indexInCurrentCombo)
-            {
-                if (obj is IHasComboInformation objectComboInfo)
-                {
-                    objectComboInfo.ComboIndex = comboIndex;
-                    objectComboInfo.IndexInCurrentCombo = indexInCurrentCombo;
-                    foreach (var nestedObject in obj.NestedHitObjects)
-                        updateNestedCombo(nestedObject, comboIndex, indexInCurrentCombo);
-                }
-            }
-
-            foreach (var hitObject in Beatmap.HitObjects)
-            {
-                if (hitObject is IHasComboInformation objectComboInfo)
-                {
-                    foreach (var nested in hitObject.NestedHitObjects)
-                        updateNestedCombo(nested, objectComboInfo.ComboIndex, objectComboInfo.IndexInCurrentCombo);
-                }
-            }
         }
     }
 }

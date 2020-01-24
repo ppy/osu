@@ -140,6 +140,9 @@ namespace osu.Game.Overlays.Profile.Header
         {
             if (string.IsNullOrEmpty(content)) return;
 
+            // newlines could be contained in API returned user content.
+            content = content.Replace("\n", " ");
+
             bottomLinkContainer.AddIcon(icon, text =>
             {
                 text.Font = text.Font.With(size: 10);

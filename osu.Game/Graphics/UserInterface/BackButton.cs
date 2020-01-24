@@ -10,20 +10,22 @@ using osu.Game.Input.Bindings;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class BackButton : VisibilityContainer, IKeyBindingHandler<GlobalAction>
+    public class BackButton : VisibilityContainer
     {
         public Action Action;
 
         private readonly TwoLayerButton button;
 
-        public BackButton()
+        public BackButton(Receptor receptor)
         {
+            receptor.OnBackPressed = () => button.Click();
+
             Size = TwoLayerButton.SIZE_EXTENDED;
 
             Child = button = new TwoLayerButton
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.TopLeft,
+                Origin = Anchor.TopLeft,
                 Text = @"back",
                 Icon = OsuIcon.LeftCircle,
                 Action = () => Action?.Invoke()
@@ -37,19 +39,6 @@ namespace osu.Game.Graphics.UserInterface
             button.HoverColour = colours.PinkDark;
         }
 
-        public bool OnPressed(GlobalAction action)
-        {
-            if (action == GlobalAction.Back)
-            {
-                Action?.Invoke();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
-
         protected override void PopIn()
         {
             button.MoveToX(0, 400, Easing.OutQuint);
@@ -60,6 +49,27 @@ namespace osu.Game.Graphics.UserInterface
         {
             button.MoveToX(-TwoLayerButton.SIZE_EXTENDED.X / 2, 400, Easing.OutQuint);
             button.FadeOut(400, Easing.OutQuint);
+        }
+
+        public class Receptor : Drawable, IKeyBindingHandler<GlobalAction>
+        {
+            public Action OnBackPressed;
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        OnBackPressed?.Invoke();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public void OnReleased(GlobalAction action)
+            {
+            }
         }
     }
 }

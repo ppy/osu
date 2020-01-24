@@ -15,7 +15,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Models;
 using osu.Game.Tournament.Screens.Drawings.Components;
@@ -24,7 +23,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class DrawingsScreen : CompositeDrawable
+    public class DrawingsScreen : TournamentScreen
     {
         private const string results_filename = "drawings_results.txt";
 
@@ -128,21 +127,21 @@ namespace osu.Game.Tournament.Screens.Drawings
                 // Control panel container
                 new ControlPanel
                 {
-                    new OsuButton
+                    new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
                         Text = "Begin random",
                         Action = teamsContainer.StartScrolling,
                     },
-                    new OsuButton
+                    new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
                         Text = "Stop random",
                         Action = teamsContainer.StopScrolling,
                     },
-                    new OsuButton
+                    new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
@@ -150,7 +149,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                         Action = reloadTeams
                     },
                     new ControlPanel.Spacer(),
-                    new OsuButton
+                    new TourneyButton
                     {
                         RelativeSizeAxes = Axes.X,
 
@@ -195,7 +194,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                 }
             }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run((Action)writeAction);
+            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
         }
 
         private void reloadTeams()

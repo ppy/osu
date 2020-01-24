@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
@@ -21,7 +22,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
         public SpinnerPlacementBlueprint()
             : base(new Spinner { Position = OsuPlayfield.BASE_SIZE / 2 })
         {
-            InternalChild = piece = new SpinnerPiece(HitObject) { Alpha = 0.5f };
+            InternalChild = piece = new SpinnerPiece { Alpha = 0.5f };
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            piece.UpdateFrom(HitObject);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -33,8 +41,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             }
             else
             {
-                HitObject.StartTime = EditorClock.CurrentTime;
-
                 isPlacingEnd = true;
                 piece.FadeTo(1f, 150, Easing.OutQuint);
 
@@ -42,6 +48,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             }
 
             return true;
+        }
+
+        public override void UpdatePosition(Vector2 screenSpacePosition)
+        {
         }
     }
 }

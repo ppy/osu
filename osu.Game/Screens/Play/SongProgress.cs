@@ -13,7 +13,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Play
@@ -39,6 +38,9 @@ namespace osu.Game.Screens.Play
         public readonly Bindable<bool> AllowSeeking = new Bindable<bool>();
 
         public readonly Bindable<bool> ShowGraph = new Bindable<bool>();
+
+        //TODO: this isn't always correct (consider mania where a non-last object may last for longer than the last in the list).
+        private double lastHitTime => objects.Last().GetEndTime() + 1;
 
         public override bool HandleNonPositionalInput => AllowSeeking.Value;
         public override bool HandlePositionalInput => AllowSeeking.Value;
@@ -101,8 +103,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, GameplayClock clock, OsuConfigManager config)
         {
-            if (clock != null)
-                gameplayClock = clock;
+            base.LoadComplete();
 
             config.BindWith(OsuSetting.ShowProgressGraph, ShowGraph);
 

@@ -26,7 +26,7 @@ namespace osu.Game.Users.Drawables
             if (ts == null)
                 throw new ArgumentNullException(nameof(ts));
 
-            Texture = ts.Get($@"Flags/{country?.FlagName ?? @"__"}");
+            Texture = ts.Get($@"Flags/{country?.FlagName ?? @"__"}") ?? ts.Get(@"Flags/__");
         }
     }
 }

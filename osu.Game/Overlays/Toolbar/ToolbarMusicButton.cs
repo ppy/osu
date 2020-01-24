@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MusicController music)
+        private void load(NowPlayingOverlay music)
         {
             StateContainer = music;
         }

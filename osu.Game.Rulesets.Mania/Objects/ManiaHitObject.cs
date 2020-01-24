@@ -3,7 +3,9 @@
 
 using osu.Framework.Bindables;
 using osu.Game.Rulesets.Mania.Objects.Types;
+using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {

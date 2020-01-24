@@ -17,12 +17,14 @@ namespace osu.Game.Tests.Visual.Online
 {
     public class TestSceneUserProfileHeader : OsuTestScene
     {
+        protected override bool UseOnlineAPI => true;
+
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ProfileHeader),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(OverlayHeaderTabControl),
+            typeof(TabControlOverlayHeader.OverlayHeaderTabControl),
             typeof(CentreHeaderContainer),
             typeof(BottomHeaderContainer),
             typeof(DetailHeaderContainer),

@@ -158,7 +158,8 @@ namespace osu.Game.Overlays
 
         private Task initialFetchTask;
 
-        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ => Schedule(action));
+        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ =>
+            Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
 
         private Task fetchListing()
         {
@@ -170,7 +171,8 @@ namespace osu.Game.Overlays
                 var tcs = new TaskCompletionSource<bool>();
 
                 var req = new GetChangelogRequest();
-                req.Success += res =>
+
+                req.Success += res => Schedule(() =>
                 {
                     // remap streams to builds to ensure model equality
                     res.Builds.ForEach(b => b.UpdateStream = res.Streams.Find(s => s.Id == b.UpdateStream.Id));
@@ -182,9 +184,15 @@ namespace osu.Game.Overlays
                     header.Streams.Populate(res.Streams);
 
                     tcs.SetResult(true);
+                });
+
+                req.Failure += e =>
+                {
+                    initialFetchTask = null;
+                    tcs.SetException(e);
                 };
-                req.Failure += _ => initialFetchTask = null;
-                req.Perform(API);
+
+                await API.PerformAsync(req);
 
                 await tcs.Task;
             });

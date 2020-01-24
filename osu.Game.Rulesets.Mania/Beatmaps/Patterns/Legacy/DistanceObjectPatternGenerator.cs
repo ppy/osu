@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             foreach (var obj in originalPattern.HitObjects)
             {
-                if (!Precision.AlmostEquals(EndTime, (obj as IHasEndTime)?.EndTime ?? obj.StartTime))
+                if (!Precision.AlmostEquals(EndTime, obj.GetEndTime()))
                     intermediatePattern.Add(obj);
                 else
                     endTimePattern.Add(obj);
@@ -364,7 +364,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     break;
             }
 
-            bool isDoubleSample(HitSampleInfo sample) => sample.Name == HitSampleInfo.HIT_CLAP || sample.Name == HitSampleInfo.HIT_FINISH;
+            static bool isDoubleSample(HitSampleInfo sample) => sample.Name == HitSampleInfo.HIT_CLAP || sample.Name == HitSampleInfo.HIT_FINISH;
 
             bool canGenerateTwoNotes = !convertType.HasFlag(PatternType.LowProbability);
             canGenerateTwoNotes &= HitObject.Samples.Any(isDoubleSample) || sampleInfoListAt(HitObject.StartTime).Any(isDoubleSample);
@@ -472,11 +472,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         /// <param name="time">The time to retrieve the sample info list from.</param>
         /// <returns></returns>
-        private List<HitSampleInfo> sampleInfoListAt(double time)
+        private IList<HitSampleInfo> sampleInfoListAt(double time)
         {
-            var curveData = HitObject as IHasCurve;
-
-            if (curveData == null)
+            if (!(HitObject is IHasCurve curveData))
                 return HitObject.Samples;
 
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;

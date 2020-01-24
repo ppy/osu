@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
                             Colour = Color4.White,
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                             Alpha = 0,
                             AlwaysPresent = true
                         }

@@ -10,7 +10,7 @@ namespace osu.Game.Tournament.Screens.Showcase
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new TournamentLogo());
+            AddInternal(new TournamentLogo(false));
         }
     }
 }

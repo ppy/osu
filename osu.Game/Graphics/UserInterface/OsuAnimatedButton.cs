@@ -64,7 +64,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = HoverColour,
-                        Blending = BlendingMode.Additive,
+                        Blending = BlendingParameters.Additive,
                         Alpha = 0,
                     },
                 }
@@ -107,10 +107,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
     }
 }

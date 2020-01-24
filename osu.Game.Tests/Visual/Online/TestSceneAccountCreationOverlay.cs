@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Overlays.AccountCreation;
 using osu.Game.Users;
@@ -25,17 +25,16 @@ namespace osu.Game.Tests.Visual.Online
             typeof(AccountCreationScreen),
         };
 
-        [Cached(typeof(IAPIProvider))]
-        private DummyAPIAccess api = new DummyAPIAccess();
+        private readonly Container userPanelArea;
+
+        private Bindable<User> localUser;
 
         public TestSceneAccountCreationOverlay()
         {
-            Container userPanelArea;
             AccountCreationOverlay accountCreation;
 
             Children = new Drawable[]
             {
-                api,
                 accountCreation = new AccountCreationOverlay(),
                 userPanelArea = new Container
                 {
@@ -46,11 +45,18 @@ namespace osu.Game.Tests.Visual.Online
                 },
             };
 
-            api.Logout();
-            api.LocalUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
-
             AddStep("show", () => accountCreation.Show());
-            AddStep("logout", () => api.Logout());
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            API.Logout();
+
+            localUser = API.LocalUser.GetBoundCopy();
+            localUser.BindValueChanged(user => { userPanelArea.Child = new UserPanel(user.NewValue) { Width = 200 }; }, true);
+
+            AddStep("logout", API.Logout);
         }
     }
 }

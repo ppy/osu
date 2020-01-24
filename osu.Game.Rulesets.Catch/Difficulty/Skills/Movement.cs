@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             if (lastPlayerPosition == null)
                 lastPlayerPosition = catchCurrent.LastNormalizedPosition;
 
-            float playerPosition = MathHelper.Clamp(
+            float playerPosition = Math.Clamp(
                 lastPlayerPosition.Value,
                 catchCurrent.NormalizedPosition - (normalized_hitobject_radius - absolute_player_positioning_error),
                 catchCurrent.NormalizedPosition + (normalized_hitobject_radius - absolute_player_positioning_error)

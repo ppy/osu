@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             Add(overlay = new DialogOverlay());
 
-            AddStep("dialog #1", () => overlay.Push(new PopupDialog
+            AddStep("dialog #1", () => overlay.Push(new TestPopupDialog
             {
                 Icon = FontAwesome.Regular.TrashAlt,
                 HeaderText = @"Confirm deletion of",
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 },
             }));
 
-            AddStep("dialog #2", () => overlay.Push(new PopupDialog
+            AddStep("dialog #2", () => overlay.Push(new TestPopupDialog
             {
                 Icon = FontAwesome.Solid.Cog,
                 HeaderText = @"What do you want to do with",
@@ -70,6 +70,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                     },
                 },
             }));
+        }
+
+        private class TestPopupDialog : PopupDialog
+        {
         }
     }
 }

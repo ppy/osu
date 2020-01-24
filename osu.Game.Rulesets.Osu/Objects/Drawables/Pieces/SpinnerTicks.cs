@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
-            const int count = 18;
+            const float count = 18;
 
-            for (int i = 0; i < count; i++)
+            for (float i = 0; i < count; i++)
             {
                 Add(new Container
                 {
@@ -40,10 +40,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Size = new Vector2(60, 10),
                     Origin = Anchor.Centre,
                     Position = new Vector2(
-                        0.5f + (float)Math.Sin((float)i / count * 2 * MathHelper.Pi) / 2 * 0.86f,
-                        0.5f + (float)Math.Cos((float)i / count * 2 * MathHelper.Pi) / 2 * 0.86f
+                        0.5f + MathF.Sin(i / count * 2 * MathF.PI) / 2 * 0.86f,
+                        0.5f + MathF.Cos(i / count * 2 * MathF.PI) / 2 * 0.86f
                     ),
-                    Rotation = -(float)i / count * 360 + 90,
+                    Rotation = -i / count * 360 + 90,
                     Children = new[]
                     {
                         new Box

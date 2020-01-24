@@ -28,24 +28,20 @@ namespace osu.Game.Tests.Visual.Editor
         {
             var testBeatmap = new Beatmap
             {
-                ControlPointInfo = new ControlPointInfo
-                {
-                    TimingPoints =
-                    {
-                        new TimingControlPoint { Time = 0, BeatLength = 200 },
-                        new TimingControlPoint { Time = 100, BeatLength = 400 },
-                        new TimingControlPoint { Time = 175, BeatLength = 800 },
-                        new TimingControlPoint { Time = 350, BeatLength = 200 },
-                        new TimingControlPoint { Time = 450, BeatLength = 100 },
-                        new TimingControlPoint { Time = 500, BeatLength = 307.69230769230802 }
-                    }
-                },
+                ControlPointInfo = new ControlPointInfo(),
                 HitObjects =
                 {
                     new HitCircle { StartTime = 0 },
                     new HitCircle { StartTime = 5000 }
                 }
             };
+
+            testBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 200 });
+            testBeatmap.ControlPointInfo.Add(100, new TimingControlPoint { BeatLength = 400 });
+            testBeatmap.ControlPointInfo.Add(175, new TimingControlPoint { BeatLength = 800 });
+            testBeatmap.ControlPointInfo.Add(350, new TimingControlPoint { BeatLength = 200 });
+            testBeatmap.ControlPointInfo.Add(450, new TimingControlPoint { BeatLength = 100 });
+            testBeatmap.ControlPointInfo.Add(500, new TimingControlPoint { BeatLength = 307.69230769230802 });
 
             Beatmap.Value = CreateWorkingBeatmap(testBeatmap);
 

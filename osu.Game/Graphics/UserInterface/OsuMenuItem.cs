@@ -11,9 +11,8 @@ namespace osu.Game.Graphics.UserInterface
         public readonly MenuItemType Type;
 
         public OsuMenuItem(string text, MenuItemType type = MenuItemType.Standard)
-            : base(text)
+            : this(text, type, null)
         {
-            Type = type;
         }
 
         public OsuMenuItem(string text, MenuItemType type, Action action)

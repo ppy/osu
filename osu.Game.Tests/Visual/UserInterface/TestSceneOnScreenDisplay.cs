@@ -7,6 +7,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Graphics;
 using osu.Game.Overlays;
+using osu.Game.Overlays.OSD;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -21,6 +22,12 @@ namespace osu.Game.Tests.Visual.UserInterface
             var osd = new TestOnScreenDisplay();
             osd.BeginTracking(this, config);
             Add(osd);
+
+            AddStep("Display empty osd toast", () => osd.Display(new EmptyToast()));
+            AddAssert("Toast width is 240", () => osd.Child.Width == 240);
+
+            AddStep("Display toast with lengthy text", () => osd.Display(new LengthyToast()));
+            AddAssert("Toast width is greater than 240", () => osd.Child.Width > 240);
 
             AddRepeatStep("Change toggle (no bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingNoKeybind), 2);
             AddRepeatStep("Change toggle (with bind)", () => config.ToggleSetting(TestConfigSetting.ToggleSettingWithKeybind), 2);
@@ -84,6 +91,22 @@ namespace osu.Game.Tests.Visual.UserInterface
             Setting2,
             Setting3,
             Setting4
+        }
+
+        private class EmptyToast : Toast
+        {
+            public EmptyToast()
+                : base("", "", "")
+            {
+            }
+        }
+
+        private class LengthyToast : Toast
+        {
+            public LengthyToast()
+                : base("Toast with a very very very long text", "A very very very very very very long text also", "A very very very very very long shortcut")
+            {
+            }
         }
 
         private class TestOnScreenDisplay : OnScreenDisplay

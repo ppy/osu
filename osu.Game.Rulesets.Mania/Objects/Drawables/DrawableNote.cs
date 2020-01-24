@@ -1,9 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Diagnostics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
-using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Input.Bindings;
@@ -30,6 +30,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Masking = true;
 
             AddInternal(headPiece = new NotePiece());
+
+            AccentColour.BindValueChanged(colour =>
+            {
+                headPiece.AccentColour = colour.NewValue;
+
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = colour.NewValue.Lighten(1f).Opacity(0.2f),
+                    Radius = 10,
+                };
+            }, true);
         }
 
         protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
@@ -39,25 +51,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
-        public override Color4 AccentColour
-        {
-            get => base.AccentColour;
-            set
-            {
-                base.AccentColour = value;
-                headPiece.AccentColour = AccentColour;
-
-                EdgeEffect = new EdgeEffectParameters
-                {
-                    Type = EdgeEffectType.Glow,
-                    Colour = AccentColour.Lighten(1f).Opacity(0.6f),
-                    Radius = 10,
-                };
-            }
-        }
-
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            Debug.Assert(HitObject.HitWindows != null);
+
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
@@ -80,6 +77,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual void OnReleased(ManiaAction action)
+        {
+        }
     }
 }

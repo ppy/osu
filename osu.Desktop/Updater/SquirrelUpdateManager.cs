@@ -20,12 +20,14 @@ using LogLevel = Splat.LogLevel;
 
 namespace osu.Desktop.Updater
 {
-    public class SquirrelUpdateManager : Component
+    public class SquirrelUpdateManager : osu.Game.Updater.UpdateManager
     {
         private UpdateManager updateManager;
         private NotificationOverlay notificationOverlay;
 
         public Task PrepareUpdateAsync() => UpdateManager.RestartAppWhenExited();
+
+        private static readonly Logger logger = Logger.GetLogger("updater");
 
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuGameBase game)
@@ -77,7 +79,7 @@ namespace osu.Desktop.Updater
                 {
                     if (useDeltaPatching)
                     {
-                        Logger.Error(e, @"delta patching failed!");
+                        logger.Add(@"delta patching failed; will attempt full download!");
 
                         //could fail if deltas are unavailable for full update path (https://github.com/Squirrel/Squirrel.Windows/issues/959)
                         //try again without deltas.
@@ -163,15 +165,10 @@ namespace osu.Desktop.Updater
         {
             public LogLevel Level { get; set; } = LogLevel.Info;
 
-            private Logger logger;
-
             public void Write(string message, LogLevel logLevel)
             {
                 if (logLevel < Level)
                     return;
-
-                if (logger == null)
-                    logger = Logger.GetLogger("updater");
 
                 logger.Add(message);
             }

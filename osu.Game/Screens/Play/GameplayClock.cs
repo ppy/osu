@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Play
         public void ProcessFrame()
         {
             // we do not want to process the underlying clock.
-            // this is handled by PauseContainer.
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -42,5 +41,7 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => underlyingClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
+
+        public IClock Source => underlyingClock;
     }
 }

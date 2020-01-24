@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<ButtonState> StateChanged;
 
+        public readonly Key TriggerKey;
+
         private readonly Container iconText;
         private readonly Container box;
         private readonly Box boxHoverLayer;
@@ -43,7 +45,6 @@ namespace osu.Game.Screens.Menu
         public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
-        private readonly Key triggerKey;
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
@@ -53,7 +54,7 @@ namespace osu.Game.Screens.Menu
         {
             this.sampleName = sampleName;
             this.clickAction = clickAction;
-            this.triggerKey = triggerKey;
+            TriggerKey = triggerKey;
 
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
@@ -92,7 +93,7 @@ namespace osu.Game.Screens.Menu
                         {
                             EdgeSmoothness = new Vector2(1.5f, 0),
                             RelativeSizeAxes = Axes.Both,
-                            Blending = BlendingMode.Additive,
+                            Blending = BlendingParameters.Additive,
                             Colour = Color4.White,
                             Alpha = 0,
                         },
@@ -193,10 +194,10 @@ namespace osu.Game.Screens.Menu
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -210,7 +211,7 @@ namespace osu.Game.Screens.Menu
             if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
                 return false;
 
-            if (triggerKey == e.Key && triggerKey != Key.Unknown)
+            if (TriggerKey == e.Key && TriggerKey != Key.Unknown)
             {
                 trigger();
                 return true;
@@ -235,7 +236,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
+            iconText.Alpha = Math.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
             base.Update();
         }
 

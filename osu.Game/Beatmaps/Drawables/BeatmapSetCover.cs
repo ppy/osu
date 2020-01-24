@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Beatmaps.Drawables
 {
+    [LongRunningLoad]
     public class BeatmapSetCover : Sprite
     {
         private readonly BeatmapSetInfo set;

@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             get => zoomTarget;
             set
             {
-                value = MathHelper.Clamp(value, MinZoom, MaxZoom);
+                value = Math.Clamp(value, MinZoom, MaxZoom);
 
                 if (IsLoaded)
                     setZoomTarget(value, ToSpaceOfOtherDrawable(new Vector2(DrawWidth / 2, 0), zoomedContent).X);
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private void setZoomTarget(float newZoom, float focusPoint)
         {
-            zoomTarget = MathHelper.Clamp(newZoom, MinZoom, MaxZoom);
+            zoomTarget = Math.Clamp(newZoom, MinZoom, MaxZoom);
             transformZoomTo(zoomTarget, focusPoint, ZoomDuration, ZoomEasing);
         }
 
