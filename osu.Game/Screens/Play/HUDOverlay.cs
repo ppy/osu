@@ -131,7 +131,6 @@ namespace osu.Game.Screens.Play
                 BindDrawableRuleset(drawableRuleset);
 
                 Progress.Objects = drawableRuleset.Objects;
-                Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
                 Progress.RequestSeek = time => RequestSeek(time);
                 Progress.ReferenceClock = drawableRuleset.FrameStableClock;
             }
