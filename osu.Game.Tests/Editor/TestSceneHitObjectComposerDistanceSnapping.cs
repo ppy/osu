@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
@@ -19,7 +20,13 @@ namespace osu.Game.Tests.Editor
         private TestHitObjectComposer composer;
 
         [Cached(typeof(EditorBeatmap))]
-        private readonly EditorBeatmap editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+        [Cached(typeof(IBeatSnapProvider))]
+        private readonly EditorBeatmap editorBeatmap;
+
+        public TestSceneHitObjectComposerDistanceSnapping()
+        {
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap(), BeatDivisor);
+        }
 
         [SetUp]
         public void Setup() => Schedule(() =>

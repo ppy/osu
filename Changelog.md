@@ -108,7 +108,7 @@
 *   添加了游戏Mods的翻译
 *   [将游戏Mods按钮文本字体变大](osu.Game/Overlays/Mods/ModButton.cs)
 *   整合更新
-    *   [M] [#7561 - 修复在比赛段的一个硬崩溃如果一局中包含一个空谱面](https://github.com/ppy/osu/pull/7561)
+    *   [M] [#7561 - 修复在比赛端的一个硬崩溃如果一局中包含一个空谱面](https://github.com/ppy/osu/pull/7561)
     *   [M] [#7564 - Update license year](https://github.com/ppy/osu/pull/7564)
 
 ## 2020/1/22:
@@ -120,3 +120,7 @@
     *   [M] [#7585, #7587 - Apply OnRelease method signature refactorings, 更新framework]()
         * [#7585](https://github.com/ppy/osu/pull/7585) 
         * [#7587](https://github.com/ppy/osu/pull/7587)
+    *   [M] [#7588 - Move beat snapping to its own interface](https://github.com/ppy/osu/pull/7588)
+    *   [M] [#7590 - 更新一些国家的名称](https://github.com/ppy/osu/pull/7590)
+    *   [M] [#7592 - Add TotalCommentsCounter to CommentsContainer](https://github.com/ppy/osu/pull/7592)
+    *   [M] [#7594 - Fix editor rate adjustment polluting global beatmap rate](https://github.com/ppy/osu/pull/7594)

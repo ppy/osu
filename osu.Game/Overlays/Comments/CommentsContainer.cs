@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Comments
 {
     public class CommentsContainer : CompositeDrawable
     {
-        private readonly CommentableType type;
-        private readonly long id;
+        private CommentableType type;
+        private long? id;
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
@@ -38,12 +38,10 @@ namespace osu.Game.Overlays.Comments
         private readonly FillFlowContainer content;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
+        private readonly TotalCommentsCounter commentCounter;
 
-        public CommentsContainer(CommentableType type, long id)
+        public CommentsContainer()
         {
-            this.type = type;
-            this.id = id;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
@@ -59,6 +57,7 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
+                        commentCounter = new TotalCommentsCounter(),
                         new CommentsHeader
                         {
                             Sort = { BindTarget = Sort },
@@ -101,7 +100,8 @@ namespace osu.Game.Overlays.Comments
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Margin = new MarginPadding(5),
-                                                Action = getComments
+                                                Action = getComments,
+                                                IsLoading = true,
                                             }
                                         }
                                     }
@@ -121,11 +121,27 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            Sort.BindValueChanged(onSortChanged, true);
+            Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }
 
-        private void onSortChanged(ValueChangedEvent<CommentsSortCriteria> sort)
+        /// <param name="type">The type of resource to get comments for.</param>
+        /// <param name="id">The id of the resource to get comments for.</param>
+        public void ShowComments(CommentableType type, long id)
+        {
+            this.type = type;
+            this.id = id;
+
+            if (!IsLoaded)
+                return;
+
+            // only reset when changing ID/type. other refetch ops are generally just changing sort order.
+            commentCounter.Current.Value = 0;
+
+            refetchComments();
+        }
+
+        private void refetchComments()
         {
             clearComments();
             getComments();
@@ -133,9 +149,12 @@ namespace osu.Game.Overlays.Comments
 
         private void getComments()
         {
+            if (!id.HasValue)
+                return;
+
             request?.Cancel();
             loadCancellation?.Cancel();
-            request = new GetCommentsRequest(type, id, Sort.Value, currentPage++);
+            request = new GetCommentsRequest(type, id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
             api.Queue(request);
         }
@@ -152,7 +171,7 @@ namespace osu.Game.Overlays.Comments
         {
             loadCancellation = new CancellationTokenSource();
 
-            FillFlowContainer page = new FillFlowContainer
+            var page = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
@@ -184,6 +203,8 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
+
+                commentCounter.Current.Value = response.Total;
 
                 moreButton.FadeTo(response.HasMore ? 1 : 0);
             }, loadCancellation.Token);

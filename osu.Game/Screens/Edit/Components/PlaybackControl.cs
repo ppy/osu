@@ -27,14 +27,12 @@ namespace osu.Game.Screens.Edit.Components
 
         private IAdjustableClock adjustableClock;
 
-        private readonly BindableDouble playbackSpeed = new BindableDouble(1.0);
+        private readonly BindableNumber<double> tempo = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
         private void load(IAdjustableClock adjustableClock)
         {
             this.adjustableClock = adjustableClock;
-
-            PlaybackTabControl tabs;
 
             Children = new Drawable[]
             {
@@ -62,16 +60,18 @@ namespace osu.Game.Screens.Edit.Components
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.5f,
                     Padding = new MarginPadding { Left = 45 },
-                    Child = tabs = new PlaybackTabControl(),
+                    Child = new PlaybackTabControl { Current = tempo },
                 }
             };
 
-            tabs.Current.ValueChanged += tempo =>
-            {
-                Beatmap.Value?.Track.ResetSpeedAdjustments();
-                playbackSpeed.Value = tempo.NewValue;
-                Beatmap.Value?.Track.AddAdjustment(AdjustableProperty.Tempo, playbackSpeed);
-            };
+            Track?.AddAdjustment(AdjustableProperty.Tempo, tempo);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            Track?.RemoveAdjustment(AdjustableProperty.Tempo, tempo);
+
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
