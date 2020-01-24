@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Show converted beatmaps",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
-                new SettingsSlider<double, StarSlider>
+                new SettingsSlider<double, StarsSlider>
                 {
                     LabelText = "Display beatmaps from",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
@@ -49,12 +49,12 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             };
         }
 
-        private class MaximumStarsSlider : StarSlider
+        private class MaximumStarsSlider : StarsSlider
         {
             public override string TooltipText => Current.IsDefault ? "no limit" : base.TooltipText;
         }
 
-        private class StarSlider : OsuSliderBar<double>
+        private class StarsSlider : OsuSliderBar<double>
         {
             public override string TooltipText => Current.Value.ToString(@"0.## stars");
         }
