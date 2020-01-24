@@ -37,10 +37,10 @@ namespace osu.Game.Overlays
             });
         }
 
-        protected override void OnAccentColourChanged(ValueChangedEvent<Color4> colour)
+        protected override void LoadComplete()
         {
-            base.OnAccentColourChanged(colour);
-            bar.Colour = colour.NewValue;
+            base.LoadComplete();
+            AccentColourBindable.BindValueChanged(colour => bar.Colour = colour.NewValue, true);
         }
 
         protected override Dropdown<T> CreateDropdown() => null;
