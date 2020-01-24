@@ -46,6 +46,8 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool AllowRateAdjustments => false;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
@@ -262,12 +264,6 @@ namespace osu.Game.Screens.Edit
         {
         }
 
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-            Beatmap.Value.Track?.Stop();
-        }
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -291,7 +287,6 @@ namespace osu.Game.Screens.Edit
 
         private void resetTrack(bool seekToStart = false)
         {
-            Beatmap.Value.Track?.ResetSpeedAdjustments();
             Beatmap.Value.Track?.Stop();
 
             if (seekToStart)
