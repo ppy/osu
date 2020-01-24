@@ -25,13 +25,12 @@ namespace osu.Game.Screens.Select
         public OptionalRange<BeatmapSetOnlineStatus> OnlineStatus;
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
+        public OptionalRange<double> UserStarDifficulty;
 
         public string[] SearchTerms = Array.Empty<string>();
 
         public RulesetInfo Ruleset;
         public bool AllowConvertedBeatmaps;
-        public double DisplayStarsMinimum;
-        public double DisplayStarsMaximum;
 
         private string searchText;
 

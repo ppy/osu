@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(Beatmap.Metadata.Artist) ||
                      criteria.Artist.Matches(Beatmap.Metadata.ArtistUnicode);
 
-            match &= Beatmap.StarDifficulty >= criteria.DisplayStarsMinimum && Beatmap.StarDifficulty <= criteria.DisplayStarsMaximum;
+            match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(Beatmap.StarDifficulty);
 
             if (match)
             {
