@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
         public Color4 Dark1 => convert(0.2f, 0.35f);
         public Color4 Dark2 => convert(0.2f, 0.3f);
         public Color4 Dark3 => convert(0.2f, 0.25f);
-        public Color4 Dark4 => convert(0.2f, 0.20f);
+        public Color4 Dark4 => convert(0.2f, 0.2f);
         public Color4 Dark5 => convert(0.2f, 0.15f);
         public Color4 Dark6 => convert(0.2f, 0.1f);
         public Color4 Foreground1 => convert(0.1f, 0.6f);
