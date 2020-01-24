@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
         public override void OnNewJudgement(JudgementResult judgement) => judgementsFlow.Push(GetColourForHitResult(HitWindows.ResultFor(judgement.TimeOffset)));
 
-        private class JudgementFlow : FillFlowContainer<DrawableResult>
+        private class JudgementFlow : FillFlowContainer<HitErrorCircle>
         {
             private const int max_available_judgements = 20;
             private const int drawable_judgement_size = 8;
@@ -48,46 +48,43 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             public void Push(Color4 colour)
             {
-                Add(new DrawableResult(colour, drawable_judgement_size));
+                Add(new HitErrorCircle(colour, drawable_judgement_size));
 
                 if (Children.Count > max_available_judgements)
                     Children.FirstOrDefault(c => !c.IsRemoved)?.Remove();
             }
         }
 
-        private class DrawableResult : Container
+        private class HitErrorCircle : Container
         {
             public bool IsRemoved { get; private set; }
 
-            private readonly CircularContainer content;
+            private readonly Circle circle;
 
-            public DrawableResult(Color4 colour, int size)
+            public HitErrorCircle(Color4 colour, int size)
             {
                 Size = new Vector2(size);
-                Child = content = new CircularContainer
+                Child = circle = new Circle
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
                     Alpha = 0,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colour
-                    },
+                    Colour = colour
                 };
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                content.FadeInFromZero(animation_duration, Easing.OutQuint);
-                content.MoveToY(-DrawSize.Y);
-                content.MoveToY(0, animation_duration, Easing.OutQuint);
+
+                circle.FadeInFromZero(animation_duration, Easing.OutQuint);
+                circle.MoveToY(-DrawSize.Y);
+                circle.MoveToY(0, animation_duration, Easing.OutQuint);
             }
 
             public void Remove()
             {
                 IsRemoved = true;
+
                 this.FadeOut(animation_duration, Easing.OutQuint).Expire();
             }
         }
