@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.Editor
                 },
                 new TimelineArea
                 {
-                    Child = new TimelineBlueprintContainer(editorBeatmap),
+                    Child = new TimelineBlueprintContainer(),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
