@@ -135,7 +135,9 @@ namespace osu.Game.Overlays.Comments
             if (!IsLoaded)
                 return;
 
+            // only reset when changing ID/type. other refetch ops are generally just changing sort order.
             commentCounter.Current.Value = 0;
+
             refetchComments();
         }
 
