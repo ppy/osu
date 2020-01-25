@@ -25,7 +25,6 @@ namespace osu.Game.Overlays
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly BasicScrollContainer scrollFlow;
-        private readonly Box background;
         private readonly Container tableContainer;
         private readonly DimmedLoadingLayer loading;
 
@@ -40,9 +39,10 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.1f),
                 },
                 scrollFlow = new BasicScrollContainer
                 {
@@ -84,17 +84,6 @@ namespace osu.Game.Overlays
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
-        {
-            Waves.FirstWaveColour = colour.Green;
-            Waves.SecondWaveColour = colour.GreenLight;
-            Waves.ThirdWaveColour = colour.GreenDark;
-            Waves.FourthWaveColour = colour.GreenDarker;
-
-            background.Colour = OsuColour.Gray(0.1f);
         }
 
         protected override void LoadComplete()
