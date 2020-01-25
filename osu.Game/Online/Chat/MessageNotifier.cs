@@ -35,6 +35,7 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnChat;
         private Bindable<User> localUser;
+        private BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
@@ -43,14 +44,16 @@ namespace osu.Game.Online.Chat
             notifyOnChat = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
             localUser = api.LocalUser;
 
+            channelManager.JoinedChannels.BindTo(joinedChannels);
+
             // Listen for new messages
-            channelManager.JoinedChannels.ItemsAdded += joinedChannels =>
+            joinedChannels.ItemsAdded += joinedChannels =>
             {
                 foreach (var channel in joinedChannels)
                     channel.NewMessagesArrived += channel_NewMessagesArrived;
             };
 
-            channelManager.JoinedChannels.ItemsRemoved += leftChannels =>
+            joinedChannels.ItemsRemoved += leftChannels =>
             {
                 foreach (var channel in leftChannels)
                     channel.NewMessagesArrived -= channel_NewMessagesArrived;
@@ -116,7 +119,7 @@ namespace osu.Game.Online.Chat
 
         private void checkForMentions(Channel channel, Message message, string username)
         {
-            if (!notifyOnMention.Value || !isMentioning(message.Content, username))
+            if (!notifyOnMention.Value || !IsMentioning(message.Content, username))
                 return;
 
             var notification = new MentionNotification(message.Sender.Username, channel);
