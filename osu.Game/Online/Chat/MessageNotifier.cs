@@ -35,7 +35,7 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> notifyOnMention;
         private Bindable<bool> notifyOnChat;
         private Bindable<User> localUser;
-        private BindableList<Channel> joinedChannels = new BindableList<Channel>();
+        private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, IAPIProvider api)
