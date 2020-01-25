@@ -6,7 +6,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK.Graphics;
@@ -23,11 +22,6 @@ namespace osu.Game.Overlays
         protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
             this.colourScheme = colourScheme;
-
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -53,7 +47,13 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.Cache(new OverlayColourProvider(colourScheme));
+            OverlayColourProvider colourProvider;
+            dependencies.Cache(colourProvider = new OverlayColourProvider(colourScheme));
+
+            Waves.FirstWaveColour = colourProvider.Highlight1;
+            Waves.SecondWaveColour = colourProvider.Link4;
+            Waves.ThirdWaveColour = colourProvider.Dark3;
+            Waves.FourthWaveColour = colourProvider.Dark1;
         }
 
         public override void Show()
