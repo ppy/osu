@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -117,21 +116,25 @@ namespace osu.Game.Online.Chat
 
         private void checkForMentions(Channel channel, Message message, string username)
         {
-            if (!notifyOnMention.Value || !anyCaseInsensitive(getWords(message.Content), username))
+            if (!notifyOnMention.Value || !isMentioning(message.Content, username))
                 return;
 
             var notification = new MentionNotification(message.Sender.Username, channel);
             notificationOverlay?.Post(notification);
         }
 
-        private IEnumerable<string> getWords(string input) => Regex.Matches(input, @"\w+", RegexOptions.Compiled).Select(c => c.Value);
-
         /// <summary>
-        /// Finds the first matching string/word in both <paramref name="x"/> and <paramref name="y"/> (case-insensitive)
+        /// Checks if <paramref name="message"/> contains <paramref name="username"/>, if not, retries making spaces into underscores.
         /// </summary>
-        private static string hasCaseInsensitive(IEnumerable<string> x, IEnumerable<string> y) => x.FirstOrDefault(x2 => anyCaseInsensitive(y, x2));
+        /// <returns>If the <paramref name="message"/> mentions the <paramref name="username"/></returns>
+        private bool isMentioning(string message, string username)
+        {
+            // sanitize input to handle casing
+            message = message.ToLower();
+            username = username.ToLower();
 
-        private static bool anyCaseInsensitive(IEnumerable<string> x, string y) => x.Any(x2 => x2.Equals(y, StringComparison.OrdinalIgnoreCase));
+            return message.Contains(username) || message.Contains(username.Replace(' ', '_'));
+        }
 
         public class PrivateMessageNotification : SimpleNotification
         {
