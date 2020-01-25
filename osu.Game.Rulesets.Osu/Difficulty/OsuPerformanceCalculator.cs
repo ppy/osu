@@ -132,9 +132,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 double hiddenFactor = Attributes.AimHiddenFactor;
 
-                // the buff starts decreasing at AR10 and reaches 0 at AR11
-                if (Attributes.ApproachRate > 10)
-                    hiddenFactor = 1 + Math.Max(1 - 2 * (Attributes.ApproachRate - 10), 0) * (hiddenFactor - 1);
+                // the buff starts decreasing at AR9.75 and reaches 0 at AR10.75
+                if (Attributes.ApproachRate > 10.75)
+                    hiddenFactor = 1;
+                else if (Attributes.ApproachRate > 9.75)
+                    hiddenFactor = 1 + (1 - Math.Pow(Math.Sin((Attributes.ApproachRate - 9.75) * Math.PI / 2), 2)) * (hiddenFactor - 1);
 
                 tp *= hiddenFactor;
             }
