@@ -111,7 +111,6 @@ platform :ios do
 
     souyuz(
       platform: "ios",
-      build_target: "osu_iOS",
       plist_path: "../osu.iOS/Info.plist"
     )
   end
