@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.TopRight,
                     Margin = new MarginPadding { Right = 15, Top = 5 }
                 },
-                exitConfirmOverlay.CreateProxy()
+                exitConfirmOverlay?.CreateProxy() ?? Drawable.Empty()
             });
 
             buttons.StateChanged += state =>
