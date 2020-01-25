@@ -66,9 +66,6 @@ namespace osu.Game.Online.Chat
             HandleMessages(messages.First().ChannelId, messages);
         }
 
-        /// <remarks>
-        /// Resolves the channel id
-        /// </remarks>
         public void HandleMessages(long channelId, IEnumerable<Message> messages)
         {
             var channel = channelManager.JoinedChannels.SingleOrDefault(c => c.Id == channelId);
