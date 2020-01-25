@@ -130,7 +130,7 @@ namespace osu.Game.Online.Chat
         /// Checks if <paramref name="message"/> contains <paramref name="username"/>, if not, retries making spaces into underscores.
         /// </summary>
         /// <returns>If the <paramref name="message"/> mentions the <paramref name="username"/></returns>
-        private bool isMentioning(string message, string username)
+        public bool IsMentioning(string message, string username)
         {
             // sanitize input to handle casing
             message = message.ToLower();
