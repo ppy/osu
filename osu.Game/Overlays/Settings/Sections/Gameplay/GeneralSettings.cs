@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "显示难度分布图",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "即使你无法失败,也显示分数计界面",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                     Keywords = new[] { "hp", "bar" }
