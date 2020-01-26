@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
@@ -12,11 +11,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
     public class ProfileRulesetSelector : OverlayRulesetSelector
     {
         public readonly Bindable<User> User = new Bindable<User>();
-
-        public ProfileRulesetSelector(OverlayColourScheme colourScheme)
-            : base(colourScheme)
-        {
-        }
 
         protected override void LoadComplete()
         {
