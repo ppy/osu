@@ -36,14 +36,14 @@ namespace osu.Game.Overlays
 
         private List<APIUpdateStream> streams;
 
+        public ChangelogOverlay()
+            : base(OverlayColourScheme.Purple)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {
-            Waves.FirstWaveColour = colour.GreyVioletLight;
-            Waves.SecondWaveColour = colour.GreyViolet;
-            Waves.ThirdWaveColour = colour.GreyVioletDark;
-            Waves.FourthWaveColour = colour.GreyVioletDarker;
-
             Children = new Drawable[]
             {
                 new Box
