@@ -22,6 +22,12 @@ namespace osu.Game.Overlays
             set => bar.Height = value;
         }
 
+        public override Color4 AccentColour
+        {
+            get => base.AccentColour;
+            set => base.AccentColour = bar.Colour = value;
+        }
+
         protected OverlayTabControl()
         {
             TabContainer.Masking = false;
@@ -34,12 +40,6 @@ namespace osu.Game.Overlays
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.CentreLeft
             });
-        }
-
-        protected override void OnAccentColourChanged(Color4 colour)
-        {
-            base.OnAccentColourChanged(colour);
-            bar.Colour = colour;
         }
 
         protected override Dropdown<T> CreateDropdown() => null;
