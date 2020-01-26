@@ -21,19 +21,16 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
-        protected readonly Bindable<Color4> AccentColourBindable = new Bindable<Color4>();
+        private Color4 accentColour;
 
         public Color4 AccentColour
         {
-            get => AccentColourBindable.Value;
+            get => accentColour;
             set
             {
-                AccentColourBindable.Value = value;
+                accentColour = value;
 
-                if (Dropdown is IHasAccentColour dropdown)
-                    dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
-                    i.AccentColour = value;
+                OnAccentColourChanged(value);
             }
         }
 
@@ -91,6 +88,14 @@ namespace osu.Game.Graphics.UserInterface
             // dont bother calculating if the strip is invisible
             if (strip.Colour.MaxAlpha > 0)
                 strip.Width = Interpolation.ValueAt(Math.Clamp(Clock.ElapsedFrameTime, 0, 1000), strip.Width, StripWidth, 0, 500, Easing.OutQuint);
+        }
+
+        protected virtual void OnAccentColourChanged(Color4 colour)
+        {
+            if (Dropdown is IHasAccentColour dropdown)
+                dropdown.AccentColour = colour;
+            foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                i.AccentColour = colour;
         }
 
         public class OsuTabItem : TabItem<T>, IHasAccentColour
