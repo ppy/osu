@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
             dependencies.Cache(colourProvider = new OverlayColourProvider(colourScheme));
 
             Waves.FirstWaveColour = colourProvider.Highlight1;
-            Waves.SecondWaveColour = colourProvider.Link4;
+            Waves.SecondWaveColour = colourProvider.Light4;
             Waves.ThirdWaveColour = colourProvider.Dark3;
             Waves.FourthWaveColour = colourProvider.Dark1;
         }
