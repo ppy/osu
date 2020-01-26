@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (AccentColour == default)
+            if (accentColour == default)
                 AccentColour = colours.Blue;
         }
 
