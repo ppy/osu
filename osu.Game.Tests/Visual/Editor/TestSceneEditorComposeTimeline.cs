@@ -38,6 +38,8 @@ namespace osu.Game.Tests.Visual.Editor
         {
             Beatmap.Value = new WaveformTestBeatmap(audio);
 
+            Dependencies.Cache(editorBeatmap);
+
             var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap);
 
             Children = new Drawable[]

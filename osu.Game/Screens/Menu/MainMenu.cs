@@ -78,13 +78,6 @@ namespace osu.Game.Screens.Menu
             holdDelay = config.GetBindable<float>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
 
-            AddInternal(songTicker = new SongTicker
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Margin = new MarginPadding { Right = 15, Top = 5 }
-            });
-
             if (host.CanExit)
             {
                 AddInternal(exitConfirmOverlay = new ExitConfirmOverlay
@@ -99,7 +92,7 @@ namespace osu.Game.Screens.Menu
                 });
             }
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
                 buttonsContainer = new ParallaxContainer
                 {
@@ -117,6 +110,13 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
+                songTicker = new SongTicker
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Margin = new MarginPadding { Right = 15, Top = 5 }
+                },
+                exitConfirmOverlay.CreateProxy()
             });
 
             buttons.StateChanged += state =>
@@ -236,10 +236,6 @@ namespace osu.Game.Screens.Menu
 
             buttons.State = ButtonSystemState.EnteringMode;
 
-            songTicker.FadeIn(100, Easing.InQuint);
-            songTicker.FadeOut(100, Easing.OutQuint);
-            songTicker.AllowUpdates = false;
-
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
             buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
@@ -249,8 +245,6 @@ namespace osu.Game.Screens.Menu
         public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            
-            songTicker.AllowUpdates = true;
 
             (Background as BackgroundScreenDefault)?.Next();
 
@@ -278,8 +272,10 @@ namespace osu.Game.Screens.Menu
             }
 
             buttons.State = ButtonSystemState.Exit;
-            this.FadeOut(3000);
+
             songTicker.Hide();
+
+            this.FadeOut(3000);
             return base.OnExiting(next);
         }
 
@@ -296,7 +292,7 @@ namespace osu.Game.Screens.Menu
                 {
                     new PopupDialogOkButton
                     {
-                        Text = @"是的",
+                        Text = @"再见",
                         Action = confirm
                     },
                     new PopupDialogCancelButton

@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private Drawable outline;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IPlacementHandler placementHandler { get; set; }
 
         public SelectionHandler()

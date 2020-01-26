@@ -5,6 +5,7 @@
 # 变更日志
 
 # 详细信息:
+# 2020.104.0
 ## 2020/1/8:
 ### 游戏界面
 *   [修正了比赛端的翻译错误](osu.Game.Tournament/TournamentSceneManager.cs)
@@ -27,7 +28,7 @@
     *   [O] [#7222 - 向"WindUp"和"WindDown"Mod添加反向选项](https://github.com/ppy/osu/pull/7222)
     *   [O] [#7334 - 向Catch和Std模式添加"镜像"Mod](https://github.com/ppy/osu/pull/7334)
     *   [O] [#7316 - 向击打圆圈添加kiai模式下的闪光](https://github.com/ppy/osu/pull/7316)
-    *   [O] [#7317 - 添加"打击结果"误差条](https://github.com/ppy/osu/pull/7317)
+    *   [M] [#7317 - 添加"打击结果"误差条](https://github.com/ppy/osu/pull/7317)
     *   [M] [#7438 - 添加登录占位符](https://github.com/ppy/osu/pull/7438)
     *   [M] [#7470 - 修复在退出编辑器后音乐速度没有恢复](https://github.com/ppy/osu/pull/7470)
     *   [M] [#7462 - 调整ctb和mania模式的生命恢复](https://github.com/ppy/osu/pull/7462)
@@ -47,10 +48,11 @@
 *   从官方pr处获取的更新
     *   [M] [#7450 - 修复osu!direct全局按键没有被正确绑定](https://github.com/ppy/osu/pull/7450)
 *   将[direct界面的排行榜]()的字体增大
-//////////////////////////////////////////////////////
+
+# 2020.118.0
 ## 2020/1/11:
 *   从官方pr处获取的更新
-    *   [?] [#7492 - 向主界面添加当前播放的音乐名](https://github.com/ppy/osu/pull/7492)
+    *   [M] [#7492 - 向主界面添加当前播放的音乐名](https://github.com/ppy/osu/pull/7492)
     *   [M] [#7485 - 观看回放时,显示当前回放的mods](https://github.com/ppy/osu/pull/7485)
 
 ## 2020/1/12:
@@ -102,8 +104,9 @@
     *   [M] [#7537 - *使无图标的mod显示首字母缩写词](https://github.com/ppy/osu/pull/7537)
     *   [M] [#7474 - 添加Benchmark项目](https://github.com/ppy/osu/pull/7474)
     *   [M] [#7479 - 在排行榜实现按国家分类(Implement CountryFilter component for RankingsOverlay)](https://github.com/ppy/osu/pull/7479)
-    *   [M] [#7534 - 修复tooltip语法](https://github.com/ppy/osu/pull/7534)
 
+
+# 2020.???.0
 ## 2020/1/20:
 *   添加了游戏Mods的翻译
 *   [将游戏Mods按钮文本字体变大](osu.Game/Overlays/Mods/ModButton.cs)
@@ -113,14 +116,25 @@
 
 ## 2020/1/22:
 *   整合更新
-    *   [M] [#7582 - Allow parsing hex colour codes with alpha](https://github.com/ppy/osu/pull/7582)
+    *   [M] [#7582 - *允许用alpha解析十六进制颜色代码](https://github.com/ppy/osu/pull/7582)
 
 ## 2020/1/24
 *   整合更新
-    *   [M] [#7585, #7587 - Apply OnRelease method signature refactorings, 更新framework]()
+    *   [M] [#7585, #7587 - 应用OnRelease方法签名重构, 更新framework]()
         * [#7585](https://github.com/ppy/osu/pull/7585) 
         * [#7587](https://github.com/ppy/osu/pull/7587)
     *   [M] [#7588 - Move beat snapping to its own interface](https://github.com/ppy/osu/pull/7588)
     *   [M] [#7590 - 更新一些国家的名称](https://github.com/ppy/osu/pull/7590)
-    *   [M] [#7592 - Add TotalCommentsCounter to CommentsContainer](https://github.com/ppy/osu/pull/7592)
+    *   [M] [#7592 - 将TotalCommentsCounter 添加至 CommentsContainer中](https://github.com/ppy/osu/pull/7592)
     *   [M] [#7594 - Fix editor rate adjustment polluting global beatmap rate](https://github.com/ppy/osu/pull/7594)
+*   移除整合
+    *   [O] [#5782 - 实现转盘额外分数](https://github.com/ppy/osu/pull/5782)        
+
+## 2020/1/25:
+*   整合更新
+    *   [M] [#7492 - 向主界面添加当前播放的音乐名](https://github.com/ppy/osu/pull/7492)
+    *   [M] [#7596 - Fix regressed input handling order](https://github.com/ppy/osu/pull/7596)
+    *   [M] [#7609 - 更新Framework](https://github.com/ppy/osu/pull/7609)
+    *   [M] [#7566 - Enforce using get-only auto property where possible](https://github.com/ppy/osu/pull/7566)
+    *   [未完成][M] [#7538 - Decouple blueprint container to allow usage in timeline](https://github.com/ppy/osu/pull/7538)
+    7538,7589,7541,3576,5247,7548,7577,7591,7460,7567

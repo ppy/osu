@@ -9,12 +9,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
-using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -37,24 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
-        public override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
-
-        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
-        {
-            switch (hitObject)
-            {
-                case DrawableHitCircle circle:
-                    return new HitCircleSelectionBlueprint(circle);
-
-                case DrawableSlider slider:
-                    return new SliderSelectionBlueprint(slider);
-
-                case DrawableSpinner spinner:
-                    return new SpinnerSelectionBlueprint(spinner);
-            }
-
-            return base.CreateBlueprintFor(hitObject);
-        }
+        protected override ComposeBlueprintContainer CreateBlueprintContainer() => new OsuBlueprintContainer(HitObjects);
 
         protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
         {

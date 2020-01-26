@@ -281,9 +281,9 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 RelativePositionAxes = Axes.Y,
                                 Y = 0.7f,
-                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                                 Origin = Anchor.Centre,
-                                Text = @"SKIP",
+                                Text = @"跳过",
                             },
                         }
                     }

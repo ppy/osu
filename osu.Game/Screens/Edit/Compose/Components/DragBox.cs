@@ -50,7 +50,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
             };
         }
 
-        public void UpdateDrag(MouseButtonEvent e)
+        /// <summary>
+        /// Handle a forwarded mouse event.
+        /// </summary>
+        /// <param name="e">The mouse event.</param>
+        /// <returns>Whether the event should be handled and blocking.</returns>
+        public virtual bool UpdateDrag(MouseButtonEvent e)
         {
             var dragPosition = e.ScreenSpaceMousePosition;
             var dragStartPosition = e.ScreenSpaceMouseDownPosition;
@@ -67,6 +72,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             box.Size = bottomRight - topLeft;
 
             performSelection?.Invoke(dragRectangle);
+            return true;
         }
     }
 }

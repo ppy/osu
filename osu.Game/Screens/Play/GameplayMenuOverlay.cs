@@ -266,24 +266,24 @@ namespace osu.Game.Screens.Play
             {
                 new OsuSpriteText
                 {
-                    Text = "You've retried ",
+                    Text = "你这次已经重试了",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    Font = OsuFont.GetFont(size: 18),
+                    Font = OsuFont.GetFont(size: 20),
                 },
                 new OsuSpriteText
                 {
-                    Text = "time".ToQuantity(retries),
-                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
+                    Text = " ".ToQuantity(retries),
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 20),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                 },
                 new OsuSpriteText
                 {
-                    Text = " in this session",
+                    Text = "次",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    Font = OsuFont.GetFont(size: 18),
+                    Font = OsuFont.GetFont(size: 20),
                 }
             };
         }

@@ -46,12 +46,12 @@ namespace osu.Game.Rulesets.Edit
         private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
-        private IBeatSnapProvider beatSnapProvider { get; set; }
+        private BindableBeatDivisor beatDivisor { get; set; }
 
         private IBeatmapProcessor beatmapProcessor;
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private BlueprintContainer blueprintContainer;
+        private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
         private DistanceSnapGrid distanceSnapGrid;
         private readonly List<Container> layerContainers = new List<Container>();
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Edit
                 new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
             });
 
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(blueprintContainer = new BlueprintContainer());
+            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(blueprintContainer = CreateBlueprintContainer());
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -233,6 +233,8 @@ namespace osu.Game.Rulesets.Edit
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
+        protected abstract ComposeBlueprintContainer CreateBlueprintContainer();
+
         protected abstract DrawableRuleset<TObject> CreateDrawableRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null);
 
         public void BeginPlacement(HitObject hitObject)
@@ -257,26 +259,40 @@ namespace osu.Game.Rulesets.Edit
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
             DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatSnapProvider.BeatDivisor);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatDivisor.Value);
         }
 
         public override float DurationToDistance(double referenceTime, double duration)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = EditorBeatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
         }
 
         public override double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
+            double beatLength = EditorBeatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
             return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance));
+            => beatSnap(referenceTime, DistanceToDuration(referenceTime, distance));
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance)));
+            => DurationToDistance(referenceTime, beatSnap(referenceTime, DistanceToDuration(referenceTime, distance)));
+
+        /// <summary>
+        /// Snaps a duration to the closest beat of a timing point applicable at the reference time.
+        /// </summary>
+        /// <param name="referenceTime">The time of the timing point which <paramref name="duration"/> resides in.</param>
+        /// <param name="duration">The duration to snap.</param>
+        /// <returns>A value that represents <paramref name="duration"/> snapped to the closest beat of the timing point.</returns>
+        private double beatSnap(double referenceTime, double duration)
+        {
+            double beatLength = EditorBeatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
+
+            // A 1ms offset prevents rounding errors due to minute variations in duration
+            return (int)((duration + 1) / beatLength) * beatLength;
+        }
 
         protected override void Dispose(bool isDisposing)
         {
@@ -308,17 +324,6 @@ namespace osu.Game.Rulesets.Edit
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
         public abstract bool CursorInPlacementArea { get; }
-
-        /// <summary>
-        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
-
-        /// <summary>
-        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
-        /// </summary>
-        public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
 
         /// <summary>
         /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
