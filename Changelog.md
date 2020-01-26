@@ -145,4 +145,4 @@
     *   [M] [#7577 - Make Difficulty Adjust mod customisation menu open automatically](https://github.com/ppy/osu/pull/7577)
     *   [M] [#7591 - Improve song select display on ultrawide displays (or when UI scale is set low)](https://github.com/ppy/osu/pull/7591)
     *   [M] [#7460 - Allow CommentsContainer refetch comments using a method](https://github.com/ppy/osu/pull/7460)
-    7567
+    *   [M] [#7567 - Update fastlane and plugins](https://github.com/ppy/osu/pull/7567)
