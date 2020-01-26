@@ -12,9 +12,9 @@ using osu.Framework.Bindables;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using NUnit.Framework;
-using osu.Game.Graphics;
 using osu.Framework.Graphics.Containers;
 using osuTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -40,14 +40,27 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Spacing = new Vector2(0, 5),
                 Children = new[]
                 {
-                    selector = new OverlayRulesetSelector(OverlayColourScheme.Green) { Current = ruleset },
-                    new OverlayRulesetSelector(OverlayColourScheme.Blue) { Current = ruleset },
-                    new OverlayRulesetSelector(OverlayColourScheme.Orange) { Current = ruleset },
-                    new OverlayRulesetSelector(OverlayColourScheme.Pink) { Current = ruleset },
-                    new OverlayRulesetSelector(OverlayColourScheme.Purple) { Current = ruleset },
-                    new OverlayRulesetSelector(OverlayColourScheme.Red) { Current = ruleset }
+                    new ColourProvidedContainer(OverlayColourScheme.Green, selector = new OverlayRulesetSelector { Current = ruleset }),
+                    new ColourProvidedContainer(OverlayColourScheme.Blue, new OverlayRulesetSelector { Current = ruleset }),
+                    new ColourProvidedContainer(OverlayColourScheme.Orange, new OverlayRulesetSelector { Current = ruleset }),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new OverlayRulesetSelector { Current = ruleset }),
+                    new ColourProvidedContainer(OverlayColourScheme.Purple, new OverlayRulesetSelector { Current = ruleset }),
+                    new ColourProvidedContainer(OverlayColourScheme.Red, new OverlayRulesetSelector { Current = ruleset }),
                 }
             });
+        }
+
+        private class ColourProvidedContainer : Container
+        {
+            [Cached]
+            private readonly OverlayColourProvider colourProvider;
+
+            public ColourProvidedContainer(OverlayColourScheme colourScheme, OverlayRulesetSelector rulesetSelector)
+            {
+                colourProvider = new OverlayColourProvider(colourScheme);
+                AutoSizeAxes = Axes.Both;
+                Add(rulesetSelector);
+            }
         }
 
         [Test]
