@@ -23,8 +23,7 @@ namespace osu.Game.Overlays
 
         private readonly Box controlBackground;
 
-        protected TabControlOverlayHeader(OverlayColourScheme colourScheme)
-            : base(colourScheme)
+        protected TabControlOverlayHeader()
         {
             HeaderInfo.Add(new Container
             {
@@ -42,10 +41,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            TabControl.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.75f);
-            controlBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.2f);
+            TabControl.AccentColour = colourProvider.Highlight1;
+            controlBackground.Colour = colourProvider.Dark4;
         }
 
         [NotNull]
