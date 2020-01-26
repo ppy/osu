@@ -106,7 +106,7 @@
     *   [M] [#7479 - 在排行榜实现按国家分类(Implement CountryFilter component for RankingsOverlay)](https://github.com/ppy/osu/pull/7479)
 
 
-# 2020.???.0
+# 2020.125.0
 ## 2020/1/20:
 *   添加了游戏Mods的翻译
 *   [将游戏Mods按钮文本字体变大](osu.Game/Overlays/Mods/ModButton.cs)
@@ -133,16 +133,18 @@
 ## 2020/1/25:
 *   整合更新
     *   [M] [#7492 - 向主界面添加当前播放的音乐名](https://github.com/ppy/osu/pull/7492)
-    *   [M] [#7596 - Fix regressed input handling order](https://github.com/ppy/osu/pull/7596)
+    *   [M] [#7596 - *修正回归输入处理顺序](https://github.com/ppy/osu/pull/7596)
     *   [M] [#7609 - 更新Framework](https://github.com/ppy/osu/pull/7609)
-    *   [M] [#7566 - Enforce using get-only auto property where possible](https://github.com/ppy/osu/pull/7566)
-    *   [M] [#7538 - Decouple blueprint container to allow usage in timeline](https://github.com/ppy/osu/pull/7538)
-    *   [M] [#7589 - Expand editor timeline functionality](https://github.com/ppy/osu/pull/7589)
-    *   [M] [#7541 - Implement colour schemes for OverlayHeader](https://github.com/ppy/osu/pull/7541)
-    *   [M] [#3576 - Hook up star rating filter](https://github.com/ppy/osu/pull/3576)
-    *   [M] [#5247 - Add setting to show the song difficulty graph](https://github.com/ppy/osu/pull/5247)
-    *   [M] [#7548 - Add mod setting (de)serialization support](https://github.com/ppy/osu/pull/7548)
-    *   [M] [#7577 - Make Difficulty Adjust mod customisation menu open automatically](https://github.com/ppy/osu/pull/7577)
-    *   [M] [#7591 - Improve song select display on ultrawide displays (or when UI scale is set low)](https://github.com/ppy/osu/pull/7591)
-    *   [M] [#7460 - Allow CommentsContainer refetch comments using a method](https://github.com/ppy/osu/pull/7460)
-    *   [M] [#7567 - Update fastlane and plugins](https://github.com/ppy/osu/pull/7567)
+    *   [M] [#7566 - *尽可能使用仅获取自动属性](https://github.com/ppy/osu/pull/7566)
+    *   [M] [#7538 - *解耦蓝图容器以允许在时间轴中使用](https://github.com/ppy/osu/pull/7538)
+    *   [M] [#7589 - *扩展编辑器时间轴功能](https://github.com/ppy/osu/pull/7589)
+    *   [M] [#7541 - *实现OverlayHeader的配色方案](https://github.com/ppy/osu/pull/7541)
+    *   [M] [#3576 - *连接星级过滤器](https://github.com/ppy/osu/pull/3576)
+    *   [M] [#5247 - 添加显示难度分布表的设置](https://github.com/ppy/osu/pull/5247)
+    *   [M] [#7548 - 添加Mod设置的 (de)serialization 支持](https://github.com/ppy/osu/pull/7548)
+    *   [M] [#7577 - 使`难度调整`被选择时自动打开自定义界面](https://github.com/ppy/osu/pull/7577)
+    *   [M] [#7591 - 改进在超宽屏上(或超低UI缩放时)的歌曲选择显示](https://github.com/ppy/osu/pull/7591)
+    *   [M] [#7460 - *允许CommentContainer使用一种方法重新获取评论](https://github.com/ppy/osu/pull/7460)
+    *   [M] [#7567 - 更新fastlane和一些插件](https://github.com/ppy/osu/pull/7567)
+
+*   **暂时移除了自动下载更新的功能**

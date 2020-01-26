@@ -55,9 +55,9 @@ namespace osu.Desktop
             {
                 LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, Add);
 
-                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
-                    Add(new SquirrelUpdateManager());
-                else
+               // if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+               //     Add(new SquirrelUpdateManager());
+               // else
                     Add(new SimpleUpdateManager());
             }
 
