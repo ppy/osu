@@ -42,39 +42,29 @@ namespace osu.Game.Overlays
         // See https://github.com/ppy/osu-web/blob/4218c288292d7c810b619075471eaea8bbb8f9d8/app/helpers.php#L1463
         private static float getBaseHue(OverlayColourScheme colourScheme)
         {
-            float hue;
-
             switch (colourScheme)
             {
                 default:
                     throw new ArgumentException($@"{colourScheme} colour scheme does not provide a hue value in {nameof(getBaseHue)}.");
 
                 case OverlayColourScheme.Red:
-                    hue = 0;
-                    break;
+                    return 0;
 
                 case OverlayColourScheme.Pink:
-                    hue = 333;
-                    break;
+                    return 333 / 360f;
 
                 case OverlayColourScheme.Orange:
-                    hue = 46;
-                    break;
+                    return 46 / 360f;
 
                 case OverlayColourScheme.Green:
-                    hue = 115;
-                    break;
+                    return 115 / 360f;
 
                 case OverlayColourScheme.Purple:
-                    hue = 255;
-                    break;
+                    return 255 / 360f;
 
                 case OverlayColourScheme.Blue:
-                    hue = 200;
-                    break;
+                    return 200 / 360f;
             }
-
-            return hue / 360f;
         }
     }
 
