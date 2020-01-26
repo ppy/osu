@@ -59,10 +59,10 @@ namespace osu.Game.Overlays
         public Color4 Highlight1 => convert(1, 0.7f);
         public Color4 Content1 => convert(0.4f, 1);
         public Color4 Content2 => convert(0.4f, 0.9f);
-        public Color4 Link1 => convert(0.4f, 0.8f);
-        public Color4 Link2 => convert(0.4f, 0.75f);
-        public Color4 Link3 => convert(0.4f, 0.7f);
-        public Color4 Link4 => convert(0.4f, 0.5f);
+        public Color4 Light1 => convert(0.4f, 0.8f);
+        public Color4 Light2 => convert(0.4f, 0.75f);
+        public Color4 Light3 => convert(0.4f, 0.7f);
+        public Color4 Light4 => convert(0.4f, 0.5f);
         public Color4 Dark1 => convert(0.2f, 0.35f);
         public Color4 Dark2 => convert(0.2f, 0.3f);
         public Color4 Dark3 => convert(0.2f, 0.25f);
