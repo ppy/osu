@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Gameplay
                         switch (global)
                         {
                             case GlobalSkinConfiguration.ComboColours:
-                                return SkinUtils.As<TValue>(new Bindable<List<Color4>>(ComboColours));
+                                return SkinUtils.As<TValue>(new Bindable<IReadOnlyList<Color4>>(ComboColours));
                         }
 
                         break;

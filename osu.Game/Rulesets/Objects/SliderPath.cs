@@ -7,7 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
 using osu.Framework.Caching;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Objects
             get
             {
                 ensureValid();
-                return cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+                return cumulativeLength.Count == 0 ? 0 : cumulativeLength[^1];
             }
         }
 
@@ -251,7 +251,7 @@ namespace osu.Game.Rulesets.Objects
                 if (calculatedLength > expectedDistance)
                 {
                     // The path will be shortened further, in which case we should trim any more unnecessary lengths and their associated path segments
-                    while (cumulativeLength.Count > 0 && cumulativeLength[cumulativeLength.Count - 1] >= expectedDistance)
+                    while (cumulativeLength.Count > 0 && cumulativeLength[^1] >= expectedDistance)
                     {
                         cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
                         calculatedPath.RemoveAt(pathEndIndex--);
@@ -269,7 +269,7 @@ namespace osu.Game.Rulesets.Objects
                 // The direction of the segment to shorten or lengthen
                 Vector2 dir = (calculatedPath[pathEndIndex] - calculatedPath[pathEndIndex - 1]).Normalized();
 
-                calculatedPath[pathEndIndex] = calculatedPath[pathEndIndex - 1] + dir * (float)(expectedDistance - cumulativeLength[cumulativeLength.Count - 1]);
+                calculatedPath[pathEndIndex] = calculatedPath[pathEndIndex - 1] + dir * (float)(expectedDistance - cumulativeLength[^1]);
                 cumulativeLength.Add(expectedDistance);
             }
         }

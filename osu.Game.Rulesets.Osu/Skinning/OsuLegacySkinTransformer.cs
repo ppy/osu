@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
         /// Their hittable area is 128px, but the actual circle portion is 118px.
         /// We must account for some gameplay elements such as slider bodies, where this padding is not present.
         /// </summary>
-        private const float legacy_circle_radius = 64 - 5;
+        public const float LEGACY_CIRCLE_RADIUS = 64 - 5;
 
         public OsuLegacySkinTransformer(ISkinSource source)
         {
@@ -70,6 +70,12 @@ namespace osu.Game.Rulesets.Osu.Skinning
                             Size = size
                         };
                     }
+
+                    return null;
+
+                case OsuSkinComponents.SliderBody:
+                    if (hasHitCircle.Value)
+                        return new LegacySliderBody();
 
                     return null;
 
@@ -124,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Skinning
                     {
                         case OsuSkinConfiguration.SliderPathRadius:
                             if (hasHitCircle.Value)
-                                return SkinUtils.As<TValue>(new BindableFloat(legacy_circle_radius));
+                                return SkinUtils.As<TValue>(new BindableFloat(LEGACY_CIRCLE_RADIUS));
 
                             break;
                     }

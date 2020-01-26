@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [Resolved]
-        private AudioManager audio { get; set; }
+        protected AudioManager Audio { get; private set; }
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
@@ -113,7 +113,7 @@ namespace osu.Game.Tests.Visual
             CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
-            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, audio);
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)

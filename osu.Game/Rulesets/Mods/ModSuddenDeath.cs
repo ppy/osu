@@ -6,15 +6,14 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor, IApplicableFailOverride
+    public abstract class ModSuddenDeath : Mod, IApplicableToHealthProcessor, IApplicableFailOverride
     {
         public override string Name => "Sudden Death";
         public override string Acronym => "SD";
-        public override IconUsage Icon => OsuIcon.ModSuddendeath;
+        public override IconUsage? Icon => OsuIcon.ModSuddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Miss and fail.";
         public override double ScoreMultiplier => 1;
@@ -24,13 +23,11 @@ namespace osu.Game.Rulesets.Mods
         public bool AllowFail => true;
         public bool RestartOnFail => true;
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            scoreProcessor.FailConditions += FailCondition;
+            healthProcessor.FailConditions += FailCondition;
         }
 
-        public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
-
-        protected virtual bool FailCondition(ScoreProcessor scoreProcessor, JudgementResult result) => scoreProcessor.Combo.Value == 0 && result.Judgement.AffectsCombo;
+        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => !result.IsHit && result.Judgement.AffectsCombo;
     }
 }

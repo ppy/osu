@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void addPart(Vector2 screenSpacePosition)
         {
             parts[currentIndex].Position = screenSpacePosition;
-            parts[currentIndex].Time = time;
+            parts[currentIndex].Time = time + 1;
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
 
-            private readonly TrailBatch vertexBatch = new TrailBatch(max_sprites, 1);
+            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
@@ -227,23 +227,52 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 shader.Bind();
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
-                for (int i = 0; i < parts.Length; ++i)
+                texture.TextureGL.Bind();
+
+                RectangleF textureRect = texture.GetTextureRect();
+
+                foreach (var part in parts)
                 {
-                    if (parts[i].InvalidationID == -1)
+                    if (part.InvalidationID == -1)
                         continue;
 
-                    vertexBatch.DrawTime = parts[i].Time;
+                    if (time - part.Time >= 1)
+                        continue;
 
-                    Vector2 pos = parts[i].Position;
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y + size.Y / 2),
+                        TexturePosition = textureRect.BottomLeft,
+                        Colour = DrawColourInfo.Colour.BottomLeft.Linear,
+                        Time = part.Time
+                    });
 
-                    DrawQuad(
-                        texture,
-                        new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
-                        DrawColourInfo.Colour,
-                        null,
-                        vertexBatch.AddAction);
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y + size.Y / 2),
+                        TexturePosition = textureRect.BottomRight,
+                        Colour = DrawColourInfo.Colour.BottomRight.Linear,
+                        Time = part.Time
+                    });
+
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y - size.Y / 2),
+                        TexturePosition = textureRect.TopRight,
+                        Colour = DrawColourInfo.Colour.TopRight.Linear,
+                        Time = part.Time
+                    });
+
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y - size.Y / 2),
+                        TexturePosition = textureRect.TopLeft,
+                        Colour = DrawColourInfo.Colour.TopLeft.Linear,
+                        Time = part.Time
+                    });
                 }
 
+                vertexBatch.Draw();
                 shader.Unbind();
             }
 
@@ -252,25 +281,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 base.Dispose(isDisposing);
 
                 vertexBatch.Dispose();
-            }
-
-            // Todo: This shouldn't exist, but is currently used to reduce allocations by caching variable-capturing closures.
-            private class TrailBatch : QuadBatch<TexturedTrailVertex>
-            {
-                public new readonly Action<TexturedVertex2D> AddAction;
-                public float DrawTime;
-
-                public TrailBatch(int size, int maxBuffers)
-                    : base(size, maxBuffers)
-                {
-                    AddAction = v => Add(new TexturedTrailVertex
-                    {
-                        Position = v.Position,
-                        TexturePosition = v.TexturePosition,
-                        Time = DrawTime + 1,
-                        Colour = v.Colour,
-                    });
-                }
             }
         }
 

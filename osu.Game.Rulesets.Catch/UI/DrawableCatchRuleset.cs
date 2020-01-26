@@ -10,10 +10,8 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Replays;
-using osu.Game.Rulesets.Catch.Scoring;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -31,8 +29,6 @@ namespace osu.Game.Rulesets.Catch.UI
             Direction.Value = ScrollingDirection.Down;
             TimeRange.Value = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
         }
-
-        public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(Beatmap);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new CatchFramedReplayInputHandler(replay);
 

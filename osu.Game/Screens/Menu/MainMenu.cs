@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -68,6 +69,9 @@ namespace osu.Game.Screens.Menu
 
         private ExitConfirmOverlay exitConfirmOverlay;
 
+        private ParallaxContainer buttonsContainer;
+        private SongTicker songTicker;
+
         [BackgroundDependencyLoader(true)]
         private void load(DirectOverlay direct, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics)
         {
@@ -88,9 +92,9 @@ namespace osu.Game.Screens.Menu
                 });
             }
 
-            AddRangeInternal(new Drawable[]
+            AddRangeInternal(new[]
             {
-                new ParallaxContainer
+                buttonsContainer = new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
                     Children = new Drawable[]
@@ -106,6 +110,13 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
+                songTicker = new SongTicker
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Margin = new MarginPadding { Right = 15, Top = 5 }
+                },
+                exitConfirmOverlay?.CreateProxy() ?? Drawable.Empty()
             });
 
             buttons.StateChanged += state =>
@@ -132,6 +143,8 @@ namespace osu.Game.Screens.Menu
 
         private void confirmAndExit()
         {
+            if (exitConfirmed) return;
+
             exitConfirmed = true;
             this.Exit();
         }
@@ -187,7 +200,7 @@ namespace osu.Game.Screens.Menu
                 buttons.State = ButtonSystemState.TopLevel;
 
                 this.FadeIn(FADE_IN_DURATION, Easing.OutQuint);
-                this.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
+                buttonsContainer.MoveTo(new Vector2(0, 0), FADE_IN_DURATION, Easing.OutQuint);
 
                 sideFlashes.Delay(FADE_IN_DURATION).FadeIn(64, Easing.InQuint);
             }
@@ -224,7 +237,7 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.EnteringMode;
 
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
-            this.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
+            buttonsContainer.MoveTo(new Vector2(-800, 0), FADE_OUT_DURATION, Easing.InSine);
 
             sideFlashes.FadeOut(64, Easing.OutQuint);
         }
@@ -244,13 +257,24 @@ namespace osu.Game.Screens.Menu
 
         public override bool OnExiting(IScreen next)
         {
-            if (!exitConfirmed && dialogOverlay != null && !(dialogOverlay.CurrentDialog is ConfirmExitDialog))
+            if (!exitConfirmed && dialogOverlay != null)
             {
-                dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
-                return true;
+                if (dialogOverlay.CurrentDialog is ConfirmExitDialog exitDialog)
+                {
+                    exitConfirmed = true;
+                    exitDialog.Buttons.First().Click();
+                }
+                else
+                {
+                    dialogOverlay.Push(new ConfirmExitDialog(confirmAndExit, () => exitConfirmOverlay.Abort()));
+                    return true;
+                }
             }
 
             buttons.State = ButtonSystemState.Exit;
+
+            songTicker.Hide();
+
             this.FadeOut(3000);
             return base.OnExiting(next);
         }

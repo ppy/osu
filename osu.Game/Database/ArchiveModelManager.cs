@@ -34,7 +34,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -222,9 +222,8 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return Task.FromResult<TModel>(null);
-
-                model.Hash = computeHash(archive);
+                if (model == null)
+                    return Task.FromResult<TModel>(null);
             }
             catch (TaskCanceledException)
             {
@@ -259,18 +258,27 @@ namespace osu.Game.Database
         /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
-        private string computeHash(ArchiveReader reader)
+        /// <remarks>
+        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
+        /// </remarks>
+        private string computeHash(TModel item, ArchiveReader reader = null)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
 
-            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)))
             {
-                using (Stream s = reader.GetStream(file))
+                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
                     s.CopyTo(hashable);
             }
 
-            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            if (reader != null)
+                return reader.Name.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         /// <summary>
@@ -300,6 +308,7 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Hash = computeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
 
@@ -355,12 +364,42 @@ namespace osu.Game.Database
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
+        public void UpdateFile(TModel model, TFileModel file, Stream contents)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                // Dereference the existing file info, since the file model will be removed.
+                Files.Dereference(file.FileInfo);
+
+                // Remove the file model.
+                usage.Context.Set<TFileModel>().Remove(file);
+
+                // Add the new file info and containing file model.
+                model.Files.Remove(file);
+                model.Files.Add(new TFileModel
+                {
+                    Filename = file.Filename,
+                    FileInfo = Files.Add(contents)
+                });
+
+                Update(model);
+            }
+        }
+
         /// <summary>
         /// Perform an update of the specified item.
-        /// TODO: Support file changes.
+        /// TODO: Support file additions/removals.
         /// </summary>
         /// <param name="item">The item to update.</param>
-        public void Update(TModel item) => ModelStore.Update(item);
+        public void Update(TModel item)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                item.Hash = computeHash(item);
+
+                ModelStore.Update(item);
+            }
+        }
 
         /// <summary>
         /// Delete an item from the manager.

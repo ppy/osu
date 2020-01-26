@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
         /// The icon of this mod.
         /// </summary>
         [JsonIgnore]
-        public virtual IconUsage Icon => FontAwesome.Solid.Question;
+        public virtual IconUsage? Icon => null;
 
         /// <summary>
         /// The type of this mod.
@@ -61,10 +61,16 @@ namespace osu.Game.Rulesets.Mods
         public virtual bool Ranked => false;
 
         /// <summary>
+        /// Whether this mod requires configuration to apply changes to the game.
+        /// </summary>
+        [JsonIgnore]
+        public virtual bool RequiresConfiguration => false;
+
+        /// <summary>
         /// The mods this mod cannot be enabled with.
         /// </summary>
         [JsonIgnore]
-        public virtual Type[] IncompatibleMods => new Type[] { };
+        public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 
         /// <summary>
         /// Creates a copy of this <see cref="Mod"/> initialised to a default state.

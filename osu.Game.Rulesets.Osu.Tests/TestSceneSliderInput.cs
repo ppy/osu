@@ -286,11 +286,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertGreatJudge() => judgementResults.Last().Type == HitResult.Great;
 
-        private bool assertHeadMissTailTracked() => judgementResults[judgementResults.Count - 2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
+        private bool assertHeadMissTailTracked() => judgementResults[^2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
 
-        private bool assertMidSliderJudgements() => judgementResults[judgementResults.Count - 2].Type == HitResult.Great;
+        private bool assertMidSliderJudgements() => judgementResults[^2].Type == HitResult.Great;
 
-        private bool assertMidSliderJudgementFail() => judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
+        private bool assertMidSliderJudgementFail() => judgementResults[^2].Type == HitResult.Miss;
 
         private ScoreAccessibleReplayPlayer currentPlayer;
 

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("set second set", () => details.BeatmapSet = secondSet);
             AddAssert("ratings set", () => details.Ratings.Metrics == secondSet.Metrics);
 
-            BeatmapSetInfo createSet() => new BeatmapSetInfo
+            static BeatmapSetInfo createSet() => new BeatmapSetInfo
             {
                 Metrics = new BeatmapSetMetrics { Ratings = Enumerable.Range(0, 11).Select(_ => RNG.Next(10)).ToArray() },
                 Beatmaps = new List<BeatmapInfo>

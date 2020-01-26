@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
     {
         internal readonly Container<PathControlPointPiece> Pieces;
 
+        private readonly Container<PathControlPointConnectionPiece> connections;
+
         private readonly Slider slider;
 
         private readonly bool allowSelection;
@@ -42,7 +44,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
+            InternalChildren = new Drawable[]
+            {
+                connections = new Container<PathControlPointConnectionPiece> { RelativeSizeAxes = Axes.Both },
+                Pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both }
+            };
         }
 
         protected override void LoadComplete()
@@ -62,19 +68,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             foreach (var point in controlPoints)
             {
-                var piece = new PathControlPointPiece(slider, point);
+                Pieces.Add(new PathControlPointPiece(slider, point).With(d =>
+                {
+                    if (allowSelection)
+                        d.RequestSelection = selectPiece;
+                }));
 
-                if (allowSelection)
-                    piece.RequestSelection = selectPiece;
-
-                Pieces.Add(piece);
+                connections.Add(new PathControlPointConnectionPiece(slider, point));
             }
         }
 
         private void removeControlPoints(IEnumerable<PathControlPoint> controlPoints)
         {
             foreach (var point in controlPoints)
+            {
                 Pieces.RemoveAll(p => p.ControlPoint == point);
+                connections.RemoveAll(c => c.ControlPoint == point);
+            }
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -98,7 +108,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
         {

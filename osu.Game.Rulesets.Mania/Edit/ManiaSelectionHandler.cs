@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
@@ -70,10 +71,12 @@ namespace osu.Game.Rulesets.Mania.Edit
             // When scrolling downwards the anchor position is at the bottom of the screen, however the movement event assumes the anchor is at the top of the screen.
             // This causes the delta to assume a positive hitobject position, and which can be corrected for by subtracting the parent height.
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                delta -= moveEvent.Blueprint.DrawableObject.Parent.DrawHeight;
+                delta -= moveEvent.Blueprint.Parent.DrawHeight; // todo: probably wrong
 
-            foreach (var b in SelectedBlueprints)
+            foreach (var selectionBlueprint in SelectedBlueprints)
             {
+                var b = (OverlaySelectionBlueprint)selectionBlueprint;
+
                 var hitObject = b.DrawableObject;
                 var objectParent = (HitObjectContainer)hitObject.Parent;
 

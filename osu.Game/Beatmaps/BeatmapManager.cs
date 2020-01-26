@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
+using Decoder = osu.Game.Beatmaps.Formats.Decoder;
+using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
 
 namespace osu.Game.Beatmaps
 {
@@ -56,14 +59,11 @@ namespace osu.Game.Beatmaps
         protected override string ImportFromStablePath => "Songs";
 
         private readonly RulesetStore rulesets;
-
         private readonly BeatmapStore beatmaps;
-
         private readonly AudioManager audioManager;
-
         private readonly GameHost host;
-
         private readonly BeatmapUpdateQueue updateQueue;
+        private readonly Storage exportStorage;
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, IAPIProvider api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
@@ -80,6 +80,7 @@ namespace osu.Game.Beatmaps
             beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
 
             updateQueue = new BeatmapUpdateQueue(api);
+            exportStorage = storage.GetStorageForDirectory("exports");
         }
 
         protected override ArchiveDownloadRequest<BeatmapSetInfo> CreateDownloadRequest(BeatmapSetInfo set, bool minimiseDownloadSize) =>
@@ -158,7 +159,9 @@ namespace osu.Game.Beatmaps
             void resetIds() => beatmapSet.Beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
-        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items) => items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID);
+        protected override bool CheckLocalAvailability(BeatmapSetInfo model, IQueryable<BeatmapSetInfo> items)
+            => base.CheckLocalAvailability(model, items)
+               || (model.OnlineBeatmapSetID != null && items.Any(b => b.OnlineBeatmapSetID == model.OnlineBeatmapSetID));
 
         /// <summary>
         /// Delete a beatmap difficulty.
@@ -171,6 +174,50 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmap">The beatmap difficulty to restore.</param>
         public void Restore(BeatmapInfo beatmap) => beatmaps.Restore(beatmap);
+
+        /// <summary>
+        /// Saves an <see cref="IBeatmap"/> file against a given <see cref="BeatmapInfo"/>.
+        /// </summary>
+        /// <param name="info">The <see cref="BeatmapInfo"/> to save the content against. The file referenced by <see cref="BeatmapInfo.Path"/> will be replaced.</param>
+        /// <param name="beatmapContent">The <see cref="IBeatmap"/> content to write.</param>
+        public void Save(BeatmapInfo info, IBeatmap beatmapContent)
+        {
+            var setInfo = QueryBeatmapSet(s => s.Beatmaps.Any(b => b.ID == info.ID));
+
+            using (var stream = new MemoryStream())
+            {
+                using (var sw = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                    new LegacyBeatmapEncoder(beatmapContent).Encode(sw);
+
+                stream.Seek(0, SeekOrigin.Begin);
+
+                UpdateFile(setInfo, setInfo.Files.Single(f => string.Equals(f.Filename, info.Path, StringComparison.OrdinalIgnoreCase)), stream);
+            }
+
+            var working = workingCache.FirstOrDefault(w => w.BeatmapInfo?.ID == info.ID);
+            if (working != null)
+                workingCache.Remove(working);
+        }
+
+        /// <summary>
+        /// Exports a <see cref="BeatmapSetInfo"/> to an .osz package.
+        /// </summary>
+        /// <param name="set">The <see cref="BeatmapSetInfo"/> to export.</param>
+        public void Export(BeatmapSetInfo set)
+        {
+            var localSet = QueryBeatmapSet(s => s.ID == set.ID);
+
+            using (var archive = ZipArchive.Create())
+            {
+                foreach (var file in localSet.Files)
+                    archive.AddEntry(file.Filename, Files.Storage.GetStream(file.FileInfo.StoragePath));
+
+                using (var outputStream = exportStorage.GetStream($"{set}.osz", FileAccess.Write, FileMode.Create))
+                    archive.SaveTo(outputStream);
+
+                exportStorage.OpenInNativeExplorer();
+            }
+        }
 
         private readonly WeakList<WorkingBeatmap> workingCache = new WeakList<WorkingBeatmap>();
 

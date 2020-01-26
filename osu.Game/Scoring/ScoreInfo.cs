@@ -89,7 +89,7 @@ namespace osu.Game.Scoring
                 if (mods == null)
                     return null;
 
-                return modsJson = JsonConvert.SerializeObject(mods);
+                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
             }
             set
             {

@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Beatmaps;
@@ -33,8 +33,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(CircularDistanceSnapGrid)
         };
 
-        [Cached(typeof(IEditorBeatmap))]
-        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap;
 
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestSceneOsuDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
         }
 
         [SetUp]
