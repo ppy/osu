@@ -559,14 +559,6 @@ namespace osu.Game.Screens.Select
                 {
                     if (state.NewValue == CarouselItemState.Selected)
                     {
-                        if (!AllowSelection)
-                        {
-                            // CarouselBeatmap may trigger a state change from OnClick, unaware that it is not allowed to.
-                            // we revert this change here to ensure sanity.
-                            c.State.Value = state.OldValue;
-                            return;
-                        }
-
                         selectedBeatmapSet = set;
                         SelectionChanged?.Invoke(c.Beatmap);
 
