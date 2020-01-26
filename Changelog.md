@@ -143,4 +143,5 @@
     *   [M] [#5247 - Add setting to show the song difficulty graph](https://github.com/ppy/osu/pull/5247)
     *   [M] [#7548 - Add mod setting (de)serialization support](https://github.com/ppy/osu/pull/7548)
     *   [M] [#7577 - Make Difficulty Adjust mod customisation menu open automatically](https://github.com/ppy/osu/pull/7577)
-    7591,7460,7567
+    *   [M] [#7591 - Improve song select display on ultrawide displays (or when UI scale is set low)](https://github.com/ppy/osu/pull/7591)
+    7460,7567
