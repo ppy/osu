@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Mods
                 foregroundIcon.RotateTo(rotate_angle * direction, mod_switch_duration, mod_switch_easing);
                 backgroundIcon.RotateTo(-rotate_angle * direction, mod_switch_duration, mod_switch_easing);
 
-                backgroundIcon.Icon = modAfter.Icon;
+                backgroundIcon.Mod = modAfter;
 
                 using (BeginDelayedSequence(mod_switch_duration, true))
                 {
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Mods
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
 
@@ -172,8 +172,6 @@ namespace osu.Game.Overlays.Mods
                         break;
                 }
             }
-
-            return true;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -218,8 +216,8 @@ namespace osu.Game.Overlays.Mods
         private void displayMod(Mod mod)
         {
             if (backgroundIcon != null)
-                backgroundIcon.Icon = foregroundIcon.Icon;
-            foregroundIcon.Icon = mod.Icon;
+                backgroundIcon.Mod = foregroundIcon.Mod;
+            foregroundIcon.Mod = mod;
             text.Text = mod.Name;
             Colour = mod.HasImplementation ? Color4.White : Color4.Gray;
         }

@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -19,6 +18,9 @@ using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
+    /// <summary>
+    /// A visualisation of a single <see cref="PathControlPoint"/> in a <see cref="Slider"/>.
+    /// </summary>
     public class PathControlPointPiece : BlueprintPiece<Slider>
     {
         public Action<PathControlPointPiece, MouseButtonEvent> RequestSelection;
@@ -28,7 +30,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         public readonly PathControlPoint ControlPoint;
 
         private readonly Slider slider;
-        private readonly Path path;
         private readonly Container marker;
         private readonly Drawable markerRing;
 
@@ -39,12 +40,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         private OsuColour colours { get; set; }
 
         private IBindable<Vector2> sliderPosition;
-        private IBindable<int> pathVersion;
+        private IBindable<Vector2> controlPointPosition;
 
         public PathControlPointPiece(Slider slider, PathControlPoint controlPoint)
         {
             this.slider = slider;
-
             ControlPoint = controlPoint;
 
             Origin = Anchor.Centre;
@@ -52,11 +52,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             InternalChildren = new Drawable[]
             {
-                path = new SmoothPath
-                {
-                    Anchor = Anchor.Centre,
-                    PathRadius = 1
-                },
                 marker = new Container
                 {
                     Anchor = Anchor.Centre,
@@ -96,20 +91,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             base.LoadComplete();
 
             sliderPosition = slider.PositionBindable.GetBoundCopy();
-            sliderPosition.BindValueChanged(_ => updateDisplay());
+            sliderPosition.BindValueChanged(_ => updateMarkerDisplay());
 
-            pathVersion = slider.Path.Version.GetBoundCopy();
-            pathVersion.BindValueChanged(_ => updateDisplay());
+            controlPointPosition = ControlPoint.Position.GetBoundCopy();
+            controlPointPosition.BindValueChanged(_ => updateMarkerDisplay());
 
             IsSelected.BindValueChanged(_ => updateMarkerDisplay());
 
-            updateDisplay();
-        }
-
-        private void updateDisplay()
-        {
             updateMarkerDisplay();
-            updateConnectingPath();
         }
 
         // The connecting path is excluded from positional input
@@ -146,13 +135,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e) => RequestSelection != null;
-
         protected override bool OnClick(ClickEvent e) => RequestSelection != null;
 
         protected override bool OnDragStart(DragStartEvent e) => e.Button == MouseButton.Left;
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (ControlPoint == slider.Path.ControlPoints[0])
             {
@@ -169,11 +156,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             }
             else
                 ControlPoint.Position.Value += e.Delta;
-
-            return true;
         }
-
-        protected override bool OnDragEnd(DragEndEvent e) => true;
 
         /// <summary>
         /// Updates the state of the circular control point marker.
@@ -188,27 +171,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (IsHovered || IsSelected.Value)
                 colour = Color4.White;
             marker.Colour = colour;
-        }
-
-        /// <summary>
-        /// Updates the path connecting this control point to the previous one.
-        /// </summary>
-        private void updateConnectingPath()
-        {
-            path.ClearVertices();
-
-            int index = slider.Path.ControlPoints.IndexOf(ControlPoint);
-
-            if (index == -1)
-                return;
-
-            if (++index != slider.Path.ControlPoints.Count)
-            {
-                path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[index].Position.Value - ControlPoint.Position.Value);
-            }
-
-            path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
         }
     }
 }

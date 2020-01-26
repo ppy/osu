@@ -71,7 +71,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(new Vector2(320, 240), sprite.InitialPosition);
                 Assert.IsTrue(sprite.IsDrawable);
                 Assert.AreEqual(Anchor.Centre, sprite.Origin);
-                Assert.AreEqual("SB/black.jpg", sprite.Path);
+                Assert.AreEqual("SB/lyric/ja-21.png", sprite.Path);
 
                 var animation = background.Elements.OfType<StoryboardAnimation>().First();
                 Assert.NotNull(animation);

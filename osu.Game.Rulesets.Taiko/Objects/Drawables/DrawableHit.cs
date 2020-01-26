@@ -77,11 +77,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             return result;
         }
 
-        public override bool OnReleased(TaikoAction action)
+        public override void OnReleased(TaikoAction action)
         {
             if (action == HitAction)
                 HitAction = null;
-            return base.OnReleased(action);
+
+            base.OnReleased(action);
         }
 
         protected override void Update()

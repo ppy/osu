@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Project">
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>WinExe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>click the circles. to the beat.</Description>
@@ -29,6 +29,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
+    <PackageReference Include="DiscordRichPresence" Version="1.0.121" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />

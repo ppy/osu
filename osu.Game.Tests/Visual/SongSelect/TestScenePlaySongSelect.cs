@@ -11,7 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;

@@ -18,7 +18,11 @@
   <ItemGroup Label="Code Analysis">
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.8" PrivateAssets="All" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)CodeAnalysis\BannedSymbols.txt" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="All" />
   </ItemGroup>
+  <PropertyGroup Label="Code Analysis">
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeAnalysis\osu.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <PropertyGroup Label="Documentation">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -36,7 +40,7 @@
     <RepositoryUrl>https://github.com/ppy/osu</RepositoryUrl>
     <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
     <Company>ppy Pty Ltd</Company>
-    <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
+    <Copyright>Copyright (c) 2020 ppy Pty Ltd</Copyright>
     <PackageTags>osu game</PackageTags>
   </PropertyGroup>
 </Project>
