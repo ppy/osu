@@ -43,10 +43,10 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            Waves.FirstWaveColour = colourProvider.Highlight1;
-            Waves.SecondWaveColour = colourProvider.Light4;
-            Waves.ThirdWaveColour = colourProvider.Dark3;
-            Waves.FourthWaveColour = colourProvider.Dark1;
+            Waves.FirstWaveColour = colourProvider.Light4;
+            Waves.SecondWaveColour = colourProvider.Light3;
+            Waves.ThirdWaveColour = colourProvider.Dark4;
+            Waves.FourthWaveColour = colourProvider.Dark3;
         }
 
         public override void Show()
