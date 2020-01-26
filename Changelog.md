@@ -141,4 +141,5 @@
     *   [M] [#7541 - Implement colour schemes for OverlayHeader](https://github.com/ppy/osu/pull/7541)
     *   [M] [#3576 - Hook up star rating filter](https://github.com/ppy/osu/pull/3576)
     *   [M] [#5247 - Add setting to show the song difficulty graph](https://github.com/ppy/osu/pull/5247)
-    7548,7577,7591,7460,7567
+    *   [M] [#7548 - Add mod setting (de)serialization support](https://github.com/ppy/osu/pull/7548)
+    7577,7591,7460,7567

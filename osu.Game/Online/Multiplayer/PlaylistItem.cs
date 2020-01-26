@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -50,7 +51,7 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("allowed_mods")]
         private APIMod[] allowedMods
         {
-            get => AllowedMods.Select(m => new APIMod { Acronym = m.Acronym }).ToArray();
+            get => AllowedMods.Select(m => new APIMod(m)).ToArray();
             set => allowedModsBacking = value;
         }
 
@@ -59,7 +60,7 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("required_mods")]
         private APIMod[] requiredMods
         {
-            get => RequiredMods.Select(m => new APIMod { Acronym = m.Acronym }).ToArray();
+            get => RequiredMods.Select(m => new APIMod(m)).ToArray();
             set => requiredModsBacking = value;
         }
 
@@ -72,10 +73,12 @@ namespace osu.Game.Online.Multiplayer
             Beatmap = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
             Ruleset = rulesets.GetRuleset(RulesetID);
 
+            Ruleset rulesetInstance = Ruleset.CreateInstance();
+
             if (allowedModsBacking != null)
             {
                 AllowedMods.Clear();
-                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => allowedModsBacking.Any(m => m.Acronym == mod.Acronym)));
+                AllowedMods.AddRange(allowedModsBacking.Select(m => m.ToMod(rulesetInstance)));
 
                 allowedModsBacking = null;
             }
@@ -83,7 +86,7 @@ namespace osu.Game.Online.Multiplayer
             if (requiredModsBacking != null)
             {
                 RequiredMods.Clear();
-                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => requiredModsBacking.Any(m => m.Acronym == mod.Acronym)));
+                RequiredMods.AddRange(requiredModsBacking.Select(m => m.ToMod(rulesetInstance)));
 
                 requiredModsBacking = null;
             }
