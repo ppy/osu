@@ -59,6 +59,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public override bool OnPressed(ManiaAction action) => false; // Handled by the hold note
 
-        public override bool OnReleased(ManiaAction action) => false; // Handled by the hold note
+        public override void OnReleased(ManiaAction action)
+        {
+        }
     }
 }

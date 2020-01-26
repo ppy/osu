@@ -299,7 +299,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (isDragging)
             {
@@ -311,14 +311,12 @@ namespace osu.Game.Overlays
 
                 ChatHeight.Value = targetChatHeight;
             }
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         private void selectTab(int index)
