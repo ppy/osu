@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public event Action<HitObject> StartTimeChanged;
 
+        public BindableList<HitObject> SelectedHitObjects { get; } = new BindableList<HitObject>();
+
         public readonly IBeatmap PlayableBeatmap;
 
         private readonly BindableBeatDivisor beatDivisor;

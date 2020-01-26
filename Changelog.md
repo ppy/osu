@@ -136,5 +136,6 @@
     *   [M] [#7596 - Fix regressed input handling order](https://github.com/ppy/osu/pull/7596)
     *   [M] [#7609 - 更新Framework](https://github.com/ppy/osu/pull/7609)
     *   [M] [#7566 - Enforce using get-only auto property where possible](https://github.com/ppy/osu/pull/7566)
-    *   [未完成][M] [#7538 - Decouple blueprint container to allow usage in timeline](https://github.com/ppy/osu/pull/7538)
-    7538,7589,7541,3576,5247,7548,7577,7591,7460,7567
+    *   [M] [#7538 - Decouple blueprint container to allow usage in timeline](https://github.com/ppy/osu/pull/7538)
+    *   [M] [#7589 - Expand editor timeline functionality](https://github.com/ppy/osu/pull/7589)
+    7589,7541,3576,5247,7548,7577,7591,7460,7567

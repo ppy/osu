@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return CreateBlueprintFor(drawable);
         }
 
-        public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
+        public virtual OverlaySelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
         protected override void AddBlueprintFor(HitObject hitObject)
         {
