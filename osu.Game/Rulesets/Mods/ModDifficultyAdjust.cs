@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Mods
 
         public override double ScoreMultiplier => 1.0;
 
+        public override bool RequiresConfiguration => true;
+
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
         [SettingSource("掉血速度", "Override a beatmap's set HP.")]
