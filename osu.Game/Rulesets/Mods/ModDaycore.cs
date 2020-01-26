@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         {
             SpeedChange.BindValueChanged(val =>
             {
-                freqAdjust.Value = SpeedChange.Default;
+                freqAdjust.Value = val.NewValue;
                 tempoAdjust.Value = val.NewValue / SpeedChange.Default;
             }, true);
         }
