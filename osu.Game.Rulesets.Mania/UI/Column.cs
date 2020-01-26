@@ -191,7 +191,9 @@ namespace osu.Game.Rulesets.Mania.UI
             return true;
         }
 
-        public bool OnReleased(ManiaAction action) => false;
+        public void OnReleased(ManiaAction action)
+        {
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
             // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border

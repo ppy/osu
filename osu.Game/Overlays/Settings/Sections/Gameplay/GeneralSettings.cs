@@ -41,6 +41,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Show difficulty graph on progress bar",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowProgressGraph)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show health display even when you can't fail",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowHealthDisplayWhenCantFail),
                     Keywords = new[] { "hp", "bar" }
