@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
 
@@ -53,13 +52,13 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
-            addHeader("Blue OverlayHeader", new TestNoControlHeader(OverlayColourScheme.Blue));
-            addHeader("Green TabControlOverlayHeader (string)", new TestStringTabControlHeader(OverlayColourScheme.Green));
-            addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(OverlayColourScheme.Pink));
-            addHeader("Red BreadcrumbControlOverlayHeader", new TestBreadcrumbControlHeader(OverlayColourScheme.Red));
+            addHeader("Blue OverlayHeader", new TestNoControlHeader(), OverlayColourScheme.Blue);
+            addHeader("Green TabControlOverlayHeader (string)", new TestStringTabControlHeader(), OverlayColourScheme.Green);
+            addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
+            addHeader("Red BreadcrumbControlOverlayHeader", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
         }
 
-        private void addHeader(string name, OverlayHeader header)
+        private void addHeader(string name, OverlayHeader header, OverlayColourScheme colourScheme)
         {
             flow.Add(new FillFlowContainer
             {
@@ -75,13 +74,28 @@ namespace osu.Game.Tests.Visual.UserInterface
                         Margin = new MarginPadding(20),
                         Text = name,
                     },
-                    header.With(h =>
+                    new ColourProvidedContainer(colourScheme, header)
                     {
-                        h.Anchor = Anchor.TopCentre;
-                        h.Origin = Anchor.TopCentre;
-                    })
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    }
                 }
             });
+        }
+
+        private class ColourProvidedContainer : Container
+        {
+            [Cached]
+            private readonly OverlayColourProvider colourProvider;
+
+            public ColourProvidedContainer(OverlayColourScheme colourScheme, OverlayHeader header)
+            {
+                colourProvider = new OverlayColourProvider(colourScheme);
+
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
+                Add(header);
+            }
         }
 
         private class TestNoControlHeader : OverlayHeader
@@ -89,11 +103,6 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override Drawable CreateBackground() => new TestBackground();
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
-
-            public TestNoControlHeader(OverlayColourScheme colourScheme)
-                : base(colourScheme)
-            {
-            }
         }
 
         private class TestStringTabControlHeader : TabControlOverlayHeader<string>
@@ -102,8 +111,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
-            public TestStringTabControlHeader(OverlayColourScheme colourScheme)
-                : base(colourScheme)
+            public TestStringTabControlHeader()
             {
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");
@@ -112,11 +120,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestEnumTabControlHeader : TabControlOverlayHeader<TestEnum>
         {
-            public TestEnumTabControlHeader(OverlayColourScheme colourScheme)
-                : base(colourScheme)
-            {
-            }
-
             protected override Drawable CreateBackground() => new TestBackground();
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
@@ -135,8 +138,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
-            public TestBreadcrumbControlHeader(OverlayColourScheme colourScheme)
-                : base(colourScheme)
+            public TestBreadcrumbControlHeader()
             {
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");

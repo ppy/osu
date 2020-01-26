@@ -25,12 +25,8 @@ namespace osu.Game.Overlays
             set => background.Height = value;
         }
 
-        protected OverlayColourScheme ColourScheme { get; }
-
-        protected OverlayHeader(OverlayColourScheme colourScheme)
+        protected OverlayHeader()
         {
-            ColourScheme = colourScheme;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -85,10 +81,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            titleBackground.Colour = colours.ForOverlayElement(ColourScheme, 0.2f, 0.15f);
-            title.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.7f);
+            titleBackground.Colour = colourProvider.Dark5;
+            title.AccentColour = colourProvider.Highlight1;
         }
 
         protected abstract Drawable CreateBackground();

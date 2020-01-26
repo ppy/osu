@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using System;
 
@@ -23,7 +22,6 @@ namespace osu.Game.Overlays.News
         public Action ShowFrontPage;
 
         public NewsHeader()
-            : base(OverlayColourScheme.Purple)
         {
             TabControl.AddItem(front_page_string);
 
