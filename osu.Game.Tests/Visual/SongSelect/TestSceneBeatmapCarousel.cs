@@ -436,6 +436,52 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkNonmatchingFilter();
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
+        [Test]
+        public void TestFilteringByUserStarDifficulty()
+        {
+            BeatmapSetInfo set = null;
+
+            loadBeatmaps(new List<BeatmapSetInfo>());
+
+            AddStep("add mixed difficulty set", () =>
+            {
+                set = createTestBeatmapSet(1);
+                set.Beatmaps.Clear();
+
+                for (int i = 1; i <= 15; i++)
+                {
+                    set.Beatmaps.Add(new BeatmapInfo
+                    {
+                        Version = $"Stars: {i}",
+                        StarDifficulty = i,
+                    });
+                }
+
+                carousel.UpdateBeatmapSet(set);
+            });
+
+            AddStep("select added set", () => carousel.SelectBeatmap(set.Beatmaps[0], false));
+
+            AddStep("filter [5..]", () => carousel.Filter(new FilterCriteria { UserStarDifficulty = { Min = 5 } }));
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
+            checkVisibleItemCount(true, 11);
+
+            AddStep("filter to [0..7]", () => carousel.Filter(new FilterCriteria { UserStarDifficulty = { Max = 7 } }));
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
+            checkVisibleItemCount(true, 7);
+
+            AddStep("filter to [5..7]", () => carousel.Filter(new FilterCriteria { UserStarDifficulty = { Min = 5, Max = 7 } }));
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
+            checkVisibleItemCount(true, 3);
+
+            AddStep("filter [2..2]", () => carousel.Filter(new FilterCriteria { UserStarDifficulty = { Min = 2, Max = 2 } }));
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
+            checkVisibleItemCount(true, 1);
+
+            AddStep("filter to [0..]", () => carousel.Filter(new FilterCriteria { UserStarDifficulty = { Min = 0 } }));
+            AddUntilStep("Wait for debounce", () => !carousel.PendingFilterTask);
+            checkVisibleItemCount(true, 15);
+        }
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets = null)
         {

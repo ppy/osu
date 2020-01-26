@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Select.Carousel
             match &= !criteria.Creator.HasFilter || criteria.Creator.Matches(Beatmap.Metadata.AuthorString);
             match &= !criteria.Artist.HasFilter || criteria.Artist.Matches(Beatmap.Metadata.Artist) ||
                      criteria.Artist.Matches(Beatmap.Metadata.ArtistUnicode);
+            
+            match &= !criteria.UserStarDifficulty.HasFilter || criteria.UserStarDifficulty.IsInRange(Beatmap.StarDifficulty);
 
             if (match)
             {

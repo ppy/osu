@@ -138,4 +138,7 @@
     *   [M] [#7566 - Enforce using get-only auto property where possible](https://github.com/ppy/osu/pull/7566)
     *   [M] [#7538 - Decouple blueprint container to allow usage in timeline](https://github.com/ppy/osu/pull/7538)
     *   [M] [#7589 - Expand editor timeline functionality](https://github.com/ppy/osu/pull/7589)
-    7589,7541,3576,5247,7548,7577,7591,7460,7567
+    *   [M] [#7541 - Implement colour schemes for OverlayHeader](https://github.com/ppy/osu/pull/7541)
+    *   [M] [#3576 - Hook up star rating filter](https://github.com/ppy/osu/pull/3576)
+    *   [M] [#5247 - ](https://github.com/ppy/osu/pull/5247)
+    5247,7548,7577,7591,7460,7567
