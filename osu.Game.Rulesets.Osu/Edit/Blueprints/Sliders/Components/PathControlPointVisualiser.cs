@@ -108,7 +108,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         private void selectPiece(PathControlPointPiece piece, MouseButtonEvent e)
         {
