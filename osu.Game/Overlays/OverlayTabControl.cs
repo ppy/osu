@@ -25,7 +25,11 @@ namespace osu.Game.Overlays
         public override Color4 AccentColour
         {
             get => base.AccentColour;
-            set => base.AccentColour = bar.Colour = value;
+            set
+            {
+                base.AccentColour = value;
+                bar.Colour = value;
+            }
         }
 
         protected OverlayTabControl()
