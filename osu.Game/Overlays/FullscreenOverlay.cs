@@ -17,11 +17,12 @@ namespace osu.Game.Overlays
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
-        private readonly OverlayColourScheme colourScheme;
+        [Cached]
+        private OverlayColourProvider colourProvider;
 
         protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
-            this.colourScheme = colourScheme;
+            colourProvider = new OverlayColourProvider(colourScheme);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -39,17 +40,9 @@ namespace osu.Game.Overlays
             };
         }
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
         [BackgroundDependencyLoader]
         private void load()
         {
-            OverlayColourProvider colourProvider;
-            dependencies.Cache(colourProvider = new OverlayColourProvider(colourScheme));
-
             Waves.FirstWaveColour = colourProvider.Highlight1;
             Waves.SecondWaveColour = colourProvider.Light4;
             Waves.ThirdWaveColour = colourProvider.Dark3;
