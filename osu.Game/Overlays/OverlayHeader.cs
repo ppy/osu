@@ -14,15 +14,9 @@ namespace osu.Game.Overlays
     public abstract class OverlayHeader : Container
     {
         private readonly Box titleBackground;
-        private readonly Container background;
         private readonly ScreenTitle title;
 
         protected readonly FillFlowContainer HeaderInfo;
-
-        protected float BackgroundHeight
-        {
-            set => background.Height = value;
-        }
 
         protected OverlayHeader()
         {
@@ -44,13 +38,7 @@ namespace osu.Game.Overlays
                         Depth = -float.MaxValue,
                         Children = new Drawable[]
                         {
-                            background = new Container
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = 80,
-                                Masking = true,
-                                Child = CreateBackground()
-                            },
+                            CreateBackground(),
                             new Container
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -86,10 +74,11 @@ namespace osu.Game.Overlays
             title.AccentColour = colourProvider.Highlight1;
         }
 
-        protected abstract Drawable CreateBackground();
-
         [NotNull]
         protected virtual Drawable CreateContent() => new Container();
+
+        [NotNull]
+        protected virtual Drawable CreateBackground() => new Container();
 
         protected abstract ScreenTitle CreateTitle();
     }
