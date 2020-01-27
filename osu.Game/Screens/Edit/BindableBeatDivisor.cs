@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -79,6 +79,27 @@ namespace osu.Game.Screens.Edit
                 default:
                     return Color4.Red;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the applicable divisor for a specific beat index.
+        /// </summary>
+        /// <param name="index">The 0-based beat index.</param>
+        /// <param name="beatDivisor">The beat divisor.</param>
+        /// <returns>The applicable divisor.</returns>
+        public static int GetDivisorForBeatIndex(int index, int beatDivisor)
+        {
+            int beat = index % beatDivisor;
+
+            for (int i = 0; i < BindableBeatDivisor.VALID_DIVISORS.Length; i++)
+            {
+                int divisor = BindableBeatDivisor.VALID_DIVISORS[i];
+
+                if ((beat * divisor) % beatDivisor == 0)
+                    return divisor;
+            }
+
+            return 0;
         }
     }
 }
