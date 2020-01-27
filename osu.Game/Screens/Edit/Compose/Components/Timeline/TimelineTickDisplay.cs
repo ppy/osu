@@ -57,8 +57,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         Add(new PointVisualisation(t)
                         {
                             Colour = BindableBeatDivisor.GetColourFor(1, colours),
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Origin = Anchor.TopCentre,
                         });
                     }
                     else
@@ -71,13 +70,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         {
                             Colour = colour,
                             Height = height,
+                            Origin = Anchor.TopCentre,
                         });
 
                         Add(new PointVisualisation(t)
                         {
                             Colour = colour,
                             Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            Origin = Anchor.BottomCentre,
                             Height = height,
                         });
                     }
