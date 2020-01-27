@@ -74,13 +74,15 @@ namespace osu.Game.Screens.Play.HUD
                 return;
 
             foreach (var c in Children)
+            {
                 foreach (var meter in c.Children)
                     meter.OnNewJudgement(result);
+            }
         }
 
         private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
         {
-            Children.ForEach(c => c.ForEach(c => c.FadeOut(fade_duration, Easing.OutQuint)));
+            Children.ForEach(c => c.ForEach(meter => meter.FadeOut(fade_duration, Easing.OutQuint)));
 
             if (hitWindows == null)
                 return;
