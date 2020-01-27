@@ -8,7 +8,6 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
@@ -27,14 +26,12 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
         private readonly Box background;
+        private readonly Box footerBackground;
         private readonly FillFlowContainer content;
         private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private readonly CommentsShowMoreButton moreButton;
@@ -75,10 +72,9 @@ namespace osu.Game.Overlays.Comments
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                new Box
+                                footerBackground = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.2f)
                                 },
                                 new FillFlowContainer
                                 {
@@ -114,9 +110,10 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.Gray2;
+            background.Colour = colourProvider.Background5;
+            footerBackground.Colour = colourProvider.Background4;
         }
 
         protected override void LoadComplete()
