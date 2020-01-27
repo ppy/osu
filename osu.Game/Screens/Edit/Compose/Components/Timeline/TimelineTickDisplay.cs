@@ -12,7 +12,7 @@ using osu.Game.Screens.Edit.Components.Timelines.Summary.Visualisations;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class TimelineBeatLineDisplay : TimelinePart
+    public class TimelineTickDisplay : TimelinePart
     {
         [Resolved]
         private EditorBeatmap beatmap { get; set; }
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public TimelineBeatLineDisplay()
+        public TimelineTickDisplay()
         {
             RelativeSizeAxes = Axes.Both;
         }

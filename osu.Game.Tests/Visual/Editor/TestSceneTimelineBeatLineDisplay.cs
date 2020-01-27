@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Editor
     [TestFixture]
     public class TestSceneTimelineBeatLineDisplay : TimelineTestScene
     {
-        public override Drawable CreateTestComponent() => new TimelineBeatLineDisplay();
+        public override Drawable CreateTestComponent() => new TimelineTickDisplay();
 
         [BackgroundDependencyLoader]
         private void load()
