@@ -27,8 +27,8 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogHeader()
         {
-            BreadcrumbControl.AddItem(listing_string);
-            BreadcrumbControl.Current.ValueChanged += e =>
+            TabControl.AddItem(listing_string);
+            TabControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
@@ -48,12 +48,12 @@ namespace osu.Game.Overlays.Changelog
         private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
             if (e.OldValue != null)
-                BreadcrumbControl.RemoveItem(e.OldValue.ToString());
+                TabControl.RemoveItem(e.OldValue.ToString());
 
             if (e.NewValue != null)
             {
-                BreadcrumbControl.AddItem(e.NewValue.ToString());
-                BreadcrumbControl.Current.Value = e.NewValue.ToString();
+                TabControl.AddItem(e.NewValue.ToString());
+                TabControl.Current.Value = e.NewValue.ToString();
 
                 updateCurrentStream();
 
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                BreadcrumbControl.Current.Value = listing_string;
+                TabControl.Current.Value = listing_string;
                 Streams.Current.Value = null;
                 title.Version = null;
             }
