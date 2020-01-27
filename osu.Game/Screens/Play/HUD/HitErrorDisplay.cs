@@ -10,10 +10,11 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class HitErrorDisplay : Container<HitErrorMeter>
+    public class HitErrorDisplay : Container<FillFlowContainer<HitErrorMeter>>
     {
         private const int fade_duration = 200;
         private const int margin = 10;
@@ -24,6 +25,9 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly ScoreProcessor processor;
 
+        private readonly FillFlowContainer<HitErrorMeter> leftMeters;
+        private readonly FillFlowContainer<HitErrorMeter> rightMeters;
+
         public HitErrorDisplay(ScoreProcessor processor, HitWindows hitWindows)
         {
             this.processor = processor;
@@ -33,6 +37,24 @@ namespace osu.Game.Screens.Play.HUD
 
             if (processor != null)
                 processor.NewJudgement += onNewJudgement;
+
+            Children = new[]
+            {
+                leftMeters = new FillFlowContainer<HitErrorMeter>
+                {
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
+                    Spacing = new Vector2(margin),
+                    Margin = new MarginPadding(margin),
+                },
+                rightMeters = new FillFlowContainer<HitErrorMeter>
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Spacing = new Vector2(margin),
+                    Margin = new MarginPadding(margin),
+                }
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -53,7 +75,8 @@ namespace osu.Game.Screens.Play.HUD
                 return;
 
             foreach (var c in Children)
-                c.OnNewJudgement(result);
+                foreach (var meter in c.Children)
+                    meter.OnNewJudgement(result);
         }
 
         private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
@@ -103,7 +126,7 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 0,
             };
 
-            completeDisplayLoading(display);
+            completeDisplayLoading(display, rightAligned);
         }
 
         private void createColour(bool rightAligned)
@@ -116,12 +139,15 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 0,
             };
 
-            completeDisplayLoading(display);
+            completeDisplayLoading(display, rightAligned);
         }
 
-        private void completeDisplayLoading(HitErrorMeter display)
+        private void completeDisplayLoading(HitErrorMeter display, bool rightAligned)
         {
-            Add(display);
+            if (rightAligned)
+                rightMeters.Add(display);
+            else
+                leftMeters.Add(display);
             display.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
