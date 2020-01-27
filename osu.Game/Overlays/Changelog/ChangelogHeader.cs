@@ -9,7 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -26,7 +25,6 @@ namespace osu.Game.Overlays.Changelog
         private const string listing_string = "listing";
 
         public ChangelogHeader()
-            : base(OverlayColourScheme.Purple)
         {
             BreadcrumbControl.AddItem(listing_string);
             BreadcrumbControl.Current.ValueChanged += e =>
