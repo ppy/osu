@@ -5,7 +5,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,7 +16,9 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly BindableInt Current = new BindableInt();
 
-        private readonly SpriteText counter;
+        private readonly OsuSpriteText counter;
+        private readonly OsuSpriteText text;
+        private readonly Box pillBackground;
 
         public TotalCommentsCounter()
         {
@@ -33,7 +34,7 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText
+                    text = new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
@@ -48,10 +49,9 @@ namespace osu.Game.Overlays.Comments
                         Masking = true,
                         Children = new Drawable[]
                         {
-                            new Box
+                            pillBackground = new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = OsuColour.Gray(0.05f)
                             },
                             counter = new OsuSpriteText
                             {
@@ -67,9 +67,11 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            counter.Colour = colours.BlueLighter;
+            text.Colour = colourProvider.Light1;
+            pillBackground.Colour = colourProvider.Background6;
+            counter.Colour = colourProvider.Foreground1;
         }
 
         protected override void LoadComplete()
