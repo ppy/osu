@@ -40,7 +40,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        protected class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
+        public class BreadcrumbTabItem : OsuTabItem, IStateful<Visibility>
         {
             protected virtual float ChevronSize => 10;
 
