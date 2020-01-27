@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Edit
                     RelativeSizeAxes = Axes.Both,
                     Children = new[]
                     {
-                        new TimelineBeatLineDisplay(),
+                        new TimelineTickDisplay(),
                         CreateTimelineContent(),
                     }
                 }, timelineContainer.Add);
