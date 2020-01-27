@@ -27,5 +27,14 @@ namespace osu.Game.Configuration
 
         [Description("Colour (both)")]
         ColourBoth,
+
+        [Description("Combined (left)")]
+        CombinedLeft,
+
+        [Description("Combined (right)")]
+        CombinedRight,
+
+        [Description("Combined (both)")]
+        CombinedBoth,
     }
 }

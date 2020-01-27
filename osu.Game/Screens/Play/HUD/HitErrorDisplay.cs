@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 leftMeters = new FillFlowContainer<HitErrorMeter>
                 {
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     Spacing = new Vector2(margin),
@@ -49,6 +50,7 @@ namespace osu.Game.Screens.Play.HUD
                 },
                 rightMeters = new FillFlowContainer<HitErrorMeter>
                 {
+                    AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Spacing = new Vector2(margin),
@@ -81,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void typeChanged(ValueChangedEvent<ScoreMeterType> type)
         {
-            Children.ForEach(c => c.FadeOut(fade_duration, Easing.OutQuint));
+            Children.ForEach(c => c.ForEach(c => c.FadeOut(fade_duration, Easing.OutQuint)));
 
             if (hitWindows == null)
                 return;
@@ -113,6 +115,19 @@ namespace osu.Game.Screens.Play.HUD
                 case ScoreMeterType.ColourRight:
                     createColour(true);
                     break;
+
+                case ScoreMeterType.CombinedLeft:
+                    createCombined(false);
+                    break;
+
+                case ScoreMeterType.CombinedRight:
+                    createCombined(true);
+                    break;
+
+                case ScoreMeterType.CombinedBoth:
+                    createCombined(false);
+                    createCombined(true);
+                    break;
             }
         }
 
@@ -140,6 +155,12 @@ namespace osu.Game.Screens.Play.HUD
             };
 
             completeDisplayLoading(display, rightAligned);
+        }
+
+        private void createCombined(bool rightAligned)
+        {
+            createBar(rightAligned);
+            createColour(rightAligned);
         }
 
         private void completeDisplayLoading(HitErrorMeter display, bool rightAligned)
