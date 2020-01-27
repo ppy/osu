@@ -36,7 +36,7 @@ namespace osu.Game.Overlays
                         AutoSizeAxes = Axes.Y,
                         Direction = FillDirection.Vertical,
                         Depth = -float.MaxValue,
-                        Children = new Drawable[]
+                        Children = new[]
                         {
                             CreateBackground(),
                             new Container
