@@ -11,7 +11,7 @@ using osuTK;
 namespace osu.Game.Tests.Visual.Editor
 {
     [TestFixture]
-    public class TestSceneTimelineBeatLineDisplay : TimelineTestScene
+    public class TestSceneTimelineTickDisplay : TimelineTestScene
     {
         public override Drawable CreateTestComponent() => new TimelineTickDisplay();
 
