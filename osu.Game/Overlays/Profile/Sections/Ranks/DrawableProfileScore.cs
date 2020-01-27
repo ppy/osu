@@ -30,6 +30,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [Resolved]
         private OsuColour colours { get; set; }
 
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
+
         public DrawableProfileScore(ScoreInfo score)
         {
             Score = score;
@@ -91,7 +94,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                                     },
                                                     new DrawableDate(Score.Date, 12)
                                                     {
-                                                        Colour = colours.GreySeafoamLighter
+                                                        Colour = colourProvider.Foreground1
                                                     }
                                                 }
                                             }
@@ -192,7 +195,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(weight: FontWeight.Bold),
                             Text = $"{Score.PP:0}",
-                            Colour = colours.GreenLight
+                            Colour = colourProvider.Highlight1
                         },
                         new OsuSpriteText
                         {
@@ -200,7 +203,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                             Text = "pp",
-                            Colour = colours.Green
+                            Colour = colourProvider.Light3
                         }
                     }
                 };
@@ -210,7 +213,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             {
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
                 Text = "-",
-                Colour = colours.GreenLight
+                Colour = colourProvider.Highlight1
             };
         }
 
