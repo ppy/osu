@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -52,29 +52,32 @@ namespace osu.Game.Screens.Edit
         {
             switch (beatDivisor)
             {
+                case 1:
+                    return Color4.White;
+
                 case 2:
-                    return colours.BlueLight;
+                    return colours.Red;
 
                 case 4:
                     return colours.Blue;
 
                 case 8:
-                    return colours.BlueDarker;
+                    return colours.Yellow;
 
                 case 16:
                     return colours.PurpleDark;
 
                 case 3:
-                    return colours.YellowLight;
+                    return colours.Purple;
 
                 case 6:
-                    return colours.Yellow;
+                    return colours.YellowDark;
 
                 case 12:
                     return colours.YellowDarker;
 
                 default:
-                    return Color4.White;
+                    return Color4.Red;
             }
         }
     }
