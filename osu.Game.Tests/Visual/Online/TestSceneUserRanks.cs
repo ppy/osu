@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Users;
@@ -26,6 +28,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DrawableProfileWeightedScore),
             typeof(RanksSection)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         public TestSceneUserRanks()
         {

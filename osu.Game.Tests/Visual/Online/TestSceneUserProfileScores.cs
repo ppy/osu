@@ -12,6 +12,8 @@ using osuTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -74,11 +76,26 @@ namespace osu.Game.Tests.Visual.Online
                 Spacing = new Vector2(0, 10),
                 Children = new[]
                 {
-                    new DrawableProfileScore(score),
-                    new DrawableProfileScore(noPPScore),
-                    new DrawableProfileWeightedScore(score, 0.85),
+                    new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(score)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(score, 0.85))
                 }
             });
+        }
+
+        private class ColourProvidedContainer : Container
+        {
+            [Cached]
+            private readonly OverlayColourProvider colourProvider;
+
+            public ColourProvidedContainer(OverlayColourScheme colourScheme, DrawableProfileScore score)
+            {
+                colourProvider = new OverlayColourProvider(colourScheme);
+
+                AutoSizeAxes = Axes.Y;
+                RelativeSizeAxes = Axes.X;
+                Add(score);
+            }
         }
     }
 }
