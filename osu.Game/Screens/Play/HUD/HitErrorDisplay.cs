@@ -10,7 +10,6 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.HUD.HitErrorMeters;
-using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -45,7 +44,6 @@ namespace osu.Game.Screens.Play.HUD
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    Spacing = new Vector2(margin),
                     Margin = new MarginPadding(margin),
                 },
                 rightMeters = new FillFlowContainer<HitErrorMeter>
@@ -53,7 +51,6 @@ namespace osu.Game.Screens.Play.HUD
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Spacing = new Vector2(margin),
                     Margin = new MarginPadding(margin),
                 }
             };
