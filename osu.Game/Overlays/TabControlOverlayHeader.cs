@@ -16,15 +16,10 @@ namespace osu.Game.Overlays
 
         protected override TabControl<string> CreateTabControl() => TabControl = new OverlayHeaderTabControl();
 
-        protected TabControlOverlayHeader(OverlayColourScheme colourScheme)
-            : base(colourScheme)
-        {
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            TabControl.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.75f);
+            TabControl.AccentColour = colourProvider.Highlight1;
         }
 
         public class OverlayHeaderTabControl : OverlayTabControl<string>
