@@ -16,6 +16,11 @@ namespace osu.Game.Overlays.SearchableList
     public abstract class SearchableListOverlay : FullscreenOverlay
     {
         public const float WIDTH_PADDING = 80;
+
+        protected SearchableListOverlay(OverlayColourScheme colourScheme)
+            : base(colourScheme)
+        {
+        }
     }
 
     public abstract class SearchableListOverlay<THeader, TTab, TCategory> : SearchableListOverlay
@@ -35,7 +40,8 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract SearchableListHeader<THeader> CreateHeader();
         protected abstract SearchableListFilterControl<TTab, TCategory> CreateFilterControl();
 
-        protected SearchableListOverlay()
+        protected SearchableListOverlay(OverlayColourScheme colourScheme)
+            : base(colourScheme)
         {
             Children = new Drawable[]
             {

@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
@@ -15,15 +14,10 @@ namespace osu.Game.Overlays
 
         protected override TabControl<string> CreateTabControl() => BreadcrumbControl = new OverlayHeaderBreadcrumbControl();
 
-        protected BreadcrumbControlOverlayHeader(OverlayColourScheme colourScheme)
-            : base(colourScheme)
-        {
-        }
-
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            BreadcrumbControl.AccentColour = colours.ForOverlayElement(ColourScheme, 1, 0.75f);
+            BreadcrumbControl.AccentColour = colourProvider.Highlight1;
         }
 
         public class OverlayHeaderBreadcrumbControl : BreadcrumbControl<string>

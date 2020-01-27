@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly Mod testCustomisableMod = new TestModCustomisable1();
 
+        private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable2();
+
         [Test]
         public void TestButtonShowsOnCustomisableMod()
         {
@@ -51,6 +53,17 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("open", () => modSelect.Show());
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
+        }
+
+        [Test]
+        public void TestCustomisationOpensOnModSelect()
+        {
+            createModSelect();
+
+            AddStep("open", () => modSelect.Show());
+            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
+            AddStep("select mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
+            AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
         }
 
         private void createModSelect()
@@ -128,6 +141,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             public override string Name => "Customisable Mod 2";
 
             public override string Acronym => "CM2";
+
+            public override bool RequiresConfiguration => true;
         }
 
         private abstract class TestModCustomisable : Mod, IApplicableMod

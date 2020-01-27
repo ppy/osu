@@ -21,6 +21,11 @@ namespace osu.Game.Overlays
 
         public readonly Bindable<string> Current = new Bindable<string>(null);
 
+        public NewsOverlay()
+            : base(OverlayColourScheme.Purple)
+        {
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {

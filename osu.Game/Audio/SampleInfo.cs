@@ -19,6 +19,6 @@ namespace osu.Game.Audio
 
         public IEnumerable<string> LookupNames => new[] { sampleName };
 
-        public int Volume { get; set; } = 100;
+        public int Volume { get; } = 100;
     }
 }

@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -83,14 +82,6 @@ namespace osu.Game.Graphics.UserInterface
             get => strip.Colour;
             set => strip.Colour = value;
         }
-
-        protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
-        {
-            Direction = FillDirection.Full,
-            RelativeSizeAxes = Axes.Both,
-            Depth = -1,
-            Masking = true
-        };
 
         protected override void UpdateAfterChildren()
         {
@@ -282,11 +273,6 @@ namespace osu.Game.Graphics.UserInterface
                     base.OnHoverLost(e);
                 }
             }
-        }
-
-        private class OsuTabFillFlowContainer : TabFillFlowContainer
-        {
-            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }

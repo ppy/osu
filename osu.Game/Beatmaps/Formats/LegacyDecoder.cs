@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Extensions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
@@ -115,7 +116,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected KeyValuePair<string, string> SplitKeyVal(string line, char separator = ':')
         {
-            var split = line.Trim().Split(new[] { separator }, 2);
+            var split = line.Split(separator, 2);
 
             return new KeyValuePair<string, string>
             (
@@ -123,6 +124,8 @@ namespace osu.Game.Beatmaps.Formats
                 split.Length > 1 ? split[1].Trim() : string.Empty
             );
         }
+
+        protected string CleanFilename(string path) => path.Trim('"').ToStandardisedPath();
 
         protected enum Section
         {

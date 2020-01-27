@@ -103,7 +103,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 MovableCatcher.X = state.CatcherX.Value;
         }
 
-        public bool OnReleased(CatchAction action) => false;
+        public void OnReleased(CatchAction action)
+        {
+        }
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
 
@@ -341,24 +343,22 @@ namespace osu.Game.Rulesets.Catch.UI
                 return false;
             }
 
-            public bool OnReleased(CatchAction action)
+            public void OnReleased(CatchAction action)
             {
                 switch (action)
                 {
                     case CatchAction.MoveLeft:
                         currentDirection++;
-                        return true;
+                        break;
 
                     case CatchAction.MoveRight:
                         currentDirection--;
-                        return true;
+                        break;
 
                     case CatchAction.Dash:
                         Dashing = false;
-                        return true;
+                        break;
                 }
-
-                return false;
             }
 
             /// <summary>
