@@ -43,10 +43,10 @@ namespace osu.Game.Overlays.Music
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             IsDraggable = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         private bool selected;
