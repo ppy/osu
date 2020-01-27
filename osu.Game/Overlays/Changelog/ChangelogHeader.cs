@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -37,7 +38,7 @@ namespace osu.Game.Overlays.Changelog
 
             Streams.Current.ValueChanged += e =>
             {
-                if (e.NewValue?.LatestBuild != null && e.NewValue != Current.Value?.UpdateStream)
+                if (e.NewValue?.LatestBuild != null && !e.NewValue.Equals(Current.Value?.UpdateStream))
                     Current.Value = e.NewValue.LatestBuild;
             };
         }
@@ -54,7 +55,7 @@ namespace osu.Game.Overlays.Changelog
                 BreadcrumbControl.AddItem(e.NewValue.ToString());
                 BreadcrumbControl.Current.Value = e.NewValue.ToString();
 
-                Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == e.NewValue.UpdateStream.Name);
+                updateCurrentStream();
 
                 title.Version = e.NewValue.UpdateStream.DisplayName;
             }
@@ -79,6 +80,20 @@ namespace osu.Game.Overlays.Changelog
         };
 
         protected override ScreenTitle CreateTitle() => title = new ChangelogHeaderTitle();
+
+        public void Populate(List<APIUpdateStream> streams)
+        {
+            Streams.Populate(streams);
+            updateCurrentStream();
+        }
+
+        private void updateCurrentStream()
+        {
+            if (Current.Value == null)
+                return;
+
+            Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Current.Value.UpdateStream.Name);
+        }
 
         public class HeaderBackground : Sprite
         {
