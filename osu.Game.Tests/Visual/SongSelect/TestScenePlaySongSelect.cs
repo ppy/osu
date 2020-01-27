@@ -104,6 +104,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
             WorkingBeatmap selected = null;
 
             AddStep("store selected beatmap", () => selected = Beatmap.Value);
@@ -129,6 +131,8 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             createSongSelect();
 
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
             WorkingBeatmap selected = null;
 
             AddStep("store selected beatmap", () => selected = Beatmap.Value);
@@ -153,6 +157,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             addRulesetImportStep(0);
 
             createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
 
             WorkingBeatmap selected = null;
 
@@ -182,6 +188,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             addRulesetImportStep(0);
 
             createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
 
             WorkingBeatmap selected = null;
 
