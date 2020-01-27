@@ -154,8 +154,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double cheeseFactor = LinearSpline.InterpolateSorted(Attributes.CheeseLevels, Attributes.CheeseFactors)
                                   .Interpolate(cheeseLevel);
 
-
-
             if (mods.Any(m => m is OsuModTouchDevice))
                 tp = Math.Min(tp, 1.47 * Math.Pow(tp, 0.8));
 
@@ -163,6 +161,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // penalize misses
             aimValue *= Math.Pow(0.96, effectiveMissCount);
+
+            // Buff long maps
+            aimValue *= 1 + (SpecialFunctions.Logistic((totalHits - 2500) / 500.0) - SpecialFunctions.Logistic(-2500 / 500.0)) * 0.128;
 
             // Buff very high AR and low AR
             double approachRateFactor = 1.0;
