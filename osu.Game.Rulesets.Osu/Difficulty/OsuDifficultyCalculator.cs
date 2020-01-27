@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 Aim.CalculateAimAttributes(hitObjects, clockRate, strainHistory, noteDensities);
 
             // graph for aim
-            string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}.txt");
+            string graphFilePath = Path.Combine("cache", $"graph_{beatmap.BeatmapInfo.OnlineBeatmapID}_{string.Join(string.Empty, mods.Select(x => x.Acronym))}.txt");
             File.WriteAllText(graphFilePath, graphText);
 
             double tapSR = tapMultiplier * Math.Pow(tapDiff, srExponent);
