@@ -7,9 +7,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osuTK.Graphics;
@@ -27,6 +25,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             typeof(TestStringTabControlHeader),
             typeof(TestEnumTabControlHeader),
             typeof(TestBreadcrumbControlHeader),
+            typeof(OverlayHeaderBackground)
         };
 
         private readonly FillFlowContainer flow;
@@ -52,6 +51,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 }
             });
 
+            addHeader("Orange OverlayHeader (no background)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
             addHeader("Blue OverlayHeader", new TestNoControlHeader(), OverlayColourScheme.Blue);
             addHeader("Green TabControlOverlayHeader (string)", new TestStringTabControlHeader(), OverlayColourScheme.Green);
             addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
@@ -98,16 +98,21 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         }
 
+        private class TestNoBackgroundHeader : OverlayHeader
+        {
+            protected override ScreenTitle CreateTitle() => new TestTitle();
+        }
+
         private class TestNoControlHeader : OverlayHeader
         {
-            protected override Drawable CreateBackground() => new TestBackground();
+            protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
         }
 
         private class TestStringTabControlHeader : TabControlOverlayHeader<string>
         {
-            protected override Drawable CreateBackground() => new TestBackground();
+            protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/news");
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
@@ -120,7 +125,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestEnumTabControlHeader : TabControlOverlayHeader<TestEnum>
         {
-            protected override Drawable CreateBackground() => new TestBackground();
+            protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
         }
@@ -134,7 +139,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestBreadcrumbControlHeader : BreadcrumbControlOverlayHeader
         {
-            protected override Drawable CreateBackground() => new TestBackground();
+            protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/search");
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
@@ -143,21 +148,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                 TabControl.AddItem("tab1");
                 TabControl.AddItem("tab2");
                 TabControl.Current.Value = "tab2";
-            }
-        }
-
-        private class TestBackground : Sprite
-        {
-            public TestBackground()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fill;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(@"Headers/changelog");
             }
         }
 
