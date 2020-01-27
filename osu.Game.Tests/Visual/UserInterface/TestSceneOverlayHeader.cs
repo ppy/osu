@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             addHeader("Blue OverlayHeader", new TestNoControlHeader(), OverlayColourScheme.Blue);
             addHeader("Green TabControlOverlayHeader (string)", new TestStringTabControlHeader(), OverlayColourScheme.Green);
             addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
-            addHeader("Red BreadcrumbControlOverlayHeader", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
+            addHeader("Red BreadcrumbControlOverlayHeader (no background)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
         }
 
         private void addHeader(string name, OverlayHeader header, OverlayColourScheme colourScheme)
@@ -139,8 +139,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestBreadcrumbControlHeader : BreadcrumbControlOverlayHeader
         {
-            protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/search");
-
             protected override ScreenTitle CreateTitle() => new TestTitle();
 
             public TestBreadcrumbControlHeader()
