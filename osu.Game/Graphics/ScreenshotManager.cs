@@ -88,7 +88,7 @@ namespace osu.Game.Graphics
                 {
                     ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
                     {
-                        if (framesWaited++ < frames_to_wait)
+                        if (framesWaited++ >= frames_to_wait)
                             // ReSharper disable once AccessToDisposedClosure
                             framesWaitedEvent.Set();
                     }, 10, true);

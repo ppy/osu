@@ -29,6 +29,11 @@ namespace osu.Game.Overlays
 
         public const float CONTENT_X_MARGIN = 70;
 
+        public UserProfileOverlay()
+                    : base(OverlayColourScheme.Green)
+        {
+        }
+
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)

@@ -13,7 +13,7 @@ namespace osu.Game.Tests.Visual.Online
     [TestFixture]
     public class TestSceneChangelogOverlay : OsuTestScene
     {
-        private ChangelogOverlay changelog;
+        private TestChangelogOverlay changelog;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -29,23 +29,40 @@ namespace osu.Game.Tests.Visual.Online
 
         protected override bool UseOnlineAPI => true;
 
-        protected override void LoadComplete()
+        [SetUp]
+        public void SetUp() => Schedule(() =>
         {
-            base.LoadComplete();
+            Child = changelog = new TestChangelogOverlay();
+        });
 
-            Add(changelog = new ChangelogOverlay());
-            AddStep(@"Show", changelog.Show);
-            AddStep(@"Hide", changelog.Hide);
+        [Test]
+        public void ShowWithNoFetch()
+        {
+            AddStep(@"Show", () => changelog.Show());
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"listing displayed", () => changelog.Current.Value == null);
+            AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
+        }
 
-            AddWaitStep("wait for hide", 3);
+        [Test]
+        public void ShowWithListing()
+        {
+            AddStep(@"Show with listing", () => changelog.ShowListing());
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"listing displayed", () => changelog.Current.Value == null);
+            AddAssert(@"no stream selected", () => changelog.Header.Streams.Current.Value == null);
+        }
 
+        [Test]
+        public void ShowWithBuild()
+        {
             AddStep(@"Show with Lazer 2018.712.0", () =>
             {
                 changelog.ShowBuild(new APIChangelogBuild
                 {
                     Version = "2018.712.0",
                     DisplayVersion = "2018.712.0",
-                    UpdateStream = new APIUpdateStream { Name = OsuGameBase.CLIENT_STREAM_NAME },
+                    UpdateStream = new APIUpdateStream { Id = 7, Name = OsuGameBase.CLIENT_STREAM_NAME },
                     ChangelogEntries = new List<APIChangelogEntry>
                     {
                         new APIChangelogEntry
@@ -56,19 +73,16 @@ namespace osu.Game.Tests.Visual.Online
                         }
                     }
                 });
-                changelog.Show();
             });
 
-            AddWaitStep("wait for show", 3);
-            AddStep(@"Hide", changelog.Hide);
-            AddWaitStep("wait for hide", 3);
+            AddUntilStep(@"wait for streams", () => changelog.Streams?.Count > 0);
+            AddAssert(@"correct build displayed", () => changelog.Current.Value.Version == "2018.712.0");
+            AddAssert(@"correct stream selected", () => changelog.Header.Streams.Current.Value.Id == 7);
+        }
 
-            AddStep(@"Show with listing", () =>
-            {
-                changelog.ShowListing();
-                changelog.Show();
-            });
-
+        [Test]
+        public void TestHTMLUnescaping()
+        {
             AddStep(@"Ensure HTML string unescaping", () =>
             {
                 changelog.ShowBuild(new APIChangelogBuild
@@ -96,6 +110,13 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 });
             });
+        }
+
+        private class TestChangelogOverlay : ChangelogOverlay
+        {
+            public new List<APIUpdateStream> Streams => base.Streams;
+
+            public new ChangelogHeader Header => base.Header;
         }
     }
 }

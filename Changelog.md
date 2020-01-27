@@ -123,10 +123,10 @@
     *   [M] [#7585, #7587 - 应用OnRelease方法签名重构, 更新framework]()
         * [#7585](https://github.com/ppy/osu/pull/7585) 
         * [#7587](https://github.com/ppy/osu/pull/7587)
-    *   [M] [#7588 - Move beat snapping to its own interface](https://github.com/ppy/osu/pull/7588)
+    *   [M] [#7588 - 将beat snapping移动到其自己的接口中](https://github.com/ppy/osu/pull/7588)
     *   [M] [#7590 - 更新一些国家的名称](https://github.com/ppy/osu/pull/7590)
     *   [M] [#7592 - 将TotalCommentsCounter 添加至 CommentsContainer中](https://github.com/ppy/osu/pull/7592)
-    *   [M] [#7594 - Fix editor rate adjustment polluting global beatmap rate](https://github.com/ppy/osu/pull/7594)
+    *   [M] [#7594 - 修复编辑器速率调整会不正确影响全局Beatmap速率的问题](https://github.com/ppy/osu/pull/7594)
 *   移除整合
     *   [O] [#5782 - 实现转盘额外分数](https://github.com/ppy/osu/pull/5782)        
 
@@ -148,3 +148,16 @@
     *   [M] [#7567 - 更新fastlane和一些插件](https://github.com/ppy/osu/pull/7567)
 
 *   **暂时移除了自动下载更新的功能**
+
+## 2020.???.0
+### 2020/1/27
+*   整合更新
+    *   [M] [#7614 - Fix NullReferenceException on main menu for mobile game hosts](https://github.com/ppy/osu/pull/7614)
+    *   [M] [#7618 - Move reverse-order comparer to ChannelTabControl](https://github.com/ppy/osu/pull/7618)
+    *   [M] [#7622 - Remap osu!mania dual stage key bindings to be more ergonomic](https://github.com/ppy/osu/pull/7622)
+    *   [M] [#7624 - Fix visual inconsistency in BreadcrumbControl](https://github.com/ppy/osu/pull/7624)
+    *   [M] [#7627 - Fix typo on ScoreProcessor comment](https://github.com/ppy/osu/pull/7627)
+    *   [M] [#7628 - Fix cursor not hiding for screenshots #7628](https://github.com/ppy/osu/pull/7628)
+    *   [M] [#7630 - Fix changelog header not dimming correctly on initial build display](https://github.com/ppy/osu/pull/7630)
+    *   [M] [#7597 - Implement OverlayColourProvider component](https://github.com/ppy/osu/pull/7597)
+    *   [M] [#7631 - Bump DiscordRichPresence from 1.0.121 to 1.0.147](https://github.com/ppy/osu/pull/7631)

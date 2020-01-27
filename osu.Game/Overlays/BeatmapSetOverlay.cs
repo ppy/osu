@@ -34,6 +34,7 @@ namespace osu.Game.Overlays
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
+            : base(OverlayColourScheme.Blue)
         {
             OsuScrollContainer scroll;
             Info info;
