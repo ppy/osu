@@ -12,6 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -34,6 +35,7 @@ namespace osu.Game.Overlays.Comments
         private DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private CommentsShowMoreButton moreButton;
         private TotalCommentsCounter commentCounter;
+        private Container noCommentsPlaceholder;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -60,6 +62,27 @@ namespace osu.Game.Overlays.Comments
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
                         },
+                        noCommentsPlaceholder = new Container
+                        {
+                            Height = 80,
+                            RelativeSizeAxes = Axes.X,
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background4
+                                },
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Margin = new MarginPadding { Left = 50 },
+                                    Text = @"No comments yet."
+                                }
+                            }
+                        },
                         content = new FillFlowContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -68,6 +91,7 @@ namespace osu.Game.Overlays.Comments
                         },
                         new Container
                         {
+                            Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
@@ -154,12 +178,21 @@ namespace osu.Game.Overlays.Comments
         {
             currentPage = 1;
             deletedChildrenPlaceholder.DeletedCount.Value = 0;
+            moreButton.Show();
             moreButton.IsLoading = true;
             content.Clear();
+            noCommentsPlaceholder.Hide();
         }
 
         private void onSuccess(CommentBundle response)
         {
+            if (!response.Comments.Any())
+            {
+                noCommentsPlaceholder.Show();
+                moreButton.Hide();
+                return;
+            }
+
             loadCancellation = new CancellationTokenSource();
 
             var page = new FillFlowContainer
