@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
@@ -106,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (!gridCache.IsValid)
             {
                 ClearInternal();
-                CreateContent(StartPosition);
+                CreateContent();
                 gridCache.Validate();
             }
         }
@@ -114,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Creates the content which visualises the grid ticks.
         /// </summary>
-        protected abstract void CreateContent(Vector2 startPosition);
+        protected abstract void CreateContent();
 
         /// <summary>
         /// Snaps a position to this grid.
@@ -126,13 +127,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Retrieves the applicable colour for a beat index.
         /// </summary>
-        /// <param name="index">The 0-based beat index.</param>
+        /// <param name="placementIndex">The 0-based beat index from the point of placement.</param>
         /// <returns>The applicable colour.</returns>
-        protected ColourInfo GetColourForBeatIndex(int index)
+        protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
         {
-            var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(index + 1, beatDivisor.Value), Colours);
+            var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
+            var beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / timingPoint.BeatLength * beatDivisor.Value);
+            var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
-            int repeatIndex = index / beatDivisor.Value;
+            int repeatIndex = placementIndex / beatDivisor.Value;
             return colour.MultiplyAlpha(0.5f / (repeatIndex + 1));
         }
     }
