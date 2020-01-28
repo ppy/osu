@@ -30,22 +30,22 @@ namespace osu.Game.Overlays.Comments
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
-        private readonly Box background;
-        private readonly Box footerBackground;
-        private readonly FillFlowContainer content;
-        private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
-        private readonly CommentsShowMoreButton moreButton;
-        private readonly TotalCommentsCounter commentCounter;
+        private FillFlowContainer content;
+        private DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private CommentsShowMoreButton moreButton;
+        private TotalCommentsCounter commentCounter;
 
-        public CommentsContainer()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5
                 },
                 new FillFlowContainer
                 {
@@ -72,9 +72,10 @@ namespace osu.Game.Overlays.Comments
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
                             {
-                                footerBackground = new Box
+                                new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
+                                    Colour = colourProvider.Background4
                                 },
                                 new FillFlowContainer
                                 {
@@ -107,13 +108,6 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            background.Colour = colourProvider.Background5;
-            footerBackground.Colour = colourProvider.Background4;
         }
 
         protected override void LoadComplete()
