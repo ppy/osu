@@ -75,10 +75,10 @@ namespace osu.Game.Overlays
         }
 
         [NotNull]
-        protected virtual Drawable CreateContent() => new Container();
+        protected virtual Drawable CreateContent() => Drawable.Empty();
 
         [NotNull]
-        protected virtual Drawable CreateBackground() => new Container();
+        protected virtual Drawable CreateBackground() => Drawable.Empty();
 
         protected abstract ScreenTitle CreateTitle();
     }
