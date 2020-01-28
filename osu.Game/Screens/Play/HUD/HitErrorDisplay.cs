@@ -115,16 +115,16 @@ namespace osu.Game.Screens.Play.HUD
                     createColour(true);
                     break;
 
+                case ScoreMeterType.CombinedBoth:
+                    createCombined(false);
+                    createCombined(true);
+                    break;
+
                 case ScoreMeterType.CombinedLeft:
                     createCombined(false);
                     break;
 
                 case ScoreMeterType.CombinedRight:
-                    createCombined(true);
-                    break;
-
-                case ScoreMeterType.CombinedBoth:
-                    createCombined(false);
                     createCombined(true);
                     break;
             }
