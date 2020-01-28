@@ -65,6 +65,8 @@ namespace osu.Game.Tests.Visual.Menus
                     game.Dispose();
                 }
 
+                RecycleLocalStorage();
+
                 game = new TestOsuGame(LocalStorage, API);
                 game.SetHost(host);
 
