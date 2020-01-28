@@ -170,7 +170,6 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
-                double floatMinValue = CurrentNumber.MinValue.ToDouble(NumberFormatInfo.InvariantInfo);
                 double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
                 if (DisplayAsPercentage)
