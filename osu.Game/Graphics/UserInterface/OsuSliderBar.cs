@@ -35,6 +35,10 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         public virtual string TooltipText { get; private set; }
+
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
         public bool DisplayAsPercentage { get; set; }
 
         private Color4 accentColour;
