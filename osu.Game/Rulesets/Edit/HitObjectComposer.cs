@@ -137,12 +137,12 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => selectTool(t)))
-                                .Prepend(new RadioButton("Select", () => selectTool(null)))
-                                .ToList();
+            toolboxCollection.Items = CompositionTools
+                                      .Prepend(new SelectTool())
+                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
+                                      .ToList();
 
-            toolboxCollection.Items[0].Select();
+            toolboxCollection.Items.First().Select();
 
             blueprintContainer.SelectionChanged += selectionChanged;
         }
@@ -187,11 +187,11 @@ namespace osu.Game.Rulesets.Edit
                 showGridFor(hitObjects);
         }
 
-        private void selectTool(HitObjectCompositionTool tool)
+        private void toolSelected(HitObjectCompositionTool tool)
         {
             blueprintContainer.CurrentTool = tool;
 
-            if (tool == null)
+            if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
             else
                 showGridFor(Enumerable.Empty<HitObject>());
