@@ -16,11 +16,10 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly BindableInt Current = new BindableInt();
 
-        private readonly OsuSpriteText counter;
-        private readonly OsuSpriteText text;
-        private readonly Box pillBackground;
+        private OsuSpriteText counter;
 
-        public TotalCommentsCounter()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             Height = 50;
@@ -34,11 +33,12 @@ namespace osu.Game.Overlays.Comments
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
-                    text = new OsuSpriteText
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         Font = OsuFont.GetFont(size: 20, italics: true),
+                        Colour = colourProvider.Light1,
                         Text = @"Comments"
                     },
                     new CircularContainer
@@ -49,29 +49,23 @@ namespace osu.Game.Overlays.Comments
                         Masking = true,
                         Children = new Drawable[]
                         {
-                            pillBackground = new Box
+                            new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                Colour = colourProvider.Background6
                             },
                             counter = new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
+                                Colour = colourProvider.Foreground1
                             }
                         },
                     }
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OverlayColourProvider colourProvider)
-        {
-            text.Colour = colourProvider.Light1;
-            pillBackground.Colour = colourProvider.Background6;
-            counter.Colour = colourProvider.Foreground1;
         }
 
         protected override void LoadComplete()
