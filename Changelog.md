@@ -161,3 +161,7 @@
     *   [M] [#7630 - Fix changelog header not dimming correctly on initial build display](https://github.com/ppy/osu/pull/7630)
     *   [M] [#7597 - Implement OverlayColourProvider component](https://github.com/ppy/osu/pull/7597)
     *   [M] [#7631 - Bump DiscordRichPresence from 1.0.121 to 1.0.147](https://github.com/ppy/osu/pull/7631)
+### 2020/1/29
+*   整合更新
+    *   [m] [#7623 - Fix crash due to misordered selection events](https://github.com/ppy/osu/pull/7623)
+    *   [m] [#7432 - Implement ability to create OverlayHeader with no TabControl](https://github.com/ppy/osu/pull/7432)

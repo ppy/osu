@@ -8,6 +8,7 @@ using osu.Framework.Testing.Input;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osuTK;
 using osuTK.Graphics;
 
@@ -30,7 +31,11 @@ namespace osu.Game.Tests.Visual
                 InputManager = new ManualInputManager
                 {
                     UseParentInput = true,
-                    Child = content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both },
+                    Child = new GlobalActionContainer(null)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Child = content = new MenuCursorContainer { RelativeSizeAxes = Axes.Both }
+                    },
                 },
                 new Container
                 {
