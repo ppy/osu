@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             snakingSlider.OnLoadComplete += d =>
             {
                 var body = (d as DrawableSlider).Body.Drawable as PlaySliderBody;
+                if (body is null) return;
                 body.SnakingIn.Value = true;
                 body.SnakingOut.Value = true;
             };
