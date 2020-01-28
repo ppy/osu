@@ -4,12 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -67,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        protected override Drawable CreateBackground() => new HeaderBackground();
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
         protected override Drawable CreateContent() => new Container
         {
@@ -93,21 +90,6 @@ namespace osu.Game.Overlays.Changelog
                 return;
 
             Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Current.Value.UpdateStream.Name);
-        }
-
-        public class HeaderBackground : Sprite
-        {
-            public HeaderBackground()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fill;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(@"Headers/changelog");
-            }
         }
 
         private class ChangelogHeaderTitle : ScreenTitle
