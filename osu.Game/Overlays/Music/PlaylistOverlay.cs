@@ -21,12 +21,14 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
+        public readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
+
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private BeatmapManager beatmaps;
 
         private FilterControl filter;
-        private PlaylistList list;
-
+        private PlaylistList2 list;
+        
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
         {
@@ -53,11 +55,11 @@ namespace osu.Game.Overlays.Music
                             Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        list = new PlaylistList
+                        list = new PlaylistList2
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
-                            Selected = itemSelected,
+                            // Selected = itemSelected,
                         },
                         filter = new FilterControl
                         {
@@ -69,6 +71,8 @@ namespace osu.Game.Overlays.Music
                     },
                 },
             };
+
+            list.BeatmapSets.BindTo(BeatmapSets);
 
             filter.Search.OnCommit = (sender, newText) =>
             {

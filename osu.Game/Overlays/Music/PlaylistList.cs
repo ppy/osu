@@ -6,30 +6,16 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
-using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistList : CompositeDrawable
+    public class PlaylistList2 : BasicRearrangeableListContainer<PlaylistListItem>
     {
-        public Action<BeatmapSetInfo> Selected;
-
-        private readonly ItemsScrollContainer items;
-
-        public PlaylistList()
-        {
-            InternalChild = items = new ItemsScrollContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Selected = set => Selected?.Invoke(set),
-            };
-        }
+        public readonly BindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
         public new MarginPadding Padding
         {
@@ -37,232 +23,81 @@ namespace osu.Game.Overlays.Music
             set => base.Padding = value;
         }
 
-        public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
-
-        public void Filter(string searchTerm) => items.SearchTerm = searchTerm;
-
-        private class ItemsScrollContainer : OsuScrollContainer
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            public Action<BeatmapSetInfo> Selected;
+            BeatmapSets.ItemsAdded += addBeatmapSets;
+            BeatmapSets.ItemsRemoved += removeBeatmapSets;
+        }
 
-            private readonly SearchContainer search;
-            private readonly FillFlowContainer<PlaylistItem> items;
+        public void Filter(string searchTerm) => ((PlaylistListFlowContainer)ListContainer).SearchTerm = searchTerm;
 
-            private readonly IBindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
+        public BeatmapSetInfo FirstVisibleSet => ListContainer.FlowingChildren.Cast<DrawablePlaylistListItem>().FirstOrDefault(i => i.MatchingFilter)?.Model.BeatmapSetInfo;
 
-            private IBindableList<BeatmapSetInfo> beatmaps;
+        private void addBeatmapSets(IEnumerable<BeatmapSetInfo> sets) => Schedule(() =>
+        {
+            foreach (var item in sets)
+                AddItem(new PlaylistListItem(item));
+        });
 
-            [Resolved]
-            private MusicController musicController { get; set; }
+        private void removeBeatmapSets(IEnumerable<BeatmapSetInfo> sets) => Schedule(() =>
+        {
+            foreach (var item in sets)
+                RemoveItem(ListContainer.Children.Select(d => d.Model).FirstOrDefault(m => m.BeatmapSetInfo == item));
+        });
 
-            public ItemsScrollContainer()
+        protected override BasicDrawableRearrangeableListItem CreateBasicItem(PlaylistListItem item) => new DrawablePlaylistListItem(item);
+
+        protected override FillFlowContainer<DrawableRearrangeableListItem> CreateListFillFlowContainer() => new PlaylistListFlowContainer
+        {
+            LayoutDuration = 200,
+            LayoutEasing = Easing.OutQuint
+        };
+    }
+
+    public class PlaylistListFlowContainer : SearchContainer<RearrangeableListContainer<PlaylistListItem>.DrawableRearrangeableListItem>
+    {
+    }
+
+    public class PlaylistListItem : IEquatable<PlaylistListItem>
+    {
+        public readonly BeatmapSetInfo BeatmapSetInfo;
+
+        public PlaylistListItem(BeatmapSetInfo beatmapSetInfo)
+        {
+            BeatmapSetInfo = beatmapSetInfo;
+        }
+
+        public override string ToString() => BeatmapSetInfo.ToString();
+
+        public bool Equals(PlaylistListItem other) => BeatmapSetInfo.Equals(other?.BeatmapSetInfo);
+    }
+
+    public class DrawablePlaylistListItem : BasicRearrangeableListContainer<PlaylistListItem>.BasicDrawableRearrangeableListItem, IFilterable
+    {
+        public DrawablePlaylistListItem(PlaylistListItem item)
+            : base(item)
+        {
+            FilterTerms = item.BeatmapSetInfo.Metadata.SearchableTerms;
+        }
+
+        public IEnumerable<string> FilterTerms { get; }
+
+        private bool matching = true;
+
+        public bool MatchingFilter
+        {
+            get => matching;
+            set
             {
-                Children = new Drawable[]
-                {
-                    search = new SearchContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            items = new ItemSearchContainer
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                            },
-                        }
-                    }
-                };
-            }
+                if (matching == value) return;
 
-            [BackgroundDependencyLoader]
-            private void load(IBindable<WorkingBeatmap> beatmap)
-            {
-                beatmaps = musicController.BeatmapSets.GetBoundCopy();
-                beatmaps.ItemsAdded += i => i.ForEach(addBeatmapSet);
-                beatmaps.ItemsRemoved += i => i.ForEach(removeBeatmapSet);
-                beatmaps.ForEach(addBeatmapSet);
+                matching = value;
 
-                beatmapBacking.BindTo(beatmap);
-                beatmapBacking.ValueChanged += _ => Scheduler.AddOnce(updateSelectedSet);
-            }
-
-            private void addBeatmapSet(BeatmapSetInfo obj)
-            {
-                if (obj == draggedItem?.BeatmapSetInfo) return;
-
-                Schedule(() => items.Insert(items.Count - 1, new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) }));
-            }
-
-            private void removeBeatmapSet(BeatmapSetInfo obj)
-            {
-                if (obj == draggedItem?.BeatmapSetInfo) return;
-
-                Schedule(() =>
-                {
-                    var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
-                    if (itemToRemove != null)
-                        items.Remove(itemToRemove);
-                });
-            }
-
-            private void updateSelectedSet()
-            {
-                foreach (PlaylistItem s in items.Children)
-                {
-                    s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo?.ID;
-                    if (s.Selected)
-                        ScrollIntoView(s);
-                }
-            }
-
-            public string SearchTerm
-            {
-                get => search.SearchTerm;
-                set => search.SearchTerm = value;
-            }
-
-            public BeatmapSetInfo FirstVisibleSet => items.FirstOrDefault(i => i.MatchingFilter)?.BeatmapSetInfo;
-
-            private Vector2 nativeDragPosition;
-            private PlaylistItem draggedItem;
-
-            private int? dragDestination;
-
-            protected override bool OnDragStart(DragStartEvent e)
-            {
-                nativeDragPosition = e.ScreenSpaceMousePosition;
-                draggedItem = items.FirstOrDefault(d => d.IsDraggable);
-                return draggedItem != null || base.OnDragStart(e);
-            }
-
-            protected override void OnDrag(DragEvent e)
-            {
-                nativeDragPosition = e.ScreenSpaceMousePosition;
-
-                if (draggedItem == null)
-                    base.OnDrag(e);
-            }
-
-            protected override void OnDragEnd(DragEndEvent e)
-            {
-                nativeDragPosition = e.ScreenSpaceMousePosition;
-
-                if (draggedItem == null)
-                {
-                    base.OnDragEnd(e);
-                    return;
-                }
-
-                if (dragDestination != null)
-                    musicController.ChangeBeatmapSetPosition(draggedItem.BeatmapSetInfo, dragDestination.Value);
-
-                draggedItem = null;
-                dragDestination = null;
-            }
-
-            protected override void Update()
-            {
-                base.Update();
-
-                if (draggedItem == null)
-                    return;
-
-                updateScrollPosition();
-                updateDragPosition();
-            }
-
-            private void updateScrollPosition()
-            {
-                const float start_offset = 10;
-                const double max_power = 50;
-                const double exp_base = 1.05;
-
-                var localPos = ToLocalSpace(nativeDragPosition);
-
-                if (localPos.Y < start_offset)
-                {
-                    if (Current <= 0)
-                        return;
-
-                    var power = Math.Min(max_power, Math.Abs(start_offset - localPos.Y));
-                    ScrollBy(-(float)Math.Pow(exp_base, power));
-                }
-                else if (localPos.Y > DrawHeight - start_offset)
-                {
-                    if (IsScrolledToEnd())
-                        return;
-
-                    var power = Math.Min(max_power, Math.Abs(DrawHeight - start_offset - localPos.Y));
-                    ScrollBy((float)Math.Pow(exp_base, power));
-                }
-            }
-
-            private void updateDragPosition()
-            {
-                var itemsPos = items.ToLocalSpace(nativeDragPosition);
-
-                int srcIndex = (int)items.GetLayoutPosition(draggedItem);
-
-                // Find the last item with position < mouse position. Note we can't directly use
-                // the item positions as they are being transformed
-                float heightAccumulator = 0;
-                int dstIndex = 0;
-
-                for (; dstIndex < items.Count; dstIndex++)
-                {
-                    // Using BoundingBox here takes care of scale, paddings, etc...
-                    heightAccumulator += items[dstIndex].BoundingBox.Height;
-                    if (heightAccumulator > itemsPos.Y)
-                        break;
-                }
-
-                dstIndex = Math.Clamp(dstIndex, 0, items.Count - 1);
-
-                if (srcIndex == dstIndex)
-                    return;
-
-                if (srcIndex < dstIndex)
-                {
-                    for (int i = srcIndex + 1; i <= dstIndex; i++)
-                        items.SetLayoutPosition(items[i], i - 1);
-                }
-                else
-                {
-                    for (int i = dstIndex; i < srcIndex; i++)
-                        items.SetLayoutPosition(items[i], i + 1);
-                }
-
-                items.SetLayoutPosition(draggedItem, dstIndex);
-                dragDestination = dstIndex;
-            }
-
-            private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
-            {
-                public IEnumerable<string> FilterTerms => Array.Empty<string>();
-
-                public bool MatchingFilter
-                {
-                    set
-                    {
-                        if (value)
-                            InvalidateLayout();
-                    }
-                }
-
-                public bool FilteringActive
-                {
-                    set { }
-                }
-
-                public IEnumerable<IFilterable> FilterableChildren => Children;
-
-                public ItemSearchContainer()
-                {
-                    LayoutDuration = 200;
-                    LayoutEasing = Easing.OutQuint;
-                }
+                this.FadeTo(matching ? 1 : 0, 200);
             }
         }
+
+        public bool FilteringActive { get; set; }
     }
 }
