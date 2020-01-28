@@ -58,6 +58,8 @@ namespace osu.Game.Rulesets.Edit
 
         private InputManager inputManager;
 
+        private RadioButtonCollection toolboxCollection;
+
         protected HitObjectComposer(Ruleset ruleset)
         {
             Ruleset = ruleset;
@@ -100,7 +102,6 @@ namespace osu.Game.Rulesets.Edit
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
 
-            RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -142,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
                                       .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
                                       .ToList();
 
-            toolboxCollection.Items.First().Select();
+            setSelectTool();
 
             blueprintContainer.SelectionChanged += selectionChanged;
         }
@@ -181,11 +182,18 @@ namespace osu.Game.Rulesets.Edit
         {
             var hitObjects = selectedHitObjects.ToArray();
 
-            if (!hitObjects.Any())
-                distanceSnapGridContainer.Hide();
-            else
+            if (hitObjects.Any())
+            {
+                // ensure in selection mode if a selection is made.
+                setSelectTool();
+
                 showGridFor(hitObjects);
+            }
+            else
+                distanceSnapGridContainer.Hide();
         }
+
+        private void setSelectTool() => toolboxCollection.Items.First().Select();
 
         private void toolSelected(HitObjectCompositionTool tool)
         {
@@ -194,7 +202,10 @@ namespace osu.Game.Rulesets.Edit
             if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
             else
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
                 showGridFor(Enumerable.Empty<HitObject>());
+            }
         }
 
         private void showGridFor(IEnumerable<HitObject> selectedHitObjects)
