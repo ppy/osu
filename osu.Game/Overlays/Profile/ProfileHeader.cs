@@ -14,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : TabControlOverlayHeader
+    public class ProfileHeader : TabControlOverlayHeader<string>
     {
         private UserCoverBackground coverContainer;
 
