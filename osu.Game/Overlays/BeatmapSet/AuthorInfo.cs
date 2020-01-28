@@ -12,7 +12,6 @@ using osuTK.Graphics;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -50,16 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new LinkFlowContainer(s =>
-                {
-                    s.Shadow = false;
-                    s.Font = OsuFont.GetFont(size: 13);
-                }).With(d =>
-                {
-                    d.AutoSizeAxes = Axes.Both;
-                    d.AddText("mapped by ");
-                    d.AddUserLink(BeatmapSet.Metadata.Author, text => text.Font = text.Font.With(italics: true));
-                }),
+                new MapperLink(beatmapSet.Metadata.Author, 13),
                 new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },

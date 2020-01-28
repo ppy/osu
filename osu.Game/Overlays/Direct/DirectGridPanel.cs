@@ -15,7 +15,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -120,16 +119,7 @@ namespace osu.Game.Overlays.Direct
                                     },
                                     Children = new Drawable[]
                                     {
-                                        new LinkFlowContainer(s =>
-                                        {
-                                            s.Shadow = false;
-                                            s.Font = OsuFont.GetFont(size: 14);
-                                        }).With(d =>
-                                        {
-                                            d.AutoSizeAxes = Axes.Both;
-                                            d.AddText("mapped by ", t => t.Colour = colours.Gray5);
-                                            d.AddUserLink(SetInfo.Metadata.Author);
-                                        }),
+                                        new MapperLink(SetInfo.Metadata.Author, 14, textCreationParameters: text => text.Colour = colours.Gray5),
                                         new Container
                                         {
                                             AutoSizeAxes = Axes.X,

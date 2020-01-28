@@ -24,6 +24,7 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
@@ -262,7 +263,8 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                Child = getMapper(metadata)
+                                //Child = getMapper(metadata)
+                                Child = string.IsNullOrEmpty(metadata.Author?.Username) ? new LinkFlowContainer() : new MapperLink(metadata.Author, 15)
                             },
                             InfoLabelContainer = new FillFlowContainer
                             {
@@ -340,23 +342,6 @@ namespace osu.Game.Screens.Select
                     return $"{bpmMin:0}";
 
                 return $"{bpmMin:0}-{bpmMax:0} (mostly {beatmap.ControlPointInfo.BPMMode:0})";
-            }
-
-            private LinkFlowContainer getMapper(BeatmapMetadata metadata)
-            {
-                if (string.IsNullOrEmpty(metadata.Author?.Username))
-                    return new LinkFlowContainer();
-
-                return new LinkFlowContainer(s =>
-                {
-                    s.Shadow = false;
-                    s.Font = OsuFont.GetFont(size: 15);
-                }).With(d =>
-                {
-                    d.AutoSizeAxes = Axes.Both;
-                    d.AddText("mapped by ");
-                    d.AddUserLink(metadata.Author, text => text.Font = text.Font.With(weight: FontWeight.Bold));
-                });
             }
 
             public class InfoLabel : Container, IHasTooltip

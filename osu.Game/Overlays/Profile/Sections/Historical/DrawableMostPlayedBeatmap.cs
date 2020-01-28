@@ -88,16 +88,11 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                                             Children = new Drawable[]
                                             {
                                                 new MostPlayedBeatmapMetadataContainer(beatmap),
-                                                new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular))
+                                                new MapperLink(beatmap.Metadata.Author, 12)
                                                 {
-                                                    AutoSizeAxes = Axes.Both,
                                                     Direction = FillDirection.Horizontal,
                                                     Colour = colours.GreySeafoamLighter
-                                                }.With(d =>
-                                                {
-                                                    d.AddText("mapped by ");
-                                                    d.AddUserLink(beatmap.Metadata.Author);
-                                                }),
+                                                },
                                             }
                                         },
                                         new PlayCountText(playCount)
