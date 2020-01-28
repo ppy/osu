@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Edit
             var beatLength = timingPoint.BeatLength / BeatDivisor;
 
             // A 1ms offset prevents rounding errors due to minute variations in duration
-            return timingPoint.Time + (int)Math.Round(((time - timingPoint.Time) + 1) / beatLength) * beatLength;
+            return timingPoint.Time + (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero) * beatLength;
         }
 
         public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
