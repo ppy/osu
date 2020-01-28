@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
@@ -25,6 +26,7 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using Key = osuTK.Input.Key;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -57,6 +59,8 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
 
         private InputManager inputManager;
+
+        private RadioButtonCollection toolboxCollection;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -100,7 +104,6 @@ namespace osu.Game.Rulesets.Edit
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
 
-            RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -145,6 +148,22 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items.First().Select();
 
             blueprintContainer.SelectionChanged += selectionChanged;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                var item = toolboxCollection.Items.Skip(e.Key - Key.Number1).FirstOrDefault();
+
+                if (item != null)
+                {
+                    item.Select();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override void LoadComplete()
