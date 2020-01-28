@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Container nubContainer;
 
         public virtual string TooltipText { get; private set; }
+        public bool DisplayAsPercentage { get; set; }
 
         private Color4 accentColour;
 
@@ -172,8 +173,11 @@ namespace osu.Game.Graphics.UserInterface
                 double floatMinValue = CurrentNumber.MinValue.ToDouble(NumberFormatInfo.InvariantInfo);
                 double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                if (floatMaxValue == 1 && floatMinValue >= -1)
-                    TooltipText = floatValue.ToString("P0");
+                if (DisplayAsPercentage)
+                {
+                    double percentage = floatValue / floatMaxValue;
+                    TooltipText = percentage.ToString("P0");
+                }
                 else
                 {
                     var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);

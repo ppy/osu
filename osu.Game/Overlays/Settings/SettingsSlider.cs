@@ -33,5 +33,11 @@ namespace osu.Game.Overlays.Settings
             get => ((TSlider)Control).KeyboardStep;
             set => ((TSlider)Control).KeyboardStep = value;
         }
+
+        public bool DisplayAsPercentage
+        {
+            get => ((TSlider)Control).DisplayAsPercentage;
+            set => ((TSlider)Control).DisplayAsPercentage = value;
+        }
     }
 }
