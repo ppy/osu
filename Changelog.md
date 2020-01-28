@@ -165,3 +165,7 @@
 *   整合更新
     *   [m] [#7623 - Fix crash due to misordered selection events](https://github.com/ppy/osu/pull/7623)
     *   [m] [#7432 - Implement ability to create OverlayHeader with no TabControl](https://github.com/ppy/osu/pull/7432)
+    *   [M] [#7638 - Use type switch in SerializationWriter](https://github.com/ppy/osu/pull/7638)
+    *   [m] [#7637 - Refactor background creation in OverlayHeader](https://github.com/ppy/osu/pull/7637)
+    *   [m] [#7650 - Change default method style for better IDE autocompletion](https://github.com/ppy/osu/pull/7650)
+    *   [m] [#7636 - Make CommentsContainer use OverlayColourProvider](https://github.com/ppy/osu/pull/7636)

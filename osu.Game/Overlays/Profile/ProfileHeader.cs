@@ -25,12 +25,10 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            BackgroundHeight = 150;
-
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("信息");
-            TabControl.AddItem("摸图记录");
+            TabControl.AddItem("摸图");
 
             centreHeaderContainer.DetailsVisible.BindValueChanged(visible => detailHeaderContainer.Expanded = visible.NewValue, true);
         }
@@ -38,7 +36,9 @@ namespace osu.Game.Overlays.Profile
         protected override Drawable CreateBackground() =>
             new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                Height = 150,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     coverContainer = new UserCoverBackground
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Profile
             public ProfileHeaderTitle()
             {
                 Title = "玩家";
-                Section = "个人信息";
+                Section = "信息";
             }
 
             protected override Drawable CreateIcon() => new ScreenTitleTextureIcon(@"Icons/profile");

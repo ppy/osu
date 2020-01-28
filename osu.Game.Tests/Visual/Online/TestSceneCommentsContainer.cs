@@ -8,6 +8,8 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -27,6 +29,9 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         protected override bool UseOnlineAPI => true;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
         public TestSceneCommentsContainer()
         {
