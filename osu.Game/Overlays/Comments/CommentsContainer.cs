@@ -12,7 +12,6 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -163,34 +162,12 @@ namespace osu.Game.Overlays.Comments
 
         private void onSuccess(CommentBundle response)
         {
-            if (!response.Comments.Any())
-            {
-                content.Add(new NoCommentsPlaceholder());
-                moreButton.Hide();
-                return;
-            }
-
             loadCancellation = new CancellationTokenSource();
 
-            var page = new FillFlowContainer
+            LoadComponentAsync(new CommentsPage(response)
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-            };
-
-            foreach (var c in response.Comments)
-            {
-                if (c.IsTopLevel)
-                {
-                    page.Add(new DrawableComment(c)
-                    {
-                        ShowDeleted = { BindTarget = ShowDeleted }
-                    });
-                }
-            }
-
-            LoadComponentAsync(page, loaded =>
+                ShowDeleted = { BindTarget = ShowDeleted }
+            }, loaded =>
             {
                 content.Add(loaded);
 
@@ -216,31 +193,6 @@ namespace osu.Game.Overlays.Comments
             request?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
-        }
-
-        private class NoCommentsPlaceholder : CompositeDrawable
-        {
-            [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
-            {
-                Height = 80;
-                RelativeSizeAxes = Axes.X;
-                AddRangeInternal(new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colourProvider.Background4
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        Margin = new MarginPadding { Left = 50 },
-                        Text = @"No comments yet."
-                    }
-                });
-            }
         }
     }
 }
