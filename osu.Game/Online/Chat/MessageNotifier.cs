@@ -130,14 +130,7 @@ namespace osu.Game.Online.Chat
         /// Checks if <paramref name="message"/> contains <paramref name="username"/>, if not, retries making spaces into underscores.
         /// </summary>
         /// <returns>If the <paramref name="message"/> mentions the <paramref name="username"/></returns>
-        public bool IsMentioning(string message, string username)
-        {
-            // sanitize input to handle casing
-            message = message.ToLower();
-            username = username.ToLower();
-
-            return message.Contains(username) || message.Contains(username.Replace(' ', '_'));
-        }
+        public bool IsMentioning(string message, string username) => message.IndexOf(username, StringComparison.OrdinalIgnoreCase) != -1 || message.IndexOf(username.Replace(' ', '_'), StringComparison.OrdinalIgnoreCase) != -1;
 
         public class PrivateMessageNotification : SimpleNotification
         {
