@@ -11,6 +11,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
+using osu.Framework.Bindables;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
 
 namespace osu.Game.Screens.Select
 {
@@ -27,6 +30,8 @@ namespace osu.Game.Screens.Select
         private readonly FillFlowContainer<FooterButton> buttons;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        private Bindable<float> uiScale;
 
         /// <param name="button">The button to be added.</param>
         /// <param name="overlay">The <see cref="OverlayContainer"/> to be toggled by this button.</param>
@@ -59,11 +64,20 @@ namespace osu.Game.Screens.Select
         }
 
         private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
+        private void updateSpacing(ValueChangedEvent<float> args) => buttons.Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 1 / args.NewValue + 0.2f, 0);
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager osuConfig)
+        {
+            uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
+            uiScale.BindValueChanged(updateSpacing, true);
+        }
 
         public Footer()
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.BottomCentre;
             Children = new Drawable[]
