@@ -92,15 +92,17 @@ namespace osu.Game.Screens.Select
                             Origin = Anchor.CentreLeft,
                             Direction = FillDirection.Horizontal,
                             Shear = -SHEAR,
-                            AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding { Horizontal = SHEAR_WIDTH / 4 },
+                            AutoSizeAxes = Axes.X,
+                            Height = 50,
+                            Margin = new MarginPadding { Right = -SHEAR_WIDTH / 2 },
+                            Spacing = new Vector2(15, 0),
                             Children = new Drawable[]
                             {
                                 TextContainer = new Container
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
+                                    AutoSizeAxes = Axes.Both,
                                     Child = SpriteText = new OsuSpriteText
                                     {
                                         Anchor = Anchor.Centre,
@@ -117,6 +119,19 @@ namespace osu.Game.Screens.Select
         public Action Hovered;
         public Action HoverLost;
         public Key? Hotkey;
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            float horizontalMargin = (100 - TextContainer.Width) / 2;
+            ButtonContentContainer.Padding = new MarginPadding
+            {
+                Left = horizontalMargin,
+                // right side margin offset to compensate for shear
+                Right = horizontalMargin - SHEAR_WIDTH / 2
+            };
+        }
 
         protected override bool OnHover(HoverEvent e)
         {

@@ -46,7 +46,6 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                Margin = new MarginPadding { Right = 10 }
             });
         }
 
@@ -94,6 +93,7 @@ namespace osu.Game.Screens.Select
             public FooterModDisplay()
             {
                 AllowExpand = false;
+                IconsContainer.Margin = new MarginPadding();
             }
         }
     }
