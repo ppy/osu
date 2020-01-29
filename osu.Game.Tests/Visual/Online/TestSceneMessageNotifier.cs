@@ -51,12 +51,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPrivateMessageNotification()
         {
-            AddStep("Send PM", () => privateMesssageChannel.AddNewMessages(new Message(messageIdCounter++)
-            {
-                Content = $"Hello {API.LocalUser.Value.Username}!",
-                Sender = friend,
-                ChannelId = privateMesssageChannel.Id
-            }));
+            AddStep("Send PM", () => privateMesssageChannel.AddNewMessages(new Message(messageIdCounter++) { Content = $"Hello {API.LocalUser.Value.Username}!", Sender = friend, ChannelId = privateMesssageChannel.Id }));
             AddAssert("Expect 1 notification", () => testContainer.NotificationOverlay.UnreadCount.Value == 1);
         }
 
