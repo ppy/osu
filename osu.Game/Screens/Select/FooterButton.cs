@@ -12,6 +12,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osu.Game.Configuration;
+using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Select
 {
@@ -56,8 +59,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        protected readonly Container TextContainer;
-        protected readonly Container LightContainer;
+        protected readonly Container TextContainer, LightContainer, HeightAndAxisContainer;
+        protected readonly ScalingDrawSizePreservingFillContainer PreservingLightContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
         private readonly Box light;
@@ -66,9 +69,6 @@ namespace osu.Game.Screens.Select
         {
             AutoSizeAxes = Axes.Both;
             Shear = SHEAR;
-            // Masks away one or two overlapping pixel
-            // when UI scale is at minimum.
-            Masking = true;
             Children = new Drawable[]
             {
                 box = new Box
@@ -82,20 +82,21 @@ namespace osu.Game.Screens.Select
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    // Make container for light slightly smaller than parent.
-                    Width = 0.996f,
-                    // Anchor is at top right because ModIcons are added to the right
-                    // so rounding errors (relative size of x) are hidden to the left.
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    Child = light = new Box
+                    Child = HeightAndAxisContainer = new Container // This container helps set correct height for the next container
                     {
                         Height = 4,
-                        Width = 0.998f,
-                        EdgeSmoothness = new Vector2(2, 0),
                         RelativeSizeAxes = Axes.X,
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
+                        Child = PreservingLightContainer = new ScalingDrawSizePreservingFillContainer(true)
+                        {
+                            Strategy = DrawSizePreservationStrategy.Average,
+                            TargetDrawSize = new Vector2(100, 4),
+                            Child = light = new Box
+                            {
+                                Height = 4,
+                                EdgeSmoothness = new Vector2(2, 0),
+                                RelativeSizeAxes = Axes.X
+                            }
+                        }
                     }
                 },
                 TextContainer = new Container
@@ -159,6 +160,35 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
+        }
+
+        protected class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        {
+            private readonly bool applyUIScale;
+            private Bindable<float> uiScale;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            public ScalingDrawSizePreservingFillContainer(bool applyUIScale)
+            {
+                this.applyUIScale = applyUIScale;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager osuConfig)
+            {
+                if (applyUIScale)
+                {
+                    uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
+                    uiScale.BindValueChanged(scaleChanged, true);
+                }
+            }
+
+            private void scaleChanged(ValueChangedEvent<float> args)
+            {
+                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
+                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
+            }
         }
     }
 }
