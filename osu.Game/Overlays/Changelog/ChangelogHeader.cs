@@ -4,12 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 
@@ -27,8 +24,8 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogHeader()
         {
-            BreadcrumbControl.AddItem(listing_string);
-            BreadcrumbControl.Current.ValueChanged += e =>
+            TabControl.AddItem(listing_string);
+            TabControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == listing_string)
                     ListingSelected?.Invoke();
@@ -48,12 +45,12 @@ namespace osu.Game.Overlays.Changelog
         private void showBuild(ValueChangedEvent<APIChangelogBuild> e)
         {
             if (e.OldValue != null)
-                BreadcrumbControl.RemoveItem(e.OldValue.ToString());
+                TabControl.RemoveItem(e.OldValue.ToString());
 
             if (e.NewValue != null)
             {
-                BreadcrumbControl.AddItem(e.NewValue.ToString());
-                BreadcrumbControl.Current.Value = e.NewValue.ToString();
+                TabControl.AddItem(e.NewValue.ToString());
+                TabControl.Current.Value = e.NewValue.ToString();
 
                 updateCurrentStream();
 
@@ -61,13 +58,13 @@ namespace osu.Game.Overlays.Changelog
             }
             else
             {
-                BreadcrumbControl.Current.Value = listing_string;
+                TabControl.Current.Value = listing_string;
                 Streams.Current.Value = null;
                 title.Version = null;
             }
         }
 
-        protected override Drawable CreateBackground() => new HeaderBackground();
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/changelog");
 
         protected override Drawable CreateContent() => new Container
         {
@@ -93,21 +90,6 @@ namespace osu.Game.Overlays.Changelog
                 return;
 
             Streams.Current.Value = Streams.Items.FirstOrDefault(s => s.Name == Current.Value.UpdateStream.Name);
-        }
-
-        public class HeaderBackground : Sprite
-        {
-            public HeaderBackground()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fill;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(@"Headers/changelog");
-            }
         }
 
         private class ChangelogHeaderTitle : ScreenTitle
