@@ -174,8 +174,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected OsuSpriteText CreateDrawableAccuracy() => new OsuSpriteText
         {
-            Text = $"{Score.Accuracy:P2}",
-            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
+            Text = $"{Score.Accuracy:0.00%}",
+            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
             Colour = colours.Yellow,
         };
 
@@ -233,14 +233,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Text = new LocalisedString((
                         $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} ",
                         $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} ")),
-                    Font = OsuFont.GetFont(weight: FontWeight.SemiBold, italics: true)
+                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                    Font = OsuFont.GetFont(size: 14, italics: true)
+                    Font = OsuFont.GetFont(size: 12, italics: true)
                 },
             };
         }
