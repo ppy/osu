@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -65,10 +66,14 @@ namespace osu.Game.Tests.Visual.Menus
                     game.Dispose();
                 }
 
+                // see MouseSettings
+                var frameworkConfig = host.Dependencies.Get<FrameworkConfigManager>();
+                frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).Disabled = false;
+
                 game = new TestOsuGame(LocalStorage, API);
                 game.SetHost(host);
 
-                // todo: this can be removed once we can run audio trakcs without a device present
+                // todo: this can be removed once we can run audio tracks without a device present
                 // see https://github.com/ppy/osu/issues/1302
                 game.LocalConfig.Set(OsuSetting.IntroSequence, IntroSequence.Circles);
 

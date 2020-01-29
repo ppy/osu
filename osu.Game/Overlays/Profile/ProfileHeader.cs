@@ -25,8 +25,6 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            BackgroundHeight = 150;
-
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("info");
@@ -38,7 +36,9 @@ namespace osu.Game.Overlays.Profile
         protected override Drawable CreateBackground() =>
             new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                Height = 150,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     coverContainer = new UserCoverBackground
