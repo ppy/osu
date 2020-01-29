@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
@@ -25,6 +26,7 @@ using osu.Game.Screens.Edit.Components.RadioButtons;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
+using Key = osuTK.Input.Key;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -57,6 +59,8 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
 
         private InputManager inputManager;
+
+        private RadioButtonCollection toolboxCollection;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -100,7 +104,6 @@ namespace osu.Game.Rulesets.Edit
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
 
-            RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -137,14 +140,30 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => selectTool(t)))
-                                .Prepend(new RadioButton("Select", () => selectTool(null)))
-                                .ToList();
+            toolboxCollection.Items = CompositionTools
+                                      .Prepend(new SelectTool())
+                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
+                                      .ToList();
 
-            toolboxCollection.Items[0].Select();
+            setSelectTool();
 
             blueprintContainer.SelectionChanged += selectionChanged;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            {
+                var item = toolboxCollection.Items.Skip(e.Key - Key.Number1).FirstOrDefault();
+
+                if (item != null)
+                {
+                    item.Select();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override void LoadComplete()
@@ -181,20 +200,30 @@ namespace osu.Game.Rulesets.Edit
         {
             var hitObjects = selectedHitObjects.ToArray();
 
-            if (!hitObjects.Any())
-                distanceSnapGridContainer.Hide();
-            else
+            if (hitObjects.Any())
+            {
+                // ensure in selection mode if a selection is made.
+                setSelectTool();
+
                 showGridFor(hitObjects);
+            }
+            else
+                distanceSnapGridContainer.Hide();
         }
 
-        private void selectTool(HitObjectCompositionTool tool)
+        private void setSelectTool() => toolboxCollection.Items.First().Select();
+
+        private void toolSelected(HitObjectCompositionTool tool)
         {
             blueprintContainer.CurrentTool = tool;
 
-            if (tool == null)
+            if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
             else
+            {
+                EditorBeatmap.SelectedHitObjects.Clear();
                 showGridFor(Enumerable.Empty<HitObject>());
+            }
         }
 
         private void showGridFor(IEnumerable<HitObject> selectedHitObjects)
@@ -275,10 +304,10 @@ namespace osu.Game.Rulesets.Edit
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance));
+            => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance)));
+            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
 
         protected override void Dispose(bool isDisposing)
         {
