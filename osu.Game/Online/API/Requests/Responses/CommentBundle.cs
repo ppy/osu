@@ -57,14 +57,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 userVotes = value;
 
-                value.ForEach(v =>
-                {
-                    Comments.ForEach(c =>
-                    {
-                        if (v == c.Id)
-                            c.IsVoted = true;
-                    });
-                });
+                Comments.ForEach(c => c.IsVoted = value.Contains(c.Id));
             }
         }
 
