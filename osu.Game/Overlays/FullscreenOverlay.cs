@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
         protected IAPIProvider API { get; private set; }
 
         [Cached]
-        private readonly OverlayColourProvider colourProvider;
+        protected readonly OverlayColourProvider colourProvider;
 
         protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
