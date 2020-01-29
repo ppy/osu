@@ -64,7 +64,12 @@ namespace osu.Game.Screens.Select
         }
 
         private void updateModeLight() => modeLight.FadeColour(buttons.FirstOrDefault(b => b.IsHovered)?.SelectedColour ?? Color4.Transparent, TRANSITION_LENGTH, Easing.OutQuint);
-        private void updateSpacing(ValueChangedEvent<float> args) => buttons.Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + 1 / args.NewValue + 0.2f, 0);
+
+        // Extra  pacing between FooterButtons is added at all UI scales.
+        // The higher the UI scale, the less spacing added.
+        // Maximum extra spacing  is 0.625f at 1.6 UI.
+        // Minimum extra spacing  is 0.320f at 0.8 UI.
+        private void updateSpacing(ValueChangedEvent<float> args) => buttons.Spacing = new Vector2(-FooterButton.SHEAR_WIDTH + (1f / args.NewValue) * 0.5f, 0);
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager osuConfig)
