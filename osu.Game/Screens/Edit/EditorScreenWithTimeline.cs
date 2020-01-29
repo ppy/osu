@@ -102,7 +102,11 @@ namespace osu.Game.Screens.Edit
                 LoadComponentAsync(new TimelineArea
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = CreateTimelineContent()
+                    Children = new[]
+                    {
+                        new TimelineTickDisplay(),
+                        CreateTimelineContent(),
+                    }
                 }, timelineContainer.Add);
             });
         }
