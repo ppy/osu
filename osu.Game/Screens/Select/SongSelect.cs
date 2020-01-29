@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public virtual bool AllowEditing => true;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private NotificationOverlay notificationOverlay { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
