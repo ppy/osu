@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -15,6 +16,12 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePlaylistOverlay : OsuTestScene
     {
+        public override IReadOnlyList<Type> RequiredTypes => new Type[]
+        {
+            typeof(PlaylistOverlay),
+            typeof(PlaylistList)
+        };
+
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
         [SetUp]
