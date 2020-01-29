@@ -40,28 +40,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             Width = 60,
                             Child = CreateDrawableAccuracy()
                         },
-                        new FillFlowContainer
+                        new OsuSpriteText
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Children = new[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
-                                    Text = $"{Score.PP * weight:0}",
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                    Text = "pp",
-                                }
-                            }
-                        }
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true),
+                            Text = $"{Score.PP * weight:0}pp",
+                        },
                     }
                 },
                 new OsuSpriteText
