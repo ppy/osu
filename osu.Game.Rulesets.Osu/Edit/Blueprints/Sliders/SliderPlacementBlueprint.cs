@@ -1,11 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -26,16 +24,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         private HitCirclePiece headCirclePiece;
         private HitCirclePiece tailCirclePiece;
 
-        private readonly List<Segment> segments = new List<Segment>();
-        private Vector2 cursor;
+        private InputManager inputManager;
 
         private PlacementState state;
+        private PathControlPoint segmentStart;
+        private PathControlPoint cursor;
+        private int currentSegmentLength;
+
+        [Resolved(CanBeNull = true)]
+        private HitObjectComposer composer { get; set; }
 
         public SliderPlacementBlueprint()
             : base(new Objects.Slider())
         {
             RelativeSizeAxes = Axes.Both;
-            segments.Add(new Segment(Vector2.Zero));
+
+            HitObject.Path.ControlPoints.Add(segmentStart = new PathControlPoint(Vector2.Zero, PathType.Linear));
+            currentSegmentLength = 1;
         }
 
         [BackgroundDependencyLoader]
@@ -46,10 +51,16 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                 bodyPiece = new SliderBodyPiece(),
                 headCirclePiece = new HitCirclePiece(),
                 tailCirclePiece = new HitCirclePiece(),
-                new PathControlPointVisualiser(HitObject),
+                new PathControlPointVisualiser(HitObject, false)
             };
 
             setState(PlacementState.Initial);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            inputManager = GetContainingInputManager();
         }
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
@@ -61,7 +72,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     break;
 
                 case PlacementState.Body:
-                    cursor = ToLocalSpace(screenSpacePosition) - HitObject.Position;
+                    ensureCursor();
+
+                    // The given screen-space position may have been externally snapped, but the unsnapped position from the input manager
+                    // is used instead since snapping control points doesn't make much sense
+                    cursor.Position.Value = ToLocalSpace(inputManager.CurrentState.Mouse.Position) - HitObject.Position;
                     break;
             }
         }
@@ -78,7 +93,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
                     switch (e.Button)
                     {
                         case MouseButton.Left:
-                            segments.Last().ControlPoints.Add(cursor);
+                            ensureCursor();
+
+                            // Detatch the cursor
+                            cursor = null;
                             break;
                     }
 
@@ -88,16 +106,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             return true;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             if (state == PlacementState.Body && e.Button == MouseButton.Right)
                 endCurve();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
-            segments.Add(new Segment(segments[segments.Count - 1].ControlPoints.Last()));
+            // Todo: This should all not occur on double click, but rather if the previous control point is hovered.
+            segmentStart = HitObject.Path.ControlPoints[^1];
+            segmentStart.Type.Value = PathType.Linear;
+
+            currentSegmentLength = 1;
             return true;
         }
 
@@ -119,10 +141,39 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             updateSlider();
         }
 
+        private void updatePathType()
+        {
+            switch (currentSegmentLength)
+            {
+                case 1:
+                case 2:
+                    segmentStart.Type.Value = PathType.Linear;
+                    break;
+
+                case 3:
+                    segmentStart.Type.Value = PathType.PerfectCurve;
+                    break;
+
+                default:
+                    segmentStart.Type.Value = PathType.Bezier;
+                    break;
+            }
+        }
+
+        private void ensureCursor()
+        {
+            if (cursor == null)
+            {
+                HitObject.Path.ControlPoints.Add(cursor = new PathControlPoint { Position = { Value = Vector2.Zero } });
+                currentSegmentLength++;
+
+                updatePathType();
+            }
+        }
+
         private void updateSlider()
         {
-            var newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
+            HitObject.Path.ExpectedDistance.Value = composer?.GetSnappedDistanceFromDistance(HitObject.StartTime, (float)HitObject.Path.CalculatedDistance) ?? (float)HitObject.Path.CalculatedDistance;
 
             bodyPiece.UpdateFrom(HitObject);
             headCirclePiece.UpdateFrom(HitObject.HeadCircle);
@@ -138,16 +189,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
         {
             Initial,
             Body,
-        }
-
-        private class Segment
-        {
-            public readonly List<Vector2> ControlPoints = new List<Vector2>();
-
-            public Segment(Vector2 offset)
-            {
-                ControlPoints.Add(offset);
-            }
         }
     }
 }

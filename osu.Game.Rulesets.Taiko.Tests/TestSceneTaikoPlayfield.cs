@@ -7,11 +7,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -66,7 +65,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             AddStep("Reset height", () => changePlayfieldSize(6));
 
             var controlPointInfo = new ControlPointInfo();
-            controlPointInfo.TimingPoints.Add(new TimingControlPoint());
+            controlPointInfo.Add(0, new TimingControlPoint());
 
             WorkingBeatmap beatmap = CreateWorkingBeatmap(new Beatmap
             {
@@ -91,7 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
-                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap, Array.Empty<Mod>()) }
+                Children = new[] { drawableRuleset = new DrawableTaikoRuleset(new TaikoRuleset(), beatmap.GetPlayableBeatmap(new TaikoRuleset().RulesetInfo)) }
             });
         }
 
@@ -142,7 +141,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
+            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
@@ -157,7 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
+            cpi.Add(0, new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());

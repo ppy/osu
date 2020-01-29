@@ -24,7 +24,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ShowConvertedBeatmaps, true);
             Set(OsuSetting.DisplayStarsMinimum, 0.0, 0, 10, 0.1);
-            Set(OsuSetting.DisplayStarsMaximum, 10.0, 0, 10, 0.1);
+            Set(OsuSetting.DisplayStarsMaximum, 10.1, 0, 10.1, 0.1);
 
             Set(OsuSetting.SongSelectGroupingMode, GroupMode.All);
             Set(OsuSetting.SongSelectSortingMode, SortMode.Title);
@@ -80,10 +80,12 @@ namespace osu.Game.Configuration
             // Gameplay
             Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
+            Set(OsuSetting.LightenDuringBreaks, true);
 
             Set(OsuSetting.HitLighting, true);
 
             Set(OsuSetting.ShowInterface, true);
+            Set(OsuSetting.ShowProgressGraph, true);
             Set(OsuSetting.ShowHealthDisplayWhenCantFail, true);
             Set(OsuSetting.KeyOverlay, false);
             Set(OsuSetting.ScoreMeter, ScoreMeterType.HitErrorBoth);
@@ -117,6 +119,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
 
             Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
+
+            Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
         }
 
         public OsuConfigManager(Storage storage)
@@ -140,12 +144,14 @@ namespace osu.Game.Configuration
         AutoCursorSize,
         DimLevel,
         BlurLevel,
+        LightenDuringBreaks,
         ShowStoryboard,
         ShowVideoBackground,
         KeyOverlay,
         ScoreMeter,
         FloatingComments,
         ShowInterface,
+        ShowProgressGraph,
         ShowHealthDisplayWhenCantFail,
         MouseDisableButtons,
         MouseDisableWheel,
@@ -186,6 +192,7 @@ namespace osu.Game.Configuration
         UIScale,
         IntroSequence,
         UIHoldActivationDelay,
-        HitLighting
+        HitLighting,
+        MenuBackgroundSource
     }
 }

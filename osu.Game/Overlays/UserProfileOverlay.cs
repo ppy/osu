@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -27,6 +28,11 @@ namespace osu.Game.Overlays
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 70;
+
+        public UserProfileOverlay()
+            : base(OverlayColourScheme.Green)
+        {
+        }
 
         public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
@@ -55,10 +61,7 @@ namespace osu.Game.Overlays
                     new BeatmapsSection(),
                     new KudosuSection()
                 }
-                : new ProfileSection[]
-                {
-                    //new AboutSection(),
-                };
+                : Array.Empty<ProfileSection>();
 
             tabs = new ProfileTabControl
             {
@@ -167,7 +170,7 @@ namespace osu.Game.Overlays
                 AccentColour = colours.Seafoam;
             }
 
-            private class ProfileTabItem : OverlayTabItem<ProfileSection>
+            private class ProfileTabItem : OverlayTabItem
             {
                 public ProfileTabItem(ProfileSection value)
                     : base(value)

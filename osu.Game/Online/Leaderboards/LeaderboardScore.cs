@@ -11,20 +11,25 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Select;
 using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
 using Humanizer;
+using osu.Game.Online.API;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer
+    public class LeaderboardScore : OsuClickableContainer, IHasContextMenu
     {
         public const float HEIGHT = 60;
 
@@ -37,6 +42,7 @@ namespace osu.Game.Online.Leaderboards
 
         private readonly ScoreInfo score;
         private readonly int rank;
+        private readonly bool allowHighlight;
 
         private Box background;
         private Container content;
@@ -49,17 +55,21 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        public LeaderboardScore(ScoreInfo score, int rank)
+        [Resolved]
+        private DialogOverlay dialogOverlay { get; set; }
+
+        public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
         {
             this.score = score;
             this.rank = rank;
+            this.allowHighlight = allowHighlight;
 
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IAPIProvider api, OsuColour colour)
         {
             var user = score.User;
 
@@ -100,7 +110,7 @@ namespace osu.Game.Online.Leaderboards
                                 background = new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.Black,
+                                    Colour = user.Id == api.LocalUser.Value.Id && allowHighlight ? colour.Green : Color4.Black,
                                     Alpha = background_alpha,
                                 },
                             },
@@ -285,17 +295,15 @@ namespace osu.Game.Online.Leaderboards
         private class ScoreComponentLabel : Container, IHasTooltip
         {
             private const float icon_size = 20;
-
-            private readonly string name;
             private readonly FillFlowContainer content;
 
             public override bool Contains(Vector2 screenSpacePos) => content.Contains(screenSpacePos);
 
-            public string TooltipText => name;
+            public string TooltipText { get; }
 
             public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
-                name = statistic.Name;
+                TooltipText = statistic.Name;
                 AutoSizeAxes = Axes.Both;
 
                 Child = content = new FillFlowContainer
@@ -356,6 +364,19 @@ namespace osu.Game.Online.Leaderboards
                 Icon = icon;
                 Name = name;
                 Value = value;
+            }
+        }
+
+        public MenuItem[] ContextMenuItems
+        {
+            get
+            {
+                List<MenuItem> items = new List<MenuItem>();
+
+                if (score.ID != 0)
+                    items.Add(new OsuMenuItem("Delete", MenuItemType.Destructive, () => dialogOverlay?.Push(new LocalScoreDeleteDialog(score))));
+
+                return items.ToArray();
             }
         }
     }

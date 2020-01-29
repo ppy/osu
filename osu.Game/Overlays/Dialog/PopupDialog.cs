@@ -21,8 +21,8 @@ namespace osu.Game.Overlays.Dialog
 {
     public abstract class PopupDialog : VisibilityContainer
     {
-        public static readonly float ENTER_DURATION = 500;
-        public static readonly float EXIT_DURATION = 200;
+        public const float ENTER_DURATION = 500;
+        public const float EXIT_DURATION = 200;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
@@ -241,7 +241,7 @@ namespace osu.Game.Overlays.Dialog
 
         protected override void PopOut()
         {
-            if (!actionInvoked)
+            if (!actionInvoked && content.IsPresent)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
                 buttonsContainer.Last().Click();

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Objects;
@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -78,6 +79,100 @@ namespace osu.Game.Rulesets.Osu.Tests
             checkPositions();
         }
 
+        [Test]
+        public void TestStackedHitObject()
+        {
+            AddStep("set stacking", () => slider.StackHeight = 5);
+            checkPositions();
+        }
+
+        [Test]
+        public void TestSingleControlPointSelection()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, true);
+            checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestSingleControlPointDeselectionViaOtherControlPoint()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            moveMouseToControlPoint(1);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, true);
+        }
+
+        [Test]
+        public void TestSingleControlPointDeselectionViaClickOutside()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddStep("move mouse outside control point", () => InputManager.MoveMouseTo(drawableObject));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestMultipleControlPointSelection()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            moveMouseToControlPoint(1);
+            AddStep("ctrl + click", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+            checkControlPointSelected(0, true);
+            checkControlPointSelected(1, true);
+        }
+
+        [Test]
+        public void TestMultipleControlPointDeselectionViaOtherControlPoint()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            moveMouseToControlPoint(1);
+            AddStep("ctrl + click", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            moveMouseToControlPoint(2);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, false);
+        }
+
+        [Test]
+        public void TestMultipleControlPointDeselectionViaClickOutside()
+        {
+            moveMouseToControlPoint(0);
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            moveMouseToControlPoint(1);
+            AddStep("ctrl + click", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.Click(MouseButton.Left);
+                InputManager.ReleaseKey(Key.ControlLeft);
+            });
+
+            AddStep("move mouse outside control point", () => InputManager.MoveMouseTo(drawableObject));
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            checkControlPointSelected(0, false);
+            checkControlPointSelected(1, false);
+        }
+
         private void moveHitObject()
         {
             AddStep("move hitobject", () =>
@@ -88,7 +183,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void checkPositions()
         {
-            AddAssert("body positioned correctly", () => blueprint.BodyPiece.Position == slider.Position);
+            AddAssert("body positioned correctly", () => blueprint.BodyPiece.Position == slider.StackedPosition);
 
             AddAssert("head positioned correctly",
                 () => Precision.AlmostEquals(blueprint.HeadBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.HeadCircle.ScreenSpaceDrawQuad.Centre));
@@ -97,11 +192,24 @@ namespace osu.Game.Rulesets.Osu.Tests
                 () => Precision.AlmostEquals(blueprint.TailBlueprint.CirclePiece.ScreenSpaceDrawQuad.Centre, drawableObject.TailCircle.ScreenSpaceDrawQuad.Centre));
         }
 
+        private void moveMouseToControlPoint(int index)
+        {
+            AddStep($"move mouse to control point {index}", () =>
+            {
+                Vector2 position = slider.Position + slider.Path.ControlPoints[index].Position.Value;
+                InputManager.MoveMouseTo(drawableObject.Parent.ToScreenSpace(position));
+            });
+        }
+
+        private void checkControlPointSelected(int index, bool selected)
+            => AddAssert($"control point {index} {(selected ? "selected" : "not selected")}", () => blueprint.ControlPointVisualiser.Pieces[index].IsSelected.Value == selected);
+
         private class TestSliderBlueprint : SliderSelectionBlueprint
         {
             public new SliderBodyPiece BodyPiece => base.BodyPiece;
             public new TestSliderCircleBlueprint HeadBlueprint => (TestSliderCircleBlueprint)base.HeadBlueprint;
             public new TestSliderCircleBlueprint TailBlueprint => (TestSliderCircleBlueprint)base.TailBlueprint;
+            public new PathControlPointVisualiser ControlPointVisualiser => base.ControlPointVisualiser;
 
             public TestSliderBlueprint(DrawableSlider slider)
                 : base(slider)

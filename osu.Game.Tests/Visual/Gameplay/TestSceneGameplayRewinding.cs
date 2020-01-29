@@ -7,7 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -17,6 +17,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 using osuTK;
 
 namespace osu.Game.Tests.Visual.Gameplay
@@ -35,9 +36,9 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private Track track;
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
+            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
             track = working.Track;
             return working;
         }
@@ -66,7 +67,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
+            SelectedMods.Value = SelectedMods.Value.Concat(new[] { ruleset.GetAutoplayMod() }).ToArray();
             return new RulesetExposingPlayer();
         }
 

@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Parallax is off", () => stack.ParallaxAmount == 0);
         }
 
-        private class TestScreen : ScreenWithBeatmapBackground
+        public class TestScreen : ScreenWithBeatmapBackground
         {
             private readonly string screenText;
 

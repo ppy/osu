@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,18 +14,17 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToScoreProcessor
+    public class OsuModBlinds : Mod, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override string Name => "Blinds";
         public override string Description => "Play with blinds on your screen.";
         public override string Acronym => "BL";
 
-        public override IconUsage Icon => FontAwesome.Solid.Adjust;
+        public override IconUsage? Icon => FontAwesome.Solid.Adjust;
         public override ModType Type => ModType.DifficultyIncrease;
 
         public override bool Ranked => false;
@@ -37,9 +37,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             drawableRuleset.Overlays.Add(blinds = new DrawableOsuBlinds(drawableRuleset.Playfield.HitObjectContainer, drawableRuleset.Beatmap));
         }
 
-        public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
+        public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
-            scoreProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
+            healthProcessor.Health.ValueChanged += health => { blinds.AnimateClosedness((float)health.NewValue); };
         }
 
         public ScoreRank AdjustRank(ScoreRank rank, double accuracy) => rank;
@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 };
             }
 
-            private float calculateGap(float value) => MathHelper.Clamp(value, 0, target_clamp) * targetBreakMultiplier;
+            private float calculateGap(float value) => Math.Clamp(value, 0, target_clamp) * targetBreakMultiplier;
 
             // lagrange polinominal for (0,0) (0.6,0.4) (1,1) should make a good curve
             private static float applyAdjustmentCurve(float value) => 0.6f * value * value + 0.4f * value;

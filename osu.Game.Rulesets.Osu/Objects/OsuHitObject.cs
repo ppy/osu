@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
@@ -96,6 +97,15 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             get => LastInComboBindable.Value;
             set => LastInComboBindable.Value = value;
+        }
+
+        protected OsuHitObject()
+        {
+            StackHeightBindable.BindValueChanged(height =>
+            {
+                foreach (var nested in NestedHitObjects.OfType<OsuHitObject>())
+                    nested.StackHeight = height.NewValue;
+            });
         }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)

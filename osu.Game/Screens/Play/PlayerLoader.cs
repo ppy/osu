@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Play
 
         private LogoTrackingContainer content;
 
-        private BeatmapMetadataDisplay info;
+        protected BeatmapMetadataDisplay MetadataInfo;
 
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
@@ -55,7 +55,9 @@ namespace osu.Game.Screens.Play
 
         protected override bool PlayResumeSound => false;
 
-        private Task loadTask;
+        protected Task LoadTask { get; private set; }
+
+        protected Task DisposalTask { get; private set; }
 
         private InputManager inputManager;
         private IdleTracker idleTracker;
@@ -94,7 +96,7 @@ namespace osu.Game.Screens.Play
                 RelativeSizeAxes = Axes.Both,
             }).WithChildren(new Drawable[]
             {
-                info = new BeatmapMetadataDisplay(Beatmap.Value, Mods.Value, content.LogoFacade)
+                MetadataInfo = new BeatmapMetadataDisplay(Beatmap.Value, Mods, content.LogoFacade)
                 {
                     Alpha = 0,
                     Anchor = Anchor.Centre,
@@ -116,8 +118,6 @@ namespace osu.Game.Screens.Play
                 },
                 idleTracker = new IdleTracker(750)
             });
-
-            loadNewPlayer();
         }
 
         protected override void LoadComplete()
@@ -125,6 +125,21 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             inputManager = GetContainingInputManager();
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            loadNewPlayer();
+
+            content.ScaleTo(0.7f);
+            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
+
+            contentIn();
+
+            MetadataInfo.Delay(750).FadeIn(500);
+            this.Delay(1800).Schedule(pushWhenLoaded);
 
             if (!muteWarningShownOnce.Value)
             {
@@ -143,7 +158,7 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
-            info.Loading = true;
+            MetadataInfo.Loading = true;
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
             loadNewPlayer();
@@ -159,7 +174,7 @@ namespace osu.Game.Screens.Play
             player.RestartCount = restartCount;
             player.RestartRequested = restartRequested;
 
-            loadTask = LoadComponentAsync(player, _ => info.Loading = false);
+            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
         }
 
         private void contentIn()
@@ -175,19 +190,6 @@ namespace osu.Game.Screens.Play
 
             content.ScaleTo(0.7f, 300, Easing.InQuint);
             content.FadeOut(250);
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-
-            content.ScaleTo(0.7f);
-            Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
-
-            contentIn();
-
-            info.Delay(750).FadeIn(500);
-            this.Delay(1800).Schedule(pushWhenLoaded);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -250,7 +252,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!this.IsCurrentScreen()) return;
 
-                        loadTask = null;
+                        LoadTask = null;
 
                         //By default, we want to load the player and never be returned to.
                         //Note that this may change if the player we load requested a re-run.
@@ -301,7 +303,7 @@ namespace osu.Game.Screens.Play
             if (isDisposing)
             {
                 // if the player never got pushed, we should explicitly dispose it.
-                loadTask?.ContinueWith(_ => player.Dispose());
+                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
             }
         }
 
@@ -348,7 +350,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private class BeatmapMetadataDisplay : Container
+        protected class BeatmapMetadataDisplay : Container
         {
             private class MetadataLine : Container
             {
@@ -377,10 +379,12 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
-            private readonly IReadOnlyList<Mod> mods;
+            private readonly Bindable<IReadOnlyList<Mod>> mods;
             private readonly Drawable facade;
             private LoadingAnimation loading;
             private Sprite backgroundSprite;
+
+            public IBindable<IReadOnlyList<Mod>> Mods => mods;
 
             public bool Loading
             {
@@ -399,11 +403,13 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, IReadOnlyList<Mod> mods, Drawable facade)
+            public BeatmapMetadataDisplay(WorkingBeatmap beatmap, Bindable<IReadOnlyList<Mod>> mods, Drawable facade)
             {
                 this.beatmap = beatmap;
-                this.mods = mods;
                 this.facade = facade;
+
+                this.mods = new Bindable<IReadOnlyList<Mod>>();
+                this.mods.BindTo(mods);
             }
 
             [BackgroundDependencyLoader]
@@ -490,7 +496,7 @@ namespace osu.Game.Screens.Play
                                 Origin = Anchor.TopCentre,
                                 AutoSizeAxes = Axes.Both,
                                 Margin = new MarginPadding { Top = 20 },
-                                Current = { Value = mods }
+                                Current = mods
                             }
                         },
                     }

@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osuTK;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -41,13 +42,13 @@ namespace osu.Game.Overlays.Rankings
                         Margin = new MarginPadding { Bottom = flag_margin },
                         Size = new Vector2(30, 20),
                     },
-                    scopeText = new SpriteText
+                    scopeText = new OsuSpriteText
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
                         Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Light)
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
@@ -73,13 +74,7 @@ namespace osu.Game.Overlays.Rankings
             base.LoadComplete();
         }
 
-        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope)
-        {
-            scopeText.Text = scope.NewValue.ToString();
-
-            if (scope.NewValue != RankingsScope.Performance)
-                Country.Value = null;
-        }
+        private void onScopeChanged(ValueChangedEvent<RankingsScope> scope) => scopeText.Text = scope.NewValue.ToString();
 
         private void onCountryChanged(ValueChangedEvent<Country> country)
         {
@@ -88,8 +83,6 @@ namespace osu.Game.Overlays.Rankings
                 flag.Hide();
                 return;
             }
-
-            Scope.Value = RankingsScope.Performance;
 
             flag.Country = country.NewValue;
             flag.Show();

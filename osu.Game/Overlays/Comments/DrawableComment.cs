@@ -14,7 +14,9 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using System.Linq;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -27,10 +29,16 @@ namespace osu.Game.Overlays.Comments
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
 
-        private readonly FillFlowContainer childCommentsVisibilityContainer;
+        private FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
 
         public DrawableComment(Comment comment)
+        {
+            this.comment = comment;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
@@ -39,8 +47,6 @@ namespace osu.Game.Overlays.Comments
             LinkFlowContainer message;
             GridContainer content;
             VotePill votePill;
-
-            this.comment = comment;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -55,7 +61,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding(margin),
+                        Padding = new MarginPadding(margin) { Left = margin + 5 },
                         Child = content = new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
@@ -81,11 +87,17 @@ namespace osu.Game.Overlays.Comments
                                         Spacing = new Vector2(5, 0),
                                         Children = new Drawable[]
                                         {
-                                            votePill = new VotePill(comment.VotesCount)
+                                            new Container
                                             {
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
-                                                AlwaysPresent = true,
+                                                Width = 40,
+                                                AutoSizeAxes = Axes.Y,
+                                                Child = votePill = new VotePill(comment)
+                                                {
+                                                    Anchor = Anchor.CentreRight,
+                                                    Origin = Anchor.CentreRight,
+                                                }
                                             },
                                             new UpdateableAvatar(comment.User)
                                             {
@@ -94,6 +106,7 @@ namespace osu.Game.Overlays.Comments
                                                 Size = new Vector2(avatar_size),
                                                 Masking = true,
                                                 CornerRadius = avatar_size / 2f,
+                                                CornerExponent = 2,
                                             },
                                         }
                                     },
@@ -116,7 +129,7 @@ namespace osu.Game.Overlays.Comments
                                                         AutoSizeAxes = Axes.Both,
                                                     },
                                                     new ParentUsername(comment),
-                                                    new SpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         Alpha = comment.IsDeleted ? 1 : 0,
                                                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
@@ -138,7 +151,7 @@ namespace osu.Game.Overlays.Comments
                                                 Colour = OsuColour.Gray(0.7f),
                                                 Children = new Drawable[]
                                                 {
-                                                    new SpriteText
+                                                    new OsuSpriteText
                                                     {
                                                         Anchor = Anchor.CentreLeft,
                                                         Origin = Anchor.CentreLeft,
@@ -189,7 +202,7 @@ namespace osu.Game.Overlays.Comments
 
             if (comment.EditedAt.HasValue)
             {
-                info.Add(new SpriteText
+                info.Add(new OsuSpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -284,7 +297,7 @@ namespace osu.Game.Overlays.Comments
                 this.count = count;
 
                 Alpha = count == 0 ? 0 : 1;
-                Child = text = new SpriteText
+                Child = text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                 };
@@ -317,7 +330,7 @@ namespace osu.Game.Overlays.Comments
                         Icon = FontAwesome.Solid.Reply,
                         Size = new Vector2(14),
                     },
-                    new SpriteText
+                    new OsuSpriteText
                     {
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
                         Text = parentComment?.User?.Username ?? parentComment?.LegacyName
@@ -331,32 +344,6 @@ namespace osu.Game.Overlays.Comments
                     return string.Empty;
 
                 return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
-            }
-        }
-
-        private class VotePill : CircularContainer
-        {
-            public VotePill(int count)
-            {
-                AutoSizeAxes = Axes.X;
-                Height = 20;
-                Masking = true;
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.Gray(0.05f)
-                    },
-                    new SpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Margin = new MarginPadding { Horizontal = margin },
-                        Font = OsuFont.GetFont(size: 14),
-                        Text = $"+{count}"
-                    }
-                };
             }
         }
     }

@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestResumeWithResumeOverlay()
         {
             AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
             resume();
@@ -70,11 +70,29 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
+        public void TestPauseWithResumeOverlay()
+        {
+            AddStep("move cursor to center", () => InputManager.MoveMouseTo(Player.ScreenSpaceDrawQuad.Centre));
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
+
+            pauseAndConfirm();
+
+            resume();
+            confirmClockRunning(false);
+            confirmPauseOverlayShown(false);
+
+            pauseAndConfirm();
+
+            AddUntilStep("resume overlay is not active", () => Player.DrawableRuleset.ResumeOverlay.State.Value == Visibility.Hidden);
+            confirmPaused();
+        }
+
+        [Test]
         public void TestResumeWithResumeOverlaySkipped()
         {
             AddStep("move cursor to button", () =>
                 InputManager.MoveMouseTo(Player.HUDOverlay.HoldToQuit.Children.OfType<HoldToConfirmContainer>().First().ScreenSpaceDrawQuad.Centre));
-            AddUntilStep("wait for hitobjects", () => Player.ScoreProcessor.Health.Value < 1);
+            AddUntilStep("wait for hitobjects", () => Player.HealthProcessor.Health.Value < 1);
 
             pauseAndConfirm();
             resumeAndConfirm();
@@ -97,8 +115,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestExitTooSoon()
         {
-            pauseAndConfirm();
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
 
+            pauseAndConfirm();
             resume();
 
             AddStep("exit too soon", () => Player.Exit());
@@ -158,7 +177,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void TestExitFromGameplay()
         {
             AddStep("exit", () => Player.Exit());
+            confirmPaused();
 
+            AddStep("exit", () => Player.Exit());
             confirmExited();
         }
 
@@ -196,6 +217,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestRestartAfterResume()
         {
+            AddStep("seek before gameplay", () => Player.GameplayClockContainer.Seek(-5000));
+
             pauseAndConfirm();
             resumeAndConfirm();
             restart();
@@ -219,6 +242,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player not exited", () => Player.IsCurrentScreen());
             AddStep("exit", () => Player.Exit());
             confirmExited();
+            confirmNoTrackAdjustments();
         }
 
         private void confirmPaused()
@@ -240,6 +264,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddUntilStep("player exited", () => !Player.IsCurrentScreen());
         }
 
+        private void confirmNoTrackAdjustments()
+        {
+            AddAssert("track has no adjustments", () => Beatmap.Value.Track.AggregateFrequency.Value == 1);
+        }
+
         private void restart() => AddStep("restart", () => Player.Restart());
         private void pause() => AddStep("pause", () => Player.Pause());
         private void resume() => AddStep("resume", () => Player.Resume());
@@ -256,9 +285,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         protected class PausePlayer : TestPlayer
         {
-            public new GameplayClockContainer GameplayClockContainer => base.GameplayClockContainer;
-
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
             public new HUDOverlay HUDOverlay => base.HUDOverlay;
 

@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -13,7 +14,9 @@ using osu.Game.IPC;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Formats;
 using osu.Game.IO;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Tests.Resources;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Zip;
@@ -412,6 +415,48 @@ namespace osu.Game.Tests.Beatmaps.IO
         }
 
         [Test]
+        public async Task TestImportWithDuplicateHashes()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportNestedStructure)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+
+                    string extractedFolder = $"{temp}_extracted";
+                    Directory.CreateDirectory(extractedFolder);
+
+                    try
+                    {
+                        using (var zip = ZipArchive.Open(temp))
+                            zip.WriteToDirectory(extractedFolder);
+
+                        using (var zip = ZipArchive.Create())
+                        {
+                            zip.AddAllFromDirectory(extractedFolder);
+                            zip.AddEntry("duplicate.osu", Directory.GetFiles(extractedFolder, "*.osu").First());
+                            zip.SaveTo(temp, new ZipWriterOptions(CompressionType.Deflate));
+                        }
+
+                        await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                        ensureLoaded(osu);
+                    }
+                    finally
+                    {
+                        Directory.Delete(extractedFolder, true);
+                    }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
         public async Task TestImportNestedStructure()
         {
             using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestImportNestedStructure)))
@@ -502,6 +547,83 @@ namespace osu.Game.Tests.Beatmaps.IO
                     {
                         Directory.Delete(extractedFolder, true);
                     }
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestUpdateBeatmapInfo()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapInfo)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+                    await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                    // Update via the beatmap, not the beatmap info, to ensure correct linking
+                    BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+                    Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
+                    beatmapToUpdate.BeatmapInfo.Version = "updated";
+
+                    manager.Update(setToUpdate);
+
+                    BeatmapInfo updatedInfo = manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID);
+                    Assert.That(updatedInfo.Version, Is.EqualTo("updated"));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        [Test]
+        public async Task TestUpdateBeatmapFile()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost(nameof(TestUpdateBeatmapFile)))
+            {
+                try
+                {
+                    var osu = loadOsu(host);
+                    var manager = osu.Dependencies.Get<BeatmapManager>();
+
+                    var temp = TestResources.GetTestBeatmapForImport();
+                    await osu.Dependencies.Get<BeatmapManager>().Import(temp);
+
+                    BeatmapSetInfo setToUpdate = manager.GetAllUsableBeatmapSets()[0];
+                    Beatmap beatmapToUpdate = (Beatmap)manager.GetWorkingBeatmap(setToUpdate.Beatmaps.First(b => b.RulesetID == 0)).Beatmap;
+                    BeatmapSetFileInfo fileToUpdate = setToUpdate.Files.First(f => beatmapToUpdate.BeatmapInfo.Path.Contains(f.Filename));
+
+                    using (var stream = new MemoryStream())
+                    {
+                        using (var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+                        {
+                            beatmapToUpdate.HitObjects.Clear();
+                            beatmapToUpdate.HitObjects.Add(new HitCircle { StartTime = 5000 });
+
+                            new LegacyBeatmapEncoder(beatmapToUpdate).Encode(writer);
+                        }
+
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        manager.UpdateFile(setToUpdate, fileToUpdate, stream);
+                    }
+
+                    // Check that the old file reference has been removed
+                    Assert.That(manager.QueryBeatmapSet(s => s.ID == setToUpdate.ID).Files.All(f => f.ID != fileToUpdate.ID));
+
+                    // Check that the new file is referenced correctly by attempting a retrieval
+                    Beatmap updatedBeatmap = (Beatmap)manager.GetWorkingBeatmap(manager.QueryBeatmap(b => b.ID == beatmapToUpdate.BeatmapInfo.ID)).Beatmap;
+                    Assert.That(updatedBeatmap.HitObjects.Count, Is.EqualTo(1));
+                    Assert.That(updatedBeatmap.HitObjects[0].StartTime, Is.EqualTo(5000));
                 }
                 finally
                 {

@@ -2,18 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Visual;
 using osuTK;
 using osuTK.Graphics;
@@ -25,32 +28,44 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double beat_length = 100;
         private static readonly Vector2 grid_position = new Vector2(512, 384);
 
-        [Cached(typeof(IEditorBeatmap))]
-        private readonly EditorBeatmap<OsuHitObject> editorBeatmap;
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(CircularDistanceSnapGrid)
+        };
+
+        [Cached(typeof(EditorBeatmap))]
+        private readonly EditorBeatmap editorBeatmap;
 
         [Cached]
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
+
+        [Cached(typeof(IDistanceSnapProvider))]
+        private readonly SnapProvider snapProvider = new SnapProvider();
 
         private TestOsuDistanceSnapGrid grid;
 
         public TestSceneOsuDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap<OsuHitObject>(new OsuBeatmap());
-
-            createGrid();
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
         }
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Clear();
-
             editorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
-            editorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-            editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beat_length });
+            editorBeatmap.ControlPointInfo.Clear();
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
 
-            beatDivisor.Value = 1;
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.SlateGray
+                },
+                grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
+                new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
+            };
         });
 
         [TestCase(1)]
@@ -64,53 +79,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestBeatDivisor(int divisor)
         {
             AddStep($"set beat divisor = {divisor}", () => beatDivisor.Value = divisor);
-            createGrid();
-        }
-
-        [TestCase(100, 100)]
-        [TestCase(200, 100)]
-        public void TestBeatLength(float beatLength, float expectedSpacing)
-        {
-            AddStep($"set beat length = {beatLength}", () =>
-            {
-                editorBeatmap.ControlPointInfo.TimingPoints.Clear();
-                editorBeatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint { BeatLength = beatLength });
-            });
-
-            createGrid();
-            AddAssert($"spacing = {expectedSpacing}", () => Precision.AlmostEquals(expectedSpacing, grid.DistanceSpacing));
-        }
-
-        [TestCase(0.5f, 50)]
-        [TestCase(1, 100)]
-        [TestCase(1.5f, 150)]
-        public void TestSpeedMultiplier(float multiplier, float expectedSpacing)
-        {
-            AddStep($"set speed multiplier = {multiplier}", () =>
-            {
-                editorBeatmap.ControlPointInfo.DifficultyPoints.Clear();
-                editorBeatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = multiplier });
-            });
-
-            createGrid();
-            AddAssert($"spacing = {expectedSpacing}", () => Precision.AlmostEquals(expectedSpacing, grid.DistanceSpacing));
-        }
-
-        [TestCase(0.5f, 50)]
-        [TestCase(1, 100)]
-        [TestCase(1.5f, 150)]
-        public void TestSliderMultiplier(float multiplier, float expectedSpacing)
-        {
-            AddStep($"set speed multiplier = {multiplier}", () => editorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = multiplier);
-            createGrid();
-            AddAssert($"spacing = {expectedSpacing}", () => Precision.AlmostEquals(expectedSpacing, grid.DistanceSpacing));
         }
 
         [Test]
         public void TestCursorInCentre()
         {
-            createGrid();
-
             AddStep("move mouse to centre", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position)));
             assertSnappedDistance((float)beat_length);
         }
@@ -118,8 +91,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestCursorBeforeMovementPoint()
         {
-            createGrid();
-
             AddStep("move mouse to just before movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 1.49f)));
             assertSnappedDistance((float)beat_length);
         }
@@ -127,23 +98,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestCursorAfterMovementPoint()
         {
-            createGrid();
-
             AddStep("move mouse to just after movement point", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 1.51f)));
             assertSnappedDistance((float)beat_length * 2);
         }
 
-        private void assertSnappedDistance(float expectedDistance) => AddAssert($"snap distance = {expectedDistance}", () =>
+        [Test]
+        public void TestLimitedDistance()
         {
-            Vector2 snappedPosition = grid.GetSnapPosition(grid.ToLocalSpace(InputManager.CurrentState.Mouse.Position));
-            float distance = Vector2.Distance(snappedPosition, grid_position);
-
-            return Precision.AlmostEquals(expectedDistance, distance);
-        });
-
-        private void createGrid()
-        {
-            AddStep("create grid", () =>
+            AddStep("create limited grid", () =>
             {
                 Children = new Drawable[]
                 {
@@ -152,11 +114,21 @@ namespace osu.Game.Rulesets.Osu.Tests
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.SlateGray
                     },
-                    grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }),
-                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnapPosition(grid.ToLocalSpace(v)) }
+                    grid = new TestOsuDistanceSnapGrid(new HitCircle { Position = grid_position }, new HitCircle { StartTime = 200 }),
+                    new SnappingCursorContainer { GetSnapPosition = v => grid.GetSnappedPosition(grid.ToLocalSpace(v)).position }
                 };
             });
+
+            AddStep("move mouse outside grid", () => InputManager.MoveMouseTo(grid.ToScreenSpace(grid_position + new Vector2((float)beat_length, 0) * 3f)));
+            assertSnappedDistance((float)beat_length * 2);
         }
+
+        private void assertSnappedDistance(float expectedDistance) => AddAssert($"snap distance = {expectedDistance}", () =>
+        {
+            Vector2 snappedPosition = grid.GetSnappedPosition(grid.ToLocalSpace(InputManager.CurrentState.Mouse.Position)).position;
+
+            return Precision.AlmostEquals(expectedDistance, Vector2.Distance(snappedPosition, grid_position));
+        });
 
         private class SnappingCursorContainer : CompositeDrawable
         {
@@ -201,10 +173,25 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             public new float DistanceSpacing => base.DistanceSpacing;
 
-            public TestOsuDistanceSnapGrid(OsuHitObject hitObject)
-                : base(hitObject)
+            public TestOsuDistanceSnapGrid(OsuHitObject hitObject, OsuHitObject nextHitObject = null)
+                : base(hitObject, nextHitObject)
             {
             }
+        }
+
+        private class SnapProvider : IDistanceSnapProvider
+        {
+            public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, time);
+
+            public float GetBeatSnapDistanceAt(double referenceTime) => (float)beat_length;
+
+            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
+
+            public double DistanceToDuration(double referenceTime, float distance) => distance;
+
+            public double GetSnappedDurationFromDistance(double referenceTime, float distance) => 0;
+
+            public float GetSnappedDistanceFromDistance(double referenceTime, float distance) => 0;
         }
     }
 }

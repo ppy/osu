@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -47,7 +47,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestRelativeBeatLengthScaleSingleTimingPoint()
         {
-            var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range / 2 });
+            var beatmap = createBeatmap();
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range / 2 });
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
 
@@ -61,10 +62,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestRelativeBeatLengthScaleTimingPointBeyondEndDoesNotBecomeDominant()
         {
-            var beatmap = createBeatmap(
-                new TimingControlPoint { BeatLength = time_range / 2 },
-                new TimingControlPoint { Time = 12000, BeatLength = time_range },
-                new TimingControlPoint { Time = 100000, BeatLength = time_range });
+            var beatmap = createBeatmap();
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range / 2 });
+            beatmap.ControlPointInfo.Add(12000, new TimingControlPoint { BeatLength = time_range });
+            beatmap.ControlPointInfo.Add(100000, new TimingControlPoint { BeatLength = time_range });
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
 
@@ -75,9 +76,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestRelativeBeatLengthScaleFromSecondTimingPoint()
         {
-            var beatmap = createBeatmap(
-                new TimingControlPoint { BeatLength = time_range },
-                new TimingControlPoint { Time = 3 * time_range, BeatLength = time_range / 2 });
+            var beatmap = createBeatmap();
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
+            beatmap.ControlPointInfo.Add(3 * time_range, new TimingControlPoint { BeatLength = time_range / 2 });
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
 
@@ -97,9 +98,9 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestNonRelativeScale()
         {
-            var beatmap = createBeatmap(
-                new TimingControlPoint { BeatLength = time_range },
-                new TimingControlPoint { Time = 3 * time_range, BeatLength = time_range / 2 });
+            var beatmap = createBeatmap();
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
+            beatmap.ControlPointInfo.Add(3 * time_range, new TimingControlPoint { BeatLength = time_range / 2 });
 
             createTest(beatmap);
 
@@ -119,7 +120,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSliderMultiplierDoesNotAffectRelativeBeatLength()
         {
-            var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range });
+            var beatmap = createBeatmap();
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
             beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
 
             createTest(beatmap, d => d.RelativeScaleBeatLengthsOverride = true);
@@ -132,7 +134,8 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestSliderMultiplierAffectsNonRelativeBeatLength()
         {
-            var beatmap = createBeatmap(new TimingControlPoint { BeatLength = time_range });
+            var beatmap = createBeatmap();
+            beatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = time_range });
             beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2;
 
             createTest(beatmap);
@@ -154,13 +157,10 @@ namespace osu.Game.Tests.Visual.Gameplay
         /// Creates an <see cref="IBeatmap"/>, containing 10 hitobjects and user-provided timing points.
         /// The hitobjects are spaced <see cref="time_range"/> milliseconds apart.
         /// </summary>
-        /// <param name="timingControlPoints">The timing points to add to the beatmap.</param>
         /// <returns>The <see cref="IBeatmap"/>.</returns>
-        private IBeatmap createBeatmap(params TimingControlPoint[] timingControlPoints)
+        private IBeatmap createBeatmap()
         {
             var beatmap = new Beatmap<HitObject> { BeatmapInfo = { Ruleset = new OsuRuleset().RulesetInfo } };
-
-            beatmap.ControlPointInfo.TimingPoints.AddRange(timingControlPoints);
 
             for (int i = 0; i < 10; i++)
                 beatmap.HitObjects.Add(new HitObject { StartTime = i * time_range });
@@ -172,7 +172,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             var ruleset = new TestScrollingRuleset();
 
-            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap), Array.Empty<Mod>());
+            drawableRuleset = (TestDrawableScrollingRuleset)ruleset.CreateDrawableRulesetWith(CreateWorkingBeatmap(beatmap).GetPlayableBeatmap(ruleset.RulesetInfo));
             drawableRuleset.FrameStablePlayback = false;
 
             overrideAction?.Invoke(drawableRuleset);
@@ -194,16 +194,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestScrollingRuleset : Ruleset
         {
-            public TestScrollingRuleset(RulesetInfo rulesetInfo = null)
-                : base(rulesetInfo)
-            {
-            }
-
             public override IEnumerable<Mod> GetModsFor(ModType type) => throw new NotImplementedException();
 
-            public override DrawableRuleset CreateDrawableRulesetWith(IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods) => new TestDrawableScrollingRuleset(this, beatmap, mods);
+            public override DrawableRuleset CreateDrawableRulesetWith(IBeatmap beatmap, IReadOnlyList<Mod> mods = null) => new TestDrawableScrollingRuleset(this, beatmap, mods);
 
-            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap);
+            public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new TestBeatmapConverter(beatmap, null);
 
             public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => throw new NotImplementedException();
 
@@ -222,7 +217,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             public new Bindable<double> TimeRange => base.TimeRange;
 
-            public TestDrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+            public TestDrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
                 : base(ruleset, beatmap, mods)
             {
                 TimeRange.Value = time_range;
@@ -273,12 +268,12 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestBeatmapConverter : BeatmapConverter<TestHitObject>
         {
-            public TestBeatmapConverter(IBeatmap beatmap)
-                : base(beatmap)
+            public TestBeatmapConverter(IBeatmap beatmap, Ruleset ruleset)
+                : base(beatmap, ruleset)
             {
             }
 
-            protected override IEnumerable<Type> ValidConversionTypes => new[] { typeof(HitObject) };
+            public override bool CanConvert() => true;
 
             protected override IEnumerable<TestHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap)
             {

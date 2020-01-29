@@ -13,12 +13,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 {
     public class ScrollingHitObjectContainer : HitObjectContainer
     {
-        /// <summary>
-        /// A multiplier applied to the length of the scrolling area to determine a safe default lifetime end for hitobjects.
-        /// This is only used to limit the lifetime end within reason, as proper lifetime management should be implemented on hitobjects themselves.
-        /// </summary>
-        private const float safe_lifetime_end_multiplier = 2;
-
         private readonly IBindable<double> timeRange = new BindableDouble();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
@@ -106,13 +100,42 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void computeLifetimeStartRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
+            hitObject.LifetimeStart = computeOriginAdjustedLifetimeStart(hitObject);
 
             foreach (var obj in hitObject.NestedHitObjects)
                 computeLifetimeStartRecursive(obj);
         }
 
         private readonly Dictionary<DrawableHitObject, Cached> hitObjectInitialStateCache = new Dictionary<DrawableHitObject, Cached>();
+
+        private double computeOriginAdjustedLifetimeStart(DrawableHitObject hitObject)
+        {
+            float originAdjustment = 0.0f;
+
+            // calculate the dimension of the part of the hitobject that should already be visible
+            // when the hitobject origin first appears inside the scrolling container
+            switch (direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    originAdjustment = hitObject.OriginPosition.Y;
+                    break;
+
+                case ScrollingDirection.Down:
+                    originAdjustment = hitObject.DrawHeight - hitObject.OriginPosition.Y;
+                    break;
+
+                case ScrollingDirection.Left:
+                    originAdjustment = hitObject.OriginPosition.X;
+                    break;
+
+                case ScrollingDirection.Right:
+                    originAdjustment = hitObject.DrawWidth - hitObject.OriginPosition.X;
+                    break;
+            }
+
+            var adjustedStartTime = scrollingInfo.Algorithm.TimeAt(-originAdjustment, hitObject.HitObject.StartTime, timeRange.Value, scrollLength);
+            return scrollingInfo.Algorithm.GetDisplayStartTime(adjustedStartTime, timeRange.Value);
+        }
 
         // Cant use AddOnce() since the delegate is re-constructed every invocation
         private void computeInitialStateRecursive(DrawableHitObject hitObject) => hitObject.Schedule(() =>
@@ -123,27 +146,21 @@ namespace osu.Game.Rulesets.UI.Scrolling
             if (cached.IsValid)
                 return;
 
-            double endTime = hitObject.HitObject.StartTime;
-
             if (hitObject.HitObject is IHasEndTime e)
             {
-                endTime = e.EndTime;
-
                 switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
                         break;
 
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime, timeRange.Value, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, e.EndTime, timeRange.Value, scrollLength);
                         break;
                 }
             }
-
-            hitObject.LifetimeEnd = scrollingInfo.Algorithm.TimeAt(scrollLength * safe_lifetime_end_multiplier, endTime, timeRange.Value, scrollLength);
 
             foreach (var obj in hitObject.NestedHitObjects)
             {

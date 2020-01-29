@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -23,8 +24,8 @@ namespace osu.Game.Screens.Play
 {
     public class HUDOverlay : Container
     {
-        private const int duration = 250;
-        private const Easing easing = Easing.OutQuint;
+        private const float fade_duration = 400;
+        private const Easing fade_easing = Easing.Out;
 
         public readonly KeyCounterDisplay KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
@@ -40,11 +41,19 @@ namespace osu.Game.Screens.Play
         public Bindable<bool> ShowHealthbar = new Bindable<bool>(true);
 
         private readonly ScoreProcessor scoreProcessor;
+        private readonly HealthProcessor healthProcessor;
         private readonly DrawableRuleset drawableRuleset;
         private readonly IReadOnlyList<Mod> mods;
 
-        private Bindable<bool> showHud;
+        /// <summary>
+        /// Whether the elements that can optionally be hidden should be visible.
+        /// </summary>
+        public Bindable<bool> ShowHud { get; } = new BindableBool();
+
+        private Bindable<bool> configShowHud;
+
         private readonly Container visibilityContainer;
+
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
@@ -53,9 +62,12 @@ namespace osu.Game.Screens.Play
 
         private readonly Container topScoreContainer;
 
-        public HUDOverlay(ScoreProcessor scoreProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
+        private IEnumerable<Drawable> hideTargets => new Drawable[] { visibilityContainer, KeyCounter };
+
+        public HUDOverlay(ScoreProcessor scoreProcessor, HealthProcessor healthProcessor, DrawableRuleset drawableRuleset, IReadOnlyList<Mod> mods)
         {
             this.scoreProcessor = scoreProcessor;
+            this.healthProcessor = healthProcessor;
             this.drawableRuleset = drawableRuleset;
             this.mods = mods;
 
@@ -68,13 +80,12 @@ namespace osu.Game.Screens.Play
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
+                        HealthDisplay = CreateHealthDisplay(),
                         topScoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             AutoSizeAxes = Axes.Both,
-                            AutoSizeDuration = 200,
-                            AutoSizeEasing = Easing.Out,
                             Children = new Drawable[]
                             {
                                 AccuracyCounter = CreateAccuracyCounter(),
@@ -82,19 +93,20 @@ namespace osu.Game.Screens.Play
                                 ComboCounter = CreateComboCounter(),
                             },
                         },
-                        HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
                         HitErrorDisplay = CreateHitErrorDisplayOverlay(),
+                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
-                PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
                     Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
                     AutoSizeAxes = Axes.Both,
+                    LayoutDuration = fade_duration / 2,
+                    LayoutEasing = fade_easing,
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -108,34 +120,26 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader(true)]
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
-            BindProcessor(scoreProcessor);
-            BindDrawableRuleset(drawableRuleset);
+            if (scoreProcessor != null)
+                BindScoreProcessor(scoreProcessor);
 
-            Progress.Objects = drawableRuleset.Objects;
-            Progress.AllowSeeking = drawableRuleset.HasReplayLoaded.Value;
-            Progress.RequestSeek = time => RequestSeek(time);
-            Progress.ReferenceClock = drawableRuleset.FrameStableClock;
+            if (healthProcessor != null)
+                BindHealthProcessor(healthProcessor);
+
+            if (drawableRuleset != null)
+            {
+                BindDrawableRuleset(drawableRuleset);
+
+                Progress.Objects = drawableRuleset.Objects;
+                Progress.RequestSeek = time => RequestSeek(time);
+                Progress.ReferenceClock = drawableRuleset.FrameStableClock;
+            }
 
             ModDisplay.Current.Value = mods;
 
-            showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.BindValueChanged(visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration, easing), true);
+            configShowHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
 
-            ShowHealthbar.BindValueChanged(healthBar =>
-            {
-                if (healthBar.NewValue)
-                {
-                    HealthDisplay.FadeIn(duration, easing);
-                    topScoreContainer.MoveToY(30, duration, easing);
-                }
-                else
-                {
-                    HealthDisplay.FadeOut(duration, easing);
-                    topScoreContainer.MoveToY(0, duration, easing);
-                }
-            }, true);
-
-            if (!showHud.Value && !hasShownNotificationOnce)
+            if (!configShowHud.Value && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
 
@@ -144,11 +148,38 @@ namespace osu.Game.Screens.Play
                     Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });
             }
+
+            // start all elements hidden
+            hideTargets.ForEach(d => d.Hide());
         }
+
+        public override void Hide() => throw new InvalidOperationException($"{nameof(HUDOverlay)} should not be hidden as it will remove the ability of a user to quit. Use {nameof(ShowHud)} instead.");
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            ShowHud.BindValueChanged(visible => hideTargets.ForEach(d => d.FadeTo(visible.NewValue ? 1 : 0, fade_duration, fade_easing)));
+
+            ShowHealthbar.BindValueChanged(healthBar =>
+            {
+                if (healthBar.NewValue)
+                {
+                    HealthDisplay.FadeIn(fade_duration, fade_easing);
+                    topScoreContainer.MoveToY(30, fade_duration, fade_easing);
+                }
+                else
+                {
+                    HealthDisplay.FadeOut(fade_duration, fade_easing);
+                    topScoreContainer.MoveToY(0, fade_duration, fade_easing);
+                }
+            }, true);
+
+            configShowHud.BindValueChanged(visible =>
+            {
+                if (!ShowHud.Disabled)
+                    ShowHud.Value = visible.NewValue;
+            }, true);
 
             replayLoaded.BindValueChanged(replayLoadedValueChanged, true);
         }
@@ -189,7 +220,7 @@ namespace osu.Game.Screens.Play
                 switch (e.Key)
                 {
                     case Key.Tab:
-                        showHud.Value = !showHud.Value;
+                        configShowHud.Value = !configShowHud.Value;
                         return true;
                 }
             }
@@ -257,19 +288,23 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20, Right = 10 },
         };
 
-        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset.FirstAvailableHitWindows);
+        protected virtual HitErrorDisplay CreateHitErrorDisplayOverlay() => new HitErrorDisplay(scoreProcessor, drawableRuleset?.FirstAvailableHitWindows);
 
         protected virtual PlayerSettingsOverlay CreatePlayerSettingsOverlay() => new PlayerSettingsOverlay();
 
-        protected virtual void BindProcessor(ScoreProcessor processor)
+        protected virtual void BindScoreProcessor(ScoreProcessor processor)
         {
             ScoreCounter?.Current.BindTo(processor.TotalScore);
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
-            HealthDisplay?.Current.BindTo(processor.Health);
 
             if (HealthDisplay is StandardHealthDisplay shd)
                 processor.NewJudgement += shd.Flash;
+        }
+
+        protected virtual void BindHealthProcessor(HealthProcessor processor)
+        {
+            HealthDisplay?.Current.BindTo(processor.Health);
         }
     }
 }

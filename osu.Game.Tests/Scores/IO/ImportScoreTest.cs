@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.IO.Archives;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
@@ -154,7 +156,30 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
-        private async Task<ScoreInfo> loadIntoOsu(OsuGameBase osu, ScoreInfo score)
+        [Test]
+        public async Task TestOnlineScoreIsAvailableLocally()
+        {
+            using (HeadlessGameHost host = new CleanRunHeadlessGameHost("TestOnlineScoreIsAvailableLocally"))
+            {
+                try
+                {
+                    var osu = await loadOsu(host);
+
+                    await loadIntoOsu(osu, new ScoreInfo { OnlineScoreID = 2 }, new TestArchiveReader());
+
+                    var scoreManager = osu.Dependencies.Get<ScoreManager>();
+
+                    // Note: A new score reference is used here since the import process mutates the original object to set an ID
+                    Assert.That(scoreManager.IsAvailableLocally(new ScoreInfo { OnlineScoreID = 2 }));
+                }
+                finally
+                {
+                    host.Exit();
+                }
+            }
+        }
+
+        private async Task<ScoreInfo> loadIntoOsu(OsuGameBase osu, ScoreInfo score, ArchiveReader archive = null)
         {
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
@@ -165,7 +190,7 @@ namespace osu.Game.Tests.Scores.IO
                 score.Ruleset = new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
-            await scoreManager.Import(score);
+            await scoreManager.Import(score, archive);
 
             return scoreManager.GetAllUsableScores().FirstOrDefault();
         }
@@ -195,6 +220,24 @@ namespace osu.Game.Tests.Scores.IO
             });
 
             Assert.IsTrue(task.Wait(timeout), failureMessage);
+        }
+
+        private class TestArchiveReader : ArchiveReader
+        {
+            public TestArchiveReader()
+                : base("test_archive")
+            {
+            }
+
+            public override Stream GetStream(string name) => new MemoryStream();
+
+            public override void Dispose()
+            {
+            }
+
+            public override IEnumerable<string> Filenames => new[] { "test_file.osr" };
+
+            public override Stream GetUnderlyingStream() => new MemoryStream();
         }
     }
 }

@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Testing;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -15,6 +15,7 @@ using osu.Game.Tests.Visual;
 using osuTK;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Storyboards;
 using static osu.Game.Tests.Visual.OsuTestScene.ClockBackedTestWorkingBeatmap;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -28,9 +29,9 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override bool Autoplay => true;
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
-            var working = new ClockBackedTestWorkingBeatmap(beatmap, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
+            var working = new ClockBackedTestWorkingBeatmap(beatmap, storyboard, new FramedClock(new ManualClock { Rate = 1 }), audioManager);
             track = (TrackVirtualManual)working.Track;
             return working;
         }
@@ -69,6 +70,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("is rotation absolute almost same", () => Precision.AlmostEquals(drawableSpinner.Disc.RotationAbsolute, estimatedRotation, 100));
         }
 
+        [Test]
+        public void TestSpinPerMinuteOnRewind()
+        {
+            double estimatedSpm = 0;
+
+            addSeekStep(2500);
+            AddStep("retrieve spm", () => estimatedSpm = drawableSpinner.SpmCounter.SpinsPerMinute);
+
+            addSeekStep(5000);
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+
+            addSeekStep(2500);
+            AddAssert("spm still valid", () => Precision.AlmostEquals(drawableSpinner.SpmCounter.SpinsPerMinute, estimatedSpm, 1.0));
+        }
+
         private void addSeekStep(double time)
         {
             AddStep($"seek to {time}", () => track.Seek(time));
@@ -83,10 +99,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 new Spinner
                 {
                     Position = new Vector2(256, 192),
-                    EndTime = 5000,
+                    EndTime = 6000,
                 },
                 // placeholder object to avoid hitting the results screen
-                new HitObject
+                new HitCircle
                 {
                     StartTime = 99999,
                 }

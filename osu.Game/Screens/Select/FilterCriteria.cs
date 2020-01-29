@@ -26,6 +26,12 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
 
+        public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
+        {
+            IsLowerInclusive = true,
+            IsUpperInclusive = true
+        };
+
         public string[] SearchTerms = Array.Empty<string>();
 
         public RulesetInfo Ruleset;
@@ -44,8 +50,10 @@ namespace osu.Game.Screens.Select
         }
 
         public struct OptionalRange<T> : IEquatable<OptionalRange<T>>
-            where T : struct, IComparable
+            where T : struct
         {
+            public bool HasFilter => Max != null || Min != null;
+
             public bool IsInRange(T value)
             {
                 if (Min != null)
@@ -79,17 +87,19 @@ namespace osu.Game.Screens.Select
             public bool IsUpperInclusive;
 
             public bool Equals(OptionalRange<T> other)
-                => Min.Equals(other.Min)
-                   && Max.Equals(other.Max)
+                => EqualityComparer<T?>.Default.Equals(Min, other.Min)
+                   && EqualityComparer<T?>.Default.Equals(Max, other.Max)
                    && IsLowerInclusive.Equals(other.IsLowerInclusive)
                    && IsUpperInclusive.Equals(other.IsUpperInclusive);
         }
 
         public struct OptionalTextFilter : IEquatable<OptionalTextFilter>
         {
+            public bool HasFilter => !string.IsNullOrEmpty(SearchTerm);
+
             public bool Matches(string value)
             {
-                if (string.IsNullOrEmpty(SearchTerm))
+                if (!HasFilter)
                     return true;
 
                 // search term is guaranteed to be non-empty, so if the string we're comparing is empty, it's not matching
@@ -101,7 +111,7 @@ namespace osu.Game.Screens.Select
 
             public string SearchTerm;
 
-            public bool Equals(OptionalTextFilter other) => SearchTerm?.Equals(other.SearchTerm) ?? true;
+            public bool Equals(OptionalTextFilter other) => SearchTerm == other.SearchTerm;
         }
     }
 }

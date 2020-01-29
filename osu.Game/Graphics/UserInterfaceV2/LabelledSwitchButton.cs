@@ -3,7 +3,7 @@
 
 namespace osu.Game.Graphics.UserInterfaceV2
 {
-    public class LabelledSwitchButton : LabelledComponent<SwitchButton>
+    public class LabelledSwitchButton : LabelledComponent<SwitchButton, bool>
     {
         public LabelledSwitchButton()
             : base(true)

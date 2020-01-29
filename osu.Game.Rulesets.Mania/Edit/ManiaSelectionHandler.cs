@@ -1,15 +1,16 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
-using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             editorClock = clock;
         }
 
-        public override void HandleMovement(MoveSelectionEvent moveEvent)
+        public override bool HandleMovement(MoveSelectionEvent moveEvent)
         {
             var maniaBlueprint = (ManiaSelectionBlueprint)moveEvent.Blueprint;
             int lastColumn = maniaBlueprint.DrawableObject.HitObject.Column;
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             performDragMovement(moveEvent);
             performColumnMovement(lastColumn, moveEvent);
 
-            base.HandleMovement(moveEvent);
+            return true;
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
             // Flip the vertical coordinate space when scrolling downwards
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                targetPosition = targetPosition - referenceParent.DrawHeight;
+                targetPosition -= referenceParent.DrawHeight;
 
             float movementDelta = targetPosition - reference.DrawableObject.Position.Y;
 
@@ -70,10 +71,12 @@ namespace osu.Game.Rulesets.Mania.Edit
             // When scrolling downwards the anchor position is at the bottom of the screen, however the movement event assumes the anchor is at the top of the screen.
             // This causes the delta to assume a positive hitobject position, and which can be corrected for by subtracting the parent height.
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                delta -= moveEvent.Blueprint.DrawableObject.Parent.DrawHeight;
+                delta -= moveEvent.Blueprint.Parent.DrawHeight; // todo: probably wrong
 
-            foreach (var b in SelectedBlueprints)
+            foreach (var selectionBlueprint in SelectedBlueprints)
             {
+                var b = (OverlaySelectionBlueprint)selectionBlueprint;
+
                 var hitObject = b.DrawableObject;
                 var objectParent = (HitObjectContainer)hitObject.Parent;
 
@@ -119,7 +122,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     maxColumn = obj.Column;
             }
 
-            columnDelta = MathHelper.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
+            columnDelta = Math.Clamp(columnDelta, -minColumn, composer.TotalColumns - 1 - maxColumn);
 
             foreach (var obj in SelectedHitObjects.OfType<ManiaHitObject>())
                 obj.Column += columnDelta;

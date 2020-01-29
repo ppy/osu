@@ -194,10 +194,10 @@ namespace osu.Game.Screens.Menu
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            iconText.Alpha = MathHelper.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
+            iconText.Alpha = Math.Clamp((box.Scale.X - 0.5f) / 0.3f, 0, 1);
             base.Update();
         }
 

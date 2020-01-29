@@ -26,7 +26,7 @@ namespace osu.Game.Overlays
     {
         public readonly Bindable<APIChangelogBuild> Current = new Bindable<APIChangelogBuild>();
 
-        private ChangelogHeader header;
+        protected ChangelogHeader Header;
 
         private Container<ChangelogContent> content;
 
@@ -34,16 +34,16 @@ namespace osu.Game.Overlays
 
         private List<APIChangelogBuild> builds;
 
-        private List<APIUpdateStream> streams;
+        protected List<APIUpdateStream> Streams;
+
+        public ChangelogOverlay()
+            : base(OverlayColourScheme.Purple)
+        {
+        }
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colour)
         {
-            Waves.FirstWaveColour = colour.GreyVioletLight;
-            Waves.SecondWaveColour = colour.GreyViolet;
-            Waves.ThirdWaveColour = colour.GreyVioletDark;
-            Waves.FourthWaveColour = colour.GreyVioletDarker;
-
             Children = new Drawable[]
             {
                 new Box
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            header = new ChangelogHeader
+                            Header = new ChangelogHeader
                             {
                                 ListingSelected = ShowListing,
                             },
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 
-            header.Current.BindTo(Current);
+            Header.Current.BindTo(Current);
 
             Current.BindValueChanged(e =>
             {
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays
             performAfterFetch(() =>
             {
                 var build = builds.Find(b => b.Version == version && b.UpdateStream.Name == updateStream)
-                            ?? streams.Find(s => s.Name == updateStream)?.LatestBuild;
+                            ?? Streams.Find(s => s.Name == updateStream)?.LatestBuild;
 
                 if (build != null)
                     ShowBuild(build);
@@ -158,7 +158,8 @@ namespace osu.Game.Overlays
 
         private Task initialFetchTask;
 
-        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ => Schedule(action));
+        private void performAfterFetch(Action action) => fetchListing()?.ContinueWith(_ =>
+            Schedule(action), TaskContinuationOptions.OnlyOnRanToCompletion);
 
         private Task fetchListing()
         {
@@ -170,6 +171,7 @@ namespace osu.Game.Overlays
                 var tcs = new TaskCompletionSource<bool>();
 
                 var req = new GetChangelogRequest();
+
                 req.Success += res => Schedule(() =>
                 {
                     // remap streams to builds to ensure model equality
@@ -177,14 +179,20 @@ namespace osu.Game.Overlays
                     res.Streams.ForEach(s => s.LatestBuild.UpdateStream = res.Streams.Find(s2 => s2.Id == s.LatestBuild.UpdateStream.Id));
 
                     builds = res.Builds;
-                    streams = res.Streams;
+                    Streams = res.Streams;
 
-                    header.Streams.Populate(res.Streams);
+                    Header.Populate(res.Streams);
 
                     tcs.SetResult(true);
                 });
-                req.Failure += _ => initialFetchTask = null;
-                req.Perform(API);
+
+                req.Failure += e =>
+                {
+                    initialFetchTask = null;
+                    tcs.SetException(e);
+                };
+
+                await API.PerformAsync(req);
 
                 await tcs.Task;
             });

@@ -38,9 +38,10 @@ namespace osu.Game.Rulesets.Osu.UI
             });
         }
 
-        public override void Show()
+        protected override void PopIn()
         {
-            base.Show();
+            base.PopIn();
+
             GameplayCursor.ActiveCursor.Hide();
             cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
             clickToResumeCursor.Appear();
@@ -55,13 +56,13 @@ namespace osu.Game.Rulesets.Osu.UI
             }
         }
 
-        public override void Hide()
+        protected override void PopOut()
         {
+            base.PopOut();
+
             localCursorContainer?.Expire();
             localCursorContainer = null;
-            GameplayCursor.ActiveCursor.Show();
-
-            base.Hide();
+            GameplayCursor?.ActiveCursor?.Show();
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -106,7 +107,9 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
 
             public void Appear() => Schedule(() =>
             {

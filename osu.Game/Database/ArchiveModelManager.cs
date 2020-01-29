@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -35,7 +34,7 @@ namespace osu.Game.Database
     /// <typeparam name="TFileModel">The associated file join type.</typeparam>
     public abstract class ArchiveModelManager<TModel, TFileModel> : ICanAcceptFiles, IModelManager<TModel>
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
-        where TFileModel : INamedFileInfo, new()
+        where TFileModel : class, INamedFileInfo, new()
     {
         private const int import_queue_request_concurrency = 1;
 
@@ -54,13 +53,13 @@ namespace osu.Game.Database
         public Action<Notification> PostNotification { protected get; set; }
 
         /// <summary>
-        /// Fired when a new <see cref="TModel"/> becomes available in the database.
+        /// Fired when a new <typeparamref name="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemAdded;
 
         /// <summary>
-        /// Fired when a <see cref="TModel"/> is removed from the database.
+        /// Fired when a <typeparamref name="TModel"/> is removed from the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
         public event Action<TModel> ItemRemoved;
@@ -95,7 +94,7 @@ namespace osu.Game.Database
         }
 
         /// <summary>
-        /// Import one or more <see cref="TModel"/> items from filesystem <paramref name="paths"/>.
+        /// Import one or more <typeparamref name="TModel"/> items from filesystem <paramref name="paths"/>.
         /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="paths">One or more archive locations on disk.</param>
@@ -108,7 +107,7 @@ namespace osu.Game.Database
             return Import(notification, paths);
         }
 
-        protected async Task Import(ProgressNotification notification, params string[] paths)
+        protected async Task<IEnumerable<TModel>> Import(ProgressNotification notification, params string[] paths)
         {
             notification.Progress = 0;
             notification.Text = $"{HumanisedModelName.Humanize(LetterCasing.Title)} import is initialising...";
@@ -168,10 +167,12 @@ namespace osu.Game.Database
 
                 notification.State = ProgressNotificationState.Completed;
             }
+
+            return imported;
         }
 
         /// <summary>
-        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// Import one <typeparamref name="TModel"/> from the filesystem and delete the file on success.
         /// </summary>
         /// <param name="path">The archive location on disk.</param>
         /// <param name="cancellationToken">An optional cancellation token.</param>
@@ -221,9 +222,8 @@ namespace osu.Game.Database
             {
                 model = CreateModel(archive);
 
-                if (model == null) return Task.FromResult<TModel>(null);
-
-                model.Hash = computeHash(archive);
+                if (model == null)
+                    return Task.FromResult<TModel>(null);
             }
             catch (TaskCanceledException)
             {
@@ -258,19 +258,31 @@ namespace osu.Game.Database
         /// <summary>
         /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
-        private string computeHash(ArchiveReader reader)
+        /// <remarks>
+        ///  In the case of no matching files, a hash will be generated from the passed archive's <see cref="ArchiveReader.Name"/>.
+        /// </remarks>
+        private string computeHash(TModel item, ArchiveReader reader = null)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
-            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
-                using (Stream s = reader.GetStream(file))
-                    s.CopyTo(hashable);
 
-            return hashable.Length > 0 ? hashable.ComputeSHA2Hash() : null;
+            foreach (TFileModel file in item.Files.Where(f => HashableFileTypes.Any(f.Filename.EndsWith)))
+            {
+                using (Stream s = Files.Store.GetStream(file.FileInfo.StoragePath))
+                    s.CopyTo(hashable);
+            }
+
+            if (hashable.Length > 0)
+                return hashable.ComputeSHA2Hash();
+
+            if (reader != null)
+                return reader.Name.ComputeSHA2Hash();
+
+            return item.Hash;
         }
 
         /// <summary>
-        /// Import an item from a <see cref="TModel"/>.
+        /// Import an item from a <typeparamref name="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
@@ -296,6 +308,7 @@ namespace osu.Game.Database
                 LogForModel(item, "Beginning import...");
 
                 item.Files = archive != null ? createFileInfos(archive, Files) : new List<TFileModel>();
+                item.Hash = computeHash(item, archive);
 
                 await Populate(item, archive, cancellationToken);
 
@@ -351,12 +364,42 @@ namespace osu.Game.Database
             return item;
         }, cancellationToken, TaskCreationOptions.HideScheduler, import_scheduler).Unwrap();
 
+        public void UpdateFile(TModel model, TFileModel file, Stream contents)
+        {
+            using (var usage = ContextFactory.GetForWrite())
+            {
+                // Dereference the existing file info, since the file model will be removed.
+                Files.Dereference(file.FileInfo);
+
+                // Remove the file model.
+                usage.Context.Set<TFileModel>().Remove(file);
+
+                // Add the new file info and containing file model.
+                model.Files.Remove(file);
+                model.Files.Add(new TFileModel
+                {
+                    Filename = file.Filename,
+                    FileInfo = Files.Add(contents)
+                });
+
+                Update(model);
+            }
+        }
+
         /// <summary>
         /// Perform an update of the specified item.
-        /// TODO: Support file changes.
+        /// TODO: Support file additions/removals.
         /// </summary>
         /// <param name="item">The item to update.</param>
-        public void Update(TModel item) => ModelStore.Update(item);
+        public void Update(TModel item)
+        {
+            using (ContextFactory.GetForWrite())
+            {
+                item.Hash = computeHash(item);
+
+                ModelStore.Update(item);
+            }
+        }
 
         /// <summary>
         /// Delete an item from the manager.
@@ -483,12 +526,16 @@ namespace osu.Game.Database
 
             // import files to manager
             foreach (string file in reader.Filenames)
+            {
                 using (Stream s = reader.GetStream(file))
+                {
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathStandardise(file.Substring(prefix.Length)),
+                        Filename = file.Substring(prefix.Length).ToStandardisedPath(),
                         FileInfo = files.Add(s)
                     });
+                }
+            }
 
             return fileInfos;
         }
@@ -580,7 +627,7 @@ namespace osu.Game.Database
         protected TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
-        /// After an existing <see cref="TModel"/> is found during an import process, the default behaviour is to restore the existing
+        /// After an existing <typeparamref name="TModel"/> is found during an import process, the default behaviour is to restore the existing
         /// item and skip the import. This method allows changing that behaviour.
         /// </summary>
         /// <param name="existing">The existing model.</param>
@@ -649,8 +696,10 @@ namespace osu.Game.Database
         private void handleEvent(Action a)
         {
             if (delayingEvents)
+            {
                 lock (queuedEvents)
                     queuedEvents.Add(a);
+            }
             else
                 a.Invoke();
         }

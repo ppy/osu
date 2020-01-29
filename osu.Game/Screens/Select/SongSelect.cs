@@ -41,151 +41,171 @@ namespace osu.Game.Screens.Select
 {
     public abstract class SongSelect : OsuScreen, IKeyBindingHandler<GlobalAction>
     {
-        public static readonly Vector2 WEDGED_CONTAINER_SIZE = new Vector2(0.5f, 245);
+        public static readonly float WEDGE_HEIGHT = 245;
 
         protected const float BACKGROUND_BLUR = 20;
         private const float left_area_padding = 20;
 
-        public readonly FilterControl FilterControl;
+        public FilterControl FilterControl { get; private set; }
 
         protected virtual bool ShowFooter => true;
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly BeatmapOptionsOverlay BeatmapOptions;
+        protected BeatmapOptionsOverlay BeatmapOptions { get; private set; }
 
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>
-        protected readonly Footer Footer;
+        protected Footer Footer { get; private set; }
 
         /// <summary>
         /// Contains any panel which is triggered by a footer button.
         /// Helps keep them located beneath the footer itself.
         /// </summary>
-        protected readonly Container FooterPanels;
+        protected Container FooterPanels { get; private set; }
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected readonly BeatmapCarousel Carousel;
-        private readonly BeatmapInfoWedge beatmapInfoWedge;
+        protected BeatmapCarousel Carousel { get; private set; }
+
+        private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
 
-        protected readonly ModSelectOverlay ModSelect;
+        protected ModSelectOverlay ModSelect { get; private set; }
 
-        protected SampleChannel SampleConfirm;
+        protected SampleChannel SampleConfirm { get; private set; }
+
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        protected readonly BeatmapDetailArea BeatmapDetails;
+        protected BeatmapDetailArea BeatmapDetails { get; private set; }
 
         private readonly Bindable<RulesetInfo> decoupledRuleset = new Bindable<RulesetInfo>();
 
         [Resolved(canBeNull: true)]
         private MusicController music { get; set; }
 
-        [Cached]
-        [Cached(Type = typeof(IBindable<IReadOnlyList<Mod>>))]
-        private readonly Bindable<IReadOnlyList<Mod>> mods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>()); // Bound to the game's mods, but is not reset on exiting
-
-        protected SongSelect()
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
+            // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
+            transferRulesetValue();
+
             AddRangeInternal(new Drawable[]
             {
-                new ParallaxContainer
-                {
-                    Masking = true,
-                    ParallaxAmount = 0.005f,
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new[]
-                    {
-                        new WedgeBackground
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Padding = new MarginPadding { Right = -150 },
-                            Size = new Vector2(WEDGED_CONTAINER_SIZE.X, 1),
-                        }
-                    }
-                },
-                new Container
-                {
-                    Origin = Anchor.BottomLeft,
-                    Anchor = Anchor.BottomLeft,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(WEDGED_CONTAINER_SIZE.X, 1),
-                    Padding = new MarginPadding
-                    {
-                        Bottom = Footer.HEIGHT,
-                        Top = WEDGED_CONTAINER_SIZE.Y + left_area_padding,
-                        Left = left_area_padding,
-                        Right = left_area_padding * 2,
-                    },
-                    Child = BeatmapDetails = new BeatmapDetailArea
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 10, Right = 5 },
-                    }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Width = 2, //avoid horizontal masking so the panels don't clip when screen stack is pushed.
-                    Child = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Width = 0.5f,
-                        Children = new Drawable[]
-                        {
-                            new Container
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding
-                                {
-                                    Top = FilterControl.HEIGHT,
-                                    Bottom = Footer.HEIGHT
-                                },
-                                Child = Carousel = new BeatmapCarousel
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1 - WEDGED_CONTAINER_SIZE.X, 1),
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    SelectionChanged = updateSelectedBeatmap,
-                                    BeatmapSetsChanged = carouselBeatmapsLoaded,
-                                },
-                            },
-                            FilterControl = new FilterControl
-                            {
-                                RelativeSizeAxes = Axes.X,
-                                Height = FilterControl.HEIGHT,
-                                FilterChanged = c => Carousel.Filter(c),
-                                Background = { Width = 2 },
-                            },
-                        }
-                    },
-                },
-                beatmapInfoWedge = new BeatmapInfoWedge
-                {
-                    Size = WEDGED_CONTAINER_SIZE,
-                    RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
-                    {
-                        Top = left_area_padding,
-                        Right = left_area_padding,
-                    },
-                },
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
                     Width = 250,
-                }
+                },
+                new VerticalMaskingContainer
+                {
+                    Children = new Drawable[]
+                    {
+                        new GridContainer // used for max width implementation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(),
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 850),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new ParallaxContainer
+                                    {
+                                        ParallaxAmount = 0.005f,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Child = new WedgeBackground
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Padding = new MarginPadding { Right = -150 },
+                                        },
+                                    },
+                                    new Container
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Padding = new MarginPadding
+                                        {
+                                            Top = FilterControl.HEIGHT,
+                                            Bottom = Footer.HEIGHT
+                                        },
+                                        Child = Carousel = new BeatmapCarousel
+                                        {
+                                            Anchor = Anchor.CentreRight,
+                                            Origin = Anchor.CentreRight,
+                                            RelativeSizeAxes = Axes.Both,
+                                            SelectionChanged = updateSelectedBeatmap,
+                                            BeatmapSetsChanged = carouselBeatmapsLoaded,
+                                        },
+                                    }
+                                },
+                            }
+                        },
+                        FilterControl = new FilterControl
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = FilterControl.HEIGHT,
+                            FilterChanged = ApplyFilterToCarousel,
+                            Background = { Width = 2 },
+                        },
+                        new GridContainer // used for max width implementation
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 650),
+                            },
+                            Content = new[]
+                            {
+                                new Drawable[]
+                                {
+                                    new Container
+                                    {
+                                        Origin = Anchor.BottomLeft,
+                                        Anchor = Anchor.BottomLeft,
+                                        RelativeSizeAxes = Axes.Both,
+
+                                        Children = new Drawable[]
+                                        {
+                                            beatmapInfoWedge = new BeatmapInfoWedge
+                                            {
+                                                Height = WEDGE_HEIGHT,
+                                                RelativeSizeAxes = Axes.X,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = left_area_padding,
+                                                    Right = left_area_padding,
+                                                },
+                                            },
+                                            new Container
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                                Padding = new MarginPadding
+                                                {
+                                                    Bottom = Footer.HEIGHT,
+                                                    Top = WEDGE_HEIGHT + left_area_padding,
+                                                    Left = left_area_padding,
+                                                    Right = left_area_padding * 2,
+                                                },
+                                                Child = BeatmapDetails = new BeatmapDetailArea
+                                                {
+                                                    RelativeSizeAxes = Axes.Both,
+                                                    Padding = new MarginPadding { Top = 10, Right = 5 },
+                                                },
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        }
+                    }
+                },
             });
 
             if (ShowFooter)
@@ -215,14 +235,10 @@ namespace osu.Game.Screens.Select
             }
 
             BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
-        {
             if (Footer != null)
             {
-                Footer.AddButton(new FooterButtonMods { Current = mods }, ModSelect);
+                Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
                 Footer.AddButton(new FooterButtonRandom { Action = triggerRandom });
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
@@ -251,20 +267,23 @@ namespace osu.Game.Screens.Select
                 {
                     // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
                     if (!beatmaps.GetAllUsableBeatmapSetsEnumerable().Any() && beatmaps.StableInstallationAvailable)
+                    {
                         dialogOverlay.Push(new ImportFromStablePopup(() =>
                         {
                             Task.Run(beatmaps.ImportFromStableAsync).ContinueWith(_ => scores.ImportFromStableAsync(), TaskContinuationOptions.OnlyOnRanToCompletion);
                             Task.Run(skins.ImportFromStableAsync);
                         }));
+                    }
                 });
             }
         }
 
-        protected override void LoadComplete()
+        protected virtual void ApplyFilterToCarousel(FilterCriteria criteria)
         {
-            base.LoadComplete();
+            // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
+            bool shouldDebounce = this.IsCurrentScreen();
 
-            mods.BindTo(Mods);
+            Schedule(() => Carousel.Filter(criteria, shouldDebounce));
         }
 
         private DependencyContainer dependencies;
@@ -332,12 +351,14 @@ namespace osu.Game.Screens.Select
             if (e.NewValue is DummyWorkingBeatmap) return;
 
             if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
+            {
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
                 if (e.NewValue?.BeatmapInfo?.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
                     Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
                     Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
                 }
+            }
         }
 
         // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
@@ -386,7 +407,7 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
 
-                    mods.Value = Array.Empty<Mod>();
+                    Mods.Value = Array.Empty<Mod>();
                     decoupledRuleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -401,7 +422,7 @@ namespace osu.Game.Screens.Select
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
+                if (!EqualityComparer<BeatmapInfo>.Default.Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
@@ -534,9 +555,6 @@ namespace osu.Game.Screens.Select
             if (Beatmap.Value.Track != null)
                 Beatmap.Value.Track.Looping = false;
 
-            mods.UnbindAll();
-            Mods.Value = Array.Empty<Mod>();
-
             return false;
         }
 
@@ -634,7 +652,7 @@ namespace osu.Game.Screens.Select
                 return;
 
             // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+            transferRulesetValue();
             Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
             decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
@@ -644,6 +662,11 @@ namespace osu.Game.Screens.Select
             Beatmap.BindValueChanged(workingBeatmapChanged);
 
             boundLocalBindables = true;
+        }
+
+        private void transferRulesetValue()
+        {
+            rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
         }
 
         private void delete(BeatmapSetInfo beatmap)
@@ -676,7 +699,9 @@ namespace osu.Game.Screens.Select
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Select;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
@@ -696,6 +721,29 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
+        }
+
+        private class VerticalMaskingContainer : Container
+        {
+            private const float panel_overflow = 1.2f;
+
+            protected override Container<Drawable> Content { get; }
+
+            public VerticalMaskingContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+                Masking = true;
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                Width = panel_overflow; //avoid horizontal masking so the panels don't clip when screen stack is pushed.
+                InternalChild = Content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Width = 1 / panel_overflow,
+                };
+            }
         }
 
         private class ResetScrollContainer : Container

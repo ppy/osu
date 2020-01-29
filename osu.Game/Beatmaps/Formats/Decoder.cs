@@ -93,7 +93,7 @@ namespace osu.Game.Beatmaps.Formats
         /// <summary>
         /// Registers a fallback decoder instantiation function.
         /// The fallback will be returned if the first non-empty line of the decoded stream does not match any known magic.
-        /// Calling this method will overwrite any existing global fallback registration for type <see cref="T"/> - use with caution.
+        /// Calling this method will overwrite any existing global fallback registration for type <typeparamref name="T"/> - use with caution.
         /// </summary>
         /// <typeparam name="T">Type of object being decoded.</typeparam>
         /// <param name="constructor">A function that constructs the fallback<see cref="Decoder"/>.</param>

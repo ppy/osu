@@ -4,9 +4,8 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Tests.Beatmaps;
 
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             yield return new ConvertValue
             {
                 StartTime = hitObject.StartTime,
-                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
+                EndTime = hitObject.GetEndTime(),
                 IsRim = hitObject is RimHit,
                 IsCentre = hitObject is CentreHit,
                 IsDrumRoll = hitObject is DrumRoll,

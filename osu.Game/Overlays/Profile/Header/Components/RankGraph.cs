@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 placeholder.FadeOut(fade_duration, Easing.Out);
 
                 graph.DefaultValueCount = ranks.Length;
-                graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
+                graph.Values = ranks.Select(x => -MathF.Log(x.Value));
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             public void HideBar() => bar.FadeOut(fade_duration);
 
-            private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+            private int calculateIndex(float mouseXPosition) => (int)MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
             private Vector2 calculateBallPosition(int index)
             {

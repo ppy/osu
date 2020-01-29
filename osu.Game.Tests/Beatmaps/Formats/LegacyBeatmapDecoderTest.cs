@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.IO;
+using osu.Game.Rulesets.Catch;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -167,9 +168,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 var controlPoints = beatmap.ControlPointInfo;
 
                 Assert.AreEqual(4, controlPoints.TimingPoints.Count);
-                Assert.AreEqual(42, controlPoints.DifficultyPoints.Count);
-                Assert.AreEqual(42, controlPoints.SamplePoints.Count);
-                Assert.AreEqual(42, controlPoints.EffectPoints.Count);
+                Assert.AreEqual(5, controlPoints.DifficultyPoints.Count);
+                Assert.AreEqual(34, controlPoints.SamplePoints.Count);
+                Assert.AreEqual(8, controlPoints.EffectPoints.Count);
 
                 var timingPoint = controlPoints.TimingPointAt(0);
                 Assert.AreEqual(956, timingPoint.Time);
@@ -191,7 +192,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(48428);
-                Assert.AreEqual(48428, difficultyPoint.Time);
+                Assert.AreEqual(0, difficultyPoint.Time);
                 Assert.AreEqual(1.0, difficultyPoint.SpeedMultiplier);
 
                 difficultyPoint = controlPoints.DifficultyPointAt(116999);
@@ -224,7 +225,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
 
                 effectPoint = controlPoints.EffectPointAt(119637);
-                Assert.AreEqual(119637, effectPoint.Time);
+                Assert.AreEqual(95901, effectPoint.Time);
                 Assert.IsFalse(effectPoint.KiaiMode);
                 Assert.IsFalse(effectPoint.OmitFirstBarLine);
             }
@@ -259,6 +260,21 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.That(controlPoints.TimingPointAt(1500).BeatLength, Is.EqualTo(500).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(2500).BeatLength, Is.EqualTo(250).Within(0.1));
                 Assert.That(controlPoints.TimingPointAt(3500).BeatLength, Is.EqualTo(500).Within(0.1));
+            }
+        }
+
+        [Test]
+        public void TestTimingPointResetsSpeedMultiplier()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("timingpoint-speedmultiplier-reset.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPoints = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPoints.DifficultyPointAt(0).SpeedMultiplier, Is.EqualTo(0.5).Within(0.1));
+                Assert.That(controlPoints.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1).Within(0.1));
             }
         }
 
@@ -298,7 +314,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var beatmap = decoder.Decode(stream);
 
-                var converted = new OsuBeatmapConverter(beatmap).Convert();
+                var converted = new OsuBeatmapConverter(beatmap, new OsuRuleset()).Convert();
                 new OsuBeatmapProcessor(converted).PreProcess();
                 new OsuBeatmapProcessor(converted).PostProcess();
 
@@ -321,7 +337,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var beatmap = decoder.Decode(stream);
 
-                var converted = new CatchBeatmapConverter(beatmap).Convert();
+                var converted = new CatchBeatmapConverter(beatmap, new CatchRuleset()).Convert();
                 new CatchBeatmapProcessor(converted).PreProcess();
                 new CatchBeatmapProcessor(converted).PostProcess();
 
@@ -363,6 +379,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeControlPointDifficultyChange()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+
+            using (var resStream = TestResources.OpenResource("controlpoint-difficulty-multiplier.osu"))
+            using (var stream = new LineBufferedReader(resStream))
+            {
+                var controlPointInfo = decoder.Decode(stream).ControlPointInfo;
+
+                Assert.That(controlPointInfo.DifficultyPointAt(5).SpeedMultiplier, Is.EqualTo(1));
+                Assert.That(controlPointInfo.DifficultyPointAt(1000).SpeedMultiplier, Is.EqualTo(10));
+                Assert.That(controlPointInfo.DifficultyPointAt(2000).SpeedMultiplier, Is.EqualTo(1.8518518518518519d));
+                Assert.That(controlPointInfo.DifficultyPointAt(3000).SpeedMultiplier, Is.EqualTo(0.5));
+            }
+        }
+
+        [Test]
         public void TestDecodeControlPointCustomSampleBank()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
@@ -381,7 +414,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
 
-            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -399,7 +432,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
-            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
@@ -419,7 +452,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(70, getTestableSampleInfo(hitObjects[3]).Volume);
             }
 
-            HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+            static HitSampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]

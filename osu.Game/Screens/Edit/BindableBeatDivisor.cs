@@ -10,7 +10,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit
 {
-    public class BindableBeatDivisor : BindableNumber<int>
+    public class BindableBeatDivisor : BindableInt
     {
         public static readonly int[] VALID_DIVISORS = { 1, 2, 3, 4, 6, 8, 12, 16 };
 
@@ -29,7 +29,10 @@ namespace osu.Game.Screens.Edit
             set
             {
                 if (!VALID_DIVISORS.Contains(value))
-                    throw new ArgumentOutOfRangeException($"Provided divisor is not in {nameof(VALID_DIVISORS)}");
+                {
+                    // If it doesn't match, value will be 0, but will be clamped to the valid range via DefaultMinValue
+                    value = Array.FindLast(VALID_DIVISORS, d => d < value);
+                }
 
                 base.Value = value;
             }

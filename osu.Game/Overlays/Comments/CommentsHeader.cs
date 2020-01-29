@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osuTK;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.Comments
                             Origin = Anchor.CentreLeft,
                             Children = new Drawable[]
                             {
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
@@ -75,9 +76,9 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.Gray3;
+            background.Colour = colourProvider.Background4;
         }
 
         private class ShowDeletedButton : HeaderButton
@@ -101,7 +102,7 @@ namespace osu.Game.Overlays.Comments
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(10),
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,

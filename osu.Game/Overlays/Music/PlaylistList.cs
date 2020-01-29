@@ -136,29 +136,29 @@ namespace osu.Game.Overlays.Music
                 return draggedItem != null || base.OnDragStart(e);
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
-                if (draggedItem == null)
-                    return base.OnDrag(e);
 
-                return true;
+                if (draggedItem == null)
+                    base.OnDrag(e);
             }
 
-            protected override bool OnDragEnd(DragEndEvent e)
+            protected override void OnDragEnd(DragEndEvent e)
             {
                 nativeDragPosition = e.ScreenSpaceMousePosition;
 
                 if (draggedItem == null)
-                    return base.OnDragEnd(e);
+                {
+                    base.OnDragEnd(e);
+                    return;
+                }
 
                 if (dragDestination != null)
                     musicController.ChangeBeatmapSetPosition(draggedItem.BeatmapSetInfo, dragDestination.Value);
 
                 draggedItem = null;
                 dragDestination = null;
-
-                return true;
             }
 
             protected override void Update()
@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Music
                         break;
                 }
 
-                dstIndex = MathHelper.Clamp(dstIndex, 0, items.Count - 1);
+                dstIndex = Math.Clamp(dstIndex, 0, items.Count - 1);
 
                 if (srcIndex == dstIndex)
                     return;
@@ -239,7 +239,7 @@ namespace osu.Game.Overlays.Music
 
             private class ItemSearchContainer : FillFlowContainer<PlaylistItem>, IHasFilterableChildren
             {
-                public IEnumerable<string> FilterTerms => new string[] { };
+                public IEnumerable<string> FilterTerms => Array.Empty<string>();
 
                 public bool MatchingFilter
                 {

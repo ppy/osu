@@ -87,9 +87,9 @@ namespace osu.Game.Screens
         private static Color4 getColourFor(object type)
         {
             int hash = type.GetHashCode();
-            byte r = (byte)MathHelper.Clamp(((hash & 0xFF0000) >> 16) * 0.8f, 20, 255);
-            byte g = (byte)MathHelper.Clamp(((hash & 0x00FF00) >> 8) * 0.8f, 20, 255);
-            byte b = (byte)MathHelper.Clamp((hash & 0x0000FF) * 0.8f, 20, 255);
+            byte r = (byte)Math.Clamp(((hash & 0xFF0000) >> 16) * 0.8f, 20, 255);
+            byte g = (byte)Math.Clamp(((hash & 0x00FF00) >> 8) * 0.8f, 20, 255);
+            byte b = (byte)Math.Clamp((hash & 0x0000FF) * 0.8f, 20, 255);
             return new Color4(r, g, b, 255);
         }
 

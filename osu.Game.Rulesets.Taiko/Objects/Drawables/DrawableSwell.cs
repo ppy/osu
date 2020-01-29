@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
-using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects;
@@ -179,7 +178,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 var completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
-                    .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
+                    .FadeTo(expandingRing.Alpha + Math.Clamp(completion / 16, 0.1f, 0.6f), 50)
                     .Then()
                     .FadeTo(completion / 8, 2000, Easing.OutQuint);
 
