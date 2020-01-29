@@ -12,8 +12,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osuTK.Graphics;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -33,30 +32,28 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneCommentsPage()
         {
-            AddRange(new Drawable[]
+            Add(new FillFlowContainer
             {
-                new Box
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 10),
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
-                },
-                new FillFlowContainer
-                {
-                    AutoSizeAxes = Axes.Y,
-                    RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
-                    Children = new Drawable[]
+                    new Container
                     {
-                        new OsuCheckbox
+                        AutoSizeAxes = Axes.Y,
+                        Width = 200,
+                        Child = new OsuCheckbox
                         {
                             Current = showDeleted,
                             LabelText = @"Show Deleted"
-                        },
-                        content = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
                         }
+                    },
+                    content = new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                     }
                 }
             });

@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Overlays.Comments
 {
-    public class CommentsPage : FillFlowContainer
+    public class CommentsPage : CompositeDrawable
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
 
@@ -24,15 +24,31 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OverlayColourProvider colourProvider)
         {
+            FillFlowContainer flow;
+
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
+
+            AddRangeInternal(new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5
+                },
+                flow = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                }
+            });
 
             if (!commentBundle.Comments.Any())
             {
-                Add(new NoCommentsPlaceholder());
+                flow.Add(new NoCommentsPlaceholder());
                 return;
             }
 
@@ -40,7 +56,7 @@ namespace osu.Game.Overlays.Comments
             {
                 if (c.IsTopLevel)
                 {
-                    Add(new DrawableComment(c)
+                    flow.Add(new DrawableComment(c)
                     {
                         ShowDeleted = { BindTarget = ShowDeleted }
                     });
