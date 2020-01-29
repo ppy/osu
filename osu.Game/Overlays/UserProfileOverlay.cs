@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
@@ -74,7 +73,7 @@ namespace osu.Game.Overlays
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.Gray(0.1f)
+                Colour = colourProvider.Background6
             });
 
             Add(sectionsContainer = new ProfileSectionsContainer
@@ -83,7 +82,8 @@ namespace osu.Game.Overlays
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
-                    Colour = OsuColour.Gray(34),
+                    // this is only visible as the ProfileTabControl background
+                    Colour = colourProvider.Background5,
                     RelativeSizeAxes = Axes.Both
                 },
             });
