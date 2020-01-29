@@ -56,6 +56,9 @@ namespace osu.Game.Screens.Select
         public override bool HandleNonPositionalInput => AllowSelection;
         public override bool HandlePositionalInput => AllowSelection;
 
+        public override bool PropagatePositionalInputSubTree => AllowSelection;
+        public override bool PropagateNonPositionalInputSubTree => AllowSelection;
+
         /// <summary>
         /// Whether carousel items have completed asynchronously loaded.
         /// </summary>
@@ -448,8 +451,6 @@ namespace osu.Game.Screens.Select
             SelectNext(direction, skipDifficulties);
             return true;
         }
-
-        protected override bool ReceivePositionalInputAtSubTree(Vector2 screenSpacePos) => ReceivePositionalInputAt(screenSpacePos);
 
         protected override void Update()
         {

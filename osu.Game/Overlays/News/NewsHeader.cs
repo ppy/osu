@@ -1,11 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.UserInterface;
 using System;
 
@@ -23,9 +20,9 @@ namespace osu.Game.Overlays.News
 
         public NewsHeader()
         {
-            BreadcrumbControl.AddItem(front_page_string);
+            TabControl.AddItem(front_page_string);
 
-            BreadcrumbControl.Current.ValueChanged += e =>
+            TabControl.Current.ValueChanged += e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
@@ -37,40 +34,25 @@ namespace osu.Game.Overlays.News
         private void showPost(ValueChangedEvent<string> e)
         {
             if (e.OldValue != null)
-                BreadcrumbControl.RemoveItem(e.OldValue);
+                TabControl.RemoveItem(e.OldValue);
 
             if (e.NewValue != null)
             {
-                BreadcrumbControl.AddItem(e.NewValue);
-                BreadcrumbControl.Current.Value = e.NewValue;
+                TabControl.AddItem(e.NewValue);
+                TabControl.Current.Value = e.NewValue;
 
                 title.IsReadingPost = true;
             }
             else
             {
-                BreadcrumbControl.Current.Value = front_page_string;
+                TabControl.Current.Value = front_page_string;
                 title.IsReadingPost = false;
             }
         }
 
-        protected override Drawable CreateBackground() => new NewsHeaderBackground();
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/news");
 
         protected override ScreenTitle CreateTitle() => title = new NewsHeaderTitle();
-
-        private class NewsHeaderBackground : Sprite
-        {
-            public NewsHeaderBackground()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fill;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                Texture = textures.Get(@"Headers/news");
-            }
-        }
 
         private class NewsHeaderTitle : ScreenTitle
         {

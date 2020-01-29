@@ -21,6 +21,22 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
+        private Color4 accentColour;
+
+        public virtual Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+
+                if (Dropdown is IHasAccentColour dropdown)
+                    dropdown.AccentColour = value;
+                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                    i.AccentColour = value;
+            }
+        }
+
         private readonly Box strip;
 
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
@@ -60,21 +76,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             if (accentColour == default)
                 AccentColour = colours.Blue;
-        }
-
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                if (Dropdown is IHasAccentColour dropdown)
-                    dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
-                    i.AccentColour = value;
-            }
         }
 
         public Color4 StripColour
