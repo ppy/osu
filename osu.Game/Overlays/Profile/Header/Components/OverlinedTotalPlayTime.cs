@@ -27,12 +27,12 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             InternalChild = info = new OverlinedInfoContainer
             {
                 Title = "Total Play Time",
-                LineColour = colours.Yellow,
+                LineColour = colourProvider.Highlight1,
             };
 
             User.BindValueChanged(updateTime, true);
