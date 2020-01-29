@@ -94,7 +94,6 @@ namespace osu.Game.Screens.Select
                             Shear = -SHEAR,
                             AutoSizeAxes = Axes.X,
                             Height = 50,
-                            Margin = new MarginPadding { Right = -SHEAR_WIDTH / 2 },
                             Spacing = new Vector2(15, 0),
                             Children = new Drawable[]
                             {
