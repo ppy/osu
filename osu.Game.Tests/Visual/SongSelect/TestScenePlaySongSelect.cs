@@ -118,6 +118,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.Enter);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
 
             AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
@@ -145,6 +146,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.Down);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
 
             AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
@@ -176,6 +178,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.Enter);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
 
             AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
@@ -208,6 +211,7 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
 
             AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
