@@ -14,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Overlays.Profile
 {
-    public class ProfileHeader : TabControlOverlayHeader
+    public class ProfileHeader : TabControlOverlayHeader<string>
     {
         private UserCoverBackground coverContainer;
 
@@ -24,10 +24,7 @@ namespace osu.Game.Overlays.Profile
         private DetailHeaderContainer detailHeaderContainer;
 
         public ProfileHeader()
-            : base(OverlayColourScheme.Green)
         {
-            BackgroundHeight = 150;
-
             User.ValueChanged += e => updateDisplay(e.NewValue);
 
             TabControl.AddItem("info");
@@ -39,7 +36,9 @@ namespace osu.Game.Overlays.Profile
         protected override Drawable CreateBackground() =>
             new Container
             {
-                RelativeSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.X,
+                Height = 150,
+                Masking = true,
                 Children = new Drawable[]
                 {
                     coverContainer = new UserCoverBackground
