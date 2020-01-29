@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Select
 
         private IEnumerable<CarouselBeatmapSet> beatmapSets => root.Children.OfType<CarouselBeatmapSet>();
 
+        // todo: only used for testing, maybe remove.
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get => beatmapSets.Select(g => g.BeatmapSet);
@@ -133,14 +134,22 @@ namespace osu.Game.Screens.Select
             };
         }
 
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
+
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config, BeatmapManager beatmaps)
+        private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
             RightClickScrollingEnabled.ValueChanged += enabled => scroll.RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
+
+            beatmaps.ItemAdded += beatmapAdded;
+            beatmaps.ItemRemoved += beatmapRemoved;
+            beatmaps.BeatmapHidden += beatmapHidden;
+            beatmaps.BeatmapRestored += beatmapRestored;
 
             loadBeatmapSets(beatmaps.GetAllUsableBeatmapSetsEnumerable());
         }
@@ -535,10 +544,26 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
+            if (beatmaps != null)
+            {
+                beatmaps.ItemAdded -= beatmapAdded;
+                beatmaps.ItemRemoved -= beatmapRemoved;
+                beatmaps.BeatmapHidden -= beatmapHidden;
+                beatmaps.BeatmapRestored -= beatmapRestored;
+            }
+
             // aggressively dispose "off-screen" items to reduce GC pressure.
             foreach (var i in Items)
                 i.Dispose();
         }
+
+        private void beatmapRemoved(BeatmapSetInfo item) => RemoveBeatmapSet(item);
+
+        private void beatmapAdded(BeatmapSetInfo item) => UpdateBeatmapSet(item);
+
+        private void beatmapRestored(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
+
+        private void beatmapHidden(BeatmapInfo b) => UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
