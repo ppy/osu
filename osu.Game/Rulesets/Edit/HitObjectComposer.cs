@@ -294,10 +294,10 @@ namespace osu.Game.Rulesets.Edit
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance));
+            => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(referenceTime, DistanceToDuration(referenceTime, distance)));
+            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
 
         protected override void Dispose(bool isDisposing)
         {
