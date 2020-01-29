@@ -174,12 +174,10 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
-                double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
                 if (DisplayAsPercentage)
                 {
-                    double percentage = floatValue / floatMaxValue;
-                    TooltipText = percentage.ToString("P0");
+                    TooltipText = floatValue.ToString("P0");
                 }
                 else
                 {
