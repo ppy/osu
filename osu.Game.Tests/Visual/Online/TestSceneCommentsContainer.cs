@@ -49,7 +49,6 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Airman comments", () => comments.ShowComments(CommentableType.Beatmapset, 24313));
             AddStep("Lazer build comments", () => comments.ShowComments(CommentableType.Build, 4772));
             AddStep("News comments", () => comments.ShowComments(CommentableType.NewsPost, 715));
-            AddStep("Beatmap with no comments", () => comments.ShowComments(CommentableType.Beatmapset, 1288));
             AddStep("Idle state", () =>
             {
                 scroll.Clear();
