@@ -30,10 +30,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
-
-            Zoom = 60;
-            MaxZoom = 240;
-
             ScrollbarVisible = false;
         }
 
@@ -64,8 +60,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
+
+                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                Zoom = getZoomLevelForVisibleMilliseconds(2000);
             }, true);
         }
+
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
