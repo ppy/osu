@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Profile.Header
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
+        private void load(OverlayColourProvider colourProvider, TextureStore textures)
         {
             Container<Drawable> hiddenDetailContainer;
             Container<Drawable> expandedDetailContainer;
@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoam
+                    Colour = colourProvider.Background4
                 },
                 new FillFlowContainer
                 {
@@ -119,12 +119,12 @@ namespace osu.Game.Overlays.Profile.Header
                                 hiddenDetailGlobal = new OverlinedInfoContainer
                                 {
                                     Title = "Global Ranking",
-                                    LineColour = colours.Yellow
+                                    LineColour = colourProvider.Highlight1
                                 },
                                 hiddenDetailCountry = new OverlinedInfoContainer
                                 {
                                     Title = "Country Ranking",
-                                    LineColour = colours.Yellow
+                                    LineColour = colourProvider.Highlight1
                                 },
                             }
                         }
