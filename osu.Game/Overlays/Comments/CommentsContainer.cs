@@ -35,7 +35,6 @@ namespace osu.Game.Overlays.Comments
         private DeletedChildrenPlaceholder deletedChildrenPlaceholder;
         private CommentsShowMoreButton moreButton;
         private TotalCommentsCounter commentCounter;
-        private Container noCommentsPlaceholder;
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
@@ -61,27 +60,6 @@ namespace osu.Game.Overlays.Comments
                         {
                             Sort = { BindTarget = Sort },
                             ShowDeleted = { BindTarget = ShowDeleted }
-                        },
-                        noCommentsPlaceholder = new Container
-                        {
-                            Height = 80,
-                            RelativeSizeAxes = Axes.X,
-                            Alpha = 0,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = colourProvider.Background4
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding { Left = 50 },
-                                    Text = @"No comments yet."
-                                }
-                            }
                         },
                         content = new FillFlowContainer
                         {
@@ -181,14 +159,13 @@ namespace osu.Game.Overlays.Comments
             moreButton.Show();
             moreButton.IsLoading = true;
             content.Clear();
-            noCommentsPlaceholder.Hide();
         }
 
         private void onSuccess(CommentBundle response)
         {
             if (!response.Comments.Any())
             {
-                noCommentsPlaceholder.Show();
+                content.Add(new NoCommentsPlaceholder());
                 moreButton.Hide();
                 return;
             }
@@ -239,6 +216,31 @@ namespace osu.Game.Overlays.Comments
             request?.Cancel();
             loadCancellation?.Cancel();
             base.Dispose(isDisposing);
+        }
+
+        private class NoCommentsPlaceholder : CompositeDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Height = 80;
+                RelativeSizeAxes = Axes.X;
+                AddRangeInternal(new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = colourProvider.Background4
+                    },
+                    new OsuSpriteText
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        Margin = new MarginPadding { Left = 50 },
+                        Text = @"No comments yet."
+                    }
+                });
+            }
         }
     }
 }
