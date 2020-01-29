@@ -74,12 +74,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 foreach (var o in objects)
                     selectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Select();
+
+                SelectionChanged?.Invoke(selectedHitObjects);
             };
 
             selectedHitObjects.ItemsRemoved += objects =>
             {
                 foreach (var o in objects)
                     selectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+
+                SelectionChanged?.Invoke(selectedHitObjects);
             };
         }
 
@@ -332,8 +336,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionHandler.HandleSelected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 1);
             beatmap.SelectedHitObjects.Add(blueprint.HitObject);
-
-            SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
@@ -341,8 +343,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             selectionHandler.HandleDeselected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 0);
             beatmap.SelectedHitObjects.Remove(blueprint.HitObject);
-
-            SelectionChanged?.Invoke(selectionHandler.SelectedHitObjects);
         }
 
         #endregion
