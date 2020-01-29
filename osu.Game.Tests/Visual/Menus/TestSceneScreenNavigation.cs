@@ -66,6 +66,8 @@ namespace osu.Game.Tests.Visual.Menus
                     game.Dispose();
                 }
 
+                RecycleLocalStorage();
+
                 // see MouseSettings
                 var frameworkConfig = host.Dependencies.Get<FrameworkConfigManager>();
                 frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity).Disabled = false;
