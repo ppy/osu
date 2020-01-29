@@ -132,7 +132,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         protected ColourInfo GetColourForIndexFromPlacement(int placementIndex)
         {
             var timingPoint = beatmap.ControlPointInfo.TimingPointAt(StartTime);
-            var beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / timingPoint.BeatLength * beatDivisor.Value);
+            var beatLength = timingPoint.BeatLength / beatDivisor.Value;
+            var beatIndex = (int)Math.Round((StartTime - timingPoint.Time) / beatLength);
+
             var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(beatIndex + placementIndex + 1, beatDivisor.Value), Colours);
 
             int repeatIndex = placementIndex / beatDivisor.Value;
