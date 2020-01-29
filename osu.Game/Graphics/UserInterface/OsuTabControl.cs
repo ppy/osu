@@ -10,7 +10,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -22,6 +21,22 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuTabControl<T> : TabControl<T>
     {
+        private Color4 accentColour;
+
+        public virtual Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+
+                if (Dropdown is IHasAccentColour dropdown)
+                    dropdown.AccentColour = value;
+                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
+                    i.AccentColour = value;
+            }
+        }
+
         private readonly Box strip;
 
         protected override Dropdown<T> CreateDropdown() => new OsuTabDropdown();
@@ -63,34 +78,11 @@ namespace osu.Game.Graphics.UserInterface
                 AccentColour = colours.Blue;
         }
 
-        private Color4 accentColour;
-
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                if (Dropdown is IHasAccentColour dropdown)
-                    dropdown.AccentColour = value;
-                foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
-                    i.AccentColour = value;
-            }
-        }
-
         public Color4 StripColour
         {
             get => strip.Colour;
             set => strip.Colour = value;
         }
-
-        protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
-        {
-            Direction = FillDirection.Full,
-            RelativeSizeAxes = Axes.Both,
-            Depth = -1,
-            Masking = true
-        };
 
         protected override void UpdateAfterChildren()
         {
@@ -282,11 +274,6 @@ namespace osu.Game.Graphics.UserInterface
                     base.OnHoverLost(e);
                 }
             }
-        }
-
-        private class OsuTabFillFlowContainer : TabFillFlowContainer
-        {
-            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }

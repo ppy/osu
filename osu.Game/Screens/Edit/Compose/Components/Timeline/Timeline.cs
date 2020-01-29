@@ -30,7 +30,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
-            Zoom = 10;
+
+            Zoom = 60;
+            MaxZoom = 240;
+
             ScrollbarVisible = false;
         }
 
