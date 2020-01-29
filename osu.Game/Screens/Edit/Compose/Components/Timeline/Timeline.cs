@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
         {
             var targetTime = (position.X / Content.DrawWidth) * track.Length;
-            return (position, beatSnapProvider.SnapTime(targetTime, targetTime));
+            return (position, beatSnapProvider.SnapTime(targetTime));
         }
 
         public float GetBeatSnapDistanceAt(double referenceTime) => throw new NotImplementedException();
