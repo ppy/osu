@@ -17,6 +17,16 @@ namespace osu.Game.Rulesets.Mods
         public override IconUsage? Icon => FontAwesome.Solid.ChevronCircleUp;
         public override double ScoreMultiplier => 1.0;
 
+        [SettingSource("Initial rate", "The starting speed of the track")]
+        public override BindableNumber<double> InitialRate { get; } = new BindableDouble
+        {
+            MinValue = 0.5,
+            MaxValue = 1,
+            Default = 1,
+            Value = 1,
+            Precision = 0.01,
+        };
+
         [SettingSource("Final rate", "The speed increase to ramp towards")]
         public override BindableNumber<double> FinalRate { get; } = new BindableDouble
         {
