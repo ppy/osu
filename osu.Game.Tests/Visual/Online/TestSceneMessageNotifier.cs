@@ -38,18 +38,10 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("Switch to PMs", () => testContainer.ChannelManager.CurrentChannel.Value = privateMesssageChannel);
 
-            AddStep("Send regular message", () => publicChannel.AddNewMessages(new Message(messageIdCounter++) {
-                Content = "Hello everyone!",
-                Sender = friend,
-                ChannelId = publicChannel.Id
-            }));
+            AddStep("Send regular message", () => publicChannel.AddNewMessages(new Message(messageIdCounter++) { Content = "Hello everyone!", Sender = friend, ChannelId = publicChannel.Id }));
             AddAssert("Expect no notifications", () => testContainer.NotificationOverlay.UnreadCount.Value == 0);
 
-            AddStep("Send message containing mention", () => publicChannel.AddNewMessages(new Message(messageIdCounter++) {
-                Content = $"Hello {API.LocalUser.Value.Username.ToLowerInvariant()}!",
-                Sender = friend,
-                ChannelId = publicChannel.Id
-            }));
+            AddStep("Send message containing mention", () => publicChannel.AddNewMessages(new Message(messageIdCounter++) { Content = $"Hello {API.LocalUser.Value.Username.ToLowerInvariant()}!", Sender = friend, ChannelId = publicChannel.Id }));
             AddAssert("Expect 1 notification", () => testContainer.NotificationOverlay.UnreadCount.Value == 1);
         }
 
