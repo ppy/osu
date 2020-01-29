@@ -10,11 +10,11 @@ namespace osu.Game.Overlays.Profile.Sections
     public class ProfileShowMoreButton : ShowMoreButton
     {
         [BackgroundDependencyLoader]
-        private void load(OsuColour colors)
+        private void load(OverlayColourProvider colourProvider)
         {
-            IdleColour = colors.GreySeafoamDark;
-            HoverColour = colors.GreySeafoam;
-            ChevronIconColour = colors.Yellow;
+            IdleColour = colourProvider.Background2;
+            HoverColour = colourProvider.Background1;
+            ChevronIconColour = colourProvider.Foreground1;
         }
     }
 }

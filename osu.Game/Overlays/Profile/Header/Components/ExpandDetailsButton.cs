@@ -25,10 +25,10 @@ namespace osu.Game.Overlays.Profile.Header.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            IdleColour = colours.GreySeafoamLight;
-            HoverColour = colours.GreySeafoamLight.Darken(0.2f);
+            IdleColour = colourProvider.Background2;
+            HoverColour = colourProvider.Background2.Lighten(0.2f);
 
             Child = icon = new SpriteIcon
             {
