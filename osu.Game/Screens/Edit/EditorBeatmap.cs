@@ -131,10 +131,8 @@ namespace osu.Game.Screens.Edit
         public double SnapTime(double time, double? referenceTime)
         {
             var timingPoint = ControlPointInfo.TimingPointAt(referenceTime ?? time);
-
             var beatLength = timingPoint.BeatLength / BeatDivisor;
 
-            // A 1ms offset prevents rounding errors due to minute variations in duration
             return timingPoint.Time + (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero) * beatLength;
         }
 
