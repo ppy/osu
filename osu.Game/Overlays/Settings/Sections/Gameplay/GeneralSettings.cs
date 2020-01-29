@@ -21,13 +21,15 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "背景暗化",
                     Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = "背景模糊",
                     Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
                 },
                 new SettingsCheckbox
                 {

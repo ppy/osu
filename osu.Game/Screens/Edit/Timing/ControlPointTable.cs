@@ -72,8 +72,8 @@ namespace osu.Game.Screens.Edit.Timing
             var columns = new List<TableColumn>
             {
                 new TableColumn(string.Empty, Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Time", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("Attributes", Anchor.Centre),
+                new TableColumn("时间", Anchor.Centre, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("属性", Anchor.Centre),
             };
 
             return columns.ToArray();

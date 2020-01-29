@@ -17,10 +17,34 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         {
             Children = new Drawable[]
             {
-                new SettingsSlider<double> { LabelText = "整体", Bindable = audio.Volume, KeyboardStep = 0.01f },
-                new SettingsSlider<double> { LabelText = "整体 (切换到其他应用时)", Bindable = config.GetBindable<double>(OsuSetting.VolumeInactive), KeyboardStep = 0.01f },
-                new SettingsSlider<double> { LabelText = "效果", Bindable = audio.VolumeSample, KeyboardStep = 0.01f },
-                new SettingsSlider<double> { LabelText = "音乐", Bindable = audio.VolumeTrack, KeyboardStep = 0.01f },
+                new SettingsSlider<double>
+                {
+                    LabelText = "整体",
+                    Bindable = audio.Volume,
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsSlider<double>
+                {
+                    LabelText = "整体(失去焦点时)",
+                    Bindable = config.GetBindable<double>(OsuSetting.VolumeInactive),
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsSlider<double>
+                {
+                    LabelText = "音效",
+                    Bindable = audio.VolumeSample,
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
+                new SettingsSlider<double>
+                {
+                    LabelText = "音乐",
+                    Bindable = audio.VolumeTrack,
+                    KeyboardStep = 0.01f,
+                    DisplayAsPercentage = true
+                },
             };
         }
     }

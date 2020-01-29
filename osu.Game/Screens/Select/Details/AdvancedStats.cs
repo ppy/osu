@@ -118,9 +118,20 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            //mania specific
-            firstValue.Title = (Beatmap?.Ruleset?.ID ?? 0) == 3 ? "键位数量" : "圆圈大小";
-            firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+            switch (Beatmap?.Ruleset?.ID ?? 0)
+            {
+                case 3:
+                    // Account for mania differences locally for now
+                    // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes
+                    firstValue.Title = "键位数量";
+                    firstValue.Value = (baseDifficulty?.CircleSize ?? 0, null);
+                    break;
+
+                default:
+                    firstValue.Title = "圆圈大小";
+                    firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+                    break;
+            }          firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
 
             starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);
 

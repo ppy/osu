@@ -106,7 +106,7 @@
     *   [M] [#7479 - 在排行榜实现按国家分类(Implement CountryFilter component for RankingsOverlay)](https://github.com/ppy/osu/pull/7479)
 
 
-# 2020.125.0
+# 2020.125.1
 ## 2020/1/20:
 *   添加了游戏Mods的翻译
 *   [将游戏Mods按钮文本字体变大](osu.Game/Overlays/Mods/ModButton.cs)
@@ -149,8 +149,8 @@
 
 *   **暂时移除了自动下载更新的功能**
 
-## 2020.???.0
-### 2020/1/27
+# 2020.125.2
+## 2020/1/27
 *   整合更新
     *   [M] [#7614 - Fix NullReferenceException on main menu for mobile game hosts](https://github.com/ppy/osu/pull/7614)
     *   [M] [#7618 - Move reverse-order comparer to ChannelTabControl](https://github.com/ppy/osu/pull/7618)
@@ -161,7 +161,19 @@
     *   [M] [#7630 - Fix changelog header not dimming correctly on initial build display](https://github.com/ppy/osu/pull/7630)
     *   [M] [#7597 - Implement OverlayColourProvider component](https://github.com/ppy/osu/pull/7597)
     *   [M] [#7631 - Bump DiscordRichPresence from 1.0.121 to 1.0.147](https://github.com/ppy/osu/pull/7631)
-### 2020/1/29
+## 2020/1/29
+*   添加翻译
+    *   编辑器(**仍需后续完善**)
+        *   添加了编辑器内物件右键菜单的翻译
+            *   (滑条)[osu.Game.Rulesets.Osu/Edit/Blueprints/Sliders/   SliderSelectionBlueprint.cs]
+            *   (物件)[osu.Game/Screens/Edit/Compose/Components/SelectionHandler.cs]
+        *   [添加了编辑器内"Playback speed"的翻译](osu.Game/Screens/Edit/Components/    PlaybackControl.cs)
+        *   [添加了Setup Mode和Design Mode界面的翻译]
+            *   [Setup Mode](osu.Game/Screens/Edit/Setup/SetupScreen.cs)
+            *   [Design Mode](osu.Game/Screens/Edit/Setup/DesignScreen.cs)
+        *   [ControlPointTable.cs:time和attributes补全](osu.Game/Screens/Edit/Timing/ControlPointTable.cs)
+        *   [effectSection](osu.Game/Screens/Edit/Timing/EffectSection.cs)
+
 *   整合更新
     *   [m] [#7623 - Fix crash due to misordered selection events](https://github.com/ppy/osu/pull/7623)
     *   [m] [#7432 - Implement ability to create OverlayHeader with no TabControl](https://github.com/ppy/osu/pull/7432)
@@ -169,3 +181,8 @@
     *   [m] [#7637 - Refactor background creation in OverlayHeader](https://github.com/ppy/osu/pull/7637)
     *   [m] [#7650 - Change default method style for better IDE autocompletion](https://github.com/ppy/osu/pull/7650)
     *   [m] [#7636 - Make CommentsContainer use OverlayColourProvider](https://github.com/ppy/osu/pull/7636)
+    *   [m] [#7645 - Allow OsuSliderBar tooltip to show as percentage as needed](https://github.com/ppy/osu/pull/7645)
+    *   [m] [#7659 - Fix random PlaySongSelect test failures](https://github.com/ppy/osu/pull/7659)
+    *   [m] [#7653 - Fix navigation test crashing when raw input is disabled](https://github.com/ppy/osu/pull/7653)
+    *   [m] [#7652 - Fix key count being incorrectly adjusted by hard/easy mods](https://github.com/ppy/osu/pull/7652)
+    *   [m] [#7634 - Add beat ticks to editor timeline](https://github.com/ppy/osu/pull/7634)

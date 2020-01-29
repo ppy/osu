@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         public override MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new OsuMenuItem("Add control point", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
+            new OsuMenuItem("添加滑条路径", MenuItemType.Standard, () => addControlPoint(rightClickPosition)),
         };
 
         public override Vector2 SelectionPoint => ((DrawableSlider)DrawableObject).HeadCircle.ScreenSpaceDrawQuad.Centre;

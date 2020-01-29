@@ -130,19 +130,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <returns>The applicable colour.</returns>
         protected ColourInfo GetColourForBeatIndex(int index)
         {
-            int beat = (index + 1) % beatDivisor.Value;
-            ColourInfo colour = Colours.Gray5;
-
-            for (int i = 0; i < BindableBeatDivisor.VALID_DIVISORS.Length; i++)
-            {
-                int divisor = BindableBeatDivisor.VALID_DIVISORS[i];
-
-                if ((beat * divisor) % beatDivisor.Value == 0)
-                {
-                    colour = BindableBeatDivisor.GetColourFor(divisor, Colours);
-                    break;
-                }
-            }
+            var colour = BindableBeatDivisor.GetColourFor(BindableBeatDivisor.GetDivisorForBeatIndex(index + 1, beatDivisor.Value), Colours);
 
             int repeatIndex = index / beatDivisor.Value;
             return colour.MultiplyAlpha(0.5f / (repeatIndex + 1));

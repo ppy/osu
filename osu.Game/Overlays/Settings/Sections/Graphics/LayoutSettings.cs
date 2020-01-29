@@ -98,25 +98,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         {
                             LabelText = "水平位置",
                             Bindable = scalingPositionX,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "垂直位置",
                             Bindable = scalingPositionY,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "水平缩放",
                             Bindable = scalingSizeX,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "垂直缩放",
                             Bindable = scalingSizeY,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                     }
                 },

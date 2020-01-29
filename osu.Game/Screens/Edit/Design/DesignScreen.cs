@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Edit.Design
     {
         public DesignScreen()
         {
-            Child = new ScreenWhiteBox.UnderConstructionMessage("Design mode");
+            Child = new ScreenWhiteBox.UnderConstructionMessage("谱面设计");
         }
     }
 }
