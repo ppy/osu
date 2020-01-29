@@ -72,7 +72,9 @@ namespace osu.Game.Screens.Select
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
-        private BeatmapManager beatmaps;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
@@ -89,7 +91,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -246,14 +248,6 @@ namespace osu.Game.Screens.Select
                 BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number3);
             }
-
-            if (this.beatmaps == null)
-                this.beatmaps = beatmaps;
-
-            this.beatmaps.ItemAdded += onBeatmapSetAdded;
-            this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
-            this.beatmaps.BeatmapHidden += onBeatmapHidden;
-            this.beatmaps.BeatmapRestored += onBeatmapRestored;
 
             dialogOverlay = dialog;
 
@@ -563,14 +557,6 @@ namespace osu.Game.Screens.Select
             base.Dispose(isDisposing);
 
             decoupledRuleset.UnbindAll();
-
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= onBeatmapSetAdded;
-                beatmaps.ItemRemoved -= onBeatmapSetRemoved;
-                beatmaps.BeatmapHidden -= onBeatmapHidden;
-                beatmaps.BeatmapRestored -= onBeatmapRestored;
-            }
         }
 
         /// <summary>
@@ -616,11 +602,6 @@ namespace osu.Game.Screens.Select
 
             lastTrack.SetTarget(track);
         }
-
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
-        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Carousel.RemoveBeatmapSet(s);
-        private void onBeatmapRestored(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
-        private void onBeatmapHidden(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private void carouselBeatmapsLoaded()
         {
