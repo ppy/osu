@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Header
         public readonly Bindable<User> User = new Bindable<User>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             Alpha = 0;
             AutoSizeAxes = Axes.Y;
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDarker,
+                    Colour = colourProvider.Background5,
                 },
                 new Container //artificial shadow
                 {
