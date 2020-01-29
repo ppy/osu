@@ -14,7 +14,7 @@ using osu.Game.Online.Leaderboards;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
-    public class DrawableRecentActivity : DrawableProfileRow
+    public class DrawableRecentActivity : CompositeDrawable
     {
         private IAPIProvider api;
 
@@ -28,24 +28,55 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        private void load(IAPIProvider api, OverlayColourProvider colourProvider)
         {
             this.api = api;
 
-            LeftFlowContainer.Padding = new MarginPadding { Left = 10, Right = 160 };
-
-            LeftFlowContainer.Add(content = new LinkFlowContainer
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            AddInternal(new GridContainer
             {
-                AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-            });
-
-            RightFlowContainer.Add(new DrawableDate(activity.CreatedAt)
-            {
-                Font = OsuFont.GetFont(size: 13),
-                Colour = OsuColour.Gray(0xAA),
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
+                AutoSizeAxes = Axes.Y,
+                ColumnDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.Absolute, size: 40),
+                    new Dimension(),
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Child = createIcon().With(icon =>
+                            {
+                                icon.Anchor = Anchor.Centre;
+                                icon.Origin = Anchor.Centre;
+                            })
+                        },
+                        content = new LinkFlowContainer
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Y,
+                            RelativeSizeAxes = Axes.X,
+                        },
+                        new DrawableDate(activity.CreatedAt)
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Colour = colourProvider.Foreground1,
+                        }
+                    }
+                }
             });
 
             var formatted = createMessage();
@@ -53,36 +84,33 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             content.AddLinks(formatted.Text, formatted.Links);
         }
 
-        protected override Drawable CreateLeftVisual()
+        private Drawable createIcon()
         {
             switch (activity.Type)
             {
                 case RecentActivityType.Rank:
                     return new UpdateableRank(activity.ScoreRank)
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 60,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 16,
                         FillMode = FillMode.Fit,
                     };
 
                 case RecentActivityType.Achievement:
                     return new DelayedLoadWrapper(new MedalIcon(activity.Achievement.Slug)
                     {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
                         RelativeSizeAxes = Axes.Both,
                         FillMode = FillMode.Fit,
                     })
                     {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 60,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 20
                     };
 
                 default:
-                    return new Container
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 60,
-                        FillMode = FillMode.Fit,
-                    };
+                    return Empty();
             }
         }
 
