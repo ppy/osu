@@ -344,7 +344,7 @@ namespace osu.Game
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
-            }, $"load {beatmap}", bypassScreenAllowChecks: true, validScreens: new[] { typeof(PlaySongSelect) });
+            }, $"load {beatmap}", validScreens: new[] { typeof(PlaySongSelect) });
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
                 screen.Push(new ReplayPlayerLoader(databasedScore));
-            }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
+            }, $"watch {databasedScoreInfo}");
         }
 
         protected virtual Loader CreateLoader() => new Loader();
@@ -447,29 +447,12 @@ namespace osu.Game
         /// <param name="action">The action to perform once we are in the correct state.</param>
         /// <param name="taskName">The task name to display in a notification (if we can't immediately reach the main menu state).</param>
         /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can immediately perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
-        /// <param name="bypassScreenAllowChecks">Whether checking <see cref="IOsuScreen.AllowExternalScreenChange"/> should be bypassed.</param>
-        private void performFromScreen(Action<IScreen> action, string taskName, IEnumerable<Type> validScreens = null, bool bypassScreenAllowChecks = false)
+        private void performFromScreen(Action<IScreen> action, string taskName, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
 
             validScreens ??= Enumerable.Empty<Type>();
             validScreens = validScreens.Append(typeof(MainMenu));
-
-            // if the current screen does not allow screen changing, give the user an option to try again later.
-            if (!bypassScreenAllowChecks && (ScreenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
-            {
-                notifications.Post(new SimpleNotification
-                {
-                    Text = $"Click here to {taskName}",
-                    Activated = () =>
-                    {
-                        performFromScreen(action, taskName, validScreens, true);
-                        return true;
-                    }
-                });
-
-                return;
-            }
 
             CloseAllOverlays(false);
 
