@@ -18,11 +18,11 @@ namespace osu.Game.Overlays
         protected IAPIProvider API { get; private set; }
 
         [Cached]
-        protected readonly OverlayColourProvider colourProvider;
+        protected readonly OverlayColourProvider ColourProvider;
 
         protected FullscreenOverlay(OverlayColourScheme colourScheme)
         {
-            colourProvider = new OverlayColourProvider(colourScheme);
+            ColourProvider = new OverlayColourProvider(colourScheme);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -43,10 +43,10 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            Waves.FirstWaveColour = colourProvider.Light4;
-            Waves.SecondWaveColour = colourProvider.Light3;
-            Waves.ThirdWaveColour = colourProvider.Dark4;
-            Waves.FourthWaveColour = colourProvider.Dark3;
+            Waves.FirstWaveColour = ColourProvider.Light4;
+            Waves.SecondWaveColour = ColourProvider.Light3;
+            Waves.ThirdWaveColour = ColourProvider.Dark4;
+            Waves.FourthWaveColour = ColourProvider.Dark3;
         }
 
         public override void Show()

@@ -73,7 +73,7 @@ namespace osu.Game.Overlays
             Add(new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = colourProvider.Background6
+                Colour = ColourProvider.Background6
             });
 
             Add(sectionsContainer = new ProfileSectionsContainer
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays
                 HeaderBackground = new Box
                 {
                     // this is only visible as the ProfileTabControl background
-                    Colour = colourProvider.Background5,
+                    Colour = ColourProvider.Background5,
                     RelativeSizeAxes = Axes.Both
                 },
             });
