@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             : base(user, header, missing)
         {
             ItemsPerPage = 10;
-            ItemsContainer.Spacing = new Vector2(0, 5);
+            ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
         protected override APIRequest<List<APIRecentActivity>> CreateRequest() =>
