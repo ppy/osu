@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 AutoSizeAxes = Axes.Y,
                 ColumnDimensions = new[]
                 {
-                    new Dimension(GridSizeMode.Absolute, size: 40),
+                    new Dimension(GridSizeMode.Absolute, size: 28),
                     new Dimension(),
                     new Dimension(GridSizeMode.AutoSize)
                 },
@@ -95,8 +95,9 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     return new UpdateableRank(activity.ScoreRank)
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 16,
+                        Height = 11,
                         FillMode = FillMode.Fit,
+                        Margin = new MarginPadding { Top = 2 }
                     };
 
                 case RecentActivityType.Achievement:
@@ -109,7 +110,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     })
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 20
+                        Width = 0.5f,
+                        Height = 18
                     };
 
                 default:
