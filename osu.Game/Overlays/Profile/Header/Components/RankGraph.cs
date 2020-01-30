@@ -16,6 +16,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Header.Components
 {
@@ -270,7 +271,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                background.Colour = colours.GreySeafoamDark;
+                // To match osu-web, background and text should both be coloured using OverlayColourProvider
+                background.Colour = colours.Gray1;
             }
 
             public bool SetContent(object content)
