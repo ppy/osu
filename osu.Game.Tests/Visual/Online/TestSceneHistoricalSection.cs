@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         [Cached]
-        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public TestSceneHistoricalSection()
         {
