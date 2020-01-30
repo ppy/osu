@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public ChannelListItem(Channel channel)
         {
-            this.Channel = channel;
+            Channel = channel;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
