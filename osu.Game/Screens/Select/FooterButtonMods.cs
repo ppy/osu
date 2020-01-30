@@ -80,9 +80,9 @@ namespace osu.Game.Screens.Select
                 MultiplierText.FadeColour(Color4.White, 200);
 
             if (Current.Value?.Count > 0)
-                modDisplay.FadeIn(0);
+                modDisplay.FadeIn();
             else
-                modDisplay.FadeOut(0);
+                modDisplay.FadeOut();
         }
 
         private class FooterModDisplay : ModDisplay
