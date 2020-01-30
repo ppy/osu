@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics;
 using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header.Components

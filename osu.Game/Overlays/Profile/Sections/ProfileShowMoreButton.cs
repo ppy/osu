@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Profile.Sections
