@@ -640,7 +640,7 @@ namespace osu.Game.Screens.Select
 
         /// <summary>
         /// Transfer the game-wide ruleset to the local decoupled ruleset.
-        /// Will immediately run filter operations is required.
+        /// Will immediately run filter operations if required.
         /// </summary>
         /// <returns>Whether a transfer occurred.</returns>
         private bool transferRulesetValue()
