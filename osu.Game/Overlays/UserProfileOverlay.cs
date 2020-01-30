@@ -29,7 +29,7 @@ namespace osu.Game.Overlays
         public const float CONTENT_X_MARGIN = 70;
 
         public UserProfileOverlay()
-            : base(OverlayColourScheme.Green)
+            : base(OverlayColourScheme.Pink)
         {
         }
 
