@@ -185,14 +185,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     addUserLink();
                     addText($" achieved rank #{activity.Rank} on ");
                     addBeatmapLink();
-                    addText($" ({activity.Mode}!)");
+                    addText($" ({activity.Mode})");
                     break;
 
                 case RecentActivityType.RankLost:
                     addUserLink();
                     addText(" has lost first place on ");
                     addBeatmapLink();
-                    addText($" ({activity.Mode}!)");
+                    addText($" ({activity.Mode})");
                     break;
 
                 case RecentActivityType.UserSupportAgain:
