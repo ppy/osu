@@ -8,7 +8,6 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
@@ -27,28 +26,26 @@ namespace osu.Game.Overlays.Comments
         [Resolved]
         private IAPIProvider api { get; set; }
 
-        [Resolved]
-        private OsuColour colours { get; set; }
-
         private GetCommentsRequest request;
         private CancellationTokenSource loadCancellation;
         private int currentPage;
 
-        private readonly Box background;
-        private readonly FillFlowContainer content;
-        private readonly DeletedChildrenPlaceholder deletedChildrenPlaceholder;
-        private readonly CommentsShowMoreButton moreButton;
-        private readonly TotalCommentsCounter commentCounter;
+        private FillFlowContainer content;
+        private DeletedCommentsCounter deletedCommentsCounter;
+        private CommentsShowMoreButton moreButton;
+        private TotalCommentsCounter commentCounter;
 
-        public CommentsContainer()
+        [BackgroundDependencyLoader]
+        private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddRangeInternal(new Drawable[]
             {
-                background = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colourProvider.Background5
                 },
                 new FillFlowContainer
                 {
@@ -78,7 +75,7 @@ namespace osu.Game.Overlays.Comments
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.2f)
+                                    Colour = colourProvider.Background4
                                 },
                                 new FillFlowContainer
                                 {
@@ -87,7 +84,7 @@ namespace osu.Game.Overlays.Comments
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
+                                        deletedCommentsCounter = new DeletedCommentsCounter
                                         {
                                             ShowDeleted = { BindTarget = ShowDeleted }
                                         },
@@ -111,12 +108,6 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            background.Colour = colours.Gray2;
         }
 
         protected override void LoadComplete()
@@ -162,7 +153,7 @@ namespace osu.Game.Overlays.Comments
         private void clearComments()
         {
             currentPage = 1;
-            deletedChildrenPlaceholder.DeletedCount.Value = 0;
+            deletedCommentsCounter.Count.Value = 0;
             moreButton.IsLoading = true;
             content.Clear();
         }
@@ -193,7 +184,7 @@ namespace osu.Game.Overlays.Comments
             {
                 content.Add(loaded);
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
                 if (response.HasMore)
                 {
