@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Comments
                 public readonly BindableBool Active = new BindableBool();
 
                 [Resolved]
-                private OsuColour colours { get; set; }
+                private OverlayColourProvider colourProvider { get; set; }
 
                 private readonly SpriteText text;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Comments
                         updateBackgroundState();
 
                         text.Font = text.Font.With(weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium);
-                        text.Colour = active.NewValue ? colours.BlueLighter : Color4.White;
+                        text.Colour = active.NewValue ? colourProvider.Light1 : Color4.White;
                     }, true);
                 }
 
