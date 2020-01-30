@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Edit
         private IAdjustableClock adjustableClock { get; set; }
 
         [Resolved]
-        private BindableBeatDivisor beatDivisor { get; set; }
+        private IBeatSnapProvider beatSnapProvider { get; set; }
 
         private IBeatmapProcessor beatmapProcessor;
 
@@ -137,12 +137,12 @@ namespace osu.Game.Rulesets.Edit
                 }
             };
 
-            toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => selectTool(t)))
-                                .Prepend(new RadioButton("Select", () => selectTool(null)))
-                                .ToList();
+            toolboxCollection.Items = CompositionTools
+                                      .Prepend(new SelectTool())
+                                      .Select(t => new RadioButton(t.Name, () => toolSelected(t)))
+                                      .ToList();
 
-            toolboxCollection.Items[0].Select();
+            toolboxCollection.Items.First().Select();
 
             blueprintContainer.SelectionChanged += selectionChanged;
         }
@@ -187,11 +187,11 @@ namespace osu.Game.Rulesets.Edit
                 showGridFor(hitObjects);
         }
 
-        private void selectTool(HitObjectCompositionTool tool)
+        private void toolSelected(HitObjectCompositionTool tool)
         {
             blueprintContainer.CurrentTool = tool;
 
-            if (tool == null)
+            if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
             else
                 showGridFor(Enumerable.Empty<HitObject>());
@@ -259,40 +259,26 @@ namespace osu.Game.Rulesets.Edit
         public override float GetBeatSnapDistanceAt(double referenceTime)
         {
             DifficultyControlPoint difficultyPoint = EditorBeatmap.ControlPointInfo.DifficultyPointAt(referenceTime);
-            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatDivisor.Value);
+            return (float)(100 * EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier / beatSnapProvider.BeatDivisor);
         }
 
         public override float DurationToDistance(double referenceTime, double duration)
         {
-            double beatLength = EditorBeatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return (float)(duration / beatLength * GetBeatSnapDistanceAt(referenceTime));
         }
 
         public override double DistanceToDuration(double referenceTime, float distance)
         {
-            double beatLength = EditorBeatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
+            double beatLength = beatSnapProvider.GetBeatLengthAtTime(referenceTime);
             return distance / GetBeatSnapDistanceAt(referenceTime) * beatLength;
         }
 
         public override double GetSnappedDurationFromDistance(double referenceTime, float distance)
-            => beatSnap(referenceTime, DistanceToDuration(referenceTime, distance));
+             => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnap(referenceTime, DistanceToDuration(referenceTime, distance)));
-
-        /// <summary>
-        /// Snaps a duration to the closest beat of a timing point applicable at the reference time.
-        /// </summary>
-        /// <param name="referenceTime">The time of the timing point which <paramref name="duration"/> resides in.</param>
-        /// <param name="duration">The duration to snap.</param>
-        /// <returns>A value that represents <paramref name="duration"/> snapped to the closest beat of the timing point.</returns>
-        private double beatSnap(double referenceTime, double duration)
-        {
-            double beatLength = EditorBeatmap.ControlPointInfo.TimingPointAt(referenceTime).BeatLength / beatDivisor.Value;
-
-            // A 1ms offset prevents rounding errors due to minute variations in duration
-            return (int)((duration + 1) / beatLength) * beatLength;
-        }
+            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
 
         protected override void Dispose(bool isDisposing)
         {

@@ -186,3 +186,11 @@
     *   [m] [#7653 - Fix navigation test crashing when raw input is disabled](https://github.com/ppy/osu/pull/7653)
     *   [m] [#7652 - Fix key count being incorrectly adjusted by hard/easy mods](https://github.com/ppy/osu/pull/7652)
     *   [m] [#7634 - Add beat ticks to editor timeline](https://github.com/ppy/osu/pull/7634)
+
+### 2020/1/30:
+*   整合更新
+    *   [m] [#7675 - Fix possible crash when searching with no channel topic](https://github.com/ppy/osu/pull/7675)
+    *   [m] [#7593 - Minor cleanups for Legacy Storyboard/Beatmap decoder](https://github.com/ppy/osu/pull/7593)
+    *   [m] [#7647 - Move select tool to an actual tool implementation](https://github.com/ppy/osu/pull/7647)
+    *   [m] [#7671 - Rename and tidy up DeletedCommentsCounter](https://github.com/ppy/osu/pull/7671)
+    *   [m] [#7642 - Fix beat snap implementation being incorrect](https://github.com/ppy/osu/pull/7642)

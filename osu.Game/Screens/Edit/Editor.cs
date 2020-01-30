@@ -349,7 +349,7 @@ namespace osu.Game.Screens.Edit
             beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
         }
 
-        public double SnapTime(double referenceTime, double duration) => editorBeatmap.SnapTime(referenceTime, duration);
+        public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
 
         public double GetBeatLengthAtTime(double referenceTime) => editorBeatmap.GetBeatLengthAtTime(referenceTime);
 

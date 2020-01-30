@@ -7,7 +7,6 @@ using System.Globalization;
 using System.IO;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Game.IO;
 using osu.Game.Storyboards;
@@ -65,12 +64,15 @@ namespace osu.Game.Beatmaps.Formats
         private void handleEvents(string line)
         {
             var depth = 0;
+            var lineSpan = line.AsSpan();
 
-            while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
+            while (lineSpan.StartsWith(" ", StringComparison.Ordinal) || lineSpan.StartsWith("_", StringComparison.Ordinal))
             {
+                lineSpan = lineSpan.Slice(1);
                 ++depth;
-                line = line.Substring(1);
             }
+
+            line = lineSpan.ToString();
 
             decodeVariables(ref line);
 
@@ -89,7 +91,7 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
-                        var path = cleanFilename(split[3]);
+                        var path = CleanFilename(split[3]);
                         var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                         var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         storyboardSprite = new StoryboardSprite(path, origin, new Vector2(x, y));
@@ -101,7 +103,7 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         var layer = parseLayer(split[1]);
                         var origin = parseOrigin(split[2]);
-                        var path = cleanFilename(split[3]);
+                        var path = CleanFilename(split[3]);
                         var x = float.Parse(split[4], NumberFormatInfo.InvariantInfo);
                         var y = float.Parse(split[5], NumberFormatInfo.InvariantInfo);
                         var frameCount = int.Parse(split[6]);
@@ -116,7 +118,7 @@ namespace osu.Game.Beatmaps.Formats
                     {
                         var time = double.Parse(split[1], CultureInfo.InvariantCulture);
                         var layer = parseLayer(split[2]);
-                        var path = cleanFilename(split[3]);
+                        var path = CleanFilename(split[3]);
                         var volume = split.Length > 4 ? float.Parse(split[4], CultureInfo.InvariantCulture) : 100;
                         storyboard.GetLayer(layer).Add(new StoryboardSampleInfo(path, time, (int)volume));
                         break;
@@ -331,7 +333,5 @@ namespace osu.Game.Beatmaps.Formats
                     break;
             }
         }
-
-        private string cleanFilename(string path) => path.Trim('"').ToStandardisedPath();
     }
 }

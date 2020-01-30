@@ -13,5 +13,8 @@ namespace osu.Game.Rulesets.Edit.Tools
         }
 
         public abstract PlacementBlueprint CreatePlacementBlueprint();
+
+
+        public override string ToString() => Name;
     }
 }

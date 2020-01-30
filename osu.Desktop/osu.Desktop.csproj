@@ -9,8 +9,8 @@
     <Product>osu!lazer</Product>
     <ApplicationIcon>lazer.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <!--<Version>0.0.0</Version>-->
-   <Version>2020.125.2</Version>
+    <Version>0.0.0</Version>
+   <!--<Version>2020.125.2</Version>-->
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
