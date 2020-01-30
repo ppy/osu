@@ -20,11 +20,11 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
-        [SettingSource("最高速度", "The final speed to ramp to")]
-        public abstract BindableNumber<double> FinalRate { get; }
+        [SettingSource("初始速度", "The starting speed of the track")]
+        public abstract BindableNumber<double> InitialRate { get; }
 
-        [SettingSource("反向变速", "Start at 100% of the final rate")]
-        public BindableBool Reverse { get; } = new BindableBool();
+        [SettingSource("最终速度", "The final speed to ramp to")]
+        public abstract BindableNumber<double> FinalRate { get; }
 
         private double finalRateTime;
         private double beginRampTime;
@@ -64,10 +64,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void Update(Playfield playfield)
         {
-            if (!Reverse.Value)
-                applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
-            else
-                applyAdjustment(1 - ((track.CurrentTime - beginRampTime) / finalRateTime));
+            applyAdjustment((track.CurrentTime - beginRampTime) / finalRateTime);
         }
 
         /// <summary>
@@ -75,6 +72,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
         private void applyAdjustment(double amount) =>
-            SpeedChange.Value = 1 + (FinalRate.Value - 1) * Math.Clamp(amount, 0, 1);
+            SpeedChange.Value = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
     }
 }

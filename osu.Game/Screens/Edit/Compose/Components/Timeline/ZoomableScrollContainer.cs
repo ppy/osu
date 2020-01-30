@@ -36,12 +36,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             base.Content.Add(zoomedContent = new Container { RelativeSizeAxes = Axes.Y });
         }
 
-        private int minZoom = 1;
+        private float minZoom = 1;
 
         /// <summary>
         /// The minimum zoom level allowed.
         /// </summary>
-        public int MinZoom
+        public float MinZoom
         {
             get => minZoom;
             set
@@ -56,12 +56,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             }
         }
 
-        private int maxZoom = 60;
+        private float maxZoom = 60;
 
         /// <summary>
         /// The maximum zoom level allowed.
         /// </summary>
-        public int MaxZoom
+        public float MaxZoom
         {
             get => maxZoom;
             set

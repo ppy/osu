@@ -3,205 +3,167 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Testing;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
-using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Screens.Edit;
-using osu.Game.Tests.Visual;
+using osu.Game.Screens.Edit.Compose.Components;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Tests.Editor
+namespace osu.Game.Tests.Visual.Editor
 {
-    [HeadlessTest]
-    public class TestSceneHitObjectComposerDistanceSnapping : EditorClockTestScene
+    public class TestSceneDistanceSnapGrid : EditorClockTestScene
     {
-        private TestHitObjectComposer composer;
+        private const double beat_length = 100;
+        private static readonly Vector2 grid_position = new Vector2(512, 384);
 
         [Cached(typeof(EditorBeatmap))]
-        [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
-        public TestSceneHitObjectComposerDistanceSnapping()
+        [Cached(typeof(IDistanceSnapProvider))]
+        private readonly SnapProvider snapProvider = new SnapProvider();
+
+        public TestSceneDistanceSnapGrid()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap(), BeatDivisor);
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+            editorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = beat_length });
         }
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = composer = new TestHitObjectComposer();
-
-            BeatDivisor.Value = 1;
-
-            composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 1;
-            composer.EditorBeatmap.ControlPointInfo.Clear();
-
-            composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = 1 });
-            composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 1000 });
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.SlateGray
+                },
+                new TestDistanceSnapGrid()
+            };
         });
 
         [TestCase(1)]
         [TestCase(2)]
-        public void TestSliderMultiplier(float multiplier)
-        {
-            AddStep($"set multiplier = {multiplier}", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = multiplier);
-
-            assertSnapDistance(100 * multiplier);
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
-        public void TestSpeedMultiplier(float multiplier)
-        {
-            AddStep($"set multiplier = {multiplier}", () =>
-            {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new DifficultyControlPoint { SpeedMultiplier = multiplier });
-            });
-
-            assertSnapDistance(100 * multiplier);
-        }
-
-        [TestCase(1)]
-        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        [TestCase(6)]
+        [TestCase(8)]
+        [TestCase(12)]
+        [TestCase(16)]
         public void TestBeatDivisor(int divisor)
         {
-            AddStep($"set divisor = {divisor}", () => BeatDivisor.Value = divisor);
-
-            assertSnapDistance(100f / divisor);
+            AddStep($"set beat divisor = {divisor}", () => BeatDivisor.Value = divisor);
         }
 
         [Test]
-        public void TestConvertDurationToDistance()
+        public void TestLimitedDistance()
         {
-            assertDurationToDistance(500, 50);
-            assertDurationToDistance(1000, 100);
-
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
-
-            assertDurationToDistance(500, 100);
-            assertDurationToDistance(1000, 200);
-
-            AddStep("set beat length = 500", () =>
+            AddStep("create limited grid", () =>
             {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.SlateGray
+                    },
+                    new TestDistanceSnapGrid(100)
+                };
             });
-
-            assertDurationToDistance(500, 200);
-            assertDurationToDistance(1000, 400);
         }
 
-        [Test]
-        public void TestConvertDistanceToDuration()
+        private class TestDistanceSnapGrid : DistanceSnapGrid
         {
-            assertDistanceToDuration(50, 500);
-            assertDistanceToDuration(100, 1000);
+            public new float DistanceSpacing => base.DistanceSpacing;
 
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
-
-            assertDistanceToDuration(100, 500);
-            assertDistanceToDuration(200, 1000);
-
-            AddStep("set beat length = 500", () =>
-            {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            });
-
-            assertDistanceToDuration(200, 500);
-            assertDistanceToDuration(400, 1000);
-        }
-
-        [Test]
-        public void TestGetSnappedDurationFromDistance()
-        {
-            assertSnappedDuration(0, 0);
-            assertSnappedDuration(50, 1000);
-            assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 2000);
-            assertSnappedDuration(200, 2000);
-            assertSnappedDuration(250, 3000);
-
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
-
-            assertSnappedDuration(0, 0);
-            assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 1000);
-            assertSnappedDuration(150, 1000);
-            assertSnappedDuration(200, 1000);
-            assertSnappedDuration(250, 1000);
-
-            AddStep("set beat length = 500", () =>
-            {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            });
-
-            assertSnappedDuration(50, 0);
-            assertSnappedDuration(100, 500);
-            assertSnappedDuration(150, 500);
-            assertSnappedDuration(200, 500);
-            assertSnappedDuration(250, 500);
-            assertSnappedDuration(400, 1000);
-        }
-
-        [Test]
-        public void GetSnappedDistanceFromDistance()
-        {
-            assertSnappedDistance(50, 100);
-            assertSnappedDistance(100, 100);
-            assertSnappedDistance(150, 200);
-            assertSnappedDistance(200, 200);
-            assertSnappedDistance(250, 300);
-
-            AddStep("set slider multiplier = 2", () => composer.EditorBeatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier = 2);
-
-            assertSnappedDistance(50, 0);
-            assertSnappedDistance(100, 200);
-            assertSnappedDistance(150, 200);
-            assertSnappedDistance(200, 200);
-            assertSnappedDistance(250, 200);
-
-            AddStep("set beat length = 500", () =>
-            {
-                composer.EditorBeatmap.ControlPointInfo.Clear();
-                composer.EditorBeatmap.ControlPointInfo.Add(0, new TimingControlPoint { BeatLength = 500 });
-            });
-
-            assertSnappedDistance(50, 0);
-            assertSnappedDistance(100, 200);
-            assertSnappedDistance(150, 200);
-            assertSnappedDistance(200, 200);
-            assertSnappedDistance(250, 200);
-            assertSnappedDistance(400, 400);
-        }
-
-        private void assertSnapDistance(float expectedDistance)
-            => AddAssert($"distance is {expectedDistance}", () => composer.GetBeatSnapDistanceAt(0) == expectedDistance);
-
-        private void assertDurationToDistance(double duration, float expectedDistance)
-            => AddAssert($"duration = {duration} -> distance = {expectedDistance}", () => composer.DurationToDistance(0, duration) == expectedDistance);
-
-        private void assertDistanceToDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration}", () => composer.DistanceToDuration(0, distance) == expectedDuration);
-
-        private void assertSnappedDuration(float distance, double expectedDuration)
-            => AddAssert($"distance = {distance} -> duration = {expectedDuration} (snapped)", () => composer.GetSnappedDurationFromDistance(0, distance) == expectedDuration);
-
-        private void assertSnappedDistance(float distance, float expectedDistance)
-            => AddAssert($"distance = {distance} -> distance = {expectedDistance} (snapped)", () => composer.GetSnappedDistanceFromDistance(0, distance) == expectedDistance);
-
-        private class TestHitObjectComposer : OsuHitObjectComposer
-        {
-            public new EditorBeatmap EditorBeatmap => base.EditorBeatmap;
-
-            public TestHitObjectComposer()
-                : base(new OsuRuleset())
+            public TestDistanceSnapGrid(double? endTime = null)
+                : base(grid_position, 0, endTime)
             {
             }
+
+            protected override void CreateContent()
+            {
+                AddInternal(new Circle
+                {
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(5),
+                    Position = StartPosition
+                });
+
+                int indexFromPlacement = 0;
+
+                for (float s = StartPosition.X + DistanceSpacing; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
+                {
+                    AddInternal(new Circle
+                    {
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(5, 10),
+                        Position = new Vector2(s, StartPosition.Y),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                    });
+                }
+
+                indexFromPlacement = 0;
+
+                for (float s = StartPosition.X - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
+                {
+                    AddInternal(new Circle
+                    {
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(5, 10),
+                        Position = new Vector2(s, StartPosition.Y),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                    });
+                }
+
+                indexFromPlacement = 0;
+
+                for (float s = StartPosition.Y + DistanceSpacing; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
+                {
+                    AddInternal(new Circle
+                    {
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(10, 5),
+                        Position = new Vector2(StartPosition.X, s),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                    });
+                }
+
+                indexFromPlacement = 0;
+
+                for (float s = StartPosition.Y - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
+                {
+                    AddInternal(new Circle
+                    {
+                        Origin = Anchor.Centre,
+                        Size = new Vector2(10, 5),
+                        Position = new Vector2(StartPosition.X, s),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
+                    });
+                }
+            }
+
+            public override (Vector2 position, double time) GetSnappedPosition(Vector2 screenSpacePosition)
+                => (Vector2.Zero, 0);
+        }
+
+        private class SnapProvider : IDistanceSnapProvider
+        {
+            public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time) => (position, time);
+
+            public float GetBeatSnapDistanceAt(double referenceTime) => 10;
+
+            public float DurationToDistance(double referenceTime, double duration) => (float)duration;
+
+            public double DistanceToDuration(double referenceTime, float distance) => distance;
+
+            public double GetSnappedDurationFromDistance(double referenceTime, float distance) => 0;
+
+            public float GetSnappedDistanceFromDistance(double referenceTime, float distance) => 0;
         }
     }
 }

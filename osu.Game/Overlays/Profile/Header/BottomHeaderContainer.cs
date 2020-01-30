@@ -32,16 +32,16 @@ namespace osu.Game.Overlays.Profile.Header
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            iconColour = colours.GreySeafoamLighter;
+            iconColour = colourProvider.Foreground1;
 
             InternalChildren = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDark,
+                    Colour = colourProvider.Background4
                 },
                 new FillFlowContainer
                 {

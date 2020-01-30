@@ -194,3 +194,10 @@
     *   [m] [#7647 - Move select tool to an actual tool implementation](https://github.com/ppy/osu/pull/7647)
     *   [m] [#7671 - Rename and tidy up DeletedCommentsCounter](https://github.com/ppy/osu/pull/7671)
     *   [m] [#7642 - Fix beat snap implementation being incorrect](https://github.com/ppy/osu/pull/7642)
+    *   [m] [#7644 - Standardise editor timeline zoom across maps of all lengths](https://github.com/ppy/osu/pull/7644)
+    *   [!_与一个现有更新冲突] #7643 - Distance snap grid correct colouring
+    *   Ensure selection tool correctly matches selection state #7649
+    *   Allow selecting composition tools using 1-4 keys #7648
+    *   [!_有变动,需要重新描述这个更新] [O->M] [#7222 - 向"WindUp"和"WindDown"Mod添加反向选项](https://github.com/ppy/osu/pull/7222)
+    *   Fix osu!catch not handling all vertical space #7673
+    *   Bring UserProfileOverlay colour scheme in line with web #7670

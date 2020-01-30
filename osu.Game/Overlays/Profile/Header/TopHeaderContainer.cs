@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile.Header
         private FillFlowContainer userStats;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
             Height = 150;
 
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Header
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = colours.GreySeafoamDark,
+                    Colour = colourProvider.Background5,
                 },
                 new FillFlowContainer
                 {
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.Profile.Header
                                             RelativeSizeAxes = Axes.X,
                                             Height = 1.5f,
                                             Margin = new MarginPadding { Top = 10 },
-                                            Colour = colours.GreySeafoamLighter,
+                                            Colour = colourProvider.Light1,
                                         },
                                         new FillFlowContainer
                                         {
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Header
                                                     Margin = new MarginPadding { Left = 10 },
                                                     Origin = Anchor.CentreLeft,
                                                     Anchor = Anchor.CentreLeft,
-                                                    Colour = colours.GreySeafoamLighter,
+                                                    Colour = colourProvider.Light1,
                                                 }
                                             }
                                         },
