@@ -327,7 +327,7 @@ namespace osu.Game
                 return;
             }
 
-            performFromScreen(screen =>
+            PerformFromScreen(screen =>
             {
                 // we might already be at song select, so a check is required before performing the load to solo.
                 if (screen is MainMenu)
@@ -344,7 +344,7 @@ namespace osu.Game
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
-            }, $"load {beatmap}", validScreens: new[] { typeof(PlaySongSelect) });
+            }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
         /// <summary>
@@ -381,12 +381,12 @@ namespace osu.Game
                 return;
             }
 
-            performFromScreen(screen =>
+            PerformFromScreen(screen =>
             {
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
                 screen.Push(new ReplayPlayerLoader(databasedScore));
-            }, $"watch {databasedScoreInfo}", new[] { typeof(PlaySongSelect) });
+            }, new[] { typeof(PlaySongSelect) });
         }
 
         protected virtual Loader CreateLoader() => new Loader();
@@ -445,9 +445,8 @@ namespace osu.Game
         /// Eagerly tries to exit the current screen until it succeeds.
         /// </summary>
         /// <param name="action">The action to perform once we are in the correct state.</param>
-        /// <param name="taskName">The task name to display in a notification (if we can't immediately reach the main menu state).</param>
         /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can immediately perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
-        private void performFromScreen(Action<IScreen> action, string taskName, IEnumerable<Type> validScreens = null)
+        protected void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
 
@@ -477,7 +476,7 @@ namespace osu.Game
                 screen = screen.GetParentScreen();
             }
 
-            performFromMainMenuTask = Schedule(() => performFromScreen(action, taskName, validScreens));
+            performFromMainMenuTask = Schedule(() => PerformFromScreen(action, validScreens));
         }
 
         /// <summary>
