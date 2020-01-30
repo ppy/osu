@@ -12,11 +12,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
 {
     public class OverlinedInfoContainer : CompositeDrawable
     {
-        /// <summary>
-        /// The amount of space between the overline and the underneath text.
-        /// </summary>
-        private const float line_bottom_margin = 2;
-
         private readonly Circle line;
         private readonly OsuSpriteText title;
         private readonly OsuSpriteText content;
@@ -49,7 +44,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = 2,
-                        Margin = new MarginPadding { Bottom = line_bottom_margin }
+                        Margin = new MarginPadding { Bottom = 2 }
                     },
                     title = new OsuSpriteText
                     {
