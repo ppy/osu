@@ -85,64 +85,64 @@ namespace osu.Game.Tests.Visual.Editor
             {
             }
 
-            protected override void CreateContent(Vector2 startPosition)
+            protected override void CreateContent()
             {
                 AddInternal(new Circle
                 {
                     Origin = Anchor.Centre,
                     Size = new Vector2(5),
-                    Position = startPosition
+                    Position = StartPosition
                 });
 
-                int beatIndex = 0;
+                int indexFromPlacement = 0;
 
-                for (float s = startPosition.X + DistanceSpacing; s <= DrawWidth && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
+                for (float s = StartPosition.X + DistanceSpacing; s <= DrawWidth && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
-                        Position = new Vector2(s, startPosition.Y),
-                        Colour = GetColourForBeatIndex(beatIndex)
+                        Position = new Vector2(s, StartPosition.Y),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
                     });
                 }
 
-                beatIndex = 0;
+                indexFromPlacement = 0;
 
-                for (float s = startPosition.X - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
+                for (float s = StartPosition.X - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(5, 10),
-                        Position = new Vector2(s, startPosition.Y),
-                        Colour = GetColourForBeatIndex(beatIndex)
+                        Position = new Vector2(s, StartPosition.Y),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
                     });
                 }
 
-                beatIndex = 0;
+                indexFromPlacement = 0;
 
-                for (float s = startPosition.Y + DistanceSpacing; s <= DrawHeight && beatIndex < MaxIntervals; s += DistanceSpacing, beatIndex++)
+                for (float s = StartPosition.Y + DistanceSpacing; s <= DrawHeight && indexFromPlacement < MaxIntervals; s += DistanceSpacing, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
-                        Position = new Vector2(startPosition.X, s),
-                        Colour = GetColourForBeatIndex(beatIndex)
+                        Position = new Vector2(StartPosition.X, s),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
                     });
                 }
 
-                beatIndex = 0;
+                indexFromPlacement = 0;
 
-                for (float s = startPosition.Y - DistanceSpacing; s >= 0 && beatIndex < MaxIntervals; s -= DistanceSpacing, beatIndex++)
+                for (float s = StartPosition.Y - DistanceSpacing; s >= 0 && indexFromPlacement < MaxIntervals; s -= DistanceSpacing, indexFromPlacement++)
                 {
                     AddInternal(new Circle
                     {
                         Origin = Anchor.Centre,
                         Size = new Vector2(10, 5),
-                        Position = new Vector2(startPosition.X, s),
-                        Colour = GetColourForBeatIndex(beatIndex)
+                        Position = new Vector2(StartPosition.X, s),
+                        Colour = GetColourForIndexFromPlacement(indexFromPlacement)
                     });
                 }
             }
