@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private readonly FillFlowContainer<ModIcon> iconsContainer;
+        protected readonly FillFlowContainer<ModIcon> IconsContainer;
         private readonly OsuSpriteText unrankedText;
 
         public ModDisplay()
@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Children = new Drawable[]
             {
-                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                IconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -69,11 +69,11 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.ValueChanged += mods =>
             {
-                iconsContainer.Clear();
+                IconsContainer.Clear();
 
                 foreach (Mod mod in mods.NewValue)
                 {
-                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+                    IconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }
 
                 if (IsLoaded)
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
             base.LoadComplete();
 
             appearTransform();
-            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
+            IconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         private void appearTransform()
@@ -104,17 +104,17 @@ namespace osu.Game.Screens.Play.HUD
 
             expand();
 
-            using (iconsContainer.BeginDelayedSequence(1200))
+            using (IconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
         private void expand()
         {
             if (AllowExpand)
-                iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+                IconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
         }
 
-        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+        private void contract() => IconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
         protected override bool OnHover(HoverEvent e)
         {
