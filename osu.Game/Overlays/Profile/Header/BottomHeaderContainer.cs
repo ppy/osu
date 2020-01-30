@@ -111,14 +111,14 @@ namespace osu.Game.Overlays.Profile.Header
             topLinkContainer.AddText("Contributed ");
             topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
 
-            string websiteWithoutProtcol = user.Website;
+            string websiteWithoutProtocol = user.Website;
 
-            if (!string.IsNullOrEmpty(websiteWithoutProtcol))
+            if (!string.IsNullOrEmpty(websiteWithoutProtocol))
             {
-                if (Uri.TryCreate(websiteWithoutProtcol, UriKind.Absolute, out var uri))
+                if (Uri.TryCreate(websiteWithoutProtocol, UriKind.Absolute, out var uri))
                 {
-                    websiteWithoutProtcol = uri.Host + uri.PathAndQuery + uri.Fragment;
-                    websiteWithoutProtcol = websiteWithoutProtcol.TrimEnd('/');
+                    websiteWithoutProtocol = uri.Host + uri.PathAndQuery + uri.Fragment;
+                    websiteWithoutProtocol = websiteWithoutProtocol.TrimEnd('/');
                 }
             }
 
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Profile.Header
             tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
             tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
             tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtcol, user.Website);
+            tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
