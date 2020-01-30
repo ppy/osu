@@ -20,9 +20,11 @@ namespace osu.Game.Rulesets.Mods
 
         public override ModType Type => ModType.Conversion;
 
-        public override IconUsage Icon => FontAwesome.Solid.Hammer;
+        public override IconUsage? Icon => FontAwesome.Solid.Hammer;
 
         public override double ScoreMultiplier => 1.0;
+
+        public override bool RequiresConfiguration => true;
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 

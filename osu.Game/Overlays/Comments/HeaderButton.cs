@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 
@@ -45,9 +44,9 @@ namespace osu.Game.Overlays.Comments
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.Gray4;
+            background.Colour = colourProvider.Background3;
         }
 
         protected override bool OnHover(HoverEvent e)

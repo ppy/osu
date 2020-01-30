@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
-    public abstract class ManiaSelectionBlueprint : SelectionBlueprint
+    public abstract class ManiaSelectionBlueprint : OverlaySelectionBlueprint
     {
         protected ManiaSelectionBlueprint(DrawableHitObject drawableObject)
             : base(drawableObject)

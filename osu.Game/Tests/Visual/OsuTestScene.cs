@@ -36,7 +36,7 @@ namespace osu.Game.Tests.Visual
 
         protected new OsuScreenDependencies Dependencies { get; private set; }
 
-        private readonly Lazy<Storage> localStorage;
+        private Lazy<Storage> localStorage;
         protected Storage LocalStorage => localStorage.Value;
 
         private readonly Lazy<DatabaseContextFactory> contextFactory;
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Visual
 
         protected OsuTestScene()
         {
-            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+            RecycleLocalStorage();
             contextFactory = new Lazy<DatabaseContextFactory>(() =>
             {
                 var factory = new DatabaseContextFactory(LocalStorage);
@@ -104,8 +104,25 @@ namespace osu.Game.Tests.Visual
             base.Content.Add(content = new DrawSizePreservingFillContainer());
         }
 
+        public void RecycleLocalStorage()
+        {
+            if (localStorage?.IsValueCreated == true)
+            {
+                try
+                {
+                    localStorage.Value.DeleteDirectory(".");
+                }
+                catch
+                {
+                    // we don't really care if this fails; it will just leave folders lying around from test runs.
+                }
+            }
+
+            localStorage = new Lazy<Storage>(() => new NativeStorage($"{GetType().Name}-{Guid.NewGuid()}"));
+        }
+
         [Resolved]
-        private AudioManager audio { get; set; }
+        protected AudioManager Audio { get; private set; }
 
         protected virtual IBeatmap CreateBeatmap(RulesetInfo ruleset) => new TestBeatmap(ruleset);
 
@@ -113,7 +130,7 @@ namespace osu.Game.Tests.Visual
             CreateWorkingBeatmap(CreateBeatmap(ruleset), null);
 
         protected virtual WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null) =>
-            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, audio);
+            new ClockBackedTestWorkingBeatmap(beatmap, storyboard, Clock, Audio);
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
@@ -131,17 +148,7 @@ namespace osu.Game.Tests.Visual
             if (contextFactory.IsValueCreated)
                 contextFactory.Value.ResetDatabase();
 
-            if (localStorage.IsValueCreated)
-            {
-                try
-                {
-                    localStorage.Value.DeleteDirectory(".");
-                }
-                catch
-                {
-                    // we don't really care if this fails; it will just leave folders lying around from test runs.
-                }
-            }
+            RecycleLocalStorage();
         }
 
         protected override ITestSceneTestRunner CreateRunner() => new OsuTestSceneTestRunner();

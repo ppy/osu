@@ -50,15 +50,15 @@ namespace osu.Game.Graphics.Containers
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (rightMouseDragging)
             {
                 scrollFromMouseEvent(e);
-                return true;
+                return;
             }
 
-            return base.OnDrag(e);
+            base.OnDrag(e);
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -72,15 +72,15 @@ namespace osu.Game.Graphics.Containers
             return base.OnDragStart(e);
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             if (rightMouseDragging)
             {
                 rightMouseDragging = false;
-                return true;
+                return;
             }
 
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         protected override bool OnScroll(ScrollEvent e)
@@ -123,8 +123,6 @@ namespace osu.Game.Graphics.Containers
 
                 Masking = true;
                 Child = box = new Box { RelativeSizeAxes = Axes.Both };
-
-                ResizeTo(1);
             }
 
             [BackgroundDependencyLoader]
@@ -164,13 +162,13 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
-                if (e.Button != MouseButton.Left) return false;
+                if (e.Button != MouseButton.Left) return;
 
                 box.FadeColour(Color4.White, 100);
 
-                return base.OnMouseUp(e);
+                base.OnMouseUp(e);
             }
         }
     }

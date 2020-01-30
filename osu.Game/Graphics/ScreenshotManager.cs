@@ -67,7 +67,9 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private volatile int screenShotTasks;
 
@@ -88,7 +90,7 @@ namespace osu.Game.Graphics
                 {
                     ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
                     {
-                        if (framesWaited++ < frames_to_wait)
+                        if (framesWaited++ >= frames_to_wait)
                             // ReSharper disable once AccessToDisposedClosure
                             framesWaitedEvent.Set();
                     }, 10, true);

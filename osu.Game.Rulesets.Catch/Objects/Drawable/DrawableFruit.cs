@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using osuTK;
 using osuTK.Graphics;

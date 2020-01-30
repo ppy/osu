@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual.UserInterface
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddStep("Select random", () =>
             {
-                selector.Current.Value = selector.Items.ElementAt(RNG.Next(selector.Items.Count()));
+                selector.Current.Value = selector.Items.ElementAt(RNG.Next(selector.Items.Count));
             });
             AddStep("Toggle disabled state", () => selector.Current.Disabled = !selector.Current.Disabled);
         }

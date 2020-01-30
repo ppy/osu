@@ -179,6 +179,8 @@ namespace osu.Game.Rulesets.Mania
 
         public override string ShortName => SHORT_NAME;
 
+        public override string PlayingVerb => "Smashing keys";
+
         public override Drawable CreateIcon() => new SpriteIcon { Icon = OsuIcon.RulesetMania };
 
         public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(this, beatmap);
@@ -235,19 +237,19 @@ namespace osu.Game.Rulesets.Mania
                     {
                         LeftKeys = new[]
                         {
-                            InputKey.Number1,
-                            InputKey.Number2,
-                            InputKey.Number3,
-                            InputKey.Number4,
+                            InputKey.Q,
+                            InputKey.W,
+                            InputKey.E,
+                            InputKey.R,
                         },
                         RightKeys = new[]
                         {
-                            InputKey.Z,
                             InputKey.X,
                             InputKey.C,
-                            InputKey.V
+                            InputKey.V,
+                            InputKey.B
                         },
-                        SpecialKey = InputKey.Tilde,
+                        SpecialKey = InputKey.S,
                         SpecialAction = ManiaAction.Special1,
                         NormalActionStart = ManiaAction.Key1
                     }.GenerateKeyBindingsFor(keys, out var nextNormal);
@@ -263,12 +265,12 @@ namespace osu.Game.Rulesets.Mania
                         },
                         RightKeys = new[]
                         {
-                            InputKey.O,
-                            InputKey.P,
-                            InputKey.BracketLeft,
-                            InputKey.BracketRight
+                            InputKey.K,
+                            InputKey.L,
+                            InputKey.Semicolon,
+                            InputKey.Quote
                         },
-                        SpecialKey = InputKey.BackSlash,
+                        SpecialKey = InputKey.I,
                         SpecialAction = ManiaAction.Special2,
                         NormalActionStart = nextNormal
                     }.GenerateKeyBindingsFor(keys, out _);
