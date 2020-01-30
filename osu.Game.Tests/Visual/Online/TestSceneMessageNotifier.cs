@@ -24,11 +24,11 @@ namespace osu.Game.Tests.Visual.Online
         [SetUp]
         public void Setup()
         {
-            friend = new User() { Id = 0, Username = "Friend" };
-            publicChannel = new Channel() { Id = 1, Name = "osu" };
+            friend = new User { Id = 0, Username = "Friend" };
+            publicChannel = new Channel { Id = 1, Name = "osu" };
             privateMesssageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
 
-            Child = testContainer = new TestContainer(new Channel[] { publicChannel, privateMesssageChannel })
+            Child = testContainer = new TestContainer(new[] { publicChannel, privateMesssageChannel })
             {
                 RelativeSizeAxes = Axes.Both,
             };
@@ -57,7 +57,7 @@ namespace osu.Game.Tests.Visual.Online
 
         private class TestContainer : Container
         {
-            private Channel[] channels;
+            private readonly Channel[] channels;
 
             public TestContainer(Channel[] channels) => this.channels = channels;
 
