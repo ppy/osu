@@ -167,9 +167,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
-                ballBg.Colour = colours.GreySeafoamDarker;
+                ballBg.Colour = colourProvider.Background5;
                 movingBall.BorderColour = line.Colour = colours.Yellow;
             }
 
