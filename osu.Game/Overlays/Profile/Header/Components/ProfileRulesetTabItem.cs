@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -28,6 +27,16 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
         }
 
+        protected override Color4 AccentColour
+        {
+            get => base.AccentColour;
+            set
+            {
+                base.AccentColour = value;
+                icon.FadeColour(value, 120, Easing.OutQuint);
+            }
+        }
+
         private readonly SpriteIcon icon;
 
         public ProfileRulesetTabItem(RulesetInfo value)
@@ -42,12 +51,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Icon = FontAwesome.Solid.Star,
                 Size = new Vector2(12),
             });
-        }
-
-        protected override void OnCurrentColourChanged(ValueChangedEvent<Color4> colour)
-        {
-            base.OnCurrentColourChanged(colour);
-            icon.FadeColour(colour.NewValue, 120, Easing.OutQuint);
         }
     }
 }

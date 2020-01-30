@@ -11,27 +11,31 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osuTK.Graphics;
 using osuTK;
-using osu.Framework.Bindables;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Overlays
 {
-    public class OverlayRulesetTabItem : TabItem<RulesetInfo>, IHasAccentColour
+    public class OverlayRulesetTabItem : TabItem<RulesetInfo>
     {
         protected readonly OsuSpriteText Text;
         private readonly FillFlowContainer content;
 
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
+        protected override Container<Drawable> Content => content;
 
-        private readonly Bindable<Color4> accentColour = new Bindable<Color4>();
-        private readonly Bindable<Color4> currentColour = new Bindable<Color4>();
+        private Color4 accentColour;
 
-        public Color4 AccentColour
+        protected virtual Color4 AccentColour
         {
-            get => accentColour.Value;
-            set => accentColour.Value = value;
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+                Text.FadeColour(value, 120, Easing.OutQuint);
+            }
         }
 
-        protected override Container<Drawable> Content => content;
+        [Resolved]
+        private OverlayColourProvider colourProvider { get; set; }
 
         public OverlayRulesetTabItem(RulesetInfo value)
             : base(value)
@@ -58,13 +62,10 @@ namespace osu.Game.Overlays
             Enabled.Value = true;
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-
-            currentColour.BindValueChanged(OnCurrentColourChanged);
-            accentColour.BindValueChanged(_ => updateState());
-            Enabled.BindValueChanged(_ => updateState(), true);
+            updateState();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -87,14 +88,7 @@ namespace osu.Game.Overlays
         private void updateState()
         {
             Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-
-            currentColour.Value = IsHovered || Active.Value
-                ? Color4.White
-                : Enabled.Value
-                    ? AccentColour
-                    : Color4.DimGray;
+            AccentColour = IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
         }
-
-        protected virtual void OnCurrentColourChanged(ValueChangedEvent<Color4> colour) => Text.FadeColour(colour.NewValue, 120, Easing.OutQuint);
     }
 }
