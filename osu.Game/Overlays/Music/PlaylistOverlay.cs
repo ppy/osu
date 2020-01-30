@@ -21,7 +21,9 @@ namespace osu.Game.Overlays.Music
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
-        public readonly IBindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
+        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+
+        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
         private BeatmapManager beatmaps;
@@ -72,7 +74,7 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            list.BeatmapSets.BindTo(BeatmapSets);
+            list.Items.BindTo(beatmapSets);
 
             filter.Search.OnCommit = (sender, newText) =>
             {
