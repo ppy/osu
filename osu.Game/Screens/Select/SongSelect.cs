@@ -35,6 +35,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
@@ -65,6 +66,14 @@ namespace osu.Game.Screens.Select
         /// Helps keep them located beneath the footer itself.
         /// </summary>
         protected Container FooterPanels { get; private set; }
+
+        /// <summary>
+        /// Whether entering editor mode should be allowed.
+        /// </summary>
+        public virtual bool AllowEditing => true;
+
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay notificationOverlay { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
@@ -295,6 +304,12 @@ namespace osu.Game.Screens.Select
 
         public void Edit(BeatmapInfo beatmap = null)
         {
+            if (!AllowEditing)
+            {
+                notificationOverlay?.Post(new SimpleNotification { Text = "Editing is not available from the current mode." });
+                return;
+            }
+
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             this.Push(new Editor());
         }
