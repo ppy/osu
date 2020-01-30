@@ -1,13 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
@@ -32,7 +30,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             TestSongSelect songSelect = null;
 
-            pushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestSongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             pushEscape();
@@ -49,7 +47,7 @@ namespace osu.Game.Tests.Visual.Navigation
             WorkingBeatmap beatmap() => Game.Beatmap.Value;
             Track track() => beatmap().Track;
 
-            pushAndConfirm(() => new TestSongSelect());
+            PushAndConfirm(() => new TestSongSelect());
 
             AddStep("import beatmap", () => ImportBeatmapTest.LoadOszIntoOsu(Game, virtualTrack: true).Wait());
 
@@ -77,7 +75,7 @@ namespace osu.Game.Tests.Visual.Navigation
         {
             TestSongSelect songSelect = null;
 
-            pushAndConfirm(() => songSelect = new TestSongSelect());
+            PushAndConfirm(() => songSelect = new TestSongSelect());
             AddStep("Show mods overlay", () => songSelect.ModSelectOverlay.Show());
             AddAssert("Overlay was shown", () => songSelect.ModSelectOverlay.State.Value == Visibility.Visible);
             AddStep("Move mouse to backButton", () => InputManager.MoveMouseTo(backButtonPosition));
@@ -93,14 +91,14 @@ namespace osu.Game.Tests.Visual.Navigation
         [Test]
         public void TestExitMultiWithEscape()
         {
-            pushAndConfirm(() => new Screens.Multi.Multiplayer());
+            PushAndConfirm(() => new Screens.Multi.Multiplayer());
             exitViaEscapeAndConfirm();
         }
 
         [Test]
         public void TestExitMultiWithBackButton()
         {
-            pushAndConfirm(() => new Screens.Multi.Multiplayer());
+            PushAndConfirm(() => new Screens.Multi.Multiplayer());
             exitViaBackButtonAndConfirm();
         }
 
@@ -114,13 +112,6 @@ namespace osu.Game.Tests.Visual.Navigation
             AddAssert("Options overlay was opened", () => Game.Settings.State.Value == Visibility.Visible);
             AddStep("Hide options overlay using escape", () => pressAndRelease(Key.Escape));
             AddAssert("Options overlay was closed", () => Game.Settings.State.Value == Visibility.Hidden);
-        }
-
-        private void pushAndConfirm(Func<Screen> newScreen)
-        {
-            Screen screen = null;
-            AddStep("Push new screen", () => Game.ScreenStack.Push(screen = newScreen()));
-            AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
         }
 
         private void pushEscape() =>
