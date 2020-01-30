@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.Profile.Header
             tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
 
             // Hide the container to prevent adding unnecessary padding if it has no children other than the NewLineContainer
-            if (!bottomLinkContainer.Children.Any(child => !(child is NewLineContainer)))
+            if (bottomLinkContainer.Children.All(child => child is NewLineContainer))
                 bottomLinkContainer.Hide();
             else
                 // this is needed if user gets changed without the whole header being reloaded
