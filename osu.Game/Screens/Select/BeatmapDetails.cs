@@ -361,11 +361,17 @@ namespace osu.Game.Screens.Select
                     switch(type)
                     {
                         case MetadataType.Tags:
-                            foreach (string tag in text.Split(" "))
-                                loaded.AddLink(tag + " ", LinkAction.OpenDirectWithSearch, tag);
+                            string[] tags = text.Split(" ");
+                            for (int i = 0; i <= tags.Length - 1; i++)
+                            {
+                                loaded.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i]);
+
+                                if (i != tags.Length - 1)
+                                    loaded.AddText(" ");
+                            }
                             break;
                         case MetadataType.Source:
-                            loaded.AddLink(text, LinkAction.OpenDirectWithSearch, text);
+                            loaded.AddLink(text, LinkAction.SearchBeatmapSet, text);
                             break;
                         default:
                             loaded.AddText(text);

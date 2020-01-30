@@ -244,8 +244,8 @@ namespace osu.Game
                     ShowChannel(link.Argument);
                     break;
 
-                case LinkAction.OpenDirectWithSearch:
-                    ShowDirectWithSearch(link.Argument);
+                case LinkAction.SearchBeatmapSet:
+                    SearchBeatmapSet(link.Argument);
                     break;
 
                 case LinkAction.OpenEditorTimestamp:
@@ -317,8 +317,8 @@ namespace osu.Game
         /// <summary>
         /// Show Direct with a query.
         /// </summary>
-        /// <param name="query">The query to search for.null</param>
-        public void ShowDirectWithSearch(string query) => waitForReady(() => direct, _ => direct.ShowWithSearch(query));
+        /// <param name="query">The query to search for.</param>
+        public void SearchBeatmapSet(string query) => waitForReady(() => direct, _ => direct.ShowWithSearch(query));
 
         /// <summary>
         /// Present a beatmap at song select immediately.
