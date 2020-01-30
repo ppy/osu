@@ -16,6 +16,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class DrawableRecentActivity : CompositeDrawable
     {
+        private const int font_size = 14;
+
         private IAPIProvider api;
 
         private readonly APIRecentActivity activity;
@@ -62,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                                 icon.Origin = Anchor.Centre;
                             })
                         },
-                        content = new LinkFlowContainer
+                        content = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: font_size))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
@@ -74,6 +76,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
                             Colour = colourProvider.Foreground1,
+                            Font = OsuFont.GetFont(size: font_size),
                         }
                     }
                 }
