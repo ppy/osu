@@ -75,6 +75,9 @@ namespace osu.Game.Screens.Select
         [Resolved(canBeNull: true)]
         private NotificationOverlay notificationOverlay { get; set; }
 
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
@@ -468,6 +471,8 @@ namespace osu.Game.Screens.Select
 
             this.FadeInFromZero(250);
             FilterControl.Activate();
+
+            ModSelect.SelectedMods.BindTo(selectedMods);
         }
 
         private const double logo_transition = 250;
@@ -508,6 +513,12 @@ namespace osu.Game.Screens.Select
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
+
+            // required due to https://github.com/ppy/osu-framework/issues/3218
+            ModSelect.SelectedMods.Disabled = false;
+            ModSelect.SelectedMods.BindTo(selectedMods);
+
             BeatmapDetails.Leaderboard.RefreshScores();
 
             Beatmap.Value.Track.Looping = true;
@@ -532,6 +543,7 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 
             BeatmapOptions.Hide();
