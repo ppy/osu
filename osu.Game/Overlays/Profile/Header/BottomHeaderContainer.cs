@@ -15,6 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
+using static osu.Framework.Graphics.Containers.TextFlowContainer;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -133,9 +134,12 @@ namespace osu.Game.Overlays.Profile.Header
             tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
 
-            // Hide the container to prevent adding unnecessary padding if it has no children other than the NewLine
-            if (!bottomLinkContainer.Children.Skip(1).Any())
+            // Hide the container to prevent adding unnecessary padding if it has no children other than the NewLineContainer
+            if (!bottomLinkContainer.Children.Any(child => !(child is NewLineContainer)))
                 bottomLinkContainer.Hide();
+            else
+                // this is needed if user gets changed without the whole header being reloaded
+                bottomLinkContainer.Show();
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
