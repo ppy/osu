@@ -29,9 +29,9 @@ namespace osu.Game.Graphics
             }
         }
 
-        public DrawableDate(DateTimeOffset date)
+        public DrawableDate(DateTimeOffset date, float textSize = OsuFont.DEFAULT_FONT_SIZE)
         {
-            Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true);
+            Font = OsuFont.GetFont(weight: FontWeight.Regular, size: textSize, italics: true);
             Date = date;
         }
 

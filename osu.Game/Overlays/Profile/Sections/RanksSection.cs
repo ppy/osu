@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Children = new[]
             {
-                new PaginatedScoreContainer(ScoreType.Best, User, "最佳成绩", "还没有(´・ω・`)", true),
+                new PaginatedScoreContainer(ScoreType.Best, User, "最佳成绩", "还没有(´・ω・`)"),
                 new PaginatedScoreContainer(ScoreType.Firsts, User, "第一名", "还没有(´・ω・`)"),
             };
         }

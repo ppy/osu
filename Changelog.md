@@ -175,35 +175,38 @@
         *   [effectSection](osu.Game/Screens/Edit/Timing/EffectSection.cs)
 
 *   整合更新
-    *   [m] [#7623 - Fix crash due to misordered selection events](https://github.com/ppy/osu/pull/7623)
-    *   [m] [#7432 - Implement ability to create OverlayHeader with no TabControl](https://github.com/ppy/osu/pull/7432)
+    *   [M] [#7623 - Fix crash due to misordered selection events](https://github.com/ppy/osu/pull/7623)
+    *   [M] [#7432 - Implement ability to create OverlayHeader with no TabControl](https://github.com/ppy/osu/pull/7432)
     *   [M] [#7638 - Use type switch in SerializationWriter](https://github.com/ppy/osu/pull/7638)
-    *   [m] [#7637 - Refactor background creation in OverlayHeader](https://github.com/ppy/osu/pull/7637)
-    *   [m] [#7650 - Change default method style for better IDE autocompletion](https://github.com/ppy/osu/pull/7650)
-    *   [m] [#7636 - Make CommentsContainer use OverlayColourProvider](https://github.com/ppy/osu/pull/7636)
-    *   [m] [#7645 - Allow OsuSliderBar tooltip to show as percentage as needed](https://github.com/ppy/osu/pull/7645)
-    *   [m] [#7659 - Fix random PlaySongSelect test failures](https://github.com/ppy/osu/pull/7659)
-    *   [m] [#7653 - Fix navigation test crashing when raw input is disabled](https://github.com/ppy/osu/pull/7653)
-    *   [m] [#7652 - Fix key count being incorrectly adjusted by hard/easy mods](https://github.com/ppy/osu/pull/7652)
-    *   [m] [#7634 - Add beat ticks to editor timeline](https://github.com/ppy/osu/pull/7634)
+    *   [M] [#7637 - Refactor background creation in OverlayHeader](https://github.com/ppy/osu/pull/7637)
+    *   [M] [#7650 - Change default method style for better IDE autocompletion](https://github.com/ppy/osu/pull/7650)
+    *   [M] [#7636 - Make CommentsContainer use OverlayColourProvider](https://github.com/ppy/osu/pull/7636)
+    *   [M] [#7645 - Allow OsuSliderBar tooltip to show as percentage as needed](https://github.com/ppy/osu/pull/7645)
+    *   [M] [#7659 - Fix random PlaySongSelect test failures](https://github.com/ppy/osu/pull/7659)
+    *   [M] [#7653 - Fix navigation test crashing when raw input is disabled](https://github.com/ppy/osu/pull/7653)
+    *   [M] [#7652 - Fix key count being incorrectly adjusted by hard/easy mods](https://github.com/ppy/osu/pull/7652)
+    *   [M] [#7634 - Add beat ticks to editor timeline](https://github.com/ppy/osu/pull/7634)
 
+## 2020.130.1
 ### 2020/1/30:
 *   整合更新
-    *   [m] [#7675 - Fix possible crash when searching with no channel topic](https://github.com/ppy/osu/pull/7675)
-    *   [m] [#7593 - Minor cleanups for Legacy Storyboard/Beatmap decoder](https://github.com/ppy/osu/pull/7593)
-    *   [m] [#7647 - Move select tool to an actual tool implementation](https://github.com/ppy/osu/pull/7647)
-    *   [m] [#7671 - Rename and tidy up DeletedCommentsCounter](https://github.com/ppy/osu/pull/7671)
-    *   [m] [#7642 - Fix beat snap implementation being incorrect](https://github.com/ppy/osu/pull/7642)
-    *   [m] [#7644 - Standardise editor timeline zoom across maps of all lengths](https://github.com/ppy/osu/pull/7644)
-    *   [!_与一个现有更新冲突] #7643 - Distance snap grid correct colouring
-    *   Ensure selection tool correctly matches selection state #7649
-    *   Allow selecting composition tools using 1-4 keys #7648
+    *   [M] [#7675 - Fix possible crash when searching with no channel topic](https://github.com/ppy/osu/pull/7675)
+    *   [M] [#7593 - Minor cleanups for Legacy Storyboard/Beatmap decoder](https://github.com/ppy/osu/pull/7593)
+    *   [M] [#7647 - Move select tool to an actual tool implementation](https://github.com/ppy/osu/pull/7647)
+    *   [M] [#7671 - Rename and tidy up DeletedCommentsCounter](https://github.com/ppy/osu/pull/7671)
+    *   [M] [#7642 - Fix beat snap implementation being incorrect](https://github.com/ppy/osu/pull/7642)
+    *   [M] [#7644 - Standardise editor timeline zoom across maps of all lengths](https://github.com/ppy/osu/pull/7644)
+    *   [#7643 - Distance snap grid correct colouring](https://github.com/ppy/osu/pull/7643)
+    *   [M] [#7649 - Ensure selection tool correctly matches selection state](https://github.com/ppy/osu/pull/7649)
+    *   [M] [#7648 - Allow selecting composition tools using 1-4 keys](https://github.com/ppy/osu/pull/7648)
     *   [!_有变动,需要重新描述这个更新] [O->M] [#7222 - 向"WindUp"和"WindDown"Mod添加反向选项](https://github.com/ppy/osu/pull/7222)
-    *   Fix osu!catch not handling all vertical space #7673
-    *   Bring UserProfileOverlay colour scheme in line with web #7670
-    *   Fix negative replay frames being played back incorrectly #7676
-    *   Fix editor being accessible for multiplayer song select #7667
-    *   Fix presenting a beatmap from a different ruleset not working #7663
-    *   Move navigation / game test scenes to new namespace #7661
-    *   Remove build target from Fastfile #7613
-    *   Fix percentage-formatted displays containing a space #7664
+    *   [M] [#7673 - Fix osu!catch not handling all vertical space](https://github.com/ppy/osu/pull/7673)
+    *   [M] [#7670 - Bring UserProfileOverlay colour scheme in line with web](https://github.com/ppy/osu/pull/7670)
+    *   [M] [#7676 - Fix negative replay frames being played back incorrectly](https://github.com/ppy/osu/pull/7676)
+    *   [M] [#7667 - Fix editor being accessible for multiplayer song select](https://github.com/ppy/osu/pull/7667)
+    *   [M] [#7663 - Fix presenting a beatmap from a different ruleset not working](https://github.com/ppy/osu/pull/7663)
+    *   [M] [#7661 - Move navigation / game test scenes to new namespace](https://github.com/ppy/osu/pull/7661)
+    *   [M] [#7613 - Remove build target from Fastfile](https://github.com/ppy/osu/pull/7613)
+    *   [M] [#7664 - Fix percentage-formatted displays containing a space](https://github.com/ppy/osu/pull/7664)
+    *   [M] [#7554 - Update profile scores in line with the web design](https://github.com/ppy/osu/pull/7554)
+    *   [M] [#7654 - Add a method to recycle test storage between runs #7654](https://github.com/ppy/osu/pull/7654)
