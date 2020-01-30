@@ -41,7 +41,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("count")]
         public int Count;
 
-        public string Mode { get; private set; }
+        public string Mode;
 
         [JsonProperty("mode")]
         private string mode
