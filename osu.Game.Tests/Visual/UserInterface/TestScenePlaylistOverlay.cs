@@ -16,10 +16,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 {
     public class TestScenePlaylistOverlay : OsuTestScene
     {
-        public override IReadOnlyList<Type> RequiredTypes => new Type[]
+        public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(PlaylistOverlay),
-            typeof(PlaylistList)
+            typeof(Playlist)
         };
 
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
