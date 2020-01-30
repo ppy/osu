@@ -28,12 +28,15 @@ namespace osu.Game.Tests.Visual.Online
             publicChannel = new Channel { Id = 1, Name = "osu" };
             privateMesssageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
 
-            Child = testContainer = new TestContainer(new[] { publicChannel, privateMesssageChannel })
+            Schedule(() =>
             {
-                RelativeSizeAxes = Axes.Both,
-            };
+                Child = testContainer = new TestContainer(new[] { publicChannel, privateMesssageChannel })
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
 
-            testContainer.ChatOverlay.Show();
+                testContainer.ChatOverlay.Show();
+            });
         }
 
         [Test]
