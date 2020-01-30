@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System;
 using osu.Game.Beatmaps;
 using osu.Framework.Bindables;
 using System.Collections.Generic;
@@ -118,16 +117,19 @@ namespace osu.Game.Screens.Select.Details
                     mod.ApplyToDifficulty(adjustedDifficulty);
             }
 
-            //mania specific
-            if ((Beatmap?.Ruleset?.ID ?? 0) == 3)
+            switch (Beatmap?.Ruleset?.ID ?? 0)
             {
-                firstValue.Title = "Key Amount";
-                firstValue.Value = ((int)MathF.Round(baseDifficulty?.CircleSize ?? 0), (int)MathF.Round(adjustedDifficulty?.CircleSize ?? 0));
-            }
-            else
-            {
-                firstValue.Title = "Circle Size";
-                firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+                case 3:
+                    // Account for mania differences locally for now
+                    // Eventually this should be handled in a more modular way, allowing rulesets to return arbitrary difficulty attributes
+                    firstValue.Title = "Key Count";
+                    firstValue.Value = (baseDifficulty?.CircleSize ?? 0, null);
+                    break;
+
+                default:
+                    firstValue.Title = "Circle Size";
+                    firstValue.Value = (baseDifficulty?.CircleSize ?? 0, adjustedDifficulty?.CircleSize);
+                    break;
             }
 
             starDifficulty.Value = ((float)(Beatmap?.StarDifficulty ?? 0), null);

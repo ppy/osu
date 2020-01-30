@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Transform";
         public override string Acronym => "TR";
-        public override IconUsage Icon => FontAwesome.Solid.ArrowsAlt;
+        public override IconUsage? Icon => FontAwesome.Solid.ArrowsAlt;
         public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;

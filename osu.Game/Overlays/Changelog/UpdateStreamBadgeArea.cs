@@ -29,8 +29,6 @@ namespace osu.Game.Overlays.Changelog
 
         public void Populate(List<APIUpdateStream> streams)
         {
-            Current.Value = null;
-
             foreach (APIUpdateStream updateStream in streams)
                 AddItem(updateStream);
         }

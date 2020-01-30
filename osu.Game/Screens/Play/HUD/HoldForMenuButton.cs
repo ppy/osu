@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -259,16 +259,14 @@ namespace osu.Game.Screens.Play.HUD
                 return false;
             }
 
-            public bool OnReleased(GlobalAction action)
+            public void OnReleased(GlobalAction action)
             {
                 switch (action)
                 {
                     case GlobalAction.Back:
                         AbortConfirm();
-                        return true;
+                        break;
                 }
-
-                return false;
             }
 
             protected override bool OnMouseDown(MouseDownEvent e)
@@ -278,11 +276,10 @@ namespace osu.Game.Screens.Play.HUD
                 return true;
             }
 
-            protected override bool OnMouseUp(MouseUpEvent e)
+            protected override void OnMouseUp(MouseUpEvent e)
             {
                 if (!e.HasAnyButtonPressed)
                     AbortConfirm();
-                return true;
             }
         }
     }

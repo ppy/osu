@@ -61,7 +61,7 @@ namespace osu.Game.Tournament
             string weightString = weight.ToString();
 
             // Only exo has an explicit "regular" weight, other fonts do not
-            if (weight == FontWeight.Regular && family != GetFamilyString(TournamentTypeface.Aquatico) && family != GetFamilyString(TournamentTypeface.Aquatico))
+            if (weight == FontWeight.Regular && family != GetFamilyString(TournamentTypeface.Aquatico))
                 weightString = string.Empty;
 
             return weightString;

@@ -13,7 +13,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
     {
         private const float shear_width = 36.75f;
 
-        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGED_CONTAINER_SIZE.Y, 0);
+        private static readonly Vector2 wedged_container_shear = new Vector2(shear_width / SongSelect.WEDGE_HEIGHT, 0);
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
@@ -363,7 +363,7 @@ namespace osu.Game.Screens.Select
 
             public class InfoLabel : Container, IHasTooltip
             {
-                public string TooltipText { get; private set; }
+                public string TooltipText { get; }
 
                 public InfoLabel(BeatmapStatistic statistic)
                 {

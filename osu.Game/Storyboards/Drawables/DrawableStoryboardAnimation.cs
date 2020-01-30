@@ -8,14 +8,14 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardAnimation : TextureAnimation, IFlippable, IVectorScalable
     {
-        public StoryboardAnimation Animation { get; private set; }
+        public StoryboardAnimation Animation { get; }
 
         private bool flipH;
 

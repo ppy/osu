@@ -23,8 +23,10 @@ using osuTK.Input;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Input.Bindings;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Setup;
 using osu.Game.Screens.Edit.Timing;
@@ -33,7 +35,8 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Edit
 {
-    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>
+    [Cached(typeof(IBeatSnapProvider))]
+    public class Editor : ScreenWithBeatmapBackground, IKeyBindingHandler<GlobalAction>, IBeatSnapProvider
     {
         public override float BackgroundParallaxAmount => 0.1f;
 
@@ -43,17 +46,23 @@ namespace osu.Game.Screens.Edit
 
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
+        public override bool AllowRateAdjustments => false;
+
+        [Resolved]
+        private BeatmapManager beatmapManager { get; set; }
+
         private Box bottomBackground;
         private Container screenContainer;
 
         private EditorScreen currentScreen;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
-
         private EditorClock clock;
 
+        private IBeatmap playableBeatmap;
+        private EditorBeatmap editorBeatmap;
+
         private DependencyContainer dependencies;
-        private GameHost host;
 
         protected override UserActivity InitialActivity => new UserActivity.Editing(Beatmap.Value.BeatmapInfo);
 
@@ -63,8 +72,6 @@ namespace osu.Game.Screens.Edit
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)
         {
-            this.host = host;
-
             beatDivisor.Value = Beatmap.Value.BeatmapInfo.BeatDivisor;
             beatDivisor.BindValueChanged(divisor => Beatmap.Value.BeatmapInfo.BeatDivisor = divisor.NewValue);
 
@@ -73,9 +80,16 @@ namespace osu.Game.Screens.Edit
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
+            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            editorBeatmap = new EditorBeatmap(playableBeatmap, beatDivisor);
+
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
+
+            // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
+
+            dependencies.CacheAs(editorBeatmap);
 
             EditorMenuBar menuBar;
 
@@ -83,7 +97,8 @@ namespace osu.Game.Screens.Edit
 
             if (RuntimeInfo.IsDesktop)
             {
-                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("Save", MenuItemType.Standard, saveBeatmap));
+                fileMenuItems.Add(new EditorMenuItem("Export package", MenuItemType.Standard, exportBeatmap));
                 fileMenuItems.Add(new EditorMenuItemSpacer());
             }
 
@@ -198,6 +213,15 @@ namespace osu.Game.Screens.Edit
                 case Key.Right:
                     seek(e, 1);
                     return true;
+
+                case Key.S:
+                    if (e.ControlPressed)
+                    {
+                        saveBeatmap();
+                        return true;
+                    }
+
+                    break;
             }
 
             return base.OnKeyDown(e);
@@ -236,12 +260,8 @@ namespace osu.Game.Screens.Edit
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
-
-        public override void OnResuming(IScreen last)
+        public void OnReleased(GlobalAction action)
         {
-            base.OnResuming(last);
-            Beatmap.Value.Track?.Stop();
         }
 
         public override void OnEntering(IScreen last)
@@ -267,7 +287,6 @@ namespace osu.Game.Screens.Edit
 
         private void resetTrack(bool seekToStart = false)
         {
-            Beatmap.Value.Track?.ResetSpeedAdjustments();
             Beatmap.Value.Track?.Stop();
 
             if (seekToStart)
@@ -284,8 +303,6 @@ namespace osu.Game.Screens.Edit
                 clock.Seek(Math.Max(0, targetTime));
             }
         }
-
-        private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
 
         private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
@@ -322,5 +339,19 @@ namespace osu.Game.Screens.Edit
             else
                 clock.SeekForward(!clock.IsRunning, amount);
         }
+
+        private void saveBeatmap() => beatmapManager.Save(playableBeatmap.BeatmapInfo, editorBeatmap);
+
+        private void exportBeatmap()
+        {
+            saveBeatmap();
+            beatmapManager.Export(Beatmap.Value.BeatmapSetInfo);
+        }
+
+        public double SnapTime(double time, double? referenceTime) => editorBeatmap.SnapTime(time, referenceTime);
+
+        public double GetBeatLengthAtTime(double referenceTime) => editorBeatmap.GetBeatLengthAtTime(referenceTime);
+
+        public int BeatDivisor => beatDivisor.Value;
     }
 }
