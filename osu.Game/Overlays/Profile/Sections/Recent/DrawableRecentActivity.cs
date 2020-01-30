@@ -214,9 +214,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     addText($"{activity.User?.PreviousUsername} has changed their username to ");
                     addUserLink();
                     break;
-
-                default:
-                    break;
             }
         }
     }
