@@ -154,6 +154,12 @@ namespace osu.Game.Overlays
             updateResultCounts();
         }
 
+        public void ShowWithSearch(string query)
+        {
+            currentQuery.Value = query;
+            Show();
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {

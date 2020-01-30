@@ -244,6 +244,10 @@ namespace osu.Game
                     ShowChannel(link.Argument);
                     break;
 
+                case LinkAction.OpenDirectWithSearch:
+                    ShowDirectWithSearch(link.Argument);
+                    break;
+
                 case LinkAction.OpenEditorTimestamp:
                 case LinkAction.JoinMultiplayerMatch:
                 case LinkAction.Spectate:
@@ -309,6 +313,12 @@ namespace osu.Game
         /// </summary>
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
+
+        /// <summary>
+        /// Show Direct with a query.
+        /// </summary>
+        /// <param name="query">The query to search for.null</param>
+        public void ShowDirectWithSearch(string query) => waitForReady(() => direct, _ => direct.ShowWithSearch(query));
 
         /// <summary>
         /// Present a beatmap at song select immediately.

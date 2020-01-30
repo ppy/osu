@@ -8,10 +8,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
+using osu.Game.Screens.Select;
 using osuTK;
 using osuTK.Graphics;
 
@@ -68,7 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = new MetadataSection("Description"),
+                                Child = new MetadataSection(MetadataType.Description),
                             },
                         },
                         new Container
@@ -86,10 +89,10 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Direction = FillDirection.Full,
                                 Children = new[]
                                 {
-                                    source = new MetadataSection("Source"),
-                                    genre = new MetadataSection("Genre") { Width = 0.5f },
-                                    language = new MetadataSection("Language") { Width = 0.5f },
-                                    tags = new MetadataSection("Tags"),
+                                    source = new MetadataSection(MetadataType.Source),
+                                    genre = new MetadataSection(MetadataType.Genre) { Width = 0.5f },
+                                    language = new MetadataSection(MetadataType.Language) { Width = 0.5f },
+                                    tags = new MetadataSection(MetadataType.Tags),
                                 },
                             },
                         },
@@ -133,8 +136,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private class MetadataSection : FillFlowContainer
         {
+            private readonly MetadataType type;
             private readonly OsuSpriteText header;
-            private readonly TextFlowContainer textFlow;
+            private readonly LinkFlowContainer textFlow;
 
             public string Text
             {
@@ -147,13 +151,32 @@ namespace osu.Game.Overlays.BeatmapSet
                     }
 
                     this.FadeIn(transition_duration);
+
                     textFlow.Clear();
-                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
+                    static void format(SpriteText t) => t.Font = t.Font.With(size: 14);
+
+                    switch(type)
+                    {
+                        case MetadataType.Tags:
+                            foreach (string tag in value.Split(" "))
+                                textFlow.AddLink(tag + " ", LinkAction.OpenDirectWithSearch, tag, null, format);
+                            break;
+
+                        case MetadataType.Source:
+                            textFlow.AddLink(value, LinkAction.OpenDirectWithSearch, value, null, format);
+                            break;
+
+                        default:
+                            textFlow.AddText(value, format);
+                            break;
+                    }
                 }
             }
 
-            public MetadataSection(string title)
+            public MetadataSection(MetadataType type)
             {
+                this.type = type;
+
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
                 Spacing = new Vector2(5f);
@@ -162,12 +185,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     header = new OsuSpriteText
                     {
-                        Text = title,
+                        Text = this.type.ToString(),
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },
-                    textFlow = new OsuTextFlowContainer
+                    textFlow = new LinkFlowContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,

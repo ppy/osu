@@ -279,7 +279,8 @@ namespace osu.Game.Online.Chat
         JoinMultiplayerMatch,
         Spectate,
         OpenUserProfile,
-        Custom
+        Custom,
+        OpenDirectWithSearch
     }
 
     public class Link : IComparable<Link>
