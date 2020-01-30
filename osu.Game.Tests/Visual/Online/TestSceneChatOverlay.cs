@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Testing;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
@@ -35,8 +38,9 @@ namespace osu.Game.Tests.Visual.Online
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
-        private readonly Channel channel1 = new Channel(new User()) { Name = "test really long username" };
-        private readonly Channel channel2 = new Channel(new User()) { Name = "test2" };
+        private readonly Channel channel1 = new Channel(new User()) { Name = "test really long username", Topic = "Topic for channel 1" };
+        private readonly Channel channel2 = new Channel(new User()) { Name = "test2", Topic = "Topic for channel 2" };
+        private readonly Channel channel3 = new Channel(new User()) { Name = "channel with no topic" };
 
         [SetUp]
         public void Setup()
@@ -45,7 +49,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 ChannelManagerContainer container;
 
-                Child = container = new ChannelManagerContainer(new List<Channel> { channel1, channel2 })
+                Child = container = new ChannelManagerContainer(new List<Channel> { channel1, channel2, channel3 })
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -94,6 +98,13 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Close channel 1", () => clickDrawable(((TestChannelTabItem)chatOverlay.TabMap[channel1]).CloseButton.Child));
 
             AddAssert("Selector is visible", () => chatOverlay.SelectionOverlayState == Visibility.Visible);
+        }
+
+        [Test]
+        public void TestSearchInSelector()
+        {
+            AddStep("search for 'test2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "test2");
+            AddUntilStep("only channel 2 visible", () => chatOverlay.ChildrenOfType<ChannelListItem>().Single(c => c.IsPresent).Channel == channel2);
         }
 
         private void clickDrawable(Drawable d)
