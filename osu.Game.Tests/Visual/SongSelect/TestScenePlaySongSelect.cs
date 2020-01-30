@@ -86,6 +86,12 @@ namespace osu.Game.Tests.Visual.SongSelect
             manager?.Delete(manager.GetAllUsableBeatmapSets());
         });
 
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
+        }
+
         [Test]
         public void TestSingleFilterOnEnter()
         {

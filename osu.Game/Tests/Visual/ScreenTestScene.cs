@@ -29,8 +29,9 @@ namespace osu.Game.Tests.Visual
 
         protected void LoadScreen(OsuScreen screen)
         {
-            if (Stack.CurrentScreen != null)
+            while (Stack.CurrentScreen != null)
                 Stack.Exit();
+
             Stack.Push(screen);
         }
     }
