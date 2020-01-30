@@ -26,9 +26,9 @@ namespace osu.Game.Overlays.Music
 
         public void Filter(string searchTerm) => ((SearchContainer<RearrangeableListItem<BeatmapSetInfo>>)ListContainer).SearchTerm = searchTerm;
 
-        public BeatmapSetInfo FirstVisibleSet => Items.FirstOrDefault(i => ((DrawablePlaylistItem)ItemMap[i]).MatchingFilter);
+        public BeatmapSetInfo FirstVisibleSet => Items.FirstOrDefault(i => ((PlaylistItem)ItemMap[i]).MatchingFilter);
 
-        protected override RearrangeableListItem<BeatmapSetInfo> CreateDrawable(BeatmapSetInfo item) => new DrawablePlaylistItem(item)
+        protected override RearrangeableListItem<BeatmapSetInfo> CreateDrawable(BeatmapSetInfo item) => new PlaylistItem(item)
         {
             SelectedSet = { BindTarget = SelectedSet },
             RequestSelection = set => RequestSelection?.Invoke(set)

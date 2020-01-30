@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class DrawablePlaylistItem : RearrangeableListItem<BeatmapSetInfo>, IFilterable
+    public class PlaylistItem : RearrangeableListItem<BeatmapSetInfo>, IFilterable
     {
         private const float fade_duration = 100;
 
@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Music
         private Color4 hoverColour;
         private Color4 artistColour;
 
-        public DrawablePlaylistItem(BeatmapSetInfo item)
+        public PlaylistItem(BeatmapSetInfo item)
             : base(item)
         {
             RelativeSizeAxes = Axes.X;
