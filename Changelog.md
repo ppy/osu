@@ -201,3 +201,9 @@
     *   [!_有变动,需要重新描述这个更新] [O->M] [#7222 - 向"WindUp"和"WindDown"Mod添加反向选项](https://github.com/ppy/osu/pull/7222)
     *   Fix osu!catch not handling all vertical space #7673
     *   Bring UserProfileOverlay colour scheme in line with web #7670
+    *   Fix negative replay frames being played back incorrectly #7676
+    *   Fix editor being accessible for multiplayer song select #7667
+    *   Fix presenting a beatmap from a different ruleset not working #7663
+    *   Move navigation / game test scenes to new namespace #7661
+    *   Remove build target from Fastfile #7613
+    *   Fix percentage-formatted displays containing a space #7664

@@ -35,6 +35,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select
@@ -65,6 +66,14 @@ namespace osu.Game.Screens.Select
         /// Helps keep them located beneath the footer itself.
         /// </summary>
         protected Container FooterPanels { get; private set; }
+
+        /// <summary>
+        /// Whether entering editor mode should be allowed.
+        /// </summary>
+        public virtual bool AllowEditing => true;
+
+        [Resolved(canBeNull: true)]
+        private NotificationOverlay notificationOverlay { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
@@ -283,7 +292,7 @@ namespace osu.Game.Screens.Select
             // if not the current screen, we want to get carousel in a good presentation state before displaying (resume or enter).
             bool shouldDebounce = this.IsCurrentScreen();
 
-            Schedule(() => Carousel.Filter(criteria, shouldDebounce));
+            Carousel.Filter(criteria, shouldDebounce);
         }
 
         private DependencyContainer dependencies;
@@ -301,6 +310,12 @@ namespace osu.Game.Screens.Select
 
         public void Edit(BeatmapInfo beatmap = null)
         {
+            if (!AllowEditing)
+            {
+                notificationOverlay?.Post(new SimpleNotification { Text = "该模式下不能编辑!" });
+                return;
+            }
+
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             this.Push(new Editor());
         }
@@ -316,8 +331,10 @@ namespace osu.Game.Screens.Select
             if (!Carousel.BeatmapSetsLoaded)
                 return;
 
-            // if we have a pending filter operation, we want to run it now.
-            // it could change selection (ie. if the ruleset has been changed).
+            transferRulesetValue();
+
+            // while transferRulesetValue will flush, it only does so if the ruleset changes.
+            // the user could have changed a filter, and we want to ensure we are 100% up-to-date and consistent here.
             Carousel.FlushPendingFilterOperations();
 
             // avoid attempting to continue before a selection has been obtained.
@@ -403,20 +420,10 @@ namespace osu.Game.Screens.Select
             {
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
-                if (ruleset?.Equals(decoupledRuleset.Value) == false)
+                if (transferRulesetValue())
                 {
-                    Logger.Log($"ruleset changed from \"{decoupledRuleset.Value}\" to \"{ruleset}\"");
-
+                    // if the ruleset changed, the rest of the selection update will happen via updateSelectedRuleset.
                     Mods.Value = Array.Empty<Mod>();
-                    decoupledRuleset.Value = ruleset;
-
-                    // force a filter before attempting to change the beatmap.
-                    // we may still be in the wrong ruleset as there is a debounce delay on ruleset changes.
-                    Carousel.Filter(null, false);
-
-                    // Filtering only completes after the carousel runs Update.
-                    // If we also have a pending beatmap change we should delay it one frame.
-                    selectionChangedDebounce = Schedule(run);
                     return;
                 }
 
@@ -653,6 +660,7 @@ namespace osu.Game.Screens.Select
 
             // manual binding to parent ruleset to allow for delayed load in the incoming direction.
             transferRulesetValue();
+
             Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
             decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
@@ -664,9 +672,23 @@ namespace osu.Game.Screens.Select
             boundLocalBindables = true;
         }
 
-        private void transferRulesetValue()
+        /// <summary>
+        /// Transfer the game-wide ruleset to the local decoupled ruleset.
+        /// Will immediately run filter operations if required.
+        /// </summary>
+        /// <returns>Whether a transfer occurred.</returns>
+        private bool transferRulesetValue()
         {
+            if (decoupledRuleset.Value?.Equals(Ruleset.Value) == true)
+                return false;
+
+            Logger.Log($"decoupled ruleset transferred (\"{decoupledRuleset.Value}\" -> \"{Ruleset.Value}\"");
             rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
+
+            // if we have a pending filter operation, we want to run it now.
+            // it could change selection (ie. if the ruleset has been changed).
+            Carousel?.FlushPendingFilterOperations();
+            return true;
         }
 
         private void delete(BeatmapSetInfo beatmap)

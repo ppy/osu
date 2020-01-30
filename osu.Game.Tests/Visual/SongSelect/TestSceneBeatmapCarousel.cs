@@ -436,6 +436,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             checkNonmatchingFilter();
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
+
         [Test]
         public void TestFilteringByUserStarDifficulty()
         {

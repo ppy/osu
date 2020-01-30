@@ -177,7 +177,7 @@ namespace osu.Game.Graphics.UserInterface
 
                 if (DisplayAsPercentage)
                 {
-                    TooltipText = floatValue.ToString("P0");
+                    TooltipText = floatValue.ToString("0%");
                 }
                 else
                 {

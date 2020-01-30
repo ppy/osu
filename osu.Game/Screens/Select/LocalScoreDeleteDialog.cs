@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select
             BeatmapInfo beatmap = beatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfoID);
             Debug.Assert(beatmap != null);
 
-            string accuracy = string.Format(score.Accuracy == 1 ? "{0:P0}" : "{0:P2}", score.Accuracy);
+            string accuracy = string.Format(score.Accuracy == 1 ? "{0:0%}" : "{0:0.00%}", score.Accuracy);
             BodyText = $"玩家:{score.User} \n 准确率{accuracy}, 评级{score.Rank}, 最大连击{score.MaxCombo}, 总分{score.TotalScore}";
 
             Icon = FontAwesome.Regular.TrashAlt;

@@ -30,10 +30,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DetailHeaderContainer),
             typeof(ProfileHeaderButton)
         };
-        
+
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
-
 
         [Resolved]
         private IAPIProvider api { get; set; }
