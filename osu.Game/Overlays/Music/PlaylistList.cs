@@ -19,12 +19,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistList : RearrangeableListContainer<PlaylistListItem>
+    public class PlaylistList : RearrangeableListContainer<BeatmapSetInfo>
     {
         public Action<BeatmapSetInfo> RequestSelection;
 
         public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
-        public readonly IBindableList<BeatmapSetInfo> BeatmapSets = new BindableList<BeatmapSetInfo>();
 
         public new MarginPadding Padding
         {
@@ -32,44 +31,17 @@ namespace osu.Game.Overlays.Music
             set => base.Padding = value;
         }
 
-        private readonly HashSet<BeatmapSetInfo> existingItems = new HashSet<BeatmapSetInfo>();
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            BeatmapSets.ItemsAdded += addBeatmapSets;
-            BeatmapSets.ItemsRemoved += removeBeatmapSets;
-
-            foreach (var item in BeatmapSets)
-                addBeatmapSet(item);
-        }
-
         public void Filter(string searchTerm) => ((PlaylistListFlowContainer)ListContainer).SearchTerm = searchTerm;
 
-        public BeatmapSetInfo FirstVisibleSet => ListContainer.FlowingChildren.Cast<DrawablePlaylistListItem>().FirstOrDefault(i => i.MatchingFilter)?.Model.BeatmapSetInfo;
-
-        private void addBeatmapSets(IEnumerable<BeatmapSetInfo> sets)
-        {
-            foreach (var set in sets)
-                addBeatmapSet(set);
-        }
-
-        private void addBeatmapSet(BeatmapSetInfo set) => Schedule(() =>
-        {
-            if (existingItems.Contains(set))
-                return;
-
-            AddItem(new PlaylistListItem(set));
-            existingItems.Add(set);
-        });
+        public BeatmapSetInfo FirstVisibleSet => ListContainer.FlowingChildren.Cast<DrawablePlaylistListItem>().FirstOrDefault(i => i.MatchingFilter)?.Model;
 
         private void removeBeatmapSets(IEnumerable<BeatmapSetInfo> sets) => Schedule(() =>
         {
             foreach (var item in sets)
-                RemoveItem(ListContainer.Children.Select(d => d.Model).FirstOrDefault(m => m.BeatmapSetInfo == item));
+                Items.Remove(ListContainer.Children.Select(d => d.Model).FirstOrDefault(m => m == item));
         });
 
-        protected override DrawableRearrangeableListItem<PlaylistListItem> CreateDrawable(PlaylistListItem item) => new DrawablePlaylistListItem(item)
+        protected override DrawableRearrangeableListItem<BeatmapSetInfo> CreateDrawable(BeatmapSetInfo item) => new DrawablePlaylistListItem(item)
         {
             SelectedSet = { BindTarget = SelectedSet },
             RequestSelection = set => RequestSelection?.Invoke(set)
@@ -77,7 +49,7 @@ namespace osu.Game.Overlays.Music
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
 
-        protected override FillFlowContainer<DrawableRearrangeableListItem<PlaylistListItem>> CreateListFillFlowContainer() => new PlaylistListFlowContainer
+        protected override FillFlowContainer<DrawableRearrangeableListItem<BeatmapSetInfo>> CreateListFillFlowContainer() => new PlaylistListFlowContainer
         {
             Spacing = new Vector2(0, 3),
             LayoutDuration = 200,
@@ -85,25 +57,11 @@ namespace osu.Game.Overlays.Music
         };
     }
 
-    public class PlaylistListFlowContainer : SearchContainer<DrawableRearrangeableListItem<PlaylistListItem>>
+    public class PlaylistListFlowContainer : SearchContainer<DrawableRearrangeableListItem<BeatmapSetInfo>>
     {
     }
 
-    public class PlaylistListItem : IEquatable<PlaylistListItem>
-    {
-        public readonly BeatmapSetInfo BeatmapSetInfo;
-
-        public PlaylistListItem(BeatmapSetInfo beatmapSetInfo)
-        {
-            BeatmapSetInfo = beatmapSetInfo;
-        }
-
-        public override string ToString() => BeatmapSetInfo.ToString();
-
-        public bool Equals(PlaylistListItem other) => BeatmapSetInfo.Equals(other?.BeatmapSetInfo);
-    }
-
-    public class DrawablePlaylistListItem : DrawableRearrangeableListItem<PlaylistListItem>, IFilterable
+    public class DrawablePlaylistListItem : DrawableRearrangeableListItem<BeatmapSetInfo>, IFilterable
     {
         private const float fade_duration = 100;
 
@@ -119,7 +77,7 @@ namespace osu.Game.Overlays.Music
         private Color4 hoverColour;
         private Color4 artistColour;
 
-        public DrawablePlaylistListItem(PlaylistListItem item)
+        public DrawablePlaylistListItem(BeatmapSetInfo item)
             : base(item)
         {
             RelativeSizeAxes = Axes.X;
@@ -127,7 +85,7 @@ namespace osu.Game.Overlays.Music
 
             Padding = new MarginPadding { Left = 5 };
 
-            FilterTerms = item.BeatmapSetInfo.Metadata.SearchableTerms;
+            FilterTerms = item.Metadata.SearchableTerms;
         }
 
         [BackgroundDependencyLoader]
@@ -164,8 +122,8 @@ namespace osu.Game.Overlays.Music
                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
             };
 
-            titleBind = localisation.GetLocalisedString(new LocalisedString((Model.BeatmapSetInfo.Metadata.TitleUnicode, Model.BeatmapSetInfo.Metadata.Title)));
-            artistBind = localisation.GetLocalisedString(new LocalisedString((Model.BeatmapSetInfo.Metadata.ArtistUnicode, Model.BeatmapSetInfo.Metadata.Artist)));
+            titleBind = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));
+            artistBind = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.ArtistUnicode, Model.Metadata.Artist)));
 
             artistBind.BindValueChanged(_ => recreateText(), true);
         }
@@ -176,11 +134,11 @@ namespace osu.Game.Overlays.Music
 
             SelectedSet.BindValueChanged(set =>
             {
-                if (set.OldValue != Model.BeatmapSetInfo && set.NewValue != Model.BeatmapSetInfo)
+                if (set.OldValue != Model && set.NewValue != Model)
                     return;
 
                 foreach (Drawable s in titleSprites)
-                    s.FadeColour(set.NewValue == Model.BeatmapSetInfo ? hoverColour : Color4.White, fade_duration);
+                    s.FadeColour(set.NewValue == Model ? hoverColour : Color4.White, fade_duration);
             }, true);
         }
 
@@ -201,7 +159,7 @@ namespace osu.Game.Overlays.Music
 
         protected override bool OnClick(ClickEvent e)
         {
-            RequestSelection?.Invoke(Model.BeatmapSetInfo);
+            RequestSelection?.Invoke(Model);
             return true;
         }
 
