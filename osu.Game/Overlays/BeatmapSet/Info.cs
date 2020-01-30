@@ -158,12 +158,18 @@ namespace osu.Game.Overlays.BeatmapSet
                     switch(type)
                     {
                         case MetadataType.Tags:
-                            foreach (string tag in value.Split(" "))
-                                textFlow.AddLink(tag + " ", LinkAction.OpenDirectWithSearch, tag, null, format);
+                            string[] tags = value.Split(" ");
+                            for (int i = 0; i <= tags.Length - 1; i++)
+                            {
+                                textFlow.AddLink(tags[i], LinkAction.SearchBeatmapSet, tags[i], null, format);
+
+                                if (i != tags.Length - 1)
+                                    textFlow.AddText(" ", format);
+                            }
                             break;
 
                         case MetadataType.Source:
-                            textFlow.AddLink(value, LinkAction.OpenDirectWithSearch, value, null, format);
+                            textFlow.AddLink(value, LinkAction.SearchBeatmapSet, value, null, format);
                             break;
 
                         default:
