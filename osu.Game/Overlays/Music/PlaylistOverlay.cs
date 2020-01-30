@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Music
         private BeatmapManager beatmaps;
 
         private FilterControl filter;
-        private PlaylistList list;
+        private Playlist list;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Music
                             Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        list = new PlaylistList
+                        list = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },

@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -19,49 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistList : RearrangeableListContainer<BeatmapSetInfo>
-    {
-        public Action<BeatmapSetInfo> RequestSelection;
-
-        public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
-
-        public new MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
-
-        public void Filter(string searchTerm) => ((PlaylistListFlowContainer)ListContainer).SearchTerm = searchTerm;
-
-        public BeatmapSetInfo FirstVisibleSet => ListContainer.FlowingChildren.Cast<DrawablePlaylistListItem>().FirstOrDefault(i => i.MatchingFilter)?.Model;
-
-        private void removeBeatmapSets(IEnumerable<BeatmapSetInfo> sets) => Schedule(() =>
-        {
-            foreach (var item in sets)
-                Items.Remove(ListContainer.Children.Select(d => d.Model).FirstOrDefault(m => m == item));
-        });
-
-        protected override DrawableRearrangeableListItem<BeatmapSetInfo> CreateDrawable(BeatmapSetInfo item) => new DrawablePlaylistListItem(item)
-        {
-            SelectedSet = { BindTarget = SelectedSet },
-            RequestSelection = set => RequestSelection?.Invoke(set)
-        };
-
-        protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer();
-
-        protected override FillFlowContainer<DrawableRearrangeableListItem<BeatmapSetInfo>> CreateListFillFlowContainer() => new PlaylistListFlowContainer
-        {
-            Spacing = new Vector2(0, 3),
-            LayoutDuration = 200,
-            LayoutEasing = Easing.OutQuint,
-        };
-    }
-
-    public class PlaylistListFlowContainer : SearchContainer<DrawableRearrangeableListItem<BeatmapSetInfo>>
-    {
-    }
-
-    public class DrawablePlaylistListItem : DrawableRearrangeableListItem<BeatmapSetInfo>, IFilterable
+    public class DrawablePlaylistItem : RearrangeableListItem<BeatmapSetInfo>, IFilterable
     {
         private const float fade_duration = 100;
 
@@ -77,7 +35,7 @@ namespace osu.Game.Overlays.Music
         private Color4 hoverColour;
         private Color4 artistColour;
 
-        public DrawablePlaylistListItem(BeatmapSetInfo item)
+        public DrawablePlaylistItem(BeatmapSetInfo item)
             : base(item)
         {
             RelativeSizeAxes = Axes.X;
