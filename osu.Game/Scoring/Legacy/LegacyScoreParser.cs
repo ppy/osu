@@ -241,7 +241,7 @@ namespace osu.Game.Scoring.Legacy
 
                 if (i == 0 && diff == 0)
                     // osu-stable adds a zero-time frame before potentially valid negative user frames.
-                    // we need to ignroe this.
+                    // we need to ignore this.
                     continue;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
