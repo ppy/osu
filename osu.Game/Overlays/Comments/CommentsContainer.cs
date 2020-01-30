@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Comments
         private int currentPage;
 
         private FillFlowContainer content;
-        private DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
         private TotalCommentsCounter commentCounter;
 
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Comments
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
+                                        deletedCommentsCounter = new DeletedCommentsCounter
                                         {
                                             ShowDeleted = { BindTarget = ShowDeleted }
                                         },
@@ -153,7 +153,7 @@ namespace osu.Game.Overlays.Comments
         private void clearComments()
         {
             currentPage = 1;
-            deletedChildrenPlaceholder.DeletedCount.Value = 0;
+            deletedCommentsCounter.Count.Value = 0;
             moreButton.IsLoading = true;
             content.Clear();
         }
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Comments
             {
                 content.Add(loaded);
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
                 if (response.HasMore)
                 {
