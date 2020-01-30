@@ -132,6 +132,10 @@ namespace osu.Game.Overlays.Profile.Header
             tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
             tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
+
+            // Hide the container to prevent adding unnecessary padding if it has no children other than the NewLine
+            if (!bottomLinkContainer.Children.Skip(1).Any())
+                bottomLinkContainer.Hide();
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
