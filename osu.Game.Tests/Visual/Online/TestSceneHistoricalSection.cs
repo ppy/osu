@@ -4,10 +4,12 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Game.Users;
@@ -26,6 +28,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(DrawableMostPlayedBeatmap),
             typeof(DrawableProfileRow)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Pink);
 
         public TestSceneHistoricalSection()
         {

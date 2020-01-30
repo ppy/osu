@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual.Online
             typeof(HeaderButton),
             typeof(SortTabControl),
             typeof(ShowChildrenButton),
-            typeof(DeletedChildrenPlaceholder),
+            typeof(DeletedCommentsCounter),
             typeof(VotePill),
             typeof(CommentsPage),
         };

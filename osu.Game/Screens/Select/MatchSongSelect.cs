@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Select
         [Resolved(typeof(Room))]
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
 
+        public override bool AllowEditing => false;
+
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
