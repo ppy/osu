@@ -345,8 +345,8 @@ namespace osu.Game.Screens.Select
                 selectionChangedDebounce = null;
             }
 
-            if (performStartAction)
-                OnStart();
+            if (performStartAction && OnStart())
+                Carousel.AllowSelection = false;
         }
 
         /// <summary>
@@ -500,6 +500,8 @@ namespace osu.Game.Screens.Select
 
         public override void OnResuming(IScreen last)
         {
+            Carousel.AllowSelection = true;
+
             BeatmapDetails.Leaderboard.RefreshScores();
 
             Beatmap.Value.Track.Looping = true;
@@ -647,7 +649,6 @@ namespace osu.Game.Screens.Select
             decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
             decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
-            Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
             Beatmap.BindValueChanged(workingBeatmapChanged);
 
             boundLocalBindables = true;
