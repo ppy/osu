@@ -19,7 +19,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Overlays;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Screens.Select
