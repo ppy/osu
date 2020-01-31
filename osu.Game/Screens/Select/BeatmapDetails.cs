@@ -358,7 +358,7 @@ namespace osu.Game.Screens.Select
                 {
                     textFlow?.Expire();
 
-                    switch(type)
+                    switch (type)
                     {
                         case MetadataType.Tags:
                             string[] tags = text.Split(" ");
