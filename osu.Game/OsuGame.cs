@@ -441,11 +441,11 @@ namespace osu.Game
         private ScheduledDelegate performFromMainMenuTask;
 
         /// <summary>
-        /// Perform an action only after returning to a specific screen specification.
+        /// Perform an action only after returning to a specific screen as indicated by <paramref name="validScreens"/>.
         /// Eagerly tries to exit the current screen until it succeeds.
         /// </summary>
         /// <param name="action">The action to perform once we are in the correct state.</param>
-        /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can immediately perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
+        /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
         protected void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
