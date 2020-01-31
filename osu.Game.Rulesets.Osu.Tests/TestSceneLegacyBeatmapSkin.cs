@@ -63,9 +63,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         private ExposedPlayer loadBeatmap(bool userHasCustomColours, bool beatmapHasColours)
         {
             ExposedPlayer player;
+            OsuScreenStack stack;
 
             Beatmap.Value = new CustomSkinWorkingBeatmap(audio, beatmapHasColours);
-            Child = new OsuScreenStack(player = new ExposedPlayer(userHasCustomColours)) { RelativeSizeAxes = Axes.Both };
+            Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+
+            stack.Push(player = new ExposedPlayer(userHasCustomColours));
 
             return player;
         }
