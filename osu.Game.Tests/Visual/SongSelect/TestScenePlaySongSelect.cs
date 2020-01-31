@@ -72,8 +72,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             // required to get bindables attached
             Add(music);
 
-            Beatmap.SetDefault();
-
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
 
@@ -88,6 +86,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 Ruleset.Value = new OsuRuleset().RulesetInfo;
                 manager?.Delete(manager.GetAllUsableBeatmapSets());
+
+                Beatmap.SetDefault();
             });
         }
 
