@@ -68,10 +68,10 @@ namespace osu.Game.Tests.Visual.Background
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
         {
-            Child = new OsuScreenStack(songSelect = new DummySongSelect())
-            {
-                RelativeSizeAxes = Axes.Both
-            };
+            var stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            Child = stack;
+
+            stack.Push(songSelect = new DummySongSelect());
         });
 
         /// <summary>

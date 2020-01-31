@@ -75,10 +75,16 @@ namespace osu.Game.Tests.Visual.Gameplay
         public void ResultsWithoutPlayer()
         {
             TestSoloResults screen = null;
+            OsuScreenStack stack;
 
-            AddStep("load results", () => Child = new OsuScreenStack(screen = createResultsScreen())
+            AddStep("load results", () =>
             {
-                RelativeSizeAxes = Axes.Both
+                Child = stack = new OsuScreenStack
+                {
+                    RelativeSizeAxes = Axes.Both
+                };
+
+                stack.Push(screen = createResultsScreen());
             });
             AddUntilStep("wait for loaded", () => screen.IsLoaded);
             AddAssert("retry overlay not present", () => screen.RetryOverlay == null);
@@ -102,11 +108,14 @@ namespace osu.Game.Tests.Visual.Gameplay
             public TestResultsContainer(IScreen screen)
             {
                 RelativeSizeAxes = Axes.Both;
+                OsuScreenStack stack;
 
-                InternalChild = new OsuScreenStack(screen)
+                InternalChild = stack = new OsuScreenStack
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
+
+                stack.Push(screen);
             }
         }
 
