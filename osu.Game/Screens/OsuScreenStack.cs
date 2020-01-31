@@ -19,30 +19,38 @@ namespace osu.Game.Screens
 
         public OsuScreenStack()
         {
-            initializeStack();
-        }
-
-        public OsuScreenStack(IScreen baseScreen)
-            : base(baseScreen)
-        {
-            initializeStack();
-        }
-
-        private void initializeStack()
-        {
             InternalChild = parallaxContainer = new ParallaxContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = backgroundScreenStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
             };
 
-            ScreenPushed += onScreenChange;
-            ScreenExited += onScreenChange;
+            ScreenPushed += screenPushed;
+            ScreenExited += screenExited;
         }
 
-        private void onScreenChange(IScreen prev, IScreen next)
+        private void screenPushed(IScreen prev, IScreen next)
         {
-            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f;
+            if (LoadState < LoadState.Ready)
+            {
+                // dependencies must be present to stay in a sane state.
+                // this is generally only ever hit by test scenes.
+                Schedule(() => screenPushed(prev, next));
+                return;
+            }
+
+            // create dependencies synchronously to ensure leases are in a sane state.
+            ((OsuScreen)next).CreateLeasedDependencies((prev as OsuScreen)?.Dependencies ?? Dependencies);
+
+            setParallax(next);
         }
+
+        private void screenExited(IScreen prev, IScreen next)
+        {
+            setParallax(next);
+        }
+
+        private void setParallax(IScreen next) =>
+            parallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * ((IOsuScreen)next)?.BackgroundParallaxAmount ?? 1.0f;
     }
 }
