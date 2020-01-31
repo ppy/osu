@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Aim : Skill
     {
         private const double probabilityThreshold = 0.02;
-        private const double timeThresholdBase = 3600;
+        private const double timeThresholdBase = 1200;
         private const double tpMin = 0.1;
         private const double tpMax = 100;
         private const double tpPrecision = 1e-8;
