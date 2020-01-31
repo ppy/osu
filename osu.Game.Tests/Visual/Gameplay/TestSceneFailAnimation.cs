@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailAnimation : AllPlayersTestScene
+    public class TestSceneFailAnimation : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(AllPlayersTestScene),
+            typeof(TestSceneAllRulesetPlayers),
             typeof(TestPlayer),
             typeof(Player),
         };
