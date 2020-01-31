@@ -10,7 +10,7 @@ using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailJudgement : AllPlayersTestScene
+    public class TestSceneFailJudgement : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
