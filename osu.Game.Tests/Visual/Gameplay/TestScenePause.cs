@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual.Gameplay
         public override void SetUpSteps()
         {
             base.SetUpSteps();
+
             AddStep("resume player", () => Player.GameplayClockContainer.Start());
             confirmClockRunning(true);
         }
