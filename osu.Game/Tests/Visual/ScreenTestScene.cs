@@ -33,9 +33,8 @@ namespace osu.Game.Tests.Visual
         [SetUpSteps]
         public virtual void SetUpSteps() => addExitAllScreensStep();
 
-        // pending framework update.
-        //[TearDownSteps]
-        //public void TearDownSteps() => addExitAllScreensStep();
+        [TearDownSteps]
+        public void TearDownSteps() => addExitAllScreensStep();
 
         private void addExitAllScreensStep()
         {
