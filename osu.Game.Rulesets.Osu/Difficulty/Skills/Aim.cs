@@ -276,7 +276,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private static double calculateFCTime(IEnumerable<OsuMovement> movements, double tp,
                                               double cheeseLevel = defaultCheeseLevel)
         {
-            double fcTime = 0;
+            double fcTime = 5;
 
             foreach (OsuMovement movement in movements)
             {
