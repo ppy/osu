@@ -39,8 +39,6 @@ namespace osu.Game.Screens.Play
 
         public override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool DisallowExternalBeatmapRulesetChanges => true;
-
         public override bool HideOverlaysOnEnter => true;
 
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
