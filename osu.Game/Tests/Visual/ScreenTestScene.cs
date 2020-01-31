@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Testing;
 using osu.Game.Screens;
 
 namespace osu.Game.Tests.Visual
@@ -27,11 +28,23 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        protected void LoadScreen(OsuScreen screen)
+        protected void LoadScreen(OsuScreen screen) => Stack.Push(screen);
+
+        [SetUpSteps]
+        public virtual void SetUpSteps() => addExitAllScreensStep();
+
+        [TearDownSteps]
+        public void TearDownSteps() => addExitAllScreensStep();
+
+        private void addExitAllScreensStep()
         {
-            if (Stack.CurrentScreen != null)
+            AddUntilStep("exit all screens", () =>
+            {
+                if (Stack.CurrentScreen == null) return true;
+
                 Stack.Exit();
-            Stack.Push(screen);
+                return false;
+            });
         }
     }
 }
