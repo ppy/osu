@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     textFlow.Clear();
                     static void format(SpriteText t) => t.Font = t.Font.With(size: 14);
 
-                    switch(type)
+                    switch (type)
                     {
                         case MetadataType.Tags:
                             string[] tags = value.Split(" ");
