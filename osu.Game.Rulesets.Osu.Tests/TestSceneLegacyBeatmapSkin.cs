@@ -7,12 +7,10 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
-using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens;
 using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -21,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestSceneLegacyBeatmapSkin : OsuTestScene
+    public class TestSceneLegacyBeatmapSkin : ScreenTestScene
     {
         [Resolved]
         private AudioManager audio { get; set; }
@@ -66,9 +64,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             OsuScreenStack stack;
 
             Beatmap.Value = new CustomSkinWorkingBeatmap(audio, beatmapHasColours);
-            Child = stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
 
-            stack.Push(player = new ExposedPlayer(userHasCustomColours));
+            LoadScreen(player = new ExposedPlayer(userHasCustomColours));
 
             return player;
         }
