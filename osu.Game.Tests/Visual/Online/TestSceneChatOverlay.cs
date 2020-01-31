@@ -104,7 +104,11 @@ namespace osu.Game.Tests.Visual.Online
         public void TestSearchInSelector()
         {
             AddStep("search for 'test2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "test2");
-            AddUntilStep("only channel 2 visible", () => chatOverlay.ChildrenOfType<ChannelListItem>().Single(c => c.IsPresent).Channel == channel2);
+            AddUntilStep("only channel 2 visible", () =>
+            {
+                var listItems = chatOverlay.ChildrenOfType<ChannelListItem>().Where(c => c.IsPresent);
+                return listItems.Count() == 1 && listItems.Single().Channel == channel2;
+            });
         }
 
         private void clickDrawable(Drawable d)
