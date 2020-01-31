@@ -79,12 +79,17 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private OsuConfigManager config;
 
-        [SetUp]
-        public virtual void SetUp() => Schedule(() =>
+        [SetUpSteps]
+        public override void SetUpSteps()
         {
-            Ruleset.Value = new OsuRuleset().RulesetInfo;
-            manager?.Delete(manager.GetAllUsableBeatmapSets());
-        });
+            base.SetUpSteps();
+
+            AddStep("delete all beatmaps", () =>
+            {
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                manager?.Delete(manager.GetAllUsableBeatmapSets());
+            });
+        }
 
         [Test]
         public void TestSingleFilterOnEnter()
@@ -120,9 +125,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -148,9 +150,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -180,9 +179,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -213,9 +209,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
