@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 
@@ -177,12 +178,12 @@ namespace osu.Game.Screens.Select.Details
                     valueText.Text = (value.adjustedValue ?? value.baseValue).ToString(forceDecimalPlaces ? "0.00" : "0.##");
                     ModBar.Length = (value.adjustedValue ?? 0) / maxValue;
 
-                    if (value.adjustedValue > value.baseValue)
+                    if (Precision.AlmostEquals(value.baseValue, value.adjustedValue ?? value.baseValue, 0.05f))
+                        ModBar.AccentColour = valueText.Colour = Color4.White;
+                    else if (value.adjustedValue > value.baseValue)
                         ModBar.AccentColour = valueText.Colour = colours.Red;
                     else if (value.adjustedValue < value.baseValue)
                         ModBar.AccentColour = valueText.Colour = colours.BlueDark;
-                    else
-                        ModBar.AccentColour = valueText.Colour = Color4.White;
                 }
             }
 
