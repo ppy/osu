@@ -40,7 +40,7 @@ namespace osu.Game.Tests.Visual.SongSelect
             BaseDifficulty = new BeatmapDifficulty
             {
                 CircleSize = 7.2f,
-                DrainRate = 1,
+                DrainRate = 3,
                 OverallDifficulty = 5.7f,
                 ApproachRate = 3.5f
             },
@@ -55,10 +55,10 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddStep("no mods selected", () => SelectedMods.Value = Array.Empty<Mod>());
 
             AddAssert("first bar text is Circle Size", () => advancedStats.ChildrenOfType<SpriteText>().First().Text == "Circle Size");
-            AddAssert("circle size bar is white", () => advancedStats.FirstValue.ModBar.AccentColour == Color4.White);
-            AddAssert("HP drain bar is white", () => advancedStats.HpDrain.ModBar.AccentColour == Color4.White);
-            AddAssert("accuracy bar is white", () => advancedStats.Accuracy.ModBar.AccentColour == Color4.White);
-            AddAssert("approach rate bar is white", () => advancedStats.ApproachRate.ModBar.AccentColour == Color4.White);
+            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
+            AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.HpDrain));
+            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
+            AddAssert("approach rate bar is white", () => barIsWhite(advancedStats.ApproachRate));
         }
 
         [Test]
@@ -91,10 +91,10 @@ namespace osu.Game.Tests.Visual.SongSelect
                 SelectedMods.Value = new[] { ruleset.GetAllMods().OfType<ModEasy>().Single() };
             });
 
-            AddAssert("circle size bar is blue", () => advancedStats.FirstValue.ModBar.AccentColour == colours.BlueDark);
-            AddAssert("HP drain bar is blue", () => advancedStats.HpDrain.ModBar.AccentColour == colours.BlueDark);
-            AddAssert("accuracy bar is blue", () => advancedStats.Accuracy.ModBar.AccentColour == colours.BlueDark);
-            AddAssert("approach rate bar is blue", () => advancedStats.ApproachRate.ModBar.AccentColour == colours.BlueDark);
+            AddAssert("circle size bar is blue", () => barIsBlue(advancedStats.FirstValue));
+            AddAssert("HP drain bar is blue", () => barIsBlue(advancedStats.HpDrain));
+            AddAssert("accuracy bar is blue", () => barIsBlue(advancedStats.Accuracy));
+            AddAssert("approach rate bar is blue", () => barIsBlue(advancedStats.ApproachRate));
         }
 
         [Test]
@@ -108,11 +108,61 @@ namespace osu.Game.Tests.Visual.SongSelect
                 SelectedMods.Value = new[] { ruleset.GetAllMods().OfType<ModHardRock>().Single() };
             });
 
-            AddAssert("circle size bar is red", () => advancedStats.FirstValue.ModBar.AccentColour == colours.Red);
-            AddAssert("HP drain bar is red", () => advancedStats.HpDrain.ModBar.AccentColour == colours.Red);
-            AddAssert("accuracy bar is red", () => advancedStats.Accuracy.ModBar.AccentColour == colours.Red);
-            AddAssert("approach rate bar is red", () => advancedStats.ApproachRate.ModBar.AccentColour == colours.Red);
+            AddAssert("circle size bar is red", () => barIsRed(advancedStats.FirstValue));
+            AddAssert("HP drain bar is red", () => barIsRed(advancedStats.HpDrain));
+            AddAssert("accuracy bar is red", () => barIsRed(advancedStats.Accuracy));
+            AddAssert("approach rate bar is red", () => barIsRed(advancedStats.ApproachRate));
         }
+
+        [Test]
+        public void TestUnchangedDifficultyAdjustMod()
+        {
+            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+
+            AddStep("select unchanged Difficulty Adjust mod", () =>
+            {
+                var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
+                var difficultyAdjustMod = ruleset.GetAllMods().OfType<ModDifficultyAdjust>().Single();
+                difficultyAdjustMod.ReadFromDifficulty(advancedStats.Beatmap.BaseDifficulty);
+                SelectedMods.Value = new[] { difficultyAdjustMod };
+            });
+
+            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
+            AddAssert("HP drain bar is white", () => barIsWhite(advancedStats.HpDrain));
+            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
+            AddAssert("approach rate bar is white", () => barIsWhite(advancedStats.ApproachRate));
+        }
+
+        [Test]
+        public void TestChangedDifficultyAdjustMod()
+        {
+            AddStep("set beatmap", () => advancedStats.Beatmap = exampleBeatmapInfo);
+
+            AddStep("select changed Difficulty Adjust mod", () =>
+            {
+                var ruleset = advancedStats.Beatmap.Ruleset.CreateInstance();
+                var difficultyAdjustMod = ruleset.GetAllMods().OfType<ModDifficultyAdjust>().Single();
+                var originalDifficulty = advancedStats.Beatmap.BaseDifficulty;
+                var adjustedDifficulty = new BeatmapDifficulty
+                {
+                    CircleSize = originalDifficulty.CircleSize,
+                    DrainRate = originalDifficulty.DrainRate - 0.5f,
+                    OverallDifficulty = originalDifficulty.OverallDifficulty,
+                    ApproachRate = originalDifficulty.ApproachRate + 2.2f,
+                };
+                difficultyAdjustMod.ReadFromDifficulty(adjustedDifficulty);
+                SelectedMods.Value = new[] { difficultyAdjustMod };
+            });
+
+            AddAssert("circle size bar is white", () => barIsWhite(advancedStats.FirstValue));
+            AddAssert("drain rate bar is blue", () => barIsBlue(advancedStats.HpDrain));
+            AddAssert("accuracy bar is white", () => barIsWhite(advancedStats.Accuracy));
+            AddAssert("approach rate bar is red", () => barIsRed(advancedStats.ApproachRate));
+        }
+
+        private bool barIsWhite(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == Color4.White;
+        private bool barIsBlue(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.BlueDark;
+        private bool barIsRed(AdvancedStats.StatisticRow row) => row.ModBar.AccentColour == colours.Red;
 
         private class TestAdvancedStats : AdvancedStats
         {
