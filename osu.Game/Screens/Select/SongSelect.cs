@@ -221,23 +221,38 @@ namespace osu.Game.Screens.Select
 
             if (ShowFooter)
             {
-                AddRangeInternal(new[]
+                AddRangeInternal(new Drawable[]
                 {
-                    FooterPanels = new Container
+                    new GridContainer // used for max width implementation
                     {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Bottom = Footer.HEIGHT },
-                        Children = new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            BeatmapOptions = new BeatmapOptionsOverlay(),
-                            ModSelect = new ModSelectOverlay
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Relative, 1f, maxSize: 560),
+                        },
+                        Content = new[]
+                        {
+                            null,
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Origin = Anchor.BottomCentre,
-                                Anchor = Anchor.BottomCentre,
+                                FooterPanels = new Container
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Bottom = Footer.HEIGHT },
+                                    Children = new Drawable[]
+                                    {
+                                        BeatmapOptions = new BeatmapOptionsOverlay(),
+                                        ModSelect = new ModSelectOverlay
+                                        {
+                                            RelativeSizeAxes = Axes.Both,
+                                            Origin = Anchor.BottomCentre,
+                                            Anchor = Anchor.BottomCentre,
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
