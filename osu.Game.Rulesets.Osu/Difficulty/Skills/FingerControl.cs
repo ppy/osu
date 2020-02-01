@@ -12,7 +12,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
         public static double CalculateFingerControlDiff(List<OsuHitObject> hitObjects, double clockRate)
         {
-        
+            if (hitObjects.Count == 0)
+            {
+                return 0;
+            }
+
             double prevTime = hitObjects[0].StartTime / 1000.0;
             double currStrain = 0;
             double prevStrainTime = 0;

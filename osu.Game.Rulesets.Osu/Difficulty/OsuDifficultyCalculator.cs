@@ -40,10 +40,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             var hitObjects = beatmap.HitObjects as List<OsuHitObject>;
 
-            if (beatmap.HitObjects.Count == 0)
-                return new OsuDifficultyAttributes { Mods = mods};
-
-            double mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
+            double mapLength = 0;
+            if (beatmap.HitObjects.Count > 0)
+                mapLength = (beatmap.HitObjects.Last().StartTime - beatmap.HitObjects.First().StartTime) / 1000 / clockRate;
 
             double preemptNoClockRate = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
             var noteDensities = NoteDensity.CalculateNoteDensities(hitObjects, preemptNoClockRate);

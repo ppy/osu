@@ -198,6 +198,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         private static double getMissCount(double p, double[] missProbabilities)
         {
+            if (missProbabilities.Sum() == 0)
+                return 0;
+
             var distribution = new PoissonBinomial(missProbabilities);
 
             Func<double, double> cdfMinusProb = missCount => distribution.Cdf(missCount) - p;

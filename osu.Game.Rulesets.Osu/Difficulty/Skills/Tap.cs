@@ -40,31 +40,35 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                                                                                  double mashLevel,
                                                                                  double clockRate)
         {
-            double prevPrevTime = hitObjects[0].StartTime / 1000.0;
-            double prevTime = hitObjects[1].StartTime / 1000.0;
             var strainHistory = new List<Vector<double>> { decayCoeffs * 0, decayCoeffs * 0 };
             var currStrain = decayCoeffs * 1;
 
-            for (int i = 2; i < hitObjects.Count; i++)
+            if (hitObjects.Count >= 2)
             {
-                double currTime = hitObjects[i].StartTime / 1000.0;
-                currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
-                strainHistory.Add(currStrain.PointwisePower(1.1 / 3) * 1.5);
+                double prevPrevTime = hitObjects[0].StartTime / 1000.0;
+                double prevTime = hitObjects[1].StartTime / 1000.0;
 
-                double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
-                double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
+                for (int i = 2; i < hitObjects.Count; i++)
+                {
+                    double currTime = hitObjects[i].StartTime / 1000.0;
+                    currStrain = currStrain.PointwiseMultiply((-decayCoeffs * (currTime - prevTime) / clockRate).PointwiseExp());
+                    strainHistory.Add(currStrain.PointwisePower(1.1 / 3) * 1.5);
 
-                double deltaTime = Math.Max((currTime - prevPrevTime) / clockRate, 0.01);
+                    double relativeD = (hitObjects[i].Position - hitObjects[i - 1].Position).Length / (2 * hitObjects[i].Radius);
+                    double spacedBuff = calculateSpacedness(relativeD) * spacedBuffFactor;
 
-                // for 1/4 notes above 200 bpm the exponent is -2.7, otherwise it's -2
-                double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.7) * 0.265, Math.Pow(deltaTime, -2));
+                    double deltaTime = Math.Max((currTime - prevPrevTime) / clockRate, 0.01);
 
-                currStrain += decayCoeffs * currStrainBase *
-                              Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
-                              Math.Pow(1 + spacedBuff, 3);
+                    // for 1/4 notes above 200 bpm the exponent is -2.7, otherwise it's -2
+                    double currStrainBase = Math.Max(Math.Pow(deltaTime, -2.7) * 0.265, Math.Pow(deltaTime, -2));
 
-                prevPrevTime = prevTime;
-                prevTime = currTime;
+                    currStrain += decayCoeffs * currStrainBase *
+                                  Math.Pow(calculateMashNerfFactor(relativeD, mashLevel), 3) *
+                                  Math.Pow(1 + spacedBuff, 3);
+
+                    prevPrevTime = prevTime;
+                    prevTime = currTime;
+                }
             }
 
             var strainResult = decayCoeffs * 0;
@@ -104,14 +108,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         public static double[] CalculateStreamnessMask(List<OsuHitObject> hitObjects, double skill, double clockRate)
         {
             double[] streamnessMask = new double[hitObjects.Count];
-            streamnessMask[0] = 0;
 
-            double streamTimeThreshold = Math.Pow(skill, -2.7 / 3.2);
-
-            for (int i = 1; i < hitObjects.Count; i++)
+            if (hitObjects.Count > 1)
             {
-                double t = (hitObjects[i].StartTime - hitObjects[i - 1].StartTime) / 1000 / clockRate;
-                streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / streamTimeThreshold - 1) * 15);
+                streamnessMask[0] = 0;
+                double streamTimeThreshold = Math.Pow(skill, -2.7 / 3.2);
+
+                for (int i = 1; i < hitObjects.Count; i++)
+                {
+                    double t = (hitObjects[i].StartTime - hitObjects[i - 1].StartTime) / 1000 / clockRate;
+                    streamnessMask[i] = 1 - SpecialFunctions.Logistic((t / streamTimeThreshold - 1) * 15);
+                }
             }
             return streamnessMask;
         }
