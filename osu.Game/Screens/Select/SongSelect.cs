@@ -247,7 +247,6 @@ namespace osu.Game.Screens.Select
                                         BeatmapOptions = new BeatmapOptionsOverlay(),
                                         ModSelect = new ModSelectOverlay
                                         {
-                                            RelativeSizeAxes = Axes.Both,
                                             Origin = Anchor.BottomCentre,
                                             Anchor = Anchor.BottomCentre,
                                         }
