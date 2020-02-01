@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly Slider slider;
         public readonly Drawable FollowCircle;
+        public readonly Drawable InternalFollowCircle;
         private readonly DrawableSlider drawableSlider;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
@@ -38,6 +39,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new[]
             {
+                InternalFollowCircle = new CircularContainer
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0
+                },
                 FollowCircle = new FollowCircleContainer
                 {
                     Origin = Anchor.Centre,
@@ -95,7 +103,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
+                // Cursor input is checked against the internal circle, which scales instantly to match osu-stable behaviour
+                InternalFollowCircle.ScaleTo(tracking ? 2.4f : 1f);
+                FollowCircle.ScaleTo(tracking ? 2f : 1f, 300, Easing.OutQuint);
                 FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
@@ -149,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // in valid time range
                 Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && FollowCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && InternalFollowCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
         }
