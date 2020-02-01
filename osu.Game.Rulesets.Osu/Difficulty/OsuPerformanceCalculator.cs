@@ -99,6 +99,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
+            if (Beatmap.HitObjects.Count <= 1)
+                return 0;
 
             // Guess the number of misaims from combo
             int effectiveMissCount = Math.Max(countMiss, (int)(Math.Floor((beatmapMaxCombo - 0.1 * countSliders) / scoreMaxCombo)));
@@ -196,6 +198,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeTapValue()
         {
+            if (Beatmap.HitObjects.Count <= 1)
+                return 0;
 
             double modifiedAcc = getModifiedAcc();
 
