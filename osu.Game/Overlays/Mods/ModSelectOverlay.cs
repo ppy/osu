@@ -66,6 +66,8 @@ namespace osu.Game.Overlays.Mods
             Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
+            RelativeSizeAxes = Axes.Both;
+
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             Children = new Drawable[]
