@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             InternalChild = scaleContainer = new ReverseArrowPiece();
         }
 
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<float> scaleBindable = new BindableFloat();
 
         [BackgroundDependencyLoader]
         private void load()
