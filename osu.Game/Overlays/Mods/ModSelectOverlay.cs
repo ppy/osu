@@ -66,7 +66,6 @@ namespace osu.Game.Overlays.Mods
             Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
-            Height = 510;
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             Children = new Drawable[]
@@ -85,8 +84,7 @@ namespace osu.Game.Overlays.Mods
                         new Triangles
                         {
                             TriangleScale = 5,
-                            RelativeSizeAxes = Axes.X,
-                            Height = Height, //set the height from the start to ensure correct triangle density.
+                            RelativeSizeAxes = Axes.Both,
                             ColourLight = new Color4(53, 66, 82, 255),
                             ColourDark = new Color4(41, 54, 70, 255),
                         },
