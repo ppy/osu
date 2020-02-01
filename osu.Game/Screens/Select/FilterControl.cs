@@ -149,8 +149,8 @@ namespace osu.Game.Screens.Select
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly Bindable<bool> showConverted = new Bindable<bool>();
-        private readonly Bindable<double> minimumStars = new Bindable<double>();
-        private readonly Bindable<double> maximumStars = new Bindable<double>();
+        private readonly Bindable<double> minimumStars = new BindableDouble();
+        private readonly Bindable<double> maximumStars = new BindableDouble();
 
         public readonly Box Background;
 
