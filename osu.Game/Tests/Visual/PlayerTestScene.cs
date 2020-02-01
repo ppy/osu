@@ -33,8 +33,10 @@ namespace osu.Game.Tests.Visual
         }
 
         [SetUpSteps]
-        public virtual void SetUpSteps()
+        public override void SetUpSteps()
         {
+            base.SetUpSteps();
+
             AddStep(ruleset.RulesetInfo.Name, loadPlayer);
             AddUntilStep("player loaded", () => Player.IsLoaded && Player.Alpha == 1);
         }
