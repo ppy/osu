@@ -74,7 +74,6 @@ namespace osu.Game.Tests.Visual.UserInterface
 
                 Child = modSelect = new TestModSelectOverlay
                 {
-                    RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                 };
