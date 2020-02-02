@@ -127,7 +127,10 @@ namespace osu.Game.Overlays.Profile.Header
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
             anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
-            bottomLinkContainer.NewLine();
+
+            if (anyInfoAdded)
+                bottomLinkContainer.NewLine();
+
             if (!string.IsNullOrEmpty(user.Twitter))
                 anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
             anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
