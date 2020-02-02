@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,13 +16,15 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class DrawableProfileScore : CompositeDrawable
     {
+        private const int height = 40;
         private const int performance_width = 80;
+
+        private const float performance_background_shear = 0.45f;
 
         protected readonly ScoreInfo Score;
 
@@ -37,12 +39,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             Score = score;
 
             RelativeSizeAxes = Axes.X;
-            Height = 40;
+            Height = height;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            float performance_background_width = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
+
             AddInternal(new ProfileItemContainer
             {
                 Children = new Drawable[]
@@ -143,22 +147,24 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1.06f, 0.5f),
+                                RelativeSizeAxes = Axes.Y,
+                                Width = performance_background_width,
+                                Height = 0.5f,
                                 Colour = colourProvider.Background4,
-                                Shear = new Vector2(-0.45f, 0),
+                                Shear = new Vector2(-performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
                             new Box
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Both,
+                                RelativeSizeAxes = Axes.Y,
                                 RelativePositionAxes = Axes.Y,
-                                Size = new Vector2(1.06f, -0.5f),
+                                Width = performance_background_width,
+                                Height = -0.5f,
                                 Position = new Vector2(0, 1),
                                 Colour = colourProvider.Background4,
-                                Shear = new Vector2(0.45f, 0),
+                                Shear = new Vector2(performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
                             createDrawablePerformance().With(d =>
