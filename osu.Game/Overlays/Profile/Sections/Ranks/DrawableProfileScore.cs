@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 Size = new Vector2(1.06f, 0.5f),
-                                Colour = Color4.Black.Opacity(0.5f),
+                                Colour = colourProvider.Background4,
                                 Shear = new Vector2(-0.45f, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 RelativePositionAxes = Axes.Y,
                                 Size = new Vector2(1.06f, -0.5f),
                                 Position = new Vector2(0, 1),
-                                Colour = Color4.Black.Opacity(0.5f),
+                                Colour = colourProvider.Background4,
                                 Shear = new Vector2(0.45f, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
