@@ -126,10 +126,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         {
             var shortName = activity.Mode;
 
-            if (rulesets.AvailableRulesets.Select(r => r.ShortName).Contains(shortName))
-                return rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName).Name;
-
-            return shortName;
+            return rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName)?.Name ?? shortName;
         }
 
         private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.Endpoint}{url}").Argument;
