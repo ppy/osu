@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -22,7 +22,8 @@ namespace osu.Game.Overlays.Profile.Header
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        private LinkFlowContainer linkContainer;
+        private LinkFlowContainer topLinkContainer;
+        private LinkFlowContainer bottomLinkContainer;
 
         private Color4 iconColour;
 
@@ -43,12 +44,26 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4
                 },
-                linkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Spacing = new Vector2(0, 10),
+                    Children = new Drawable[]
+                    {
+                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        },
+                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        }
+                    }
                 }
             };
 
@@ -57,43 +72,44 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            linkContainer.Clear();
+            topLinkContainer.Clear();
+            bottomLinkContainer.Clear();
 
             if (user == null) return;
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
-                linkContainer.AddText("Here since the beginning");
+                topLinkContainer.AddText("Here since the beginning");
             else
             {
-                linkContainer.AddText("Joined ");
-                linkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
+                topLinkContainer.AddText("Joined ");
+                topLinkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
             }
 
-            addSpacer(linkContainer);
+            addSpacer(topLinkContainer);
 
             if (user.IsOnline)
             {
-                linkContainer.AddText("Currently online");
-                addSpacer(linkContainer);
+                topLinkContainer.AddText("Currently online");
+                addSpacer(topLinkContainer);
             }
             else if (user.LastVisit.HasValue)
             {
-                linkContainer.AddText("Last seen ");
-                linkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
+                topLinkContainer.AddText("Last seen ");
+                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
 
-                addSpacer(linkContainer);
+                addSpacer(topLinkContainer);
             }
 
             if (user.PlayStyles?.Length > 0)
             {
-                linkContainer.AddText("Plays with ");
-                linkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
+                topLinkContainer.AddText("Plays with ");
+                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
 
-                addSpacer(linkContainer);
+                addSpacer(topLinkContainer);
             }
 
-            linkContainer.AddText("Contributed ");
-            linkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
+            topLinkContainer.AddText("Contributed ");
+            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
@@ -106,51 +122,48 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             }
 
-            requireNewLineOnAddInfo = true;
+            bool anyInfoAdded = false;
 
-            tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
-            tryAddInfo(OsuIcon.Heart, user.Interests);
-            tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
-
-            requireNewLineOnAddInfo = true;
-
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
+            anyInfoAdded |= tryAddInfo(OsuIcon.Heart, user.Interests);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
+            bottomLinkContainer.NewLine();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
-            tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
+                anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
+            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            anyInfoAdded |= tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
+
+            // If no information was added to the bottomLinkContainer, hide it to avoid unwanted padding
+            if (anyInfoAdded)
+                bottomLinkContainer.Show();
+            else
+                bottomLinkContainer.Hide();
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
-        private bool requireNewLineOnAddInfo;
-
-        private void tryAddInfo(IconUsage icon, string content, string link = null)
+        private bool tryAddInfo(IconUsage icon, string content, string link = null)
         {
-            if (string.IsNullOrEmpty(content)) return;
-
-            if (requireNewLineOnAddInfo)
-            {
-                linkContainer.NewLine();
-                requireNewLineOnAddInfo = false;
-            }
+            if (string.IsNullOrEmpty(content)) return false;
 
             // newlines could be contained in API returned user content.
             content = content.Replace("\n", " ");
 
-            linkContainer.AddIcon(icon, text =>
+            bottomLinkContainer.AddIcon(icon, text =>
             {
                 text.Font = text.Font.With(size: 10);
                 text.Colour = iconColour;
             });
 
             if (link != null)
-                linkContainer.AddLink(" " + content, link, creationParameters: embolden);
+                bottomLinkContainer.AddLink(" " + content, link, creationParameters: embolden);
             else
-                linkContainer.AddText(" " + content, embolden);
+                bottomLinkContainer.AddText(" " + content, embolden);
 
-            addSpacer(linkContainer);
+            addSpacer(bottomLinkContainer);
+            return true;
         }
 
         private void embolden(SpriteText text) => text.Font = text.Font.With(weight: FontWeight.Bold);
