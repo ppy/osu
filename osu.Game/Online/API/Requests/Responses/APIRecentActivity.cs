@@ -41,37 +41,8 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("count")]
         public int Count;
 
-        public string Mode;
-
         [JsonProperty("mode")]
-        private string mode
-        {
-            set
-            {
-                switch (value)
-                {
-                    default:
-                        Mode = value;
-                        return;
-
-                    case "osu":
-                        Mode = "osu!";
-                        return;
-
-                    case "mania":
-                        Mode = "osu!mania";
-                        return;
-
-                    case "taiko":
-                        Mode = "osu!taiko";
-                        return;
-
-                    case "fruits":
-                        Mode = "osu!catch";
-                        return;
-                }
-            }
-        }
+        public string Mode;
 
         [JsonProperty("beatmap")]
         public RecentActivityBeatmap Beatmap;
