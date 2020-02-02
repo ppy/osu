@@ -285,7 +285,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
-
         /// <summary>
         /// Scenario:
         /// - Press a key on the slider head
