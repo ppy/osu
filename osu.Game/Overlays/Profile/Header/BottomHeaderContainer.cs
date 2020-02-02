@@ -15,7 +15,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
-using static osu.Framework.Graphics.Containers.TextFlowContainer;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -23,8 +22,7 @@ namespace osu.Game.Overlays.Profile.Header
     {
         public readonly Bindable<User> User = new Bindable<User>();
 
-        private LinkFlowContainer topLinkContainer;
-        private LinkFlowContainer bottomLinkContainer;
+        private LinkFlowContainer linkContainer;
 
         private Color4 iconColour;
 
@@ -45,26 +43,12 @@ namespace osu.Game.Overlays.Profile.Header
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background4
                 },
-                new FillFlowContainer
+                linkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
                     Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
                     Spacing = new Vector2(0, 10),
-                    Children = new Drawable[]
-                    {
-                        topLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
-                        bottomLinkContainer = new LinkFlowContainer(text => text.Font = text.Font.With(size: 12))
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        }
-                    }
                 }
             };
 
@@ -73,44 +57,43 @@ namespace osu.Game.Overlays.Profile.Header
 
         private void updateDisplay(User user)
         {
-            topLinkContainer.Clear();
-            bottomLinkContainer.Clear();
+            linkContainer.Clear();
 
             if (user == null) return;
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
-                topLinkContainer.AddText("Here since the beginning");
+                linkContainer.AddText("Here since the beginning");
             else
             {
-                topLinkContainer.AddText("Joined ");
-                topLinkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
+                linkContainer.AddText("Joined ");
+                linkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
             }
 
-            addSpacer(topLinkContainer);
+            addSpacer(linkContainer);
 
             if (user.IsOnline)
             {
-                topLinkContainer.AddText("Currently online");
-                addSpacer(topLinkContainer);
+                linkContainer.AddText("Currently online");
+                addSpacer(linkContainer);
             }
             else if (user.LastVisit.HasValue)
             {
-                topLinkContainer.AddText("Last seen ");
-                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
+                linkContainer.AddText("Last seen ");
+                linkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
 
-                addSpacer(topLinkContainer);
+                addSpacer(linkContainer);
             }
 
             if (user.PlayStyles?.Length > 0)
             {
-                topLinkContainer.AddText("Plays with ");
-                topLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
+                linkContainer.AddText("Plays with ");
+                linkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), embolden);
 
-                addSpacer(topLinkContainer);
+                addSpacer(linkContainer);
             }
 
-            topLinkContainer.AddText("Contributed ");
-            topLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
+            linkContainer.AddText("Contributed ");
+            linkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: embolden);
 
             string websiteWithoutProtocol = user.Website;
 
@@ -123,46 +106,51 @@ namespace osu.Game.Overlays.Profile.Header
                 }
             }
 
+            requireNewLineOnAddInfo = true;
+
             tryAddInfo(FontAwesome.Solid.MapMarker, user.Location);
             tryAddInfo(OsuIcon.Heart, user.Interests);
             tryAddInfo(FontAwesome.Solid.Suitcase, user.Occupation);
-            bottomLinkContainer.NewLine();
+
+            requireNewLineOnAddInfo = true;
+
             if (!string.IsNullOrEmpty(user.Twitter))
                 tryAddInfo(FontAwesome.Brands.Twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
             tryAddInfo(FontAwesome.Brands.Discord, user.Discord);
             tryAddInfo(FontAwesome.Brands.Skype, user.Skype, @"skype:" + user.Skype + @"?chat");
             tryAddInfo(FontAwesome.Brands.Lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
             tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
-
-            // Hide the container to prevent adding unnecessary padding if it has no children other than the NewLineContainer
-            if (bottomLinkContainer.Children.All(child => child is NewLineContainer))
-                bottomLinkContainer.Hide();
-            else
-                // this is needed if user gets changed without the whole header being reloaded
-                bottomLinkContainer.Show();
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
+
+        private bool requireNewLineOnAddInfo;
 
         private void tryAddInfo(IconUsage icon, string content, string link = null)
         {
             if (string.IsNullOrEmpty(content)) return;
 
+            if (requireNewLineOnAddInfo)
+            {
+                linkContainer.NewLine();
+                requireNewLineOnAddInfo = false;
+            }
+
             // newlines could be contained in API returned user content.
             content = content.Replace("\n", " ");
 
-            bottomLinkContainer.AddIcon(icon, text =>
+            linkContainer.AddIcon(icon, text =>
             {
                 text.Font = text.Font.With(size: 10);
                 text.Colour = iconColour;
             });
 
             if (link != null)
-                bottomLinkContainer.AddLink(" " + content, link, creationParameters: embolden);
+                linkContainer.AddLink(" " + content, link, creationParameters: embolden);
             else
-                bottomLinkContainer.AddText(" " + content, embolden);
+                linkContainer.AddText(" " + content, embolden);
 
-            addSpacer(bottomLinkContainer);
+            addSpacer(linkContainer);
         }
 
         private void embolden(SpriteText text) => text.Font = text.Font.With(weight: FontWeight.Bold);
