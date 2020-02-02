@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -15,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterDisplay : FillFlowContainer<KeyCounter>
+    public class KeyCounterDisplay : Container<KeyCounter>
     {
         private const int duration = 100;
         private const double key_fade_time = 80;
@@ -23,10 +22,19 @@ namespace osu.Game.Screens.Play
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
+        protected readonly FillFlowContainer<KeyCounter> KeyFlow;
+
+        protected override Container<KeyCounter> Content => KeyFlow;
+
         public KeyCounterDisplay()
         {
-            Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
+
+            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
+            {
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+            };
         }
 
         public override void Add(KeyCounter key)
@@ -102,8 +110,8 @@ namespace osu.Game.Screens.Play
         }
 
         private void updateVisibility() =>
-            // Change visibility of all key counters internally to isolate from showing them by fading in this container.
-            Children.ForEach(k => k.FadeTo(Visible.Value || ConfigVisibility.Value ? 1 : 0, duration));
+            // Isolate changing visibility of the key counters from fading this component.
+            KeyFlow.FadeTo(Visible.Value || alwaysShow.Value ? 1 : 0, duration);
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
