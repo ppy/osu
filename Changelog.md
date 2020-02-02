@@ -210,3 +210,10 @@
     *   [M] [#7664 - Fix percentage-formatted displays containing a space](https://github.com/ppy/osu/pull/7664)
     *   [M] [#7554 - Update profile scores in line with the web design](https://github.com/ppy/osu/pull/7554)
     *   [M] [#7654 - Add a method to recycle test storage between runs #7654](https://github.com/ppy/osu/pull/7654)
+
+### 2020/2/2:
+*   整合更新
+    *   [m] [#7389 - Fix footer button content not correctly being centered](https://github.com/ppy/osu/pull/7389)
+    *   [m] [#7683 - Fix chat test intermittently failing](https://github.com/ppy/osu/pull/7683)
+    *   [m] [#7691 - Fix incorrect nUnit adapter version causing rider failures](https://github.com/ppy/osu/pull/7691)
+    *   [! 存在问题] [m] [#7690 - Centralise screen exit logic to ScreenTestScene](https://github.com/ppy/osu/pull/7690)

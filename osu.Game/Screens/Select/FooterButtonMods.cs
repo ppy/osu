@@ -3,7 +3,6 @@
 
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-// using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Rulesets.Mods;
 using System.Collections.Generic;
@@ -46,7 +45,6 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Font = OsuFont.GetFont(weight: FontWeight.Bold),
-                Margin = new MarginPadding { Right = 10 }
             });
         }
 
@@ -82,9 +80,9 @@ namespace osu.Game.Screens.Select
                 MultiplierText.FadeColour(Color4.White, 200);
 
             if (Current.Value?.Count > 0)
-                modDisplay.FadeIn(0);
+                modDisplay.FadeIn();
             else
-                modDisplay.FadeOut(0);
+                modDisplay.FadeOut();
         }
 
         private class FooterModDisplay : ModDisplay
@@ -94,6 +92,7 @@ namespace osu.Game.Screens.Select
             public FooterModDisplay()
             {
                 AllowExpand = false;
+                IconsContainer.Margin = new MarginPadding();
             }
         }
     }

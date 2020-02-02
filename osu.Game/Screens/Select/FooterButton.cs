@@ -118,6 +118,19 @@ namespace osu.Game.Screens.Select
         public Action HoverLost;
         public Key? Hotkey;
 
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            float horizontalMargin = (100 - TextContainer.Width) / 2;
+            ButtonContentContainer.Padding = new MarginPadding
+            {
+                Left = horizontalMargin,
+                // right side margin offset to compensate for shear
+                Right = horizontalMargin - SHEAR_WIDTH / 2
+            };
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             Hovered?.Invoke();

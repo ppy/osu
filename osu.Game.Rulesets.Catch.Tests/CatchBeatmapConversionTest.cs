@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("hardrock-stream", new[] { typeof(CatchModHardRock) })]
         [TestCase("hardrock-repeat-slider", new[] { typeof(CatchModHardRock) })]
         [TestCase("hardrock-spinner", new[] { typeof(CatchModHardRock) })]
-        [TestCase("mirror-slider", new[] { typeof(CatchModMirror) })]
-        [TestCase("mirror-hardrock-repeat-slider", new[] { typeof(CatchModMirror), typeof(CatchModHardRock) })]
         public new void Test(string name, params Type[] mods) => base.Test(name, mods);
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
@@ -85,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         public float Position
         {
-            get => HitObject?.GameplayX * CatchPlayfield.BASE_WIDTH ?? position;
+            get => HitObject?.X * CatchPlayfield.BASE_WIDTH ?? position;
             set => position = value;
         }
 

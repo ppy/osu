@@ -108,6 +108,5 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }
             }
         };
-
     }
 }

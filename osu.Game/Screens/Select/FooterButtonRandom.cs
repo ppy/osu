@@ -24,9 +24,13 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = @"撤销随机",
-                Alpha = 0
+                Alpha = 0,
             });
+            // force both text sprites to always be present to avoid width flickering while they're being swapped out
+            SpriteText.AlwaysPresent = secondaryText.AlwaysPresent = true;
         }
+
+        
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
