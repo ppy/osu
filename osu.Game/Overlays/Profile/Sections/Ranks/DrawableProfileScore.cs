@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -23,8 +23,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     public class DrawableProfileScore : CompositeDrawable
     {
         private const int performance_width = 80;
-        private const int content_padding_left = 10;
-        private const int content_padding_right = 30;
 
         protected readonly ScoreInfo Score;
 
@@ -52,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = content_padding_left, Right = performance_width + content_padding_right },
+                        Padding = new MarginPadding { Left = 10, Right = performance_width + 30 },
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
