@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly Slider slider;
         public readonly Drawable FollowCircle;
-        public readonly Drawable InternalFollowCircle;
+        public readonly Drawable TrackingArea;
         private readonly DrawableSlider drawableSlider;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
@@ -39,7 +39,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                InternalFollowCircle = new CircularContainer
+                // This is separate from the visible followcircle to ensure consistent internal tracking area (needed to match osu-stable)
+                TrackingArea = new CircularContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -103,8 +104,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                // Cursor input is checked against the internal circle, which scales instantly to match osu-stable behaviour
-                InternalFollowCircle.ScaleTo(tracking ? 2.4f : 1f);
+                // Tracking area is bigger than the visible followcircle and scales instantly to match osu-stable
+                TrackingArea.ScaleTo(tracking ? 2.4f : 1f);
                 FollowCircle.ScaleTo(tracking ? 2f : 1f, 300, Easing.OutQuint);
                 FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
@@ -159,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // in valid time range
                 Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && InternalFollowCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && TrackingArea.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
         }
