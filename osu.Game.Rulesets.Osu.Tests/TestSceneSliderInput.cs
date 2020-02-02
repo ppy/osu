@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_during_slide_2 = 3000;
         private const double time_during_slide_3 = 3500;
         private const double time_during_slide_4 = 3800;
+        private const double time_slider_end = 4000;
 
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
@@ -282,6 +283,47 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddAssert("Tracking acquired", assertMidSliderJudgements);
+        }
+
+
+        /// <summary>
+        /// Scenario:
+        /// - Press a key on the slider head
+        /// - While holding the key, move cursor close to the edge of tracking area
+        /// - Keep the cursor on the edge of tracking area until the slider ends
+        /// Expected Result:
+        /// A passing test case will have the slider track the cursor throughout the whole test.
+        /// </summary>
+        [Test]
+        public void TestTrackingAreaEdge()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(0, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_start + 100 },
+                new OsuReplayFrame { Position = new Vector2(25, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+            });
+            AddAssert("Tracking kept", assertGreatJudge);
+        }
+
+        /// <summary>
+        /// Scenario:
+        /// - Press a key on the slider head
+        /// - While holding the key, move cursor just outside the tracking area
+        /// - Keep the cursor just outside the tracking area until the slider ends
+        /// Expected Result:
+        /// A passing test case will have the slider drop the tracking on frame 2.
+        /// </summary>
+        [Test]
+        public void TestTrackingAreaOutsideEdge()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(0, OsuHitObject.OBJECT_RADIUS * 1.2f), Actions = { OsuAction.LeftButton }, Time = time_slider_start + 100 },
+                new OsuReplayFrame { Position = new Vector2(25, OsuHitObject.OBJECT_RADIUS * 1.2f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+            });
+            AddAssert("Tracking dropped", assertMidSliderJudgementFail);
         }
 
         private bool assertGreatJudge() => judgementResults.Last().Type == HitResult.Great;
