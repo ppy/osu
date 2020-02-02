@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public event Action DefaultsApplied;
 
-        public readonly Bindable<double> StartTimeBindable = new Bindable<double>();
+        public readonly Bindable<double> StartTimeBindable = new BindableDouble();
 
         /// <summary>
         /// The time at which the HitObject starts.
