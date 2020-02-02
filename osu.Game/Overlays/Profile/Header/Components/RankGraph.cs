@@ -270,7 +270,8 @@ namespace osu.Game.Overlays.Profile.Header.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                // To match osu-web, background and text should both be coloured using OverlayColourProvider
+                // Temporary colour since it's currently impossible to change it without bugs (see https://github.com/ppy/osu-framework/issues/3231)
+                // If above is fixed, this should use OverlayColourProvider
                 background.Colour = colours.Gray1;
             }
 
