@@ -23,7 +23,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     public class DrawableProfileScore : CompositeDrawable
     {
         private const int performance_width = 80;
-        private const int content_padding = 10;
+        private const int content_padding_left = 10;
+        private const int content_padding_right = 30;
 
         protected readonly ScoreInfo Score;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = content_padding, Right = performance_width + content_padding },
+                        Padding = new MarginPadding { Left = content_padding_left, Right = performance_width + content_padding_right },
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
@@ -142,17 +143,21 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         {
                             new Box
                             {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1, 0.5f),
+                                Size = new Vector2(1.06f, 0.5f),
                                 Colour = Color4.Black.Opacity(0.5f),
                                 Shear = new Vector2(-0.45f, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
                             new Box
                             {
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Both,
                                 RelativePositionAxes = Axes.Y,
-                                Size = new Vector2(1, -0.5f),
+                                Size = new Vector2(1.06f, -0.5f),
                                 Position = new Vector2(0, 1),
                                 Colour = Color4.Black.Opacity(0.5f),
                                 Shear = new Vector2(0.45f, 0),
