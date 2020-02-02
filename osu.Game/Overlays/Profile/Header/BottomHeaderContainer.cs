@@ -139,10 +139,7 @@ namespace osu.Game.Overlays.Profile.Header
             anyInfoAdded |= tryAddInfo(FontAwesome.Solid.Link, websiteWithoutProtocol, user.Website);
 
             // If no information was added to the bottomLinkContainer, hide it to avoid unwanted padding
-            if (anyInfoAdded)
-                bottomLinkContainer.Show();
-            else
-                bottomLinkContainer.Hide();
+            bottomLinkContainer.Alpha = anyInfoAdded ? 1 : 0;
         }
 
         private void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
