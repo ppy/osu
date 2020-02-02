@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
         private const double key_fade_time = 80;
 
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
-        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+        protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
         public KeyCounterDisplay()
         {
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.KeyOverlay, configVisibility);
+            config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
         }
 
         protected override void LoadComplete()
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             Visible.BindValueChanged(_ => updateVisibility());
-            configVisibility.BindValueChanged(_ => updateVisibility(), true);
+            ConfigVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
         private bool isCounting = true;
