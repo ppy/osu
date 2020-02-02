@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,6 +13,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
@@ -19,7 +21,11 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
     {
         private const int font_size = 14;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly APIRecentActivity activity;
 
@@ -31,10 +37,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, OverlayColourProvider colourProvider)
+        private void load(OverlayColourProvider colourProvider)
         {
-            this.api = api;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             AddInternal(new GridContainer
@@ -118,6 +122,16 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             }
         }
 
+        private string getRulesetName()
+        {
+            var shortName = activity.Mode;
+
+            if (rulesets.AvailableRulesets.Select(r => r.ShortName).Contains(shortName))
+                return rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName).Name;
+
+            return shortName;
+        }
+
         private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.Endpoint}{url}").Argument;
 
         private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
@@ -185,14 +199,14 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     addUserLink();
                     addText($" achieved rank #{activity.Rank} on ");
                     addBeatmapLink();
-                    addText($" ({activity.Mode})");
+                    addText($" ({getRulesetName()})");
                     break;
 
                 case RecentActivityType.RankLost:
                     addUserLink();
                     addText(" has lost first place on ");
                     addBeatmapLink();
-                    addText($" ({activity.Mode})");
+                    addText($" ({getRulesetName()})");
                     break;
 
                 case RecentActivityType.UserSupportAgain:

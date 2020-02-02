@@ -138,6 +138,22 @@ namespace osu.Game.Tests.Visual.Online
                 new APIRecentActivity
                 {
                     User = dummyUser,
+                    Type = RecentActivityType.Rank,
+                    Rank = 1,
+                    Mode = "vitaru",
+                    Beatmap = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
+                    Type = RecentActivityType.Rank,
+                    Rank = 1,
+                    Mode = "fruits",
+                    Beatmap = dummyBeatmap,
+                },
+                new APIRecentActivity
+                {
+                    User = dummyUser,
                     Type = RecentActivityType.RankLost,
                     Mode = "osu!",
                     Beatmap = dummyBeatmap,
