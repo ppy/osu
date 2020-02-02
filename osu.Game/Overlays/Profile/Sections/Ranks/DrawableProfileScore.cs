@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load()
         {
-            float performance_background_width = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
+            float performanceBackgroundWidth = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
 
             AddInternal(new ProfileItemContainer
             {
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Y,
-                                Width = performance_background_width,
+                                Width = performanceBackgroundWidth,
                                 Height = 0.5f,
                                 Colour = colourProvider.Background4,
                                 Shear = new Vector2(-performance_background_shear, 0),
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Origin = Anchor.TopRight,
                                 RelativeSizeAxes = Axes.Y,
                                 RelativePositionAxes = Axes.Y,
-                                Width = performance_background_width,
+                                Width = performanceBackgroundWidth,
                                 Height = -0.5f,
                                 Position = new Vector2(0, 1),
                                 Colour = colourProvider.Background4,
