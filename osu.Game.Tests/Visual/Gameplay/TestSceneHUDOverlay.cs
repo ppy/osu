@@ -77,11 +77,14 @@ namespace osu.Game.Tests.Visual.Gameplay
         [Test]
         public void TestChangeHUDVisibilityOnHiddenKeyCounter()
         {
+            bool keyCounterVisibleValue = false;
+
             createNew();
+            AddStep("save keycounter visible value", () => keyCounterVisibleValue = config.Get<bool>(OsuSetting.KeyOverlay));
 
             AddStep("set keycounter visible false", () =>
             {
-                hudOverlay.KeyCounter.ConfigVisibility.Value = false;
+                config.Set<bool>(OsuSetting.KeyOverlay, false);
                 hudOverlay.KeyCounter.Visible.Value = false;
             });
 
@@ -92,6 +95,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
             AddAssert("key counters still hidden", () => !hudOverlay.KeyCounter.KeyFlow.IsPresent);
+
+            AddStep("return value", () => config.Set<bool>(OsuSetting.KeyOverlay, keyCounterVisibleValue));
         }
 
         private void createNew(Action<TestHUDOverlay> action = null)
@@ -125,7 +130,7 @@ namespace osu.Game.Tests.Visual.Gameplay
 
         private class TestKeyCounterDisplay : KeyCounterDisplay
         {
-            public new Container<KeyCounter> KeyFlow => base.KeyFlow;
+            public new FillFlowContainer<KeyCounter> KeyFlow => base.KeyFlow;
         }
     }
 }
