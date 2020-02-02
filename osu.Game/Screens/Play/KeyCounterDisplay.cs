@@ -19,8 +19,13 @@ namespace osu.Game.Screens.Play
         private const int duration = 100;
         private const double key_fade_time = 80;
 
+        /// <summary>
+        /// Whether to always show key counter regardless of <see cref="Visible"/>.
+        /// This is bound to <see cref="OsuSetting.KeyOverlay"/> configuration setting bindable.
+        /// </summary>
+        private readonly Bindable<bool> alwaysShow = new Bindable<bool>();
+
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
-        protected readonly Bindable<bool> ConfigVisibility = new Bindable<bool>();
 
         protected readonly FillFlowContainer<KeyCounter> KeyFlow;
 
@@ -51,7 +56,7 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            config.BindWith(OsuSetting.KeyOverlay, ConfigVisibility);
+            config.BindWith(OsuSetting.KeyOverlay, alwaysShow);
         }
 
         protected override void LoadComplete()
@@ -59,7 +64,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
 
             Visible.BindValueChanged(_ => updateVisibility());
-            ConfigVisibility.BindValueChanged(_ => updateVisibility(), true);
+            alwaysShow.BindValueChanged(_ => updateVisibility(), true);
         }
 
         private bool isCounting = true;
