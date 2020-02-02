@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Profile.Header
             else
             {
                 topLinkContainer.AddText("Joined ");
-                topLinkContainer.AddText(new DrawableDate(user.JoinDate), embolden);
+                topLinkContainer.AddText(new DrawableDate(user.JoinDate, italic: false), embolden);
             }
 
             addSpacer(topLinkContainer);
@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.Profile.Header
             else if (user.LastVisit.HasValue)
             {
                 topLinkContainer.AddText("Last seen ");
-                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), embolden);
+                topLinkContainer.AddText(new DrawableDate(user.LastVisit.Value, italic: false), embolden);
 
                 addSpacer(topLinkContainer);
             }
