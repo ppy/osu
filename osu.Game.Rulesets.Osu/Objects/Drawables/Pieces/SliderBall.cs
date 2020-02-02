@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public Func<OsuAction?> GetInitialHitAction;
 
         private readonly Slider slider;
-        public readonly Drawable FollowCircle;
-        public readonly Drawable TrackingArea;
+        private readonly Drawable followCircle;
+        private readonly Drawable trackingArea;
         private readonly DrawableSlider drawableSlider;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
@@ -40,13 +40,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Children = new[]
             {
                 // This is separate from the visible followcircle to ensure consistent internal tracking area (needed to match osu-stable)
-                TrackingArea = new CircularContainer
+                trackingArea = new CircularContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both
                 },
-                FollowCircle = new FollowCircleContainer
+                followCircle = new FollowCircleContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -104,9 +104,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 tracking = value;
 
                 // Tracking area is bigger than the visible followcircle and scales instantly to match osu-stable
-                TrackingArea.ScaleTo(tracking ? 2.4f : 1f);
-                FollowCircle.ScaleTo(tracking ? 2f : 1f, 300, Easing.OutQuint);
-                FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+                trackingArea.ScaleTo(tracking ? 2.4f : 1f);
+                followCircle.ScaleTo(tracking ? 2f : 1f, 300, Easing.OutQuint);
+                followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // in valid time range
                 Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && TrackingArea.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && trackingArea.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
         }
