@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -100,7 +101,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void updateVisibility() => this.FadeTo(Visible.Value || configVisibility.Value ? 1 : 0, duration);
+        private void updateVisibility() =>
+            // Change visibility of all key counters internally to isolate from showing them by fading in this container.
+            Children.ForEach(k => k.FadeTo(Visible.Value || ConfigVisibility.Value ? 1 : 0, duration));
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
