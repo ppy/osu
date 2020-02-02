@@ -302,8 +302,8 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
-            public readonly Bindable<double> DimLevel = new Bindable<double>();
-            public readonly Bindable<double> BlurLevel = new Bindable<double>();
+            public readonly Bindable<double> DimLevel = new BindableDouble();
+            public readonly Bindable<double> BlurLevel = new BindableDouble();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 

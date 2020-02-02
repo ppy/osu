@@ -217,3 +217,6 @@
     *   [m] [#7683 - Fix chat test intermittently failing](https://github.com/ppy/osu/pull/7683)
     *   [m] [#7691 - Fix incorrect nUnit adapter version causing rider failures](https://github.com/ppy/osu/pull/7691)
     *   [! 存在问题] [m] [#7690 - Centralise screen exit logic to ScreenTestScene](https://github.com/ppy/osu/pull/7690)
+    *   [m] [#7687 - Fix Alt+number shortcuts for tabs in chat overlay](https://github.com/ppy/osu/pull/7687)
+    *   Make use of ElementAtOrDefault() when possible #76954
+    *   Remove all usages of Bindable<float> and Bindable<double> #7709
