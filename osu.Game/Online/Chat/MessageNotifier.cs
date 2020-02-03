@@ -137,16 +137,14 @@ namespace osu.Game.Online.Chat
             public PrivateMessageNotification(string username, Channel channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
-                Username = username;
-                Channel = channel;
-                Text = $"You received a private message from '{Username}'. Click to read it!";
+                this.username = username;
+                this.channel = channel;
+                Text = $"You received a private message from '{this.username}'. Click to read it!";
             }
 
-            public string Username { get; }
+            private readonly string username;
 
-            public Channel Channel { get; }
-
-            public Action<PrivateMessageNotification> OnRemove { get; set; }
+            private readonly Channel channel;
 
             public override bool IsImportant => false;
 
@@ -159,7 +157,7 @@ namespace osu.Game.Online.Chat
                 {
                     notificationOverlay.Hide();
                     chatOverlay.Show();
-                    channelManager.CurrentChannel.Value = Channel;
+                    channelManager.CurrentChannel.Value = channel;
 
                     return true;
                 };
@@ -172,10 +170,10 @@ namespace osu.Game.Online.Chat
             {
                 Icon = FontAwesome.Solid.At;
                 Text = $"Your name was mentioned in chat by '{username}'. Click to find out why!";
-                Channel = channel;
+                this.channel = channel;
             }
 
-            public Channel Channel { get; }
+            private readonly Channel channel;
 
             public override bool IsImportant => false;
 
@@ -188,7 +186,7 @@ namespace osu.Game.Online.Chat
                 {
                     notificationOverlay.Hide();
                     chatOverlay.Show();
-                    channelManager.CurrentChannel.Value = Channel;
+                    channelManager.CurrentChannel.Value = channel;
 
                     return true;
                 };
