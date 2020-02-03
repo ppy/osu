@@ -8,6 +8,7 @@ using osu.Framework.Bindables;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.API;
 using System.Collections.Generic;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
@@ -16,7 +17,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
             : base(user, header, missing)
         {
-            ItemsPerPage = 5;
+            ItemsPerPage = 10;
+            ItemsContainer.Spacing = new Vector2(0, 8);
         }
 
         protected override APIRequest<List<APIRecentActivity>> CreateRequest() =>
