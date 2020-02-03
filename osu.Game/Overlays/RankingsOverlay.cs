@@ -55,12 +55,13 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new RankingsHeader
+                            new RankingsOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Depth = -float.MaxValue,
                                 Country = { BindTarget = Country },
-                                Scope = { BindTarget = Scope },
+                                Current = { BindTarget = Scope },
                                 Ruleset = { BindTarget = ruleset }
                             },
                             new Container
