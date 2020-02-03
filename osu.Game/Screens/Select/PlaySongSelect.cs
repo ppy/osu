@@ -68,10 +68,7 @@ namespace osu.Game.Screens.Select
 
             SampleConfirm?.Play();
 
-            LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
-            {
-                if (this.IsCurrentScreen()) this.Push(player);
-            });
+            this.Push(player = new PlayerLoader(() => new Player()));
 
             return true;
         }
