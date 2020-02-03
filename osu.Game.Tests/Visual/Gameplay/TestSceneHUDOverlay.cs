@@ -15,9 +15,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 {
     public class TestSceneHUDOverlay : ManualInputManagerTestScene
     {
-        private TestHUDOverlay hudOverlay;
+        private HUDOverlay hudOverlay;
 
-        private Drawable hideTarget => hudOverlay.KeyCounter; // best way of checking hideTargets without exposing.
+        // best way to check without exposing.
+        private Drawable hideTarget => hudOverlay.KeyCounter;
+        private FillFlowContainer<KeyCounter> keyCounterFlow => (FillFlowContainer<KeyCounter>)hudOverlay.KeyCounter.Child.Parent;
 
         [Resolved]
         private OsuConfigManager config { get; set; }
@@ -30,7 +32,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("showhud is set", () => hudOverlay.ShowHud.Value);
 
             AddAssert("hidetarget is visible", () => hideTarget.IsPresent);
-            AddAssert("key counter flow is visible", () => hudOverlay.KeyCounter.KeyFlow.IsPresent);
+            AddAssert("key counter flow is visible", () => keyCounterFlow.IsPresent);
             AddAssert("pause button is visible", () => hudOverlay.HoldToQuit.IsPresent);
         }
 
@@ -55,7 +57,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
 
             // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
-            AddAssert("key counter flow not affected", () => hudOverlay.KeyCounter.KeyFlow.IsPresent);
+            AddAssert("key counter flow not affected", () => keyCounterFlow.IsPresent);
         }
 
         [Test]
@@ -90,47 +92,26 @@ namespace osu.Game.Tests.Visual.Gameplay
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
             AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
-            AddAssert("key counters hidden", () => !hudOverlay.KeyCounter.KeyFlow.IsPresent);
+            AddAssert("key counters hidden", () => !keyCounterFlow.IsPresent);
 
             AddStep("set showhud true", () => hudOverlay.ShowHud.Value = true);
             AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
-            AddAssert("key counters still hidden", () => !hudOverlay.KeyCounter.KeyFlow.IsPresent);
+            AddAssert("key counters still hidden", () => !keyCounterFlow.IsPresent);
 
             AddStep("return value", () => config.Set<bool>(OsuSetting.KeyOverlay, keyCounterVisibleValue));
         }
 
-        private void createNew(Action<TestHUDOverlay> action = null)
+        private void createNew(Action<HUDOverlay> action = null)
         {
             AddStep("create overlay", () =>
             {
-                Child = hudOverlay = new TestHUDOverlay();
+                Child = hudOverlay = new HUDOverlay(null, null, null, Array.Empty<Mod>());
+
+                // Add any key just to display the key counter visually.
+                hudOverlay.KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
 
                 action?.Invoke(hudOverlay);
             });
-        }
-
-        private class TestHUDOverlay : HUDOverlay
-        {
-            public new TestKeyCounterDisplay KeyCounter => (TestKeyCounterDisplay)base.KeyCounter;
-
-            protected override KeyCounterDisplay CreateKeyCounter() => new TestKeyCounterDisplay
-            {
-                Anchor = Anchor.BottomRight,
-                Origin = Anchor.BottomRight,
-                Margin = new MarginPadding(10),
-            };
-
-            public TestHUDOverlay()
-                : base(null, null, null, Array.Empty<Mod>())
-            {
-                // Add any key just to display the key counter visually.
-                KeyCounter.Add(new KeyCounterKeyboard(Key.Space));
-            }
-        }
-
-        private class TestKeyCounterDisplay : KeyCounterDisplay
-        {
-            public new FillFlowContainer<KeyCounter> KeyFlow => base.KeyFlow;
         }
     }
 }
