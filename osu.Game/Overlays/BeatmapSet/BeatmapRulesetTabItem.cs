@@ -18,8 +18,6 @@ namespace osu.Game.Overlays.BeatmapSet
     {
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
-
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
 
@@ -72,17 +70,6 @@ namespace osu.Game.Overlays.BeatmapSet
                 countContainer.FadeTo(beatmapsCount > 0 ? 1 : 0);
 
                 Enabled.Value = beatmapsCount > 0;
-            }, true);
-
-            Enabled.BindValueChanged(enabled =>
-            {
-                if (enabled.NewValue)
-                {
-                    UpdateState();
-                    return;
-                }
-
-                AccentColour = colourProvider.Foreground1;
             }, true);
         }
     }

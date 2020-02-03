@@ -17,6 +17,8 @@ namespace osu.Game.Overlays
 {
     public class OverlayRulesetTabItem : TabItem<RulesetInfo>
     {
+        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
+
         private Color4 accentColour;
 
         protected virtual Color4 AccentColour
@@ -61,37 +63,35 @@ namespace osu.Game.Overlays
             Enabled.Value = true;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
-            UpdateState();
+            base.LoadComplete();
+            Enabled.BindValueChanged(_ => updateState(), true);
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            UpdateState();
+            updateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            UpdateState();
+            updateState();
         }
 
-        protected override void OnActivated() => UpdateState();
+        protected override void OnActivated() => updateState();
 
-        protected override void OnDeactivated() => UpdateState();
+        protected override void OnDeactivated() => updateState();
 
-        protected void UpdateState()
+        private void updateState()
         {
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-
-            if (!Enabled.Value)
-                return;
-
-            AccentColour = IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
+            AccentColour = IsHovered || Active.Value ? Color4.White : getStateColour();
         }
+
+        private Color4 getStateColour() => Enabled.Value ? colourProvider.Highlight1 : colourProvider.Foreground1;
     }
 }
