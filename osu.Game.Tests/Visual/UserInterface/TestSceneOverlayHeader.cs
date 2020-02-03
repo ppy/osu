@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             addHeader("Orange OverlayHeader (no background)", new TestNoBackgroundHeader(), OverlayColourScheme.Orange);
             addHeader("Blue OverlayHeader", new TestNoControlHeader(), OverlayColourScheme.Blue);
-            addHeader("Green TabControlOverlayHeader (string)", new TestStringTabControlHeader(), OverlayColourScheme.Green);
+            addHeader("Green TabControlOverlayHeader (string) with ruleset selector", new TestStringTabControlHeader(), OverlayColourScheme.Green);
             addHeader("Pink TabControlOverlayHeader (enum)", new TestEnumTabControlHeader(), OverlayColourScheme.Pink);
             addHeader("Red BreadcrumbControlOverlayHeader (no background)", new TestBreadcrumbControlHeader(), OverlayColourScheme.Red);
         }
@@ -115,6 +115,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/news");
 
             protected override ScreenTitle CreateTitle() => new TestTitle();
+
+            protected override Drawable CreateTitleContent() => new OverlayRulesetSelector();
 
             public TestStringTabControlHeader()
             {

@@ -220,3 +220,9 @@
     *   [m] [#7687 - Fix Alt+number shortcuts for tabs in chat overlay](https://github.com/ppy/osu/pull/7687)
     *   Make use of ElementAtOrDefault() when possible #76954
     *   Remove all usages of Bindable<float> and Bindable<double> #7709
+
+### 2020/2/3:
+    *   [m] [#7710 - Adjust profile scores to closer match osu-web](https://github.com/ppy/osu/pull/7710)
+    *   [m] [#7714 - Make slider tracking match what is on screen](https://github.com/ppy/osu/pull/7714)
+    *   [m] [#7716 - Add ability to create ruleset selector in OverlayHeader](https://github.com/ppy/osu/pull/7716)
+    *   Bump Sentry from 1.2.0 to 2.0.1 #7717

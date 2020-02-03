@@ -1,10 +1,10 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -16,14 +16,16 @@ using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class DrawableProfileScore : CompositeDrawable
     {
+        private const int height = 40;
         private const int performance_width = 80;
-        private const int content_padding = 10;
+
+        private const float performance_background_shear = 0.45f;
+        private static readonly float performance_background_width = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
 
         protected readonly ScoreInfo Score;
 
@@ -38,7 +40,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             Score = score;
 
             RelativeSizeAxes = Axes.X;
-            Height = 40;
+            Height = height;
         }
 
         [BackgroundDependencyLoader]
@@ -51,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = content_padding, Right = performance_width + content_padding },
+                        Padding = new MarginPadding { Left = 10, Right = performance_width + 30 },
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
@@ -142,20 +144,26 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         {
                             new Box
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Size = new Vector2(1, 0.5f),
-                                Colour = Color4.Black.Opacity(0.5f),
-                                Shear = new Vector2(-0.45f, 0),
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                RelativeSizeAxes = Axes.Y,
+                                Width = performance_background_width,
+                                Height = 0.5f,
+                                Colour = colourProvider.Background4,
+                                Shear = new Vector2(-performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
                             new Box
                             {
-                                RelativeSizeAxes = Axes.Both,
+                                Anchor = Anchor.TopRight,
+                                Origin = Anchor.TopRight,
+                                RelativeSizeAxes = Axes.Y,
                                 RelativePositionAxes = Axes.Y,
-                                Size = new Vector2(1, -0.5f),
+                                Width = performance_background_width,
+                                Height = -0.5f,
                                 Position = new Vector2(0, 1),
-                                Colour = Color4.Black.Opacity(0.5f),
-                                Shear = new Vector2(0.45f, 0),
+                                Colour = colourProvider.Background4,
+                                Shear = new Vector2(performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
                             createDrawablePerformance().With(d =>
@@ -240,7 +248,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                    Font = OsuFont.GetFont(size: 12, italics: true)
+                    Font = OsuFont.GetFont(size: 16, italics: true)
                 },
             };
         }
