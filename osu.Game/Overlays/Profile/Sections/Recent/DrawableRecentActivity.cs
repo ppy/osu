@@ -122,30 +122,6 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
             }
         }
 
-        private string getRulesetName()
-        {
-            var shortName = activity.Mode;
-
-            return rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == shortName)?.Name ?? shortName;
-        }
-
-        private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.Endpoint}{url}").Argument;
-
-        private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
-            => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);
-
-        private void addUserLink()
-            => content.AddLink(activity.User?.Username, LinkAction.OpenUserProfile, getLinkArgument(activity.User?.Url), creationParameters: t => t.Font = getLinkFont(FontWeight.Bold));
-
-        private void addBeatmapLink()
-            => content.AddLink(activity.Beatmap?.Title, LinkAction.OpenBeatmap, getLinkArgument(activity.Beatmap?.Url), creationParameters: t => t.Font = getLinkFont());
-
-        private void addBeatmapsetLink()
-            => content.AddLink(activity.Beatmapset?.Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset?.Url), creationParameters: t => t.Font = getLinkFont());
-
-        private void addText(string text)
-            => content.AddText(text, t => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold));
-
         private void createMessage()
         {
             switch (activity.Type)
@@ -227,5 +203,25 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                     break;
             }
         }
+
+        private string getRulesetName() =>
+            rulesets.AvailableRulesets.FirstOrDefault(r => r.ShortName == activity.Mode)?.Name ?? activity.Mode;
+
+        private void addUserLink()
+            => content.AddLink(activity.User?.Username, LinkAction.OpenUserProfile, getLinkArgument(activity.User?.Url), creationParameters: t => t.Font = getLinkFont(FontWeight.Bold));
+
+        private void addBeatmapLink()
+            => content.AddLink(activity.Beatmap?.Title, LinkAction.OpenBeatmap, getLinkArgument(activity.Beatmap?.Url), creationParameters: t => t.Font = getLinkFont());
+
+        private void addBeatmapsetLink()
+            => content.AddLink(activity.Beatmapset?.Title, LinkAction.OpenBeatmapSet, getLinkArgument(activity.Beatmapset?.Url), creationParameters: t => t.Font = getLinkFont());
+
+        private string getLinkArgument(string url) => MessageFormatter.GetLinkDetails($"{api.Endpoint}{url}").Argument;
+
+        private FontUsage getLinkFont(FontWeight fontWeight = FontWeight.Regular)
+            => OsuFont.GetFont(size: font_size, weight: fontWeight, italics: true);
+
+        private void addText(string text)
+            => content.AddText(text, t => t.Font = OsuFont.GetFont(size: font_size, weight: FontWeight.SemiBold));
     }
 }
