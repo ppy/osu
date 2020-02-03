@@ -8,6 +8,8 @@ using osu.Game.Online.API.Requests;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
+using osu.Game.Overlays;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -22,37 +24,35 @@ namespace osu.Game.Tests.Visual.Online
             typeof(HeaderButton),
             typeof(SortTabControl),
             typeof(ShowChildrenButton),
-            typeof(DeletedChildrenPlaceholder),
-            typeof(VotePill)
+            typeof(DeletedCommentsCounter),
+            typeof(VotePill),
+            typeof(CommentsPage),
         };
 
         protected override bool UseOnlineAPI => true;
 
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
+
         public TestSceneCommentsContainer()
         {
-            BasicScrollContainer scrollFlow;
+            BasicScrollContainer scroll;
+            CommentsContainer comments;
 
-            Add(scrollFlow = new BasicScrollContainer
+            Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Child = comments = new CommentsContainer()
             });
 
-            AddStep("Big Black comments", () =>
+            AddStep("Big Black comments", () => comments.ShowComments(CommentableType.Beatmapset, 41823));
+            AddStep("Airman comments", () => comments.ShowComments(CommentableType.Beatmapset, 24313));
+            AddStep("Lazer build comments", () => comments.ShowComments(CommentableType.Build, 4772));
+            AddStep("News comments", () => comments.ShowComments(CommentableType.NewsPost, 715));
+            AddStep("Idle state", () =>
             {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 41823));
-            });
-
-            AddStep("Airman comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Beatmapset, 24313));
-            });
-
-            AddStep("lazer build comments", () =>
-            {
-                scrollFlow.Clear();
-                scrollFlow.Add(new CommentsContainer(CommentableType.Build, 4772));
+                scroll.Clear();
+                scroll.Add(comments = new CommentsContainer());
             });
         }
     }

@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                        Child = screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
@@ -119,6 +119,8 @@ namespace osu.Game.Screens.Multi
                     roomManager = new RoomManager()
                 }
             };
+
+            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;

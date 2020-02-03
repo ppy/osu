@@ -7,11 +7,9 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays
 {
-    public abstract class BreadcrumbControlOverlayHeader : OverlayHeader
+    public abstract class BreadcrumbControlOverlayHeader : TabControlOverlayHeader<string>
     {
-        protected OverlayHeaderBreadcrumbControl BreadcrumbControl;
-
-        protected override TabControl<string> CreateTabControl() => BreadcrumbControl = new OverlayHeaderBreadcrumbControl();
+        protected override OsuTabControl<string> CreateTabControl() => new OverlayHeaderBreadcrumbControl();
 
         public class OverlayHeaderBreadcrumbControl : BreadcrumbControl<string>
         {

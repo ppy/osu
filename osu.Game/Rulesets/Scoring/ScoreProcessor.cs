@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Scoring
         public readonly Bindable<ScoreRank> Rank = new Bindable<ScoreRank>(ScoreRank.X);
 
         /// <summary>
-        /// THe highest combo achieved by this score.
+        /// The highest combo achieved by this score.
         /// </summary>
         public readonly BindableInt HighestCombo = new BindableInt();
 

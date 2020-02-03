@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Bindables;
@@ -11,10 +12,14 @@ using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Edit;
+using osuTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
-    public class Timeline : ZoomableScrollContainer
+    [Cached(typeof(IDistanceSnapProvider))]
+    [Cached]
+    public class Timeline : ZoomableScrollContainer, IDistanceSnapProvider
     {
         public readonly Bindable<bool> WaveformVisible = new Bindable<bool>();
         public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
@@ -25,7 +30,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
-            Zoom = 10;
             ScrollbarVisible = false;
         }
 
@@ -56,8 +60,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 waveform.Waveform = b.NewValue.Waveform;
                 track = b.NewValue.Track;
+
+                MinZoom = getZoomLevelForVisibleMilliseconds(10000);
+                MaxZoom = getZoomLevelForVisibleMilliseconds(500);
+                Zoom = getZoomLevelForVisibleMilliseconds(2000);
             }, true);
         }
+
+        private float getZoomLevelForVisibleMilliseconds(double milliseconds) => (float)(track.Length / milliseconds);
 
         /// <summary>
         /// The timeline's scroll position in the last frame.
@@ -143,10 +153,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             return false;
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             endUserDrag();
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         private void beginUserDrag()
@@ -162,5 +172,27 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             if (trackWasPlaying)
                 adjustableClock.Start();
         }
+
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private IBeatSnapProvider beatSnapProvider { get; set; }
+
+        public (Vector2 position, double time) GetSnappedPosition(Vector2 position, double time)
+        {
+            var targetTime = (position.X / Content.DrawWidth) * track.Length;
+            return (position, beatSnapProvider.SnapTime(targetTime));
+        }
+
+        public float GetBeatSnapDistanceAt(double referenceTime) => throw new NotImplementedException();
+
+        public float DurationToDistance(double referenceTime, double duration) => throw new NotImplementedException();
+
+        public double DistanceToDuration(double referenceTime, float distance) => throw new NotImplementedException();
+
+        public double GetSnappedDurationFromDistance(double referenceTime, float distance) => throw new NotImplementedException();
+
+        public float GetSnappedDistanceFromDistance(double referenceTime, float distance) => throw new NotImplementedException();
     }
 }

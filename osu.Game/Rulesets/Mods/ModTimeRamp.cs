@@ -20,6 +20,9 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         private const double final_rate_progress = 0.75f;
 
+        [SettingSource("Initial rate", "The starting speed of the track")]
+        public abstract BindableNumber<double> InitialRate { get; }
+
         [SettingSource("Final rate", "The final speed to ramp to")]
         public abstract BindableNumber<double> FinalRate { get; }
 
@@ -69,6 +72,6 @@ namespace osu.Game.Rulesets.Mods
         /// </summary>
         /// <param name="amount">The amount of adjustment to apply (from 0..1).</param>
         private void applyAdjustment(double amount) =>
-            SpeedChange.Value = 1 + (FinalRate.Value - 1) * Math.Clamp(amount, 0, 1);
+            SpeedChange.Value = InitialRate.Value + (FinalRate.Value - InitialRate.Value) * Math.Clamp(amount, 0, 1);
     }
 }

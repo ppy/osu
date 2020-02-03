@@ -220,9 +220,11 @@ namespace osu.Game.Scoring.Legacy
             float lastTime = 0;
             ReplayFrame currentFrame = null;
 
-            foreach (var l in reader.ReadToEnd().Split(','))
+            var frames = reader.ReadToEnd().Split(',');
+
+            for (var i = 0; i < frames.Length; i++)
             {
-                var split = l.Split('|');
+                var split = frames[i].Split('|');
 
                 if (split.Length < 4)
                     continue;
@@ -234,7 +236,13 @@ namespace osu.Game.Scoring.Legacy
                 }
 
                 var diff = Parsing.ParseFloat(split[0]);
+
                 lastTime += diff;
+
+                if (i == 0 && diff == 0)
+                    // osu-stable adds a zero-time frame before potentially valid negative user frames.
+                    // we need to ignore this.
+                    continue;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
                 // but for now we'll achieve equal playback to stable by skipping negative frames
