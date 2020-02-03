@@ -17,11 +17,6 @@ namespace osu.Game.Overlays
 {
     public class OverlayRulesetTabItem : TabItem<RulesetInfo>
     {
-        protected readonly OsuSpriteText Text;
-        private readonly FillFlowContainer content;
-
-        protected override Container<Drawable> Content => content;
-
         private Color4 accentColour;
 
         protected virtual Color4 AccentColour
@@ -30,12 +25,16 @@ namespace osu.Game.Overlays
             set
             {
                 accentColour = value;
-                Text.FadeColour(value, 120, Easing.OutQuint);
+                text.FadeColour(value, 120, Easing.OutQuint);
             }
         }
 
+        protected override Container<Drawable> Content { get; }
+
         [Resolved]
         private OverlayColourProvider colourProvider { get; set; }
+
+        private readonly OsuSpriteText text;
 
         public OverlayRulesetTabItem(RulesetInfo value)
             : base(value)
@@ -44,12 +43,12 @@ namespace osu.Game.Overlays
 
             AddRangeInternal(new Drawable[]
             {
-                content = new FillFlowContainer
+                Content = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
                     Spacing = new Vector2(3, 0),
-                    Child = Text = new OsuSpriteText
+                    Child = text = new OsuSpriteText
                     {
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays
 
         private void updateState()
         {
-            Text.Font = Text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
+            text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
             AccentColour = IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
         }
     }
