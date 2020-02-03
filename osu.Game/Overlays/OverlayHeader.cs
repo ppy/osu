@@ -63,8 +63,8 @@ namespace osu.Game.Overlays
                                         {
                                             title = CreateTitle().With(title =>
                                             {
-                                                Anchor = Anchor.CentreLeft;
-                                                Origin = Anchor.CentreLeft;
+                                                title.Anchor = Anchor.CentreLeft;
+                                                title.Origin = Anchor.CentreLeft;
                                             }),
                                             CreateTitleContent().With(content =>
                                             {
