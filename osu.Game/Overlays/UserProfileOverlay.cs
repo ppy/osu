@@ -67,7 +67,7 @@ namespace osu.Game.Overlays
                 RelativeSizeAxes = Axes.X,
                 Anchor = Anchor.TopCentre,
                 Origin = Anchor.TopCentre,
-                Height = 30
+                Height = 34
             };
 
             Add(new Box
