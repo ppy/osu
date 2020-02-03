@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 Add(localCursorContainer = new OsuCursorContainer());
 
-                localCursorScale = new Bindable<float>();
+                localCursorScale = new BindableFloat();
                 localCursorScale.BindTo(localCursorContainer.CursorScale);
                 localCursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
             }

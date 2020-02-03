@@ -321,8 +321,10 @@ namespace osu.Game.Overlays
 
         private void selectTab(int index)
         {
-            var channel = ChannelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            var channel = ChannelTabControl.Items
+                                           .Where(tab => !(tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                                           .ElementAtOrDefault(index);
+            if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
 
