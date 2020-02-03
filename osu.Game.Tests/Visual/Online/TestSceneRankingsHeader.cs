@@ -18,6 +18,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(RankingsOverlayHeader),
             typeof(CountryFilter),
+            typeof(CountryPill)
         };
 
         [Cached]
