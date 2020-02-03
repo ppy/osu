@@ -20,12 +20,12 @@ namespace osu.Game.Screens.Play
         private const double key_fade_time = 80;
 
         /// <summary>
-        /// Whether to always show key counter regardless of <see cref="Visible"/>.
+        /// Whether to always show key counter regardless of any other condition.
         /// This is bound to <see cref="OsuSetting.KeyOverlay"/> configuration setting bindable.
         /// </summary>
         private readonly Bindable<bool> alwaysShow = new Bindable<bool>();
 
-        public readonly Bindable<bool> Visible = new Bindable<bool>(true);
+        public readonly Bindable<bool> HasReplayLoaded = new BindableBool();
 
         protected readonly FillFlowContainer<KeyCounter> KeyFlow;
 
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            Visible.BindValueChanged(_ => updateVisibility());
+            HasReplayLoaded.BindValueChanged(_ => updateVisibility());
             alwaysShow.BindValueChanged(_ => updateVisibility(), true);
         }
 
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
 
         private void updateVisibility() =>
             // Isolate changing visibility of the key counters from fading this component.
-            KeyFlow.FadeTo(Visible.Value || alwaysShow.Value ? 1 : 0, duration);
+            KeyFlow.FadeTo(HasReplayLoaded.Value || alwaysShow.Value ? 1 : 0, duration);
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;
