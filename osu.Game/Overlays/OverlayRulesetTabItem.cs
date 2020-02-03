@@ -89,9 +89,9 @@ namespace osu.Game.Overlays
         private void updateState()
         {
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-            AccentColour = IsHovered || Active.Value ? Color4.White : getStateColour();
+            AccentColour = Enabled.Value ? getActiveColour() : colourProvider.Foreground1;
         }
 
-        private Color4 getStateColour() => Enabled.Value ? colourProvider.Highlight1 : colourProvider.Foreground1;
+        private Color4 getActiveColour() => IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
     }
 }
