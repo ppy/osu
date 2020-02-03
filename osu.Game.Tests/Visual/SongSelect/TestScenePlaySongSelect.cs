@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -77,7 +78,6 @@ namespace osu.Game.Tests.Visual.SongSelect
 
         private OsuConfigManager config;
 
-        [SetUpSteps]
         public override void SetUpSteps()
         {
             base.SetUpSteps();
@@ -424,6 +424,31 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("start not requested", () => !startRequested);
+        }
+
+        [Test]
+        public void TestAutoplayViaCtrlEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.Enter);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
         }
 
         [Test]

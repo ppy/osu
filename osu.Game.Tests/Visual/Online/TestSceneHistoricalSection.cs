@@ -26,7 +26,6 @@ namespace osu.Game.Tests.Visual.Online
             typeof(HistoricalSection),
             typeof(PaginatedMostPlayedBeatmapContainer),
             typeof(DrawableMostPlayedBeatmap),
-            typeof(DrawableProfileRow)
         };
 
         [Cached]
