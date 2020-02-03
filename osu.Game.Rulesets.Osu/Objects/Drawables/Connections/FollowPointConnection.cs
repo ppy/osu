@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// <summary>
         /// The start time of <see cref="Start"/>.
         /// </summary>
-        public readonly Bindable<double> StartTime = new Bindable<double>();
+        public readonly Bindable<double> StartTime = new BindableDouble();
 
         /// <summary>
         /// The <see cref="DrawableOsuHitObject"/> which <see cref="FollowPoint"/>s will exit from.

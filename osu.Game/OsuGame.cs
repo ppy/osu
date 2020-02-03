@@ -386,7 +386,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
                 screen.Push(new ReplayPlayerLoader(databasedScore));
-            }, new[] { typeof(PlaySongSelect) });
+            }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
         protected virtual Loader CreateLoader() => new Loader();

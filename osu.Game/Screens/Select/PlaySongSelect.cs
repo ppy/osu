@@ -33,6 +33,8 @@ namespace osu.Game.Screens.Select
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
+
             player = null;
 
             if (removeAutoModOnResume)
@@ -41,8 +43,6 @@ namespace osu.Game.Screens.Select
                 ModSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
-
-            base.OnResuming(last);
         }
 
         protected override bool OnStart()
