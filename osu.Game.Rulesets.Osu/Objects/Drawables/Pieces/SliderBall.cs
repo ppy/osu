@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public Func<OsuAction?> GetInitialHitAction;
 
         private readonly Slider slider;
-        public readonly Drawable FollowCircle;
+        private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                FollowCircle = new FollowCircleContainer
+                followCircle = new FollowCircleContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -95,8 +95,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
-                FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // in valid time range
                 Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && FollowCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
         }
