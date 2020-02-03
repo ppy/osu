@@ -44,8 +44,8 @@ namespace osu.Game.Overlays.Profile.Sections
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = idleColour = colourProvider.Background4;
-            hoverColour = colourProvider.Background3;
+            background.Colour = idleColour = colourProvider.Background3;
+            hoverColour = colourProvider.Background2;
         }
 
         protected override bool OnHover(HoverEvent e)
