@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
 using osu.Framework.Allocation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -35,6 +36,9 @@ namespace osu.Game.Tests.Visual.Online
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         private readonly BasicScrollContainer scrollFlow;
         private readonly DimmedLoadingLayer loading;
