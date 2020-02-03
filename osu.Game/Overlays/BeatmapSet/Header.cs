@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = tabs_height,
+                    AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
                     {
                         tabsBg = new Box
@@ -84,8 +84,8 @@ namespace osu.Game.Overlays.BeatmapSet
                         RulesetSelector = new BeatmapRulesetSelector
                         {
                             Current = ruleset,
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         }
                     },
                 },
