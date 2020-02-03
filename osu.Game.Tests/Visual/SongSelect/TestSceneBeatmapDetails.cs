@@ -3,14 +3,8 @@
 
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Testing;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual.SongSelect
@@ -179,28 +173,6 @@ namespace osu.Game.Tests.Visual.SongSelect
             {
                 OnlineBeatmapID = 162,
             });
-        }
-
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
-
-        [Resolved]
-        private OsuColour colours { get; set; }
-
-        [Test]
-        public void TestModAdjustments()
-        {
-            TestAllMetrics();
-
-            Ruleset ruleset = rulesets.AvailableRulesets.First().CreateInstance();
-
-            AddStep("with EZ mod", () => SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModEasy) });
-
-            AddAssert("first bar coloured blue", () => details.ChildrenOfType<Bar>().Skip(1).First().AccentColour == colours.BlueDark);
-
-            AddStep("with HR mod", () => SelectedMods.Value = new[] { ruleset.GetAllMods().First(m => m is ModHardRock) });
-
-            AddAssert("first bar coloured red", () => details.ChildrenOfType<Bar>().Skip(1).First().AccentColour == colours.Red);
         }
     }
 }
