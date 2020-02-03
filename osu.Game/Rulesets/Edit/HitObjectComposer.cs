@@ -154,7 +154,7 @@ namespace osu.Game.Rulesets.Edit
         {
             if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
             {
-                var item = toolboxCollection.Items.Skip(e.Key - Key.Number1).FirstOrDefault();
+                var item = toolboxCollection.Items.ElementAtOrDefault(e.Key - Key.Number1);
 
                 if (item != null)
                 {
