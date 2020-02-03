@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.BeatmapSet
         [BackgroundDependencyLoader]
         private void load()
         {
-            Content.Add(countContainer = new Container
+            Add(countContainer = new Container
             {
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
