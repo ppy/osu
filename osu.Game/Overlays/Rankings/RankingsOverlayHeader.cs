@@ -7,6 +7,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -25,6 +26,19 @@ namespace osu.Game.Overlays.Rankings
         protected override Drawable CreateTitleContent() => new OverlayRulesetSelector
         {
             Current = Ruleset
+        };
+
+        protected override Drawable CreateContent() => new Container
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            Children = new Drawable[]
+            {
+                new CountryFilter
+                {
+                    Current = Country
+                }
+            }
         };
 
         private class RankingsTitle : ScreenTitle
