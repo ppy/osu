@@ -64,29 +64,33 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private void load()
         {
-            updateState();
+            UpdateState();
         }
 
         protected override bool OnHover(HoverEvent e)
         {
             base.OnHover(e);
-            updateState();
+            UpdateState();
             return true;
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
             base.OnHoverLost(e);
-            updateState();
+            UpdateState();
         }
 
-        protected override void OnActivated() => updateState();
+        protected override void OnActivated() => UpdateState();
 
-        protected override void OnDeactivated() => updateState();
+        protected override void OnDeactivated() => UpdateState();
 
-        private void updateState()
+        protected void UpdateState()
         {
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
+
+            if (!Enabled.Value)
+                return;
+
             AccentColour = IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
         }
     }
