@@ -108,7 +108,9 @@ namespace osu.Game.Tests.Visual.Online
                 AddRange(new Drawable[] { ChannelManager, ChatOverlay, NotificationOverlay, MessageNotifier });
 
                 ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
-                ((BindableList<Channel>)ChannelManager.JoinedChannels).AddRange(channels);
+
+                foreach (var channel in channels)
+                    ChannelManager.JoinChannel(channel);
             }
         }
     }
