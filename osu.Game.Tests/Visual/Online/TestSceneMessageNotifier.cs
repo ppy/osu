@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Online
     {
         private User friend;
         private Channel publicChannel;
-        private Channel privateMesssageChannel;
+        private Channel privateMessageChannel;
         private TestContainer testContainer;
 
         private int messageIdCounter;
