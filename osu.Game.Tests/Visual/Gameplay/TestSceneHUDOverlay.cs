@@ -30,8 +30,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddAssert("showhud is set", () => hudOverlay.ShowHud.Value);
 
             AddAssert("hidetarget is visible", () => hideTarget.IsPresent);
-            AddAssert("key counter flow is visible", () => hudOverlay.KeyCounter.KeyFlow.IsPresent);
             AddAssert("pause button is visible", () => hudOverlay.HoldToQuit.IsPresent);
+            AddAssert("key counter flow is hidden", () => !hudOverlay.KeyCounter.KeyFlow.IsPresent);
         }
 
         [Test]
@@ -45,17 +45,19 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestHideExternally()
+        public void TestChangeVisibilityExternally()
         {
             createNew();
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
-
             AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
+            AddAssert("key counter flow is hidden", () => !hudOverlay.KeyCounter.KeyFlow.IsPresent);
             AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
 
-            // Key counter flow container should not be affected by this, only the key counter display will be hidden as checked above.
-            AddAssert("key counter flow not affected", () => hudOverlay.KeyCounter.KeyFlow.IsPresent);
+            AddStep("set showhud false", () => hudOverlay.ShowHud.Value = true);
+            AddUntilStep("hidetarget is visible", () => hideTarget.IsPresent);
+            AddAssert("key counter flow is still hidden", () => !hudOverlay.KeyCounter.KeyFlow.IsPresent);
+            AddAssert("pause button is still visible", () => hudOverlay.HoldToQuit.IsPresent);
         }
 
         [Test]
@@ -82,11 +84,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             createNew();
             AddStep("save keycounter visible value", () => keyCounterVisibleValue = config.Get<bool>(OsuSetting.KeyOverlay));
 
-            AddStep("set keycounter visible false", () =>
-            {
-                config.Set<bool>(OsuSetting.KeyOverlay, false);
-                hudOverlay.KeyCounter.Visible.Value = false;
-            });
+            AddStep("set keycounter visible false", () => config.Set<bool>(OsuSetting.KeyOverlay, false));
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
             AddUntilStep("hidetarget is hidden", () => !hideTarget.IsPresent);
