@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("set keycounter visible false", () =>
             {
                 config.Set<bool>(OsuSetting.KeyOverlay, false);
-                hudOverlay.KeyCounter.Visible.Value = false;
+                hudOverlay.KeyCounter.AlwaysVisible.Value = false;
             });
 
             AddStep("set showhud false", () => hudOverlay.ShowHud.Value = false);
