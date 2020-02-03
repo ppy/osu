@@ -137,12 +137,9 @@ namespace osu.Game.Online.Chat
             public PrivateMessageNotification(string username, Channel channel)
             {
                 Icon = FontAwesome.Solid.Envelope;
-                this.username = username;
+                Text = $"You received a private message from '{username}'. Click to read it!";
                 this.channel = channel;
-                Text = $"You received a private message from '{this.username}'. Click to read it!";
             }
-
-            private readonly string username;
 
             private readonly Channel channel;
 
