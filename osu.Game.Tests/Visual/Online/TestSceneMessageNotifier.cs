@@ -79,12 +79,9 @@ namespace osu.Game.Tests.Visual.Online
             [BackgroundDependencyLoader]
             private void load()
             {
-                AddRange(new Drawable[] { ChannelManager, NotificationOverlay });
+                AddRange(new Drawable[] { ChannelManager, ChatOverlay, NotificationOverlay, MessageNotifier });
 
                 ((BindableList<Channel>)ChannelManager.AvailableChannels).AddRange(channels);
-
-                AddRange(new Drawable[] { ChatOverlay, MessageNotifier });
-
                 ((BindableList<Channel>)ChannelManager.JoinedChannels).AddRange(channels);
             }
         }
