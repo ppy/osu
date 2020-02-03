@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings;
 
 namespace osu.Game.Tests.Visual.Online
@@ -20,6 +21,9 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         protected override bool UseOnlineAPI => true;
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Resolved]
         private IAPIProvider api { get; set; }

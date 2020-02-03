@@ -83,9 +83,9 @@ namespace osu.Game.Overlays.Rankings
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            background.Colour = colours.GreySeafoam;
+            background.Colour = colourProvider.Dark3;
         }
 
         protected override void LoadComplete()
@@ -138,9 +138,9 @@ namespace osu.Game.Overlays.Rankings
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                valueText.Colour = colours.GreySeafoamLighter;
+                valueText.Colour = colourProvider.Content2;
             }
         }
 
@@ -151,10 +151,10 @@ namespace osu.Game.Overlays.Rankings
             protected override DropdownMenu CreateMenu() => menu = base.CreateMenu().With(m => m.MaxHeight = 400);
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                menu.BackgroundColour = colours.Gray1;
-                AccentColour = colours.GreySeafoamDarker;
+                menu.BackgroundColour = colourProvider.Background5;
+                AccentColour = colourProvider.Background6;
             }
         }
     }
