@@ -26,11 +26,11 @@ namespace osu.Game.Tests.Visual.Online
         {
             friend = new User { Id = 0, Username = "Friend" };
             publicChannel = new Channel { Id = 1, Name = "osu" };
-            privateMesssageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
+            privateMessageChannel = new Channel(friend) { Id = 2, Name = friend.Username, Type = ChannelType.PM };
 
             Schedule(() =>
             {
-                Child = testContainer = new TestContainer(new[] { publicChannel, privateMesssageChannel })
+                Child = testContainer = new TestContainer(new[] { publicChannel, privateMessageChannel })
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -42,7 +42,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPublicChannelMention()
         {
-            AddStep("Switch to PMs", () => testContainer.ChannelManager.CurrentChannel.Value = privateMesssageChannel);
+            AddStep("Switch to PMs", () => testContainer.ChannelManager.CurrentChannel.Value = privateMessageChannel);
 
             AddStep("Send regular message", () => publicChannel.AddNewMessages(new Message(messageIdCounter++) { Content = "Hello everyone!", Sender = friend, ChannelId = publicChannel.Id }));
             AddAssert("Expect no notifications", () => testContainer.NotificationOverlay.UnreadCount.Value == 0);
@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestPrivateMessageNotification()
         {
-            AddStep("Send PM", () => privateMesssageChannel.AddNewMessages(new Message(messageIdCounter++) { Content = $"Hello {API.LocalUser.Value.Username}!", Sender = friend, ChannelId = privateMesssageChannel.Id }));
+            AddStep("Send PM", () => privateMessageChannel.AddNewMessages(new Message(messageIdCounter++) { Content = $"Hello {API.LocalUser.Value.Username}!", Sender = friend, ChannelId = privateMessageChannel.Id }));
             AddAssert("Expect 1 notification", () => testContainer.NotificationOverlay.UnreadCount.Value == 1);
         }
 
