@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private const int performance_width = 80;
 
         private const float performance_background_shear = 0.45f;
-        private readonly float performance_background_width = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
+        private static readonly float performance_background_width = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
 
         protected readonly ScoreInfo Score;
 
