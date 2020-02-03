@@ -31,6 +31,9 @@ namespace osu.Game.Scoring
         [Column(TypeName = "DECIMAL(1,4)")]
         public double Accuracy { get; set; }
 
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy == 1 ? "100%" : $"{Accuracy:P2}";
+
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
 

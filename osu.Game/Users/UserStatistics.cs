@@ -43,6 +43,9 @@ namespace osu.Game.Users
         [JsonProperty(@"hit_accuracy")]
         public decimal Accuracy;
 
+        [JsonIgnore]
+        public string DisplayAccuracy => $"{Accuracy:P2}";
+
         [JsonProperty(@"play_count")]
         public int PlayCount;
 
