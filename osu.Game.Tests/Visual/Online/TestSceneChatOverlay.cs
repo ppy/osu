@@ -38,9 +38,21 @@ namespace osu.Game.Tests.Visual.Online
         private TestChatOverlay chatOverlay;
         private ChannelManager channelManager;
 
-        private readonly Channel channel1 = new Channel(new User()) { Name = "test really long username", Topic = "Topic for channel 1" };
-        private readonly Channel channel2 = new Channel(new User()) { Name = "test2", Topic = "Topic for channel 2" };
-        private readonly Channel channel3 = new Channel(new User()) { Name = "channel with no topic" };
+        private readonly List<Channel> channels;
+
+        private Channel channel1 => channels[0];
+        private Channel channel2 => channels[1];
+
+        public TestSceneChatOverlay()
+        {
+            channels = Enumerable.Range(1, 10)
+                                 .Select(index => new Channel(new User())
+                                 {
+                                     Name = $"Channel no. {index}",
+                                     Topic = index == 3 ? null : $"We talk about the number {index} here"
+                                 })
+                                 .ToList();
+        }
 
         [SetUp]
         public void Setup()
@@ -49,7 +61,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 ChannelManagerContainer container;
 
-                Child = container = new ChannelManagerContainer(new List<Channel> { channel1, channel2, channel3 })
+                Child = container = new ChannelManagerContainer(channels)
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
@@ -103,12 +115,42 @@ namespace osu.Game.Tests.Visual.Online
         [Test]
         public void TestSearchInSelector()
         {
-            AddStep("search for 'test2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "test2");
+            AddStep("search for 'no. 2'", () => chatOverlay.ChildrenOfType<SearchTextBox>().First().Text = "no. 2");
             AddUntilStep("only channel 2 visible", () =>
             {
                 var listItems = chatOverlay.ChildrenOfType<ChannelListItem>().Where(c => c.IsPresent);
                 return listItems.Count() == 1 && listItems.Single().Channel == channel2;
             });
+        }
+
+        [Test]
+        public void TestChannelShortcutKeys()
+        {
+            AddStep("join 10 channels", () => channels.ForEach(channel => channelManager.JoinChannel(channel)));
+            AddStep("close channel selector", () =>
+            {
+                InputManager.PressKey(Key.Escape);
+                InputManager.ReleaseKey(Key.Escape);
+            });
+            AddUntilStep("wait for close", () => chatOverlay.SelectionOverlayState == Visibility.Hidden);
+
+            for (int zeroBasedIndex = 0; zeroBasedIndex < 10; ++zeroBasedIndex)
+            {
+                var oneBasedIndex = zeroBasedIndex + 1;
+                var targetNumberKey = oneBasedIndex % 10;
+                var targetChannel = channels[zeroBasedIndex];
+                AddStep($"press Alt+{targetNumberKey}", () => pressChannelHotkey(targetNumberKey));
+                AddAssert($"channel #{oneBasedIndex} is selected", () => channelManager.CurrentChannel.Value == targetChannel);
+            }
+        }
+
+        private void pressChannelHotkey(int number)
+        {
+            var channelKey = Key.Number0 + number;
+            InputManager.PressKey(Key.AltLeft);
+            InputManager.PressKey(channelKey);
+            InputManager.ReleaseKey(Key.AltLeft);
+            InputManager.ReleaseKey(channelKey);
         }
 
         private void clickDrawable(Drawable d)
