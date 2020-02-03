@@ -300,7 +300,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
                 new OsuReplayFrame { Position = new Vector2(0, OsuHitObject.OBJECT_RADIUS * 1.19f), Actions = { OsuAction.LeftButton }, Time = time_slider_start + 100 },
-                new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.19f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+                new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.199f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
             });
 
             AddAssert("Tracking kept", assertGreatJudge);
@@ -321,7 +321,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
                 new OsuReplayFrame { Position = new Vector2(0, OsuHitObject.OBJECT_RADIUS * 1.21f), Actions = { OsuAction.LeftButton }, Time = time_slider_start + 100 },
-                new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.21f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
+                new OsuReplayFrame { Position = new Vector2(slider_path_length, OsuHitObject.OBJECT_RADIUS * 1.201f), Actions = { OsuAction.LeftButton }, Time = time_slider_end },
             });
 
             AddAssert("Tracking dropped", assertMidSliderJudgementFail);
