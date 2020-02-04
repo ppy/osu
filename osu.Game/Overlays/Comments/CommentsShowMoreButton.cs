@@ -14,6 +14,8 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
+            Height = 20;
+
             IdleColour = colourProvider.Background2;
             HoverColour = colourProvider.Background1;
             ChevronIconColour = colourProvider.Foreground1;

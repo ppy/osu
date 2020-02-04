@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -72,19 +73,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             // required to get bindables attached
             Add(music);
 
-            Beatmap.SetDefault();
-
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
 
         private OsuConfigManager config;
 
-        [SetUp]
-        public virtual void SetUp() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            Ruleset.Value = new OsuRuleset().RulesetInfo;
-            manager?.Delete(manager.GetAllUsableBeatmapSets());
-        });
+            base.SetUpSteps();
+
+            AddStep("delete all beatmaps", () =>
+            {
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                manager?.Delete(manager.GetAllUsableBeatmapSets());
+
+                Beatmap.SetDefault();
+            });
+        }
 
         [Test]
         public void TestSingleFilterOnEnter()
@@ -118,10 +123,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.Enter);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -145,10 +148,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.Down);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -176,10 +177,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseKey(Key.Enter);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection changed", () => selected != Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -208,10 +207,8 @@ namespace osu.Game.Tests.Visual.SongSelect
                 InputManager.ReleaseButton(MouseButton.Left);
             });
 
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
             AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
-
-            AddUntilStep("wait for return to song select", () => songSelect.IsCurrentScreen());
-            AddUntilStep("bindable lease returned", () => !Beatmap.Disabled);
         }
 
         [Test]
@@ -427,6 +424,31 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("start not requested", () => !startRequested);
+        }
+
+        [Test]
+        public void TestAutoplayViaCtrlEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.Enter);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
         }
 
         [Test]

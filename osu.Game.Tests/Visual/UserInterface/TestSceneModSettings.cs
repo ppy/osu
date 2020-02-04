@@ -27,6 +27,13 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private readonly Mod testCustomisableAutoOpenMod = new TestModCustomisable2();
 
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            SelectedMods.Value = Array.Empty<Mod>();
+            Ruleset.Value = new TestRulesetInfo();
+        });
+
         [Test]
         public void TestButtonShowsOnCustomisableMod()
         {
@@ -70,13 +77,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         {
             AddStep("create mod select", () =>
             {
-                Ruleset.Value = new TestRulesetInfo();
-
                 Child = modSelect = new TestModSelectOverlay
                 {
-                    RelativeSizeAxes = Axes.X,
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
+                    SelectedMods = { BindTarget = SelectedMods }
                 };
             });
         }

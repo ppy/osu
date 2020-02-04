@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Comments
         {
             LinkFlowContainer username;
             FillFlowContainer childCommentsContainer;
-            DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+            DeletedCommentsCounter deletedCommentsCounter;
             FillFlowContainer info;
             LinkFlowContainer message;
             GridContainer content;
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Comments
                                 AutoSizeAxes = Axes.Y,
                                 Direction = FillDirection.Vertical
                             },
-                            deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
+                            deletedCommentsCounter = new DeletedCommentsCounter
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
                             }
@@ -193,7 +193,7 @@ namespace osu.Game.Overlays.Comments
                 }
             };
 
-            deletedChildrenPlaceholder.DeletedCount.Value = comment.DeletedChildrenCount;
+            deletedCommentsCounter.Count.Value = comment.DeletedChildrenCount;
 
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
@@ -213,7 +213,7 @@ namespace osu.Game.Overlays.Comments
 
             if (comment.HasMessage)
             {
-                var formattedSource = MessageFormatter.FormatText(comment.GetMessage);
+                var formattedSource = MessageFormatter.FormatText(comment.Message);
                 message.AddLinks(formattedSource.Text, formattedSource.Links);
             }
 
@@ -343,7 +343,7 @@ namespace osu.Game.Overlays.Comments
                 if (parentComment == null)
                     return string.Empty;
 
-                return parentComment.HasMessage ? parentComment.GetMessage : parentComment.IsDeleted ? @"deleted" : string.Empty;
+                return parentComment.HasMessage ? parentComment.Message : parentComment.IsDeleted ? @"deleted" : string.Empty;
             }
         }
     }

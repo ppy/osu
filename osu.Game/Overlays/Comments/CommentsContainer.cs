@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Comments
         private int currentPage;
 
         private FillFlowContainer content;
-        private DeletedChildrenPlaceholder deletedChildrenPlaceholder;
+        private DeletedCommentsCounter deletedCommentsCounter;
         private CommentsShowMoreButton moreButton;
         private TotalCommentsCounter commentCounter;
 
@@ -68,6 +68,7 @@ namespace osu.Game.Overlays.Comments
                         },
                         new Container
                         {
+                            Name = @"Footer",
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.Comments
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        deletedChildrenPlaceholder = new DeletedChildrenPlaceholder
+                                        deletedCommentsCounter = new DeletedCommentsCounter
                                         {
                                             ShowDeleted = { BindTarget = ShowDeleted }
                                         },
@@ -153,7 +154,8 @@ namespace osu.Game.Overlays.Comments
         private void clearComments()
         {
             currentPage = 1;
-            deletedChildrenPlaceholder.DeletedCount.Value = 0;
+            deletedCommentsCounter.Count.Value = 0;
+            moreButton.Show();
             moreButton.IsLoading = true;
             content.Clear();
         }
@@ -162,29 +164,14 @@ namespace osu.Game.Overlays.Comments
         {
             loadCancellation = new CancellationTokenSource();
 
-            var page = new FillFlowContainer
+            LoadComponentAsync(new CommentsPage(response)
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-            };
-
-            foreach (var c in response.Comments)
-            {
-                if (c.IsTopLevel)
-                {
-                    page.Add(new DrawableComment(c)
-                    {
-                        ShowDeleted = { BindTarget = ShowDeleted }
-                    });
-                }
-            }
-
-            LoadComponentAsync(page, loaded =>
+                ShowDeleted = { BindTarget = ShowDeleted }
+            }, loaded =>
             {
                 content.Add(loaded);
 
-                deletedChildrenPlaceholder.DeletedCount.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
+                deletedCommentsCounter.Count.Value += response.Comments.Count(c => c.IsDeleted && c.IsTopLevel);
 
                 if (response.HasMore)
                 {
@@ -194,10 +181,12 @@ namespace osu.Game.Overlays.Comments
                     moreButton.Current.Value = response.TopLevelCount - loadedTopLevelComments;
                     moreButton.IsLoading = false;
                 }
+                else
+                {
+                    moreButton.Hide();
+                }
 
                 commentCounter.Current.Value = response.Total;
-
-                moreButton.FadeTo(response.HasMore ? 1 : 0);
             }, loadCancellation.Token);
         }
 
