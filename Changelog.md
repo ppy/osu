@@ -226,3 +226,8 @@
     *   [m] [#7714 - Make slider tracking match what is on screen](https://github.com/ppy/osu/pull/7714)
     *   [m] [#7716 - Add ability to create ruleset selector in OverlayHeader](https://github.com/ppy/osu/pull/7716)
     *   Bump Sentry from 1.2.0 to 2.0.1 #7717
+
+### 2020/2/4:
+    *   [m] [#7719 - Update BeatmapOverlay header in line with the web design](https://github.com/ppy/osu/pull/7719)
+    *   [m] [#7720 - Fix potential nullref in UserDimBackgrounds tests](https://github.com/ppy/osu/pull/7720)
+    *   [m] [#7723 - Expose TabControlOverlayHeader.Current value](https://github.com/ppy/osu/pull/7723)

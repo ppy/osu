@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.News
 
         private NewsHeaderTitle title;
 
-        public readonly Bindable<string> Current = new Bindable<string>(null);
+        public readonly Bindable<string> Post = new Bindable<string>(null);
 
         public Action ShowFrontPage;
 
@@ -22,13 +22,13 @@ namespace osu.Game.Overlays.News
         {
             TabControl.AddItem(front_page_string);
 
-            TabControl.Current.ValueChanged += e =>
+            Current.ValueChanged += e =>
             {
                 if (e.NewValue == front_page_string)
                     ShowFrontPage?.Invoke();
             };
 
-            Current.ValueChanged += showPost;
+            Post.ValueChanged += showPost;
         }
 
         private void showPost(ValueChangedEvent<string> e)
@@ -39,13 +39,13 @@ namespace osu.Game.Overlays.News
             if (e.NewValue != null)
             {
                 TabControl.AddItem(e.NewValue);
-                TabControl.Current.Value = e.NewValue;
+                Current.Value = e.NewValue;
 
                 title.IsReadingPost = true;
             }
             else
             {
-                TabControl.Current.Value = front_page_string;
+                Current.Value = front_page_string;
                 title.IsReadingPost = false;
             }
         }
