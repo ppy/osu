@@ -11,7 +11,8 @@ namespace osu.Game.Overlays.BeatmapSet
     public class BeatmapSetHeader : OverlayHeader
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-        public BeatmapRulesetSelector RulesetSelector;
+
+        public BeatmapRulesetSelector RulesetSelector { get; private set; }
 
         protected override ScreenTitle CreateTitle() => new BeatmapHeaderTitle();
 
