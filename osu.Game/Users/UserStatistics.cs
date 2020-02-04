@@ -30,7 +30,7 @@ namespace osu.Game.Users
         public decimal? PP;
 
         [JsonProperty(@"pp_rank")] // the API sometimes only returns this value in condensed user responses
-        private int rank
+        private int? rank
         {
             set => Ranks.Global = value;
         }
@@ -71,13 +71,13 @@ namespace osu.Game.Users
         public struct Grades
         {
             [JsonProperty(@"ssh")]
-            public int SSPlus;
+            public int? SSPlus;
 
             [JsonProperty(@"ss")]
             public int SS;
 
             [JsonProperty(@"sh")]
-            public int SPlus;
+            public int? SPlus;
 
             [JsonProperty(@"s")]
             public int S;
@@ -85,7 +85,7 @@ namespace osu.Game.Users
             [JsonProperty(@"a")]
             public int A;
 
-            public int this[ScoreRank rank]
+            public int? this[ScoreRank rank]
             {
                 get
                 {
