@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreStatisticsSection : CompositeDrawable
     {
         private const float margin = 10;
-        private const float statistics_column_min_width = 50;
+        private const float statistics_column_min_width = 40;
 
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
         private readonly FontUsage largeFont = OsuFont.GetFont(size: 22);
