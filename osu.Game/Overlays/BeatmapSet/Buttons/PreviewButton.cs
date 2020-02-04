@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private const float transition_duration = 500;
 
-        private readonly Box bg, progress;
+        private readonly Box background, progress;
         private readonly PlayButton playButton;
 
         private PreviewTrack preview => playButton.Preview;
@@ -40,10 +40,11 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             Children = new Drawable[]
             {
-                bg = new Box
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.25f),
+                    Colour = Color4.Black,
+                    Alpha = 0.5f
                 },
                 new Container
                 {
@@ -91,13 +92,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         protected override bool OnHover(HoverEvent e)
         {
-            bg.FadeColour(Color4.Black.Opacity(0.5f), 100);
+            background.FadeTo(0.75f, 80);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
+            background.FadeTo(0.5f, 80);
             base.OnHoverLost(e);
         }
     }
