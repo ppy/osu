@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float buttons_spacing = 5;
 
         private readonly UpdateableBeatmapSetCover cover;
+        private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
         private readonly FillFlowContainer downloadButtonsContainer;
