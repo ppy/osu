@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreStatisticsSection : CompositeDrawable
     {
         private const float margin = 10;
+        private const float statistics_column_min_width = 50;
 
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
         private readonly FontUsage largeFont = OsuFont.GetFont(size: 22);
@@ -112,7 +113,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             private readonly Box separator;
             private readonly OsuSpriteText text;
 
-            public InfoColumn(string title, Drawable content)
+            public InfoColumn(string title, Drawable content, float? minWidth = null)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -130,7 +131,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         },
                         separator = new Box
                         {
-                            RelativeSizeAxes = Axes.X,
+                            RelativeSizeAxes = minWidth == null ? Axes.X : Axes.None,
+                            Width = minWidth ?? 1f,
                             Height = 1
                         },
                         content
@@ -149,13 +151,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             private readonly SpriteText text;
 
-            public TextColumn(string title, FontUsage font)
-                : this(title, new OsuSpriteText { Font = font })
+            public TextColumn(string title, FontUsage font, float? minWidth = null)
+                : this(title, new OsuSpriteText { Font = font }, minWidth)
             {
             }
 
-            private TextColumn(string title, SpriteText text)
-                : base(title, text)
+            private TextColumn(string title, SpriteText text, float? minWidth = null)
+                : base(title, text, minWidth)
             {
                 this.text = text;
             }
