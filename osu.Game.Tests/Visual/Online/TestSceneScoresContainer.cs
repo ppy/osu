@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
@@ -26,6 +28,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ScoreTable),
             typeof(ScoreTableRowBackground),
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         public TestSceneScoresContainer()
         {
