@@ -113,6 +113,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
+            api.LocalUser.BindValueChanged(_ => refetchComments());
             Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }
