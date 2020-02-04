@@ -393,7 +393,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Correction #6 - High bpm jump buff (alt buff)
             double effectiveBpm = 30 / (t12 + 1e-10);
-            double highBpmJumpBuff = SpecialFunctions.Logistic((effectiveBpm - 340) / 16) *
+            double highBpmJumpBuff = SpecialFunctions.Logistic((effectiveBpm - 370) / 16) *
                                      SpecialFunctions.Logistic((d12 - 1.9) / 0.15) * 0.23;
 
 
