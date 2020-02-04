@@ -30,6 +30,8 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        public const float HEIGHT = 510;
+
         protected readonly TriangleButton DeselectAllButton;
         protected readonly TriangleButton CustomiseButton;
         protected readonly TriangleButton CloseButton;
