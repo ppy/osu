@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                             },
                             rank = new UpdateableRank(ScoreRank.D)
                             {
