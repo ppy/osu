@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         text = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
                             Text = title.ToUpper()
                         },
                         separator = new Box
