@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 2),
+                    Spacing = new Vector2(0, 1),
                     Children = new[]
                     {
                         text = new OsuSpriteText
