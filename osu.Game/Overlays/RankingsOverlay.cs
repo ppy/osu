@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
@@ -27,6 +26,7 @@ namespace osu.Game.Overlays
         private readonly BasicScrollContainer scrollFlow;
         private readonly Container tableContainer;
         private readonly DimmedLoadingLayer loading;
+        private readonly Box background;
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
@@ -39,10 +39,9 @@ namespace osu.Game.Overlays
         {
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = OsuColour.Gray(0.1f),
+                    RelativeSizeAxes = Axes.Both
                 },
                 scrollFlow = new BasicScrollContainer
                 {
@@ -55,12 +54,13 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new RankingsHeader
+                            new RankingsOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Depth = -float.MaxValue,
                                 Country = { BindTarget = Country },
-                                Scope = { BindTarget = Scope },
+                                Current = { BindTarget = Scope },
                                 Ruleset = { BindTarget = ruleset }
                             },
                             new Container
@@ -84,6 +84,12 @@ namespace osu.Game.Overlays
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            background.Colour = ColourProvider.Background5;
         }
 
         protected override void LoadComplete()

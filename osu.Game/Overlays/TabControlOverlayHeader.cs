@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
                     TabControl = CreateTabControl().With(control =>
                     {
                         control.Margin = new MarginPadding { Left = UserProfileOverlay.CONTENT_X_MARGIN };
-                        control.Current = current;
+                        control.Current = Current;
                     })
                 }
             });
