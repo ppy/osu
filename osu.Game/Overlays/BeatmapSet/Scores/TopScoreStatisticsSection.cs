@@ -24,8 +24,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const float margin = 10;
 
-        private readonly FontUsage smallFont = OsuFont.GetFont(size: 20);
-        private readonly FontUsage largeFont = OsuFont.GetFont(size: 25);
+        private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
+        private readonly FontUsage largeFont = OsuFont.GetFont(size: 22);
 
         private readonly TextColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
@@ -109,6 +109,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private class InfoColumn : CompositeDrawable
         {
             private readonly Box separator;
+            private readonly OsuSpriteText text;
 
             public InfoColumn(string title, Drawable content)
             {
@@ -121,9 +122,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Spacing = new Vector2(0, 2),
                     Children = new[]
                     {
-                        new OsuSpriteText
+                        text = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Black),
                             Text = title.ToUpper()
                         },
                         separator = new Box
@@ -137,9 +138,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                separator.Colour = colours.Gray5;
+                separator.Colour = text.Colour = colourProvider.Foreground1;
             }
         }
 
@@ -189,15 +190,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set
                 {
                     modsContainer.Clear();
-
-                    foreach (Mod mod in value)
+                    modsContainer.Children = value.Select(mod => new ModIcon(mod)
                     {
-                        modsContainer.Add(new ModIcon(mod)
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Scale = new Vector2(0.3f),
-                        });
-                    }
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.25f),
+                    }).ToList();
                 }
             }
         }
