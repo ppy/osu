@@ -4,8 +4,8 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Scoring;
-using static osu.Game.Users.User;
 using osu.Game.Utils;
+using static osu.Game.Users.User;
 
 namespace osu.Game.Users
 {
