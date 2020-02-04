@@ -106,8 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 AutoSizeAxes = Axes.Y,
                                 Padding = new MarginPadding
                                 {
-                                    Top = 20,
-                                    Bottom = 30,
+                                    Vertical = BeatmapSetOverlay.Y_PADDING,
                                     Left = BeatmapSetOverlay.X_PADDING,
                                     Right = BeatmapSetOverlay.X_PADDING + BeatmapSetOverlay.RIGHT_WIDTH,
                                 },
@@ -187,7 +186,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                                 AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Top = BeatmapSetOverlay.TOP_PADDING, Right = BeatmapSetOverlay.X_PADDING },
+                                Margin = new MarginPadding { Top = BeatmapSetOverlay.Y_PADDING, Right = BeatmapSetOverlay.X_PADDING },
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(10),
                                 Children = new Drawable[]
