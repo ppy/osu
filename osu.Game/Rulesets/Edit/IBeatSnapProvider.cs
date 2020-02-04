@@ -8,10 +8,10 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Snaps a duration to the closest beat of a timing point applicable at the reference time.
         /// </summary>
-        /// <param name="referenceTime">The time of the timing point which <paramref name="duration"/> resides in.</param>
-        /// <param name="duration">The duration to snap.</param>
-        /// <returns>A value that represents <paramref name="duration"/> snapped to the closest beat of the timing point.</returns>
-        double SnapTime(double referenceTime, double duration);
+        /// <param name="time">The time to snap.</param>
+        /// <param name="referenceTime">An optional reference point to use for timing point lookup.</param>
+        /// <returns>A value that represents <paramref name="time"/> snapped to the closest beat of the timing point.</returns>
+        double SnapTime(double time, double? referenceTime = null);
 
         /// <summary>
         /// Get the most appropriate beat length at a given time.

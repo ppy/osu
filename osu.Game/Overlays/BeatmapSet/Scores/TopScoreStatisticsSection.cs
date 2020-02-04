@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set
             {
                 totalScoreColumn.Text = $@"{value.TotalScore:N0}";
-                accuracyColumn.Text = $@"{value.Accuracy:P2}";
+                accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
                 ppColumn.Text = $@"{value.PP:N0}";
 

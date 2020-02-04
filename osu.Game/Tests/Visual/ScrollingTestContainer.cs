@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual
             public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
 
-            public readonly Bindable<double> TimeRange = new Bindable<double>(1000) { Value = 1000 };
+            public readonly Bindable<double> TimeRange = new BindableDouble(1000) { Value = 1000 };
             IBindable<double> IScrollingInfo.TimeRange => TimeRange;
 
             public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
