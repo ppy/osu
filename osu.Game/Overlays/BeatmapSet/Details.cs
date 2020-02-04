@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -106,6 +106,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private class DetailBox : Container
         {
             private readonly Container content;
+            private readonly Box background;
+
             protected override Container<Drawable> Content => content;
 
             public DetailBox()
@@ -115,10 +117,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 InternalChildren = new Drawable[]
                 {
-                    new Box
+                    background = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
                         Alpha = 0.5f
                     },
                     content = new Container
@@ -128,6 +129,12 @@ namespace osu.Game.Overlays.BeatmapSet
                         Padding = new MarginPadding { Horizontal = 15 },
                     },
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                background.Colour = colourProvider.Background6;
             }
         }
     }
