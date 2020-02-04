@@ -129,6 +129,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             {
                                                 Direction = FillDirection.Horizontal,
                                                 AutoSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding { Top = 15 },
                                                 Children = new Drawable[]
                                                 {
                                                     title = new OsuSpriteText
