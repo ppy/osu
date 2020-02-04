@@ -23,7 +23,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreStatisticsSection : CompositeDrawable
     {
         private const float margin = 10;
-        private const float statistics_column_min_width = 40;
+        private const float top_columns_min_width = 64;
+        private const float bottom_columns_min_width = 45;
 
         private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
         private readonly FontUsage largeFont = OsuFont.GetFont(size: 22);
@@ -58,9 +59,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            totalScoreColumn = new TextColumn("total score", largeFont),
-                            accuracyColumn = new TextColumn("accuracy", largeFont),
-                            maxComboColumn = new TextColumn("max combo", largeFont)
+                            totalScoreColumn = new TextColumn("total score", largeFont, top_columns_min_width),
+                            accuracyColumn = new TextColumn("accuracy", largeFont, top_columns_min_width),
+                            maxComboColumn = new TextColumn("max combo", largeFont, top_columns_min_width)
                         }
                     },
                     new FillFlowContainer
@@ -78,7 +79,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(margin, 0),
                             },
-                            ppColumn = new TextColumn("pp", smallFont, statistics_column_min_width),
+                            ppColumn = new TextColumn("pp", smallFont, bottom_columns_min_width),
                             modsColumn = new ModsInfoColumn(),
                         }
                     },
@@ -103,7 +104,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont, statistics_column_min_width)
+        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont, bottom_columns_min_width)
         {
             Text = count.ToString()
         };
