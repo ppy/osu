@@ -196,8 +196,8 @@ namespace osu.Game.Overlays.BeatmapSet
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
-                                        TextSize = 14,
-                                        TextPadding = new MarginPadding { Horizontal = 25, Vertical = 8 }
+                                        TextSize = 17,
+                                        TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
                                     },
                                     Details = new Details(),
                                 },
