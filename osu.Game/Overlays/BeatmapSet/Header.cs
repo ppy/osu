@@ -93,10 +93,9 @@ namespace osu.Game.Overlays.BeatmapSet
                                         RelativeSizeAxes = Axes.Both,
                                         Masking = true,
                                     },
-                                    new Box
+                                    coverGradient = new Box
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0.8f)),
+                                        RelativeSizeAxes = Axes.Both
                                     },
                                 },
                             },
@@ -215,8 +214,10 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
+            coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
+
             State.BindValueChanged(_ => updateDownloadButtons());
 
             BeatmapSet.BindValueChanged(setInfo =>
