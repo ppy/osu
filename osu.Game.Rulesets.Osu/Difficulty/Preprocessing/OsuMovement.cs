@@ -391,10 +391,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 timeLate = cheesabilityLate * (1 / (1 / (t12 + 0.07) + t23Reciprocal));
             }
 
-            // Correction #6 - Small circle bonus
+            // Correction #6 - High bpm jump buff (alt buff)
+            double effectiveBpm = 30 / (t12 + 1e-10);
+            double highBpmJumpBuff = SpecialFunctions.Logistic((effectiveBpm - 340) / 16) *
+                                     SpecialFunctions.Logistic((d12 - 1.9) / 0.15) * 0.23;
+
+
+            // Correction #7 - Small circle bonus
             double smallCircleBonus = SpecialFunctions.Logistic((55 - 2 * obj2.Radius) / 3.0) * 0.3;
 
-            // Correction #7 - Stacked notes nerf
+            // Correction #8 - Stacked notes nerf
             double stackedThreshold = 0.8;
             double d12StackedNerf;
 
@@ -403,7 +409,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             else
                 d12StackedNerf = d12;
 
-            // Correction #8 - Hidden Mod
+            // Correction #9 - Hidden Mod
             double correctionHidden = 0;
             if (hidden)
             {
@@ -411,7 +417,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
 
-            // Correction #9 - Stacked wiggle fix
+            // Correction #10 - Stacked wiggle fix
             if (obj0 != null && obj3 != null)
             {
                 var d02 = ((pos2 - pos0) / (2 * obj2.Radius)).L2Norm();
@@ -429,7 +435,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
             // Apply the corrections
             double d12WithCorrection = d12StackedNerf * (1 + smallCircleBonus) * (1 + correction0 + correction3 + patternCorrection) *
-                                       (1 + tapCorrection) * (1 + correctionHidden);
+                                       (1 + highBpmJumpBuff) * (1 + tapCorrection) * (1 + correctionHidden);
 
             movement.D = d12WithCorrection;
             movement.MT = t12;
