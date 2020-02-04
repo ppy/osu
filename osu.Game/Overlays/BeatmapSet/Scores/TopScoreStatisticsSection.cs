@@ -99,7 +99,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
                 ppColumn.Text = $@"{value.PP:N0}";
 
-                statisticsColumns.ChildrenEnumerable = value.Statistics.Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
+                statisticsColumns.ChildrenEnumerable = value.Statistics
+                                                            .OrderByDescending(pair => pair.Key)
+                                                            .Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
                 modsColumn.Mods = value.Mods;
             }
         }
