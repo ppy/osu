@@ -134,7 +134,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             RelativeSizeAxes = minWidth == null ? Axes.X : Axes.None,
                             Width = minWidth ?? 1f,
-                            Height = 2
+                            Height = 2,
+                            Margin = new MarginPadding { Top = 2 }
                         },
                         content
                     }
