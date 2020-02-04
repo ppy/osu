@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Comments
             loadCancellation?.Cancel();
             request = new GetCommentsRequest(type, id.Value, Sort.Value, currentPage++);
             request.Success += onSuccess;
-            api.Queue(request);
+            api.PerformAsync(request);
         }
 
         private void clearComments()
