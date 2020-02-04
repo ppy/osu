@@ -68,7 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Mania scores", () => createScoreTable(new ManiaRuleset().RulesetInfo));
             AddStep("Taiko country scores", () => createCountryTable(new TaikoRuleset().RulesetInfo));
             AddStep("Catch US performance page 10", () => createPerformanceTable(new CatchRuleset().RulesetInfo, "US", 10));
-            AddStep("Osu 271 spotlight table", () => createSpotlightTable(new OsuRuleset().RulesetInfo, 271));
+            AddStep("Osu spotlight table (chart 271)", () => createSpotlightTable(new OsuRuleset().RulesetInfo, 271));
         }
 
         private void createCountryTable(RulesetInfo ruleset, int page = 1)
