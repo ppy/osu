@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Play
                         IsPaused = { BindTarget = GameplayClockContainer.IsPaused }
                     },
                     PlayerSettingsOverlay = { PlaybackSettings = { UserPlaybackRate = { BindTarget = GameplayClockContainer.UserPlaybackRate } } },
-                    KeyCounter = { Visible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
+                    KeyCounter = { AlwaysVisible = { BindTarget = DrawableRuleset.HasReplayLoaded } },
                     RequestSeek = GameplayClockContainer.Seek,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre
