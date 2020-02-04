@@ -26,6 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box successRateBackground;
         private readonly Box background;
         private readonly SuccessRate successRate;
+        private readonly OsuSpriteText unrankedPlaceholder;
 
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -110,6 +111,14 @@ namespace osu.Game.Overlays.BeatmapSet
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding { Top = 20, Horizontal = 15 },
                                 },
+                                unrankedPlaceholder = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Alpha = 0,
+                                    Text = "Unranked beatmap",
+                                    Font = OsuFont.GetFont(size: 13)
+                                },
                             },
                         },
                     },
@@ -122,6 +131,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
                 genre.Text = b.NewValue?.OnlineInfo?.Genre?.Name ?? string.Empty;
                 language.Text = b.NewValue?.OnlineInfo?.Language?.Name ?? string.Empty;
+                var setHasLeaderboard = (b.NewValue?.OnlineInfo?.Status ?? 0) > 0;
+                successRate.Alpha = setHasLeaderboard ? 1 : 0;
+                unrankedPlaceholder.Alpha = setHasLeaderboard ? 0 : 1;
             };
         }
 
