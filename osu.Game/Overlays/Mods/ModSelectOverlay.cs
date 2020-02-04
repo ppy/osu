@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly Container ModSettingsContainer;
 
-        protected readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
+        public readonly Bindable<IReadOnlyList<Mod>> SelectedMods = new Bindable<IReadOnlyList<Mod>>(Array.Empty<Mod>());
 
         private Bindable<Dictionary<ModType, IReadOnlyList<Mod>>> availableMods;
 
@@ -323,14 +323,13 @@ namespace osu.Game.Overlays.Mods
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, Bindable<IReadOnlyList<Mod>> selectedMods, OsuGameBase osu)
+        private void load(OsuColour colours, AudioManager audio, OsuGameBase osu)
         {
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
             UnrankedLabel.Colour = colours.Blue;
 
             availableMods = osu.AvailableMods.GetBoundCopy();
-            SelectedMods.BindTo(selectedMods);
 
             sampleOn = audio.Samples.Get(@"UI/check-on");
             sampleOff = audio.Samples.Get(@"UI/check-off");

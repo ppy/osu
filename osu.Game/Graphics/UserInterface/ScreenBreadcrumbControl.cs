@@ -17,7 +17,8 @@ namespace osu.Game.Graphics.UserInterface
             stack.ScreenPushed += onPushed;
             stack.ScreenExited += onExited;
 
-            onPushed(null, stack.CurrentScreen);
+            if (stack.CurrentScreen != null)
+                onPushed(null, stack.CurrentScreen);
 
             Current.ValueChanged += current => current.NewValue.MakeCurrent();
         }

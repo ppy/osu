@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -76,6 +78,13 @@ namespace osu.Game.Tests.Visual.Navigation
             ConfirmAtMainMenu();
         }
 
+        protected void PushAndConfirm(Func<Screen> newScreen)
+        {
+            Screen screen = null;
+            AddStep("Push new screen", () => Game.ScreenStack.Push(screen = newScreen()));
+            AddUntilStep("Wait for new screen", () => Game.ScreenStack.CurrentScreen == screen && screen.IsLoaded);
+        }
+
         protected void ConfirmAtMainMenu() => AddUntilStep("Wait for main menu", () => Game.ScreenStack.CurrentScreen is MainMenu menu && menu.IsLoaded);
 
         public class TestOsuGame : OsuGame
@@ -95,6 +104,8 @@ namespace osu.Game.Tests.Visual.Navigation
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
             protected override Loader CreateLoader() => new TestLoader();
+
+            public new void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null) => base.PerformFromScreen(action, validScreens);
 
             public TestOsuGame(Storage storage, IAPIProvider api)
             {
