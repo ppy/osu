@@ -60,7 +60,7 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.Current.BindTo(Current);
+            header.Post.BindTo(Current);
             Current.TriggerChange();
         }
 
