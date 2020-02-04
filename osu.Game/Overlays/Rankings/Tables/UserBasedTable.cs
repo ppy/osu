@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Rankings.Tables
 
         protected sealed override Drawable[] CreateAdditionalContent(UserStatistics item) => new[]
         {
-            new ColoredRowText { Text = $@"{item.Accuracy:F2}%", },
+            new ColoredRowText { Text = item.DisplayAccuracy, },
             new ColoredRowText { Text = $@"{item.PlayCount:N0}", },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {

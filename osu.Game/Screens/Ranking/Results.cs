@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Ranking
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.BottomCentre,
-                                Text = $"{Score.Accuracy:P2}",
+                                Text = Score.DisplayAccuracy,
                                 Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
                                 RelativePositionAxes = Axes.X,
                                 X = 0.9f,
