@@ -43,7 +43,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black,
                     Alpha = 0.5f
                 },
                 new Container
@@ -72,9 +71,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
             progress.Colour = colours.Yellow;
+            background.Colour = colourProvider.Background6;
         }
 
         protected override void Update()
