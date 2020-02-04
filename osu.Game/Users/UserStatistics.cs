@@ -85,20 +85,20 @@ namespace osu.Game.Users
             [JsonProperty(@"a")]
             public int A;
 
-            public int? this[ScoreRank rank]
+            public int this[ScoreRank rank]
             {
                 get
                 {
                     switch (rank)
                     {
                         case ScoreRank.XH:
-                            return SSPlus;
+                            return SSPlus ?? 0;
 
                         case ScoreRank.X:
                             return SS;
 
                         case ScoreRank.SH:
-                            return SPlus;
+                            return SPlus ?? 0;
 
                         case ScoreRank.S:
                             return S;
