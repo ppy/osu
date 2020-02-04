@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -64,6 +64,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 for (int i = 0; i < value.Count; i++)
                     backgroundFlow.Add(new ScoreTableRowBackground(i, value[i]));
+
+                // Ensure correct column order
+                foreach (ScoreInfo score in value)
+                    score.Statistics = score.Statistics.OrderByDescending(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
 
                 Columns = createHeaders(value[0]);
                 Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
