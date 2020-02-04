@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
@@ -20,6 +20,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly PreviewButton preview;
         private readonly BasicStats basic;
         private readonly AdvancedStats advanced;
+        private readonly DetailBox ratingBox;
 
         private BeatmapSetInfo beatmapSet;
 
@@ -53,6 +54,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void updateDisplay()
         {
             Ratings.Metrics = BeatmapSet?.Metrics;
+            ratingBox.Alpha = (BeatmapSet?.OnlineInfo?.Status ?? 0) > 0 ? 1 : 0;
         }
 
         public Details()
@@ -85,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         Margin = new MarginPadding { Vertical = 7.5f },
                     },
                 },
-                new DetailBox
+                ratingBox = new DetailBox
                 {
                     Child = Ratings = new UserRatings
                     {
