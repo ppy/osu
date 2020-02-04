@@ -9,7 +9,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Select.Details;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
