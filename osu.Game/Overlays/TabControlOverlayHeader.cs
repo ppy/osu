@@ -20,8 +20,6 @@ namespace osu.Game.Overlays
     /// <typeparam name="T">The type of item to be represented by tabs.</typeparam>
     public abstract class TabControlOverlayHeader<T> : OverlayHeader, IHasCurrentValue<T>
     {
-        public readonly Bindable<T> Current = new Bindable<T>();
-
         protected OsuTabControl<T> TabControl;
 
         private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
