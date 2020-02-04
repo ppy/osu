@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont)
+        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont, statistics_column_min_width)
         {
             Text = count.ToString()
         };
