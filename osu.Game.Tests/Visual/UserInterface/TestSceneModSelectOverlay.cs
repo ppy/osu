@@ -62,6 +62,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
+                    SelectedMods = { BindTarget = SelectedMods }
                 },
 
                 modDisplay = new ModDisplay
