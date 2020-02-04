@@ -26,7 +26,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box successRateBackground;
         private readonly Box background;
         private readonly SuccessRate successRate;
-        private readonly OsuSpriteText unrankedPlaceholder;
 
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -39,6 +38,8 @@ namespace osu.Game.Overlays.BeatmapSet
         public Info()
         {
             MetadataSection source, tags, genre, language;
+            OsuSpriteText unrankedPlaceholder;
+
             RelativeSizeAxes = Axes.X;
             Height = 220;
             Masking = true;
