@@ -81,9 +81,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("rank", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
                 new TableColumn("score", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 60, maxSize: 70)),
                 new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
-                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
+                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 110))
             };
 
             foreach (var statistic in score.Statistics)
@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold);
+                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
             }
 
             [BackgroundDependencyLoader]
