@@ -130,7 +130,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         separator = new Box
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 2
+                            Height = 1
                         },
                         content
                     }
