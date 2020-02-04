@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 {
                                                     title = new OsuSpriteText
                                                     {
-                                                        Font = OsuFont.GetFont(size: 37, weight: FontWeight.Bold, italics: true)
+                                                        Font = OsuFont.GetFont(size: 37, weight: FontWeight.SemiBold, italics: true)
                                                     },
                                                     externalLink = new ExternalLinkButton
                                                     {
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     },
                                                 }
                                             },
-                                            artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.SemiBold, italics: true) },
+                                            artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.Medium, italics: true) },
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.X,
