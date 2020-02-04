@@ -32,7 +32,7 @@ namespace osu.Game.Scoring
         public double Accuracy { get; set; }
 
         [JsonIgnore]
-        public string DisplayAccuracy => Accuracy == 1 ? "100%" : $"{Accuracy:P2}";
+        public string DisplayAccuracy => Accuracy == 1 ? "100%" : $"{Accuracy:0.00%}";
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
