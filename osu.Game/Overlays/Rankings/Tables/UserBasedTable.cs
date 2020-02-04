@@ -44,8 +44,8 @@ namespace osu.Game.Overlays.Rankings.Tables
             new ColoredRowText { Text = $@"{item.PlayCount:N0}", },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {
-            new ColoredRowText { Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}", },
-            new ColoredRowText { Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}", },
+            new ColoredRowText { Text = $@"{item.GradesCount.SS + (item.GradesCount.SSPlus ?? 0):N0}", },
+            new ColoredRowText { Text = $@"{item.GradesCount.S + (item.GradesCount.SPlus ?? 0):N0}", },
             new ColoredRowText { Text = $@"{item.GradesCount.A:N0}", }
         }).ToArray();
 

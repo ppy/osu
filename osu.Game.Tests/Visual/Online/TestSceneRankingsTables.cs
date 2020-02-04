@@ -68,6 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Mania scores", () => createScoreTable(new ManiaRuleset().RulesetInfo));
             AddStep("Taiko country scores", () => createCountryTable(new TaikoRuleset().RulesetInfo));
             AddStep("Catch US performance page 10", () => createPerformanceTable(new CatchRuleset().RulesetInfo, "US", 10));
+            AddStep("Osu 271 spotlight table", () => createSpotlightTable(new OsuRuleset().RulesetInfo, 271));
         }
 
         private void createCountryTable(RulesetInfo ruleset, int page = 1)
@@ -106,6 +107,20 @@ namespace osu.Game.Tests.Visual.Online
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
                 var table = new ScoresTable(page, rankings.Users);
+                loadTable(table);
+            });
+
+            api.Queue(request);
+        }
+
+        private void createSpotlightTable(RulesetInfo ruleset, int spotlight)
+        {
+            onLoadStarted();
+
+            request = new GetSpotlightRankingsRequest(ruleset, spotlight);
+            ((GetSpotlightRankingsRequest)request).Success += rankings => Schedule(() =>
+            {
+                var table = new ScoresTable(1, rankings.Users);
                 loadTable(table);
             });
 
