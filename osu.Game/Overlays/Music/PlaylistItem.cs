@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -66,6 +66,7 @@ namespace osu.Game.Overlays.Music
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(12),
                             Colour = colours.Gray5,
+                            AlwaysPresent = true,
                             Alpha = 0
                         },
                         text = new OsuTextFlowContainer
