@@ -17,8 +17,6 @@ namespace osu.Game.Overlays
 {
     public class OverlayRulesetTabItem : TabItem<RulesetInfo>
     {
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
-
         private Color4 accentColour;
 
         protected virtual Color4 AccentColour
@@ -68,6 +66,8 @@ namespace osu.Game.Overlays
             base.LoadComplete();
             Enabled.BindValueChanged(_ => updateState(), true);
         }
+
+        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
 
         protected override bool OnHover(HoverEvent e)
         {
