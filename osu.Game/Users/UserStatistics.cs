@@ -4,6 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using osu.Game.Scoring;
+using osu.Game.Utils;
 using static osu.Game.Users.User;
 
 namespace osu.Game.Users
@@ -42,6 +43,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"hit_accuracy")]
         public decimal Accuracy;
+
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;

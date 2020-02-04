@@ -5,6 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Rulesets;
 using System;
@@ -20,6 +21,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(BeatmapRulesetSelector),
             typeof(BeatmapRulesetTabItem),
         };
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private readonly TestRulesetSelector selector;
 

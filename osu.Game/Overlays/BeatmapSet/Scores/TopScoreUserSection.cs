@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -51,13 +50,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold, italics: true)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                             },
                             rank = new UpdateableRank(ScoreRank.D)
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Size = new Vector2(40),
+                                Size = new Vector2(28),
                                 FillMode = FillMode.Fit,
                             },
                         }
@@ -66,7 +65,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Size = new Vector2(80),
+                        Size = new Vector2(70),
                         Masking = true,
                         CornerRadius = 5,
                         EdgeEffect = new EdgeEffectParameters
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(0, 3),
                         Children = new Drawable[]
                         {
-                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold, italics: true))
+                            usernameText = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true))
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
@@ -97,25 +96,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold)
                             },
                             flag = new UpdateableFlag
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Size = new Vector2(20, 13),
+                                Size = new Vector2(19, 13),
                                 ShowPlaceholderOnNull = false,
                             },
                         }
                     }
                 }
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            rankText.Colour = colours.Yellow;
         }
 
         public int ScorePosition
