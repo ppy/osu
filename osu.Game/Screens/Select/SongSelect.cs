@@ -223,13 +223,13 @@ namespace osu.Game.Screens.Select
             {
                 AddRangeInternal(new Drawable[]
                 {
-                    new GridContainer // used for max width implementation
+                    new GridContainer // used for max height implementation
                     {
                         RelativeSizeAxes = Axes.Both,
                         RowDimensions = new[]
                         {
                             new Dimension(),
-                            new Dimension(GridSizeMode.Relative, 1f, maxSize: 560),
+                            new Dimension(GridSizeMode.Relative, 1f, maxSize: ModSelectOverlay.HEIGHT + Footer.HEIGHT),
                         },
                         Content = new[]
                         {
