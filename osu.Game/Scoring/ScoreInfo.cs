@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Scoring
         public double Accuracy { get; set; }
 
         [JsonIgnore]
-        public string DisplayAccuracy => Accuracy == 1 ? "100%" : $"{Accuracy:0.00%}";
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }

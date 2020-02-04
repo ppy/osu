@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using osu.Game.Scoring;
 using static osu.Game.Users.User;
+using osu.Game.Utils;
 
 namespace osu.Game.Users
 {
@@ -44,7 +45,7 @@ namespace osu.Game.Users
         public decimal Accuracy;
 
         [JsonIgnore]
-        public string DisplayAccuracy => $"{Accuracy:0.00%}";
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"play_count")]
         public int PlayCount;
