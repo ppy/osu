@@ -44,9 +44,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(10, 0),
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10, 8),
                 Children = new Drawable[]
                 {
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(margin, 0),
+                        Children = new Drawable[]
+                        {
+                            totalScoreColumn = new TextColumn("total score", largeFont),
+                            accuracyColumn = new TextColumn("accuracy", largeFont),
+                            maxComboColumn = new TextColumn("max combo", largeFont)
+                        }
+                    },
                     new FillFlowContainer
                     {
                         Anchor = Anchor.TopRight,
@@ -64,20 +79,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             },
                             ppColumn = new TextColumn("pp", smallFont),
                             modsColumn = new ModsInfoColumn(),
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(margin, 0),
-                        Children = new Drawable[]
-                        {
-                            totalScoreColumn = new TextColumn("total score", largeFont),
-                            accuracyColumn = new TextColumn("accuracy", largeFont),
-                            maxComboColumn = new TextColumn("max combo", largeFont)
                         }
                     },
                 }
