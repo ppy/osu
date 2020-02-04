@@ -18,11 +18,19 @@ namespace osu.Game.Overlays
     /// An overlay header which contains a <see cref="OsuTabControl{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of item to be represented by tabs.</typeparam>
-    public abstract class TabControlOverlayHeader<T> : OverlayHeader
+    public abstract class TabControlOverlayHeader<T> : OverlayHeader, IHasCurrentValue<T>
     {
         public readonly Bindable<T> Current = new Bindable<T>();
 
         protected OsuTabControl<T> TabControl;
+
+        private readonly BindableWithCurrent<T> current = new BindableWithCurrent<T>();
+
+        public Bindable<T> Current
+        {
+            get => current.Current;
+            set => current.Current = value;
+        }
 
         private readonly Box controlBackground;
 
