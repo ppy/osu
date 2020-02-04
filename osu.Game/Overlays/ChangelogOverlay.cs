@@ -78,7 +78,7 @@ namespace osu.Game.Overlays
 
             sampleBack = audio.Samples.Get(@"UI/generic-select-soft");
 
-            Header.Current.BindTo(Current);
+            Header.Build.BindTo(Current);
 
             Current.BindValueChanged(e =>
             {
