@@ -16,6 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Rankings.Tables;
 using osu.Game.Online.API.Requests.Responses;
 using System.Linq;
+using osuTK;
+using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Overlays
 {
@@ -37,6 +39,9 @@ namespace osu.Game.Overlays
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         public RankingsOverlay()
             : base(OverlayColourScheme.Green)
@@ -209,7 +214,28 @@ namespace osu.Game.Overlays
                     return new CountriesTable(1, countryRequest.Result.Countries);
 
                 case GetSpotlightRankingsRequest spotlightRequest:
-                    return new ScoresTable(1, spotlightRequest.Result.Users);
+                    return new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Children = new Drawable[]
+                        {
+                            new ScoresTable(1, spotlightRequest.Result.Users),
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Spacing = new Vector2(10),
+                                Children = spotlightRequest.Result.BeatmapSets.Select(b => new DirectGridPanel(b.ToBeatmapSet(rulesets))
+                                {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                }).ToList()
+                            }
+                        }
+                    };
             }
 
             return null;
