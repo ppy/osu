@@ -77,7 +77,7 @@ namespace osu.Game.Graphics
         public static IconUsage ModAutopilot => Get(0xe03a);
         public static IconUsage ModAuto => Get(0xe03b);
         public static IconUsage ModCinema => Get(0xe03c);
-        public static IconUsage ModDoubletime => Get(0xe03d);
+        public static IconUsage ModSpunOut => Get(0xe03d);
         public static IconUsage ModEasy => Get(0xe03e);
         public static IconUsage ModFlashlight => Get(0xe03f);
         public static IconUsage ModHalftime => Get(0xe040);
