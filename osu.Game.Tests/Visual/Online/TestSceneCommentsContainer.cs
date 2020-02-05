@@ -10,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Game.Overlays.Comments;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
+using osu.Game.Online.API;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -34,21 +35,26 @@ namespace osu.Game.Tests.Visual.Online
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Purple);
 
+        private CommentsContainer comments;
+        private readonly BasicScrollContainer scroll;
+
         public TestSceneCommentsContainer()
         {
-            BasicScrollContainer scroll;
-            CommentsContainer comments;
-
             Add(scroll = new BasicScrollContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Child = comments = new CommentsContainer()
             });
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(IAPIProvider api)
+        {
             AddStep("Big Black comments", () => comments.ShowComments(CommentableType.Beatmapset, 41823));
             AddStep("Airman comments", () => comments.ShowComments(CommentableType.Beatmapset, 24313));
             AddStep("Lazer build comments", () => comments.ShowComments(CommentableType.Build, 4772));
             AddStep("News comments", () => comments.ShowComments(CommentableType.NewsPost, 715));
+            AddStep("Trigger user change", api.LocalUser.TriggerChange);
             AddStep("Idle state", () =>
             {
                 scroll.Clear();
