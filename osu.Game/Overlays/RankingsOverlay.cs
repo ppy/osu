@@ -27,7 +27,7 @@ namespace osu.Game.Overlays
         private readonly Bindable<APISpotlight> spotlight = new Bindable<APISpotlight>();
 
         private readonly BasicScrollContainer scrollFlow;
-        private readonly Container tableContainer;
+        private readonly Container contentContainer;
         private readonly DimmedLoadingLayer loading;
         private readonly Box background;
         private readonly RankingsOverlayHeader header;
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays
                                 AutoSizeAxes = Axes.Y,
                                 Children = new Drawable[]
                                 {
-                                    tableContainer = new Container
+                                    contentContainer = new Container
                                     {
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
@@ -160,12 +160,12 @@ namespace osu.Game.Overlays
 
             if (request == null)
             {
-                loadTable(null);
+                loadContent(null);
                 return;
             }
 
-            request.Success += () => loadTable(createTableFromResponse(request));
-            request.Failure += _ => loadTable(null);
+            request.Success += () => loadContent(createContentFromResponse(request));
+            request.Failure += _ => loadContent(null);
             api.Queue(request);
         }
 
@@ -189,7 +189,7 @@ namespace osu.Game.Overlays
             return null;
         }
 
-        private Drawable createTableFromResponse(APIRequest request)
+        private Drawable createContentFromResponse(APIRequest request)
         {
             switch (request)
             {
@@ -215,21 +215,21 @@ namespace osu.Game.Overlays
             return null;
         }
 
-        private void loadTable(Drawable table)
+        private void loadContent(Drawable content)
         {
             scrollFlow.ScrollToStart();
 
-            if (table == null)
+            if (content == null)
             {
-                tableContainer.Clear();
+                contentContainer.Clear();
                 loading.Hide();
                 return;
             }
 
-            LoadComponentAsync(table, t =>
+            LoadComponentAsync(content, t =>
             {
                 loading.Hide();
-                tableContainer.Child = table;
+                contentContainer.Child = content;
             }, (cancellationToken = new CancellationTokenSource()).Token);
         }
     }
