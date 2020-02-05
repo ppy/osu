@@ -25,16 +25,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"Spinners will be automatically completed";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
-
         public override double ScoreMultiplier => 0.9;
-
         private List<OsuReplayFrame> replayFrames;
-
         private int currentFrame;
         public void Update(Playfield playfield)
         {
             bool requiresHold = false;
-
             inputManager.AllowUserCursorMovement = true;
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
@@ -60,39 +56,27 @@ namespace osu.Game.Rulesets.Osu.Mods
                         new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
                     }
                 }
-
-
-                
             }
-            
         }
-
         private bool wasHit;
         private bool wasLeft;
-
         private OsuInputManager inputManager;
-
         private void addAction(bool hitting)
         {
             if (wasHit == hitting)
                 return;
-
             wasHit = hitting;
-
             var state = new ReplayState<OsuAction>
             {
                 PressedActions = new List<OsuAction>()
             };
-
             if (hitting)
             {
                 state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
                 wasLeft = !wasLeft;
             }
-
             state.Apply(inputManager.CurrentState, inputManager);
         }
-
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             // grab the input manager for future use.
