@@ -22,29 +22,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Spun Out";
         public override string Acronym => "SO";
         public override IconUsage? Icon => OsuIcon.ModSpunOut;
-        public override ModType Type => ModType.DifficultyIncrease;
+        public override ModType Type => ModType.DifficultyReduction;
         public override string Description => @"Spinners will be automatically completed";
-        public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
+        public override bool Ranked => true;
         public override double ScoreMultiplier => 0.9;
         private List<OsuReplayFrame> replayFrames;
         private int currentFrame;
         public void Update(Playfield playfield)
         {
             bool requiresHold = false;
-            inputManager.AllowUserCursorMovement = true;
             foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
-                inputManager.AllowUserCursorMovement = true;
                 double time = playfield.Time.Current;
-                if (!(drawable is DrawableOsuHitObject osuHit))
-                {
-                    inputManager.AllowUserCursorMovement = true;
-                    return;
-                }
-                if (osuHit is DrawableSpinner)
+                if (requiresHold |= (drawable is DrawableSpinner))
                 {
                     inputManager.AllowUserCursorMovement = false;
-                    requiresHold |= (osuHit is DrawableSpinner);
                     if (currentFrame == replayFrames.Count - 1)
                     {
                         return;
@@ -56,10 +48,13 @@ namespace osu.Game.Rulesets.Osu.Mods
                         new MousePositionAbsoluteInput { Position = playfield.ToScreenSpace(replayFrames[currentFrame].Position) }.Apply(inputManager.CurrentState, inputManager);
                     }
                 }
+                else
+                {
+                    inputManager.AllowUserCursorMovement = true;
+                }
             }
         }
         private bool wasHit;
-        private bool wasLeft;
         private OsuInputManager inputManager;
         private void addAction(bool hitting)
         {
@@ -72,8 +67,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             };
             if (hitting)
             {
-                state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
-                wasLeft = !wasLeft;
+                state.PressedActions.Add(OsuAction.LeftButton);
             }
             state.Apply(inputManager.CurrentState, inputManager);
         }
