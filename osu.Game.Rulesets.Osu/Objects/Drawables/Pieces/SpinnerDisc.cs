@@ -98,6 +98,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
 
+            var delta = thisAngle - lastAngle;
+
             if (validAndTracking)
             {
                 if (!rotationTransferred)
@@ -106,13 +108,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     rotationTransferred = true;
                 }
 
-                if (thisAngle - lastAngle > 180)
+                if (delta > 180)
+                {
                     lastAngle += 360;
-                else if (lastAngle - thisAngle > 180)
+                    delta -= 360;
+                }
+                else if (-delta > 180)
+                {
                     lastAngle -= 360;
+                    delta += 360;
+                }
 
-                currentRotation += thisAngle - lastAngle;
-                RotationAbsolute += Math.Abs(thisAngle - lastAngle) * Math.Sign(Clock.ElapsedFrameTime);
+                currentRotation += delta;
+                RotationAbsolute += Math.Abs(delta) * Math.Sign(Clock.ElapsedFrameTime);
             }
 
             lastAngle = thisAngle;
