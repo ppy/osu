@@ -218,6 +218,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OverlayColourProvider colourProvider)
         {
             coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
+            onlineStatusPill.BackgroundColour = colourProvider.Background6;
 
             State.BindValueChanged(_ => updateDownloadButtons());
 
