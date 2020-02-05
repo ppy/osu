@@ -50,17 +50,17 @@ namespace osu.Game.Online.Chat
             joinedChannels.ItemsAdded += joinedChannels =>
             {
                 foreach (var channel in joinedChannels)
-                    channel.NewMessagesArrived += channel_newMessagesArrived;
+                    channel.NewMessagesArrived += newMessagesArrived;
             };
 
             joinedChannels.ItemsRemoved += leftChannels =>
             {
                 foreach (var channel in leftChannels)
-                    channel.NewMessagesArrived -= channel_newMessagesArrived;
+                    channel.NewMessagesArrived -= newMessagesArrived;
             };
         }
 
-        private void channel_newMessagesArrived(IEnumerable<Message> messages)
+        private void newMessagesArrived(IEnumerable<Message> messages)
         {
             if (messages == null || !messages.Any())
                 return;
