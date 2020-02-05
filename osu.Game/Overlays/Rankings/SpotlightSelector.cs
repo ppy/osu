@@ -14,6 +14,7 @@ using osuTK;
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Rankings
 {
@@ -101,12 +102,12 @@ namespace osu.Game.Overlays.Rankings
             background.Colour = colourProvider.Dark3;
         }
 
-        public void ShowInfo(APISpotlight spotlight, int mapCount)
+        public void ShowInfo(GetSpotlightRankingsResponse response)
         {
-            startDateColumn.Value = dateToString(spotlight.StartDate);
-            endDateColumn.Value = dateToString(spotlight.EndDate);
-            mapCountColumn.Value = mapCount.ToString();
-            participantsColumn.Value = spotlight.Participants?.ToString("N0");
+            startDateColumn.Value = dateToString(response.Spotlight.StartDate);
+            endDateColumn.Value = dateToString(response.Spotlight.EndDate);
+            mapCountColumn.Value = response.BeatmapSets.Count.ToString();
+            participantsColumn.Value = response.Spotlight.Participants?.ToString("N0");
         }
 
         protected override void PopIn()

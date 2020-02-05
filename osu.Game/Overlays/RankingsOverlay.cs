@@ -217,7 +217,7 @@ namespace osu.Game.Overlays
                     return new CountriesTable(1, countryRequest.Result.Countries);
 
                 case GetSpotlightRankingsRequest spotlightRequest:
-                    header.SpotlightSelector.ShowInfo(spotlightRequest.Result.Spotlight, spotlightRequest.Result.BeatmapSets.Count);
+                    header.SpotlightSelector.ShowInfo(spotlightRequest.Result);
                     return new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Y,
