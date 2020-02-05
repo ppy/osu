@@ -96,32 +96,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
-
             var delta = thisAngle - lastAngle;
 
+            bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+
             if (validAndTracking)
-            {
-                if (!rotationTransferred)
-                {
-                    currentRotation = Rotation * 2;
-                    rotationTransferred = true;
-                }
-
-                if (delta > 180)
-                {
-                    lastAngle += 360;
-                    delta -= 360;
-                }
-                else if (-delta > 180)
-                {
-                    lastAngle -= 360;
-                    delta += 360;
-                }
-
-                currentRotation += delta;
-                RotationAbsolute += Math.Abs(delta) * Math.Sign(Clock.ElapsedFrameTime);
-            }
+                Rotate(delta);
 
             lastAngle = thisAngle;
 
@@ -135,6 +115,29 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
+        }
+
+        public void Rotate(float angle)
+        {
+            if (!rotationTransferred)
+            {
+                currentRotation = Rotation * 2;
+                rotationTransferred = true;
+            }
+
+            if (angle > 180)
+            {
+                lastAngle += 360;
+                angle -= 360;
+            }
+            else if (-angle > 180)
+            {
+                lastAngle -= 360;
+                angle += 360;
+            }
+
+            currentRotation += angle;
+            RotationAbsolute += Math.Abs(angle) * Math.Sign(Clock.ElapsedFrameTime);
         }
     }
 }
