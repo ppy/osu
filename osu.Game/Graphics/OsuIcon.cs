@@ -81,6 +81,7 @@ namespace osu.Game.Graphics
         public static IconUsage ModEasy => Get(0xe03e);
         public static IconUsage ModFlashlight => Get(0xe03f);
         public static IconUsage ModHalftime => Get(0xe040);
+        public static IconUsage ModDoubletime => Get(0xe03d);
         public static IconUsage ModHardrock => Get(0xe041);
         public static IconUsage ModHidden => Get(0xe042);
         public static IconUsage ModNightcore => Get(0xe043);
