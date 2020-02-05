@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Threading;
@@ -36,17 +37,16 @@ namespace osu.Game.Screens.Edit
 
         public readonly IBeatmap PlayableBeatmap;
 
-        private readonly BindableBeatDivisor beatDivisor;
+        [Resolved]
+        private BindableBeatDivisor beatDivisor { get; set; }
 
         private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
-        public EditorBeatmap(IBeatmap playableBeatmap, BindableBeatDivisor beatDivisor = null)
+        public EditorBeatmap(IBeatmap playableBeatmap)
         {
             PlayableBeatmap = playableBeatmap;
-
-            this.beatDivisor = beatDivisor;
 
             beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
 
