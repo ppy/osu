@@ -36,7 +36,6 @@ namespace osu.Game.Overlays
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
-        private GetSpotlightsRequest spotlightsRequest;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -147,6 +146,8 @@ namespace osu.Game.Overlays
 
             Country.Value = requested;
         }
+
+        private GetSpotlightsRequest spotlightsRequest;
 
         private void getSpotlights()
         {
