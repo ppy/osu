@@ -218,32 +218,38 @@ namespace osu.Game.Overlays
                     return new CountriesTable(1, countryRequest.Result.Countries);
 
                 case GetSpotlightRankingsRequest spotlightRequest:
-                    header.SpotlightSelector.ShowInfo(spotlightRequest.Result);
-                    return new FillFlowContainer
-                    {
-                        AutoSizeAxes = Axes.Y,
-                        RelativeSizeAxes = Axes.X,
-                        Direction = FillDirection.Vertical,
-                        Spacing = new Vector2(0, 20),
-                        Children = new Drawable[]
-                        {
-                            new ScoresTable(1, spotlightRequest.Result.Users),
-                            new FillFlowContainer
-                            {
-                                AutoSizeAxes = Axes.Y,
-                                RelativeSizeAxes = Axes.X,
-                                Spacing = new Vector2(10),
-                                Children = spotlightRequest.Result.BeatmapSets.Select(b => new DirectGridPanel(b.ToBeatmapSet(rulesets))
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                }).ToList()
-                            }
-                        }
-                    };
+                    return getSpotlightContent(spotlightRequest.Result);
             }
 
             return null;
+        }
+
+        private Drawable getSpotlightContent(GetSpotlightRankingsResponse response)
+        {
+            header.SpotlightSelector.ShowInfo(response);
+
+            return new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
+                {
+                    new ScoresTable(1, response.Users),
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                        Spacing = new Vector2(10),
+                        Children = response.BeatmapSets.Select(b => new DirectGridPanel(b.ToBeatmapSet(rulesets))
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }).ToList()
+                    }
+                }
+            };
         }
 
         private void loadContent(Drawable content)
