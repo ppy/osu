@@ -11,7 +11,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Swell : TaikoHitObject, IHasEndTime
     {
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
 
