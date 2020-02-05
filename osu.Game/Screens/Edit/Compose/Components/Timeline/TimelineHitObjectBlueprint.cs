@@ -119,7 +119,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 switch (hitObject)
                 {
                     case IHasRepeats repeatHitObject:
-                        repeatHitObject.RepeatCount = (int)((time - hitObject.StartTime) / (repeatHitObject.Duration / repeatHitObject.RepeatCount));
+                        // find the number of repeats which can fit in the requested time.
+                        var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
+                        var proposedCount = (int)((time - hitObject.StartTime) / lengthOfOneRepeat) - 1;
+
+                        if (proposedCount == repeatHitObject.RepeatCount || proposedCount < 0)
+                            return;
+
+                        repeatHitObject.RepeatCount = proposedCount;
                         break;
 
                     case IHasEndTime endTimeHitObject:
