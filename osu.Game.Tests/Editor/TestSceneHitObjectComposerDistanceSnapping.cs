@@ -3,6 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
@@ -23,15 +25,31 @@ namespace osu.Game.Tests.Editor
         [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap;
 
+        protected override Container<Drawable> Content { get; }
+
         public TestSceneHitObjectComposerDistanceSnapping()
         {
-            editorBeatmap = new EditorBeatmap(new OsuBeatmap(), BeatDivisor);
+            base.Content.Add(new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    editorBeatmap = new EditorBeatmap(new OsuBeatmap()),
+                    Content = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    }
+                },
+            });
         }
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            Child = composer = new TestHitObjectComposer();
+            Children = new Drawable[]
+            {
+                composer = new TestHitObjectComposer()
+            };
 
             BeatDivisor.Value = 1;
 
