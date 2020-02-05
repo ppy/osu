@@ -36,6 +36,7 @@ namespace osu.Game.Overlays
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
+        private GetSpotlightsRequest spotlightsRequest;
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -115,6 +116,8 @@ namespace osu.Game.Overlays
 
             Scope.BindValueChanged(_ =>
             {
+                spotlightsRequest?.Cancel();
+
                 // country filtering is only valid for performance scope.
                 if (Scope.Value != RankingsScope.Performance)
                     Country.Value = null;
@@ -148,9 +151,9 @@ namespace osu.Game.Overlays
         private void getSpotlights()
         {
             loading.Show();
-            var request = new GetSpotlightsRequest();
-            request.Success += response => header.Spotlights = response.Spotlights;
-            api.Queue(request);
+            spotlightsRequest = new GetSpotlightsRequest();
+            spotlightsRequest.Success += response => header.Spotlights = response.Spotlights;
+            api.Queue(spotlightsRequest);
         }
 
         private void loadNewContent()
@@ -214,6 +217,7 @@ namespace osu.Game.Overlays
                     return new CountriesTable(1, countryRequest.Result.Countries);
 
                 case GetSpotlightRankingsRequest spotlightRequest:
+                    header.SpotlightSelector.ShowInfo(spotlightRequest.Result.Spotlight, spotlightRequest.Result.BeatmapSets.Count);
                     return new FillFlowContainer
                     {
                         AutoSizeAxes = Axes.Y,
