@@ -23,6 +23,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private readonly Container extensionBar;
 
+        protected override bool ShouldBeConsideredForInput(Drawable child) => true;
+
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
@@ -103,6 +105,45 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 {
                     RelativeSizeAxes = Axes.Both,
                 };
+            }
+
+            protected override bool OnHover(HoverEvent e)
+            {
+                updateState();
+
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                updateState();
+                base.OnHoverLost(e);
+            }
+
+            private bool hasMouseDown;
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                hasMouseDown = true;
+                updateState();
+                return true;
+            }
+
+            protected override void OnMouseUp(MouseUpEvent e)
+            {
+                hasMouseDown = false;
+                updateState();
+                base.OnMouseUp(e);
+            }
+
+            private void updateState()
+            {
+                if (IsHovered || hasMouseDown)
+                    Colour = Color4.Orange;
+                else
+                {
+                    Colour = Color4.White;
+                }
             }
 
             protected override bool OnDragStart(DragStartEvent e) => true;
