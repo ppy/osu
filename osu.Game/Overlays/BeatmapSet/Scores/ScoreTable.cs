@@ -16,6 +16,7 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
+using osu.Game.Utils;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -120,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Text = $@"{score.Accuracy:0.00%}",
+                    Text = score.Accuracy.FormatAccuracy(alwaysShowDecimals: true),
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
