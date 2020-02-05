@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 {
                     Text = "切换:"
                 },
-                showStoryboardToggle = new PlayerCheckbox { LabelText = "故事版" },
+                showStoryboardToggle = new PlayerCheckbox { LabelText = "故事板" },
                 showVideoToggle = new PlayerCheckbox { LabelText = "背景视频" },
                 beatmapSkinsToggle = new PlayerCheckbox { LabelText = "谱面皮肤" },
                 beatmapHitsoundsToggle = new PlayerCheckbox { LabelText = "谱面击打音效" }

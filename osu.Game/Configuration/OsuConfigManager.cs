@@ -118,7 +118,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.UIHoldActivationDelay, 200f, 0f, 500f, 50f);
 
-            Set(OsuSetting.IntroSequence, IntroSequence.Triangles);
+            Set(OsuSetting.IntroSequence, IntroSequence.TrianglesCN);
 
             Set(OsuSetting.MenuBackgroundSource, BackgroundSource.Skin);
         }

@@ -68,6 +68,12 @@ namespace osu.Game.Screens
                 case IntroSequence.Circles:
                     return new IntroCircles();
 
+                case IntroSequence.CirclesCN:
+                    return new IntroCirclesCN();
+                
+                case IntroSequence.TrianglesCN:
+                    return new IntroTrianglesCN();
+
                 default:
                     return new IntroTriangles();
             }

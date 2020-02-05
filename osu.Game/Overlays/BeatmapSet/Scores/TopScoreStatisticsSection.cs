@@ -59,9 +59,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Spacing = new Vector2(margin, 0),
                         Children = new Drawable[]
                         {
-                            totalScoreColumn = new TextColumn("total score", largeFont, top_columns_min_width),
-                            accuracyColumn = new TextColumn("accuracy", largeFont, top_columns_min_width),
-                            maxComboColumn = new TextColumn("max combo", largeFont, top_columns_min_width)
+                            totalScoreColumn = new TextColumn("总分", largeFont, top_columns_min_width),
+                            accuracyColumn = new TextColumn("准确率", largeFont, top_columns_min_width),
+                            maxComboColumn = new TextColumn("最大连击", largeFont, top_columns_min_width)
                         }
                     },
                     new FillFlowContainer
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         text = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 16, weight: FontWeight.Bold),
                             Text = title.ToUpper()
                         },
                         separator = new Box

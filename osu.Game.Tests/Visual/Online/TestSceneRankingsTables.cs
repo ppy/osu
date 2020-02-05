@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Taiko;
 using osu.Game.Rulesets.Catch;
 using osu.Framework.Allocation;
+using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual.Online
 {
@@ -35,6 +36,9 @@ namespace osu.Game.Tests.Visual.Online
 
         [Resolved]
         private IAPIProvider api { get; set; }
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         private readonly BasicScrollContainer scrollFlow;
         private readonly DimmedLoadingLayer loading;
@@ -64,6 +68,7 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Mania scores", () => createScoreTable(new ManiaRuleset().RulesetInfo));
             AddStep("Taiko country scores", () => createCountryTable(new TaikoRuleset().RulesetInfo));
             AddStep("Catch US performance page 10", () => createPerformanceTable(new CatchRuleset().RulesetInfo, "US", 10));
+            AddStep("Osu spotlight table (chart 271)", () => createSpotlightTable(new OsuRuleset().RulesetInfo, 271));
         }
 
         private void createCountryTable(RulesetInfo ruleset, int page = 1)
@@ -102,6 +107,20 @@ namespace osu.Game.Tests.Visual.Online
             ((GetUserRankingsRequest)request).Success += rankings => Schedule(() =>
             {
                 var table = new ScoresTable(page, rankings.Users);
+                loadTable(table);
+            });
+
+            api.Queue(request);
+        }
+
+        private void createSpotlightTable(RulesetInfo ruleset, int spotlight)
+        {
+            onLoadStarted();
+
+            request = new GetSpotlightRankingsRequest(ruleset, spotlight);
+            ((GetSpotlightRankingsRequest)request).Success += rankings => Schedule(() =>
+            {
+                var table = new ScoresTable(1, rankings.Users);
                 loadTable(table);
             });
 

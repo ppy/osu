@@ -120,7 +120,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "下载中...",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "导入中...",
-                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 17, weight: FontWeight.Bold)
                             },
                         };
                         break;

@@ -14,7 +14,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Menu
 {
-    public class IntroSequence : Container
+    public class IntroSequenceCN : Container
     {
         private const float logo_size = 460; //todo: this should probably be 480
 
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
         private CircularContainer yellowCircle;
         private CircularContainer purpleCircle;
 
-        public IntroSequence()
+        public IntroSequenceCN()
         {
             RelativeSizeAxes = Axes.Both;
             Alpha = 0;
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Text = "welcome",
+                    Text = "欢迎 来到osu!",
                     Padding = new MarginPadding { Bottom = 10 },
                     Font = OsuFont.GetFont(weight: FontWeight.Light, size: 80),
                     Alpha = 0,

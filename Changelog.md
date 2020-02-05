@@ -236,3 +236,14 @@
     *   [m] [#7724 - Update BeatmapSetOverlay to match web design](https://github.com/ppy/osu/pull/7724)
     *   [m] [#7725 - Adjust TopScoreStatisticsSection to closer match web design](https://github.com/ppy/osu/pull/7725)
     *   [m] [#7721 - Add {ScoreInfo,UserStatistics}.Accuracy](https://github.com/ppy/osu/pull/7721)
+    *   [m] [#7726 - Add API to get rankings data for selected spotlight #7726](https://github.com/ppy/osu/pull/7726)
+*   变更
+    *   [+] 添加了原版的开场动画
+        *   [Circles](osu.Game/Screens/Menu/IntroCircles.cs)
+        *   [Triangles](osu.Game/Screens/Menu/IntroTriangles.cs)
+        *   现在的开场动画默认为汉化后的Triangles(TrianglesCN)
+        *   涉及修改的文件
+            *   [osu.Game/Screens/Menu/OsuLogo.cs](osu.Game/Screens/Menu/OsuLogo.cs)
+            *   [osu.Game/Screens/Loader.cs](osu.Game/Screens/Loader.cs)
+            *   [osu.Game/Configuration/IntroSequence.cs](osu.Game/Configuration/IntroSequence.cs)
+            *   [osu.Game/Configuration/OsuConfigManager.cs](osu.Game/Configuration/OsuConfigManager.cs)

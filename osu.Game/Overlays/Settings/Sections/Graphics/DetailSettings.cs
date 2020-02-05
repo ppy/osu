@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "故事版",
+                    LabelText = "故事板",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
                 },
                 new SettingsCheckbox

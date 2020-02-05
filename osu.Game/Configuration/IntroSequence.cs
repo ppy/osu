@@ -11,6 +11,10 @@ namespace osu.Game.Configuration
         Circles,
         [Description("三角")]
         Triangles,
+        [Description("圆周(中文)")]
+        CirclesCN,
+        [Description("三角(中文)")]
+        TrianglesCN,
         [Description("随机")]
         Random
     }
