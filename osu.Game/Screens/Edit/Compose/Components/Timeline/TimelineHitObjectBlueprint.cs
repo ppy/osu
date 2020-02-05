@@ -156,6 +156,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             [Resolved]
             private EditorBeatmap beatmap { get; set; }
 
+            [Resolved]
+            private IBeatSnapProvider beatSnapProvider { get; set; }
+
             protected override void OnDrag(DragEvent e)
             {
                 base.OnDrag(e);
@@ -178,7 +181,12 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                         break;
 
                     case IHasEndTime endTimeHitObject:
-                        endTimeHitObject.EndTime = time;
+                        var snappedTime = beatSnapProvider.SnapTime(time);
+
+                        if (endTimeHitObject.EndTime == snappedTime || snappedTime <= hitObject.StartTime)
+                            return;
+
+                        endTimeHitObject.EndTime = snappedTime;
                         break;
                 }
 
