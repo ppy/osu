@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -178,7 +177,7 @@ namespace osu.Game.Overlays.Profile.Header
             if (user?.Statistics != null)
             {
                 userStats.Add(new UserStatsLine("Ranked谱面总分", user.Statistics.RankedScore.ToString("#,##0")));
-                userStats.Add(new UserStatsLine("准确率", Math.Round(user.Statistics.Accuracy, 2).ToString("#0.00'%'")));
+               userStats.Add(new UserStatsLine("准确率", user.Statistics.DisplayAccuracy));
                 userStats.Add(new UserStatsLine("游玩次数", user.Statistics.PlayCount.ToString("#,##0")));
                 userStats.Add(new UserStatsLine("总分", user.Statistics.TotalScore.ToString("#,##0")));
                 userStats.Add(new UserStatsLine("总连击", user.Statistics.TotalHits.ToString("#,##0")));

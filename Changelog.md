@@ -231,3 +231,8 @@
     *   [m] [#7719 - Update BeatmapOverlay header in line with the web design](https://github.com/ppy/osu/pull/7719)
     *   [m] [#7720 - Fix potential nullref in UserDimBackgrounds tests](https://github.com/ppy/osu/pull/7720)
     *   [m] [#7723 - Expose TabControlOverlayHeader.Current value](https://github.com/ppy/osu/pull/7723)
+
+### 2020/2/5:
+    *   [m] [#7724 - Update BeatmapSetOverlay to match web design](https://github.com/ppy/osu/pull/7724)
+    *   [m] [#7725 - Adjust TopScoreStatisticsSection to closer match web design](https://github.com/ppy/osu/pull/7725)
+    *   [m] [#7721 - Add {ScoreInfo,UserStatistics}.Accuracy](https://github.com/ppy/osu/pull/7721)

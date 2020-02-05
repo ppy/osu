@@ -182,7 +182,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
         protected OsuSpriteText CreateDrawableAccuracy() => new OsuSpriteText
         {
-            Text = $"{Score.Accuracy:0.00%}",
+            Text = Score.DisplayAccuracy,
             Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
             Colour = colours.Yellow,
         };
