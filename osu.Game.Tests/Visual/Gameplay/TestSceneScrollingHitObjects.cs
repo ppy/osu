@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
+using osu.Framework.Utils;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
@@ -19,6 +20,7 @@ using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
@@ -236,7 +238,11 @@ namespace osu.Game.Tests.Visual.Gameplay
 
                 AutoSizeAxes = Axes.Both;
 
-                AddInternal(new Box { Size = new Vector2(75) });
+                AddInternal(new Box
+                {
+                    Size = new Vector2(75),
+                    Colour = new Color4(RNG.NextSingle(), RNG.NextSingle(), RNG.NextSingle(), 1)
+                });
             }
         }
     }
