@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
+                                Text = BeatmapSet.Value.OnlineInfo.HasVideo ? (noVideo ? "without Video" : "with Video") : string.Empty,
                                 Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
                             },
                         };
