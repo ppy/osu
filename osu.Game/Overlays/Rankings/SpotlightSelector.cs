@@ -38,6 +38,8 @@ namespace osu.Game.Overlays.Rankings
 
         private readonly InfoColumn startDateColumn;
         private readonly InfoColumn endDateColumn;
+        private readonly InfoColumn mapCountColumn;
+        private readonly InfoColumn participantsColumn;
 
         public SpotlightSelector()
         {
@@ -75,6 +77,8 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 startDateColumn = new InfoColumn(@"Start Date"),
                                 endDateColumn = new InfoColumn(@"End Date"),
+                                mapCountColumn = new InfoColumn(@"Map Count"),
+                                participantsColumn = new InfoColumn(@"Participants")
                             }
                         }
                     }
@@ -88,17 +92,12 @@ namespace osu.Game.Overlays.Rankings
             background.Colour = colourProvider.Dark3;
         }
 
-        protected override void LoadComplete()
+        public void ShowInfo(APISpotlight spotlight, int mapCount)
         {
-            base.LoadComplete();
-
-            Current.BindValueChanged(onCurrentChanged);
-        }
-
-        private void onCurrentChanged(ValueChangedEvent<APISpotlight> spotlight)
-        {
-            startDateColumn.Value = dateToString(spotlight.NewValue.StartDate);
-            endDateColumn.Value = dateToString(spotlight.NewValue.EndDate);
+            startDateColumn.Value = dateToString(spotlight.StartDate);
+            endDateColumn.Value = dateToString(spotlight.EndDate);
+            mapCountColumn.Value = mapCount.ToString();
+            participantsColumn.Value = spotlight.Participants?.ToString("N0");
         }
 
         private string dateToString(DateTimeOffset date) => date.ToString("yyyy-MM-dd");

@@ -20,8 +20,8 @@ namespace osu.Game.Overlays.Rankings
 
         public IEnumerable<APISpotlight> Spotlights
         {
-            get => spotlightSelector.Spotlights;
-            set => spotlightSelector.Spotlights = value;
+            get => SpotlightSelector.Spotlights;
+            set => SpotlightSelector.Spotlights = value;
         }
 
         protected override ScreenTitle CreateTitle() => new RankingsTitle
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Rankings
             Current = Ruleset
         };
 
-        private SpotlightSelector spotlightSelector;
+        public SpotlightSelector SpotlightSelector;
 
         protected override Drawable CreateContent() => new FillFlowContainer
         {
@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Rankings
                 {
                     Current = Country
                 },
-                spotlightSelector = new SpotlightSelector
+                SpotlightSelector = new SpotlightSelector
                 {
                     Current = { BindTarget = Spotlight }
                 }
@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Rankings
         }
 
         private void onCurrentChanged(ValueChangedEvent<RankingsScope> scope) =>
-            spotlightSelector.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
+            SpotlightSelector.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
 
         private class RankingsTitle : ScreenTitle
         {
