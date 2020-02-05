@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Rankings
         }
 
         private void onCurrentChanged(ValueChangedEvent<RankingsScope> scope) =>
-            SpotlightSelector.FadeTo(scope.NewValue == RankingsScope.Spotlights ? 1 : 0, 200, Easing.OutQuint);
+            SpotlightSelector.State.Value = scope.NewValue == RankingsScope.Spotlights ? Visibility.Visible : Visibility.Hidden;
 
         private class RankingsTitle : ScreenTitle
         {
