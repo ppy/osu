@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
@@ -37,20 +38,20 @@ namespace osu.Game.Tests.Visual.Online
                 Ruleset = { BindTarget = ruleset },
                 Spotlights = new[]
                 {
-                    new Spotlight
+                    new APISpotlight
                     {
                         Id = 1,
-                        Text = "Spotlight 1"
+                        Name = "Spotlight 1"
                     },
-                    new Spotlight
+                    new APISpotlight
                     {
                         Id = 2,
-                        Text = "Spotlight 2"
+                        Name = "Spotlight 2"
                     },
-                    new Spotlight
+                    new APISpotlight
                     {
                         Id = 3,
-                        Text = "Spotlight 3"
+                        Name = "Spotlight 3"
                     }
                 }
             });
