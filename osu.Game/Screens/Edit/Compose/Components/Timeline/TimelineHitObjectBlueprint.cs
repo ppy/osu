@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -24,7 +26,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
-        public const float THICKNESS = 3;
+        public const float THICKNESS = 5;
 
         private const float circle_size = 16;
 
@@ -44,25 +46,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            if (hitObject is IHasEndTime)
-            {
-                AddInternal(extensionBar = new Container
-                {
-                    CornerRadius = 2,
-                    Masking = true,
-                    Size = new Vector2(1, THICKNESS),
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    RelativePositionAxes = Axes.X,
-                    RelativeSizeAxes = Axes.X,
-                    Colour = Color4.Black,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                });
-            }
-
             AddInternal(circle = new Circle
             {
                 Size = new Vector2(circle_size),
@@ -74,6 +57,78 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 BorderColour = Color4.Black,
                 BorderThickness = THICKNESS,
             });
+
+            if (hitObject is IHasEndTime)
+            {
+                AddRangeInternal(new Drawable[]
+                {
+                    extensionBar = new Container
+                    {
+                        CornerRadius = 2,
+                        Masking = true,
+                        Size = new Vector2(1, THICKNESS),
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        RelativePositionAxes = Axes.X,
+                        RelativeSizeAxes = Axes.X,
+                        Child = new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        }
+                    },
+                    new DragBar(hitObject),
+                });
+            }
+        }
+
+        public class DragBar : CompositeDrawable
+        {
+            private readonly HitObject hitObject;
+
+            [Resolved]
+            private Timeline timeline { get; set; }
+
+            public DragBar(HitObject hitObject)
+            {
+                this.hitObject = hitObject;
+
+                CornerRadius = 2;
+                Masking = true;
+                Size = new Vector2(THICKNESS, 1.5f);
+                Anchor = Anchor.CentreRight;
+                Origin = Anchor.CentreRight;
+                RelativePositionAxes = Axes.X;
+                RelativeSizeAxes = Axes.Y;
+                InternalChild = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
+            }
+
+            protected override bool OnDragStart(DragStartEvent e) => true;
+
+            [Resolved]
+            private EditorBeatmap beatmap { get; set; }
+
+            protected override void OnDrag(DragEvent e)
+            {
+                base.OnDrag(e);
+
+                var time = timeline.GetTimeFromScreenSpacePosition(e.ScreenSpaceMousePosition);
+
+                switch (hitObject)
+                {
+                    case IHasRepeats repeatHitObject:
+                        repeatHitObject.RepeatCount = (int)((time - hitObject.StartTime) / (repeatHitObject.Duration / repeatHitObject.RepeatCount));
+                        break;
+
+                    case IHasEndTime endTimeHitObject:
+                        endTimeHitObject.EndTime = time;
+                        break;
+                }
+
+                beatmap.UpdateHitObject(hitObject);
+            }
         }
 
         protected override void Update()
@@ -88,14 +143,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             circle.BorderColour = Color4.Orange;
             if (extensionBar != null)
-                extensionBar.Colour = Color4.Orange;
+                extensionBar.BorderColour = Color4.Orange;
         }
 
         protected override void OnDeselected()
         {
             circle.BorderColour = Color4.Black;
             if (extensionBar != null)
-                extensionBar.Colour = Color4.Black;
+                extensionBar.BorderColour = Color4.Black;
         }
 
         public override Quad SelectionQuad
