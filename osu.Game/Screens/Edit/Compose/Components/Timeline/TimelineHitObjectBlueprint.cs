@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -27,6 +28,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
+
+        public Action<DragEvent> OnDragHandled;
 
         public const float THICKNESS = 5;
 
@@ -78,7 +81,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                             RelativeSizeAxes = Axes.Both,
                         }
                     },
-                    new DragBar(hitObject),
+                    new DragBar(hitObject) { OnDragHandled = e => OnDragHandled?.Invoke(e) }
                 });
             }
         }
@@ -89,6 +92,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
             [Resolved]
             private Timeline timeline { get; set; }
+
+            public Action<DragEvent> OnDragHandled;
 
             public DragBar(HitObject hitObject)
             {
@@ -155,6 +160,8 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 base.OnDrag(e);
 
+                OnDragHandled?.Invoke(e);
+
                 var time = timeline.GetTimeFromScreenSpacePosition(e.ScreenSpaceMousePosition);
 
                 switch (hitObject)
@@ -176,6 +183,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                 }
 
                 beatmap.UpdateHitObject(hitObject);
+            }
+
+            protected override void OnDragEnd(DragEndEvent e)
+            {
+                base.OnDragEnd(e);
+
+                OnDragHandled?.Invoke(null);
             }
         }
 
