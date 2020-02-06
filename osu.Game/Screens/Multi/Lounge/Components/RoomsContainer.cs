@@ -47,22 +47,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            rooms.BindTo(roomManager.Rooms);
-
-            rooms.ItemsAdded += addRooms;
-            rooms.ItemsRemoved += removeRooms;
-
-            roomManager.RoomsUpdated += updateSorting;
-
-            addRooms(rooms);
-        }
-
         protected override void LoadComplete()
         {
-            filter?.BindValueChanged(f => Filter(f.NewValue), true);
+            rooms.ItemsAdded += addRooms;
+            rooms.ItemsRemoved += removeRooms;
+            roomManager.RoomsUpdated += updateSorting;
+
+            rooms.BindTo(roomManager.Rooms);
         }
 
         public void Filter(FilterCriteria criteria)
@@ -94,8 +85,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             foreach (var r in rooms)
                 roomFlow.Add(new DrawableRoom(r) { Action = () => selectRoom(r) });
 
-            if (filter != null)
-                Filter(filter.Value);
+            Filter(filter?.Value);
         }
 
         private void removeRooms(IEnumerable<Room> rooms)
