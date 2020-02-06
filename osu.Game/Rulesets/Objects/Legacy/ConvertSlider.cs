@@ -26,7 +26,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public List<IList<HitSampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }
 
-        public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;
+        public double EndTime
+        {
+            get => StartTime + this.SpanCount() * Distance / Velocity;
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
+        }
+
         public double Duration => EndTime - StartTime;
 
         public double Velocity = 1;
