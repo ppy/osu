@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         public double EndTime
         {
             get => StartTime + this.SpanCount() * Distance / Velocity;
-            set => throw new System.NotImplementedException();
+            set => throw new System.NotSupportedException($"Adjust via {nameof(RepeatCount)} instead"); // can be implemented if/when needed.
         }
 
         public double Duration => EndTime - StartTime;
