@@ -25,7 +25,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             OsuSpriteText titleText;
 
             IScreen startScreen = new TestScreenOne();
-            screenStack = new OsuScreenStack(startScreen) { RelativeSizeAxes = Axes.Both };
+
+            screenStack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            screenStack.Push(startScreen);
 
             Children = new Drawable[]
             {

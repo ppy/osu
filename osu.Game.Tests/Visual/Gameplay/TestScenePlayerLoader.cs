@@ -207,9 +207,11 @@ namespace osu.Game.Tests.Visual.Gameplay
             {
                 RelativeSizeAxes = Axes.Both;
 
+                OsuScreenStack stack;
+
                 InternalChildren = new Drawable[]
                 {
-                    new OsuScreenStack(screen)
+                    stack = new OsuScreenStack
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -224,6 +226,8 @@ namespace osu.Game.Tests.Visual.Gameplay
                         Origin = Anchor.TopLeft,
                     }
                 };
+
+                stack.Push(screen);
             }
         }
 

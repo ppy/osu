@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
@@ -30,6 +31,9 @@ namespace osu.Game.Scoring
         [JsonProperty("accuracy")]
         [Column(TypeName = "DECIMAL(1,4)")]
         public double Accuracy { get; set; }
+
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
