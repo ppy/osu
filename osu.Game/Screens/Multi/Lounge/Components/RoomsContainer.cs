@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             rooms.BindTo(roomManager.Rooms);
 
-            filter.BindValueChanged(criteria => Filter(criteria.NewValue));
+            filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
         }
 
         public void Filter(FilterCriteria criteria)
