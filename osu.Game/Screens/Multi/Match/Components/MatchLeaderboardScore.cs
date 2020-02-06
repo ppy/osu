@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         protected override IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:0%}" : @"{0:0.00%}", model.Accuracy)),
+            new LeaderboardScoreStatistic(FontAwesome.Solid.Crosshairs, "Accuracy", model.DisplayAccuracy),
             new LeaderboardScoreStatistic(FontAwesome.Solid.Sync, "Total Attempts", score.TotalAttempts.ToString()),
             new LeaderboardScoreStatistic(FontAwesome.Solid.Check, "Completed Beatmaps", score.CompletedBeatmaps.ToString()),
         };

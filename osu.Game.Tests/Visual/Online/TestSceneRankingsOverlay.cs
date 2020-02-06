@@ -25,7 +25,8 @@ namespace osu.Game.Tests.Visual.Online
             typeof(TableRowBackground),
             typeof(UserBasedTable),
             typeof(RankingsTable<>),
-            typeof(RankingsOverlay)
+            typeof(RankingsOverlay),
+            typeof(RankingsOverlayHeader)
         };
 
         [Cached]

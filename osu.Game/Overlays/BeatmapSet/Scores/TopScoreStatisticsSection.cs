@@ -23,9 +23,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class TopScoreStatisticsSection : CompositeDrawable
     {
         private const float margin = 10;
+        private const float top_columns_min_width = 64;
+        private const float bottom_columns_min_width = 45;
 
-        private readonly FontUsage smallFont = OsuFont.GetFont(size: 20);
-        private readonly FontUsage largeFont = OsuFont.GetFont(size: 25);
+        private readonly FontUsage smallFont = OsuFont.GetFont(size: 16);
+        private readonly FontUsage largeFont = OsuFont.GetFont(size: 22);
 
         private readonly TextColumn totalScoreColumn;
         private readonly TextColumn accuracyColumn;
@@ -44,9 +46,24 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Spacing = new Vector2(10, 0),
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(10, 8),
                 Children = new Drawable[]
                 {
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(margin, 0),
+                        Children = new Drawable[]
+                        {
+                            totalScoreColumn = new TextColumn("total score", largeFont, top_columns_min_width),
+                            accuracyColumn = new TextColumn("accuracy", largeFont, top_columns_min_width),
+                            maxComboColumn = new TextColumn("max combo", largeFont, top_columns_min_width)
+                        }
+                    },
                     new FillFlowContainer
                     {
                         Anchor = Anchor.TopRight,
@@ -62,22 +79,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(margin, 0),
                             },
-                            ppColumn = new TextColumn("pp", smallFont),
+                            ppColumn = new TextColumn("pp", smallFont, bottom_columns_min_width),
                             modsColumn = new ModsInfoColumn(),
-                        }
-                    },
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Horizontal,
-                        Spacing = new Vector2(margin, 0),
-                        Children = new Drawable[]
-                        {
-                            totalScoreColumn = new TextColumn("total score", largeFont),
-                            accuracyColumn = new TextColumn("accuracy", largeFont),
-                            maxComboColumn = new TextColumn("max combo", largeFont)
                         }
                     },
                 }
@@ -92,16 +95,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set
             {
                 totalScoreColumn.Text = $@"{value.TotalScore:N0}";
-                accuracyColumn.Text = $@"{value.Accuracy:P2}";
+                accuracyColumn.Text = value.DisplayAccuracy;
                 maxComboColumn.Text = $@"{value.MaxCombo:N0}x";
                 ppColumn.Text = $@"{value.PP:N0}";
 
-                statisticsColumns.ChildrenEnumerable = value.Statistics.Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
+                statisticsColumns.ChildrenEnumerable = value.Statistics
+                                                            .OrderByDescending(pair => pair.Key)
+                                                            .Select(kvp => createStatisticsColumn(kvp.Key, kvp.Value));
                 modsColumn.Mods = value.Mods;
             }
         }
 
-        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont)
+        private TextColumn createStatisticsColumn(HitResult hitResult, int count) => new TextColumn(hitResult.GetDescription(), smallFont, bottom_columns_min_width)
         {
             Text = count.ToString()
         };
@@ -109,8 +114,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private class InfoColumn : CompositeDrawable
         {
             private readonly Box separator;
+            private readonly OsuSpriteText text;
 
-            public InfoColumn(string title, Drawable content)
+            public InfoColumn(string title, Drawable content, float? minWidth = null)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -118,18 +124,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 2),
+                    Spacing = new Vector2(0, 1),
                     Children = new[]
                     {
-                        new OsuSpriteText
+                        text = new OsuSpriteText
                         {
-                            Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black),
+                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
                             Text = title.ToUpper()
                         },
                         separator = new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 2
+                            RelativeSizeAxes = minWidth == null ? Axes.X : Axes.None,
+                            Width = minWidth ?? 1f,
+                            Height = 2,
+                            Margin = new MarginPadding { Top = 2 }
                         },
                         content
                     }
@@ -137,9 +145,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider)
             {
-                separator.Colour = colours.Gray5;
+                text.Colour = colourProvider.Foreground1;
+                separator.Colour = colourProvider.Background3;
             }
         }
 
@@ -147,13 +156,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             private readonly SpriteText text;
 
-            public TextColumn(string title, FontUsage font)
-                : this(title, new OsuSpriteText { Font = font })
+            public TextColumn(string title, FontUsage font, float? minWidth = null)
+                : this(title, new OsuSpriteText { Font = font }, minWidth)
             {
             }
 
-            private TextColumn(string title, SpriteText text)
-                : base(title, text)
+            private TextColumn(string title, SpriteText text, float? minWidth = null)
+                : base(title, text, minWidth)
             {
                 this.text = text;
             }
@@ -189,15 +198,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 set
                 {
                     modsContainer.Clear();
-
-                    foreach (Mod mod in value)
+                    modsContainer.Children = value.Select(mod => new ModIcon(mod)
                     {
-                        modsContainer.Add(new ModIcon(mod)
-                        {
-                            AutoSizeAxes = Axes.Both,
-                            Scale = new Vector2(0.3f),
-                        });
-                    }
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.25f),
+                    }).ToList();
                 }
             }
         }

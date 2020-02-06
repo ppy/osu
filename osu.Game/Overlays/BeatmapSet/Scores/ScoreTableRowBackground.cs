@@ -48,18 +48,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider, IAPIProvider api)
         {
             var isOwnScore = api.LocalUser.Value.Id == score.UserID;
 
             if (isOwnScore)
                 background.Colour = colours.GreenDarker;
             else if (index % 2 == 0)
-                background.Colour = colours.Gray3;
+                background.Colour = colourProvider.Background4;
             else
                 background.Alpha = 0;
 
-            hoveredBackground.Colour = isOwnScore ? colours.GreenDark : colours.Gray4;
+            hoveredBackground.Colour = isOwnScore ? colours.GreenDark : colourProvider.Background3;
         }
 
         protected override bool OnHover(HoverEvent e)
