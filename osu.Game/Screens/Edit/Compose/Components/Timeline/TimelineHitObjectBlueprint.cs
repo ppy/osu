@@ -25,8 +25,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
     {
         private readonly Circle circle;
 
-        protected override bool ShouldBeConsideredForInput(Drawable child) => true;
-
         [UsedImplicitly]
         private readonly Bindable<double> startTime;
 
@@ -41,11 +39,6 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private const float shadow_radius = 5;
 
         private const float circle_size = 16;
-
-        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
-            base.ReceivePositionalInputAt(screenSpacePos) ||
-            circle.ReceivePositionalInputAt(screenSpacePos) ||
-            dragBar?.ReceivePositionalInputAt(screenSpacePos) == true;
 
         public TimelineHitObjectBlueprint(HitObject hitObject)
             : base(hitObject)
@@ -137,6 +130,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // no bindable so we perform this every update
             Width = (float)(HitObject.GetEndTime() - HitObject.StartTime);
         }
+
+        protected override bool ShouldBeConsideredForInput(Drawable child) => true;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            base.ReceivePositionalInputAt(screenSpacePos) ||
+            circle.ReceivePositionalInputAt(screenSpacePos) ||
+            dragBar?.ReceivePositionalInputAt(screenSpacePos) == true;
 
         protected override void OnSelected()
         {
