@@ -38,13 +38,14 @@ namespace osu.Game.Tests.Visual.Editor
         {
             Beatmap.Value = new WaveformTestBeatmap(audio);
 
-            var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap, BeatDivisor);
+            var editorBeatmap = new EditorBeatmap((Beatmap<HitObject>)Beatmap.Value.Beatmap);
 
             Dependencies.Cache(editorBeatmap);
             Dependencies.CacheAs<IBeatSnapProvider>(editorBeatmap);
 
             AddRange(new Drawable[]
             {
+                editorBeatmap,
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
