@@ -8,8 +8,12 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Catch;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
@@ -82,19 +86,48 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
         }
 
-        private void addRooms(int count)
+        [Test]
+        public void TestRulesetFiltering()
+        {
+            addRooms(2, new OsuRuleset().RulesetInfo);
+            addRooms(3, new CatchRuleset().RulesetInfo);
+
+            AddUntilStep("5 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 5);
+
+            AddStep("filter osu! rooms", () => container.Filter(new FilterCriteria { Ruleset = new OsuRuleset().RulesetInfo }));
+
+            AddUntilStep("2 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 2);
+
+            AddStep("filter catch rooms", () => container.Filter(new FilterCriteria { Ruleset = new CatchRuleset().RulesetInfo }));
+
+            AddUntilStep("3 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 3);
+        }
+
+        private void addRooms(int count, RulesetInfo ruleset = null)
         {
             AddStep("add rooms", () =>
             {
                 for (int i = 0; i < count; i++)
                 {
-                    roomManager.Rooms.Add(new Room
+                    var room = new Room
                     {
                         RoomID = { Value = i },
                         Name = { Value = $"Room {i}" },
                         Host = { Value = new User { Username = "Host" } },
                         EndDate = { Value = DateTimeOffset.Now + TimeSpan.FromSeconds(10) }
-                    });
+                    };
+
+                    if (ruleset != null)
+                        room.Playlist.Add(new PlaylistItem
+                        {
+                            Ruleset = ruleset,
+                            Beatmap = new BeatmapInfo
+                            {
+                                Metadata = new BeatmapMetadata()
+                            }
+                        });
+
+                    roomManager.Rooms.Add(room);
                 }
             });
         }
