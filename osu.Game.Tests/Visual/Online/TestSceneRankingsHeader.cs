@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
 using osu.Game.Users;
@@ -15,12 +16,13 @@ namespace osu.Game.Tests.Visual.Online
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(DismissableFlag),
-            typeof(HeaderTitle),
-            typeof(RankingsRulesetSelector),
-            typeof(RankingsScopeSelector),
-            typeof(RankingsHeader),
+            typeof(RankingsOverlayHeader),
+            typeof(CountryFilter),
+            typeof(CountryPill)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider overlayColour = new OverlayColourProvider(OverlayColourScheme.Green);
 
         public TestSceneRankingsHeader()
         {
@@ -28,11 +30,9 @@ namespace osu.Game.Tests.Visual.Online
             var ruleset = new Bindable<RulesetInfo>();
             var scope = new Bindable<RankingsScope>();
 
-            Add(new RankingsHeader
+            Add(new RankingsOverlayHeader
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Scope = { BindTarget = scope },
+                Current = { BindTarget = scope },
                 Country = { BindTarget = countryBindable },
                 Ruleset = { BindTarget = ruleset },
                 Spotlights = new[]

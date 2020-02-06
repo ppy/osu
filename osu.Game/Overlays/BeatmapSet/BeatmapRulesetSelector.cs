@@ -2,17 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osuTK;
 using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
-    public class BeatmapRulesetSelector : RulesetSelector
+    public class BeatmapRulesetSelector : OverlayRulesetSelector
     {
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -28,21 +25,9 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
-        public BeatmapRulesetSelector()
-        {
-            AutoSizeAxes = Axes.Both;
-        }
-
         protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new BeatmapRulesetTabItem(value)
         {
             BeatmapSet = { BindTarget = beatmapSet }
-        };
-
-        protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
-        {
-            AutoSizeAxes = Axes.Both,
-            Direction = FillDirection.Horizontal,
-            Spacing = new Vector2(10, 0),
         };
     }
 }
