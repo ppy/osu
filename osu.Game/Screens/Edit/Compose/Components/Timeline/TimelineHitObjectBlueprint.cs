@@ -275,18 +275,18 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                     case IHasRepeats repeatHitObject:
                         // find the number of repeats which can fit in the requested time.
                         var lengthOfOneRepeat = repeatHitObject.Duration / (repeatHitObject.RepeatCount + 1);
-                        var proposedCount = (int)((time - hitObject.StartTime) / lengthOfOneRepeat) - 1;
+                        var proposedCount = Math.Max(0, (int)((time - hitObject.StartTime) / lengthOfOneRepeat) - 1);
 
-                        if (proposedCount == repeatHitObject.RepeatCount || proposedCount < 0)
+                        if (proposedCount == repeatHitObject.RepeatCount)
                             return;
 
                         repeatHitObject.RepeatCount = proposedCount;
                         break;
 
                     case IHasEndTime endTimeHitObject:
-                        var snappedTime = beatSnapProvider.SnapTime(time);
+                        var snappedTime = Math.Max(hitObject.StartTime, beatSnapProvider.SnapTime(time));
 
-                        if (endTimeHitObject.EndTime == snappedTime || snappedTime <= hitObject.StartTime)
+                        if (endTimeHitObject.EndTime == snappedTime)
                             return;
 
                         endTimeHitObject.EndTime = snappedTime;
