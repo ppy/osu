@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const float horizontal_inset = 20;
         private const float row_height = 25;
-        private const int text_size = 14;
+        private const int text_size = 12;
 
         private readonly FillFlowContainer backgroundFlow;
 
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Text = $@"{score.Accuracy:P2}",
+                    Text = score.DisplayAccuracy,
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
@@ -190,7 +190,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black);
+                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Colour = colourProvider.Foreground1;
             }
         }
     }
