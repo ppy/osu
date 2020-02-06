@@ -16,7 +16,6 @@ using osu.Game.Scoring;
 using osu.Game.Users.Drawables;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Utils;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -65,10 +64,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                 for (int i = 0; i < value.Count; i++)
                     backgroundFlow.Add(new ScoreTableRowBackground(i, value[i]));
-
-                // Ensure correct column order
-                foreach (ScoreInfo score in value)
-                    score.Statistics = score.Statistics.OrderByDescending(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
 
                 Columns = createHeaders(value[0]);
                 Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
@@ -121,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Text = score.Accuracy.FormatAccuracy(alwaysShowDecimals: true),
+                    Text = score.DisplayAccuracy,
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
