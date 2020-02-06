@@ -26,7 +26,7 @@ namespace osu.Game.Screens
             };
 
             ScreenPushed += screenPushed;
-            ScreenExited += screenExited;
+            ScreenExited += ScreenChanged;
         }
 
         private void screenPushed(IScreen prev, IScreen next)
@@ -42,10 +42,10 @@ namespace osu.Game.Screens
             // create dependencies synchronously to ensure leases are in a sane state.
             ((OsuScreen)next).CreateLeasedDependencies((prev as OsuScreen)?.Dependencies ?? Dependencies);
 
-            setParallax(next);
+            ScreenChanged(prev, next);
         }
 
-        private void screenExited(IScreen prev, IScreen next)
+        protected virtual void ScreenChanged(IScreen prev, IScreen next)
         {
             setParallax(next);
         }
