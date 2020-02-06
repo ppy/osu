@@ -118,6 +118,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     };
 
                     if (ruleset != null)
+                    {
                         room.Playlist.Add(new PlaylistItem
                         {
                             Ruleset = ruleset,
@@ -126,6 +127,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
                                 Metadata = new BeatmapMetadata()
                             }
                         });
+                    }
 
                     roomManager.Rooms.Add(room);
                 }
