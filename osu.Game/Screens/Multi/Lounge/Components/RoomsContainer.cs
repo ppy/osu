@@ -54,6 +54,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             roomManager.RoomsUpdated += updateSorting;
 
             rooms.BindTo(roomManager.Rooms);
+
+            filter?.BindValueChanged(criteria => Filter(criteria.NewValue));
         }
 
         public void Filter(FilterCriteria criteria)
@@ -65,7 +67,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 else
                 {
                     bool matchingFilter = true;
-                    matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+                    matchingFilter &= r.Room.Playlist.Count == 0 || r.Room.Playlist.Any(i => i.Ruleset.Equals(criteria.Ruleset));
+
+                    if (!string.IsNullOrEmpty(criteria.SearchString))
+                        matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                     switch (criteria.SecondaryFilter)
                     {
