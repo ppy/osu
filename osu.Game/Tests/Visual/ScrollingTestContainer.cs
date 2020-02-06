@@ -86,8 +86,8 @@ namespace osu.Game.Tests.Visual
                 }
             }
 
-            public double GetDisplayStartTime(double time, double timeRange)
-                => implementation.GetDisplayStartTime(time, timeRange);
+            public double GetDisplayStartTime(double originTime, float offset, double timeRange, float scrollLength)
+                => implementation.GetDisplayStartTime(originTime, offset, timeRange, scrollLength);
 
             public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
                 => implementation.GetLength(startTime, endTime, timeRange, scrollLength);
