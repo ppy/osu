@@ -52,9 +52,41 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Test]
         public void TestBasicListChanges()
         {
+            addRooms(3);
+
+            AddAssert("has 3 rooms", () => container.Rooms.Count == 3);
+            AddStep("remove first room", () => roomManager.Rooms.Remove(roomManager.Rooms.FirstOrDefault()));
+            AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
+            AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
+
+            AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
+            AddAssert("first room selected", () => Room == roomManager.Rooms.First());
+
+            AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
+            AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
+        }
+
+        [Test]
+        public void TestStringFiltering()
+        {
+            addRooms(4);
+
+            AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
+
+            AddStep("filter one room", () => container.Filter(new FilterCriteria { SearchString = "1" }));
+
+            AddUntilStep("1 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 1);
+
+            AddStep("remove filter", () => container.Filter(null));
+
+            AddUntilStep("4 rooms visible", () => container.Rooms.Count(r => r.IsPresent) == 4);
+        }
+
+        private void addRooms(int count)
+        {
             AddStep("add rooms", () =>
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < count; i++)
                 {
                     roomManager.Rooms.Add(new Room
                     {
@@ -65,17 +97,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     });
                 }
             });
-
-            AddAssert("has 2 rooms", () => container.Rooms.Count == 3);
-            AddStep("remove first room", () => roomManager.Rooms.Remove(roomManager.Rooms.FirstOrDefault()));
-            AddAssert("has 2 rooms", () => container.Rooms.Count == 2);
-            AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
-
-            AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => Room == roomManager.Rooms.First());
-
-            AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
         }
 
         private void joinRequested(Room room) => room.Status.Value = new JoinedRoomStatus();
