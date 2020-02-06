@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -27,11 +28,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
 
+        private RoomsContainer container;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            RoomsContainer container;
-
             Child = container = new RoomsContainer
             {
                 Anchor = Anchor.Centre,
@@ -39,9 +40,18 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Width = 0.5f,
                 JoinRequested = joinRequested
             };
+        }
+
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
 
             AddStep("clear rooms", () => roomManager.Rooms.Clear());
+        }
 
+        [Test]
+        public void TestBasicListChanges()
+        {
             AddStep("add rooms", () =>
             {
                 for (int i = 0; i < 3; i++)
