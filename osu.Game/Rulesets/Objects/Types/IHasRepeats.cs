@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Objects.Types
         /// <summary>
         /// The amount of times the HitObject repeats.
         /// </summary>
-        int RepeatCount { get; }
+        int RepeatCount { get; set; }
 
         /// <summary>
         /// The samples to be played when each node of the <see cref="IHasRepeats"/> is hit.<br />

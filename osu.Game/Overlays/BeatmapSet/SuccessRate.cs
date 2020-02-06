@@ -17,7 +17,7 @@ namespace osu.Game.Overlays.BeatmapSet
         protected readonly FailRetryGraph Graph;
 
         private readonly FillFlowContainer header;
-        private readonly OsuSpriteText successRateLabel, successPercent, graphLabel;
+        private readonly OsuSpriteText successPercent;
         private readonly Bar successRate;
         private readonly Container percentContainer;
 
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        successRateLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Font = OsuFont.GetFont(size: 13),
                             },
                         },
-                        graphLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -107,7 +107,6 @@ namespace osu.Game.Overlays.BeatmapSet
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            successRateLabel.Colour = successPercent.Colour = graphLabel.Colour = colours.Gray5;
             successRate.AccentColour = colours.Green;
             successRate.BackgroundColour = colours.GrayD;
 
