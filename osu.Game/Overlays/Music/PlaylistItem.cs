@@ -23,7 +23,10 @@ namespace osu.Game.Overlays.Music
     {
         private const float fade_duration = 100;
 
+        public BindableBool PlaylistDragActive = new BindableBool();
+
         public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
+
         public Action<BeatmapSetInfo> RequestSelection;
 
         private PlaylistItemHandle handle;
@@ -122,11 +125,26 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
+        protected override bool OnDragStart(DragStartEvent e)
+        {
+            if (!base.OnDragStart(e))
+                return false;
+
+            PlaylistDragActive.Value = true;
+            return true;
+        }
+
+        protected override void OnDragEnd(DragEndEvent e)
+        {
+            PlaylistDragActive.Value = false;
+            base.OnDragEnd(e);
+        }
+
         protected override bool IsDraggableAt(Vector2 screenSpacePos) => handle.HandlingDrag;
 
         protected override bool OnHover(HoverEvent e)
         {
-            handle.UpdateHoverState(true);
+            handle.UpdateHoverState(IsDragged || !PlaylistDragActive.Value);
             return base.OnHover(e);
         }
 

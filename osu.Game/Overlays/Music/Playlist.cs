@@ -18,6 +18,11 @@ namespace osu.Game.Overlays.Music
 
         public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
 
+        /// <summary>
+        /// Whether any item is currently being dragged. Used to hide other items' drag handles.
+        /// </summary>
+        private readonly BindableBool playlistDragActive = new BindableBool();
+
         public new MarginPadding Padding
         {
             get => base.Padding;
@@ -31,6 +36,7 @@ namespace osu.Game.Overlays.Music
         protected override RearrangeableListItem<BeatmapSetInfo> CreateDrawable(BeatmapSetInfo item) => new PlaylistItem(item)
         {
             SelectedSet = { BindTarget = SelectedSet },
+            PlaylistDragActive = { BindTarget = playlistDragActive },
             RequestSelection = set => RequestSelection?.Invoke(set)
         };
 
