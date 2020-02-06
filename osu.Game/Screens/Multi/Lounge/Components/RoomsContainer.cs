@@ -65,6 +65,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 else
                 {
                     bool matchingFilter = true;
+
+                    matchingFilter &= r.Room.Playlist.Any(i => i.Ruleset.Equals(criteria.Ruleset));
+
                     matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
 
                     switch (criteria.SecondaryFilter)
