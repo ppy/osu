@@ -75,8 +75,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             {
                 matchingFilter = value;
 
-                if (IsLoaded)
-                    this.FadeTo(MatchingFilter ? 1 : 0, 200);
+                if (!IsLoaded)
+                    return;
+
+                if (matchingFilter)
+                    this.FadeIn(200);
+                else
+                    Hide();
             }
         }
 
