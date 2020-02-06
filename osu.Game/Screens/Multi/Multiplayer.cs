@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Multi
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
         private readonly MultiplayerWaveContainer waves;
 
         private readonly OsuButton createButton;
@@ -275,7 +277,11 @@ namespace osu.Game.Screens.Multi
 
         private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
         {
-            if (screenStack.CurrentScreen is MatchSubScreen)
+            bool isMatch = screenStack.CurrentScreen is MatchSubScreen;
+
+            Beatmap.Disabled = isMatch;
+
+            if (isMatch)
             {
                 var track = Beatmap.Value?.Track;
 
