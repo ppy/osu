@@ -12,6 +12,7 @@ using osu.Game.Online.API.Requests.Responses;
 using System.Threading;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Users;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -22,6 +23,8 @@ namespace osu.Game.Overlays.Comments
 
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableBool ShowDeleted = new BindableBool();
+
+        protected readonly Bindable<User> User = new Bindable<User>();
 
         [Resolved]
         private IAPIProvider api { get; set; }
@@ -109,11 +112,13 @@ namespace osu.Game.Overlays.Comments
                     }
                 }
             });
+
+            User.BindTo(api.LocalUser);
         }
 
         protected override void LoadComplete()
         {
-            api.LocalUser.BindValueChanged(_ => refetchComments());
+            User.BindValueChanged(_ => refetchComments());
             Sort.BindValueChanged(_ => refetchComments(), true);
             base.LoadComplete();
         }
