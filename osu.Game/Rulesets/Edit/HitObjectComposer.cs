@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -50,8 +49,6 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        private IBeatmapProcessor beatmapProcessor;
-
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
         private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
@@ -71,8 +68,6 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IFrameBasedClock framedClock)
         {
-            beatmapProcessor = Ruleset.CreateBeatmapProcessor(EditorBeatmap.PlayableBeatmap);
-
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
             EditorBeatmap.StartTimeChanged += UpdateHitObject;
@@ -179,7 +174,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
+            if (EditorClock.CurrentTime != lastGridUpdateTime && !(blueprintContainer.CurrentTool is SelectTool))
                 showGridFor(Enumerable.Empty<HitObject>());
         }
 
@@ -240,19 +235,6 @@ namespace osu.Game.Rulesets.Edit
             lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
-        private ScheduledDelegate scheduledUpdate;
-
-        public override void UpdateHitObject(HitObject hitObject)
-        {
-            scheduledUpdate?.Cancel();
-            scheduledUpdate = Schedule(() =>
-            {
-                beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(EditorBeatmap.ControlPointInfo, EditorBeatmap.BeatmapInfo.BaseDifficulty);
-                beatmapProcessor?.PostProcess();
-            });
-        }
-
         private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
 
         private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
@@ -309,6 +291,8 @@ namespace osu.Game.Rulesets.Edit
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
             => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
 
+        public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -344,7 +328,7 @@ namespace osu.Game.Rulesets.Edit
         /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
         /// </summary>
         /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>.</returns>
+        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
