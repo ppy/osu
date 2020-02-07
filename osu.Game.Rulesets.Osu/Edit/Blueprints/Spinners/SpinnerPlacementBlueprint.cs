@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
             if (isPlacingEnd)
             {
                 HitObject.EndTime = EditorClock.CurrentTime;
-                EndPlacement();
+                EndPlacement(true);
             }
             else
             {

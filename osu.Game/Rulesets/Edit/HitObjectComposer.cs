@@ -254,11 +254,14 @@ namespace osu.Game.Rulesets.Edit
                 hitObject.StartTime = GetSnappedPosition(distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position), hitObject.StartTime).time;
         }
 
-        public void EndPlacement(HitObject hitObject)
+        public void EndPlacement(HitObject hitObject, bool commit)
         {
-            EditorBeatmap.Add(hitObject);
+            if (commit)
+            {
+                EditorBeatmap.Add(hitObject);
 
-            adjustableClock.Seek(hitObject.StartTime);
+                adjustableClock.Seek(hitObject.StartTime);
+            }
 
             showGridFor(Enumerable.Empty<HitObject>());
         }
