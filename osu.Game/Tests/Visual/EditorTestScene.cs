@@ -24,8 +24,13 @@ namespace osu.Game.Tests.Visual
         private void load()
         {
             Beatmap.Value = CreateWorkingBeatmap(ruleset.RulesetInfo);
+        }
 
-            LoadScreen(new Editor());
+        public override void SetUpSteps()
+        {
+            base.SetUpSteps();
+
+            AddStep("Load editor", () => LoadScreen(new Editor()));
         }
     }
 }
