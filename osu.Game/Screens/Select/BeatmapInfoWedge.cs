@@ -23,7 +23,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osu.Game.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -263,8 +262,7 @@ namespace osu.Game.Screens.Select
                                 Margin = new MarginPadding { Top = 10 },
                                 Direction = FillDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
-                                //Child = getMapper(metadata)
-                                Child = string.IsNullOrEmpty(metadata.Author?.Username) ? new LinkFlowContainer() : new MapperLink(metadata.Author, 15)
+                                Child = string.IsNullOrEmpty(metadata.Author?.Username) ? Empty() : new MapperLink(metadata.Author, 15)
                             },
                             InfoLabelContainer = new FillFlowContainer
                             {
