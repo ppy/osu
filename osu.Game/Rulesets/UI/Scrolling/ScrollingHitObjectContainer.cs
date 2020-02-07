@@ -133,8 +133,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
 
-            var adjustedStartTime = scrollingInfo.Algorithm.TimeAt(-originAdjustment, hitObject.HitObject.StartTime, timeRange.Value, scrollLength);
-            return scrollingInfo.Algorithm.GetDisplayStartTime(adjustedStartTime, timeRange.Value);
+            return scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, originAdjustment, timeRange.Value, scrollLength);
         }
 
         // Cant use AddOnce() since the delegate is re-constructed every invocation
