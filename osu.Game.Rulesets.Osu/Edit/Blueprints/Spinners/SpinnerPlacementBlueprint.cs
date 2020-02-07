@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
@@ -52,6 +53,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
                     return false;
 
                 BeginPlacement();
+                piece.FadeTo(1f, 150, Easing.OutQuint);
+
                 isPlacingEnd = true;
             }
 
