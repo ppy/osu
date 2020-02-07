@@ -289,7 +289,11 @@ namespace osu.Game.Rulesets.Edit
             => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
+        {
+            var snappedEndTime = beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+
+            return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
+        }
 
         public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
 
