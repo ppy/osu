@@ -33,12 +33,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
 
-        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.DrawableObject.HitObject);
+        public IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject);
 
         private Drawable outline;
 
-        [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
+        [Resolved(CanBeNull = true)]
+        private EditorBeatmap editorBeatmap { get; set; }
 
         public SelectionHandler()
         {
@@ -87,7 +87,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return false;
         }
 
-        public bool OnReleased(PlatformAction action) => action.ActionMethod == PlatformActionMethod.Delete;
+        public void OnReleased(PlatformAction action)
+        {
+        }
 
         #endregion
 
@@ -102,7 +104,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint becoming selected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        internal void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
+        internal void HandleSelected(SelectionBlueprint blueprint)
+        {
+            selectedBlueprints.Add(blueprint);
+            editorBeatmap.SelectedHitObjects.Add(blueprint.HitObject);
+
+            UpdateVisibility();
+        }
 
         /// <summary>
         /// Handle a blueprint becoming deselected.
@@ -111,6 +119,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
+            editorBeatmap.SelectedHitObjects.Remove(blueprint.HitObject);
 
             // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
             if (selectedBlueprints.Count == 0)
@@ -139,14 +148,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 DeselectAll?.Invoke();
                 blueprint.Select();
             }
-
-            UpdateVisibility();
         }
 
         private void deleteSelected()
         {
             foreach (var h in selectedBlueprints.ToList())
-                placementHandler.Delete(h.DrawableObject.HitObject);
+                editorBeatmap.Remove(h.HitObject);
         }
 
         #endregion

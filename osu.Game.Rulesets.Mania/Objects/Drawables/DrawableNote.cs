@@ -77,6 +77,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual void OnReleased(ManiaAction action)
+        {
+        }
     }
 }

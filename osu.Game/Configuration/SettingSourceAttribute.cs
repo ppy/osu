@@ -35,22 +35,18 @@ namespace osu.Game.Configuration
     {
         public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
-            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
+            foreach (var (attr, property) in obj.GetSettingsSourceProperties())
             {
-                var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
+                object value = property.GetValue(obj);
 
-                if (attr == null)
-                    continue;
-
-                var prop = property.GetValue(obj);
-
-                switch (prop)
+                switch (value)
                 {
                     case BindableNumber<float> bNumber:
                         yield return new SettingsSlider<float>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Bindable = bNumber,
+                            KeyboardStep = 0.1f,
                         };
 
                         break;
@@ -59,7 +55,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<double>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Bindable = bNumber,
+                            KeyboardStep = 0.1f,
                         };
 
                         break;
@@ -102,8 +99,21 @@ namespace osu.Game.Configuration
                         break;
 
                     default:
-                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({prop})");
+                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({value})");
                 }
+            }
+        }
+
+        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties(this object obj)
+        {
+            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
+            {
+                var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
+
+                if (attr == null)
+                    continue;
+
+                yield return (attr, property);
             }
         }
     }

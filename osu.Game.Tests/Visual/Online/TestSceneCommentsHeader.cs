@@ -4,7 +4,9 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 
 namespace osu.Game.Tests.Visual.Online
@@ -18,6 +20,9 @@ namespace osu.Game.Tests.Visual.Online
             typeof(HeaderButton),
             typeof(SortTabControl),
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         private readonly Bindable<CommentsSortCriteria> sort = new Bindable<CommentsSortCriteria>();
         private readonly BindableBool showDeleted = new BindableBool();
