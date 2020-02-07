@@ -33,7 +33,7 @@ namespace osu.Game.Online.Chat
         private ChannelManager channelManager { get; set; }
 
         private Bindable<bool> notifyOnMention;
-        private Bindable<bool> notifyOnChat;
+        private Bindable<bool> notifyOnPM;
         private Bindable<User> localUser;
         private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
@@ -41,7 +41,7 @@ namespace osu.Game.Online.Chat
         private void load(OsuConfigManager config, IAPIProvider api)
         {
             notifyOnMention = config.GetBindable<bool>(OsuSetting.ChatHighlightName);
-            notifyOnChat = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
+            notifyOnPM = config.GetBindable<bool>(OsuSetting.ChatMessageNotification);
             localUser = api.LocalUser;
 
             channelManager.JoinedChannels.BindTo(joinedChannels);
@@ -107,7 +107,7 @@ namespace osu.Game.Online.Chat
 
         private bool checkForPMs(Channel channel, Message message)
         {
-            if (!notifyOnChat.Value || channel.Type != ChannelType.PM)
+            if (!notifyOnPM.Value || channel.Type != ChannelType.PM)
                 return false;
 
             var notification = new PrivateMessageNotification(message.Sender.Username, channel);
