@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             public IReadOnlyList<Color4> UsableComboColours =>
                 GameplayClockContainer.ChildrenOfType<BeatmapSkinProvidingContainer>()
                                       .First()
-                                      .GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+                                      .GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
         }
 
         private class CustomSkinWorkingBeatmap : ClockBackedTestWorkingBeatmap
