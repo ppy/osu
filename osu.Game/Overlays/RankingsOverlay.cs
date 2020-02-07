@@ -110,7 +110,8 @@ namespace osu.Game.Overlays
                 if (Country.Value != null)
                     Scope.Value = RankingsScope.Performance;
 
-                Scheduler.AddOnce(loadNewContent);
+                if (Scope.Value != RankingsScope.Spotlights)
+                    Scheduler.AddOnce(loadNewContent);
             }, true);
 
             Scope.BindValueChanged(_ =>
