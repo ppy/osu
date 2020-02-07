@@ -49,8 +49,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
+        protected ComposeBlueprintContainer BlueprintContainer;
+
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
         private DistanceSnapGrid distanceSnapGrid;
         private readonly List<Container> layerContainers = new List<Container>();
@@ -94,7 +95,7 @@ namespace osu.Game.Rulesets.Edit
                 new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
             });
 
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(blueprintContainer = CreateBlueprintContainer());
+            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -142,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
 
             setSelectTool();
 
-            blueprintContainer.SelectionChanged += selectionChanged;
+            BlueprintContainer.SelectionChanged += selectionChanged;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -174,7 +175,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            if (EditorClock.CurrentTime != lastGridUpdateTime && !(blueprintContainer.CurrentTool is SelectTool))
+            if (EditorClock.CurrentTime != lastGridUpdateTime && !(BlueprintContainer.CurrentTool is SelectTool))
                 showGridFor(Enumerable.Empty<HitObject>());
         }
 
@@ -210,7 +211,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void toolSelected(HitObjectCompositionTool tool)
         {
-            blueprintContainer.CurrentTool = tool;
+            BlueprintContainer.CurrentTool = tool;
 
             if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
