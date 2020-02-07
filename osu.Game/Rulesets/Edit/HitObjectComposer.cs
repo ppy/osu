@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        protected ComposeBlueprintContainer BlueprintContainer;
+        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
         private Container distanceSnapGridContainer;
