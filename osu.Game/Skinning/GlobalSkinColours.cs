@@ -3,8 +3,9 @@
 
 namespace osu.Game.Skinning
 {
-    public enum GlobalSkinColour
+    public enum GlobalSkinColours
     {
+        ComboColours,
         MenuGlow
     }
 }
