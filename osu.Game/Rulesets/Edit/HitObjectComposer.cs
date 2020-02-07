@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
+            if (EditorClock.CurrentTime != lastGridUpdateTime && !(blueprintContainer.CurrentTool is SelectTool))
                 showGridFor(Enumerable.Empty<HitObject>());
         }
 
@@ -328,7 +328,7 @@ namespace osu.Game.Rulesets.Edit
         /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
         /// </summary>
         /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>.</returns>
+        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current poitn in time.</returns>
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
