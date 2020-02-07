@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     Origin = Anchor.Centre,
                                     Alpha = 0,
                                     Text = "Unranked beatmap",
-                                    Font = OsuFont.GetFont(size: 13)
+                                    Font = OsuFont.GetFont(size: 12)
                                 },
                             },
                         },
