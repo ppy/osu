@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Audio.Track;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
@@ -9,6 +10,9 @@ using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Graphics.Containers;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -59,5 +63,47 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
+
+        protected override Caret CreateCaret() => new BeatCaret
+        {
+            CaretWidth = CaretWidth,
+            SelectionColour = SelectionColour,
+        };
+
+        private class BeatCaret : BasicCaret
+        {
+            private bool hasSelection;
+
+            public BeatCaret()
+            {
+                AddInternal(new CaretBeatSyncedContainer(this));
+            }
+
+            public override void DisplayAt(Vector2 position, float? selectionWidth)
+            {
+                base.DisplayAt(position, selectionWidth);
+
+                hasSelection = selectionWidth != null;
+                if (selectionWidth == null)
+                    ClearTransforms(targetMember: nameof(Alpha));
+            }
+
+            private class CaretBeatSyncedContainer : BeatSyncedContainer
+            {
+                private readonly BeatCaret caret;
+
+                public CaretBeatSyncedContainer(BeatCaret caret)
+                {
+                    this.caret = caret;
+                    MinimumBeatLength = 300;
+                }
+
+                protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
+                {
+                    if (!caret.hasSelection)
+                        caret.FadeTo(0.7f).FadeTo(0.4f, timingPoint.BeatLength, Easing.InOutSine);
+                }
+            }
+        }
     }
 }
