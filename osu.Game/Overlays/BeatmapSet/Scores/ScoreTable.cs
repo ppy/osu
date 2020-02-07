@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const float horizontal_inset = 20;
         private const float row_height = 25;
-        private const int text_size = 14;
+        private const int text_size = 12;
 
         private readonly FillFlowContainer backgroundFlow;
 
@@ -190,7 +190,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold);
+                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold);
             }
 
             [BackgroundDependencyLoader]
