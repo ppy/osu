@@ -29,8 +29,6 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 Text = "No recent plays",
                 Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
             });
-
-            Graph.Alpha = 0;
         }
 
         protected override void LoadComplete()

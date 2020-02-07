@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Profile
             Add(Graph = new RankChartLineGraph
             {
                 RelativeSizeAxes = Axes.Both,
+                Alpha = 0
             });
 
             Graph.OnBallMove += i => DataIndex = i;
