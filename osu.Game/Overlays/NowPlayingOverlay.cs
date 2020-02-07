@@ -183,6 +183,7 @@ namespace osu.Game.Overlays
                 }
             };
 
+            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
             playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
