@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Game.Overlays.Profile;
 using osu.Framework.Graphics;
-using static osu.Game.Users.User;
 using osu.Game.Overlays;
 using osu.Framework.Allocation;
+using static osu.Game.Users.User;
 
 namespace osu.Game.Tests.Visual.Online
 {
