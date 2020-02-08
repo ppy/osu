@@ -21,13 +21,13 @@ namespace osu.Game.Overlays.Profile
     {
         protected const float FADE_DURATION = 150;
 
-        protected readonly RankChartLineGraph Graph;
+        protected readonly UserLineGraph Graph;
         protected KeyValuePair<TKey, TValue>[] Data;
         protected int DataIndex;
 
         protected UserGraph()
         {
-            Add(Graph = new RankChartLineGraph
+            Add(Graph = new UserLineGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0
@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile
 
         protected abstract object GetTooltipContent();
 
-        protected class RankChartLineGraph : LineGraph
+        protected class UserLineGraph : LineGraph
         {
             private readonly CircularContainer movingBall;
             private readonly Container bar;
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.Profile
 
             public Action<int> OnBallMove;
 
-            public RankChartLineGraph()
+            public UserLineGraph()
             {
                 Add(bar = new Container
                 {
