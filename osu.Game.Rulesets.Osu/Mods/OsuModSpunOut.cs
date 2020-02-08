@@ -3,15 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpunOut : Mod, IApplicableToDrawableHitObjects
+    public class OsuModSpunOut : Mod, IApplicableToDrawableHitObjects, IUpdatableByPlayfield
     {
         public override string Name => "Spun Out";
         public override string Acronym => "SO";
@@ -22,15 +25,32 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot) };
 
+        private double lastFrameTime;
+        private double frameDelay;
+
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var hitObject in drawables)
             {
                 if (hitObject is DrawableSpinner spinner)
                 {
-                    spinner.Disc.AutoSpin = true;
+                    spinner.Disc.Trackable = false;
+                    spinner.Disc.OnUpdate += d =>
+                    {
+                        if (d is SpinnerDisc s)
+                        {
+                            if (s.Valid)
+                            s.Rotate((float)frameDelay);
+                        }
+                    };
                 }
             }
+        }
+
+        public void Update(Playfield playfield)
+        {
+            frameDelay = playfield.Time.Current - lastFrameTime;
+            lastFrameTime = playfield.Time.Current;
         }
     }
 }

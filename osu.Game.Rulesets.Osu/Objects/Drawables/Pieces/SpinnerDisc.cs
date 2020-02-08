@@ -73,7 +73,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        public bool AutoSpin { get; set; } = false;
+        public bool Valid => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+        public bool Trackable { get; set; }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -95,22 +96,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override void Update()
         {
             base.Update();
+            var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            bool valid = spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+            var delta = thisAngle - lastAngle;
 
-            if (valid && AutoSpin)
-                Rotate(6f);
-            else
-            {
-                var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
+            if (Valid && tracking && Trackable)
+                Rotate(delta);
 
-                var delta = thisAngle - lastAngle;
-
-                if (valid && tracking)
-                    Rotate(delta);
-
-                lastAngle = thisAngle;
-            }
+            lastAngle = thisAngle;
 
             if (Complete && updateCompleteTick())
             {
