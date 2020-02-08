@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [SetUp]
         public void SetUp() => Schedule(() =>
         {
-            SelectedMods.Value = new[] { new OsuModHidden() };
+            SelectedMods.Value = new[] { new OsuModSpunOut() };
         });
     }
 }
