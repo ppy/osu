@@ -91,6 +91,33 @@ namespace osu.Game.Tests.Visual.Online
                 },
                 new Comment
                 {
+                    Id = 100,
+                    Message = "This comment has \"load replies\" button because it has unloaded replies",
+                    LegacyName = "TestUser1100",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 5,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 111,
+                    Message = "This comment has \"Show More\" button because it has unloaded replies, but some of them are loaded",
+                    LegacyName = "TestUser1111",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 100,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 112,
+                    ParentId = 111,
+                    Message = "I'm here to make my parent work",
+                    LegacyName = "someone",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 2,
+                },
+                new Comment
+                {
                     Id = 2,
                     Message = "This comment has been deleted :( but visible for admins",
                     LegacyName = "TestUser2",
@@ -155,8 +182,6 @@ namespace osu.Game.Tests.Visual.Online
                     Username = "Good_Admin"
                 }
             },
-            TopLevelCount = 4,
-            Total = 7
         };
     }
 }

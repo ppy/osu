@@ -17,6 +17,7 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Framework.Allocation;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -31,6 +32,10 @@ namespace osu.Game.Overlays.Comments
 
         private FillFlowContainer childCommentsVisibilityContainer;
         private readonly Comment comment;
+        private LoadMoreCommentsButton loadMoreCommentsButton;
+        private ShowMoreButton showMoreButton;
+        private RepliesButton repliesButton;
+        private ChevronButton chevronButton;
 
         public DrawableComment(Comment comment)
         {
@@ -158,10 +163,11 @@ namespace osu.Game.Overlays.Comments
                                                         Colour = OsuColour.Gray(0.7f),
                                                         Text = HumanizerUtils.Humanize(comment.CreatedAt)
                                                     },
-                                                    new RepliesButton(comment.RepliesCount)
+                                                    repliesButton = new RepliesButton(comment.RepliesCount)
                                                     {
                                                         Expanded = { BindTarget = childrenExpanded }
                                                     },
+                                                    loadMoreCommentsButton = new LoadMoreCommentsButton()
                                                 }
                                             }
                                         }
@@ -187,7 +193,8 @@ namespace osu.Game.Overlays.Comments
                             deletedCommentsCounter = new DeletedCommentsCounter
                             {
                                 ShowDeleted = { BindTarget = ShowDeleted }
-                            }
+                            },
+                            showMoreButton = new ShowMoreButton()
                         }
                     }
                 }
@@ -240,7 +247,7 @@ namespace osu.Game.Overlays.Comments
 
                 if (comment.ChildComments.Any())
                 {
-                    AddInternal(new ChevronButton(comment)
+                    AddInternal(chevronButton = new ChevronButton
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
@@ -264,16 +271,28 @@ namespace osu.Game.Overlays.Comments
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+
+            updateButtonsState();
             base.LoadComplete();
+        }
+
+        private void updateButtonsState()
+        {
+            var loadedReplesCount = comment.ChildComments.Count;
+            var hasUnloadedReplies = loadedReplesCount != comment.RepliesCount;
+
+            loadMoreCommentsButton.FadeTo(hasUnloadedReplies && loadedReplesCount == 0 ? 1 : 0);
+            showMoreButton.FadeTo(hasUnloadedReplies && loadedReplesCount > 0 ? 1 : 0);
+            repliesButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
+            chevronButton?.FadeTo(loadedReplesCount != 0 ? 1 : 0);
         }
 
         private class ChevronButton : ShowChildrenButton
         {
             private readonly SpriteIcon icon;
 
-            public ChevronButton(Comment comment)
+            public ChevronButton()
             {
-                Alpha = comment.IsTopLevel && comment.ChildComments.Any() ? 1 : 0;
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
@@ -295,7 +314,6 @@ namespace osu.Game.Overlays.Comments
             {
                 this.count = count;
 
-                Alpha = count == 0 ? 0 : 1;
                 Child = text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
@@ -306,6 +324,30 @@ namespace osu.Game.Overlays.Comments
             {
                 text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
             }
+        }
+
+        private class LoadMoreCommentsButton : GetCommentRepliesButton
+        {
+            public LoadMoreCommentsButton()
+            {
+                IdleColour = OsuColour.Gray(0.7f);
+                HoverColour = Color4.White;
+            }
+
+            protected override string GetText() => @"[+] load replies";
+        }
+
+        private class ShowMoreButton : GetCommentRepliesButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Margin = new MarginPadding { Vertical = 10, Left = 80 };
+                IdleColour = colourProvider.Light2;
+                HoverColour = colourProvider.Light1;
+            }
+
+            protected override string GetText() => @"Show More";
         }
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
