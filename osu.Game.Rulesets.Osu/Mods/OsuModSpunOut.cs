@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (d is SpinnerDisc s)
                         {
                             if (s.Valid)
-                                s.Rotate((float)frameDelay);
+                                s.Rotate(180 / MathF.PI * ((float)frameDelay) / 40);
                         }
                     };
                 }
