@@ -73,6 +73,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
+        public bool AutoSpin { get; set; } = false;
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
@@ -94,16 +96,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
+            bool valid = spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
 
-            var delta = thisAngle - lastAngle;
+            if (valid && AutoSpin)
+                Rotate(6f);
+            else
+            {
+                var thisAngle = -MathUtils.RadiansToDegrees(MathF.Atan2(mousePosition.X - DrawSize.X / 2, mousePosition.Y - DrawSize.Y / 2));
 
-            bool validAndTracking = tracking && spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
+                var delta = thisAngle - lastAngle;
 
-            if (validAndTracking)
-                Rotate(delta);
+                if (valid && tracking)
+                    Rotate(delta);
 
-            lastAngle = thisAngle;
+                lastAngle = thisAngle;
+            }
 
             if (Complete && updateCompleteTick())
             {
@@ -114,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     .FadeTo(tracking_alpha, 250, Easing.OutQuint);
             }
 
-            this.RotateTo(currentRotation / 2, validAndTracking ? 500 : 1500, Easing.OutExpo);
+            this.RotateTo(currentRotation / 2, 500, Easing.OutExpo);
         }
 
         public void Rotate(float angle)
