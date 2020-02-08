@@ -13,7 +13,6 @@ using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Framework.Bindables;
-using System;
 using System.Linq;
 
 namespace osu.Game.Overlays.Comments
@@ -25,8 +24,6 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly BindableInt CurrentPage = new BindableInt();
         public readonly BindableList<Comment> LoadedReplies = new BindableList<Comment>();
-
-        public Action<IEnumerable<Comment>> OnCommentsReceived;
 
         protected override IEnumerable<Drawable> EffectTargets => new[] { text };
 
