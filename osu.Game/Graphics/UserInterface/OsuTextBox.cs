@@ -9,6 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
@@ -70,38 +71,82 @@ namespace osu.Game.Graphics.UserInterface
             SelectionColour = SelectionColour,
         };
 
-        private class BeatCaret : BasicCaret
+        private class BeatCaret : Caret
         {
-            private bool hasSelection;
+            private const float caret_move_time = 60;
+
+            private readonly CaretBeatSyncedContainer beatSync;
 
             public BeatCaret()
             {
-                AddInternal(new CaretBeatSyncedContainer(this));
+                RelativeSizeAxes = Axes.Y;
+                Size = new Vector2(1, 0.9f);
+
+                Colour = Color4.Transparent;
+                Anchor = Anchor.CentreLeft;
+                Origin = Anchor.CentreLeft;
+
+                Masking = true;
+                CornerRadius = 1;
+                InternalChild = beatSync = new CaretBeatSyncedContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                };
             }
+
+            public override void Hide() => this.FadeOut(200);
+
+            public float CaretWidth { get; set; }
+
+            public Color4 SelectionColour { get; set; }
 
             public override void DisplayAt(Vector2 position, float? selectionWidth)
             {
-                base.DisplayAt(position, selectionWidth);
+                beatSync.HasSelection = selectionWidth != null;
 
-                hasSelection = selectionWidth != null;
-                if (selectionWidth == null)
-                    ClearTransforms(targetMember: nameof(Alpha));
+                if (selectionWidth != null)
+                {
+                    this.MoveTo(new Vector2(position.X, position.Y), 60, Easing.Out);
+                    this.ResizeWidthTo(selectionWidth.Value + CaretWidth / 2, caret_move_time, Easing.Out);
+                    this.FadeColour(SelectionColour, 200, Easing.Out);
+                }
+                else
+                {
+                    this.MoveTo(new Vector2(position.X - CaretWidth / 2, position.Y), 60, Easing.Out);
+                    this.ResizeWidthTo(CaretWidth, caret_move_time, Easing.Out);
+                    this.FadeColour(Color4.White, 200, Easing.Out);
+                }
             }
 
             private class CaretBeatSyncedContainer : BeatSyncedContainer
             {
-                private readonly BeatCaret caret;
+                private bool hasSelection;
 
-                public CaretBeatSyncedContainer(BeatCaret caret)
+                public bool HasSelection
                 {
-                    this.caret = caret;
+                    set
+                    {
+                        hasSelection = value;
+                        if (value)
+
+                            this.FadeTo(0.5f, 200, Easing.Out);
+                    }
+                }
+
+                public CaretBeatSyncedContainer()
+                {
                     MinimumBeatLength = 300;
+                    InternalChild = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                    };
                 }
 
                 protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
                 {
-                    if (!caret.hasSelection)
-                        caret.FadeTo(0.7f).FadeTo(0.4f, timingPoint.BeatLength, Easing.InOutSine);
+                    if (!hasSelection)
+                        this.FadeTo(0.7f).FadeTo(0.4f, timingPoint.BeatLength, Easing.InOutSine);
                 }
             }
         }
