@@ -24,6 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float spacing = 20;
 
         private readonly Box successRateBackground;
+        private readonly Box background;
         private readonly SuccessRate successRate;
 
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
@@ -50,10 +51,9 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
+                    RelativeSizeAxes = Axes.Both
                 },
                 new Container
                 {
@@ -126,14 +126,14 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            successRateBackground.Colour = colours.GrayE;
+            successRateBackground.Colour = colourProvider.Background4;
+            background.Colour = colourProvider.Background5;
         }
 
         private class MetadataSection : FillFlowContainer
         {
-            private readonly OsuSpriteText header;
             private readonly TextFlowContainer textFlow;
 
             public string Text
@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     this.FadeIn(transition_duration);
                     textFlow.Clear();
-                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
+                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 12));
                 }
             }
 
@@ -160,11 +160,10 @@ namespace osu.Game.Overlays.BeatmapSet
 
                 InternalChildren = new Drawable[]
                 {
-                    header = new OsuSpriteText
+                    new OsuSpriteText
                     {
                         Text = title,
-                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
-                        Shadow = false,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Black),
                         Margin = new MarginPadding { Top = 20 },
                     },
                     textFlow = new OsuTextFlowContainer
@@ -173,12 +172,6 @@ namespace osu.Game.Overlays.BeatmapSet
                         AutoSizeAxes = Axes.Y,
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                header.Colour = textFlow.Colour = colours.Gray5;
             }
         }
     }

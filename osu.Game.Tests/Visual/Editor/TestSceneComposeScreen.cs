@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Screens.Edit;
@@ -14,6 +15,7 @@ namespace osu.Game.Tests.Visual.Editor
     public class TestSceneComposeScreen : EditorClockTestScene
     {
         [Cached(typeof(EditorBeatmap))]
+        [Cached(typeof(IBeatSnapProvider))]
         private readonly EditorBeatmap editorBeatmap =
             new EditorBeatmap(new OsuBeatmap
             {

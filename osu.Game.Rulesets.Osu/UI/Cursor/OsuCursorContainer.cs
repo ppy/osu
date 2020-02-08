@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
             autoCursorScale.ValueChanged += _ => calculateScale();
 
-            CursorScale = new Bindable<float>();
+            CursorScale = new BindableFloat();
             CursorScale.ValueChanged += e => ActiveCursor.Scale = cursorTrail.Scale = new Vector2(e.NewValue);
 
             calculateScale();
@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return false;
         }
 
-        public bool OnReleased(OsuAction action)
+        public void OnReleased(OsuAction action)
         {
             switch (action)
             {
@@ -120,8 +120,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         updateExpandedState();
                     break;
             }
-
-            return false;
         }
 
         public override bool HandlePositionalInput => true; // OverlayContainer will set this false when we go hidden, but we always want to receive input.

@@ -9,6 +9,7 @@ using osuTK;
 using System;
 using System.Linq;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -81,7 +82,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             RemoveItem(channel);
 
             if (Current.Value == channel)
-                Current.Value = Items.FirstOrDefault();
+            {
+                // Prefer non-selector channels first
+                Current.Value = Items.FirstOrDefault(c => !(c is ChannelSelectorTabItem.ChannelSelectorTabChannel)) ?? Items.FirstOrDefault();
+            }
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
@@ -109,6 +113,19 @@ namespace osu.Game.Overlays.Chat.Tabs
                 SelectTab(selectorTab);
 
             OnRequestLeave?.Invoke(tab.Value);
+        }
+
+        protected override TabFillFlowContainer CreateTabFlow() => new ChannelTabFillFlowContainer
+        {
+            Direction = FillDirection.Full,
+            RelativeSizeAxes = Axes.Both,
+            Depth = -1,
+            Masking = true
+        };
+
+        private class ChannelTabFillFlowContainer : TabFillFlowContainer
+        {
+            protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
         }
     }
 }
