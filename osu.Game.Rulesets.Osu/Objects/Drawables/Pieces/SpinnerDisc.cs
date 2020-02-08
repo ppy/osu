@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         public bool Valid => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
-        public bool Trackable { get; set; }
+        public bool Trackable { get; set; } = true;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
