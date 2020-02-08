@@ -222,17 +222,20 @@
     *   Remove all usages of Bindable<float> and Bindable<double> #7709
 
 ### 2020/2/3:
+*   整合更新
     *   [m] [#7710 - Adjust profile scores to closer match osu-web](https://github.com/ppy/osu/pull/7710)
     *   [m] [#7714 - Make slider tracking match what is on screen](https://github.com/ppy/osu/pull/7714)
     *   [m] [#7716 - Add ability to create ruleset selector in OverlayHeader](https://github.com/ppy/osu/pull/7716)
     *   Bump Sentry from 1.2.0 to 2.0.1 #7717
 
 ### 2020/2/4:
+*   整合更新
     *   [m] [#7719 - Update BeatmapOverlay header in line with the web design](https://github.com/ppy/osu/pull/7719)
     *   [m] [#7720 - Fix potential nullref in UserDimBackgrounds tests](https://github.com/ppy/osu/pull/7720)
     *   [m] [#7723 - Expose TabControlOverlayHeader.Current value](https://github.com/ppy/osu/pull/7723)
 
 ### 2020/2/5:
+*   整合更新
     *   [m] [#7724 - Update BeatmapSetOverlay to match web design](https://github.com/ppy/osu/pull/7724)
     *   [m] [#7725 - Adjust TopScoreStatisticsSection to closer match web design](https://github.com/ppy/osu/pull/7725)
     *   [m] [#7721 - Add {ScoreInfo,UserStatistics}.Accuracy](https://github.com/ppy/osu/pull/7721)
@@ -249,6 +252,7 @@
             *   [osu.Game/Configuration/OsuConfigManager.cs](osu.Game/Configuration/OsuConfigManager.cs)
 
 ### 2020/2/8:
+*   整合更新
     *   [m] [Allow guest users to see the comments in CommentsContainer #7728]
     *   [m] [Make EditorBeatmap a drawable component #7732]
     *   [m] [Add the ability to extend hold notes (spinners / sliders etc.) via timeline #7734]
@@ -280,3 +284,5 @@
     *   [m] [Apply precision when determining bar colour in difficulty statistics #7703]
     *   [m] [Return to song select after viewing a replay from the leaderboard #7679]
     *   [m] [Fix mod select overlay overflowing toolbar at max ui scale #7707]
+    *   [m] [Implement SpotlightSelector component for RankingsOverlay #7488]
+    *   [m] [Reimplement music playlist using framework's RearrangeableListContainer #7680]
