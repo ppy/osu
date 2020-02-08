@@ -9,7 +9,7 @@ using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
-    public class UserHistoryGraph : UserGraph<DateTime, long>
+    public abstract class UserHistoryGraph : UserGraph<DateTime, long>
     {
         private UserHistoryCount[] values;
 
@@ -21,13 +21,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 values = value;
                 updateValues(value);
             }
-        }
-
-        private readonly string tooltipCounterName;
-
-        public UserHistoryGraph(string tooltipCounterName)
-        {
-            this.tooltipCounterName = tooltipCounterName;
         }
 
         private void updateValues(UserHistoryCount[] values)
@@ -61,15 +54,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             };
         }
 
-        protected override UserGraphTooltip GetTooltip() => new HistoryGraphTooltip(tooltipCounterName);
-
-        private class HistoryGraphTooltip : UserGraphTooltip
+        protected abstract class HistoryGraphTooltip : UserGraphTooltip
         {
-            public HistoryGraphTooltip(string topText)
-                : base(topText)
-            {
-            }
-
             public override bool SetContent(object content)
             {
                 if (!(content is TooltipDisplayContent info))

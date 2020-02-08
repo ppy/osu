@@ -25,9 +25,9 @@ namespace osu.Game.Tests.Visual.Online
 
         public TestSceneUserHistoryGraph()
         {
-            UserHistoryGraph graph;
+            TestGraph graph;
 
-            Add(graph = new UserHistoryGraph("Counter Name")
+            Add(graph = new TestGraph
             {
                 RelativeSizeAxes = Axes.X,
                 Height = 200,
@@ -107,6 +107,16 @@ namespace osu.Game.Tests.Visual.Online
             AddStep("Set more values", () => graph.Values = moreValues);
             AddStep("Set null values", () => graph.Values = null);
             AddStep("Set empty values", () => graph.Values = Array.Empty<UserHistoryCount>());
+        }
+
+        private class TestGraph : UserHistoryGraph
+        {
+            protected override UserGraphTooltip GetTooltip() => new TestTooltip();
+
+            private class TestTooltip : HistoryGraphTooltip
+            {
+                protected override string TooltipCounterName => "Test Counter";
+            }
         }
     }
 }

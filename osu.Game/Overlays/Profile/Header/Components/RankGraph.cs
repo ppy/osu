@@ -80,10 +80,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private class RankGraphTooltip : UserGraphTooltip
         {
-            public RankGraphTooltip()
-                : base(@"Global Ranking")
-            {
-            }
+            protected override string TooltipCounterName => @"Global Ranking";
 
             public override bool SetContent(object content)
             {
