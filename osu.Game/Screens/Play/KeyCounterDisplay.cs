@@ -14,18 +14,32 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
-    public class KeyCounterDisplay : FillFlowContainer<KeyCounter>
+    public class KeyCounterDisplay : Container<KeyCounter>
     {
         private const int duration = 100;
         private const double key_fade_time = 80;
 
-        public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
+
+        protected readonly FillFlowContainer<KeyCounter> KeyFlow;
+
+        protected override Container<KeyCounter> Content => KeyFlow;
+
+        /// <summary>
+        /// Whether the key counter should be visible regardless of the configuration value.
+        /// This is true by default, but can be changed.
+        /// </summary>
+        public readonly Bindable<bool> AlwaysVisible = new Bindable<bool>(true);
 
         public KeyCounterDisplay()
         {
-            Direction = FillDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
+
+            InternalChild = KeyFlow = new FillFlowContainer<KeyCounter>
+            {
+                Direction = FillDirection.Horizontal,
+                AutoSizeAxes = Axes.Both,
+            };
         }
 
         public override void Add(KeyCounter key)
@@ -49,7 +63,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
 
-            Visible.BindValueChanged(_ => updateVisibility());
+            AlwaysVisible.BindValueChanged(_ => updateVisibility());
             configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
@@ -100,7 +114,9 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private void updateVisibility() => this.FadeTo(Visible.Value || configVisibility.Value ? 1 : 0, duration);
+        private void updateVisibility() =>
+            // Isolate changing visibility of the key counters from fading this component.
+            KeyFlow.FadeTo(AlwaysVisible.Value || configVisibility.Value ? 1 : 0, duration);
 
         public override bool HandleNonPositionalInput => receptor == null;
         public override bool HandlePositionalInput => receptor == null;

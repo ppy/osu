@@ -75,6 +75,9 @@ namespace osu.Game.Screens.Select
         [Resolved(canBeNull: true)]
         private NotificationOverlay notificationOverlay { get; set; }
 
+        [Resolved]
+        private Bindable<IReadOnlyList<Mod>> selectedMods { get; set; }
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         protected BeatmapCarousel Carousel { get; private set; }
@@ -219,23 +222,37 @@ namespace osu.Game.Screens.Select
 
             if (ShowFooter)
             {
-                AddRangeInternal(new[]
+                AddRangeInternal(new Drawable[]
                 {
-                    FooterPanels = new Container
+                    new GridContainer // used for max height implementation
                     {
-                        Anchor = Anchor.BottomLeft,
-                        Origin = Anchor.BottomLeft,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding { Bottom = Footer.HEIGHT },
-                        Children = new Drawable[]
+                        RelativeSizeAxes = Axes.Both,
+                        RowDimensions = new[]
                         {
-                            BeatmapOptions = new BeatmapOptionsOverlay(),
-                            ModSelect = new ModSelectOverlay
+                            new Dimension(),
+                            new Dimension(GridSizeMode.Relative, 1f, maxSize: ModSelectOverlay.HEIGHT + Footer.HEIGHT),
+                        },
+                        Content = new[]
+                        {
+                            null,
+                            new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Origin = Anchor.BottomCentre,
-                                Anchor = Anchor.BottomCentre,
+                                FooterPanels = new Container
+                                {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Padding = new MarginPadding { Bottom = Footer.HEIGHT },
+                                    Children = new Drawable[]
+                                    {
+                                        BeatmapOptions = new BeatmapOptionsOverlay(),
+                                        ModSelect = new ModSelectOverlay
+                                        {
+                                            Origin = Anchor.BottomCentre,
+                                            Anchor = Anchor.BottomCentre,
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
@@ -466,6 +483,8 @@ namespace osu.Game.Screens.Select
 
             this.FadeInFromZero(250);
             FilterControl.Activate();
+
+            ModSelect.SelectedMods.BindTo(selectedMods);
         }
 
         private const double logo_transition = 250;
@@ -506,6 +525,12 @@ namespace osu.Game.Screens.Select
 
         public override void OnResuming(IScreen last)
         {
+            base.OnResuming(last);
+
+            // required due to https://github.com/ppy/osu-framework/issues/3218
+            ModSelect.SelectedMods.Disabled = false;
+            ModSelect.SelectedMods.BindTo(selectedMods);
+
             Carousel.AllowSelection = true;
 
             BeatmapDetails.Leaderboard.RefreshScores();
@@ -521,8 +546,6 @@ namespace osu.Game.Screens.Select
                 music?.Play();
             }
 
-            base.OnResuming(last);
-
             this.FadeIn(250);
 
             this.ScaleTo(1, 250, Easing.OutSine);
@@ -532,6 +555,7 @@ namespace osu.Game.Screens.Select
 
         public override void OnSuspending(IScreen next)
         {
+            ModSelect.SelectedMods.UnbindFrom(selectedMods);
             ModSelect.Hide();
 
             BeatmapOptions.Hide();

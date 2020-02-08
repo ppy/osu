@@ -249,7 +249,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"该链接类型尚不支持!",
+                        Text = @"This link type is not yet supported!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -327,10 +327,10 @@ namespace osu.Game
                 return;
             }
 
-            performFromMainMenu(() =>
+            PerformFromScreen(screen =>
             {
                 // we might already be at song select, so a check is required before performing the load to solo.
-                if (menuScreen.IsCurrentScreen())
+                if (screen is MainMenu)
                     menuScreen.LoadToSolo();
 
                 // we might even already be at the song
@@ -344,7 +344,7 @@ namespace osu.Game
 
                 Ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
-            }, $"load {beatmap}", bypassScreenAllowChecks: true, targetScreen: typeof(PlaySongSelect));
+            }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
         /// <summary>
@@ -381,12 +381,12 @@ namespace osu.Game
                 return;
             }
 
-            performFromMainMenu(() =>
+            PerformFromScreen(screen =>
             {
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
 
-                menuScreen.Push(new ReplayPlayerLoader(databasedScore));
-            }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
+                screen.Push(new ReplayPlayerLoader(databasedScore));
+            }, validScreens: new[] { typeof(PlaySongSelect) });
         }
 
         protected virtual Loader CreateLoader() => new Loader();
@@ -441,53 +441,42 @@ namespace osu.Game
         private ScheduledDelegate performFromMainMenuTask;
 
         /// <summary>
-        /// Perform an action only after returning to the main menu.
+        /// Perform an action only after returning to a specific screen as indicated by <paramref name="validScreens"/>.
         /// Eagerly tries to exit the current screen until it succeeds.
         /// </summary>
         /// <param name="action">The action to perform once we are in the correct state.</param>
-        /// <param name="taskName">The task name to display in a notification (if we can't immediately reach the main menu state).</param>
-        /// <param name="targetScreen">An optional target screen type. If this screen is already current we can immediately perform the action without returning to the menu.</param>
-        /// <param name="bypassScreenAllowChecks">Whether checking <see cref="IOsuScreen.AllowExternalScreenChange"/> should be bypassed.</param>
-        private void performFromMainMenu(Action action, string taskName, Type targetScreen = null, bool bypassScreenAllowChecks = false)
+        /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
+        protected void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
 
-            // if the current screen does not allow screen changing, give the user an option to try again later.
-            if (!bypassScreenAllowChecks && (ScreenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
-            {
-                notifications.Post(new SimpleNotification
-                {
-                    Text = $"点击这里来 {taskName}",
-                    Activated = () =>
-                    {
-                        performFromMainMenu(action, taskName, targetScreen, true);
-                        return true;
-                    }
-                });
-
-                return;
-            }
+            validScreens ??= Enumerable.Empty<Type>();
+            validScreens = validScreens.Append(typeof(MainMenu));
 
             CloseAllOverlays(false);
 
             // we may already be at the target screen type.
-            if (targetScreen != null && ScreenStack.CurrentScreen?.GetType() == targetScreen)
+            if (validScreens.Contains(ScreenStack.CurrentScreen?.GetType()) && !Beatmap.Disabled)
             {
-                action();
+                action(ScreenStack.CurrentScreen);
                 return;
             }
 
-            // all conditions have been met to continue with the action.
-            if (menuScreen?.IsCurrentScreen() == true && !Beatmap.Disabled)
+            // find closest valid target
+            IScreen screen = ScreenStack.CurrentScreen;
+
+            while (screen != null)
             {
-                action();
-                return;
+                if (validScreens.Contains(screen.GetType()))
+                {
+                    screen.MakeCurrent();
+                    break;
+                }
+
+                screen = screen.GetParentScreen();
             }
 
-            // menuScreen may not be initialised yet (null check required).
-            menuScreen?.MakeCurrent();
-
-            performFromMainMenuTask = Schedule(() => performFromMainMenu(action, taskName));
+            performFromMainMenuTask = Schedule(() => PerformFromScreen(action, validScreens));
         }
 
         /// <summary>
@@ -739,7 +728,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.Solid.ExclamationCircle : FontAwesome.Solid.Bomb,
-                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\n该错误已被自动反馈给开发人员" : string.Empty),
+                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -747,7 +736,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = FontAwesome.Solid.EllipsisH,
-                        Text = "详细信息已记录. 点击这里来查看日志.",
+                        Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
@@ -827,6 +816,7 @@ namespace osu.Game
                 case GlobalAction.ToggleNowPlaying:
                     nowPlaying.ToggleVisibility();
                     return true;
+
                 case GlobalAction.ToggleChat:
                     chatOverlay.ToggleVisibility();
                     return true;
