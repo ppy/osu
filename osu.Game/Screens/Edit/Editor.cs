@@ -81,14 +81,14 @@ namespace osu.Game.Screens.Edit
             clock = new EditorClock(Beatmap.Value, beatDivisor) { IsCoupled = false };
             clock.ChangeSource(sourceClock);
 
-            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
-            editorBeatmap = new EditorBeatmap(playableBeatmap, beatDivisor);
-
             dependencies.CacheAs<IFrameBasedClock>(clock);
             dependencies.CacheAs<IAdjustableClock>(clock);
 
             // todo: remove caching of this and consume via editorBeatmap?
             dependencies.Cache(beatDivisor);
+
+            playableBeatmap = Beatmap.Value.GetPlayableBeatmap(Beatmap.Value.BeatmapInfo.Ruleset);
+            AddInternal(editorBeatmap = new EditorBeatmap(playableBeatmap));
 
             dependencies.CacheAs(editorBeatmap);
 
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit
 
             fileMenuItems.Add(new EditorMenuItem("退出", MenuItemType.Standard, this.Exit));
 
-            InternalChild = new OsuContextMenuContainer
+            AddInternal(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Edit
                         }
                     },
                 }
-            };
+            });
 
             menuBar.Mode.ValueChanged += onModeChanged;
 

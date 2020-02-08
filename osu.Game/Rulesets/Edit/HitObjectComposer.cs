@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -50,8 +49,6 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        private IBeatmapProcessor beatmapProcessor;
-
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
         private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
@@ -71,8 +68,6 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IFrameBasedClock framedClock)
         {
-            beatmapProcessor = Ruleset.CreateBeatmapProcessor(EditorBeatmap.PlayableBeatmap);
-
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
             EditorBeatmap.StartTimeChanged += UpdateHitObject;
@@ -155,7 +150,6 @@ namespace osu.Game.Rulesets.Edit
             if (e.Key >= Key.Number1 && e.Key <= Key.Number9)
             {
                 var item = toolboxCollection.Items.ElementAtOrDefault(e.Key - Key.Number1);
-
 
                 if (item != null)
                 {
@@ -241,19 +235,6 @@ namespace osu.Game.Rulesets.Edit
             lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
-        private ScheduledDelegate scheduledUpdate;
-
-        public override void UpdateHitObject(HitObject hitObject)
-        {
-            scheduledUpdate?.Cancel();
-            scheduledUpdate = Schedule(() =>
-            {
-                beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(EditorBeatmap.ControlPointInfo, EditorBeatmap.BeatmapInfo.BaseDifficulty);
-                beatmapProcessor?.PostProcess();
-            });
-        }
-
         private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
 
         private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
@@ -309,6 +290,8 @@ namespace osu.Game.Rulesets.Edit
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
             => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
+
+        public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
 
         protected override void Dispose(bool isDisposing)
         {

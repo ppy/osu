@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class HoldNote : ManiaHitObject, IHasEndTime
     {
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         private double duration;
 

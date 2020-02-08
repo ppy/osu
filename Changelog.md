@@ -247,3 +247,7 @@
             *   [osu.Game/Screens/Loader.cs](osu.Game/Screens/Loader.cs)
             *   [osu.Game/Configuration/IntroSequence.cs](osu.Game/Configuration/IntroSequence.cs)
             *   [osu.Game/Configuration/OsuConfigManager.cs](osu.Game/Configuration/OsuConfigManager.cs)
+
+### 2020/2/8:
+    *   [m] [Allow guest users to see the comments in CommentsContainer #7728]
+    *   [m] [Make EditorBeatmap a drawable component #7732]
