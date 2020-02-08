@@ -214,11 +214,14 @@ namespace osu.Game.Rulesets.UI
         {
             foreach (TObject h in Beatmap.HitObjects)
             {
-                cancellationToken?.ThrowIfCancellationRequested();
+                if (cancellationToken?.IsCancellationRequested == true)
+                    return;
+
                 addHitObject(h);
             }
 
-            cancellationToken?.ThrowIfCancellationRequested();
+            if (cancellationToken?.IsCancellationRequested == true)
+                return;
 
             Playfield.PostProcess();
 
