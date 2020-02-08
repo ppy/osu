@@ -251,3 +251,23 @@
 ### 2020/2/8:
     *   [m] [Allow guest users to see the comments in CommentsContainer #7728]
     *   [m] [Make EditorBeatmap a drawable component #7732]
+    *   [m] [Add the ability to extend hold notes (spinners / sliders etc.) via timeline #7734]
+    *   [m] [Fix rooms test scene not displaying anything #7739]
+
+    *   [m] [Simplify the way multiple subscreens handle their disable states via a custom stack #7741]
+    *   [m] [Make multiplayer room listing filter by current ruleset #7740]
+
+    *   [m] [Set a sane default keyboard step for mod settings #7742]
+    *   [m] [Make ScreenshotManager a Component #7743]
+    *   [m] [Fix lifetime calculation in overlapping scroll algorithm #7745]
+    *   [m] [Update framework #7747]
+    *   [m] [Fix incorrect distance snap grid being displayed when in selection mode #7749]
+    *   [m] [Fix editor test scene exiting after loading #7750]
+    *   [m] [Fix duration snapping still being incorrect #7751]
+    *   [m] [Update the windows platform offset to match stable #7752]
+    *   [m] [Make editor screens display below timeline #7754]
+    *   [m] [Fix spinner placement blueprint in multiple ways #7755]
+    *   [m] [Receive historical monthly user playcounts from API #7758]
+    *   [m] [Fix beatmap overlay scoreboards having their statistics columns unsorted #7760]
+    *   [m] [Make accuracy formatting more consistent #7763]
+    *   [m] [Update default background dim to 80% to match stable #7766]

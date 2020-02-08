@@ -203,6 +203,21 @@ namespace osu.Game.Users
             public int ID;
         }
 
+        [JsonProperty("monthly_playcounts")]
+        public UserHistoryCount[] MonthlyPlaycounts;
+
+        [JsonProperty("replays_watched_counts")]
+        public UserHistoryCount[] ReplaysWatchedCounts;
+
+        public class UserHistoryCount
+        {
+            [JsonProperty("start_date")]
+            public DateTime Date;
+
+            [JsonProperty("count")]
+            public long Count;
+        }
+
         public override string ToString() => Username;
 
         /// <summary>

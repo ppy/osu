@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Menu
             Color4 defaultColour = Color4.White.Opacity(0.2f);
 
             if (user.Value?.IsSupporter ?? false)
-                AccentColour = skin.Value.GetConfig<GlobalSkinColour, Color4>(GlobalSkinColour.MenuGlow)?.Value ?? defaultColour;
+                AccentColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? defaultColour;
             else
                 AccentColour = defaultColour;
         }

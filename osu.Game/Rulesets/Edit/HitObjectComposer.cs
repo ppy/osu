@@ -49,8 +49,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
+        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
+
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
         private DistanceSnapGrid distanceSnapGrid;
         private readonly List<Container> layerContainers = new List<Container>();
@@ -94,7 +95,7 @@ namespace osu.Game.Rulesets.Edit
                 new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
             });
 
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(blueprintContainer = CreateBlueprintContainer());
+            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -142,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
 
             setSelectTool();
 
-            blueprintContainer.SelectionChanged += selectionChanged;
+            BlueprintContainer.SelectionChanged += selectionChanged;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -174,7 +175,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
+            if (EditorClock.CurrentTime != lastGridUpdateTime && !(BlueprintContainer.CurrentTool is SelectTool))
                 showGridFor(Enumerable.Empty<HitObject>());
         }
 
@@ -210,7 +211,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void toolSelected(HitObjectCompositionTool tool)
         {
-            blueprintContainer.CurrentTool = tool;
+            BlueprintContainer.CurrentTool = tool;
 
             if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
@@ -289,7 +290,11 @@ namespace osu.Game.Rulesets.Edit
             => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
+        {
+            var snappedEndTime = beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+
+            return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
+        }
 
         public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
 
@@ -328,7 +333,7 @@ namespace osu.Game.Rulesets.Edit
         /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
         /// </summary>
         /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>.</returns>
+        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 

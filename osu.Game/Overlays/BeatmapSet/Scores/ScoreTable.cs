@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("最大连击", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
             };
 
-            foreach (var statistic in score.Statistics)
+            foreach (var statistic in score.SortedStatistics)
                 columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70)));
 
             columns.AddRange(new[]
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             });
 
-            foreach (var kvp in score.Statistics)
+            foreach (var kvp in score.SortedStatistics)
             {
                 content.Add(new OsuSpriteText
                 {

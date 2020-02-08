@@ -36,6 +36,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override DistanceSnapGrid CreateDistanceSnapGrid(IEnumerable<HitObject> selectedHitObjects)
         {
+            if (BlueprintContainer.CurrentTool is SpinnerCompositionTool)
+                return null;
+
             var objects = selectedHitObjects.ToList();
 
             if (objects.Count == 0)
@@ -88,6 +91,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 targetIndex++;
             }
+
+            if (sourceObject is Spinner)
+                return null;
 
             return new OsuDistanceSnapGrid((OsuHitObject)sourceObject, (OsuHitObject)targetObject);
         }

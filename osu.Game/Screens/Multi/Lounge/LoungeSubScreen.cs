@@ -91,6 +91,12 @@ namespace osu.Game.Screens.Multi.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            onReturning();
+        }
+
+        private void onReturning()
+        {
             Filter.Search.HoldFocus = true;
         }
 

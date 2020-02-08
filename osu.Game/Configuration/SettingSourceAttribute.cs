@@ -45,7 +45,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<float>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Bindable = bNumber,
+                            KeyboardStep = 0.1f,
                         };
 
                         break;
@@ -54,7 +55,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<double>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Bindable = bNumber,
+                            KeyboardStep = 0.1f,
                         };
 
                         break;
