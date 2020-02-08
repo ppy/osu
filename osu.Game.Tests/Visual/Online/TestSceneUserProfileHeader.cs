@@ -24,12 +24,15 @@ namespace osu.Game.Tests.Visual.Online
             typeof(ProfileHeader),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(TabControlOverlayHeader.OverlayHeaderTabControl),
+            typeof(TabControlOverlayHeader<>.OverlayHeaderTabControl),
             typeof(CentreHeaderContainer),
             typeof(BottomHeaderContainer),
             typeof(DetailHeaderContainer),
             typeof(ProfileHeaderButton)
         };
+
+        [Cached]
+        private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Green);
 
         [Resolved]
         private IAPIProvider api { get; set; }

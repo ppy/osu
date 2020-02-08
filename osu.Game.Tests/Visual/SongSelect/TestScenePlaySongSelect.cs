@@ -14,6 +14,7 @@ using osu.Framework.Extensions;
 using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Overlays;
@@ -22,9 +23,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Taiko;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.SongSelect
 {
@@ -70,19 +73,23 @@ namespace osu.Game.Tests.Visual.SongSelect
             // required to get bindables attached
             Add(music);
 
-            Beatmap.SetDefault();
-
             Dependencies.Cache(config = new OsuConfigManager(LocalStorage));
         }
 
         private OsuConfigManager config;
 
-        [SetUp]
-        public virtual void SetUp() => Schedule(() =>
+        public override void SetUpSteps()
         {
-            Ruleset.Value = new OsuRuleset().RulesetInfo;
-            manager?.Delete(manager.GetAllUsableBeatmapSets());
-        });
+            base.SetUpSteps();
+
+            AddStep("delete all beatmaps", () =>
+            {
+                Ruleset.Value = new OsuRuleset().RulesetInfo;
+                manager?.Delete(manager.GetAllUsableBeatmapSets());
+
+                Beatmap.SetDefault();
+            });
+        }
 
         [Test]
         public void TestSingleFilterOnEnter()
@@ -93,6 +100,115 @@ namespace osu.Game.Tests.Visual.SongSelect
             createSongSelect();
 
             AddAssert("filter count is 1", () => songSelect.FilterCount == 1);
+        }
+
+        [Test]
+        public void TestChangeBeatmapBeforeEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
+            WorkingBeatmap selected = null;
+
+            AddStep("store selected beatmap", () => selected = Beatmap.Value);
+
+            AddStep("select next and enter", () =>
+            {
+                InputManager.PressKey(Key.Down);
+                InputManager.ReleaseKey(Key.Down);
+                InputManager.PressKey(Key.Enter);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+            AddAssert("ensure selection changed", () => selected != Beatmap.Value);
+        }
+
+        [Test]
+        public void TestChangeBeatmapAfterEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
+            WorkingBeatmap selected = null;
+
+            AddStep("store selected beatmap", () => selected = Beatmap.Value);
+
+            AddStep("select next and enter", () =>
+            {
+                InputManager.PressKey(Key.Enter);
+                InputManager.ReleaseKey(Key.Enter);
+                InputManager.PressKey(Key.Down);
+                InputManager.ReleaseKey(Key.Down);
+            });
+
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+            AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
+        }
+
+        [Test]
+        public void TestChangeBeatmapViaMouseBeforeEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
+            WorkingBeatmap selected = null;
+
+            AddStep("store selected beatmap", () => selected = Beatmap.Value);
+
+            AddStep("select next and enter", () =>
+            {
+                InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
+                                                   .First(b => ((CarouselBeatmap)b.Item).Beatmap != songSelect.Carousel.SelectedBeatmap));
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+
+                InputManager.PressKey(Key.Enter);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+            AddAssert("ensure selection changed", () => selected != Beatmap.Value);
+        }
+
+        [Test]
+        public void TestChangeBeatmapViaMouseAfterEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddUntilStep("wait for initial selection", () => !Beatmap.IsDefault);
+
+            WorkingBeatmap selected = null;
+
+            AddStep("store selected beatmap", () => selected = Beatmap.Value);
+
+            AddStep("select next and enter", () =>
+            {
+                InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmap>()
+                                                   .First(b => ((CarouselBeatmap)b.Item).Beatmap != songSelect.Carousel.SelectedBeatmap));
+
+                InputManager.PressButton(MouseButton.Left);
+
+                InputManager.PressKey(Key.Enter);
+                InputManager.ReleaseKey(Key.Enter);
+
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+
+            AddUntilStep("wait for not current", () => !songSelect.IsCurrentScreen());
+            AddAssert("ensure selection didn't change", () => selected == Beatmap.Value);
         }
 
         [Test]
@@ -308,6 +424,31 @@ namespace osu.Game.Tests.Visual.SongSelect
             });
 
             AddAssert("start not requested", () => !startRequested);
+        }
+
+        [Test]
+        public void TestAutoplayViaCtrlEnter()
+        {
+            addRulesetImportStep(0);
+
+            createSongSelect();
+
+            AddStep("press ctrl+enter", () =>
+            {
+                InputManager.PressKey(Key.ControlLeft);
+                InputManager.PressKey(Key.Enter);
+
+                InputManager.ReleaseKey(Key.ControlLeft);
+                InputManager.ReleaseKey(Key.Enter);
+            });
+
+            AddUntilStep("wait for player", () => Stack.CurrentScreen is PlayerLoader);
+
+            AddAssert("autoplay enabled", () => songSelect.Mods.Value.FirstOrDefault() is ModAutoplay);
+
+            AddUntilStep("wait for return to ss", () => songSelect.IsCurrentScreen());
+
+            AddAssert("mod disabled", () => songSelect.Mods.Value.Count == 0);
         }
 
         [Test]

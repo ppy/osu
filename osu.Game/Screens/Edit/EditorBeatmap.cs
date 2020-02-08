@@ -4,15 +4,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Screens.Edit
 {
-    public class EditorBeatmap : IBeatmap
+    public class EditorBeatmap : Component, IBeatmap, IBeatSnapProvider
     {
         /// <summary>
         /// Invoked when a <see cref="HitObject"/> is added to this <see cref="EditorBeatmap"/>.
@@ -29,7 +33,14 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public event Action<HitObject> StartTimeChanged;
 
+        public BindableList<HitObject> SelectedHitObjects { get; } = new BindableList<HitObject>();
+
         public readonly IBeatmap PlayableBeatmap;
+
+        [Resolved]
+        private BindableBeatDivisor beatDivisor { get; set; }
+
+        private readonly IBeatmapProcessor beatmapProcessor;
 
         private readonly Dictionary<HitObject, Bindable<double>> startTimeBindables = new Dictionary<HitObject, Bindable<double>>();
 
@@ -37,8 +48,27 @@ namespace osu.Game.Screens.Edit
         {
             PlayableBeatmap = playableBeatmap;
 
+            beatmapProcessor = playableBeatmap.BeatmapInfo.Ruleset?.CreateInstance().CreateBeatmapProcessor(PlayableBeatmap);
+
             foreach (var obj in HitObjects)
                 trackStartTime(obj);
+        }
+
+        private ScheduledDelegate scheduledUpdate;
+
+        /// <summary>
+        /// Updates a <see cref="HitObject"/>, invoking <see cref="HitObject.ApplyDefaults"/> and re-processing the beatmap.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to update.</param>
+        public void UpdateHitObject(HitObject hitObject)
+        {
+            scheduledUpdate?.Cancel();
+            scheduledUpdate = Scheduler.AddDelayed(() =>
+            {
+                beatmapProcessor?.PreProcess();
+                hitObject?.ApplyDefaults(ControlPointInfo, BeatmapInfo.BaseDifficulty);
+                beatmapProcessor?.PostProcess();
+            }, 0);
         }
 
         public BeatmapInfo BeatmapInfo
@@ -121,5 +151,17 @@ namespace osu.Game.Screens.Edit
 
             return list.Count - 1;
         }
+
+        public double SnapTime(double time, double? referenceTime)
+        {
+            var timingPoint = ControlPointInfo.TimingPointAt(referenceTime ?? time);
+            var beatLength = timingPoint.BeatLength / BeatDivisor;
+
+            return timingPoint.Time + (int)Math.Round((time - timingPoint.Time) / beatLength, MidpointRounding.AwayFromZero) * beatLength;
+        }
+
+        public double GetBeatLengthAtTime(double referenceTime) => ControlPointInfo.TimingPointAt(referenceTime).BeatLength / BeatDivisor;
+
+        public int BeatDivisor => beatDivisor?.Value ?? 1;
     }
 }

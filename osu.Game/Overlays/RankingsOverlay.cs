@@ -6,7 +6,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Users;
 using osu.Game.Rulesets;
@@ -25,9 +24,9 @@ namespace osu.Game.Overlays
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private readonly BasicScrollContainer scrollFlow;
-        private readonly Box background;
         private readonly Container tableContainer;
         private readonly DimmedLoadingLayer loading;
+        private readonly Box background;
 
         private APIRequest lastRequest;
         private CancellationTokenSource cancellationToken;
@@ -36,12 +35,13 @@ namespace osu.Game.Overlays
         private IAPIProvider api { get; set; }
 
         public RankingsOverlay()
+            : base(OverlayColourScheme.Green)
         {
             Children = new Drawable[]
             {
                 background = new Box
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both
                 },
                 scrollFlow = new BasicScrollContainer
                 {
@@ -54,12 +54,13 @@ namespace osu.Game.Overlays
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            new RankingsHeader
+                            new RankingsOverlayHeader
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Depth = -float.MaxValue,
                                 Country = { BindTarget = Country },
-                                Scope = { BindTarget = Scope },
+                                Current = { BindTarget = Scope },
                                 Ruleset = { BindTarget = ruleset }
                             },
                             new Container
@@ -86,14 +87,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load()
         {
-            Waves.FirstWaveColour = colour.Green;
-            Waves.SecondWaveColour = colour.GreenLight;
-            Waves.ThirdWaveColour = colour.GreenDark;
-            Waves.FourthWaveColour = colour.GreenDarker;
-
-            background.Colour = OsuColour.Gray(0.1f);
+            background.Colour = ColourProvider.Background5;
         }
 
         protected override void LoadComplete()

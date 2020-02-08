@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Select
         [Resolved(typeof(Room))]
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
 
+        public override bool AllowEditing => false;
+
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
@@ -63,20 +65,7 @@ namespace osu.Game.Screens.Select
                 Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             }
 
-            Beatmap.Disabled = true;
-            Ruleset.Disabled = true;
-            Mods.Disabled = true;
-
             return false;
-        }
-
-        public override void OnEntering(IScreen last)
-        {
-            base.OnEntering(last);
-
-            Beatmap.Disabled = false;
-            Ruleset.Disabled = false;
-            Mods.Disabled = false;
         }
     }
 }

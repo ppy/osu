@@ -161,7 +161,7 @@ namespace osu.Game.Overlays.Settings
                 UpdateState();
             }
 
-            public string TooltipText => "Revert to default";
+            public string TooltipText => "revert to default";
 
             protected override bool OnClick(ClickEvent e)
             {

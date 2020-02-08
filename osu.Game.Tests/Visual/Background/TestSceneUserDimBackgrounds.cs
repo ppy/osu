@@ -68,10 +68,10 @@ namespace osu.Game.Tests.Visual.Background
         [SetUp]
         public virtual void SetUp() => Schedule(() =>
         {
-            Child = new OsuScreenStack(songSelect = new DummySongSelect())
-            {
-                RelativeSizeAxes = Axes.Both
-            };
+            var stack = new OsuScreenStack { RelativeSizeAxes = Axes.Both };
+            Child = stack;
+
+            stack.Push(songSelect = new DummySongSelect());
         });
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace osu.Game.Tests.Visual.Background
 
         private void setupUserSettings()
         {
-            AddUntilStep("Song select has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+            AddUntilStep("Song select has selection", () => songSelect.Carousel?.SelectedBeatmap != null);
             AddStep("Set default user settings", () =>
             {
                 SelectedMods.Value = SelectedMods.Value.Concat(new[] { new OsuModNoFail() }).ToArray();
@@ -302,8 +302,8 @@ namespace osu.Game.Tests.Visual.Background
             }
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
-            public readonly Bindable<double> DimLevel = new Bindable<double>();
-            public readonly Bindable<double> BlurLevel = new Bindable<double>();
+            public readonly Bindable<double> DimLevel = new BindableDouble();
+            public readonly Bindable<double> BlurLevel = new BindableDouble();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
