@@ -97,7 +97,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
 
-            var spunOutMod = easierMods.FirstOrDefault(m => m is OsuModSpunOut);
+            var targetMod = easierMods.FirstOrDefault(m => m is OsuModTarget);
 
             var easy = easierMods.FirstOrDefault(m => m is OsuModEasy);
             var hardRock = harderMods.FirstOrDefault(m => m is OsuModHardRock);
@@ -109,7 +109,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiplierTextColour(noFailMod, () => modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, () => modSelect.HighMultiplierColour);
 
-            testUnimplementedMod(spunOutMod);
+            testUnimplementedMod(targetMod);
         }
 
         [Test]
