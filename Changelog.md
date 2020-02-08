@@ -286,3 +286,19 @@
     *   [m] [Fix mod select overlay overflowing toolbar at max ui scale #7707]
     *   [m] [Implement SpotlightSelector component for RankingsOverlay #7488]
     *   [m] [Reimplement music playlist using framework's RearrangeableListContainer #7680]
+    *   [m] [Update RankingsOverlay in line with the web design #7722]
+    *   [m] [Implement OverlayRulesetSelector component #7418]
+    *   [m] [Update profile recent activities in line with the web design #7668]
+    *   [m] [Add placeholder for no comments case in CommentsContainer #7655]
+
+*   翻译优化
+    *   [osu.Game/Overlays/Profile/Sections/RecentSection.cs](osu.Game/Overlays/Profile/Sections/RecentSection.cs)
+        *   "最近游玩"改为"近期活动"
+
+*   Issues
+    *   [mf #2 一点建议: 将"开始动画"处的”欢迎来到osu!“改回"welcome to osu!"]
+        *   解决方案:
+            *   创建翻译版的同时保留原版
+            *   默认选择原版
+    *   [mf #3 翻译错误: "设置 -> 细节设置"处的"故事版"应为"故事板"]
+        *   已解决,同时发现并纠正了其他地方的一处相同错误

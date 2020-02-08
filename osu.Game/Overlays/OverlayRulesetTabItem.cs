@@ -61,13 +61,11 @@ namespace osu.Game.Overlays
             Enabled.Value = true;
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            Enabled.BindValueChanged(_ => updateState(), true);
+            updateState();
         }
-
-        public override bool PropagatePositionalInputSubTree => Enabled.Value && !Active.Value && base.PropagatePositionalInputSubTree;
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -89,9 +87,7 @@ namespace osu.Game.Overlays
         private void updateState()
         {
             text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-            AccentColour = Enabled.Value ? getActiveColour() : colourProvider.Foreground1;
+            AccentColour = IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
         }
-
-        private Color4 getActiveColour() => IsHovered || Active.Value ? Color4.White : colourProvider.Highlight1;
     }
 }

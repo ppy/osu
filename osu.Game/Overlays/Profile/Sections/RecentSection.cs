@@ -7,7 +7,7 @@ namespace osu.Game.Overlays.Profile.Sections
 {
     public class RecentSection : ProfileSection
     {
-        public override string Title => "最近游玩";
+        public override string Title => "近期活动";
 
         public override string Identifier => "recent_activity";
 
