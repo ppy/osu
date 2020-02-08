@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot) };
 
         private double lastFrameTime;
-        private double frameDelay;
+        private float frameDelay;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                         if (d is SpinnerDisc s)
                         {
                             if (s.Valid)
-                                s.Rotate(180 / MathF.PI * ((float)frameDelay) / 40);
+                                s.Rotate(180 / MathF.PI * frameDelay / 40);
                         }
                     };
                 }
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void Update(Playfield playfield)
         {
-            frameDelay = playfield.Time.Current - lastFrameTime;
+            frameDelay = (float)(playfield.Time.Current - lastFrameTime);
             lastFrameTime = playfield.Time.Current;
         }
     }
