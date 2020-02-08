@@ -172,7 +172,8 @@ namespace osu.Game.Overlays.Comments
 
             LoadComponentAsync(new CommentsPage(response)
             {
-                ShowDeleted = { BindTarget = ShowDeleted }
+                ShowDeleted = { BindTarget = ShowDeleted },
+                Sort = { BindTarget = Sort }
             }, loaded =>
             {
                 content.Add(loaded);

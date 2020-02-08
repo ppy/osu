@@ -15,6 +15,7 @@ namespace osu.Game.Overlays.Comments
     public class CommentsPage : CompositeDrawable
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
 
         private readonly CommentBundle commentBundle;
 
@@ -52,13 +53,29 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
+            commentBundle.Comments.ForEach(child =>
+            {
+                if (child.ParentId != null)
+                {
+                    commentBundle.Comments.ForEach(parent =>
+                    {
+                        if (parent.Id == child.ParentId)
+                        {
+                            parent.ChildComments.Add(child);
+                            child.ParentComment = parent;
+                        }
+                    });
+                }
+            });
+
             foreach (var c in commentBundle.Comments)
             {
                 if (c.IsTopLevel)
                 {
                     flow.Add(new DrawableComment(c)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        ShowDeleted = { BindTarget = ShowDeleted },
+                        Sort = { BindTarget = Sort }
                     });
                 }
             }
