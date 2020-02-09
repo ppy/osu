@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestCustomisationOpensOnModSelect()
+        public void TestAutoOpenOnModSelect()
         {
             createModSelect();
 
@@ -71,6 +71,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
             AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
+            AddStep("deselect mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
+            AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
         }
 
         private void createModSelect()
