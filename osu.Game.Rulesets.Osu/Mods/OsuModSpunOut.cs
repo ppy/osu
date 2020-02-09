@@ -33,9 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     spinner.Disc.Enabled = false;
                     spinner.Disc.OnUpdate += d =>
                     {
-                        var s = d as SpinnerDisc;
-
-                        if (s.Valid)
+                        if (d is SpinnerDisc s && s.Valid)
                             s.Rotate(180 / MathF.PI * (float)s.Clock.ElapsedFrameTime / 40);
                     };
                 }
