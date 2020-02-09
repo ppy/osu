@@ -63,7 +63,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         }
 
         [Test]
-        public void TestAutoOpenOnModSelect()
+        public void TestCustomisationMenuVisibility()
         {
             createModSelect();
             openModSelect();
