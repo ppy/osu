@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModSpunOut : Mod, IApplicableToDrawableHitObjects, IUpdatableByPlayfield
+    public class OsuModSpunOut : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Spun Out";
         public override string Acronym => "SO";
@@ -23,9 +23,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override double ScoreMultiplier => 0.9;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(OsuModAutopilot) };
-
-        private double lastFrameTime;
-        private float frameDelay;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
@@ -39,16 +36,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                         var s = d as SpinnerDisc;
 
                         if (s.Valid)
-                            s.Rotate(180 / MathF.PI * frameDelay / 40);
+                            s.Rotate(180 / MathF.PI * (float)s.Clock.ElapsedFrameTime / 40);
                     };
                 }
             }
-        }
-
-        public void Update(Playfield playfield)
-        {
-            frameDelay = (float)(playfield.Time.Current - lastFrameTime);
-            lastFrameTime = playfield.Time.Current;
         }
     }
 }
