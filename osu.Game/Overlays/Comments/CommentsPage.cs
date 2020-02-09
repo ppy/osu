@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Comments
                 if (child.IsTopLevel)
                     continue;
 
-                var parent = commentBundle.Comments.FirstOrDefault(parent => parent.Id == child.ParentId);
+                var parent = commentBundle.Comments.FirstOrDefault(p => p.Id == child.ParentId);
 
                 // Some comments may have no parents in received bundle
                 if (parent != null)
