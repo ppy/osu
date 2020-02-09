@@ -36,11 +36,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                     spinner.Disc.Trackable = false;
                     spinner.Disc.OnUpdate += d =>
                     {
-                        if (d is SpinnerDisc s)
-                        {
-                            if (s.Valid)
-                                s.Rotate(180 / MathF.PI * frameDelay / 40);
-                        }
+                        var s = d as SpinnerDisc;
+
+                        if (s.Valid)
+                            s.Rotate(180 / MathF.PI * frameDelay / 40);
                     };
                 }
             }
