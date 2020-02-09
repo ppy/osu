@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
             switch (lastObject)
             {
                 case null:
-                    length = excess_length;
+                    length = 0;
                     break;
 
                 case IHasEndTime endTime:
