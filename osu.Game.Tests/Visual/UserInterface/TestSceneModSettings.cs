@@ -38,8 +38,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestButtonShowsOnCustomisableMod()
         {
             createModSelect();
+            openModSelect();
 
-            AddStep("open", () => modSelect.Show());
             AddAssert("button disabled", () => !modSelect.CustomiseButton.Enabled.Value);
             AddUntilStep("wait for button load", () => modSelect.ButtonsLoaded);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableMod));
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             AddAssert("mods still active", () => SelectedMods.Value.Count == 1);
 
-            AddStep("open", () => modSelect.Show());
+            openModSelect();
             AddAssert("button enabled", () => modSelect.CustomiseButton.Enabled.Value);
         }
 
@@ -66,8 +66,8 @@ namespace osu.Game.Tests.Visual.UserInterface
         public void TestAutoOpenOnModSelect()
         {
             createModSelect();
+            openModSelect();
 
-            AddStep("open", () => modSelect.Show());
             AddAssert("Customisation closed", () => modSelect.ModSettingsContainer.Alpha == 0);
             AddStep("select mod", () => modSelect.SelectMod(testCustomisableAutoOpenMod));
             AddAssert("Customisation opened", () => modSelect.ModSettingsContainer.Alpha == 1);
@@ -86,6 +86,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                     SelectedMods = { BindTarget = SelectedMods }
                 };
             });
+        }
+
+        private void openModSelect()
+        {
+            AddStep("open", () => modSelect.Show());
+            AddUntilStep("wait for ready", () => modSelect.State.Value == Visibility.Visible && modSelect.ButtonsLoaded);
         }
 
         private class TestModSelectOverlay : ModSelectOverlay
