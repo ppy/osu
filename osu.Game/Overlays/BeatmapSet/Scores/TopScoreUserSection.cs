@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
                             },
-                            new FillFlowContainer()
+                            new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
