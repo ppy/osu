@@ -65,19 +65,19 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
 
-        protected override Caret CreateCaret() => new BeatCaret
+        protected override Caret CreateCaret() => new OsuCaret
         {
             CaretWidth = CaretWidth,
             SelectionColour = SelectionColour,
         };
 
-        private class BeatCaret : Caret
+        private class OsuCaret : Caret
         {
             private const float caret_move_time = 60;
 
             private readonly CaretBeatSyncedContainer beatSync;
 
-            public BeatCaret()
+            public OsuCaret()
             {
                 RelativeSizeAxes = Axes.Y;
                 Size = new Vector2(1, 0.9f);
