@@ -53,20 +53,21 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            commentBundle.Comments.ForEach(child =>
+            foreach (var child in commentBundle.Comments)
             {
-                if (child.ParentId != null)
+                // No need to find parent for top level comments
+                if (child.IsTopLevel)
+                    continue;
+
+                var parent = commentBundle.Comments.FirstOrDefault(parent => parent.Id == child.ParentId);
+
+                // Some comments may have no parents in received bundle
+                if (parent != null)
                 {
-                    commentBundle.Comments.ForEach(parent =>
-                    {
-                        if (parent.Id == child.ParentId)
-                        {
-                            parent.ChildComments.Add(child);
-                            child.ParentComment = parent;
-                        }
-                    });
+                    parent.ChildComments.Add(child);
+                    child.ParentComment = parent;
                 }
-            });
+            }
 
             foreach (var c in commentBundle.Comments)
             {

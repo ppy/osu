@@ -58,8 +58,8 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("load comments", () => createPage(comment_bundle));
-            AddStep("load empty comments", () => createPage(empty_comment_bundle));
+            AddStep("load comments", () => createPage(getCommentBundle()));
+            AddStep("load empty comments", () => createPage(getEmptyCommentBundle()));
         }
 
         private void createPage(CommentBundle commentBundle)
@@ -71,13 +71,12 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private static readonly CommentBundle empty_comment_bundle = new CommentBundle
+        private CommentBundle getEmptyCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>(),
-            Total = 0,
         };
 
-        private static readonly CommentBundle comment_bundle = new CommentBundle
+        private CommentBundle getCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>
             {
