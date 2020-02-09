@@ -78,6 +78,8 @@ namespace osu.Game.Overlays.Comments
                     uniqueComments.Add(c);
             });
 
+            uniqueComments.ForEach(c => c.ParentComment = comment);
+
             LoadedReplies.AddRange(uniqueComments);
         }
 
