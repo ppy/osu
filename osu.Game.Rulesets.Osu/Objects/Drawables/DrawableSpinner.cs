@@ -177,7 +177,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void Update()
         {
             Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
-            if (!SpmCounter.IsPresent && Disc.Tracking)
+            if (!SpmCounter.IsPresent && (Disc.Tracking || !Disc.Enabled))
                 SpmCounter.FadeIn(HitObject.TimeFadeIn);
 
             base.Update();
