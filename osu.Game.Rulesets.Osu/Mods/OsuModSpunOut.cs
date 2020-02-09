@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (hitObject is DrawableSpinner spinner)
                 {
-                    spinner.Disc.Trackable = false;
+                    spinner.Disc.Enabled = false;
                     spinner.Disc.OnUpdate += d =>
                     {
                         var s = d as SpinnerDisc;

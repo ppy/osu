@@ -50,9 +50,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             get => tracking;
             set
             {
-                if (value == tracking) return;
+                if ((Enabled && value) == tracking) return;
 
-                tracking = value;
+                tracking = Enabled && value;
 
                 background.FadeTo(tracking ? tracking_alpha : idle_alpha, 100);
             }
@@ -74,7 +74,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         public bool Valid => spinner.StartTime <= Time.Current && spinner.EndTime > Time.Current;
-        public bool Trackable { get; set; } = true;
+
+        public bool Enabled { get; set; } = true;
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
@@ -100,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             var delta = thisAngle - lastAngle;
 
-            if (Valid && tracking && Trackable)
+            if (Valid && tracking)
                 Rotate(delta);
 
             lastAngle = thisAngle;
