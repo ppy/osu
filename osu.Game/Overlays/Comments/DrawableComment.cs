@@ -288,7 +288,7 @@ namespace osu.Game.Overlays.Comments
                 var newReplies = replies.Select(reply => reply.Comment);
                 LoadedReplies.AddRange(newReplies);
                 deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
-                childCommentsContainer.Add(page);                
+                childCommentsContainer.Add(page);
                 updateButtonsState();
             });
         }
