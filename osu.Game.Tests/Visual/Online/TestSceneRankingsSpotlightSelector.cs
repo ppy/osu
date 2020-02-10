@@ -36,12 +36,6 @@ namespace osu.Game.Tests.Visual.Online
         }
 
         [Test]
-        public void TestVisibility()
-        {
-            AddStep("Toggle Visibility", selector.ToggleVisibility);
-        }
-
-        [Test]
         public void TestLocalSpotlights()
         {
             var spotlights = new[]
