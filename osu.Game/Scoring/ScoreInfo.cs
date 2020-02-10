@@ -151,6 +151,8 @@ namespace osu.Game.Scoring
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
+        public IOrderedEnumerable<KeyValuePair<HitResult, int>> SortedStatistics => Statistics.OrderByDescending(pair => pair.Key);
+
         [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
