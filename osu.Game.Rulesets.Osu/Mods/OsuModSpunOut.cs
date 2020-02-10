@@ -30,17 +30,19 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (hitObject is DrawableSpinner spinner)
                 {
                     spinner.Disc.Enabled = false;
-                    spinner.OnUpdate += d =>
-                    {
-                        if (d is DrawableSpinner s)
-                        {
-                            if (s.Disc.Valid)
-                                s.Disc.Rotate(180 / MathF.PI * (float)s.Clock.ElapsedFrameTime / 40);
-                            if (!s.SpmCounter.IsPresent)
-                                s.SpmCounter.FadeIn(s.HitObject.TimeFadeIn);
-                        }
-                    };
+                    spinner.OnUpdate += autoSpin;
                 }
+            }
+        }
+
+        private void autoSpin(Drawable drawable)
+        {
+            if (drawable is DrawableSpinner spinner)
+            {
+                if (spinner.Disc.Valid)
+                    spinner.Disc.Rotate(180 / MathF.PI * (float)spinner.Clock.ElapsedFrameTime / 40);
+                if (!spinner.SpmCounter.IsPresent)
+                    spinner.SpmCounter.FadeIn(spinner.HitObject.TimeFadeIn);
             }
         }
     }
