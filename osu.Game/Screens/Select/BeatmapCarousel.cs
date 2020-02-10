@@ -17,7 +17,6 @@ using osu.Framework.Caching;
 using osu.Framework.Threading;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
