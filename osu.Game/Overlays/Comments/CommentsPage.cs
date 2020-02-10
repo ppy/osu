@@ -9,12 +9,22 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using System.Linq;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API;
+using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsPage : CompositeDrawable
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        public readonly Bindable<CommentableType> Type = new Bindable<CommentableType>();
+        public readonly BindableLong CommentableId = new BindableLong();
+
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private readonly CommentBundle commentBundle;
 
@@ -52,17 +62,57 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            foreach (var c in commentBundle.Comments)
+            foreach (var comment in commentBundle.Comments)
             {
-                if (c.IsTopLevel)
+                var drawableComment = createDrawableComment(comment);
+
+                var children = commentBundle.Comments.Where(c => c.ParentId == comment.Id);
+
+                if (children.Any())
                 {
-                    flow.Add(new DrawableComment(c)
+                    children.ForEach(c =>
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        c.ParentComment = comment;
                     });
+                    drawableComment.OnLoadComplete += loaded => ((DrawableComment)loaded).AddReplies(children.Select(c => createDrawableComment(c)));
                 }
+
+                if (comment.IsTopLevel)
+                    flow.Add(drawableComment);
             }
         }
+
+        private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
+        {
+            var request = new GetCommentRepliesRequest(drawableComment.Comment.Id, Type.Value, CommentableId.Value, Sort.Value, page);
+            request.Success += response => onCommentRepliesReceived(response, drawableComment);
+            api.PerformAsync(request);
+        }
+
+        private void onCommentRepliesReceived(CommentBundle response, DrawableComment drawableComment)
+        {
+            var receivedComments = response.Comments;
+
+            var uniqueComments = new List<Comment>();
+
+            // We may receive already loaded comments
+            receivedComments.ForEach(c =>
+            {
+                if (drawableComment.LoadedReplies.All(loadedReply => loadedReply.Id != c.Id))
+                    uniqueComments.Add(c);
+            });
+
+            uniqueComments.ForEach(c => c.ParentComment = drawableComment.Comment);
+
+            drawableComment.AddReplies(uniqueComments.Select(comment => createDrawableComment(comment)));
+        }
+
+        private DrawableComment createDrawableComment(Comment comment) => new DrawableComment(comment)
+        {
+            ShowDeleted = { BindTarget = ShowDeleted },
+            Sort = { BindTarget = Sort },
+            RepliesRequested = onCommentRepliesRequested
+        };
 
         private class NoCommentsPlaceholder : CompositeDrawable
         {
