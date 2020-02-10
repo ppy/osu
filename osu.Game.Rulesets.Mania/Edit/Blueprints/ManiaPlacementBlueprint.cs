@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override void OnMouseUp(MouseUpEvent e)
         {
-            EndPlacement();
+            EndPlacement(true);
             base.OnMouseUp(e);
         }
 
