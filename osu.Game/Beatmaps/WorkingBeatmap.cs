@@ -184,14 +184,16 @@ namespace osu.Game.Beatmaps
                 }
                 catch (AggregateException ae)
                 {
-                    foreach (var e in ae.InnerExceptions)
-                    {
-                        if (e is TaskCanceledException)
-                            continue;
+                    // This is the exception that is generally expected here, which occurs via natural cancellation of the asynchronous load
+                    if (ae.InnerExceptions.FirstOrDefault() is TaskCanceledException)
+                        return null;
 
-                        Logger.Log(e.Message);
-                    }
-
+                    Logger.Error(ae, "Beatmap failed to load");
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, "Beatmap failed to load");
                     return null;
                 }
             }
