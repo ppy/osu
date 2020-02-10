@@ -3,12 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -30,10 +30,15 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (hitObject is DrawableSpinner spinner)
                 {
                     spinner.Disc.Enabled = false;
-                    spinner.Disc.OnUpdate += d =>
+                    spinner.OnUpdate += d =>
                     {
-                        if (d is SpinnerDisc s && s.Valid)
-                            s.Rotate(180 / MathF.PI * (float)s.Clock.ElapsedFrameTime / 40);
+                        if (d is DrawableSpinner s)
+                        {
+                            if (s.Disc.Valid)
+                                s.Disc.Rotate(180 / MathF.PI * (float)s.Clock.ElapsedFrameTime / 40);
+                            if (!s.SpmCounter.IsPresent)
+                                s.SpmCounter.FadeIn(s.HitObject.TimeFadeIn);
+                        }
                     };
                 }
             }
