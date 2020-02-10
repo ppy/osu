@@ -62,24 +62,26 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            foreach (var comment in commentBundle.Comments)
+            commentBundle.Comments.ForEach(c =>
             {
-                var drawableComment = createDrawableComment(comment);
+                if (c.IsTopLevel)
+                    flow.Add(createCommentWithReplies(c, commentBundle));
+            });
+        }
 
-                var children = commentBundle.Comments.Where(c => c.ParentId == comment.Id);
+        private DrawableComment createCommentWithReplies(Comment comment, CommentBundle commentBundle)
+        {
+            var drawableComment = createDrawableComment(comment);
 
-                if (children.Any())
-                {
-                    children.ForEach(c =>
-                    {
-                        c.ParentComment = comment;
-                    });
-                    drawableComment.OnLoadComplete += loaded => ((DrawableComment)loaded).AddReplies(children.Select(createDrawableComment));
-                }
+            var replies = commentBundle.Comments.Where(c => c.ParentId == comment.Id);
 
-                if (comment.IsTopLevel)
-                    flow.Add(drawableComment);
+            if (replies.Any())
+            {
+                replies.ForEach(c => c.ParentComment = comment);
+                drawableComment.OnLoadComplete += _ => drawableComment.AddReplies(replies.Select(reply => createCommentWithReplies(reply, commentBundle)));
             }
+
+            return drawableComment;
         }
 
         private void onCommentRepliesRequested(DrawableComment drawableComment, int page)
