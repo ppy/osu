@@ -9,6 +9,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using System.Linq;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -16,6 +17,8 @@ namespace osu.Game.Overlays.Comments
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        public readonly Bindable<CommentableType> Type = new Bindable<CommentableType>();
+        public readonly BindableLong Id = new BindableLong();
 
         private readonly CommentBundle commentBundle;
 
@@ -76,7 +79,9 @@ namespace osu.Game.Overlays.Comments
                     flow.Add(new DrawableComment(c)
                     {
                         ShowDeleted = { BindTarget = ShowDeleted },
-                        Sort = { BindTarget = Sort }
+                        Sort = { BindTarget = Sort },
+                        Type = { BindTarget = Type },
+                        CommentableId = { BindTarget = Id }
                     });
                 }
             }

@@ -20,6 +20,7 @@ using osu.Framework.Allocation;
 using osuTK.Graphics;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -30,6 +31,8 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        public readonly Bindable<CommentableType> Type = new Bindable<CommentableType>();
+        public readonly BindableLong CommentableId = new BindableLong();
         private readonly BindableInt currentPage = new BindableInt();
 
         private readonly BindableList<Comment> loadedReplies = new BindableList<Comment>();
@@ -175,7 +178,7 @@ namespace osu.Game.Overlays.Comments
                                                         {
                                                             Expanded = { BindTarget = childrenExpanded }
                                                         },
-                                                        loadMoreCommentsButton = new LoadMoreCommentsButton(comment)
+                                                        loadMoreCommentsButton = new LoadMoreCommentsButton(comment, Type.Value, CommentableId.Value)
                                                         {
                                                             Sort = { BindTarget = Sort },
                                                             CurrentPage = { BindTarget = currentPage },
@@ -207,7 +210,7 @@ namespace osu.Game.Overlays.Comments
                                 {
                                     ShowDeleted = { BindTarget = ShowDeleted }
                                 },
-                                showMoreButton = new ShowMoreButton(comment)
+                                showMoreButton = new ShowMoreButton(comment, Type.Value, CommentableId.Value)
                                 {
                                     Sort = { BindTarget = Sort },
                                     CurrentPage = { BindTarget = currentPage },
@@ -311,7 +314,9 @@ namespace osu.Game.Overlays.Comments
                 page.Add(new DrawableComment(c)
                 {
                     ShowDeleted = { BindTarget = ShowDeleted },
-                    Sort = { BindTarget = Sort }
+                    Sort = { BindTarget = Sort },
+                    Type = { BindTarget = Type },
+                    CommentableId = { BindTarget = CommentableId }
                 });
             });
 
@@ -374,8 +379,8 @@ namespace osu.Game.Overlays.Comments
 
         private class LoadMoreCommentsButton : GetCommentRepliesButton
         {
-            public LoadMoreCommentsButton(Comment comment)
-                : base(comment)
+            public LoadMoreCommentsButton(Comment comment, CommentableType type, long commentableId)
+                : base(comment, type, commentableId)
             {
                 IdleColour = OsuColour.Gray(0.7f);
                 HoverColour = Color4.White;
@@ -386,8 +391,8 @@ namespace osu.Game.Overlays.Comments
 
         private class ShowMoreButton : GetCommentRepliesButton
         {
-            public ShowMoreButton(Comment comment)
-                : base(comment)
+            public ShowMoreButton(Comment comment, CommentableType type, long commentableId)
+                : base(comment, type, commentableId)
             {
             }
 

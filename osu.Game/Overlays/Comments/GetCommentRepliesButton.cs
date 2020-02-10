@@ -31,12 +31,17 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; }
 
         private readonly Comment comment;
+        private readonly CommentableType type;
+        private readonly long commentableId;
+
         private OsuSpriteText text;
         private GetCommentRepliesRequest request;
 
-        protected GetCommentRepliesButton(Comment comment)
+        protected GetCommentRepliesButton(Comment comment, CommentableType type, long commentableId)
         {
             this.comment = comment;
+            this.commentableId = commentableId;
+            this.type = type;
 
             AutoSizeAxes = Axes.Both;
             LoadingAnimationSize = new Vector2(8);
@@ -60,7 +65,7 @@ namespace osu.Game.Overlays.Comments
         {
             CurrentPage.Value++;
 
-            request = new GetCommentRepliesRequest(comment.Id, Sort.Value, CurrentPage.Value);
+            request = new GetCommentRepliesRequest(comment.Id, type, commentableId, Sort.Value, CurrentPage.Value);
             request.Success += onSuccess;
             api.PerformAsync(request);
         }
