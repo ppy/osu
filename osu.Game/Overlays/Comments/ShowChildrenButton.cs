@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Comments
 
         protected override void LoadComplete()
         {
-            Action = () => Expanded.Value = !Expanded.Value;
+            Action = Expanded.Toggle;
 
             Expanded.BindValueChanged(OnExpandedChanged, true);
             base.LoadComplete();
