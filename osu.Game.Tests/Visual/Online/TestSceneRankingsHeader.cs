@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Rankings;
 using osu.Game.Rulesets;
@@ -35,25 +34,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Current = { BindTarget = scope },
                 Country = { BindTarget = countryBindable },
-                Ruleset = { BindTarget = ruleset },
-                Spotlights = new[]
-                {
-                    new APISpotlight
-                    {
-                        Id = 1,
-                        Name = "Spotlight 1"
-                    },
-                    new APISpotlight
-                    {
-                        Id = 2,
-                        Name = "Spotlight 2"
-                    },
-                    new APISpotlight
-                    {
-                        Id = 3,
-                        Name = "Spotlight 3"
-                    }
-                }
+                Ruleset = { BindTarget = ruleset }
             });
 
             var country = new Country
