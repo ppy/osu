@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack());
+            track = new RecyclableLazy<Track>(() => GetTrack() ?? GetVirtualTrack(1000));
             background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
             waveform = new RecyclableLazy<Waveform>(GetWaveform);
             storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
@@ -48,7 +48,7 @@ namespace osu.Game.Beatmaps
             total_count.Value++;
         }
 
-        protected virtual Track GetVirtualTrack()
+        protected virtual Track GetVirtualTrack(double emptyLength = 0)
         {
             const double excess_length = 1000;
 
@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
             switch (lastObject)
             {
                 case null:
-                    length = excess_length;
+                    length = emptyLength;
                     break;
 
                 case IHasEndTime endTime:
