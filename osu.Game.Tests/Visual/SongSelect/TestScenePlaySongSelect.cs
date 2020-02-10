@@ -452,13 +452,13 @@ namespace osu.Game.Tests.Visual.SongSelect
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
 
-            AddUntilStep("correct beatmap selected", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
-            AddAssert("carousel also correct", () => songSelect.Carousel.SelectedBeatmap.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
 
             AddStep("reset filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
 
-            AddAssert("still selected", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
-            AddAssert("carousel also correct", () => songSelect.Carousel.SelectedBeatmap.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmap.OnlineBeatmapID == target.OnlineBeatmapID);
         }
 
         [Test]
