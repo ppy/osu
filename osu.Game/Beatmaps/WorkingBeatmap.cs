@@ -189,7 +189,7 @@ namespace osu.Game.Beatmaps
                         if (e is TaskCanceledException)
                             continue;
 
-                        Logger.Log(e.ToString());
+                        Logger.Log(e.Message);
                     }
 
                     return null;
