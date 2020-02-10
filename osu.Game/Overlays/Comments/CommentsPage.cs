@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         c.ParentComment = comment;
                     });
-                    drawableComment.OnLoadComplete += loaded => ((DrawableComment)loaded).AddReplies(children.Select(c => createDrawableComment(c)));
+                    drawableComment.OnLoadComplete += loaded => ((DrawableComment)loaded).AddReplies(children.Select(createDrawableComment));
                 }
 
                 if (comment.IsTopLevel)
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.Comments
 
             uniqueComments.ForEach(c => c.ParentComment = drawableComment.Comment);
 
-            drawableComment.AddReplies(uniqueComments.Select(comment => createDrawableComment(comment)));
+            drawableComment.AddReplies(uniqueComments.Select(createDrawableComment));
         }
 
         private DrawableComment createDrawableComment(Comment comment) => new DrawableComment(comment)
