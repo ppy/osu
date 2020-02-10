@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModDifficultyAdjust : ModDifficultyAdjust
     {
-        [SettingSource("Circle Size", "Override a beatmap's set CS.")]
+        [SettingSource("Circle Size", "Override a beatmap's set CS.", SettingSourceAttribute.FIRST)]
         public BindableNumber<float> CircleSize { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             Value = 5,
         };
 
-        [SettingSource("Approach Rate", "Override a beatmap's set AR.")]
+        [SettingSource("Approach Rate", "Override a beatmap's set AR.", SettingSourceAttribute.LAST)]
         public BindableNumber<float> ApproachRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
