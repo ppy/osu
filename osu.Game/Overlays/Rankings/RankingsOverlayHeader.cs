@@ -60,8 +60,10 @@ namespace osu.Game.Overlays.Rankings
             base.LoadComplete();
         }
 
-        private void onCurrentChanged(ValueChangedEvent<RankingsScope> scope) =>
-            SpotlightSelector.State.Value = scope.NewValue == RankingsScope.Spotlights ? Visibility.Visible : Visibility.Hidden;
+        private void onCurrentChanged(ValueChangedEvent<RankingsScope> scope)
+        {
+
+        }
 
         private class RankingsTitle : ScreenTitle
         {
