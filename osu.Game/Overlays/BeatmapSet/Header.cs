@@ -134,7 +134,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                 {
                                                     title = new OsuSpriteText
                                                     {
-                                                        Font = OsuFont.GetFont(size: 37.5f, weight: FontWeight.SemiBold, italics: true)
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
                                                     },
                                                     externalLink = new ExternalLinkButton
                                                     {
