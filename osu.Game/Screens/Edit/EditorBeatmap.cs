@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit
         public readonly BindableList<HitObject> SelectedHitObjects = new BindableList<HitObject>();
 
         /// <summary>
-        /// The current placement
+        /// The current placement. Null if there's no active placement.
         /// </summary>
         public readonly Bindable<HitObject> PlacementObject = new Bindable<HitObject>();
 
