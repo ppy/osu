@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
-        [SettingSource("Drain Rate", "Override a beatmap's set HP.", SettingSourceAttribute.ORDERED_RELATIVE, 1)]
+        [SettingSource("HP Drain", "Override a beatmap's set HP.", SettingSourceAttribute.ORDERED_RELATIVE, 1)]
         public BindableNumber<float> DrainRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        [SettingSource("Overall Difficulty", "Override a beatmap's set OD.", SettingSourceAttribute.ORDERED_RELATIVE, 1)]
+        [SettingSource("Accuracy", "Override a beatmap's set OD.", SettingSourceAttribute.ORDERED_RELATIVE, 1)]
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,
