@@ -35,11 +35,12 @@ namespace osu.Game.Overlays.Rankings
         private GetSpotlightRankingsRequest getRankingsRequest;
         private GetSpotlightsRequest spotlightsRequest;
 
-        private readonly SpotlightSelector selector;
-        private readonly Container content;
-        private readonly DimmedLoadingLayer loading;
+        private SpotlightSelector selector;
+        private Container content;
+        private DimmedLoadingLayer loading;
 
-        public SpotlightsLayout()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -48,7 +49,6 @@ namespace osu.Game.Overlays.Rankings
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
                 Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
                     selector = new SpotlightSelector
@@ -65,8 +65,9 @@ namespace osu.Game.Overlays.Rankings
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
+                                Margin = new MarginPadding { Vertical = 10 }
                             },
-                            loading = new DimmedLoadingLayer(),
+                            loading = new DimmedLoadingLayer()
                         }
                     }
                 }
@@ -76,6 +77,8 @@ namespace osu.Game.Overlays.Rankings
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            selector.Show();
 
             selectedSpotlight.BindValueChanged(onSpotlightChanged);
             Ruleset.BindValueChanged(onRulesetChanged);

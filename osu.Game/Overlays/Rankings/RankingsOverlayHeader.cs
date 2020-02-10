@@ -6,23 +6,13 @@ using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Users;
-using System.Collections.Generic;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Rankings
 {
     public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
         public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
-        public readonly Bindable<APISpotlight> Spotlight = new Bindable<APISpotlight>();
         public readonly Bindable<Country> Country = new Bindable<Country>();
-
-        public IEnumerable<APISpotlight> Spotlights
-        {
-            get => SpotlightSelector.Spotlights;
-            set => SpotlightSelector.Spotlights = value;
-        }
 
         protected override ScreenTitle CreateTitle() => new RankingsTitle
         {
@@ -34,36 +24,10 @@ namespace osu.Game.Overlays.Rankings
             Current = Ruleset
         };
 
-        public SpotlightSelector SpotlightSelector;
-
-        protected override Drawable CreateContent() => new FillFlowContainer
+        protected override Drawable CreateContent() => new CountryFilter
         {
-            RelativeSizeAxes = Axes.X,
-            AutoSizeAxes = Axes.Y,
-            Direction = FillDirection.Vertical,
-            Children = new Drawable[]
-            {
-                new CountryFilter
-                {
-                    Current = Country
-                },
-                SpotlightSelector = new SpotlightSelector
-                {
-                    Current = { BindTarget = Spotlight }
-                }
-            }
+            Current = Country
         };
-
-        protected override void LoadComplete()
-        {
-            Current.BindValueChanged(onCurrentChanged, true);
-            base.LoadComplete();
-        }
-
-        private void onCurrentChanged(ValueChangedEvent<RankingsScope> scope)
-        {
-
-        }
 
         private class RankingsTitle : ScreenTitle
         {
