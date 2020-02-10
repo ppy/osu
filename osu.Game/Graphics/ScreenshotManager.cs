@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -22,7 +22,7 @@ using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
+    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 

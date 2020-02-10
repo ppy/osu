@@ -78,7 +78,7 @@ namespace osu.Game.Configuration
             Set(OsuSetting.MenuParallax, true);
 
             // Gameplay
-            Set(OsuSetting.DimLevel, 0.3, 0, 1, 0.01);
+            Set(OsuSetting.DimLevel, 0.8, 0, 1, 0.01);
             Set(OsuSetting.BlurLevel, 0, 0, 1, 0.01);
             Set(OsuSetting.LightenDuringBreaks, true);
 

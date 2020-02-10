@@ -46,17 +46,20 @@ namespace osu.Game.Rulesets.Osu.Skinning
             switch (osuComponent.Component)
             {
                 case OsuSkinComponents.FollowPoint:
-                    return this.GetAnimation(component.LookupName, true, false);
+                    return this.GetAnimation(component.LookupName, true, false, true);
 
                 case OsuSkinComponents.SliderFollowCircle:
-                    var followCircle = this.GetAnimation("sliderfollowcircle", true, true);
+                    var followCircle = this.GetAnimation("sliderfollowcircle", true, true, true);
                     if (followCircle != null)
                         // follow circles are 2x the hitcircle resolution in legacy skins (since they are scaled down from >1x
                         followCircle.Scale *= 0.5f;
                     return followCircle;
 
                 case OsuSkinComponents.SliderBall:
-                    var sliderBallContent = this.GetAnimation("sliderb", true, true, "");
+                    var sliderBallContent = this.GetAnimation("sliderb", true, true, animationSeparator: "");
+
+                    // todo: slider ball has a custom frame delay based on velocity
+                    // Math.Max((150 / Velocity) * GameBase.SIXTY_FRAME_TIME, GameBase.SIXTY_FRAME_TIME);
 
                     if (sliderBallContent != null)
                     {
