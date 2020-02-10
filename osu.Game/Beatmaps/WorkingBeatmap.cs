@@ -159,8 +159,16 @@ namespace osu.Game.Beatmaps
                 {
                     return LoadBeatmapAsync().Result;
                 }
-                catch (TaskCanceledException)
+                catch (AggregateException ae)
                 {
+                    foreach (var e in ae.InnerExceptions)
+                    {
+                        if (e is TaskCanceledException)
+                            continue;
+
+                        Logger.Log(e.ToString());
+                    }
+
                     return null;
                 }
             }
