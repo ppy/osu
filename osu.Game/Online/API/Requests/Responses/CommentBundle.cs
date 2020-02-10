@@ -9,31 +9,8 @@ namespace osu.Game.Online.API.Requests.Responses
 {
     public class CommentBundle
     {
-        private List<Comment> comments;
-
         [JsonProperty(@"comments")]
-        public List<Comment> Comments
-        {
-            get => comments;
-            set
-            {
-                comments = value;
-                comments.ForEach(child =>
-                {
-                    if (child.ParentId != null)
-                    {
-                        comments.ForEach(parent =>
-                        {
-                            if (parent.Id == child.ParentId)
-                            {
-                                parent.ChildComments.Add(child);
-                                child.ParentComment = parent;
-                            }
-                        });
-                    }
-                });
-            }
-        }
+        public List<Comment> Comments { get; set; }
 
         [JsonProperty(@"has_more")]
         public bool HasMore { get; set; }

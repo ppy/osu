@@ -58,8 +58,8 @@ namespace osu.Game.Tests.Visual.Online
                 }
             });
 
-            AddStep("load comments", () => createPage(comment_bundle));
-            AddStep("load empty comments", () => createPage(empty_comment_bundle));
+            AddStep("load comments", () => createPage(getCommentBundle()));
+            AddStep("load empty comments", () => createPage(getEmptyCommentBundle()));
         }
 
         private void createPage(CommentBundle commentBundle)
@@ -71,13 +71,12 @@ namespace osu.Game.Tests.Visual.Online
             });
         }
 
-        private static readonly CommentBundle empty_comment_bundle = new CommentBundle
+        private CommentBundle getEmptyCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>(),
-            Total = 0,
         };
 
-        private static readonly CommentBundle comment_bundle = new CommentBundle
+        private CommentBundle getCommentBundle() => new CommentBundle
         {
             Comments = new List<Comment>
             {
@@ -88,6 +87,33 @@ namespace osu.Game.Tests.Visual.Online
                     LegacyName = "TestUser1",
                     CreatedAt = DateTimeOffset.Now,
                     VotesCount = 5
+                },
+                new Comment
+                {
+                    Id = 100,
+                    Message = "This comment has \"load replies\" button because it has unloaded replies",
+                    LegacyName = "TestUser1100",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 5,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 111,
+                    Message = "This comment has \"Show More\" button because it has unloaded replies, but some of them are loaded",
+                    LegacyName = "TestUser1111",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 100,
+                    RepliesCount = 2,
+                },
+                new Comment
+                {
+                    Id = 112,
+                    ParentId = 111,
+                    Message = "I'm here to make my parent work",
+                    LegacyName = "someone",
+                    CreatedAt = DateTimeOffset.Now,
+                    VotesCount = 2,
                 },
                 new Comment
                 {
@@ -155,8 +181,6 @@ namespace osu.Game.Tests.Visual.Online
                     Username = "Good_Admin"
                 }
             },
-            TopLevelCount = 4,
-            Total = 7
         };
     }
 }

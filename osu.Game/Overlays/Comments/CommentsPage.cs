@@ -9,12 +9,16 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using System.Linq;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Comments
 {
     public class CommentsPage : CompositeDrawable
     {
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        public readonly Bindable<CommentableType> Type = new Bindable<CommentableType>();
+        public readonly BindableLong Id = new BindableLong();
 
         private readonly CommentBundle commentBundle;
 
@@ -52,13 +56,32 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
+            foreach (var child in commentBundle.Comments)
+            {
+                // No need to find parent for top level comments
+                if (child.IsTopLevel)
+                    continue;
+
+                var parent = commentBundle.Comments.FirstOrDefault(p => p.Id == child.ParentId);
+
+                // Some comments may have no parents in received bundle
+                if (parent != null)
+                {
+                    parent.ChildComments.Add(child);
+                    child.ParentComment = parent;
+                }
+            }
+
             foreach (var c in commentBundle.Comments)
             {
                 if (c.IsTopLevel)
                 {
                     flow.Add(new DrawableComment(c)
                     {
-                        ShowDeleted = { BindTarget = ShowDeleted }
+                        ShowDeleted = { BindTarget = ShowDeleted },
+                        Sort = { BindTarget = Sort },
+                        Type = { BindTarget = Type },
+                        CommentableId = { BindTarget = Id }
                     });
                 }
             }

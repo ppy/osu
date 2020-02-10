@@ -17,6 +17,10 @@ using System.Linq;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Framework.Allocation;
+using osuTK.Graphics;
+using System.Collections.Generic;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -26,11 +30,23 @@ namespace osu.Game.Overlays.Comments
         private const int margin = 10;
 
         public readonly BindableBool ShowDeleted = new BindableBool();
+        public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
+        public readonly Bindable<CommentableType> Type = new Bindable<CommentableType>();
+        public readonly BindableLong CommentableId = new BindableLong();
+        private readonly BindableInt currentPage = new BindableInt();
+
+        private readonly BindableList<Comment> loadedReplies = new BindableList<Comment>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
 
         private FillFlowContainer childCommentsVisibilityContainer;
+        private FillFlowContainer childCommentsContainer;
         private readonly Comment comment;
+        private LoadMoreCommentsButton loadMoreCommentsButton;
+        private ShowMoreButton showMoreButton;
+        private RepliesButton repliesButton;
+        private ChevronButton chevronButton;
+        private DeletedCommentsCounter deletedCommentsCounter;
 
         public DrawableComment(Comment comment)
         {
@@ -41,8 +57,6 @@ namespace osu.Game.Overlays.Comments
         private void load()
         {
             LinkFlowContainer username;
-            FillFlowContainer childCommentsContainer;
-            DeletedCommentsCounter deletedCommentsCounter;
             FillFlowContainer info;
             LinkFlowContainer message;
             GridContainer content;
@@ -50,150 +64,171 @@ namespace osu.Game.Overlays.Comments
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            InternalChild = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                new FillFlowContainer
                 {
-                    new Container
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Padding = new MarginPadding(margin) { Left = margin + 5 },
-                        Child = content = new GridContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ColumnDimensions = new[]
+                            Padding = new MarginPadding(margin) { Left = margin + 5 },
+                            Child = content = new GridContainer
                             {
-                                new Dimension(GridSizeMode.AutoSize),
-                                new Dimension(),
-                            },
-                            RowDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.AutoSize)
-                            },
-                            Content = new[]
-                            {
-                                new Drawable[]
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                ColumnDimensions = new[]
                                 {
-                                    new FillFlowContainer
+                                    new Dimension(GridSizeMode.AutoSize),
+                                    new Dimension(),
+                                },
+                                RowDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.AutoSize)
+                                },
+                                Content = new[]
+                                {
+                                    new Drawable[]
                                     {
-                                        AutoSizeAxes = Axes.Both,
-                                        Margin = new MarginPadding { Horizontal = margin },
-                                        Direction = FillDirection.Horizontal,
-                                        Spacing = new Vector2(5, 0),
-                                        Children = new Drawable[]
+                                        new FillFlowContainer
                                         {
-                                            new Container
+                                            AutoSizeAxes = Axes.Both,
+                                            Margin = new MarginPadding { Horizontal = margin },
+                                            Direction = FillDirection.Horizontal,
+                                            Spacing = new Vector2(5, 0),
+                                            Children = new Drawable[]
                                             {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Width = 40,
-                                                AutoSizeAxes = Axes.Y,
-                                                Child = votePill = new VotePill(comment)
+                                                new Container
                                                 {
-                                                    Anchor = Anchor.CentreRight,
-                                                    Origin = Anchor.CentreRight,
-                                                }
-                                            },
-                                            new UpdateableAvatar(comment.User)
-                                            {
-                                                Anchor = Anchor.Centre,
-                                                Origin = Anchor.Centre,
-                                                Size = new Vector2(avatar_size),
-                                                Masking = true,
-                                                CornerRadius = avatar_size / 2f,
-                                                CornerExponent = 2,
-                                            },
-                                        }
-                                    },
-                                    new FillFlowContainer
-                                    {
-                                        RelativeSizeAxes = Axes.X,
-                                        AutoSizeAxes = Axes.Y,
-                                        Spacing = new Vector2(0, 3),
-                                        Children = new Drawable[]
-                                        {
-                                            new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(7, 0),
-                                                Children = new Drawable[]
-                                                {
-                                                    username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Width = 40,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Child = votePill = new VotePill(comment)
                                                     {
-                                                        AutoSizeAxes = Axes.Both,
-                                                    },
-                                                    new ParentUsername(comment),
-                                                    new OsuSpriteText
-                                                    {
-                                                        Alpha = comment.IsDeleted ? 1 : 0,
-                                                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                                                        Text = @"deleted",
+                                                        Anchor = Anchor.CentreRight,
+                                                        Origin = Anchor.CentreRight,
                                                     }
-                                                }
-                                            },
-                                            message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Padding = new MarginPadding { Right = 40 }
-                                            },
-                                            info = new FillFlowContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(10, 0),
-                                                Colour = OsuColour.Gray(0.7f),
-                                                Children = new Drawable[]
+                                                },
+                                                new UpdateableAvatar(comment.User)
                                                 {
-                                                    new OsuSpriteText
+                                                    Anchor = Anchor.Centre,
+                                                    Origin = Anchor.Centre,
+                                                    Size = new Vector2(avatar_size),
+                                                    Masking = true,
+                                                    CornerRadius = avatar_size / 2f,
+                                                    CornerExponent = 2,
+                                                },
+                                            }
+                                        },
+                                        new FillFlowContainer
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Spacing = new Vector2(0, 3),
+                                            Children = new Drawable[]
+                                            {
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(7, 0),
+                                                    Children = new Drawable[]
                                                     {
-                                                        Anchor = Anchor.CentreLeft,
-                                                        Origin = Anchor.CentreLeft,
-                                                        Font = OsuFont.GetFont(size: 12),
-                                                        Text = HumanizerUtils.Humanize(comment.CreatedAt)
-                                                    },
-                                                    new RepliesButton(comment.RepliesCount)
+                                                        username = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true))
+                                                        {
+                                                            AutoSizeAxes = Axes.Both,
+                                                        },
+                                                        new ParentUsername(comment),
+                                                        new OsuSpriteText
+                                                        {
+                                                            Alpha = comment.IsDeleted ? 1 : 0,
+                                                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                                                            Text = @"deleted",
+                                                        }
+                                                    }
+                                                },
+                                                message = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(size: 14))
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    Padding = new MarginPadding { Right = 40 }
+                                                },
+                                                info = new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Spacing = new Vector2(10, 0),
+                                                    Children = new Drawable[]
                                                     {
-                                                        Expanded = { BindTarget = childrenExpanded }
-                                                    },
+                                                        new OsuSpriteText
+                                                        {
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Font = OsuFont.GetFont(size: 12),
+                                                            Colour = OsuColour.Gray(0.7f),
+                                                            Text = HumanizerUtils.Humanize(comment.CreatedAt)
+                                                        },
+                                                        repliesButton = new RepliesButton(comment.RepliesCount)
+                                                        {
+                                                            Expanded = { BindTarget = childrenExpanded }
+                                                        },
+                                                        loadMoreCommentsButton = new LoadMoreCommentsButton(comment, Type.Value, CommentableId.Value)
+                                                        {
+                                                            Sort = { BindTarget = Sort },
+                                                            CurrentPage = { BindTarget = currentPage },
+                                                            LoadedReplies = { BindTarget = loadedReplies }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                    },
-                    childCommentsVisibilityContainer = new FillFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
+                        },
+                        childCommentsVisibilityContainer = new FillFlowContainer
                         {
-                            childCommentsContainer = new FillFlowContainer
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
                             {
-                                Padding = new MarginPadding { Left = 20 },
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical
-                            },
-                            deletedCommentsCounter = new DeletedCommentsCounter
-                            {
-                                ShowDeleted = { BindTarget = ShowDeleted }
+                                childCommentsContainer = new FillFlowContainer
+                                {
+                                    Padding = new MarginPadding { Left = 20 },
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical
+                                },
+                                deletedCommentsCounter = new DeletedCommentsCounter
+                                {
+                                    ShowDeleted = { BindTarget = ShowDeleted }
+                                },
+                                showMoreButton = new ShowMoreButton(comment, Type.Value, CommentableId.Value)
+                                {
+                                    Sort = { BindTarget = Sort },
+                                    CurrentPage = { BindTarget = currentPage },
+                                    LoadedReplies = { BindTarget = loadedReplies }
+                                }
                             }
-                        }
+                        },
                     }
+                },
+                chevronButton = new ChevronButton
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    Margin = new MarginPadding { Right = 30, Top = margin },
+                    Expanded = { BindTarget = childrenExpanded },
+                    Alpha = 0
                 }
             };
-
-            deletedCommentsCounter.Count.Value = comment.DeletedChildrenCount;
 
             if (comment.UserId.HasValue)
                 username.AddUserLink(comment.User);
@@ -237,23 +272,7 @@ namespace osu.Game.Overlays.Comments
                         Colour = OsuColour.Gray(0.1f)
                     }
                 });
-
-                if (comment.ChildComments.Any())
-                {
-                    AddInternal(new ChevronButton(comment)
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                        Margin = new MarginPadding { Right = 30, Top = margin },
-                        Expanded = { BindTarget = childrenExpanded }
-                    });
-                }
             }
-
-            comment.ChildComments.ForEach(c => childCommentsContainer.Add(new DrawableComment(c)
-            {
-                ShowDeleted = { BindTarget = ShowDeleted }
-            }));
         }
 
         protected override void LoadComplete()
@@ -264,20 +283,70 @@ namespace osu.Game.Overlays.Comments
                     this.FadeTo(show.NewValue ? 1 : 0);
             }, true);
             childrenExpanded.BindValueChanged(expanded => childCommentsVisibilityContainer.FadeTo(expanded.NewValue ? 1 : 0), true);
+
+            loadedReplies.ItemsAdded += onRepliesAdded;
+            loadedReplies.AddRange(comment.ChildComments);
+
             base.LoadComplete();
+        }
+
+        private void onRepliesAdded(IEnumerable<Comment> newReplies)
+        {
+            LoadComponentAsync(createRepliesPage(newReplies), loaded =>
+            {
+                childCommentsContainer.Add(loaded);
+                deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
+                updateButtonsState();
+            });
+        }
+
+        private FillFlowContainer<DrawableComment> createRepliesPage(IEnumerable<Comment> replies)
+        {
+            var page = new FillFlowContainer<DrawableComment>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Direction = FillDirection.Vertical,
+            };
+
+            replies.ForEach(c =>
+            {
+                page.Add(new DrawableComment(c)
+                {
+                    ShowDeleted = { BindTarget = ShowDeleted },
+                    Sort = { BindTarget = Sort },
+                    Type = { BindTarget = Type },
+                    CommentableId = { BindTarget = CommentableId }
+                });
+            });
+
+            return page;
+        }
+
+        private void updateButtonsState()
+        {
+            var loadedReplesCount = loadedReplies.Count;
+            var hasUnloadedReplies = loadedReplesCount != comment.RepliesCount;
+
+            loadMoreCommentsButton.FadeTo(hasUnloadedReplies && loadedReplesCount == 0 ? 1 : 0);
+            showMoreButton.FadeTo(hasUnloadedReplies && loadedReplesCount > 0 ? 1 : 0);
+            repliesButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
+
+            if (comment.IsTopLevel)
+                chevronButton.FadeTo(loadedReplesCount != 0 ? 1 : 0);
+
+            showMoreButton.IsLoading = loadMoreCommentsButton.IsLoading = false;
         }
 
         private class ChevronButton : ShowChildrenButton
         {
             private readonly SpriteIcon icon;
 
-            public ChevronButton(Comment comment)
+            public ChevronButton()
             {
-                Alpha = comment.IsTopLevel && comment.ChildComments.Any() ? 1 : 0;
                 Child = icon = new SpriteIcon
                 {
                     Size = new Vector2(12),
-                    Colour = OsuColour.Gray(0.7f)
                 };
             }
 
@@ -296,7 +365,6 @@ namespace osu.Game.Overlays.Comments
             {
                 this.count = count;
 
-                Alpha = count == 0 ? 0 : 1;
                 Child = text = new OsuSpriteText
                 {
                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
@@ -307,6 +375,36 @@ namespace osu.Game.Overlays.Comments
             {
                 text.Text = $@"{(expanded.NewValue ? "[+]" : "[-]")} replies ({count})";
             }
+        }
+
+        private class LoadMoreCommentsButton : GetCommentRepliesButton
+        {
+            public LoadMoreCommentsButton(Comment comment, CommentableType type, long commentableId)
+                : base(comment, type, commentableId)
+            {
+                IdleColour = OsuColour.Gray(0.7f);
+                HoverColour = Color4.White;
+            }
+
+            protected override string GetText() => @"[+] load replies";
+        }
+
+        private class ShowMoreButton : GetCommentRepliesButton
+        {
+            public ShowMoreButton(Comment comment, CommentableType type, long commentableId)
+                : base(comment, type, commentableId)
+            {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Margin = new MarginPadding { Vertical = 10, Left = 80 };
+                IdleColour = colourProvider.Light2;
+                HoverColour = colourProvider.Light1;
+            }
+
+            protected override string GetText() => @"Show More";
         }
 
         private class ParentUsername : FillFlowContainer, IHasTooltip
