@@ -131,9 +131,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         new Dimension(GridSizeMode.Absolute, 4),
                         new Dimension(GridSizeMode.AutoSize)
                     },
-                    Content = new Drawable[][]
+                    Content = new[]
                     {
-                        new []
+                        new Drawable[]
                         {
                             text = new OsuSpriteText
                             {
@@ -141,7 +141,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Text = title.ToUpper()
                             }
                         },
-                        new[]
+                        new Drawable[]
                         {
                             separator = new Box
                             {
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Height = 2
                             }
                         },
-                        new[]
+                        new Drawable[]
                         {
                             content
                         }
