@@ -103,11 +103,12 @@ namespace osu.Game.Rulesets.Edit
         /// Signals that the placement of <see cref="HitObject"/> has finished.
         /// This will destroy this <see cref="PlacementBlueprint"/>, and add the <see cref="HitObject"/> to the <see cref="Beatmap"/>.
         /// </summary>
-        protected void EndPlacement()
+        /// <param name="commit">Whether the object should be committed.</param>
+        public void EndPlacement(bool commit)
         {
             if (!PlacementBegun)
                 BeginPlacement();
-            placementHandler.EndPlacement(HitObject);
+            placementHandler.EndPlacement(HitObject, commit);
         }
 
         /// <summary>

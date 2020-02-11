@@ -91,6 +91,22 @@ namespace osu.Game.Screens.Multi.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            onReturning();
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (currentRoom.Value?.RoomID.Value == null)
+                currentRoom.Value = new Room();
+
+            onReturning();
+        }
+
+        private void onReturning()
+        {
             Filter.Search.HoldFocus = true;
         }
 
@@ -104,14 +120,6 @@ namespace osu.Game.Screens.Multi.Lounge
         {
             base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
-        }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            if (currentRoom.Value?.RoomID.Value == null)
-                currentRoom.Value = new Room();
         }
 
         private void joinRequested(Room room)

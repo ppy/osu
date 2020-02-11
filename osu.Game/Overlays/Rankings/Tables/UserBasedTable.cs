@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Users;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Rankings.Tables
 {
@@ -44,9 +45,9 @@ namespace osu.Game.Overlays.Rankings.Tables
             new ColoredRowText { Text = $@"{item.PlayCount:N0}", },
         }.Concat(CreateUniqueContent(item)).Concat(new[]
         {
-            new ColoredRowText { Text = $@"{item.GradesCount.SS + item.GradesCount.SSPlus:N0}", },
-            new ColoredRowText { Text = $@"{item.GradesCount.S + item.GradesCount.SPlus:N0}", },
-            new ColoredRowText { Text = $@"{item.GradesCount.A:N0}", }
+            new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.XH] + item.GradesCount[ScoreRank.X]:N0}", },
+            new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.SH] + item.GradesCount[ScoreRank.S]:N0}", },
+            new ColoredRowText { Text = $@"{item.GradesCount[ScoreRank.A]:N0}", }
         }).ToArray();
 
         protected abstract TableColumn[] CreateUniqueHeaders();

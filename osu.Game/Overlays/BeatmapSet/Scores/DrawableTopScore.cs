@@ -42,7 +42,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(10),
+                    Padding = new MarginPadding
+                    {
+                        Vertical = 10,
+                        Left = 10,
+                        Right = 25,
+                    },
                     Children = new Drawable[]
                     {
                         new AutoSizingGrid
