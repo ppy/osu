@@ -7,20 +7,32 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Graphics.Sprites;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Comments
 {
     public abstract class CommentEditor : CompositeDrawable
     {
         private const int footer_height = 40;
+        private const int side_padding = 8;
+
+        protected abstract string FooterText { get; }
+
+        protected abstract string CommitButtonText { get; }
+
+        protected abstract string TextboxPlaceholderText { get; }
 
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             RelativeSizeAxes = Axes.X;
-            Height = footer_height * 2;
+            AutoSizeAxes = Axes.Y;
             Masking = true;
             CornerRadius = 6;
+            BorderThickness = 3;
+            BorderColour = colourProvider.Background3;
 
             AddRangeInternal(new Drawable[]
             {
@@ -29,31 +41,70 @@ namespace osu.Game.Overlays.Comments
                     RelativeSizeAxes = Axes.Both,
                     Colour = colourProvider.Background3
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    Name = "Footer",
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Height = footer_height,
-                    Padding = new MarginPadding { Horizontal = 8 },
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new EditorTextbox
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Font = OsuFont.GetFont(size: 12),
-                            Shadow = false,
-                            Text = FooterText()
+                            Height = footer_height,
+                            RelativeSizeAxes = Axes.X,
+                            PlaceholderText = TextboxPlaceholderText
+                        },
+                        new Container
+                        {
+                            Name = "Footer",
+                            RelativeSizeAxes = Axes.X,
+                            Height = footer_height,
+                            Padding = new MarginPadding { Horizontal = side_padding },
+                            Children = new Drawable[]
+                            {
+                                new OsuSpriteText
+                                {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
+                                    Text = FooterText
+                                }
+                            }
                         }
                     }
                 }
             });
         }
 
-        protected abstract string FooterText();
+        private class EditorTextbox : BasicTextBox
+        {
+            protected override float LeftRightPadding => side_padding;
 
-        protected abstract string EmptyTextboxText();
+            protected override Color4 SelectionColour => Color4.LightSkyBlue;
+
+            private OsuSpriteText placeholder;
+
+            public EditorTextbox()
+            {
+                Masking = false;
+                TextContainer.Height = 0.4f;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                BackgroundUnfocused = BackgroundFocused = colourProvider.Background5;
+                placeholder.Colour = colourProvider.Background3;
+                BackgroundCommit = Color4.LightSkyBlue;
+            }
+
+
+            protected override SpriteText CreatePlaceholder() => placeholder = new OsuSpriteText
+            {
+                Font = OsuFont.GetFont(weight: FontWeight.Regular),
+            };
+
+            protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
+        }
     }
 }
