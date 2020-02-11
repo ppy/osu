@@ -32,6 +32,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             public new LoadingAnimation LoadingAnimation => base.LoadingAnimation;
 
+            public CompositeDrawable ViewTarget => base.Content.Parent;
+
             public TestOnlineViewContainer()
                 : base(@"Please sign in to view dummy test content")
             {
@@ -53,9 +55,9 @@ namespace osu.Game.Tests.Visual.Online
                 };
             }
 
-            protected override void FadeContentOut(Drawable content) => content.Hide();
+            protected override void PopContentOut(Drawable content) => content.Hide();
 
-            protected override void FadeContentIn(Drawable content) => content.Show();
+            protected override void PopContentIn(Drawable content) => content.Show();
         }
 
         [Test]
@@ -63,7 +65,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
 
-            AddAssert("children are visible", () => onlineView.TransformationTarget.IsPresent);
+            AddAssert("children are visible", () => onlineView.ViewTarget.IsPresent);
             AddAssert("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
         }
 
@@ -72,7 +74,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
 
-            AddAssert("children are hidden", () => !onlineView.TransformationTarget.IsPresent);
+            AddAssert("children are hidden", () => !onlineView.ViewTarget.IsPresent);
             AddAssert("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
         }
 
@@ -81,12 +83,16 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
 
-            AddAssert("children are hidden", () => !onlineView.TransformationTarget.IsPresent);
+            AddAssert("children are hidden", () => !onlineView.ViewTarget.IsPresent);
             AddAssert("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+        }
 
+        [Test]
+        public void TestFailingStateVisibility()
+        {
             AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
 
-            AddAssert("children are hidden", () => !onlineView.TransformationTarget.IsPresent);
+            AddAssert("children are hidden", () => !onlineView.ViewTarget.IsPresent);
             AddAssert("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
         }
     }
