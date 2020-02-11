@@ -131,9 +131,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         new Dimension(GridSizeMode.Absolute, 4),
                         new Dimension(GridSizeMode.AutoSize)
                     },
-                    Content = new[]
+                    Content = new Drawable[][]
                     {
-                        new[]
+                        new []
                         {
                             text = new OsuSpriteText
                             {
