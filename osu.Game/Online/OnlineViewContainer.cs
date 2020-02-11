@@ -11,7 +11,7 @@ using osu.Game.Online.Placeholders;
 namespace osu.Game.Online
 {
     /// <summary>
-    /// A <see cref="Container"/> for dislaying online content which require a local user to be logged in.
+    /// A <see cref="Container"/> for displaying online content which require a local user to be logged in.
     /// Shows its children only when the local user is logged in and supports displaying a placeholder if not.
     /// </summary>
     public abstract class OnlineViewContainer : Container, IOnlineComponent
@@ -21,7 +21,7 @@ namespace osu.Game.Online
 
         protected const double TRANSFORM_TIME = 300.0;
 
-        internal readonly Container TransformationTarget;
+        private readonly Container viewTarget;
         protected override Container<Drawable> Content { get; }
 
         [Resolved]
@@ -31,7 +31,7 @@ namespace osu.Game.Online
         {
             InternalChildren = new Drawable[]
             {
-                TransformationTarget = new Container
+                viewTarget = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = Content = new Container
@@ -52,30 +52,30 @@ namespace osu.Game.Online
             switch (state)
             {
                 case APIState.Offline:
-                    FadeContentOut(TransformationTarget);
+                    PopContentOut(viewTarget);
                     placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * TRANSFORM_TIME, Easing.OutQuint);
                     placeholder.FadeInFromZero(2 * TRANSFORM_TIME, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Online:
-                    FadeContentIn(TransformationTarget);
+                    PopContentIn(viewTarget);
                     placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
-                    FadeContentOut(TransformationTarget);
+                    PopContentOut(viewTarget);
                     LoadingAnimation.Show();
                     placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
                     break;
             }
         }
 
-        protected abstract void FadeContentOut(Drawable content);
+        protected abstract void PopContentOut(Drawable content);
 
-        protected abstract void FadeContentIn(Drawable content);
+        protected abstract void PopContentIn(Drawable content);
 
         protected override void LoadComplete()
         {
