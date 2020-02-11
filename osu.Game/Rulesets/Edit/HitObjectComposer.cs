@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -50,10 +49,9 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IBeatSnapProvider beatSnapProvider { get; set; }
 
-        private IBeatmapProcessor beatmapProcessor;
+        protected ComposeBlueprintContainer BlueprintContainer { get; private set; }
 
         private DrawableEditRulesetWrapper<TObject> drawableRulesetWrapper;
-        private ComposeBlueprintContainer blueprintContainer;
         private Container distanceSnapGridContainer;
         private DistanceSnapGrid distanceSnapGrid;
         private readonly List<Container> layerContainers = new List<Container>();
@@ -71,8 +69,6 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IFrameBasedClock framedClock)
         {
-            beatmapProcessor = Ruleset.CreateBeatmapProcessor(EditorBeatmap.PlayableBeatmap);
-
             EditorBeatmap.HitObjectAdded += addHitObject;
             EditorBeatmap.HitObjectRemoved += removeHitObject;
             EditorBeatmap.StartTimeChanged += UpdateHitObject;
@@ -99,7 +95,7 @@ namespace osu.Game.Rulesets.Edit
                 new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both }
             });
 
-            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(blueprintContainer = CreateBlueprintContainer());
+            var layerAboveRuleset = drawableRulesetWrapper.CreatePlayfieldAdjustmentContainer().WithChild(BlueprintContainer = CreateBlueprintContainer());
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -147,7 +143,7 @@ namespace osu.Game.Rulesets.Edit
 
             setSelectTool();
 
-            blueprintContainer.SelectionChanged += selectionChanged;
+            BlueprintContainer.SelectionChanged += selectionChanged;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -179,7 +175,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Update();
 
-            if (EditorClock.CurrentTime != lastGridUpdateTime && blueprintContainer.CurrentTool != null)
+            if (EditorClock.CurrentTime != lastGridUpdateTime && !(BlueprintContainer.CurrentTool is SelectTool))
                 showGridFor(Enumerable.Empty<HitObject>());
         }
 
@@ -215,7 +211,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void toolSelected(HitObjectCompositionTool tool)
         {
-            blueprintContainer.CurrentTool = tool;
+            BlueprintContainer.CurrentTool = tool;
 
             if (tool is SelectTool)
                 distanceSnapGridContainer.Hide();
@@ -240,19 +236,6 @@ namespace osu.Game.Rulesets.Edit
             lastGridUpdateTime = EditorClock.CurrentTime;
         }
 
-        private ScheduledDelegate scheduledUpdate;
-
-        public override void UpdateHitObject(HitObject hitObject)
-        {
-            scheduledUpdate?.Cancel();
-            scheduledUpdate = Schedule(() =>
-            {
-                beatmapProcessor?.PreProcess();
-                hitObject?.ApplyDefaults(EditorBeatmap.ControlPointInfo, EditorBeatmap.BeatmapInfo.BaseDifficulty);
-                beatmapProcessor?.PostProcess();
-            });
-        }
-
         private void addHitObject(HitObject hitObject) => UpdateHitObject(hitObject);
 
         private void removeHitObject(HitObject hitObject) => UpdateHitObject(null);
@@ -268,15 +251,22 @@ namespace osu.Game.Rulesets.Edit
 
         public void BeginPlacement(HitObject hitObject)
         {
+            EditorBeatmap.PlacementObject.Value = hitObject;
+
             if (distanceSnapGrid != null)
                 hitObject.StartTime = GetSnappedPosition(distanceSnapGrid.ToLocalSpace(inputManager.CurrentState.Mouse.Position), hitObject.StartTime).time;
         }
 
-        public void EndPlacement(HitObject hitObject)
+        public void EndPlacement(HitObject hitObject, bool commit)
         {
-            EditorBeatmap.Add(hitObject);
+            EditorBeatmap.PlacementObject.Value = null;
 
-            adjustableClock.Seek(hitObject.StartTime);
+            if (commit)
+            {
+                EditorBeatmap.Add(hitObject);
+
+                adjustableClock.Seek(hitObject.GetEndTime());
+            }
 
             showGridFor(Enumerable.Empty<HitObject>());
         }
@@ -307,7 +297,13 @@ namespace osu.Game.Rulesets.Edit
             => beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime) - referenceTime;
 
         public override float GetSnappedDistanceFromDistance(double referenceTime, float distance)
-            => DurationToDistance(referenceTime, beatSnapProvider.SnapTime(DistanceToDuration(referenceTime, distance), referenceTime));
+        {
+            var snappedEndTime = beatSnapProvider.SnapTime(referenceTime + DistanceToDuration(referenceTime, distance), referenceTime);
+
+            return DurationToDistance(referenceTime, snappedEndTime - referenceTime);
+        }
+
+        public override void UpdateHitObject(HitObject hitObject) => EditorBeatmap.UpdateHitObject(hitObject);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -344,7 +340,7 @@ namespace osu.Game.Rulesets.Edit
         /// Creates the <see cref="DistanceSnapGrid"/> applicable for a <see cref="HitObject"/> selection.
         /// </summary>
         /// <param name="selectedHitObjects">The <see cref="HitObject"/> selection.</param>
-        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>.</returns>
+        /// <returns>The <see cref="DistanceSnapGrid"/> for <paramref name="selectedHitObjects"/>. If empty, a grid is returned for the current point in time.</returns>
         [CanBeNull]
         protected virtual DistanceSnapGrid CreateDistanceSnapGrid([NotNull] IEnumerable<HitObject> selectedHitObjects) => null;
 
