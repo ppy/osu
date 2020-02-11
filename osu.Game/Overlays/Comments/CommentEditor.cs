@@ -23,6 +23,8 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract string TextboxPlaceholderText { get; }
 
+        protected FillFlowContainer ButtonsContainer;
+
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
@@ -67,6 +69,14 @@ namespace osu.Game.Overlays.Comments
                                     Origin = Anchor.CentreLeft,
                                     Font = OsuFont.GetFont(size: 12, weight: FontWeight.SemiBold),
                                     Text = FooterText
+                                },
+                                ButtonsContainer = new FillFlowContainer
+                                {
+                                    Name = "Buttons",
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Horizontal,
                                 }
                             }
                         }
