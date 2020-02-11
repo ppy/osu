@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osuTK;
@@ -23,8 +25,21 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        private readonly OsuSpriteText text;
+        private readonly TestCommentEditor commentEditor;
+        private readonly TestCancellableCommentEditor cancellableCommentEditor;
+
         public TestSceneCommentEditor()
         {
+            Add(new Container
+            {
+                AutoSizeAxes = Axes.Both,
+                Child = text = new OsuSpriteText
+                {
+                    Font = OsuFont.GetFont()
+                }
+            });
+
             Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
@@ -35,10 +50,27 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
-                    new TestCommentEditor(),
-                    new TestCancellableCommentEditor()
+                    commentEditor = new TestCommentEditor
+                    {
+                        OnCommit = onCommit
+                    },
+                    cancellableCommentEditor = new TestCancellableCommentEditor
+                    {
+                        OnCommit = onCommit
+                    }
                 }
             });
+        }
+
+        private void onCommit(string value)
+        {
+            text.Text = $@"Invoked text: {value}";
+
+            Scheduler.AddDelayed(() =>
+            {
+                commentEditor.IsLoading = false;
+                cancellableCommentEditor.IsLoading = false;
+            }, 500);
         }
 
         private class TestCommentEditor : CommentEditor

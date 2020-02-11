@@ -24,6 +24,12 @@ namespace osu.Game.Overlays.Comments
 
         public Action<string> OnCommit;
 
+        public bool IsLoading
+        {
+            get => commitButton.IsLoading;
+            set => commitButton.IsLoading = value;
+        }
+
         protected abstract string FooterText { get; }
 
         protected abstract string CommitButtonText { get; }
@@ -107,7 +113,7 @@ namespace osu.Game.Overlays.Comments
 
             textbox.OnCommit += (u, v) =>
             {
-                if (!commitButton.IsReady.Value)
+                if (commitButton.IsBlocked.Value)
                     return;
 
                 commitButton.Click();
@@ -119,7 +125,7 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
 
-            current.BindValueChanged(text => commitButton.IsReady.Value = !string.IsNullOrEmpty(text.NewValue), true);
+            current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
 
         private class EditorTextbox : BasicTextBox
@@ -156,9 +162,9 @@ namespace osu.Game.Overlays.Comments
         {
             private const int duration = 200;
 
-            public readonly BindableBool IsReady = new BindableBool();
+            public readonly BindableBool IsBlocked = new BindableBool();
 
-            public override bool PropagatePositionalInputSubTree => IsReady.Value && base.PropagatePositionalInputSubTree;
+            public override bool PropagatePositionalInputSubTree => !IsBlocked.Value && base.PropagatePositionalInputSubTree;
 
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
 
@@ -186,17 +192,17 @@ namespace osu.Game.Overlays.Comments
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                IsReady.BindValueChanged(onReadyStateChanged, true);
+                IsBlocked.BindValueChanged(onBlockedStateChanged, true);
             }
 
-            private void onReadyStateChanged(ValueChangedEvent<bool> isReady)
+            private void onBlockedStateChanged(ValueChangedEvent<bool> isBlocked)
             {
-                drawableText.FadeColour(isReady.NewValue ? Color4.White : colourProvider.Foreground1, duration, Easing.OutQuint);
+                drawableText.FadeColour(isBlocked.NewValue ? colourProvider.Foreground1 : Color4.White, duration, Easing.OutQuint);
 
-                if (isReady.NewValue)
-                    background.FadeColour(IsHovered ? HoverColour : IdleColour, duration, Easing.OutQuint);
-                else
+                if (isBlocked.NewValue)
                     background.FadeColour(colourProvider.Background5, duration, Easing.OutQuint);
+                else
+                    background.FadeColour(IsHovered ? HoverColour : IdleColour, duration, Easing.OutQuint);
             }
 
             protected override Drawable CreateContent() => new CircularContainer
