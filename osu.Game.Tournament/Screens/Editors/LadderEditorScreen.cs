@@ -53,12 +53,12 @@ namespace osu.Game.Tournament.Screens.Editors
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
+                    new OsuMenuItem("创建新的比赛", MenuItemType.Highlighted, () =>
                     {
                         var pos = MatchesContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
                         LadderInfo.Matches.Add(new TournamentMatch { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
                     }),
-                    new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
+                    new OsuMenuItem("重置队伍", MenuItemType.Destructive, () =>
                     {
                         foreach (var p in MatchesContainer)
                             p.Match.Reset();

@@ -222,7 +222,7 @@ namespace osu.Game.Tournament.Components
 
             panelContents.Children = new Drawable[]
             {
-                new DiffPiece(("Length", TimeSpan.FromMilliseconds(length).ToString(@"mm\:ss")))
+                new DiffPiece(("长度", TimeSpan.FromMilliseconds(length).ToString(@"mm\:ss")))
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.BottomLeft,
@@ -237,7 +237,7 @@ namespace osu.Game.Tournament.Components
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.BottomRight
                 },
-                new DiffPiece(("Star Rating", $"{beatmap.StarDifficulty:0.#}{srExtra}"))
+                new DiffPiece(("难度星级", $"{beatmap.StarDifficulty:0.#}{srExtra}"))
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.TopRight

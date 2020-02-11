@@ -216,7 +216,7 @@
     *   [m] [#7389 - Fix footer button content not correctly being centered](https://github.com/ppy/osu/pull/7389)
     *   [m] [#7683 - Fix chat test intermittently failing](https://github.com/ppy/osu/pull/7683)
     *   [m] [#7691 - Fix incorrect nUnit adapter version causing rider failures](https://github.com/ppy/osu/pull/7691)
-    *   [! 存在问题] [m] [#7690 - Centralise screen exit logic to ScreenTestScene](https://github.com/ppy/osu/pull/7690)
+    *   [m] [#7690 - Centralise screen exit logic to ScreenTestScene](https://github.com/ppy/osu/pull/7690)
     *   [m] [#7687 - Fix Alt+number shortcuts for tabs in chat overlay](https://github.com/ppy/osu/pull/7687)
     *   Make use of ElementAtOrDefault() when possible #76954
     *   Remove all usages of Bindable<float> and Bindable<double> #7709
@@ -302,3 +302,20 @@
             *   默认选择原版
     *   [mf #3 翻译错误: "设置 -> 细节设置"处的"故事版"应为"故事板"]
         *   已解决,同时发现并纠正了其他地方的一处相同错误
+
+### 2020/2/9 更新发布后
+*   整合更新
+    *   [m] [Make the caret blink to the beat #7761]
+
+### 2020/2/10
+*   翻译补全
+    *   **疑似**补全了比赛端下方SongBar的内容
+        *   [文件](osu.Game.Tournament/Components/SongBar.cs)
+
+### 2020/2/11
+*   整合更新
+    *   [m] [Minor cleanups for legacy beatmap decoders #7768]
+    *   [m] [Improve mod settings tests #7773]
+    *   [m] [Fix BeatSyncContainer failing at song select #7776]
+    *   [m] [Bump Sentry from 2.0.1 to 2.0.2 #7781]
+    *   [m] [Bump Microsoft.NET.Test.Sdk from 16.4.0 to 16.5.0 #7782]

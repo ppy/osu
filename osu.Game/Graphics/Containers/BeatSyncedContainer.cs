@@ -59,9 +59,9 @@ namespace osu.Game.Graphics.Containers
             Track track = null;
             IBeatmap beatmap = null;
 
-            double currentTrackTime;
-            TimingControlPoint timingPoint;
-            EffectControlPoint effectPoint;
+            double currentTrackTime = 0;
+            TimingControlPoint timingPoint = null;
+            EffectControlPoint effectPoint = null;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -69,24 +69,18 @@ namespace osu.Game.Graphics.Containers
                 beatmap = Beatmap.Value.Beatmap;
             }
 
-            if (track != null && beatmap != null && track.IsRunning)
+            if (track != null && beatmap != null && track.IsRunning && track.Length > 0)
             {
-                currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
+                currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
-
-                if (timingPoint.BeatLength == 0)
-                {
-                    IsBeatSyncedWithTrack = false;
-                    return;
-                }
-
-                IsBeatSyncedWithTrack = true;
             }
-            else
+
+            IsBeatSyncedWithTrack = timingPoint?.BeatLength > 0;
+
+            if (timingPoint == null || !IsBeatSyncedWithTrack)
             {
-                IsBeatSyncedWithTrack = false;
                 currentTrackTime = Clock.CurrentTime;
                 timingPoint = defaultTiming;
                 effectPoint = defaultEffect;
