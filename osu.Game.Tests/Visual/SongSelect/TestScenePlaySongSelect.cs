@@ -442,15 +442,19 @@ namespace osu.Game.Tests.Visual.SongSelect
 
             AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
 
+            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+
             BeatmapInfo target = null;
 
             AddStep("select beatmap externally", () =>
             {
-                target = manager.QueryBeatmapSets(b => b.Beatmaps.Any(bi => bi.RulesetID == (differentRuleset ? 1 : 0)))
+                target = manager.GetAllUsableBeatmapSets().Where(b => b.Beatmaps.Any(bi => bi.RulesetID == (differentRuleset ? 1 : 0)))
                                 .ElementAt(5).Beatmaps.First();
 
                 Beatmap.Value = manager.GetWorkingBeatmap(target);
             });
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
 
             AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
             AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
