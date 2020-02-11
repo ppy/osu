@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -16,6 +17,7 @@ namespace osu.Game.Tests.Visual.UserInterface
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(CommentEditor),
+            typeof(CancellableCommentEditor),
         };
 
         [Cached]
@@ -23,13 +25,19 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         public TestSceneCommentEditor()
         {
-            Add(new Container
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
                 Width = 800,
-                Child = new TestCommentEditor()
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Children = new Drawable[]
+                {
+                    new TestCommentEditor(),
+                    new TestCancellableCommentEditor()
+                }
             });
         }
 
@@ -40,6 +48,15 @@ namespace osu.Game.Tests.Visual.UserInterface
             protected override string CommitButtonText => @"Commit";
 
             protected override string TextboxPlaceholderText => @"This textbox is empty";
+        }
+
+        private class TestCancellableCommentEditor : CancellableCommentEditor
+        {
+            protected override string FooterText => @"Wow, another one. Sicc";
+
+            protected override string CommitButtonText => @"Save";
+
+            protected override string TextboxPlaceholderText => @"Miltiline textboxes soon";
         }
     }
 }
