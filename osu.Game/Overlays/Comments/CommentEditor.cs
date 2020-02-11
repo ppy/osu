@@ -15,7 +15,6 @@ namespace osu.Game.Overlays.Comments
 {
     public abstract class CommentEditor : CompositeDrawable
     {
-        private const int footer_height = 40;
         private const int side_padding = 8;
 
         protected abstract string FooterText { get; }
@@ -50,7 +49,7 @@ namespace osu.Game.Overlays.Comments
                     {
                         new EditorTextbox
                         {
-                            Height = footer_height,
+                            Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = TextboxPlaceholderText
                         },
@@ -58,7 +57,7 @@ namespace osu.Game.Overlays.Comments
                         {
                             Name = "Footer",
                             RelativeSizeAxes = Axes.X,
-                            Height = footer_height,
+                            Height = 35,
                             Padding = new MarginPadding { Horizontal = side_padding },
                             Children = new Drawable[]
                             {
