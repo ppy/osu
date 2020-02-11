@@ -22,8 +22,8 @@ namespace osu.Game.Overlays.Comments
         {
             ButtonsContainer.Add(new CancelButton
             {
-                Anchor = Anchor.CentreLeft,
-                Origin = Anchor.CentreLeft,
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
                 Action = () => OnCancel?.Invoke()
             });
         }
