@@ -17,31 +17,24 @@ namespace osu.Game.Configuration
     /// An attribute to mark a bindable as being exposed to the user via settings controls.
     /// Can be used in conjunction with <see cref="SettingSourceExtensions.CreateSettingsControls"/> to automatically create UI controls.
     /// </summary>
+    /// <remarks>
+    /// All controls with OrderPosition set to an int greater than 0 will be placed first in ascending order.
+    /// All controls with no OrderPosition will come afterward in default order.
+    /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
     public class SettingSourceAttribute : Attribute
     {
-        public enum OrderMode
-        {
-            FIRST,
-            ORDERED_RELATIVE,
-            UNORDERED,
-            LAST
-        }
-
         public string Label { get; }
 
         public string Description { get; }
 
-        public OrderMode OrderingMode { get; }
-
         public int OrderPosition { get; }
 
-        public SettingSourceAttribute(string label, string description = null, OrderMode order = OrderMode.UNORDERED, int orderPosition = 0)
+        public SettingSourceAttribute(string label, string description = null, int orderPosition = -1)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
-            OrderingMode = order;
             OrderPosition = orderPosition;
         }
     }
@@ -136,12 +129,10 @@ namespace osu.Game.Configuration
         {
             var original = obj.GetSettingsSourceProperties();
 
-            var first = original.Where(attr => attr.Item1.OrderingMode == SettingSourceAttribute.OrderMode.FIRST);
-            var orderedRelative = original.Where(attr => attr.Item1.OrderingMode == SettingSourceAttribute.OrderMode.ORDERED_RELATIVE).OrderBy(attr => attr.Item1.OrderPosition);
-            var unordered = original.Where(attr => attr.Item1.OrderingMode == SettingSourceAttribute.OrderMode.UNORDERED);
-            var last = original.Where(attr => attr.Item1.OrderingMode == SettingSourceAttribute.OrderMode.LAST);
+            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition > -1).OrderBy(attr => attr.Item1.OrderPosition);
+            var unordered = original.Except(orderedRelative);
 
-            return first.Concat(orderedRelative).Concat(unordered).Concat(last);
+            return orderedRelative.Concat(unordered);
         }
     }
 }
