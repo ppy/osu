@@ -14,6 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using System.Collections.Generic;
 using System;
 using osuTK;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -31,11 +32,14 @@ namespace osu.Game.Overlays.Comments
 
         protected FillFlowContainer ButtonsContainer;
 
+        private readonly Bindable<string> current = new Bindable<string>();
+
+        private CommitButton commitButton;
+
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
             EditorTextbox textbox;
-            CommitButton commitButton;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -62,7 +66,8 @@ namespace osu.Game.Overlays.Comments
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = TextboxPlaceholderText
+                            PlaceholderText = TextboxPlaceholderText,
+                            Current = current
                         },
                         new Container
                         {
@@ -91,7 +96,7 @@ namespace osu.Game.Overlays.Comments
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Action = () => OnCommit?.Invoke(textbox.Text)
+                                        Action = () => OnCommit?.Invoke(current.Value)
                                     }
                                 }
                             }
@@ -100,14 +105,28 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textbox.OnCommit += (u, v) => commitButton.Click();
+            textbox.OnCommit += (u, v) =>
+            {
+                if (!commitButton.IsReady.Value)
+                    return;
+
+                commitButton.Click();
+                current.Value = string.Empty;
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            current.BindValueChanged(text => commitButton.IsReady.Value = !string.IsNullOrEmpty(text.NewValue), true);
         }
 
         private class EditorTextbox : BasicTextBox
         {
             protected override float LeftRightPadding => side_padding;
 
-            protected override Color4 SelectionColour => Color4.LightSkyBlue;
+            protected override Color4 SelectionColour => Color4.Gray;
 
             private OsuSpriteText placeholder;
 
@@ -122,7 +141,7 @@ namespace osu.Game.Overlays.Comments
             {
                 BackgroundUnfocused = BackgroundFocused = colourProvider.Background5;
                 placeholder.Colour = colourProvider.Background3;
-                BackgroundCommit = Color4.LightSkyBlue;
+                BackgroundCommit = colourProvider.Background3;
             }
 
             protected override SpriteText CreatePlaceholder() => placeholder = new OsuSpriteText
@@ -137,7 +156,14 @@ namespace osu.Game.Overlays.Comments
         {
             private const int duration = 200;
 
+            public readonly BindableBool IsReady = new BindableBool();
+
+            public override bool PropagatePositionalInputSubTree => IsReady.Value && base.PropagatePositionalInputSubTree;
+
             protected override IEnumerable<Drawable> EffectTargets => new[] { background };
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
 
             private OsuSpriteText drawableText;
             private Box background;
@@ -151,10 +177,26 @@ namespace osu.Game.Overlays.Comments
             }
 
             [BackgroundDependencyLoader]
-            private void load(OverlayColourProvider colourProvider)
+            private void load()
             {
                 IdleColour = colourProvider.GetColour(0.5f, 0.45f);
                 HoverColour = colourProvider.GetColour(0.5f, 0.6f);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                IsReady.BindValueChanged(onReadyStateChanged, true);
+            }
+
+            private void onReadyStateChanged(ValueChangedEvent<bool> isReady)
+            {
+                drawableText.FadeColour(isReady.NewValue ? Color4.White : colourProvider.Foreground1, duration, Easing.OutQuint);
+
+                if (isReady.NewValue)
+                    background.FadeColour(IsHovered ? HoverColour : IdleColour, duration, Easing.OutQuint);
+                else
+                    background.FadeColour(colourProvider.Background5, duration, Easing.OutQuint);
             }
 
             protected override Drawable CreateContent() => new CircularContainer
