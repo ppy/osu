@@ -63,6 +63,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private void refreshTool()
         {
             placementBlueprintContainer.Clear();
+
+            currentPlacement?.EndPlacement(false);
             currentPlacement = null;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
