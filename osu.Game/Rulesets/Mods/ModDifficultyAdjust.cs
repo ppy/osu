@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using osu.Game.Configuration;
-using static osu.Game.Configuration.SettingSourceAttribute;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override Type[] IncompatibleMods => new[] { typeof(ModEasy), typeof(ModHardRock) };
 
-        [SettingSource("HP Drain", "Override a beatmap's set HP.", OrderMode.ORDERED_RELATIVE, 1)]
+        [SettingSource("HP Drain", "Override a beatmap's set HP.", 1)]
         public BindableNumber<float> DrainRate { get; } = new BindableFloat
         {
             Precision = 0.1f,
@@ -39,7 +38,7 @@ namespace osu.Game.Rulesets.Mods
             Value = 5,
         };
 
-        [SettingSource("Accuracy", "Override a beatmap's set OD.", OrderMode.ORDERED_RELATIVE, 1)]
+        [SettingSource("Accuracy", "Override a beatmap's set OD.", 2)]
         public BindableNumber<float> OverallDifficulty { get; } = new BindableFloat
         {
             Precision = 0.1f,
