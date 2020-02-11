@@ -35,9 +35,11 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestCommentEditor : CommentEditor
         {
-            protected override string EmptyTextboxText() => @"This textbox is empty";
+            protected override string FooterText => @"Footer text. And it is pretty long. Cool.";
 
-            protected override string FooterText() => @"Footer text. And it is pretty long. Cool.";
+            protected override string CommitButtonText => @"Commit";
+
+            protected override string TextboxPlaceholderText => @"This textbox is empty";
         }
     }
 }
