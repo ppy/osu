@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 Height = 2
                             }
                         },
-                        new Drawable[]
+                        new[]
                         {
                             content
                         }
