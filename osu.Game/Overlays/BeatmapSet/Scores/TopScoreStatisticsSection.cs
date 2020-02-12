@@ -118,26 +118,42 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 AutoSizeAxes = Axes.Both;
 
-                InternalChild = new FillFlowContainer
+                InternalChild = new GridContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0, 1),
-                    Children = new[]
+                    ColumnDimensions = new[]
                     {
-                        text = new OsuSpriteText
+                        new Dimension(GridSizeMode.AutoSize, minSize: minWidth ?? 0)
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Absolute, 4),
+                        new Dimension(GridSizeMode.AutoSize)
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
-                            Text = title.ToUpper()
+                            text = new OsuSpriteText
+                            {
+                                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold),
+                                Text = title.ToUpper()
+                            }
                         },
-                        separator = new Box
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = minWidth == null ? Axes.X : Axes.None,
-                            Width = minWidth ?? 1f,
-                            Height = 2,
-                            Margin = new MarginPadding { Top = 2 }
+                            separator = new Box
+                            {
+                                Anchor = Anchor.CentreLeft,
+                                RelativeSizeAxes = Axes.X,
+                                Height = 2
+                            }
                         },
-                        content
+                        new[]
+                        {
+                            content
+                        }
                     }
                 };
             }
