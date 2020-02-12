@@ -155,6 +155,7 @@ namespace osu.Game.Screens.Select
                                             Origin = Anchor.CentreRight,
                                             RelativeSizeAxes = Axes.Both,
                                             SelectionChanged = updateSelectedBeatmap,
+                                            SelectionFinalised = beatmapInfo => { FinaliseSelection(beatmapInfo); },
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
                                         },
                                     }

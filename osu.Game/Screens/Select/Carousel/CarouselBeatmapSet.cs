@@ -15,8 +15,9 @@ namespace osu.Game.Screens.Select.Carousel
         public IEnumerable<CarouselBeatmap> Beatmaps => InternalChildren.OfType<CarouselBeatmap>();
 
         public BeatmapSetInfo BeatmapSet;
+        public BeatmapCarousel Carousel;
 
-        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet)
+        public CarouselBeatmapSet(BeatmapSetInfo beatmapSet, BeatmapCarousel carousel)
         {
             BeatmapSet = beatmapSet ?? throw new ArgumentNullException(nameof(beatmapSet));
 
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Select.Carousel
                       .Where(b => !b.Hidden)
                       .Select(b => new CarouselBeatmap(b))
                       .ForEach(AddChild);
+
+            Carousel = carousel;
         }
 
         protected override DrawableCarouselItem CreateDrawableRepresentation() => new DrawableCarouselBeatmapSet(this);
