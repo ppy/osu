@@ -133,7 +133,7 @@ namespace osu.Game.Overlays.Comments
             // We may receive already loaded comments
             receivedComments.ForEach(c =>
             {
-                if (!drawableComment.LoadedReplies.ContainsKey(c.Id))
+                if (!drawableComment.ContainsReply(c.Id))
                     uniqueComments.Add(c);
             });
 

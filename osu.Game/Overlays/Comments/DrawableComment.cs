@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
-        public readonly Dictionary<long, Comment> LoadedReplies = new Dictionary<long, Comment>();
+        private readonly Dictionary<long, Comment> loadedReplies = new Dictionary<long, Comment>();
 
         /// <summary>
         /// <see cref="DrawableComment"/>s which will be added to this <see cref="DrawableComment"/> as replies on initial load.
@@ -290,6 +290,8 @@ namespace osu.Game.Overlays.Comments
             base.LoadComplete();
         }
 
+        public bool ContainsReply(long replyId) => loadedReplies.ContainsKey(replyId);
+
         public void AddReplies(IEnumerable<DrawableComment> replies)
         {
             if (LoadState == LoadState.NotLoaded)
@@ -311,7 +313,7 @@ namespace osu.Game.Overlays.Comments
             childCommentsContainer.Add(page);
 
             var newReplies = replies.Select(reply => reply.Comment);
-            newReplies.ForEach(reply => LoadedReplies.Add(reply.Id, reply));
+            newReplies.ForEach(reply => loadedReplies.Add(reply.Id, reply));
             deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
             updateButtonsState();
         }
@@ -326,7 +328,7 @@ namespace osu.Game.Overlays.Comments
 
         private void updateButtonsState()
         {
-            var loadedReplesCount = LoadedReplies.Count;
+            var loadedReplesCount = loadedReplies.Count;
             var hasUnloadedReplies = loadedReplesCount != Comment.RepliesCount;
 
             loadMoreCommentsButton.FadeTo(hasUnloadedReplies && loadedReplesCount == 0 ? 1 : 0);
