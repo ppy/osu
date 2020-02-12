@@ -21,53 +21,82 @@ namespace osu.Game.Overlays.Profile
     {
         protected const float FADE_DURATION = 150;
 
-        protected readonly UserLineGraph Graph;
-        protected KeyValuePair<TKey, TValue>[] Data;
+        private readonly UserLineGraph graph;
+        private KeyValuePair<TKey, TValue>[] data;
         private int dataIndex;
 
         protected UserGraph()
         {
-            Add(Graph = new UserLineGraph
+            data = Array.Empty<KeyValuePair<TKey, TValue>>();
+
+            Add(graph = new UserLineGraph
             {
                 RelativeSizeAxes = Axes.Both,
                 Alpha = 0
             });
 
-            Graph.OnBallMove += i => dataIndex = i;
+            graph.OnBallMove += i => dataIndex = i;
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Graph.LineColour = colours.Yellow;
+            graph.LineColour = colours.Yellow;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            if (Data?.Length > 1)
-            {
-                Graph.UpdateBallPosition(e.MousePosition.X);
-                Graph.ShowBar();
-            }
+            if (data.Length <= 1)
+                return base.OnHover(e);
+
+            graph.UpdateBallPosition(e.MousePosition.X);
+            graph.ShowBar();
 
             return base.OnHover(e);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (Data?.Length > 1)
-                Graph.UpdateBallPosition(e.MousePosition.X);
+            if (data.Length > 1)
+                graph.UpdateBallPosition(e.MousePosition.X);
 
             return base.OnMouseMove(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (Data?.Length > 1)
-                Graph.HideBar();
+            if (data.Length > 1)
+                graph.HideBar();
 
             base.OnHoverLost(e);
         }
+
+        protected KeyValuePair<TKey, TValue>[] Data
+        {
+            set
+            {
+                value ??= Array.Empty<KeyValuePair<TKey, TValue>>();
+                data = value;
+                redrawGraph();
+            }
+        }
+
+        private void redrawGraph()
+        {
+            if (data.Length == 0)
+            {
+                HideGraph();
+                return;
+            }
+
+            graph.DefaultValueCount = data.Length;
+            graph.Values = data.Select(pair => GetDataPointHeight(pair.Value)).ToArray();
+            ShowGraph();
+        }
+
+        protected abstract float GetDataPointHeight(TValue value);
+        protected virtual void ShowGraph() => graph.FadeIn(FADE_DURATION, Easing.Out);
+        protected virtual void HideGraph() => graph.FadeOut(FADE_DURATION, Easing.Out);
 
         public ITooltip GetCustomTooltip() => GetTooltip();
 
@@ -77,10 +106,10 @@ namespace osu.Game.Overlays.Profile
         {
             get
             {
-                if (Data == null || Data.Length == 0)
+                if (data.Length == 0)
                     return null;
 
-                var (key, value) = Data[dataIndex];
+                var (key, value) = data[dataIndex];
                 return GetTooltipContent(key, value);
             }
         }

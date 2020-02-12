@@ -4,43 +4,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Graphics;
 using static osu.Game.Users.User;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public abstract class UserHistoryGraph : UserGraph<DateTime, long>
     {
-        private UserHistoryCount[] values;
-
         public UserHistoryCount[] Values
         {
-            get => values;
             set
             {
-                values = value;
-                updateValues(value);
+                if (value == null)
+                {
+                    Data = null;
+                    return;
+                }
+
+                Data = value.Select(v => new KeyValuePair<DateTime, long>(v.Date, v.Count)).ToArray();
             }
         }
 
-        private void updateValues(UserHistoryCount[] values)
-        {
-            if (values == null || !values.Any())
-            {
-                Graph.FadeOut(FADE_DURATION, Easing.Out);
-                Data = null;
-                return;
-            }
-
-            Data = values.Select(v => new KeyValuePair<DateTime, long>(v.Date, v.Count)).ToArray();
-
-            if (values.Length > 1)
-            {
-                Graph.DefaultValueCount = Data.Length;
-                Graph.Values = Data.Select(x => (float)x.Value);
-                Graph.FadeIn(FADE_DURATION, Easing.Out);
-            }
-        }
+        protected override float GetDataPointHeight(long playCount) => playCount;
 
         protected override object GetTooltipContent(DateTime date, long playCount)
         {

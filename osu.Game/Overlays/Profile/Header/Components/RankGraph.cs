@@ -39,27 +39,29 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
         private void updateStatistics(UserStatistics statistics)
         {
-            placeholder.FadeIn(FADE_DURATION, Easing.Out);
+            int[] userRanks = statistics?.RankHistory?.Data;
 
-            if (statistics?.Ranks.Global == null)
+            if (userRanks == null)
             {
-                Graph.FadeOut(FADE_DURATION, Easing.Out);
                 Data = null;
                 return;
             }
 
-            int[] userRanks = statistics.RankHistory?.Data ?? new[] { statistics.Ranks.Global.Value };
             Data = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
+        }
 
-            if (Data.Length > 1)
-            {
-                placeholder.FadeOut(FADE_DURATION, Easing.Out);
+        protected override float GetDataPointHeight(int rank) => -MathF.Log(rank);
 
-                Graph.DefaultValueCount = Data.Length;
-                Graph.Values = Data.Select(x => -MathF.Log(x.Value));
-            }
+        protected override void ShowGraph()
+        {
+            base.ShowGraph();
+            placeholder.FadeOut(FADE_DURATION, Easing.Out);
+        }
 
-            Graph.FadeTo(Data.Length > 1 ? 1 : 0, FADE_DURATION, Easing.Out);
+        protected override void HideGraph()
+        {
+            base.HideGraph();
+            placeholder.FadeIn(FADE_DURATION, Easing.Out);
         }
 
         protected override object GetTooltipContent(int index, int rank)
