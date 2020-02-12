@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Select
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
         }
 
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea(); // Todo: Temporary
+
         protected override bool OnStart()
         {
             var item = new PlaylistItem
