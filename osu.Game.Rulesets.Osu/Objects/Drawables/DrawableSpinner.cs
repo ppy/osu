@@ -207,7 +207,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Ticks.Rotation = Disc.Rotation;
             SpmCounter.SetRotation(Disc.RotationAbsolute);
 
-            spinRate.Value = (spmCounter.SpinsPerMinute / 180) * Progress;
+            sampleRate.Value = (SpmCounter.SpinsPerMinute / 180) * Progress;
 
             float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
             Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
