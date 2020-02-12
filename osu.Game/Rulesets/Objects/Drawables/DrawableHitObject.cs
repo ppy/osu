@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
-            startTimeBindable.BindValueChanged(_ => updateState(ArmedState.Idle, true));
+            startTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
 
             if (HitObject is IHasComboInformation combo)
             {
