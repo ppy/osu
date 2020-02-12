@@ -36,6 +36,11 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         public readonly List<Comment> LoadedReplies = new List<Comment>();
 
+        /// <summary>
+        /// <see cref="DrawableComment"/>s which will be added to this <see cref="DrawableComment"/> as replies when it will be loaded.
+        /// </summary>
+        public readonly List<DrawableComment> InitialReplies = new List<DrawableComment>();
+
         private readonly BindableBool childrenExpanded = new BindableBool(true);
 
         private int currentPage;
@@ -265,6 +270,9 @@ namespace osu.Game.Overlays.Comments
                     Colour = OsuColour.Gray(0.1f)
                 });
             }
+
+            if (InitialReplies.Any())
+                AddReplies(InitialReplies);
         }
 
         protected override void LoadComplete()
@@ -283,14 +291,28 @@ namespace osu.Game.Overlays.Comments
 
         public void AddReplies(IEnumerable<DrawableComment> replies)
         {
-            LoadComponentAsync(createRepliesPage(replies), page =>
+            if (LoadState == LoadState.NotLoaded)
+                throw new NotSupportedException($@"Can't use {nameof(AddReplies)} when not loaded.");
+
+            var page = createRepliesPage(replies);
+
+            if (LoadState == LoadState.Loading)
             {
-                var newReplies = replies.Select(reply => reply.Comment);
-                LoadedReplies.AddRange(newReplies);
-                deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
-                childCommentsContainer.Add(page);
-                updateButtonsState();
-            });
+                addRepliesPage(page, replies);
+                return;
+            }
+
+            LoadComponentAsync(page, loaded => addRepliesPage(loaded, replies));
+        }
+
+        private void addRepliesPage(FillFlowContainer<DrawableComment> page, IEnumerable<DrawableComment> replies)
+        {
+            childCommentsContainer.Add(page);
+
+            var newReplies = replies.Select(reply => reply.Comment);
+            LoadedReplies.AddRange(newReplies);
+            deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
+            updateButtonsState();
         }
 
         private FillFlowContainer<DrawableComment> createRepliesPage(IEnumerable<DrawableComment> replies) => new FillFlowContainer<DrawableComment>
