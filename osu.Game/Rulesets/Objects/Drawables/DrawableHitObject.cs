@@ -250,8 +250,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
-                base.ApplyTransformsAt(transformTime, true);
-                base.ClearTransformsAfter(transformTime, true);
+                base.ApplyTransformsAt(double.MinValue, true);
+                base.ClearTransformsAfter(double.MinValue, true);
 
                 using (BeginAbsoluteSequence(transformTime, true))
                 {
