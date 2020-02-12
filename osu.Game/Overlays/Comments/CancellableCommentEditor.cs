@@ -63,8 +63,8 @@ namespace osu.Game.Overlays.Comments
             [BackgroundDependencyLoader]
             private void load(OverlayColourProvider colourProvider)
             {
-                IdleColour = colourProvider.GetColour(0.5f, 0.45f);
-                HoverColour = colourProvider.GetColour(0.5f, 0.6f);
+                IdleColour = colourProvider.Light4;
+                HoverColour = colourProvider.Light3;
             }
         }
     }
