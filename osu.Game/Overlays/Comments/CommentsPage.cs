@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Comments
             if (replies.Any())
             {
                 replies.ForEach(c => c.ParentComment = comment);
-                drawableComment.OnLoadComplete += _ => drawableComment.AddReplies(replies.Select(reply => createCommentWithReplies(reply, commentBundle)));
+                drawableComment.InitialReplies.AddRange(replies.Select(reply => createCommentWithReplies(reply, commentBundle)));
             }
 
             return drawableComment;
