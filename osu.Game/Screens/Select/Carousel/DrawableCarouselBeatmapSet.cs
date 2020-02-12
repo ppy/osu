@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
@@ -33,10 +34,13 @@ namespace osu.Game.Screens.Select.Carousel
         private DialogOverlay dialogOverlay;
         private readonly BeatmapSetInfo beatmapSet;
 
+        private BeatmapCarousel carousel;
+
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
             : base(set)
         {
             beatmapSet = set.BeatmapSet;
+            carousel = set.Carousel;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -117,7 +121,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             return beatmaps.Count > maximum_difficulty_icons
                 ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
-                : beatmaps.Select(b => new FilterableDifficultyIcon(b));
+                : beatmaps.Select(b => new FilterableDifficultyIcon(b, carousel));
         }
 
         public MenuItem[] ContextMenuItems
@@ -210,12 +214,32 @@ namespace osu.Game.Screens.Select.Carousel
         {
             private readonly BindableBool filtered = new BindableBool();
 
-            public FilterableDifficultyIcon(CarouselBeatmap item)
+            private BeatmapCarousel carousel;
+            private BeatmapInfo info;
+
+            public FilterableDifficultyIcon(CarouselBeatmap item, BeatmapCarousel carousel)
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
+
+                this.carousel = carousel;
+                info = item.Beatmap;
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if(e.AltPressed || carousel.SelectedBeatmap == info)
+                {
+                    Schedule(() => carousel.SelectionFinalised?.Invoke(info));
+                }
+                else
+                {
+                    carousel.SelectBeatmap(info);
+                }
+
+                return true;
             }
         }
 
