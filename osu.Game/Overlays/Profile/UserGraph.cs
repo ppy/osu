@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile
 
         protected readonly UserLineGraph Graph;
         protected KeyValuePair<TKey, TValue>[] Data;
-        protected int DataIndex;
+        private int dataIndex;
 
         protected UserGraph()
         {
@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Profile
                 Alpha = 0
             });
 
-            Graph.OnBallMove += i => DataIndex = i;
+            Graph.OnBallMove += i => dataIndex = i;
         }
 
         [BackgroundDependencyLoader]
@@ -71,11 +71,21 @@ namespace osu.Game.Overlays.Profile
 
         public ITooltip GetCustomTooltip() => GetTooltip();
 
-        public object TooltipContent => GetTooltipContent();
-
         protected abstract UserGraphTooltip GetTooltip();
 
-        protected abstract object GetTooltipContent();
+        public object TooltipContent
+        {
+            get
+            {
+                if (Data == null || Data.Length == 0)
+                    return null;
+
+                var (key, value) = Data[dataIndex];
+                return GetTooltipContent(key, value);
+            }
+        }
+
+        protected abstract object GetTooltipContent(TKey key, TValue value);
 
         protected class UserLineGraph : LineGraph
         {

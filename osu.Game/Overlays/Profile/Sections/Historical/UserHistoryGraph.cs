@@ -42,15 +42,12 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             }
         }
 
-        protected override object GetTooltipContent()
+        protected override object GetTooltipContent(DateTime date, long playCount)
         {
-            if (!Data?.Any() ?? true)
-                return null;
-
             return new TooltipDisplayContent
             {
-                Count = Data[DataIndex].Value.ToString("N0"),
-                Date = Data[DataIndex].Key.ToString("MMMM yyyy")
+                Count = playCount.ToString("N0"),
+                Date = date.ToString("MMMM yyyy")
             };
         }
 
