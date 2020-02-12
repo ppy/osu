@@ -18,8 +18,8 @@ namespace osu.Game.Configuration
     /// Can be used in conjunction with <see cref="SettingSourceExtensions.CreateSettingsControls"/> to automatically create UI controls.
     /// </summary>
     /// <remarks>
-    /// All controls with OrderPosition set to an int greater than 0 will be placed first in ascending order.
-    /// All controls with no OrderPosition will come afterward in default order.
+    /// All controls with <see cref="OrderPosition"/> set will be placed first in ascending order.
+    /// All controls with no <see cref="OrderPosition"/> will come afterward in default order.
     /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
