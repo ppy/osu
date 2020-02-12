@@ -18,7 +18,11 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         private const float base_distance = 100;
 
-        public double EndTime => StartTime + Duration;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
 
         public double Duration { get; set; }
 
@@ -88,6 +92,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

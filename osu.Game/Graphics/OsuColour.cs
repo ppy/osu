@@ -35,10 +35,24 @@ namespace osu.Game.Graphics
                         Convert.ToByte(hex.Substring(2, 2), 16),
                         Convert.ToByte(hex.Substring(4, 2), 16),
                         255);
+
+                case 4:
+                    return new Color4(
+                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        (byte)(Convert.ToByte(hex.Substring(3, 1), 16) * 17));
+
+                case 8:
+                    return new Color4(
+                        Convert.ToByte(hex.Substring(0, 2), 16),
+                        Convert.ToByte(hex.Substring(2, 2), 16),
+                        Convert.ToByte(hex.Substring(4, 2), 16),
+                        Convert.ToByte(hex.Substring(6, 2), 16));
             }
         }
 
-        public Color4 ForDifficultyRating(DifficultyRating difficulty)
+        public Color4 ForDifficultyRating(DifficultyRating difficulty, bool useLighterColour = false)
         {
             switch (difficulty)
             {
@@ -56,10 +70,10 @@ namespace osu.Game.Graphics
                     return Pink;
 
                 case DifficultyRating.Expert:
-                    return Purple;
+                    return useLighterColour ? PurpleLight : Purple;
 
                 case DifficultyRating.ExpertPlus:
-                    return Gray0;
+                    return useLighterColour ? Gray9 : Gray0;
             }
         }
 

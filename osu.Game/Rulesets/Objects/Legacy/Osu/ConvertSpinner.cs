@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         public float Y => Position.Y;
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
 
         public bool NewCombo { get; set; }
 

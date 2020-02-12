@@ -62,7 +62,6 @@ namespace osu.Game.Screens.Multi.Match
         [BackgroundDependencyLoader]
         private void load()
         {
-            MatchChatDisplay chat;
             Components.Header header;
             Info info;
             GridContainer bottomRow;
@@ -122,7 +121,7 @@ namespace osu.Game.Screens.Multi.Match
                                                 Vertical = 10,
                                             },
                                             RelativeSizeAxes = Axes.Both,
-                                            Child = chat = new MatchChatDisplay
+                                            Child = new MatchChatDisplay
                                             {
                                                 RelativeSizeAxes = Axes.Both
                                             }
@@ -158,12 +157,6 @@ namespace osu.Game.Screens.Multi.Match
                 info.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
                 bottomRow.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
             }, true);
-
-            chat.Exit += () =>
-            {
-                if (this.IsCurrentScreen())
-                    this.Exit();
-            };
 
             beatmapManager.ItemAdded += beatmapAdded;
         }

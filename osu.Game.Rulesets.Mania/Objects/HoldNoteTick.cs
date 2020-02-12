@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Mania.Objects
     {
         public override Judgement CreateJudgement() => new HoldNoteTickJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

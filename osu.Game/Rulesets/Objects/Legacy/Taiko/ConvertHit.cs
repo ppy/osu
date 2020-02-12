@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
     /// </summary>
     internal sealed class ConvertHit : HitObject
     {
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

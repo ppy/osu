@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Tournament.Models
 {
@@ -14,6 +15,8 @@ namespace osu.Game.Tournament.Models
     [Serializable]
     public class LadderInfo
     {
+        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
         public BindableList<TournamentMatch> Matches = new BindableList<TournamentMatch>();
         public BindableList<TournamentRound> Rounds = new BindableList<TournamentRound>();
         public BindableList<TournamentTeam> Teams = new BindableList<TournamentTeam>();

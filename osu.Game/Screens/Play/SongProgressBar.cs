@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Threading;
 
 namespace osu.Game.Screens.Play
@@ -19,6 +19,23 @@ namespace osu.Game.Screens.Play
 
         private readonly Box fill;
         private readonly Container handleBase;
+        private readonly Container handleContainer;
+
+        private bool showHandle;
+
+        public bool ShowHandle
+        {
+            get => showHandle;
+            set
+            {
+                if (value == showHandle)
+                    return;
+
+                showHandle = value;
+
+                handleBase.FadeTo(showHandle ? 1 : 0, 200);
+            }
+        }
 
         public Color4 FillColour
         {
@@ -74,7 +91,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Width = 2,
-                    Height = barHeight + handleBarHeight,
+                    Alpha = 0,
                     Colour = Color4.White,
                     Position = new Vector2(2, 0),
                     Children = new Drawable[]
@@ -84,7 +101,7 @@ namespace osu.Game.Screens.Play
                             Name = "HandleBar box",
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new Container
+                        handleContainer = new Container
                         {
                             Name = "Handle container",
                             Origin = Anchor.BottomCentre,
@@ -116,7 +133,8 @@ namespace osu.Game.Screens.Play
         {
             base.Update();
 
-            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, MathHelper.Clamp(Time.Elapsed / 40, 0, 1));
+            handleBase.Height = Height - handleContainer.Height;
+            float newX = (float)Interpolation.Lerp(handleBase.X, NormalizedValue * UsableWidth, Math.Clamp(Time.Elapsed / 40, 0, 1));
 
             fill.Width = newX;
             handleBase.X = newX;
@@ -127,7 +145,11 @@ namespace osu.Game.Screens.Play
         protected override void OnUserChange(double value)
         {
             scheduledSeek?.Cancel();
-            scheduledSeek = Schedule(() => OnSeek?.Invoke(value));
+            scheduledSeek = Schedule(() =>
+            {
+                if (showHandle)
+                    OnSeek?.Invoke(value);
+            });
         }
     }
 }

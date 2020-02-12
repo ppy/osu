@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             foreach (var stage in stages)
             {
-                sum = sum + stage.Columns.Count;
+                sum += stage.Columns.Count;
                 if (sum > column)
                     return stage;
             }

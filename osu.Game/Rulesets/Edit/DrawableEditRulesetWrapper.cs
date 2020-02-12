@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly DrawableRuleset<TObject> drawableRuleset;
 
         [Resolved]
-        private IEditorBeatmap<TObject> beatmap { get; set; }
+        private EditorBeatmap beatmap { get; set; }
 
         public DrawableEditRulesetWrapper(DrawableRuleset<TObject> drawableRuleset)
         {
@@ -63,6 +63,10 @@ namespace osu.Game.Rulesets.Edit
             drawableRuleset.Playfield.Remove(drawableObject);
             drawableRuleset.Playfield.PostProcess();
         }
+
+        public override bool PropagatePositionalInputSubTree => false;
+
+        public override bool PropagateNonPositionalInputSubTree => false;
 
         public PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => drawableRuleset.CreatePlayfieldAdjustmentContainer();
 

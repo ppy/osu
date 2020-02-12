@@ -1,15 +1,15 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.UI.Cursor;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
 using osuTK;
 using osuTK.Graphics;
@@ -18,9 +18,11 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuResumeOverlay : ResumeOverlay
     {
+        private Container cursorScaleContainer;
         private OsuClickToResumeCursor clickToResumeCursor;
 
-        private GameplayCursorContainer localCursorContainer;
+        private OsuCursorContainer localCursorContainer;
+        private Bindable<float> localCursorScale;
 
         public override CursorContainer LocalCursor => State.Value == Visibility.Visible ? localCursorContainer : null;
 
@@ -29,24 +31,38 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume });
+            Add(cursorScaleContainer = new Container
+            {
+                RelativePositionAxes = Axes.Both,
+                Child = clickToResumeCursor = new OsuClickToResumeCursor { ResumeRequested = Resume }
+            });
         }
 
-        public override void Show()
+        protected override void PopIn()
         {
-            base.Show();
-            clickToResumeCursor.ShowAt(GameplayCursor.ActiveCursor.Position);
+            base.PopIn();
+
+            GameplayCursor.ActiveCursor.Hide();
+            cursorScaleContainer.MoveTo(GameplayCursor.ActiveCursor.Position);
+            clickToResumeCursor.Appear();
 
             if (localCursorContainer == null)
+            {
                 Add(localCursorContainer = new OsuCursorContainer());
+
+                localCursorScale = new BindableFloat();
+                localCursorScale.BindTo(localCursorContainer.CursorScale);
+                localCursorScale.BindValueChanged(scale => cursorScaleContainer.Scale = new Vector2(scale.NewValue), true);
+            }
         }
 
-        public override void Hide()
+        protected override void PopOut()
         {
+            base.PopOut();
+
             localCursorContainer?.Expire();
             localCursorContainer = null;
-
-            base.Hide();
+            GameplayCursor?.ActiveCursor?.Show();
         }
 
         protected override bool OnHover(HoverEvent e) => true;
@@ -82,7 +98,7 @@ namespace osu.Game.Rulesets.Osu.UI
                     case OsuAction.RightButton:
                         if (!IsHovered) return false;
 
-                        this.ScaleTo(new Vector2(2), TRANSITION_TIME, Easing.OutQuint);
+                        this.ScaleTo(2, TRANSITION_TIME, Easing.OutQuint);
 
                         ResumeRequested?.Invoke();
                         return true;
@@ -91,13 +107,14 @@ namespace osu.Game.Rulesets.Osu.UI
                 return false;
             }
 
-            public bool OnReleased(OsuAction action) => false;
+            public void OnReleased(OsuAction action)
+            {
+            }
 
-            public void ShowAt(Vector2 activeCursorPosition) => Schedule(() =>
+            public void Appear() => Schedule(() =>
             {
                 updateColour();
-                this.MoveTo(activeCursorPosition);
-                this.ScaleTo(new Vector2(4)).Then().ScaleTo(Vector2.One, 1000, Easing.OutQuint);
+                this.ScaleTo(4).Then().ScaleTo(1, 1000, Easing.OutQuint);
             });
 
             private void updateColour()

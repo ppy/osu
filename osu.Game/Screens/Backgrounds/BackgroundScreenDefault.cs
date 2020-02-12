@@ -4,8 +4,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Online.API;
 using osu.Game.Skinning;
@@ -24,6 +26,10 @@ namespace osu.Game.Screens.Backgrounds
 
         private Bindable<User> user;
         private Bindable<Skin> skin;
+        private Bindable<BackgroundSource> mode;
+
+        [Resolved]
+        private IBindable<WorkingBeatmap> beatmap { get; set; }
 
         public BackgroundScreenDefault(bool animateOnEnter = true)
             : base(animateOnEnter)
@@ -31,13 +37,16 @@ namespace osu.Game.Screens.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(IAPIProvider api, SkinManager skinManager)
+        private void load(IAPIProvider api, SkinManager skinManager, OsuConfigManager config)
         {
             user = api.LocalUser.GetBoundCopy();
             skin = skinManager.CurrentSkin.GetBoundCopy();
+            mode = config.GetBindable<BackgroundSource>(OsuSetting.MenuBackgroundSource);
 
             user.ValueChanged += _ => Next();
             skin.ValueChanged += _ => Next();
+            mode.ValueChanged += _ => Next();
+            beatmap.ValueChanged += _ => Next();
 
             currentDisplay = RNG.Next(0, background_count);
 
@@ -66,7 +75,18 @@ namespace osu.Game.Screens.Backgrounds
             Background newBackground;
 
             if (user.Value?.IsSupporter ?? false)
-                newBackground = new SkinnedBackground(skin.Value, backgroundName);
+            {
+                switch (mode.Value)
+                {
+                    case BackgroundSource.Beatmap:
+                        newBackground = new BeatmapBackground(beatmap.Value, backgroundName);
+                        break;
+
+                    default:
+                        newBackground = new SkinnedBackground(skin.Value, backgroundName);
+                        break;
+                }
+            }
             else
                 newBackground = new Background(backgroundName);
 

@@ -81,7 +81,6 @@ namespace osu.Game.Overlays
                         {
                             RelativeSizeAxes = Axes.X,
                             Y = player_height + 10,
-                            OrderChanged = musicController.ChangeBeatmapSetPosition
                         },
                         playerContainer = new Container
                         {
@@ -138,7 +137,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => musicController.PrevTrack(),
+                                                    Action = () => musicController.PreviousTrack(),
                                                     Icon = FontAwesome.Solid.StepBackward,
                                                 },
                                                 playButton = new MusicIconButton
@@ -169,12 +168,13 @@ namespace osu.Game.Overlays
                                         },
                                     }
                                 },
-                                progressBar = new ProgressBar
+                                progressBar = new HoverableProgressBar
                                 {
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.BottomCentre,
-                                    Height = progress_height,
+                                    Height = progress_height / 2,
                                     FillColour = colours.Yellow,
+                                    BackgroundColour = colours.YellowDarker.Opacity(0.5f),
                                     OnSeek = musicController.SeekTo
                                 }
                             },
@@ -183,6 +183,7 @@ namespace osu.Game.Overlays
                 }
             };
 
+            playlist.BeatmapSets.BindTo(musicController.BeatmapSets);
             playlist.State.ValueChanged += s => playlistButton.FadeColour(s.NewValue == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
@@ -385,21 +386,35 @@ namespace osu.Game.Overlays
                 return true;
             }
 
-            protected override bool OnDrag(DragEvent e)
+            protected override void OnDrag(DragEvent e)
             {
                 Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
-                change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
+                change *= change.Length <= 0 ? 0 : MathF.Pow(change.Length, 0.7f) / change.Length;
 
                 this.MoveTo(change);
-                return true;
             }
 
-            protected override bool OnDragEnd(DragEndEvent e)
+            protected override void OnDragEnd(DragEndEvent e)
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                return base.OnDragEnd(e);
+                base.OnDragEnd(e);
+            }
+        }
+
+        private class HoverableProgressBar : ProgressBar
+        {
+            protected override bool OnHover(HoverEvent e)
+            {
+                this.ResizeHeightTo(progress_height, 500, Easing.OutQuint);
+                return base.OnHover(e);
+            }
+
+            protected override void OnHoverLost(HoverLostEvent e)
+            {
+                this.ResizeHeightTo(progress_height / 2, 500, Easing.OutQuint);
+                base.OnHoverLost(e);
             }
         }
     }

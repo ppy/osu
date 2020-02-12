@@ -11,28 +11,22 @@ using osu.Game.Database;
 
 namespace osu.Game.Rulesets
 {
-    /// <summary>
-    /// Todo: All of this needs to be moved to a RulesetStore.
-    /// </summary>
-    public class RulesetStore : DatabaseBackedStore
+    public class RulesetStore : DatabaseBackedStore, IDisposable
     {
-        private static readonly Dictionary<Assembly, Type> loaded_assemblies = new Dictionary<Assembly, Type>();
+        private const string ruleset_library_prefix = "osu.Game.Rulesets";
 
-        static RulesetStore()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
-
-            // On android in release configuration assemblies are loaded from the apk directly into memory.
-            // We cannot read assemblies from cwd, so should check loaded assemblies instead.
-            loadFromAppDomain();
-
-            loadFromDisk();
-        }
+        private readonly Dictionary<Assembly, Type> loadedAssemblies = new Dictionary<Assembly, Type>();
 
         public RulesetStore(IDatabaseContextFactory factory)
             : base(factory)
         {
+            // On android in release configuration assemblies are loaded from the apk directly into memory.
+            // We cannot read assemblies from cwd, so should check loaded assemblies instead.
+            loadFromAppDomain();
+            loadFromDisk();
             addMissingRulesets();
+
+            AppDomain.CurrentDomain.AssemblyResolve += resolveRulesetAssembly;
         }
 
         /// <summary>
@@ -54,9 +48,7 @@ namespace osu.Game.Rulesets
         /// </summary>
         public IEnumerable<RulesetInfo> AvailableRulesets { get; private set; }
 
-        private static Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) => loaded_assemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
-
-        private const string ruleset_library_prefix = "osu.Game.Rulesets";
+        private Assembly resolveRulesetAssembly(object sender, ResolveEventArgs args) => loadedAssemblies.Keys.FirstOrDefault(a => a.FullName == args.Name);
 
         private void addMissingRulesets()
         {
@@ -64,21 +56,23 @@ namespace osu.Game.Rulesets
             {
                 var context = usage.Context;
 
-                var instances = loaded_assemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r, (RulesetInfo)null)).ToList();
+                var instances = loadedAssemblies.Values.Select(r => (Ruleset)Activator.CreateInstance(r)).ToList();
 
-                //add all legacy modes in correct order
-                foreach (var r in instances.Where(r => r.LegacyID != null).OrderBy(r => r.LegacyID))
+                //add all legacy rulesets first to ensure they have exclusive choice of primary key.
+                foreach (var r in instances.Where(r => r is ILegacyRuleset))
                 {
-                    if (context.RulesetInfo.SingleOrDefault(rsi => rsi.ID == r.RulesetInfo.ID) == null)
+                    if (context.RulesetInfo.SingleOrDefault(dbRuleset => dbRuleset.ID == r.RulesetInfo.ID) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
                 }
 
                 context.SaveChanges();
 
                 //add any other modes
-                foreach (var r in instances.Where(r => r.LegacyID == null))
+                foreach (var r in instances.Where(r => !(r is ILegacyRuleset)))
+                {
                     if (context.RulesetInfo.FirstOrDefault(ri => ri.InstantiationInfo == r.RulesetInfo.InstantiationInfo) == null)
                         context.RulesetInfo.Add(r.RulesetInfo);
+                }
 
                 context.SaveChanges();
 
@@ -93,7 +87,7 @@ namespace osu.Game.Rulesets
                             // this allows for debug builds to successfully load rulesets (even though debug rulesets have a 0.0.0 version).
                             asm.Version = null;
                             return Assembly.Load(asm);
-                        }, null), (RulesetInfo)null)).RulesetInfo;
+                        }, null))).RulesetInfo;
 
                         r.Name = instanceInfo.Name;
                         r.ShortName = instanceInfo.ShortName;
@@ -113,7 +107,7 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private static void loadFromAppDomain()
+        private void loadFromAppDomain()
         {
             foreach (var ruleset in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -126,7 +120,7 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private static void loadFromDisk()
+        private void loadFromDisk()
         {
             try
             {
@@ -135,17 +129,17 @@ namespace osu.Game.Rulesets
                 foreach (string file in files.Where(f => !Path.GetFileName(f).Contains("Tests")))
                     loadRulesetFromFile(file);
             }
-            catch
+            catch (Exception e)
             {
-                Logger.Log($"Could not load rulesets from directory {Environment.CurrentDirectory}");
+                Logger.Error(e, $"Could not load rulesets from directory {Environment.CurrentDirectory}");
             }
         }
 
-        private static void loadRulesetFromFile(string file)
+        private void loadRulesetFromFile(string file)
         {
             var filename = Path.GetFileNameWithoutExtension(file);
 
-            if (loaded_assemblies.Values.Any(t => t.Namespace == filename))
+            if (loadedAssemblies.Values.Any(t => t.Namespace == filename))
                 return;
 
             try
@@ -158,19 +152,30 @@ namespace osu.Game.Rulesets
             }
         }
 
-        private static void addRuleset(Assembly assembly)
+        private void addRuleset(Assembly assembly)
         {
-            if (loaded_assemblies.ContainsKey(assembly))
+            if (loadedAssemblies.ContainsKey(assembly))
                 return;
 
             try
             {
-                loaded_assemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
+                loadedAssemblies[assembly] = assembly.GetTypes().First(t => t.IsPublic && t.IsSubclassOf(typeof(Ruleset)));
             }
             catch (Exception e)
             {
                 Logger.Error(e, $"Failed to add ruleset {assembly}");
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            AppDomain.CurrentDomain.AssemblyResolve -= resolveRulesetAssembly;
         }
     }
 }

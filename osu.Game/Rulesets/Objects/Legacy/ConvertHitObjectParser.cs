@@ -10,7 +10,8 @@ using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
 using JetBrains.Annotations;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
+using osu.Game.Beatmaps.Legacy;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
@@ -46,27 +47,27 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             double startTime = Parsing.ParseDouble(split[2]) + Offset;
 
-            ConvertHitObjectType type = (ConvertHitObjectType)Parsing.ParseInt(split[3]);
+            LegacyHitObjectType type = (LegacyHitObjectType)Parsing.ParseInt(split[3]);
 
-            int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
-            type &= ~ConvertHitObjectType.ComboOffset;
+            int comboOffset = (int)(type & LegacyHitObjectType.ComboOffset) >> 4;
+            type &= ~LegacyHitObjectType.ComboOffset;
 
-            bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
-            type &= ~ConvertHitObjectType.NewCombo;
+            bool combo = type.HasFlag(LegacyHitObjectType.NewCombo);
+            type &= ~LegacyHitObjectType.NewCombo;
 
-            var soundType = (LegacySoundType)Parsing.ParseInt(split[4]);
+            var soundType = (LegacyHitSoundType)Parsing.ParseInt(split[4]);
             var bankInfo = new SampleBankInfo();
 
             HitObject result = null;
 
-            if (type.HasFlag(ConvertHitObjectType.Circle))
+            if (type.HasFlag(LegacyHitObjectType.Circle))
             {
                 result = CreateHit(pos, combo, comboOffset);
 
                 if (split.Length > 5)
                     readCustomSampleBanks(split[5], bankInfo);
             }
-            else if (type.HasFlag(ConvertHitObjectType.Slider))
+            else if (type.HasFlag(LegacyHitObjectType.Slider))
             {
                 PathType pathType = PathType.Catmull;
                 double? length = null;
@@ -74,9 +75,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 string[] pointSplit = split[5].Split('|');
 
                 int pointCount = 1;
+
                 foreach (var t in pointSplit)
+                {
                     if (t.Length > 1)
                         pointCount++;
+                }
 
                 var points = new Vector2[pointCount];
 
@@ -112,16 +116,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     points[pointIndex++] = new Vector2((int)Parsing.ParseDouble(temp[0], Parsing.MAX_COORDINATE_VALUE), (int)Parsing.ParseDouble(temp[1], Parsing.MAX_COORDINATE_VALUE)) - pos;
                 }
 
-                // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-
-                if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
-                    pathType = PathType.Linear;
-
                 int repeatCount = Parsing.ParseInt(split[6]);
 
                 if (repeatCount > 9000)
-                    throw new ArgumentOutOfRangeException(nameof(repeatCount), @"Repeat count is way too high");
+                    throw new FormatException(@"Repeat count is way too high");
 
                 // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                 repeatCount = Math.Max(0, repeatCount - 1);
@@ -160,7 +158,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 // Populate node sound types with the default hit object sound type
-                var nodeSoundTypes = new List<LegacySoundType>();
+                var nodeSoundTypes = new List<LegacyHitSoundType>();
                 for (int i = 0; i < nodes; i++)
                     nodeSoundTypes.Add(soundType);
 
@@ -174,23 +172,22 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         if (i >= adds.Length)
                             break;
 
-                        int sound;
-                        int.TryParse(adds[i], out sound);
-                        nodeSoundTypes[i] = (LegacySoundType)sound;
+                        int.TryParse(adds[i], out var sound);
+                        nodeSoundTypes[i] = (LegacyHitSoundType)sound;
                     }
                 }
 
                 // Generate the final per-node samples
-                var nodeSamples = new List<List<HitSampleInfo>>(nodes);
+                var nodeSamples = new List<IList<HitSampleInfo>>(nodes);
                 for (int i = 0; i < nodes; i++)
                     nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
+                result = CreateSlider(pos, combo, comboOffset, convertControlPoints(points, pathType), length, repeatCount, nodeSamples);
 
                 // The samples are played when the slider ends, which is the last node
-                result.Samples = nodeSamples[nodeSamples.Count - 1];
+                result.Samples = nodeSamples[^1];
             }
-            else if (type.HasFlag(ConvertHitObjectType.Spinner))
+            else if (type.HasFlag(LegacyHitObjectType.Spinner))
             {
                 double endTime = Math.Max(startTime, Parsing.ParseDouble(split[5]) + Offset);
 
@@ -199,7 +196,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 if (split.Length > 6)
                     readCustomSampleBanks(split[6], bankInfo);
             }
-            else if (type.HasFlag(ConvertHitObjectType.Hold))
+            else if (type.HasFlag(LegacyHitObjectType.Hold))
             {
                 // Note: Hold is generated by BMS converts
 
@@ -235,8 +232,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[0]);
-            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Parsing.ParseInt(split[1]);
+            var bank = (LegacySampleBank)Parsing.ParseInt(split[0]);
+            var addbank = (LegacySampleBank)Parsing.ParseInt(split[1]);
 
             string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
@@ -257,6 +254,44 @@ namespace osu.Game.Rulesets.Objects.Legacy
             bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
+        private PathControlPoint[] convertControlPoints(Vector2[] vertices, PathType type)
+        {
+            if (type == PathType.PerfectCurve)
+            {
+                if (vertices.Length != 3)
+                    type = PathType.Bezier;
+                else if (isLinear(vertices))
+                {
+                    // osu-stable special-cased colinear perfect curves to a linear path
+                    type = PathType.Linear;
+                }
+            }
+
+            var points = new List<PathControlPoint>(vertices.Length)
+            {
+                new PathControlPoint
+                {
+                    Position = { Value = vertices[0] },
+                    Type = { Value = type }
+                }
+            };
+
+            for (int i = 1; i < vertices.Length; i++)
+            {
+                if (vertices[i] == vertices[i - 1])
+                {
+                    points[^1].Type.Value = type;
+                    continue;
+                }
+
+                points.Add(new PathControlPoint { Position = { Value = vertices[i] } });
+            }
+
+            return points.ToArray();
+
+            static bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+        }
+
         /// <summary>
         /// Creates a legacy Hit-type hit object.
         /// </summary>
@@ -274,12 +309,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="controlPoints">The slider control points.</param>
         /// <param name="length">The slider length.</param>
-        /// <param name="pathType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double? length, PathType pathType, int repeatCount,
-                                                  List<List<HitSampleInfo>> nodeSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, PathControlPoint[] controlPoints, double? length, int repeatCount,
+                                                  List<IList<HitSampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
@@ -300,7 +334,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="endTime">The hold end time.</param>
         protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime);
 
-        private List<HitSampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
+        private List<HitSampleInfo> convertSoundType(LegacyHitSoundType type, SampleBankInfo bankInfo)
         {
             // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
             if (!string.IsNullOrEmpty(bankInfo.Filename))
@@ -326,7 +360,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
             };
 
-            if (type.HasFlag(LegacySoundType.Finish))
+            if (type.HasFlag(LegacyHitSoundType.Finish))
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
@@ -337,7 +371,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 });
             }
 
-            if (type.HasFlag(LegacySoundType.Whistle))
+            if (type.HasFlag(LegacyHitSoundType.Whistle))
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
@@ -348,7 +382,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 });
             }
 
-            if (type.HasFlag(LegacySoundType.Clap))
+            if (type.HasFlag(LegacyHitSoundType.Clap))
             {
                 soundTypes.Add(new LegacyHitSampleInfo
                 {
@@ -396,16 +430,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 Filename,
                 Path.ChangeExtension(Filename, null)
             };
-        }
-
-        [Flags]
-        private enum LegacySoundType
-        {
-            None = 0,
-            Normal = 1,
-            Whistle = 2,
-            Finish = 4,
-            Clap = 8
         }
     }
 }

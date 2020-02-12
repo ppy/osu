@@ -4,8 +4,10 @@
 using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
@@ -20,6 +22,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         [Resolved(CanBeNull = true)]
         private Bindable<FilterCriteria> filter { get; set; }
+
+        [Resolved]
+        private IBindable<RulesetInfo> ruleset { get; set; }
 
         public FilterControl()
         {
@@ -37,17 +42,29 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
 
-            Search.Current.BindValueChanged(_ => updateFilter());
+            ruleset.BindValueChanged(_ => updateFilter());
+            Search.Current.BindValueChanged(_ => scheduleUpdateFilter());
             Tabs.Current.BindValueChanged(_ => updateFilter(), true);
+        }
+
+        private ScheduledDelegate scheduledFilterUpdate;
+
+        private void scheduleUpdateFilter()
+        {
+            scheduledFilterUpdate?.Cancel();
+            scheduledFilterUpdate = Scheduler.AddDelayed(updateFilter, 200);
         }
 
         private void updateFilter()
         {
+            scheduledFilterUpdate?.Cancel();
+
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
                 PrimaryFilter = Tabs.Current.Value,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value
+                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value,
+                Ruleset = ruleset.Value
             };
         }
     }

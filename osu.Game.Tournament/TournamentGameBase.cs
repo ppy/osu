@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -11,22 +12,23 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Models;
+using osu.Game.Users;
 using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Tournament
 {
+    [Cached(typeof(TournamentGameBase))]
     public abstract class TournamentGameBase : OsuGameBase
     {
         private const string bracket_filename = "bracket.json";
@@ -50,10 +52,10 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
-            Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
+            Resources.AddStore(new DllResourceStore(typeof(TournamentGameBase).Assembly));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Regular");
+            AddFont(Resources, @"Resources/Fonts/Aquatico-Light");
 
             Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
@@ -76,7 +78,7 @@ namespace osu.Game.Tournament
 
             AddRange(new[]
             {
-                new OsuButton
+                new TourneyButton
                 {
                     Text = "Save Changes",
                     Width = 140,
@@ -102,7 +104,7 @@ namespace osu.Game.Tournament
                             Colour = Color4.Red,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        new SpriteText
+                        new OsuSpriteText
                         {
                             Text = "Please make the window wider",
                             Font = OsuFont.Default.With(weight: "bold"),
@@ -126,6 +128,11 @@ namespace osu.Game.Tournament
             {
                 ladder = new LadderInfo();
             }
+
+            if (ladder.Ruleset.Value == null)
+                ladder.Ruleset.Value = RulesetStore.AvailableRulesets.First();
+
+            Ruleset.BindTo(ladder.Ruleset);
 
             dependencies.Cache(ladder);
 
@@ -165,15 +172,17 @@ namespace osu.Game.Tournament
 
             // link matches to rounds
             foreach (var round in ladder.Rounds)
-            foreach (var id in round.Matches)
             {
-                var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
-
-                if (found != null)
+                foreach (var id in round.Matches)
                 {
-                    found.Round.Value = round;
-                    if (round.StartDate.Value > found.Date.Value)
-                        found.Date.Value = round.StartDate.Value;
+                    var found = ladder.Matches.FirstOrDefault(p => p.ID == id);
+
+                    if (found != null)
+                    {
+                        found.Round.Value = round;
+                        if (round.StartDate.Value > found.Date.Value)
+                            found.Date.Value = round.StartDate.Value;
+                    }
                 }
             }
 
@@ -193,15 +202,14 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             foreach (var t in ladder.Teams)
-            foreach (var p in t.Players)
-                if (string.IsNullOrEmpty(p.Username))
+            {
+                foreach (var p in t.Players)
                 {
-                    var req = new GetUserRequest(p.Id);
-                    req.Perform(API);
-                    p.Username = req.Result.Username;
-
+                    if (p.Username == null || p.Statistics == null)
+                        PopulateUser(p);
                     addedInfo = true;
                 }
+            }
 
             return addedInfo;
         }
@@ -214,17 +222,51 @@ namespace osu.Game.Tournament
             bool addedInfo = false;
 
             foreach (var r in ladder.Rounds)
-            foreach (var b in r.Beatmaps)
-                if (b.BeatmapInfo == null)
+            {
+                foreach (var b in r.Beatmaps.ToList())
                 {
-                    var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                    req.Perform(API);
-                    b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+                    if (b.BeatmapInfo != null)
+                        continue;
 
-                    addedInfo = true;
+                    if (b.ID > 0)
+                    {
+                        var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                        API.Perform(req);
+                        b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
+
+                        addedInfo = true;
+                    }
+
+                    if (b.BeatmapInfo == null)
+                        // if online population couldn't be performed, ensure we don't leave a null value behind
+                        r.Beatmaps.Remove(b);
                 }
+            }
 
             return addedInfo;
+        }
+
+        public void PopulateUser(User user, Action success = null, Action failure = null)
+        {
+            var req = new GetUserRequest(user.Id, Ruleset.Value);
+
+            req.Success += res =>
+            {
+                user.Username = res.Username;
+                user.Statistics = res.Statistics;
+                user.Country = res.Country;
+                user.Cover = res.Cover;
+
+                success?.Invoke();
+            };
+
+            req.Failure += _ =>
+            {
+                user.Id = 1;
+                failure?.Invoke();
+            };
+
+            API.Queue(req);
         }
 
         protected override void LoadComplete()
@@ -261,7 +303,7 @@ namespace osu.Game.Tournament
 
         private class TournamentInputManager : UserInputManager
         {
-            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            protected override MouseButtonEventManager CreateButtonEventManagerFor(MouseButton button)
             {
                 switch (button)
                 {
@@ -269,7 +311,7 @@ namespace osu.Game.Tournament
                         return new RightMouseManager(button);
                 }
 
-                return base.CreateButtonManagerFor(button);
+                return base.CreateButtonEventManagerFor(button);
             }
 
             private class RightMouseManager : MouseButtonEventManager

@@ -33,18 +33,29 @@ namespace osu.Game.Screens.Select
 
         private Bindable<GroupMode> groupMode;
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria
+        public FilterCriteria CreateCriteria()
         {
-            Group = groupMode.Value,
-            Sort = sortMode.Value,
-            SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted.Value,
-            Ruleset = ruleset.Value
-        };
+            var query = searchTextBox.Text;
 
-        public Action Exit;
+            var criteria = new FilterCriteria
+            {
+                Group = groupMode.Value,
+                Sort = sortMode.Value,
+                AllowConvertedBeatmaps = showConverted.Value,
+                Ruleset = ruleset.Value,
+            };
 
-        private readonly SearchTextBox searchTextBox;
+            if (!minimumStars.IsDefault)
+                criteria.UserStarDifficulty.Min = minimumStars.Value;
+
+            if (!maximumStars.IsDefault)
+                criteria.UserStarDifficulty.Max = maximumStars.Value;
+
+            FilterQueryParser.ApplyQueries(criteria, query);
+            return criteria;
+        }
+
+        private readonly SeekLimitedSearchTextBox searchTextBox;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
             base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
@@ -68,11 +79,7 @@ namespace osu.Game.Screens.Select
                     Origin = Anchor.TopRight,
                     Children = new Drawable[]
                     {
-                        searchTextBox = new SearchTextBox
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Exit = () => Exit?.Invoke(),
-                        },
+                        searchTextBox = new SeekLimitedSearchTextBox { RelativeSizeAxes = Axes.X },
                         new Box
                         {
                             RelativeSizeAxes = Axes.X,
@@ -141,7 +148,9 @@ namespace osu.Game.Screens.Select
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private Bindable<bool> showConverted;
+        private readonly Bindable<bool> showConverted = new Bindable<bool>();
+        private readonly Bindable<double> minimumStars = new BindableDouble();
+        private readonly Bindable<double> maximumStars = new BindableDouble();
 
         public readonly Box Background;
 
@@ -150,8 +159,14 @@ namespace osu.Game.Screens.Select
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
             showConverted.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += _ => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria());

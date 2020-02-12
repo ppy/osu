@@ -43,6 +43,7 @@ namespace osu.Game.Overlays.Volume
         {
             Content.BorderThickness = 3;
             Content.CornerRadius = HEIGHT / 2;
+            Content.CornerExponent = 2;
 
             Size = new Vector2(width, HEIGHT);
 

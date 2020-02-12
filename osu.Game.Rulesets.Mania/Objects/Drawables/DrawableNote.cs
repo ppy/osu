@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        public const float CORNER_RADIUS = NotePiece.NOTE_HEIGHT / 2;
-
         private readonly NotePiece headPiece;
 
         public DrawableNote(Note hitObject)
@@ -79,6 +77,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             return UpdateResult(true);
         }
 
-        public virtual bool OnReleased(ManiaAction action) => false;
+        public virtual void OnReleased(ManiaAction action)
+        {
+        }
     }
 }

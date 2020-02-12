@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osuTK;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         if (objectN is Spinner)
                             continue;
 
-                        double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
+                        double endTime = stackBaseObject.GetEndTime();
                         double stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
 
                         if (objectN.StartTime - endTime > stackThreshold)
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         OsuHitObject objectN = beatmap.HitObjects[n];
                         if (objectN is Spinner) continue;
 
-                        double endTime = (objectN as IHasEndTime)?.EndTime ?? objectN.StartTime;
+                        double endTime = objectN.GetEndTime();
 
                         if (objectI.StartTime - endTime > stackThreshold)
                             //We are no longer within stacking range of the previous object.
@@ -199,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 if (currHitObject.StackHeight != 0 && !(currHitObject is Slider))
                     continue;
 
-                double startTime = (currHitObject as IHasEndTime)?.EndTime ?? currHitObject.StartTime;
+                double startTime = currHitObject.GetEndTime();
                 int sliderStack = 0;
 
                 for (int j = i + 1; j < beatmap.HitObjects.Count; j++)
@@ -217,14 +217,14 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, currHitObject.Position) < stack_distance)
                     {
                         currHitObject.StackHeight++;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
+                        startTime = beatmap.HitObjects[j].GetEndTime();
                     }
                     else if (Vector2Extensions.Distance(beatmap.HitObjects[j].Position, position2) < stack_distance)
                     {
                         //Case for sliders - bump notes down and right, rather than up and left.
                         sliderStack++;
                         beatmap.HitObjects[j].StackHeight -= sliderStack;
-                        startTime = (beatmap.HitObjects[j] as IHasEndTime)?.EndTime ?? beatmap.HitObjects[j].StartTime;
+                        startTime = beatmap.HitObjects[j].GetEndTime();
                     }
                 }
             }

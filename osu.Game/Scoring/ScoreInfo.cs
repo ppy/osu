@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
+using osu.Game.Utils;
 
 namespace osu.Game.Scoring
 {
@@ -30,6 +31,9 @@ namespace osu.Game.Scoring
         [JsonProperty("accuracy")]
         [Column(TypeName = "DECIMAL(1,4)")]
         public double Accuracy { get; set; }
+
+        [JsonIgnore]
+        public string DisplayAccuracy => Accuracy.FormatAccuracy();
 
         [JsonProperty(@"pp")]
         public double? PP { get; set; }
@@ -89,7 +93,7 @@ namespace osu.Game.Scoring
                 if (mods == null)
                     return null;
 
-                return modsJson = JsonConvert.SerializeObject(mods);
+                return modsJson = JsonConvert.SerializeObject(mods.Select(m => new DeserializedMod { Acronym = m.Acronym }));
             }
             set
             {
@@ -147,6 +151,8 @@ namespace osu.Game.Scoring
         [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
+        public IOrderedEnumerable<KeyValuePair<HitResult, int>> SortedStatistics => Statistics.OrderByDescending(pair => pair.Key);
+
         [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
@@ -183,6 +189,21 @@ namespace osu.Game.Scoring
 
         public override string ToString() => $"{User} playing {Beatmap}";
 
-        public bool Equals(ScoreInfo other) => other?.OnlineScoreID == OnlineScoreID;
+        public bool Equals(ScoreInfo other)
+        {
+            if (other == null)
+                return false;
+
+            if (ID != 0 && other.ID != 0)
+                return ID == other.ID;
+
+            if (OnlineScoreID.HasValue && other.OnlineScoreID.HasValue)
+                return OnlineScoreID == other.OnlineScoreID;
+
+            if (!string.IsNullOrEmpty(Hash) && !string.IsNullOrEmpty(other.Hash))
+                return Hash == other.Hash;
+
+            return ReferenceEquals(this, other);
+        }
     }
 }

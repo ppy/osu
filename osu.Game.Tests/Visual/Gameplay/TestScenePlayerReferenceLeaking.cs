@@ -6,10 +6,11 @@ using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
+using osu.Game.Storyboards;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestScenePlayerReferenceLeaking : AllPlayersTestScene
+    public class TestScenePlayerReferenceLeaking : TestSceneAllRulesetPlayers
     {
         private readonly WeakList<WorkingBeatmap> workingWeakReferences = new WeakList<WorkingBeatmap>();
 
@@ -42,9 +43,9 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
         }
 
-        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap)
+        protected override WorkingBeatmap CreateWorkingBeatmap(IBeatmap beatmap, Storyboard storyboard = null)
         {
-            var working = base.CreateWorkingBeatmap(beatmap);
+            var working = base.CreateWorkingBeatmap(beatmap, storyboard);
             workingWeakReferences.Add(working);
             return working;
         }

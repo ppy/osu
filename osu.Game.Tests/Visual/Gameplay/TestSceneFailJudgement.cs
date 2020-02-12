@@ -6,46 +6,38 @@ using System.Linq;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual.Gameplay
 {
-    public class TestSceneFailJudgement : AllPlayersTestScene
+    public class TestSceneFailJudgement : TestSceneAllRulesetPlayers
     {
         protected override Player CreatePlayer(Ruleset ruleset)
         {
-            Mods.Value = Array.Empty<Mod>();
-
-            var beatmap = Beatmap.Value.GetPlayableBeatmap(ruleset.RulesetInfo, Array.Empty<Mod>());
-            return new FailPlayer(ruleset.GetAutoplayMod().CreateReplayScore(beatmap));
+            SelectedMods.Value = Array.Empty<Mod>();
+            return new FailPlayer();
         }
 
         protected override void AddCheckSteps()
         {
             AddUntilStep("wait for fail", () => Player.HasFailed);
             AddUntilStep("wait for multiple judged objects", () => ((FailPlayer)Player).DrawableRuleset.Playfield.AllHitObjects.Count(h => h.AllJudged) > 1);
-            AddAssert("total judgements == 1", () => ((FailPlayer)Player).ScoreProcessor.JudgedHits == 1);
+            AddAssert("total judgements == 1", () => ((FailPlayer)Player).HealthProcessor.JudgedHits >= 1);
         }
 
-        private class FailPlayer : ReplayPlayer
+        private class FailPlayer : TestPlayer
         {
-            public new DrawableRuleset DrawableRuleset => base.DrawableRuleset;
+            public new HealthProcessor HealthProcessor => base.HealthProcessor;
 
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-
-            protected override bool PauseOnFocusLost => false;
-
-            public FailPlayer(Score score)
-                : base(score, false, false)
+            public FailPlayer()
+                : base(false, false)
             {
             }
 
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-                ScoreProcessor.FailConditions += (_, __) => true;
+                HealthProcessor.FailConditions += (_, __) => true;
             }
         }
     }
