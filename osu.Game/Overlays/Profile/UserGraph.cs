@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Profile
             graph.UpdateBallPosition(e.MousePosition.X);
             graph.ShowBar();
 
-            return base.OnHover(e);
+            return true;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
