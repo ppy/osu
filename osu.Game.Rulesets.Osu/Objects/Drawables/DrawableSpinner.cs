@@ -15,7 +15,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Audio;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -44,11 +43,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
-        private Color4 normalColour;
-        private Color4 completeColour;
+        private readonly BindableDouble sampleRate = new BindableDouble();
 
         private SkinnableSound spinningSample;
-        private BindableDouble spinRate;
+
+        private Color4 normalColour;
+        private Color4 completeColour;
 
         public DrawableSpinner(Spinner s)
             : base(s)
@@ -141,12 +141,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
+        }
 
-            AddInternal(spinningSample = new SkinnableSound(HitObject.SampleControlPoint.ApplyTo(new HitSampleInfo { Name = "spinnerspin" }))
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            AddInternal(spinningSample = new SkinnableSound(HitObject.SampleControlPoint.GetSampleInfo("spinnerspin"))
             {
-                Looping = true
+                Looping = true,
             });
-            spinningSample.AddAdjustment(AdjustableProperty.Frequency, spinRate = new BindableDouble());
+
+            spinningSample.AddAdjustment(AdjustableProperty.Frequency, sampleRate);
         }
 
         public float Progress => Math.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
