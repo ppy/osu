@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float buttons_spacing = 5;
 
         private readonly UpdateableBeatmapSetCover cover;
+        private readonly Box coverGradient;
         private readonly OsuSpriteText title, artist;
         private readonly AuthorInfo author;
         private readonly FillFlowContainer downloadButtonsContainer;
@@ -93,10 +94,9 @@ namespace osu.Game.Overlays.BeatmapSet
                                         RelativeSizeAxes = Axes.Both,
                                         Masking = true,
                                     },
-                                    new Box
+                                    coverGradient = new Box
                                     {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.3f), Color4.Black.Opacity(0.8f)),
+                                        RelativeSizeAxes = Axes.Both
                                     },
                                 },
                             },
@@ -106,8 +106,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 AutoSizeAxes = Axes.Y,
                                 Padding = new MarginPadding
                                 {
-                                    Top = 20,
-                                    Bottom = 30,
+                                    Vertical = BeatmapSetOverlay.Y_PADDING,
                                     Left = BeatmapSetOverlay.X_PADDING,
                                     Right = BeatmapSetOverlay.X_PADDING + BeatmapSetOverlay.RIGHT_WIDTH,
                                 },
@@ -130,11 +129,12 @@ namespace osu.Game.Overlays.BeatmapSet
                                             {
                                                 Direction = FillDirection.Horizontal,
                                                 AutoSizeAxes = Axes.Both,
+                                                Margin = new MarginPadding { Top = 15 },
                                                 Children = new Drawable[]
                                                 {
                                                     title = new OsuSpriteText
                                                     {
-                                                        Font = OsuFont.GetFont(size: 37, weight: FontWeight.Bold, italics: true)
+                                                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.SemiBold, italics: true)
                                                     },
                                                     externalLink = new ExternalLinkButton
                                                     {
@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                                     },
                                                 }
                                             },
-                                            artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.SemiBold, italics: true) },
+                                            artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 20, weight: FontWeight.Medium, italics: true) },
                                             new Container
                                             {
                                                 RelativeSizeAxes = Axes.X,
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Anchor = Anchor.BottomRight,
                                 Origin = Anchor.BottomRight,
                                 AutoSizeAxes = Axes.Both,
-                                Margin = new MarginPadding { Top = BeatmapSetOverlay.TOP_PADDING, Right = BeatmapSetOverlay.X_PADDING },
+                                Margin = new MarginPadding { Top = BeatmapSetOverlay.Y_PADDING, Right = BeatmapSetOverlay.X_PADDING },
                                 Direction = FillDirection.Vertical,
                                 Spacing = new Vector2(10),
                                 Children = new Drawable[]
@@ -197,7 +197,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         TextSize = 14,
-                                        TextPadding = new MarginPadding { Horizontal = 25, Vertical = 8 }
+                                        TextPadding = new MarginPadding { Horizontal = 35, Vertical = 10 }
                                     },
                                     Details = new Details(),
                                 },
@@ -215,8 +215,11 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
+            coverGradient.Colour = ColourInfo.GradientVertical(colourProvider.Background6.Opacity(0.3f), colourProvider.Background6.Opacity(0.8f));
+            onlineStatusPill.BackgroundColour = colourProvider.Background6;
+
             State.BindValueChanged(_ => updateDownloadButtons());
 
             BeatmapSet.BindValueChanged(setInfo =>

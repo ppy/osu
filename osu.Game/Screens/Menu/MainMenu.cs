@@ -141,12 +141,15 @@ namespace osu.Game.Screens.Menu
             preloadSongSelect();
         }
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         private void confirmAndExit()
         {
             if (exitConfirmed) return;
 
             exitConfirmed = true;
-            this.Exit();
+            game.PerformFromScreen(menu => menu.Exit());
         }
 
         private void preloadSongSelect()

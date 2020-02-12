@@ -49,14 +49,7 @@ namespace osu.Game.Graphics.UserInterface
             public GradientLine()
             {
                 RelativeSizeAxes = Axes.X;
-                Size = new Vector2(0.8f, 1.5f);
-
-                ColumnDimensions = new[]
-                {
-                    new Dimension(),
-                    new Dimension(mode: GridSizeMode.Relative, size: 0.4f),
-                    new Dimension(),
-                };
+                Size = new Vector2(0.8f, 1f);
 
                 Content = new[]
                 {
@@ -65,16 +58,12 @@ namespace osu.Game.Graphics.UserInterface
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Color4.White)
+                            Colour = ColourInfo.GradientHorizontal(Color4.Transparent, Colour)
                         },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                        },
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientHorizontal(Color4.White, Color4.Transparent)
+                            Colour = ColourInfo.GradientHorizontal(Colour, Color4.Transparent)
                         },
                     }
                 };
