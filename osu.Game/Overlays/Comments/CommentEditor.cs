@@ -102,7 +102,11 @@ namespace osu.Game.Overlays.Comments
                                     {
                                         Anchor = Anchor.CentreRight,
                                         Origin = Anchor.CentreRight,
-                                        Action = () => OnCommit?.Invoke(current.Value)
+                                        Action = () =>
+                                        {
+                                            OnCommit?.Invoke(current.Value);
+                                            current.Value = string.Empty;
+                                        }
                                     }
                                 }
                             }
@@ -117,7 +121,6 @@ namespace osu.Game.Overlays.Comments
                     return;
 
                 commitButton.Click();
-                current.Value = string.Empty;
             };
         }
 
@@ -173,6 +176,7 @@ namespace osu.Game.Overlays.Comments
 
             private OsuSpriteText drawableText;
             private Box background;
+            private Box blockedBackground;
 
             public CommitButton(string text)
             {
@@ -187,6 +191,7 @@ namespace osu.Game.Overlays.Comments
             {
                 IdleColour = colourProvider.Light4;
                 HoverColour = colourProvider.Light3;
+                blockedBackground.Colour = colourProvider.Background5;
             }
 
             protected override void LoadComplete()
@@ -198,11 +203,7 @@ namespace osu.Game.Overlays.Comments
             private void onBlockedStateChanged(ValueChangedEvent<bool> isBlocked)
             {
                 drawableText.FadeColour(isBlocked.NewValue ? colourProvider.Foreground1 : Color4.White, duration, Easing.OutQuint);
-
-                if (isBlocked.NewValue)
-                    background.FadeColour(colourProvider.Background5, duration, Easing.OutQuint);
-                else
-                    background.FadeColour(IsHovered ? HoverColour : IdleColour, duration, Easing.OutQuint);
+                background.FadeTo(isBlocked.NewValue ? 0 : 1, duration, Easing.OutQuint);
             }
 
             protected override Drawable CreateContent() => new CircularContainer
@@ -212,6 +213,10 @@ namespace osu.Game.Overlays.Comments
                 AutoSizeAxes = Axes.X,
                 Children = new Drawable[]
                 {
+                    blockedBackground = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
                     background = new Box
                     {
                         RelativeSizeAxes = Axes.Both
