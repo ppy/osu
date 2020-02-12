@@ -29,12 +29,17 @@ namespace osu.Game.Configuration
 
         public string Description { get; }
 
-        public int OrderPosition { get; }
+        public int? OrderPosition { get; }
 
-        public SettingSourceAttribute(string label, string description = null, int orderPosition = -1)
+        public SettingSourceAttribute(string label, string description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
+        }
+
+        public SettingSourceAttribute(string label, string description, int orderPosition)
+            : this(label, description)
+        {
             OrderPosition = orderPosition;
         }
     }
@@ -129,7 +134,7 @@ namespace osu.Game.Configuration
         {
             var original = obj.GetSettingsSourceProperties();
 
-            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition > -1).OrderBy(attr => attr.Item1.OrderPosition);
+            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition != null).OrderBy(attr => attr.Item1.OrderPosition);
             var unordered = original.Except(orderedRelative);
 
             return orderedRelative.Concat(unordered);
