@@ -20,6 +20,7 @@ using osuTK.Graphics;
 using System.Collections.Generic;
 using System;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -34,10 +35,10 @@ namespace osu.Game.Overlays.Comments
 
         public readonly BindableBool ShowDeleted = new BindableBool();
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
-        public readonly List<Comment> LoadedReplies = new List<Comment>();
+        public readonly Dictionary<long, Comment> LoadedReplies = new Dictionary<long, Comment>();
 
         /// <summary>
-        /// <see cref="DrawableComment"/>s which will be added to this <see cref="DrawableComment"/> as replies when it will be loaded.
+        /// <see cref="DrawableComment"/>s which will be added to this <see cref="DrawableComment"/> as replies on initial load.
         /// </summary>
         public readonly List<DrawableComment> InitialReplies = new List<DrawableComment>();
 
@@ -310,7 +311,7 @@ namespace osu.Game.Overlays.Comments
             childCommentsContainer.Add(page);
 
             var newReplies = replies.Select(reply => reply.Comment);
-            LoadedReplies.AddRange(newReplies);
+            newReplies.ForEach(reply => LoadedReplies.Add(reply.Id, reply));
             deletedCommentsCounter.Count.Value += newReplies.Count(reply => reply.IsDeleted);
             updateButtonsState();
         }
