@@ -62,16 +62,13 @@ namespace osu.Game.Overlays.Profile.Header.Components
             Graph.FadeTo(Data.Length > 1 ? 1 : 0, FADE_DURATION, Easing.Out);
         }
 
-        protected override object GetTooltipContent()
+        protected override object GetTooltipContent(int index, int rank)
         {
-            if (Statistics.Value?.Ranks.Global == null)
-                return null;
-
-            var days = ranked_days - Data[DataIndex].Key + 1;
+            var days = ranked_days - index + 1;
 
             return new TooltipDisplayContent
             {
-                Rank = $"#{Data[DataIndex].Value:#,##0}",
+                Rank = $"#{rank:#,##0}",
                 Time = days == 0 ? "now" : $"{days} days ago"
             };
         }
