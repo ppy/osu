@@ -12,7 +12,6 @@ using System.Linq;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API;
 using System.Collections.Generic;
-using osu.Framework.Extensions.IEnumerableExtensions;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -27,6 +26,7 @@ namespace osu.Game.Overlays.Comments
         private IAPIProvider api { get; set; }
 
         private readonly CommentBundle commentBundle;
+        private FillFlowContainer flow;
 
         public CommentsPage(CommentBundle commentBundle)
         {
@@ -36,8 +36,6 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            FillFlowContainer flow;
-
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
@@ -62,24 +60,59 @@ namespace osu.Game.Overlays.Comments
                 return;
             }
 
-            commentBundle.Comments.ForEach(c =>
-            {
-                if (c.IsTopLevel)
-                    flow.Add(createCommentWithReplies(c, commentBundle));
-            });
+            createBaseTree(commentBundle.Comments);
         }
 
-        private DrawableComment createCommentWithReplies(Comment comment, CommentBundle commentBundle)
+        private void createBaseTree(List<Comment> comments)
+        {
+            var nodeDictionary = new Dictionary<long, Comment>();
+            var topLevelNodes = new List<Comment>();
+            var orphanedNodes = new List<Comment>();
+
+            foreach (var comment in comments)
+            {
+                nodeDictionary.Add(comment.Id, comment);
+
+                if (comment.IsTopLevel)
+                    topLevelNodes.Add(comment);
+
+                var orphanedNodesCopy = new List<Comment>(orphanedNodes);
+
+                foreach (var orphan in orphanedNodesCopy)
+                {
+                    if (orphan.ParentId == comment.Id)
+                    {
+                        orphan.ParentComment = comment;
+                        comment.ChildComments.Add(orphan);
+                        orphanedNodes.Remove(orphan);
+                    }
+                }
+
+                // No need to find parent for top-level comment
+                if (comment.IsTopLevel)
+                    continue;
+
+                if (nodeDictionary.ContainsKey(comment.ParentId.Value))
+                {
+                    comment.ParentComment = nodeDictionary[comment.ParentId.Value];
+                    nodeDictionary[comment.ParentId.Value].ChildComments.Add(comment);
+                }
+                else
+                    orphanedNodes.Add(comment);
+            }
+
+            foreach (var comment in topLevelNodes)
+                flow.Add(createCommentWithReplies(comment));
+        }
+
+        private DrawableComment createCommentWithReplies(Comment comment)
         {
             var drawableComment = createDrawableComment(comment);
 
-            var replies = commentBundle.Comments.Where(c => c.ParentId == comment.Id);
+            var replies = comment.ChildComments;
 
             if (replies.Any())
-            {
-                replies.ForEach(c => c.ParentComment = comment);
-                drawableComment.InitialReplies.AddRange(replies.Select(reply => createCommentWithReplies(reply, commentBundle)));
-            }
+                drawableComment.InitialReplies.AddRange(replies.Select(createCommentWithReplies));
 
             return drawableComment;
         }
@@ -100,7 +133,7 @@ namespace osu.Game.Overlays.Comments
             // We may receive already loaded comments
             receivedComments.ForEach(c =>
             {
-                if (drawableComment.LoadedReplies.All(loadedReply => loadedReply.Id != c.Id))
+                if (!drawableComment.LoadedReplies.ContainsKey(c.Id))
                     uniqueComments.Add(c);
             });
 
