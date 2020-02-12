@@ -54,8 +54,6 @@ namespace osu.Game.Skinning
             }
         }
 
-        public bool Looping;
-
         public void Play() => channels?.ForEach(c => c.Play());
 
         public void Stop() => channels?.ForEach(c => c.Stop());
