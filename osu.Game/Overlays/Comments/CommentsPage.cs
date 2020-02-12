@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Comments
                 }
 
                 // No need to find parent for top-level comment
-                if (comment.IsTopLevel)
+                if (!comment.ParentId.HasValue)
                     continue;
 
                 if (nodeDictionary.ContainsKey(comment.ParentId.Value))
@@ -112,7 +112,7 @@ namespace osu.Game.Overlays.Comments
             var replies = comment.ChildComments;
 
             if (replies.Any())
-                drawableComment.InitialReplies.AddRange(replies.Select(createCommentWithReplies));
+                drawableComment.Replies.AddRange(replies.Select(createCommentWithReplies));
 
             return drawableComment;
         }
@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Comments
 
             uniqueComments.ForEach(c => c.ParentComment = drawableComment.Comment);
 
-            drawableComment.AddReplies(uniqueComments.Select(createDrawableComment));
+            drawableComment.Replies.AddRange(uniqueComments.Select(createDrawableComment));
         }
 
         private DrawableComment createDrawableComment(Comment comment) => new DrawableComment(comment)

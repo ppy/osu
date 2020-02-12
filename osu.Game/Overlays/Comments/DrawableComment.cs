@@ -37,10 +37,7 @@ namespace osu.Game.Overlays.Comments
         public readonly Bindable<CommentsSortCriteria> Sort = new Bindable<CommentsSortCriteria>();
         private readonly Dictionary<long, Comment> loadedReplies = new Dictionary<long, Comment>();
 
-        /// <summary>
-        /// <see cref="DrawableComment"/>s which will be added to this <see cref="DrawableComment"/> as replies on initial load.
-        /// </summary>
-        public readonly List<DrawableComment> InitialReplies = new List<DrawableComment>();
+        public readonly BindableList<DrawableComment> Replies = new BindableList<DrawableComment>();
 
         private readonly BindableBool childrenExpanded = new BindableBool(true);
 
@@ -272,8 +269,10 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
-            if (InitialReplies.Any())
-                AddReplies(InitialReplies);
+            Replies.ItemsAdded += onRepliesAdded;
+
+            if (Replies.Any())
+                onRepliesAdded(Replies);
         }
 
         protected override void LoadComplete()
@@ -292,11 +291,8 @@ namespace osu.Game.Overlays.Comments
 
         public bool ContainsReply(long replyId) => loadedReplies.ContainsKey(replyId);
 
-        public void AddReplies(IEnumerable<DrawableComment> replies)
+        private void onRepliesAdded(IEnumerable<DrawableComment> replies)
         {
-            if (LoadState == LoadState.NotLoaded)
-                throw new NotSupportedException($@"Can't use {nameof(AddReplies)} when not loaded.");
-
             var page = createRepliesPage(replies);
 
             if (LoadState == LoadState.Loading)
