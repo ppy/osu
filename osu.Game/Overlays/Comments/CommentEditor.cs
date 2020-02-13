@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Comments
 
         protected abstract string CommitButtonText { get; }
 
-        protected abstract string TextboxPlaceholderText { get; }
+        protected abstract string TextBoxPlaceholder { get; }
 
         protected FillFlowContainer ButtonsContainer;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Comments
         [BackgroundDependencyLoader]
         private void load(OverlayColourProvider colourProvider)
         {
-            EditorTextbox textbox;
+            EditorTextBox textBox;
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -68,11 +68,11 @@ namespace osu.Game.Overlays.Comments
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        textbox = new EditorTextbox
+                        textBox = new EditorTextBox
                         {
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
-                            PlaceholderText = TextboxPlaceholderText,
+                            PlaceholderText = TextBoxPlaceholder,
                             Current = Current
                         },
                         new Container
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Comments
                 }
             });
 
-            textbox.OnCommit += (u, v) =>
+            textBox.OnCommit += (u, v) =>
             {
                 if (commitButton.IsBlocked.Value)
                     return;
@@ -131,7 +131,7 @@ namespace osu.Game.Overlays.Comments
             Current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
 
-        private class EditorTextbox : BasicTextBox
+        private class EditorTextBox : BasicTextBox
         {
             protected override float LeftRightPadding => side_padding;
 
@@ -139,7 +139,7 @@ namespace osu.Game.Overlays.Comments
 
             private OsuSpriteText placeholder;
 
-            public EditorTextbox()
+            public EditorTextBox()
             {
                 Masking = false;
                 TextContainer.Height = 0.4f;
