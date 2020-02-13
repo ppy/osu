@@ -126,10 +126,8 @@ namespace osu.Game.Graphics
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                // Temporary colour since it's currently impossible to change it without bugs (see https://github.com/ppy/osu-framework/issues/3231)
-                // If above is fixed, this should use OverlayColourProvider
-                background.Colour = colours.Gray1;
-                timeText.Colour = colours.GreyCyanLighter;
+                background.Colour = colours.GreySeafoamDarker;
+                timeText.Colour = colours.BlueLighter;
             }
 
             protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
@@ -140,8 +138,8 @@ namespace osu.Game.Graphics
                 if (!(content is DateTimeOffset date))
                     return false;
 
-                dateText.Text = string.Format($"{date:d MMMM yyyy}") + " ";
-                timeText.Text = string.Format($"{date:hh:mm:ss \"UTC\"z}");
+                dateText.Text = $"{date:d MMMM yyyy} ";
+                timeText.Text = $"{date:hh:mm:ss \"UTC\"z}";
                 return true;
             }
 
