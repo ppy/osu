@@ -53,11 +53,6 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
 
-        /// <summary>
-        /// Raised when user finalises beatmap selection using <see cref="DrawableCarouselBeatmapSet.FilterableDifficultyIcon"/>
-        /// </summary>
-        public Action<BeatmapInfo> SelectionFinalised;
-
         public override bool HandleNonPositionalInput => AllowSelection;
         public override bool HandlePositionalInput => AllowSelection;
 
@@ -582,7 +577,7 @@ namespace osu.Game.Screens.Select
                     b.Metadata = beatmapSet.Metadata;
             }
 
-            var set = new CarouselBeatmapSet(beatmapSet, this);
+            var set = new CarouselBeatmapSet(beatmapSet);
 
             foreach (var c in set.Beatmaps)
             {

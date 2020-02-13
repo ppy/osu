@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Select
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected BeatmapCarousel Carousel { get; private set; }
+        public BeatmapCarousel Carousel { get; private set; }
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
@@ -155,7 +155,6 @@ namespace osu.Game.Screens.Select
                                             Origin = Anchor.CentreRight,
                                             RelativeSizeAxes = Axes.Both,
                                             SelectionChanged = updateSelectedBeatmap,
-                                            SelectionFinalised = beatmapInfo => { FinaliseSelection(beatmapInfo); },
                                             BeatmapSetsChanged = carouselBeatmapsLoaded,
                                         },
                                     }
