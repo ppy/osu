@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
                 if (e.Button != MouseButton.Left)
                     return false;
 
-                BeginPlacement();
+                BeginPlacement(commitStart: true);
                 piece.FadeTo(1f, 150, Easing.OutQuint);
 
                 isPlacingEnd = true;
