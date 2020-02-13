@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Edit
         public event Action<PlacementState> StateChanged;
 
         /// <summary>
-        /// Whether the <see cref="HitObject"/> is currently being placed, but has not necessarily finished being placed.
+        /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
         /// </summary>
-        public bool PlacementBegun { get; private set; }
+        public bool PlacementActive { get; private set; }
 
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
@@ -92,23 +92,25 @@ namespace osu.Game.Rulesets.Edit
         /// Signals that the placement of <see cref="HitObject"/> has started.
         /// </summary>
         /// <param name="startTime">The start time of <see cref="HitObject"/> at the placement point. If null, the current clock time is used.</param>
-        protected void BeginPlacement(double? startTime = null)
+        /// <param name="commitStart">Whether this call is committing a value for HitObject.StartTime and continuing with further adjustments.</param>
+        protected void BeginPlacement(double? startTime = null, bool commitStart = false)
         {
             HitObject.StartTime = startTime ?? EditorClock.CurrentTime;
             placementHandler.BeginPlacement(HitObject);
-            PlacementBegun = true;
+            PlacementActive |= commitStart;
         }
 
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has finished.
-        /// This will destroy this <see cref="PlacementBlueprint"/>, and add the <see cref="HitObject"/> to the <see cref="Beatmap"/>.
+        /// This will destroy this <see cref="PlacementBlueprint"/>, and add the HitObject.StartTime to the <see cref="Beatmap"/>.
         /// </summary>
         /// <param name="commit">Whether the object should be committed.</param>
         public void EndPlacement(bool commit)
         {
-            if (!PlacementBegun)
+            if (!PlacementActive)
                 BeginPlacement();
             placementHandler.EndPlacement(HitObject, commit);
+            PlacementActive = false;
         }
 
         /// <summary>

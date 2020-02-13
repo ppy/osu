@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 if (composer.CursorInPlacementArea)
                     currentPlacement.State = PlacementState.Shown;
-                else if (currentPlacement?.PlacementBegun == false)
+                else if (currentPlacement?.PlacementActive == false)
                     currentPlacement.State = PlacementState.Hidden;
             }
         }

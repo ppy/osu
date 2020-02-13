@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         public override void UpdatePosition(Vector2 screenSpacePosition)
         {
-            if (!PlacementBegun)
+            if (!PlacementActive)
                 Column = ColumnAt(screenSpacePosition);
 
             if (Column == null) return;
