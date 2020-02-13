@@ -16,6 +16,10 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Indicates that the object has been judged as a miss.
         /// </summary>
+        /// <remarks>
+        /// This miss window should determine how early a hit can be before it is considered for judgement (as opposed to being ignored as
+        /// "too far in the future). It should also define when a forced miss should be triggered (as a result of no user input in time).
+        /// </remarks>
         [Description(@"Miss")]
         Miss,
 

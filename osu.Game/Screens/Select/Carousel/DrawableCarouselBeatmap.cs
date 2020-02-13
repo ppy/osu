@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -81,7 +82,7 @@ namespace osu.Game.Screens.Select.Carousel
                     Origin = Anchor.CentreLeft,
                     Children = new Drawable[]
                     {
-                        new DifficultyIcon(beatmap)
+                        new DifficultyIcon(beatmap, shouldShowTooltip: false)
                         {
                             Scale = new Vector2(1.8f),
                         },
@@ -168,15 +169,22 @@ namespace osu.Game.Screens.Select.Carousel
             base.ApplyState();
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
-            new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
-            new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
-            new OsuMenuItem("Details", MenuItemType.Standard, () =>
+            get
             {
-                if (beatmap.OnlineBeatmapID.HasValue) beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
-            }),
-        };
+                List<MenuItem> items = new List<MenuItem>
+                {
+                    new OsuMenuItem("Play", MenuItemType.Highlighted, () => startRequested?.Invoke(beatmap)),
+                    new OsuMenuItem("Edit", MenuItemType.Standard, () => editRequested?.Invoke(beatmap)),
+                    new OsuMenuItem("Hide", MenuItemType.Destructive, () => hideRequested?.Invoke(beatmap)),
+                };
+
+                if (beatmap.OnlineBeatmapID.HasValue)
+                    items.Add(new OsuMenuItem("Details", MenuItemType.Standard, () => beatmapOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value)));
+
+                return items.ToArray();
+            }
+        }
     }
 }

@@ -13,15 +13,13 @@ namespace osu.Game.Screens.Multi.Components
 
         protected override void AddTabItem(TabItem<T> tab, bool addToDropdown = true)
         {
-            if (tab is DisableableTabItem<T> disableable)
+            if (tab is DisableableTabItem disableable)
                 disableable.Enabled.BindTo(Enabled);
             base.AddTabItem(tab, addToDropdown);
         }
 
-        protected abstract class DisableableTabItem<T> : TabItem<T>
+        protected abstract class DisableableTabItem : TabItem<T>
         {
-            public readonly BindableBool Enabled = new BindableBool();
-
             protected DisableableTabItem(T value)
                 : base(value)
             {

@@ -14,11 +14,12 @@ namespace osu.Game.Overlays.BeatmapSet
 {
     public class SuccessRate : Container
     {
+        protected readonly FailRetryGraph Graph;
+
         private readonly FillFlowContainer header;
-        private readonly OsuSpriteText successRateLabel, successPercent, graphLabel;
+        private readonly OsuSpriteText successPercent;
         private readonly Bar successRate;
         private readonly Container percentContainer;
-        private readonly FailRetryGraph graph;
 
         private BeatmapInfo beatmap;
 
@@ -37,15 +38,15 @@ namespace osu.Game.Overlays.BeatmapSet
 
         private void updateDisplay()
         {
-            int passCount = beatmap?.OnlineInfo.PassCount ?? 0;
-            int playCount = beatmap?.OnlineInfo.PlayCount ?? 0;
+            int passCount = beatmap?.OnlineInfo?.PassCount ?? 0;
+            int playCount = beatmap?.OnlineInfo?.PlayCount ?? 0;
 
             var rate = playCount != 0 ? (float)passCount / playCount : 0;
-            successPercent.Text = rate.ToString("P0");
+            successPercent.Text = rate.ToString("0.#%");
             successRate.Length = rate;
             percentContainer.ResizeWidthTo(successRate.Length, 250, Easing.InOutCubic);
 
-            graph.Metrics = beatmap?.Metrics;
+            Graph.Metrics = beatmap?.Metrics;
         }
 
         public SuccessRate()
@@ -59,7 +60,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        successRateLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -84,7 +85,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                 Font = OsuFont.GetFont(size: 13),
                             },
                         },
-                        graphLabel = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -94,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         },
                     },
                 },
-                graph = new FailRetryGraph
+                Graph = new FailRetryGraph
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
@@ -104,11 +105,10 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OverlayColourProvider colourProvider)
         {
-            successRateLabel.Colour = successPercent.Colour = graphLabel.Colour = colours.Gray5;
             successRate.AccentColour = colours.Green;
-            successRate.BackgroundColour = colours.GrayD;
+            successRate.BackgroundColour = colourProvider.Background6;
 
             updateDisplay();
         }
@@ -117,7 +117,7 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             base.UpdateAfterChildren();
 
-            graph.Padding = new MarginPadding { Top = header.DrawHeight };
+            Graph.Padding = new MarginPadding { Top = header.DrawHeight };
         }
     }
 }

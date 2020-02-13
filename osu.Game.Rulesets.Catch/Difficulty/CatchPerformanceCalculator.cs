@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
-using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -35,12 +34,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             mods = Score.Mods;
 
-            var legacyScore = Score as LegacyScoreInfo;
-
-            fruitsHit = legacyScore?.Count300 ?? Score.Statistics[HitResult.Perfect];
-            ticksHit = legacyScore?.Count100 ?? 0;
-            tinyTicksHit = legacyScore?.Count50 ?? 0;
-            tinyTicksMissed = legacyScore?.CountKatu ?? 0;
+            fruitsHit = Score?.GetCount300() ?? Score.Statistics[HitResult.Perfect];
+            ticksHit = Score?.GetCount100() ?? 0;
+            tinyTicksHit = Score?.GetCount50() ?? 0;
+            tinyTicksMissed = Score?.GetCountKatu() ?? 0;
             misses = Score.Statistics[HitResult.Miss];
 
             // Don't count scores made with supposedly unranked mods
@@ -48,13 +45,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 return 0;
 
             // We are heavily relying on aim in catch the beat
-            double value = Math.Pow(5.0f * Math.Max(1.0f, Attributes.StarRating / 0.0049f) - 4.0f, 2.0f) / 100000.0f;
+            double value = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
             int numTotalHits = totalComboHits();
 
             // Longer maps are worth more
-            float lengthBonus =
+            double lengthBonus =
                 0.95f + 0.3f * Math.Min(1.0f, numTotalHits / 2500.0f) +
                 (numTotalHits > 2500 ? (float)Math.Log10(numTotalHits / 2500.0f) * 0.475f : 0.0f);
 
@@ -62,12 +59,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             value *= lengthBonus;
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
-            value *= Math.Pow(0.97f, misses);
+            value *= Math.Pow(0.97, misses);
 
             // Combo scaling
-            float beatmapMaxCombo = Attributes.MaxCombo;
-            if (beatmapMaxCombo > 0)
-                value *= Math.Min(Math.Pow(Attributes.MaxCombo, 0.8f) / Math.Pow(beatmapMaxCombo, 0.8f), 1.0f);
+            if (Attributes.MaxCombo > 0)
+                value *= Math.Min(Math.Pow(Attributes.MaxCombo, 0.8) / Math.Pow(Attributes.MaxCombo, 0.8), 1.0);
 
             float approachRate = (float)Attributes.ApproachRate;
             float approachRateFactor = 1.0f;
@@ -82,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (mods.Any(m => m is ModHidden))
             {
-                value *= 1.05f + 0.075f * (10.0f - Math.Min(10.0f, approachRate)); // 7.5% for each AR below 10
+                value *= 1.05 + 0.075 * (10.0 - Math.Min(10.0, Attributes.ApproachRate)); // 7.5% for each AR below 10
                 // Hiddens gives almost nothing on max approach rate, and more the lower it is
                 if (approachRate <= 10.0f)
                     value *= 1.05f + 0.075f * (10.0f - approachRate); // 7.5% for each AR below 10
@@ -92,19 +88,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (mods.Any(m => m is ModFlashlight))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
-                value *= 1.35f * lengthBonus;
+                value *= 1.35 * lengthBonus;
 
             // Scale the aim value with accuracy _slightly_
-            value *= Math.Pow(accuracy(), 5.5f);
+            value *= Math.Pow(accuracy(), 5.5);
 
             // Custom multipliers for NoFail. SpunOut is not applicable.
             if (mods.Any(m => m is ModNoFail))
-                value *= 0.90f;
+                value *= 0.90;
 
             return value;
         }
 
-        private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
+        private float accuracy() => totalHits() == 0 ? 0 : Math.Clamp((float)totalSuccessfulHits() / totalHits(), 0, 1);
         private int totalHits() => tinyTicksHit + ticksHit + fruitsHit + misses + tinyTicksMissed;
         private int totalSuccessfulHits() => tinyTicksHit + ticksHit + fruitsHit;
         private int totalComboHits() => misses + ticksHit + fruitsHit;

@@ -16,6 +16,7 @@ using System.ComponentModel;
 using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -66,7 +67,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             api?.Register(this);
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state) => Schedule(() =>
         {
             form = null;
 
@@ -87,6 +88,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         }
                     };
                     break;
+
                 case APIState.Failing:
                 case APIState.Connecting:
                     LinkFlowContainer linkFlow;
@@ -95,7 +97,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         new LoadingAnimation
                         {
-                            State = Visibility.Visible,
+                            State = { Value = Visibility.Visible },
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
@@ -112,6 +114,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     linkFlow.AddLink("cancel", api.Logout, string.Empty);
                     break;
+
                 case APIState.Online:
                     Children = new Drawable[]
                     {
@@ -151,8 +154,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
+                    panel.Activity.BindTo(api.LocalUser.Value.Activity);
 
-                    dropdown.Current.ValueChanged += action =>
+                    dropdown.Current.BindValueChanged(action =>
                     {
                         switch (action.NewValue)
                         {
@@ -160,26 +164,27 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();
                                 dropdown.StatusColour = colours.Green;
                                 break;
+
                             case UserAction.DoNotDisturb:
                                 api.LocalUser.Value.Status.Value = new UserStatusDoNotDisturb();
                                 dropdown.StatusColour = colours.Red;
                                 break;
+
                             case UserAction.AppearOffline:
                                 api.LocalUser.Value.Status.Value = new UserStatusOffline();
                                 dropdown.StatusColour = colours.Gray7;
                                 break;
+
                             case UserAction.SignOut:
                                 api.Logout();
                                 break;
                         }
-                    };
-                    dropdown.Current.TriggerChange();
-
+                    }, true);
                     break;
             }
 
             if (form != null) GetContainingInputManager()?.ChangeFocus(form);
-        }
+        });
 
         public override bool AcceptsFocus => true;
 
@@ -195,6 +200,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             private TextBox username;
             private TextBox password;
+            private ShakeContainer shakeSignIn;
             private IAPIProvider api;
 
             public Action RequestHide;
@@ -203,6 +209,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
                     api.Login(username.Text, password.Text);
+                else
+                    shakeSignIn.Shake();
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
@@ -217,7 +225,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "email address",
+                        PlaceholderText = "username",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
@@ -231,7 +239,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Remember email address",
+                        LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
@@ -239,10 +247,23 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
-                    new SettingsButton
+                    new Container
                     {
-                        Text = "Sign in",
-                        Action = performLogin
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            shakeSignIn = new ShakeContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Child = new SettingsButton
+                                {
+                                    Text = "Sign in",
+                                    Action = performLogin
+                                },
+                            }
+                        }
                     },
                     new SettingsButton
                     {
@@ -276,10 +297,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 set
                 {
-                    var h = Header as UserDropdownHeader;
-                    if (h == null) return;
-
-                    h.StatusColour = value;
+                    if (Header is UserDropdownHeader h)
+                        h.StatusColour = value;
                 }
             }
 
@@ -304,8 +323,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Colour = Color4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
-
-                    ItemsContainer.Padding = new MarginPadding();
                 }
 
                 [BackgroundDependencyLoader]
@@ -314,7 +331,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     BackgroundColour = colours.Gray3;
                 }
 
-                protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
+                protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableUserDropdownMenuItem(item);
 
                 private class DrawableUserDropdownMenuItem : DrawableOsuDropdownMenuItem
                 {
@@ -363,7 +380,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     {
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
-                        Icon = FontAwesome.CircleOutline,
+                        Icon = FontAwesome.Regular.Circle,
                         Size = new Vector2(14),
                     });
 

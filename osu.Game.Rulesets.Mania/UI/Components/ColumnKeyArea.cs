@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Game.Graphics;
@@ -114,11 +115,10 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             return false;
         }
 
-        public bool OnReleased(ManiaAction action)
+        public void OnReleased(ManiaAction action)
         {
             if (action == this.action.Value)
                 keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
-            return false;
         }
     }
 }

@@ -8,8 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Chat;
-using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
@@ -26,8 +25,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void load(OsuColour colours)
         {
             OsuSpriteText summary;
-            OsuSpriteText levelRangeHigher;
-            OsuSpriteText levelRangeLower;
             Container flagContainer;
             LinkFlowContainer hostText;
 
@@ -46,21 +43,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             Width = 22f,
                             RelativeSizeAxes = Axes.Y,
                         },
-                        /*new Container //todo: team banners
-                        {
-                            Width = 38f,
-                            RelativeSizeAxes = Axes.Y,
-                            CornerRadius = 2f,
-                            Masking = true,
-                            Children = new[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.FromHex(@"ad387e"),
-                                },
-                            },
-                        },*/
                         hostText = new LinkFlowContainer
                         {
                             Anchor = Anchor.CentreLeft,
@@ -95,20 +77,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 if (host.NewValue != null)
                 {
                     hostText.AddText("hosted by ");
-                    hostText.AddLink(host.NewValue.Username, null, LinkAction.OpenUserProfile, host.NewValue.Id.ToString(), "Open profile",
-                        s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
-                    flagContainer.Child = new DrawableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
+                    hostText.AddUserLink(host.NewValue, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+
+                    flagContainer.Child = new UpdateableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);
 
             ParticipantCount.BindValueChanged(count => summary.Text = "participant".ToQuantity(count.NewValue), true);
-
-            /*Participants.BindValueChanged(e =>
-            {
-                var ranks = v.Select(u => u.Statistics.Ranks.Global);
-                levelRangeLower.Text = ranks.Min().ToString();
-                levelRangeHigher.Text = ranks.Max().ToString();
-            });*/
         }
     }
 }

@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
             if (beatmap.HitObjects.Count == 0)
-                return new CatchDifficultyAttributes { Mods = mods };
+                return new CatchDifficultyAttributes { Mods = mods, Skills = skills };
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
@@ -41,7 +41,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 StarRating = Math.Sqrt(skills[0].DifficultyValue()) * star_scaling_factor,
                 Mods = mods,
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet))
+                MaxCombo = beatmap.HitObjects.Count(h => h is Fruit) + beatmap.HitObjects.OfType<JuiceStream>().SelectMany(j => j.NestedHitObjects).Count(h => !(h is TinyDroplet)),
+                Skills = skills
             };
         }
 
@@ -58,32 +59,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchHitObject lastObject = null;
 
-            foreach (var hitObject in beatmap.HitObjects.OfType<CatchHitObject>())
+            // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
+            foreach (var hitObject in beatmap.HitObjects
+                                             .SelectMany(obj => obj is JuiceStream stream ? stream.NestedHitObjects : new[] { obj })
+                                             .Cast<CatchHitObject>()
+                                             .OrderBy(x => x.StartTime))
             {
-                if (lastObject == null)
-                {
-                    lastObject = hitObject;
+                // We want to only consider fruits that contribute to the combo.
+                if (hitObject is BananaShower || hitObject is TinyDroplet)
                     continue;
-                }
 
-                switch (hitObject)
-                {
-                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                    case Fruit fruit:
-                        yield return new CatchDifficultyHitObject(fruit, lastObject, clockRate, halfCatchWidth);
+                if (lastObject != null)
+                    yield return new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatchWidth);
 
-                        lastObject = hitObject;
-                        break;
-                    case JuiceStream _:
-                        foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
-                        {
-                            yield return new CatchDifficultyHitObject(nested, lastObject, clockRate, halfCatchWidth);
-
-                            lastObject = nested;
-                        }
-
-                        break;
-                }
+                lastObject = hitObject;
             }
         }
 

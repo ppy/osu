@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
-        private readonly BindableList<WindowMode> windowModes = new BindableList<WindowMode>();
+        private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
         private OsuGameBase game;
         private SettingsDropdown<Size> resolutionDropdown;
@@ -75,12 +75,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
                     Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
-                    KeyboardStep = 0.01f
+                    KeyboardStep = 0.01f,
+                    Keywords = new[] { "scale", "letterbox" },
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
                     LabelText = "Screen Scaling",
                     Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
+                    Keywords = new[] { "scale", "letterbox" },
                 },
                 scalingSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
@@ -96,25 +98,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         {
                             LabelText = "Horizontal position",
                             Bindable = scalingPositionX,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical position",
                             Bindable = scalingPositionY,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal scale",
                             Bindable = scalingSizeX,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical scale",
                             Bindable = scalingSizeY,
-                            KeyboardStep = 0.01f
+                            KeyboardStep = 0.01f,
+                            DisplayAsPercentage = true
                         },
                     }
                 },
@@ -237,7 +243,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>
         {
-            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl { Items = Items };
+            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl();
 
             private class ResolutionDropdownControl : DropdownControl
             {

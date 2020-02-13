@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,10 +14,9 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboard : Container<DrawableStoryboardLayer>
     {
-        public Storyboard Storyboard { get; private set; }
+        public Storyboard Storyboard { get; }
 
-        private readonly Container<DrawableStoryboardLayer> content;
-        protected override Container<DrawableStoryboardLayer> Content => content;
+        protected override Container<DrawableStoryboardLayer> Content { get; }
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
@@ -48,7 +48,7 @@ namespace osu.Game.Storyboards.Drawables
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddInternal(content = new Container<DrawableStoryboardLayer>
+            AddInternal(Content = new Container<DrawableStoryboardLayer>
             {
                 Size = new Vector2(640, 480),
                 Anchor = Anchor.Centre,
@@ -57,7 +57,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(FileStore fileStore, GameplayClock clock)
+        private void load(FileStore fileStore, GameplayClock clock, CancellationToken? cancellationToken)
         {
             if (clock != null)
                 Clock = clock;
@@ -65,7 +65,11 @@ namespace osu.Game.Storyboards.Drawables
             dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+
                 Add(layer.CreateDrawable());
+            }
         }
 
         private void updateLayerVisibility()

@@ -35,12 +35,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             switch (TotalColumns)
             {
-                case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
+                case 8 when HitObject.Samples.Any(s => s.Name == HitSampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
                     break;
+
                 case 8:
                     addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
                     break;
+
                 default:
                     if (TotalColumns > 0)
                         addToPattern(pattern, GetRandomColumn(), generateHold);
@@ -70,9 +72,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 };
 
                 if (hold.Head.Samples == null)
-                    hold.Head.Samples = new List<SampleInfo>();
+                    hold.Head.Samples = new List<HitSampleInfo>();
 
-                hold.Head.Samples.Add(new SampleInfo { Name = SampleInfo.HIT_NORMAL });
+                hold.Head.Samples.Add(new HitSampleInfo { Name = HitSampleInfo.HIT_NORMAL });
 
                 hold.Tail.Samples = HitObject.Samples;
 

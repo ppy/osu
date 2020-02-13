@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override string Header => "Skin";
 
-        public override IconUsage Icon => FontAwesome.PaintBrush;
+        public override IconUsage Icon => FontAwesome.Solid.PaintBrush;
 
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
@@ -35,16 +35,16 @@ namespace osu.Game.Overlays.Settings.Sections
             Children = new Drawable[]
             {
                 skinDropdown = new SkinSettingsDropdown(),
-                new SettingsSlider<double, SizeSlider>
+                new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize),
+                    Bindable = config.GetBindable<float>(OsuSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
-                new SettingsSlider<double, SizeSlider>
+                new SettingsSlider<float, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize),
+                    Bindable = config.GetBindable<float>(OsuSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
@@ -82,13 +82,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
 
-        private void itemAdded(SkinInfo s, bool existing)
-        {
-            if (existing)
-                return;
-
-            Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
-        }
+        private void itemAdded(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
 
         protected override void Dispose(bool isDisposing)
         {
@@ -101,18 +95,20 @@ namespace osu.Game.Overlays.Settings.Sections
             }
         }
 
-        private class SizeSlider : OsuSliderBar<double>
+        private class SizeSlider : OsuSliderBar<float>
         {
             public override string TooltipText => Current.Value.ToString(@"0.##x");
         }
 
         private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
         {
-            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl { Items = Items };
+            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl();
 
             private class SkinDropdownControl : DropdownControl
             {
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
+
+                protected override DropdownMenu CreateMenu() => base.CreateMenu().With(m => m.MaxHeight = 200);
             }
         }
     }

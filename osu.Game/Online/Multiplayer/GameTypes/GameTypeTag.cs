@@ -18,7 +18,7 @@ namespace osu.Game.Online.Multiplayer.GameTypes
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Icon = FontAwesome.Refresh,
+                Icon = FontAwesome.Solid.Sync,
                 Size = new Vector2(size),
                 Colour = colours.Blue,
                 Shadow = false,

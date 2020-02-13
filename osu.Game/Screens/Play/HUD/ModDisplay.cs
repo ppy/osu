@@ -18,15 +18,17 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class ModDisplay : Container, IHasCurrentValue<IEnumerable<Mod>>
+    public class ModDisplay : Container, IHasCurrentValue<IReadOnlyList<Mod>>
     {
         private const int fade_duration = 1000;
 
         public bool DisplayUnrankedText = true;
 
-        private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
+        public bool AllowExpand = true;
 
-        public Bindable<IEnumerable<Mod>> Current
+        private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
+
+        public Bindable<IReadOnlyList<Mod>> Current
         {
             get => current;
             set
@@ -39,7 +41,7 @@ namespace osu.Game.Screens.Play.HUD
             }
         }
 
-        private readonly FillFlowContainer<ModIcon> iconsContainer;
+        protected readonly FillFlowContainer<ModIcon> IconsContainer;
         private readonly OsuSpriteText unrankedText;
 
         public ModDisplay()
@@ -48,7 +50,7 @@ namespace osu.Game.Screens.Play.HUD
 
             Children = new Drawable[]
             {
-                iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
+                IconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -67,10 +69,11 @@ namespace osu.Game.Screens.Play.HUD
 
             Current.ValueChanged += mods =>
             {
-                iconsContainer.Clear();
+                IconsContainer.Clear();
+
                 foreach (Mod mod in mods.NewValue)
                 {
-                    iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
+                    IconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }
 
                 if (IsLoaded)
@@ -87,7 +90,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
             appearTransform();
+            IconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
         }
 
         private void appearTransform()
@@ -97,16 +102,19 @@ namespace osu.Game.Screens.Play.HUD
             else
                 unrankedText.Hide();
 
-            iconsContainer.FinishTransforms();
-            iconsContainer.FadeInFromZero(fade_duration, Easing.OutQuint);
             expand();
-            using (iconsContainer.BeginDelayedSequence(1200))
+
+            using (IconsContainer.BeginDelayedSequence(1200))
                 contract();
         }
 
-        private void expand() => iconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+        private void expand()
+        {
+            if (AllowExpand)
+                IconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
+        }
 
-        private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+        private void contract() => IconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
         protected override bool OnHover(HoverEvent e)
         {

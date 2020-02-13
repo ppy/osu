@@ -14,12 +14,16 @@ namespace osu.Game.Rulesets.Mania.Judgements
             {
                 default:
                     return 0;
+
                 case HitResult.Meh:
                     return 50;
+
                 case HitResult.Ok:
                     return 100;
+
                 case HitResult.Good:
                     return 200;
+
                 case HitResult.Great:
                 case HitResult.Perfect:
                     return 300;

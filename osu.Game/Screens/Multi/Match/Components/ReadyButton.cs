@@ -54,11 +54,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID) != null;
         }
 
-        private void beatmapAdded(BeatmapSetInfo model, bool existing)
+        private void beatmapAdded(BeatmapSetInfo model)
         {
-            if (Beatmap.Value == null)
-                return;
-
             if (model.Beatmaps.Any(b => b.OnlineBeatmapID == Beatmap.Value.OnlineBeatmapID))
                 Schedule(() => hasBeatmap = true);
         }

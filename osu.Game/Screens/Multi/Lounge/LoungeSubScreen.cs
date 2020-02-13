@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.55f,
                             Children = new Drawable[]
                             {
-                                new ScrollContainer
+                                new OsuScrollContainer
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ScrollbarOverlapsContent = false,
@@ -68,8 +69,6 @@ namespace osu.Game.Screens.Multi.Lounge
                     },
                 },
             };
-
-            Filter.Search.Exit += this.Exit;
         }
 
         protected override void UpdateAfterChildren()
@@ -92,6 +91,22 @@ namespace osu.Game.Screens.Multi.Lounge
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+
+            onReturning();
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+
+            if (currentRoom.Value?.RoomID.Value == null)
+                currentRoom.Value = new Room();
+
+            onReturning();
+        }
+
+        private void onReturning()
+        {
             Filter.Search.HoldFocus = true;
         }
 
@@ -105,14 +120,6 @@ namespace osu.Game.Screens.Multi.Lounge
         {
             base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
-        }
-
-        public override void OnResuming(IScreen last)
-        {
-            base.OnResuming(last);
-
-            if (currentRoom.Value?.RoomID.Value == null)
-                currentRoom.Value = new Room();
         }
 
         private void joinRequested(Room room)

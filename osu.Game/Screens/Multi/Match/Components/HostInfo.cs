@@ -6,8 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Online.Chat;
 using osu.Game.Users;
+using osu.Game.Users.Drawables;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
@@ -54,8 +54,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 linkContainer.AddText("hosted by");
                 linkContainer.NewLine();
-                linkContainer.AddLink(host.Username, null, LinkAction.OpenUserProfile, host.Id.ToString(), "View Profile",
-                    s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                linkContainer.AddUserLink(host, s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
             }
         }
     }

@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         {
             BodyText = "Everything?";
 
-            Icon = FontAwesome.TrashOutline;
+            Icon = FontAwesome.Regular.TrashAlt;
             HeaderText = @"Confirm deletion of";
             Buttons = new PopupDialogButton[]
             {

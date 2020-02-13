@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Menu
                     // align off-screen to make sure our edges don't become visible during parallax.
                     X = -box_width,
                     Alpha = 0,
-                    Blending = BlendingMode.Additive
+                    Blending = BlendingParameters.Additive
                 },
                 rightBox = new Box
                 {
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Menu
                     Height = 1.5f,
                     X = box_width,
                     Alpha = 0,
-                    Blending = BlendingMode.Additive
+                    Blending = BlendingParameters.Additive
                 }
             };
 
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Menu
 
         private void flash(Drawable d, double beatLength, bool kiai, TrackAmplitudes amplitudes)
         {
-            d.FadeTo(Math.Max(0, ((d.Equals(leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
+            d.FadeTo(Math.Max(0, ((ReferenceEquals(d, leftBox) ? amplitudes.LeftChannel : amplitudes.RightChannel) - amplitude_dead_zone) / (kiai ? kiai_multiplier : alpha_multiplier)), box_fade_in_time)
              .Then()
              .FadeOut(beatLength, Easing.In);
         }
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Menu
             Color4 baseColour = colours.Blue;
 
             if (user.Value?.IsSupporter ?? false)
-                baseColour = skin.Value.GetValue<SkinConfiguration, Color4?>(s => s.CustomColours.ContainsKey("MenuGlow") ? s.CustomColours["MenuGlow"] : (Color4?)null) ?? baseColour;
+                baseColour = skin.Value.GetConfig<GlobalSkinColours, Color4>(GlobalSkinColours.MenuGlow)?.Value ?? baseColour;
 
             // linear colour looks better in this case, so let's use it for now.
             Color4 gradientDark = baseColour.Opacity(0).ToLinear();

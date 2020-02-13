@@ -28,9 +28,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load()
         {
             ReadyButton readyButton;
-            ViewBeatmapButton viewBeatmapButton;
             HostInfo hostInfo;
-            RoomStatusInfo statusInfo;
 
             InternalChildren = new Drawable[]
             {
@@ -63,7 +61,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         new OsuSpriteText
                                         {
                                             Font = OsuFont.GetFont(size: 30),
-                                            Current = Name
+                                            Current = RoomName
                                         },
                                         new RoomStatusInfo(),
                                     }
@@ -81,7 +79,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                viewBeatmapButton = new ViewBeatmapButton(),
                                 readyButton = new ReadyButton
                                 {
                                     Action = () => OnStart?.Invoke()
@@ -92,11 +89,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item =>
-            {
-                viewBeatmapButton.Beatmap.Value = item.NewValue?.Beatmap;
-                readyButton.Beatmap.Value = item.NewValue?.Beatmap;
-            }, true);
+            CurrentItem.BindValueChanged(item => readyButton.Beatmap.Value = item.NewValue?.Beatmap, true);
 
             hostInfo.Host.BindTo(Host);
         }

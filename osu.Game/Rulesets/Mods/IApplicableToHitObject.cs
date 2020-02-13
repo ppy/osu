@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
     public interface IApplicableToHitObject : IApplicableMod
     {
         /// <summary>
-        /// Applies this <see cref="IApplicableToHitObject{TObject}"/> to a <see cref="HitObject"/>.
+        /// Applies this <see cref="IApplicableToHitObject"/> to a <see cref="HitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to apply to.</param>
         void ApplyToHitObject(HitObject hitObject);

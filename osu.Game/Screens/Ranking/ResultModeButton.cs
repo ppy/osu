@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osuTK;
@@ -35,7 +36,9 @@ namespace osu.Game.Screens.Ranking
             Size = new Vector2(50);
 
             Masking = true;
+
             CornerRadius = 25;
+            CornerExponent = 2;
 
             activeColour = colours.PinkDarker;
             inactiveColour = OsuColour.Gray(0.8f);
@@ -89,6 +92,6 @@ namespace osu.Game.Screens.Ranking
 
         protected override void OnDeactivated() => colouredPart.FadeColour(inactiveColour, 200, Easing.OutQuint);
 
-        public string TooltipText { get; private set; }
+        public string TooltipText { get; }
     }
 }

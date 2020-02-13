@@ -9,6 +9,18 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APILegacyScores
     {
         [JsonProperty(@"scores")]
-        public IEnumerable<APILegacyScoreInfo> Scores;
+        public List<APILegacyScoreInfo> Scores;
+
+        [JsonProperty(@"userScore")]
+        public APILegacyUserTopScoreInfo UserScore;
+    }
+
+    public class APILegacyUserTopScoreInfo
+    {
+        [JsonProperty(@"position")]
+        public int Position;
+
+        [JsonProperty(@"score")]
+        public APILegacyScoreInfo Score;
     }
 }

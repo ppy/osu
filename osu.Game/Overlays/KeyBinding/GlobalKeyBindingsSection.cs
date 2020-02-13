@@ -9,12 +9,13 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {
-        public override IconUsage Icon => FontAwesome.Globe;
+        public override IconUsage Icon => FontAwesome.Solid.Globe;
         public override string Header => "Global";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
         {
             Add(new DefaultBindingsSubsection(manager));
+            Add(new AudioControlKeyBindingsSubsection(manager));
             Add(new InGameKeyBindingsSubsection(manager));
         }
 
@@ -37,6 +38,17 @@ namespace osu.Game.Overlays.KeyBinding
                 : base(null)
             {
                 Defaults = manager.InGameKeyBindings;
+            }
+        }
+
+        private class AudioControlKeyBindingsSubsection : KeyBindingsSubsection
+        {
+            protected override string Header => "Audio";
+
+            public AudioControlKeyBindingsSubsection(GlobalActionContainer manager)
+                : base(null)
+            {
+                Defaults = manager.AudioControlKeyBindings;
             }
         }
     }

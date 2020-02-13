@@ -37,14 +37,14 @@ namespace osu.Game.Graphics.UserInterface
                     Position = new Vector2(1, 1),
                     Colour = Color4.Black,
                     Alpha = 0.4f,
-                    Icon = FontAwesome.CircleONotch
+                    Icon = FontAwesome.Solid.CircleNotch
                 },
                 spinner = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.CircleONotch
+                    Icon = FontAwesome.Solid.CircleNotch
                 }
             };
         }

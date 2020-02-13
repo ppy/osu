@@ -16,10 +16,13 @@ namespace osu.Game.Rulesets.Osu.Judgements
             {
                 default:
                     return 0;
+
                 case HitResult.Meh:
                     return 50;
+
                 case HitResult.Good:
                     return 100;
+
                 case HitResult.Great:
                     return 300;
             }

@@ -10,11 +10,11 @@ namespace osu.Game.Overlays.Toolbar
     {
         public ToolbarMusicButton()
         {
-            Icon = FontAwesome.Music;
+            Icon = FontAwesome.Solid.Music;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(MusicController music)
+        private void load(NowPlayingOverlay music)
         {
             StateContainer = music;
         }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -9,21 +8,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarButton : Button
+    public class SidebarButton : OsuButton
     {
         private readonly SpriteIcon drawableIcon;
         private readonly SpriteText headerText;
         private readonly Box selectionIndicator;
         private readonly Container text;
-        public new Action<SettingsSection> Action;
 
         private SettingsSection section;
 
@@ -46,6 +42,7 @@ namespace osu.Game.Overlays.Settings
             set
             {
                 selected = value;
+
                 if (selected)
                 {
                     selectionIndicator.FadeIn(50);
@@ -61,11 +58,10 @@ namespace osu.Game.Overlays.Settings
 
         public SidebarButton()
         {
-            BackgroundColour = OsuColour.Gray(60);
-            Background.Alpha = 0;
-
             Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
+
+            BackgroundColour = Color4.Black;
 
             AddRange(new Drawable[]
             {
@@ -98,7 +94,6 @@ namespace osu.Game.Overlays.Settings
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                 },
-                new HoverClickSounds(HoverSampleSet.Loud),
             });
         }
 
@@ -106,24 +101,6 @@ namespace osu.Game.Overlays.Settings
         private void load(OsuColour colours)
         {
             selectionIndicator.Colour = colours.Yellow;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Action?.Invoke(section);
-            return base.OnClick(e);
-        }
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            Background.FadeTo(0.4f, 200);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e)
-        {
-            Background.FadeTo(0, 200);
-            base.OnHoverLost(e);
         }
     }
 }

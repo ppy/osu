@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
@@ -23,6 +25,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
 
+        public override float PathRadius
+        {
+            get => base.PathRadius;
+            set
+            {
+                if (base.PathRadius == value)
+                    return;
+
+                base.PathRadius = value;
+
+                Refresh();
+            }
+        }
+
         public override Vector2 PathOffset => snakedPathOffset;
 
         /// <summary>
@@ -35,16 +51,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         /// </summary>
         private Vector2 snakedPathOffset;
 
-        private readonly Slider slider;
-
-        public SnakingSliderBody(Slider slider)
-        {
-            this.slider = slider;
-        }
+        private Slider slider;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(DrawableHitObject drawableObject)
         {
+            slider = (Slider)drawableObject.HitObject;
+
             Refresh();
         }
 
@@ -54,7 +67,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var spanProgress = slider.ProgressAt(completionProgress);
 
             double start = 0;
-            double end = SnakingIn.Value ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadeIn, 0, 1) : 1;
+            double end = SnakingIn.Value ? Math.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / (slider.TimePreempt / 3), 0, 1) : 1;
 
             if (span >= slider.SpanCount() - 1)
             {
@@ -78,8 +91,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             slider.Path.GetPathToProgress(CurrentCurve, 0, 1);
             SetVertices(CurrentCurve);
 
-            // The body is sized to the full path size to avoid excessive autosize computations
+            // Force the body to be the final path size to avoid excessive autosize computations
+            Path.AutoSizeAxes = Axes.Both;
             Size = Path.Size;
+
+            updatePathSize();
 
             snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
             snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
@@ -93,10 +109,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             setRange(lastSnakedStart, lastSnakedEnd);
         }
 
+        public override void RecyclePath()
+        {
+            base.RecyclePath();
+            updatePathSize();
+        }
+
+        private void updatePathSize()
+        {
+            // Force the path to its final size to avoid excessive framebuffer resizes
+            Path.AutoSizeAxes = Axes.None;
+            Path.Size = Size;
+        }
+
         private void setRange(double p0, double p1)
         {
             if (p0 > p1)
-                MathHelper.Swap(ref p0, ref p1);
+                (p0, p1) = (p1, p0);
 
             if (SnakedStart == p0 && SnakedEnd == p1) return;
 

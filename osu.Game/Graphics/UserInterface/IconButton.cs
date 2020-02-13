@@ -11,12 +11,12 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class IconButton : OsuAnimatedButton
     {
-        public const float BUTTON_SIZE = 30;
+        public const float DEFAULT_BUTTON_SIZE = 30;
 
         private Color4? iconColour;
 
         /// <summary>
-        /// The icon colour. This does not affect <see cref="IconButton.Colour"/>.
+        /// The icon colour. This does not affect <see cref="Drawable.Colour">Colour</see>.
         /// </summary>
         public Color4 IconColour
         {
@@ -49,7 +49,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         /// <summary>
-        /// The icon scale. This does not affect <see cref="IconButton.Scale"/>.
+        /// The icon scale. This does not affect <see cref="Drawable.Scale">Scale</see>.
         /// </summary>
         public Vector2 IconScale
         {
@@ -57,25 +57,11 @@ namespace osu.Game.Graphics.UserInterface
             set => icon.Scale = value;
         }
 
-        /// <summary>
-        /// The size of the <see cref="IconButton"/> while it is not being pressed.
-        /// </summary>
-        public Vector2 ButtonSize
-        {
-            get => Content.Size;
-            set
-            {
-                Content.RelativeSizeAxes = Axes.None;
-                Content.Size = value;
-            }
-        }
-
         private readonly SpriteIcon icon;
 
         public IconButton()
         {
-            AutoSizeAxes = Axes.Both;
-            ButtonSize = new Vector2(BUTTON_SIZE);
+            Size = new Vector2(DEFAULT_BUTTON_SIZE);
 
             Add(icon = new SpriteIcon
             {

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -31,6 +32,8 @@ namespace osu.Game.Screens.Multi
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
+        // this is required due to PlayerLoader eventually being pushed to the main stack
+        // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private readonly MultiplayerWaveContainer waves;
@@ -95,7 +98,7 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                        Child = screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
@@ -118,6 +121,8 @@ namespace osu.Game.Screens.Multi
                     roomManager = new RoomManager()
                 }
             };
+
+            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
@@ -166,14 +171,17 @@ namespace osu.Game.Screens.Multi
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
-                forcefullyExit();
+                Schedule(forcefullyExit);
         }
 
         private void forcefullyExit()
         {
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
-                this.Exit();
+            {
+                while (this.IsCurrentScreen())
+                    this.Exit();
+            }
             else
             {
                 this.MakeCurrent();
@@ -185,20 +193,48 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
             waves.Show();
+
+            beginHandlingTrack();
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            this.FadeIn(250);
+            this.ScaleTo(1, 250, Easing.OutSine);
+
+            base.OnResuming(last);
+
+            beginHandlingTrack();
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            this.ScaleTo(1.1f, 250, Easing.InSine);
+            this.FadeOut(250);
+
+            endHandlingTrack();
+
+            roomManager.TimeBetweenPolls = 0;
         }
 
         public override bool OnExiting(IScreen next)
         {
+            roomManager.PartRoom();
+
+            if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
+            {
+                screenStack.Exit();
+                return true;
+            }
+
             waves.Hide();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            cancelLooping();
-
             if (screenStack.CurrentScreen != null)
                 loungeSubScreen.MakeCurrent();
 
-            updatePollingRate(isIdle.Value);
+            endHandlingTrack();
 
             base.OnExiting(next);
             return false;
@@ -212,23 +248,54 @@ namespace osu.Game.Screens.Multi
             logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
         }
 
-        public override void OnResuming(IScreen last)
+        private void beginHandlingTrack()
         {
-            this.FadeIn(250);
-            this.ScaleTo(1, 250, Easing.OutSine);
-
-            base.OnResuming(last);
-
-            updatePollingRate(isIdle.Value);
+            Beatmap.BindValueChanged(updateTrack, true);
         }
 
-        public override void OnSuspending(IScreen next)
+        private void endHandlingTrack()
         {
-            this.ScaleTo(1.1f, 250, Easing.InSine);
-            this.FadeOut(250);
-
             cancelLooping();
-            roomManager.TimeBetweenPolls = 0;
+            Beatmap.ValueChanged -= updateTrack;
+        }
+
+        private void screenPushed(IScreen lastScreen, IScreen newScreen) => subScreenChanged(newScreen);
+
+        private void screenExited(IScreen lastScreen, IScreen newScreen)
+        {
+            subScreenChanged(newScreen);
+
+            if (screenStack.CurrentScreen == null && this.IsCurrentScreen())
+                this.Exit();
+        }
+
+        private void subScreenChanged(IScreen newScreen)
+        {
+            updatePollingRate(isIdle.Value);
+            createButton.FadeTo(newScreen is LoungeSubScreen ? 1 : 0, 200);
+
+            updateTrack();
+        }
+
+        private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
+        {
+            if (screenStack.CurrentScreen is MatchSubScreen)
+            {
+                var track = Beatmap.Value?.Track;
+
+                if (track != null)
+                {
+                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                    track.Looping = true;
+
+                    if (!track.IsRunning)
+                        track.Restart();
+                }
+            }
+            else
+            {
+                cancelLooping();
+            }
         }
 
         private void cancelLooping()
@@ -236,48 +303,10 @@ namespace osu.Game.Screens.Multi
             var track = Beatmap?.Value?.Track;
 
             if (track != null)
-                track.Looping = false;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (!this.IsCurrentScreen()) return;
-
-            if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = Beatmap.Value.Track;
-                if (track != null)
-                {
-                    track.Looping = true;
-
-                    if (!track.IsRunning)
-                    {
-                        game.Audio.AddItemToList(track);
-                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
-                        track.Start();
-                    }
-                }
-
-                createButton.Hide();
+                track.Looping = false;
+                track.RestartPoint = 0;
             }
-            else if (screenStack.CurrentScreen is LoungeSubScreen)
-                createButton.Show();
-        }
-
-        private void screenPushed(IScreen lastScreen, IScreen newScreen)
-            => updatePollingRate(isIdle.Value);
-
-        private void screenExited(IScreen lastScreen, IScreen newScreen)
-        {
-            if (lastScreen is MatchSubScreen)
-                cancelLooping();
-
-            updatePollingRate(isIdle.Value);
-
-            if (screenStack.CurrentScreen == null)
-                this.Exit();
         }
 
         protected override void Dispose(bool isDisposing)
