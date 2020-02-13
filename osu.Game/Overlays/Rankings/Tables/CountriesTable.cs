@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Rankings.Tables
             public CountryName(Country country)
             {
                 Font = OsuFont.GetFont(size: 12, italics: true);
-                Text = $@"{country.FullName}";
+                Text = country.FullName ?? string.Empty;
             }
 
             [BackgroundDependencyLoader]
