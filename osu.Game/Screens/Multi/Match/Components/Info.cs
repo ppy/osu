@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item => readyButton.Beatmap.Value = item.NewValue?.Beatmap, true);
+            CurrentItem.BindValueChanged(item => readyButton.Beatmap.Value = item.NewValue?.Beatmap.Value, true);
 
             hostInfo.Host.BindTo(Host);
         }
