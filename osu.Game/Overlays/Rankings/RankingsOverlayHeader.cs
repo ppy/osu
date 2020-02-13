@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.Rankings
             Current = Country
         };
 
+        protected override Drawable CreateBackground() => new OverlayHeaderBackground(@"Headers/rankings");
+
         private class RankingsTitle : ScreenTitle
         {
             public readonly Bindable<RankingsScope> Scope = new Bindable<RankingsScope>();
