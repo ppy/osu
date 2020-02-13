@@ -49,57 +49,64 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestCommitViaKeyboard()
         {
-            AddStep("Click on textbox", () =>
+            AddStep("click on text box", () =>
             {
                 InputManager.MoveMouseTo(commentEditor);
                 InputManager.Click(MouseButton.Left);
             });
-            AddStep("Write something", () => commentEditor.Current.Value = "text");
-            AddStep("Click Enter", () => press(Key.Enter));
-            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commentEditor.CommittedText));
-            AddAssert("Button is loading", () => commentEditor.IsLoading);
+            AddStep("enter text", () => commentEditor.Current.Value = "text");
+
+            AddStep("press Enter", () => press(Key.Enter));
+
+            AddAssert("text committed", () => commentEditor.CommittedText == "text");
+            AddAssert("button is loading", () => commentEditor.IsLoading);
         }
 
         [Test]
         public void TestCommitViaKeyboardWhenEmpty()
         {
-            AddStep("Click on textbox", () =>
+            AddStep("click on text box", () =>
             {
                 InputManager.MoveMouseTo(commentEditor);
                 InputManager.Click(MouseButton.Left);
             });
-            AddStep("Click Enter", () => press(Key.Enter));
-            AddAssert("Text not invoked", () => string.IsNullOrEmpty(commentEditor.CommittedText));
-            AddAssert("Button is not loading", () => !commentEditor.IsLoading);
+
+            AddStep("press Enter", () => press(Key.Enter));
+
+            AddAssert("no text committed", () => commentEditor.CommittedText == null);
+            AddAssert("button is not loading", () => !commentEditor.IsLoading);
         }
 
         [Test]
         public void TestCommitViaButton()
         {
-            AddStep("Click on textbox", () =>
+            AddStep("click on text box", () =>
             {
                 InputManager.MoveMouseTo(commentEditor);
                 InputManager.Click(MouseButton.Left);
             });
-            AddStep("Write something", () => commentEditor.Current.Value = "text");
-            AddStep("Click on button", () =>
+            AddStep("enter text", () => commentEditor.Current.Value = "some other text");
+
+            AddStep("click submit", () =>
             {
                 InputManager.MoveMouseTo(commentEditor.ButtonsContainer);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commentEditor.CommittedText));
-            AddAssert("Button is loading", () => commentEditor.IsLoading);
+
+            AddAssert("text committed", () => commentEditor.CommittedText == "some other text");
+            AddAssert("button is loading", () => commentEditor.IsLoading);
         }
 
         [Test]
         public void TestCancelAction()
         {
-            AddStep("Click on cancel button", () =>
+            AddStep("click cancel button", () =>
             {
                 InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("Cancel action is fired", () => cancellableCommentEditor.Cancelled);
+
+            AddAssert("cancel action fired", () => cancellableCommentEditor.Cancelled);
         }
 
         private void press(Key key)
@@ -128,7 +135,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override string FooterText => @"Footer text. And it is pretty long. Cool.";
             protected override string CommitButtonText => @"Commit";
-            protected override string TextboxPlaceholderText => @"This textbox is empty";
+            protected override string TextboxPlaceholderText => @"This text box is empty";
         }
 
         private class TestCancellableCommentEditor : CancellableCommentEditor
@@ -144,7 +151,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             protected override string CommitButtonText => @"Save";
-            protected override string TextboxPlaceholderText => @"Miltiline textboxes soon";
+            protected override string TextboxPlaceholderText => @"Multiline textboxes soon";
         }
     }
 }
