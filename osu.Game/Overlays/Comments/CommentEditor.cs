@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Comments
 
         protected FillFlowContainer ButtonsContainer;
 
-        private readonly Bindable<string> current = new Bindable<string>();
+        protected readonly Bindable<string> Current = new Bindable<string>();
 
         private CommitButton commitButton;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Comments
                             Height = 40,
                             RelativeSizeAxes = Axes.X,
                             PlaceholderText = TextboxPlaceholderText,
-                            Current = current
+                            Current = Current
                         },
                         new Container
                         {
@@ -104,8 +104,8 @@ namespace osu.Game.Overlays.Comments
                                         Origin = Anchor.CentreRight,
                                         Action = () =>
                                         {
-                                            OnCommit?.Invoke(current.Value);
-                                            current.Value = string.Empty;
+                                            OnCommit?.Invoke(Current.Value);
+                                            Current.Value = string.Empty;
                                         }
                                     }
                                 }
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Comments
         {
             base.LoadComplete();
 
-            current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
+            Current.BindValueChanged(text => commitButton.IsBlocked.Value = string.IsNullOrEmpty(text.NewValue), true);
         }
 
         private class EditorTextbox : BasicTextBox
@@ -219,7 +219,8 @@ namespace osu.Game.Overlays.Comments
                     },
                     background = new Box
                     {
-                        RelativeSizeAxes = Axes.Both
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0
                     },
                     drawableText = new OsuSpriteText
                     {
