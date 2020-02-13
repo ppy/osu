@@ -135,7 +135,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
             protected override string FooterText => @"Footer text. And it is pretty long. Cool.";
             protected override string CommitButtonText => @"Commit";
-            protected override string TextboxPlaceholderText => @"This text box is empty";
+            protected override string TextBoxPlaceholder => @"This text box is empty";
         }
 
         private class TestCancellableCommentEditor : CancellableCommentEditor
@@ -151,7 +151,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
 
             protected override string CommitButtonText => @"Save";
-            protected override string TextboxPlaceholderText => @"Multiline textboxes soon";
+            protected override string TextBoxPlaceholder => @"Multiline textboxes soon";
         }
     }
 }
