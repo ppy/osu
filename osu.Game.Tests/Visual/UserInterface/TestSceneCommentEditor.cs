@@ -31,73 +31,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         private string commitText;
         private bool cancelActionFired;
 
-        [Test]
-        public void TestCommitViaKeyboard()
+        [SetUp]
+        public void SetUp()
         {
-            AddStep("Create", createEditors);
-            AddStep("Click on textbox", () =>
-            {
-                InputManager.MoveMouseTo(commentEditor);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddStep("Write something", () => commentEditor.Current.Value = "text");
-            AddStep("Click Enter", () => press(Key.Enter));
-            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
-            AddAssert("Button is loading", () => commentEditor.IsLoading);
-        }
-
-        [Test]
-        public void TestCommitViaKeyboardWhenEmpty()
-        {
-            AddStep("Create", createEditors);
-            AddStep("Click on textbox", () =>
-            {
-                InputManager.MoveMouseTo(commentEditor);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddStep("Click Enter", () => press(Key.Enter));
-            AddAssert("Text not invoked", () => string.IsNullOrEmpty(commitText));
-            AddAssert("Button is not loading", () => !commentEditor.IsLoading);
-        }
-
-        [Test]
-        public void TestCommitViaButton()
-        {
-            AddStep("Create", createEditors);
-            AddStep("Click on textbox", () =>
-            {
-                InputManager.MoveMouseTo(commentEditor);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddStep("Write something", () => commentEditor.Current.Value = "text");
-            AddStep("Click on button", () =>
-            {
-                InputManager.MoveMouseTo(commentEditor.ButtonsContainer);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
-            AddAssert("Button is loading", () => commentEditor.IsLoading);
-        }
-
-        [Test]
-        public void TestCancelAction()
-        {
-            AddStep("Create", createEditors);
-            AddStep("Click on cancel button", () =>
-            {
-                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer);
-                InputManager.Click(MouseButton.Left);
-            });
-            AddAssert("Cancel action is fired", () => cancelActionFired);
-        }
-
-        private void createEditors()
-        {
-            Clear();
             commitText = string.Empty;
             cancelActionFired = false;
 
-            Add(new FillFlowContainer
+            Schedule(() => Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -117,7 +57,63 @@ namespace osu.Game.Tests.Visual.UserInterface
                         OnCancel = onCancel
                     }
                 }
+            }));
+        }
+
+        [Test]
+        public void TestCommitViaKeyboard()
+        {
+            AddStep("Click on textbox", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor);
+                InputManager.Click(MouseButton.Left);
             });
+            AddStep("Write something", () => commentEditor.Current.Value = "text");
+            AddStep("Click Enter", () => press(Key.Enter));
+            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
+            AddAssert("Button is loading", () => commentEditor.IsLoading);
+        }
+
+        [Test]
+        public void TestCommitViaKeyboardWhenEmpty()
+        {
+            AddStep("Click on textbox", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Click Enter", () => press(Key.Enter));
+            AddAssert("Text not invoked", () => string.IsNullOrEmpty(commitText));
+            AddAssert("Button is not loading", () => !commentEditor.IsLoading);
+        }
+
+        [Test]
+        public void TestCommitViaButton()
+        {
+            AddStep("Click on textbox", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Write something", () => commentEditor.Current.Value = "text");
+            AddStep("Click on button", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor.ButtonsContainer);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
+            AddAssert("Button is loading", () => commentEditor.IsLoading);
+        }
+
+        [Test]
+        public void TestCancelAction()
+        {
+            AddStep("Click on cancel button", () =>
+            {
+                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("Cancel action is fired", () => cancelActionFired);
         }
 
         private void onCommit(string value)
