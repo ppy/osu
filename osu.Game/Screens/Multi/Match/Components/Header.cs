@@ -33,6 +33,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         public Action RequestBeatmapSelection;
 
         private MatchBeatmapPanel beatmapPanel;
+        private ModDisplay modDisplay;
 
         public Header()
         {
@@ -44,7 +45,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load(OsuColour colours)
         {
             BeatmapSelectButton beatmapButton;
-            ModDisplay modDisplay;
 
             InternalChildren = new Drawable[]
             {
@@ -120,15 +120,25 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>(), true);
-
             beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
+
+            Playlist.ItemsAdded += _ => updateMods();
+            Playlist.ItemsRemoved += _ => updateMods();
+
+            updateMods();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             ShowBeatmapPanel.BindValueChanged(value => beatmapPanel.FadeTo(value.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
+        }
+
+        private void updateMods()
+        {
+            var item = Playlist.FirstOrDefault();
+
+            modDisplay.Current.Value = item?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
         }
 
         private class BeatmapSelectButton : HeaderButton
