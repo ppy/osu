@@ -62,19 +62,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// </summary>
         private void refreshTool()
         {
-            placementBlueprintContainer.Clear();
-
             removePlacement();
-
-            var blueprint = CurrentTool?.CreatePlacementBlueprint();
-
-            if (blueprint != null)
-            {
-                placementBlueprintContainer.Child = currentPlacement = blueprint;
-
-                // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
-                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
-            }
+            createPlacement();
         }
 
         private void updatePlacementPosition(Vector2 screenSpacePosition)
@@ -102,7 +91,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (currentPlacement?.PlacementActive == false && !composer.CursorInPlacementArea)
+            if (composer.CursorInPlacementArea)
+                createPlacement();
+            else if (currentPlacement?.PlacementActive == false)
                 removePlacement();
         }
 
@@ -124,11 +115,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.AddBlueprintFor(hitObject);
         }
 
+        private void createPlacement()
+        {
+            if (currentPlacement != null) return;
+
+            var blueprint = CurrentTool?.CreatePlacementBlueprint();
+
+            if (blueprint != null)
+            {
+                placementBlueprintContainer.Child = currentPlacement = blueprint;
+
+                // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
+            }
+        }
+
         private void removePlacement()
         {
             if (currentPlacement == null) return;
 
             currentPlacement.EndPlacement(false);
+            currentPlacement.Expire();
             currentPlacement = null;
         }
 
