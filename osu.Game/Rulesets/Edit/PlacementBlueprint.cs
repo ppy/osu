@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
-using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -20,13 +18,8 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>
+    public abstract class PlacementBlueprint : CompositeDrawable
     {
-        /// <summary>
-        /// Invoked when <see cref="State"/> has changed.
-        /// </summary>
-        public event Action<PlacementState> StateChanged;
-
         /// <summary>
         /// Whether the <see cref="HitObject"/> is currently mid-placement, but has not necessarily finished being placed.
         /// </summary>
@@ -53,8 +46,6 @@ namespace osu.Game.Rulesets.Edit
             // This is required to allow the blueprint's position to be updated via OnMouseMove/Handle
             // on the same frame it is made visible via a PlacementState change.
             AlwaysPresent = true;
-
-            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
@@ -65,27 +56,6 @@ namespace osu.Game.Rulesets.Edit
             EditorClock = clock;
 
             ApplyDefaultsToHitObject();
-        }
-
-        private PlacementState state;
-
-        public PlacementState State
-        {
-            get => state;
-            set
-            {
-                if (state == value)
-                    return;
-
-                state = value;
-
-                if (state == PlacementState.Shown)
-                    Show();
-                else
-                    Hide();
-
-                StateChanged?.Invoke(value);
-            }
         }
 
         /// <summary>
@@ -143,11 +113,5 @@ namespace osu.Game.Rulesets.Edit
                     return false;
             }
         }
-    }
-
-    public enum PlacementState
-    {
-        Hidden,
-        Shown,
     }
 }

@@ -64,8 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             placementBlueprintContainer.Clear();
 
-            currentPlacement?.EndPlacement(false);
-            currentPlacement = null;
+            removePlacement();
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
 
@@ -103,18 +102,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (currentPlacement != null)
-            {
-                if (composer.CursorInPlacementArea)
-                    currentPlacement.State = PlacementState.Shown;
-                else if (currentPlacement?.PlacementActive == false)
-                    currentPlacement.State = PlacementState.Hidden;
-            }
+            if (currentPlacement?.PlacementActive == false && !composer.CursorInPlacementArea)
+                removePlacement();
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
         {
             var drawable = drawableHitObjects.FirstOrDefault(d => d.HitObject == hitObject);
+
             if (drawable == null)
                 return null;
 
@@ -129,6 +124,14 @@ namespace osu.Game.Screens.Edit.Compose.Components
             base.AddBlueprintFor(hitObject);
         }
 
+        private void removePlacement()
+        {
+            if (currentPlacement == null) return;
+
+            currentPlacement.EndPlacement(false);
+            currentPlacement = null;
+        }
+
         private HitObjectCompositionTool currentTool;
 
         /// <summary>
@@ -137,6 +140,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         public HitObjectCompositionTool CurrentTool
         {
             get => currentTool;
+
             set
             {
                 if (currentTool == value)
