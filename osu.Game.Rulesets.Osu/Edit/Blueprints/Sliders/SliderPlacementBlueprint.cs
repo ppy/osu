@@ -126,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void beginCurve()
         {
-            BeginPlacement();
+            BeginPlacement(commitStart: true);
             setState(PlacementState.Body);
         }
 
