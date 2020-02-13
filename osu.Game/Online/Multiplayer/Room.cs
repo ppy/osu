@@ -32,10 +32,6 @@ namespace osu.Game.Online.Multiplayer
         public BindableList<PlaylistItem> Playlist { get; private set; } = new BindableList<PlaylistItem>();
 
         [Cached]
-        [JsonIgnore]
-        public Bindable<PlaylistItem> CurrentItem { get; private set; } = new Bindable<PlaylistItem>();
-
-        [Cached]
         [JsonProperty("channel_id")]
         public Bindable<int> ChannelId { get; private set; } = new Bindable<int>();
 
@@ -69,18 +65,6 @@ namespace osu.Game.Online.Multiplayer
 
         [Cached]
         public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
-
-        public Room()
-        {
-            Playlist.ItemsAdded += updateCurrent;
-            Playlist.ItemsRemoved += updateCurrent;
-            updateCurrent(Playlist);
-        }
-
-        private void updateCurrent(IEnumerable<PlaylistItem> playlist)
-        {
-            CurrentItem.Value = playlist.FirstOrDefault();
-        }
 
         // todo: TEMPORARY
         [JsonProperty("participant_count")]
@@ -136,11 +120,9 @@ namespace osu.Game.Online.Multiplayer
             if (DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();
 
-            // Todo: Temporary, should only remove/add new items (requires framework changes)
-            if (Playlist.Count == 0)
-                Playlist.AddRange(other.Playlist);
-            else if (other.Playlist.Count > 0)
-                Playlist.First().ID = other.Playlist.First().ID;
+            foreach (var removedItem in Playlist.Except(other.Playlist).ToArray())
+                Playlist.Remove(removedItem);
+            Playlist.AddRange(other.Playlist.Except(Playlist).ToArray());
 
             Position = other.Position;
         }
