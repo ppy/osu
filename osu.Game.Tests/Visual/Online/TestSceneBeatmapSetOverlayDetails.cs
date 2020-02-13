@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Screens.Select.Details;
 
@@ -21,6 +23,9 @@ namespace osu.Game.Tests.Visual.Online
         };
 
         private RatingsExposingDetails details;
+
+        [Cached]
+        private OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
         [SetUp]
         public void Setup() => Schedule(() =>
@@ -55,8 +60,12 @@ namespace osu.Game.Tests.Visual.Online
                         {
                             Fails = Enumerable.Range(1, 100).Select(_ => RNG.Next(10)).ToArray(),
                             Retries = Enumerable.Range(-2, 100).Select(_ => RNG.Next(10)).ToArray(),
-                        }
+                        },
                     }
+                },
+                OnlineInfo = new BeatmapSetOnlineInfo
+                {
+                    Status = BeatmapSetOnlineStatus.Ranked
                 }
             };
         }
