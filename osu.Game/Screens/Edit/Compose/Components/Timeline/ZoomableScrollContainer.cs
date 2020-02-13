@@ -2,10 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Framework.Utils;
 using osu.Game.Graphics.Containers;
 using osuTK;
@@ -29,6 +31,9 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override Container<Drawable> Content => zoomedContent;
 
         private float currentZoom = 1;
+
+        [Resolved]
+        private IFrameBasedClock editorClock { get; set; }
 
         public ZoomableScrollContainer()
             : base(Direction.Horizontal)
@@ -104,8 +109,15 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         protected override bool OnScroll(ScrollEvent e)
         {
             if (e.IsPrecise)
+            {
+                // can't handle scroll correctly while playing.
+                // the editor will handle this case for us.
+                if (editorClock.IsRunning)
+                    return false;
+
                 // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
                 return base.OnScroll(e);
+            }
 
             setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
             return true;
