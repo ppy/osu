@@ -376,16 +376,22 @@ namespace osu.Game.Screens.Select
 
         private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            if (e.NewValue is DummyWorkingBeatmap) return;
+            if (e.NewValue is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
-            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
+            if (!Carousel.SelectBeatmap(e.NewValue.BeatmapInfo, false))
             {
-                // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
-                if (e.NewValue?.BeatmapInfo?.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
+                // A selection may not have been possible with filters applied.
+
+                // There was possibly a ruleset mismatch. This is a case we can help things along by updating the game-wide ruleset to match.
+                if (e.NewValue.BeatmapInfo.Ruleset != null && !e.NewValue.BeatmapInfo.Ruleset.Equals(decoupledRuleset.Value))
                 {
                     Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
-                    Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
+                    transferRulesetValue();
                 }
+
+                // Even if a ruleset mismatch was not the cause (ie. a text filter is applied),
+                // we still want to forcefully show the new beatmap, bypassing filters.
+                Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
             }
         }
 

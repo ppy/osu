@@ -229,6 +229,17 @@ namespace osu.Game.Screens.Select
                 if (item != null)
                 {
                     select(item);
+
+                    // if we got here and the set is filtered, it means we were bypassing filters.
+                    // in this case, reapplying the filter is necessary to ensure the panel is in the correct place
+                    // (since it is forcefully being included in the carousel).
+                    if (set.Filtered.Value)
+                    {
+                        Debug.Assert(bypassFilters);
+
+                        applyActiveCriteria(false, true);
+                    }
+
                     return true;
                 }
             }
