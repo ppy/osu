@@ -76,17 +76,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #endregion
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            if (currentPlacement != null)
-            {
-                updatePlacementPosition(e.ScreenSpaceMousePosition);
-                return true;
-            }
-
-            return base.OnMouseMove(e);
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -95,6 +84,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 createPlacement();
             else if (currentPlacement?.PlacementActive == false)
                 removePlacement();
+
+            if (currentPlacement != null)
+                updatePlacementPosition(inputManager.CurrentState.Mouse.Position);
         }
 
         protected sealed override SelectionBlueprint CreateBlueprintFor(HitObject hitObject)
