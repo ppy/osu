@@ -21,7 +21,7 @@ namespace osu.Game.Overlays
     public class BeatmapSetOverlay : FullscreenOverlay
     {
         public const float X_PADDING = 40;
-        public const float TOP_PADDING = 25;
+        public const float Y_PADDING = 25;
         public const float RIGHT_WIDTH = 275;
         protected readonly Header Header;
 
