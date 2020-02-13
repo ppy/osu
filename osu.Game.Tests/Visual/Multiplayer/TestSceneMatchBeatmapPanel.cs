@@ -32,11 +32,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Origin = Anchor.Centre,
             });
 
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1763072 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2101557 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1973466 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2109801 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1922035 } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 1763072 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 2101557 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 1973466 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 2109801 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 1922035 } } });
         }
 
         protected override void LoadComplete()
