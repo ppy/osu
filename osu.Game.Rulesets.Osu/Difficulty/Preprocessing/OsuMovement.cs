@@ -232,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                             double cos012 = Math.Min(Math.Max(-s01.DotProduct(s12) / d01 / d12, -1), 1);
                             double correction0_moving = correction0MovingSpline.Interpolate(cos012);
 
-                            double movingness = SpecialFunctions.Logistic(d01 * 2) * 2 - 1;
+                            double movingness = SpecialFunctions.Logistic(d01 * 6 - 5) - SpecialFunctions.Logistic(-5);
                             correction0 = (movingness * correction0_moving + (1 - movingness) * correction0Still) * 1.5;
                         }
                     }
