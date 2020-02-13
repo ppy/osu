@@ -126,16 +126,8 @@ namespace osu.Game.Overlays.Comments
 
         private void onCommentRepliesReceived(CommentBundle response, DrawableComment drawableComment)
         {
-            var receivedComments = response.Comments;
-
-            var uniqueComments = new List<Comment>();
-
             // We may receive already loaded comments
-            receivedComments.ForEach(c =>
-            {
-                if (!drawableComment.ContainsReply(c.Id))
-                    uniqueComments.Add(c);
-            });
+            var uniqueComments = response.Comments.Where(c => !drawableComment.ContainsReply(c.Id)).ToList();
 
             uniqueComments.ForEach(c => c.ParentComment = drawableComment.Comment);
 
