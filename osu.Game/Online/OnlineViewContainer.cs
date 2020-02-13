@@ -21,7 +21,7 @@ namespace osu.Game.Online
 
         protected const double TRANSFORM_TIME = 300.0;
 
-        private Container viewContent;
+        private readonly Container viewContent;
         protected override Container<Drawable> Content => viewContent;
 
         [Resolved]
@@ -69,9 +69,9 @@ namespace osu.Game.Online
             }
         }
 
-        protected abstract void PopContentOut(Drawable content);
+        protected virtual void PopContentOut(Drawable content) => content.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
 
-        protected abstract void PopContentIn(Drawable content);
+        protected virtual void PopContentIn(Drawable content) => content.FadeIn(TRANSFORM_TIME, Easing.OutQuint);
 
         protected override void LoadComplete()
         {

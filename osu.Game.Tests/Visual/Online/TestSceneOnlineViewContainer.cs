@@ -54,10 +54,6 @@ namespace osu.Game.Tests.Visual.Online
                     }
                 };
             }
-
-            protected override void PopContentOut(Drawable content) => content.Hide();
-
-            protected override void PopContentIn(Drawable content) => content.Show();
         }
 
         [Test]
