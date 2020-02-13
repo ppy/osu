@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             public new LoadingAnimation LoadingAnimation => base.LoadingAnimation;
 
-            public CompositeDrawable ViewTarget => base.Content.Parent;
+            public CompositeDrawable ViewTarget => base.Content;
 
             public TestOnlineViewContainer()
                 : base(@"Please sign in to view dummy test content")
