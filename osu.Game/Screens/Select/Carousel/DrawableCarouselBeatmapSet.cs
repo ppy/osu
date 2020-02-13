@@ -34,18 +34,20 @@ namespace osu.Game.Screens.Select.Carousel
         private DialogOverlay dialogOverlay;
         private readonly BeatmapSetInfo beatmapSet;
 
-        private BeatmapCarousel carousel;
+        private SongSelect songSelect;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
             : base(set)
         {
             beatmapSet = set.BeatmapSet;
-            carousel = set.Carousel;
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
+        private void load(SongSelect songSelect, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
         {
+            if(songSelect != null)
+                this.songSelect = songSelect;
+
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             dialogOverlay = overlay;
             if (beatmapOverlay != null)
@@ -121,7 +123,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             return beatmaps.Count > maximum_difficulty_icons
                 ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
-                : beatmaps.Select(b => new FilterableDifficultyIcon(b, carousel));
+                : beatmaps.Select(b => new FilterableDifficultyIcon(b, songSelect, songSelect.Carousel));
         }
 
         public MenuItem[] ContextMenuItems
@@ -214,32 +216,33 @@ namespace osu.Game.Screens.Select.Carousel
         {
             private readonly BindableBool filtered = new BindableBool();
 
+            private SongSelect songSelect;
             private BeatmapCarousel carousel;
             private BeatmapInfo info;
 
-            public FilterableDifficultyIcon(CarouselBeatmap item, BeatmapCarousel carousel)
+            public FilterableDifficultyIcon(CarouselBeatmap item, SongSelect songSelect, BeatmapCarousel carousel)
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
 
+                this.songSelect = songSelect;
                 this.carousel = carousel;
                 info = item.Beatmap;
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                if(e.AltPressed || carousel.SelectedBeatmap == info)
+                if(!filtered.Value)
                 {
-                    Schedule(() => carousel.SelectionFinalised?.Invoke(info));
-                }
-                else
-                {
-                    carousel.SelectBeatmap(info);
+                    carousel?.SelectBeatmap(info);
+
+                    if (e.AltPressed)
+                        songSelect?.FinaliseSelection();
                 }
 
-                return true;
+                return base.OnClick(e);
             }
         }
 
