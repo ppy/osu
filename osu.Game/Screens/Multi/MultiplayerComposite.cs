@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
@@ -35,7 +34,7 @@ namespace osu.Game.Screens.Multi
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
 
         [Resolved(typeof(Room))]
-        protected Bindable<IEnumerable<User>> Participants { get; private set; }
+        protected BindableList<User> Participants { get; private set; }
 
         [Resolved(typeof(Room))]
         protected Bindable<int> ParticipantCount { get; private set; }
