@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            CurrentItem.BindValueChanged(item => loadNewPanel(item.NewValue?.Beatmap), true);
+            CurrentItem.BindValueChanged(item => loadNewPanel(item.NewValue?.Beatmap.Value), true);
         }
 
         private void loadNewPanel(BeatmapInfo beatmap)
