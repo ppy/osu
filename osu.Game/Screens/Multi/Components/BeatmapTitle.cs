@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
@@ -25,7 +26,10 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            CurrentItem.BindValueChanged(_ => updateText(), true);
+            Playlist.ItemsAdded += _ => updateText();
+            Playlist.ItemsRemoved += _ => updateText();
+
+            updateText();
         }
 
         private float textSize = OsuFont.DEFAULT_FONT_SIZE;
@@ -54,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
 
             textFlow.Clear();
 
-            var beatmap = CurrentItem.Value?.Beatmap;
+            var beatmap = Playlist.FirstOrDefault()?.Beatmap;
 
             if (beatmap == null)
             {

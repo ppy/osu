@@ -26,10 +26,11 @@ namespace osu.Game.Users
 {
     public class UserPanel : OsuClickableContainer, IHasContextMenu
     {
-        private readonly User user;
         private const float height = 100;
         private const float content_padding = 10;
         private const float status_height = 30;
+
+        public readonly User User;
 
         [Resolved(canBeNull: true)]
         private OsuColour colours { get; set; }
@@ -54,7 +55,7 @@ namespace osu.Game.Users
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            this.user = user;
+            User = user;
 
             Height = height - status_height;
         }
@@ -86,7 +87,7 @@ namespace osu.Game.Users
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        User = user,
+                        User = User,
                     }, 300, 5000)
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -106,7 +107,7 @@ namespace osu.Game.Users
                             new UpdateableAvatar
                             {
                                 Size = new Vector2(height - status_height - content_padding * 2),
-                                User = user,
+                                User = User,
                                 Masking = true,
                                 CornerRadius = 5,
                                 OpenOnClick = { Value = false },
@@ -125,7 +126,7 @@ namespace osu.Game.Users
                                 {
                                     new OsuSpriteText
                                     {
-                                        Text = user.Username,
+                                        Text = User.Username,
                                         Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 18, italics: true),
                                     },
                                     infoContainer = new FillFlowContainer
@@ -138,7 +139,7 @@ namespace osu.Game.Users
                                         Spacing = new Vector2(5f, 0f),
                                         Children = new Drawable[]
                                         {
-                                            new UpdateableFlag(user.Country)
+                                            new UpdateableFlag(User.Country)
                                             {
                                                 Width = 30f,
                                                 RelativeSizeAxes = Axes.Y,
@@ -191,12 +192,12 @@ namespace osu.Game.Users
                 }
             });
 
-            if (user.IsSupporter)
+            if (User.IsSupporter)
             {
                 infoContainer.Add(new SupporterIcon
                 {
                     Height = 20f,
-                    SupportLevel = user.SupportLevel
+                    SupportLevel = User.SupportLevel
                 });
             }
 
@@ -206,7 +207,7 @@ namespace osu.Game.Users
             base.Action = ViewProfile = () =>
             {
                 Action?.Invoke();
-                profile?.ShowUser(user);
+                profile?.ShowUser(User);
             };
         }
 
