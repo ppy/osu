@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Users;
@@ -17,7 +18,9 @@ namespace osu.Game.Online.API
             Id = 1001,
         });
 
-        public bool IsLoggedIn => true;
+        public Bindable<UserActivity> Activity { get; } = new Bindable<UserActivity>();
+
+        public bool IsLoggedIn => State == APIState.Online;
 
         public string ProvidedUsername => LocalUser.Value.Username;
 
@@ -41,9 +44,22 @@ namespace osu.Game.Online.API
             }
         }
 
+        public DummyAPIAccess()
+        {
+            LocalUser.BindValueChanged(u =>
+            {
+                u.OldValue?.Activity.UnbindFrom(Activity);
+                u.NewValue.Activity.BindTo(Activity);
+            }, true);
+        }
+
         public virtual void Queue(APIRequest request)
         {
         }
+
+        public void Perform(APIRequest request) { }
+
+        public Task PerformAsync(APIRequest request) => Task.CompletedTask;
 
         public void Register(IOnlineComponent component)
         {

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
@@ -26,9 +25,13 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public const float HEIGHT = 200;
 
-        public MatchTabControl Tabs;
+        public readonly BindableBool ShowBeatmapPanel = new BindableBool();
+
+        public MatchTabControl Tabs { get; private set; }
 
         public Action RequestBeatmapSelection;
+
+        private MatchBeatmapPanel beatmapPanel;
 
         public Header()
         {
@@ -54,8 +57,14 @@ namespace osu.Game.Screens.Multi.Match.Components
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.4f), Color4.Black.Opacity(0.6f)),
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.7f), Color4.Black.Opacity(0.8f)),
                         },
+                        beatmapPanel = new MatchBeatmapPanel
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Margin = new MarginPadding { Right = 100 },
+                        }
                     }
                 },
                 new Box
@@ -110,9 +119,15 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>(), true);
+            CurrentItem.BindValueChanged(item => modDisplay.Current.Value = item.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>(), true);
 
             beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            ShowBeatmapPanel.BindValueChanged(value => beatmapPanel.FadeTo(value.NewValue ? 1 : 0, 200, Easing.OutQuint), true);
         }
 
         private class BeatmapSelectButton : HeaderButton
@@ -138,7 +153,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
             {
-                protected override double FadeDuration => 200;
+                protected override double TransformDuration => 200;
             }
         }
     }

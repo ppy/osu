@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Chat;
 using osuTK.Graphics;
@@ -21,13 +22,9 @@ namespace osu.Game.Online.Chat
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
 
-        public Action Exit;
-
         private readonly FocusedTextBox textbox;
 
         protected ChannelManager ChannelManager;
-
-        private ScrollContainer scroll;
 
         private DrawableChannel drawableChannel;
 
@@ -68,8 +65,6 @@ namespace osu.Game.Online.Chat
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
-
-                textbox.Exit += () => Exit?.Invoke();
             }
 
             Channel.BindValueChanged(channelChanged);
@@ -130,10 +125,35 @@ namespace osu.Game.Online.Chat
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
+            protected override DaySeparator CreateDaySeparator(DateTimeOffset time) => new CustomDaySeparator(time);
+
             public StandAloneDrawableChannel(Channel channel)
                 : base(channel)
             {
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
                 ChatLineFlow.Padding = new MarginPadding { Horizontal = 0 };
+            }
+
+            private class CustomDaySeparator : DaySeparator
+            {
+                public CustomDaySeparator(DateTimeOffset time)
+                    : base(time)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load(OsuColour colours)
+                {
+                    Colour = colours.Yellow;
+                    TextSize = 14;
+                    LineHeight = 1;
+                    Padding = new MarginPadding { Horizontal = 10 };
+                    Margin = new MarginPadding { Vertical = 5 };
+                }
             }
         }
 
@@ -143,6 +163,7 @@ namespace osu.Game.Online.Chat
 
             protected override float HorizontalPadding => 10;
             protected override float MessagePadding => 120;
+            protected override float TimestampPadding => 50;
 
             public StandAloneMessage(Message message)
                 : base(message)

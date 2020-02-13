@@ -6,24 +6,18 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shaders;
+using osu.Framework.Utils;
 using osu.Game.Screens.Menu;
 using osuTK;
 using osu.Framework.Screens;
-using osu.Game.Overlays;
+using osu.Game.Configuration;
+using IntroSequence = osu.Game.Configuration.IntroSequence;
 
 namespace osu.Game.Screens
 {
-    public class Loader : OsuScreen
+    public class Loader : StartupScreen
     {
         private bool showDisclaimer;
-
-        public override bool HideOverlaysOnEnter => true;
-
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
-
-        protected override bool AllowBackButton => false;
 
         public Loader()
         {
@@ -54,7 +48,30 @@ namespace osu.Game.Screens
         private OsuScreen loadableScreen;
         private ShaderPrecompiler precompiler;
 
-        protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+        private IntroSequence introSequence;
+
+        protected virtual OsuScreen CreateLoadableScreen()
+        {
+            if (showDisclaimer)
+                return new Disclaimer(getIntroSequence());
+
+            return getIntroSequence();
+        }
+
+        private IntroScreen getIntroSequence()
+        {
+            if (introSequence == IntroSequence.Random)
+                introSequence = (IntroSequence)RNG.Next(0, (int)IntroSequence.Random);
+
+            switch (introSequence)
+            {
+                case IntroSequence.Circles:
+                    return new IntroCircles();
+
+                default:
+                    return new IntroTriangles();
+            }
+        }
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
@@ -80,9 +97,10 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load(OsuGameBase game, OsuConfigManager config)
         {
             showDisclaimer = game.IsDeployedBuild;
+            introSequence = config.Get<IntroSequence>(OsuSetting.IntroSequence);
         }
 
         /// <summary>

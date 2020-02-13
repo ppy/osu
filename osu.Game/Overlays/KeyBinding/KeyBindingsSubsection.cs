@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.KeyBinding
             this.variant = variant;
 
             FlowContent.Spacing = new Vector2(0, 1);
-            FlowContent.Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS };
+            FlowContent.Padding = new MarginPadding { Left = SettingsPanel.CONTENT_MARGINS, Right = SettingsPanel.CONTENT_MARGINS };
         }
 
         [BackgroundDependencyLoader]
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.KeyBinding
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Text = "Reset";
+            Text = "Reset all bindings in section";
             RelativeSizeAxes = Axes.X;
             Margin = new MarginPadding { Top = 5 };
             Height = 20;

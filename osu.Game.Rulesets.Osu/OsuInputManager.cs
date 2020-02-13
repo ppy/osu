@@ -18,12 +18,25 @@ namespace osu.Game.Rulesets.Osu
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
         }
 
+        /// <summary>
+        /// Whether the user's cursor movement events should be accepted.
+        /// Can be used to block only movement while still accepting button input.
+        /// </summary>
+        public bool AllowUserCursorMovement { get; set; } = true;
+
         protected override RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new OsuKeyBindingContainer(ruleset, variant, unique);
 
         public OsuInputManager(RulesetInfo ruleset)
             : base(ruleset, 0, SimultaneousBindingMode.Unique)
         {
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            if (e is MouseMoveEvent && !AllowUserCursorMovement) return false;
+
+            return base.Handle(e);
         }
 
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,33 +14,29 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
-using osu.Game.Overlays;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
-    public class Disclaimer : OsuScreen
+    public class Disclaimer : StartupScreen
     {
-        private Intro intro;
         private SpriteIcon icon;
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
         private LinkFlowContainer supportFlow;
-
-        public override bool HideOverlaysOnEnter => true;
-        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
-
-        public override bool CursorVisible => false;
 
         private Drawable heart;
 
         private const float icon_y = -85;
         private const float icon_size = 30;
 
+        private readonly OsuScreen nextScreen;
+
         private readonly Bindable<User> currentUser = new Bindable<User>();
 
-        public Disclaimer()
+        public Disclaimer(OsuScreen nextScreen = null)
         {
+            this.nextScreen = nextScreen;
             ValidForResume = false;
         }
 
@@ -54,7 +49,7 @@ namespace osu.Game.Screens.Menu
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Icon = FontAwesome.Warning,
+                    Icon = FontAwesome.Solid.ExclamationTriangle,
                     Size = new Vector2(icon_size),
                     Y = icon_y,
                 },
@@ -97,7 +92,7 @@ namespace osu.Game.Screens.Menu
             textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();
 
-            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
+            static void format(SpriteText t) => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold);
 
             textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
@@ -128,7 +123,7 @@ namespace osu.Game.Screens.Menu
                     supportFlow.AddText(" to help support the game", format);
                 }
 
-                heart = supportFlow.AddIcon(FontAwesome.Heart, t =>
+                heart = supportFlow.AddIcon(FontAwesome.Solid.Heart, t =>
                 {
                     t.Padding = new MarginPadding { Left = 5 };
                     t.Font = t.Font.With(size: 12);
@@ -152,7 +147,8 @@ namespace osu.Game.Screens.Menu
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            LoadComponentAsync(intro = new Intro());
+            if (nextScreen != null)
+                LoadComponentAsync(nextScreen);
         }
 
         public override void OnEntering(IScreen last)
@@ -176,7 +172,11 @@ namespace osu.Game.Screens.Menu
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d => this.Push(intro));
+                .Finally(d =>
+                {
+                    if (nextScreen != null)
+                        this.Push(nextScreen);
+                });
         }
     }
 }

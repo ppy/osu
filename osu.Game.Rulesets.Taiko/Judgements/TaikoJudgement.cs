@@ -16,8 +16,10 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             {
                 case HitResult.Good:
                     return 100;
+
                 case HitResult.Great:
                     return 300;
+
                 default:
                     return 0;
             }
@@ -29,10 +31,13 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             {
                 case HitResult.Miss:
                     return -1.0;
+
                 case HitResult.Good:
                     return 1.1;
+
                 case HitResult.Great:
                     return 3.0;
+
                 default:
                     return 0;
             }

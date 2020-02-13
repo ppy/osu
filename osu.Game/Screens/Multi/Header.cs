@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Multi
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.BottomLeft,
-                            X = -35,
+                            X = -ScreenTitle.ICON_WIDTH,
                         },
                         breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Title = "multiplayer";
+                Title = "multi";
                 Icon = OsuIcon.Multi;
                 AccentColour = colours.Yellow;
             }

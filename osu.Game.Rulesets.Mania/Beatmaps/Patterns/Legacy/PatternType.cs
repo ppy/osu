@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <summary>
         /// Keep the same as last row.
         /// </summary>
-        ForceStack = 1 << 0,
+        ForceStack = 1,
 
         /// <summary>
         /// Keep different from last row.

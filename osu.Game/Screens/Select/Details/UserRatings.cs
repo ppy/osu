@@ -20,9 +20,9 @@ namespace osu.Game.Screens.Select.Details
         private readonly Container graphContainer;
         private readonly BarGraph graph;
 
-        private BeatmapMetrics metrics;
+        private BeatmapSetMetrics metrics;
 
-        public BeatmapMetrics Metrics
+        public BeatmapSetMetrics Metrics
         {
             get => metrics;
             set

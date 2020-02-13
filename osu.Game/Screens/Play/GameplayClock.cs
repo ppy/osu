@@ -8,7 +8,7 @@ namespace osu.Game.Screens.Play
 {
     /// <summary>
     /// A clock which is used for gameplay elements that need to follow audio time 1:1.
-    /// Exposed via DI by <see cref="PausableGameplayContainer"/>.
+    /// Exposed via DI by <see cref="GameplayClockContainer"/>.
     /// <remarks>
     /// The main purpose of this clock is to stop components using it from accidentally processing the main
     /// <see cref="IFrameBasedClock"/>, as this should only be done once to ensure accuracy.
@@ -34,7 +34,6 @@ namespace osu.Game.Screens.Play
         public void ProcessFrame()
         {
             // we do not want to process the underlying clock.
-            // this is handled by PauseContainer.
         }
 
         public double ElapsedFrameTime => underlyingClock.ElapsedFrameTime;
@@ -42,5 +41,7 @@ namespace osu.Game.Screens.Play
         public double FramesPerSecond => underlyingClock.FramesPerSecond;
 
         public FrameTimeInfo TimeInfo => underlyingClock.TimeInfo;
+
+        public IClock Source => underlyingClock;
     }
 }

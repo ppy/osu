@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// This item is not in a hidden state.
         /// </summary>
-        public bool Visible => State.Value != CarouselItemState.Collapsed && !Filtered.Value;
+        public bool Visible => State.Value == CarouselItemState.Selected || (State.Value != CarouselItemState.Collapsed && !Filtered.Value);
 
         public virtual List<DrawableCarouselItem> Drawables
         {
@@ -30,8 +30,6 @@ namespace osu.Game.Screens.Select.Carousel
                 return items;
             }
         }
-
-        private int creationOrder;
 
         protected CarouselItem()
         {

@@ -12,10 +12,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class Toolbar : OverlayContainer
+    public class Toolbar : VisibilityContainer
     {
         public const float HEIGHT = 40;
         public const float TOOLTIP_HEIGHT = 30;
@@ -23,8 +24,7 @@ namespace osu.Game.Overlays.Toolbar
         public Action OnHome;
 
         private ToolbarUserButton userButton;
-
-        protected override bool BlockPositionalInput => false;
+        private ToolbarRulesetSelector rulesetSelector;
 
         private const double transition_time = 500;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame)
+        private void load(OsuGame osuGame, Bindable<RulesetInfo> parentRuleset)
         {
             Children = new Drawable[]
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        new ToolbarRulesetSelector()
+                        rulesetSelector = new ToolbarRulesetSelector()
                     }
                 },
                 new FillFlowContainer
@@ -69,13 +69,14 @@ namespace osu.Game.Overlays.Toolbar
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
                     {
+                        new ToolbarChangelogButton(),
                         new ToolbarDirectButton(),
                         new ToolbarChatButton(),
                         new ToolbarSocialButton(),
                         new ToolbarMusicButton(),
                         //new ToolbarButton
                         //{
-                        //    Icon = FontAwesome.search
+                        //    Icon = FontAwesome.Solid.search
                         //},
                         userButton = new ToolbarUserButton(),
                         new ToolbarNotificationButton(),
@@ -83,10 +84,13 @@ namespace osu.Game.Overlays.Toolbar
                 }
             };
 
-            StateChanged += visibility =>
+            // Bound after the selector is added to the hierarchy to give it a chance to load the available rulesets
+            rulesetSelector.Current.BindTo(parentRuleset);
+
+            State.ValueChanged += visibility =>
             {
                 if (overlayActivationMode.Value == OverlayActivation.Disabled)
-                    State = Visibility.Hidden;
+                    Hide();
             };
 
             if (osuGame != null)

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.IO;
 using SharpCompress.Archives.Zip;
 
 namespace osu.Game.Utils
@@ -10,6 +11,9 @@ namespace osu.Game.Utils
     {
         public static bool IsZipArchive(string path)
         {
+            if (!File.Exists(path))
+                return false;
+
             try
             {
                 using (var arc = ZipArchive.Open(path))

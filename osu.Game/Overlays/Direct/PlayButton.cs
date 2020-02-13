@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Direct
                     Origin = Anchor.Centre,
                     FillMode = FillMode.Fit,
                     RelativeSizeAxes = Axes.Both,
-                    Icon = FontAwesome.Play,
+                    Icon = FontAwesome.Solid.Play,
                 },
                 loadingAnimation = new LoadingAnimation
                 {
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Direct
 
         private void playingStateChanged(ValueChangedEvent<bool> e)
         {
-            icon.Icon = e.NewValue ? FontAwesome.Stop : FontAwesome.Play;
+            icon.Icon = e.NewValue ? FontAwesome.Solid.Stop : FontAwesome.Solid.Play;
             icon.FadeColour(e.NewValue || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
             if (e.NewValue)
@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Direct
 
                 if (Preview != null)
                 {
-                    Preview.Start();
+                    attemptStart();
                     return;
                 }
 
@@ -147,7 +147,7 @@ namespace osu.Game.Overlays.Direct
 
                     // user may have changed their mind.
                     if (Playing.Value)
-                        preview.Start();
+                        attemptStart();
                 });
             }
             else
@@ -155,6 +155,12 @@ namespace osu.Game.Overlays.Direct
                 Preview?.Stop();
                 loading = false;
             }
+        }
+
+        private void attemptStart()
+        {
+            if (Preview?.Start() != true)
+                Playing.Value = false;
         }
 
         protected override void Dispose(bool isDisposing)

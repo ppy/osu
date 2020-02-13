@@ -9,6 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
@@ -17,7 +18,7 @@ using osu.Framework.Input.Events;
 namespace osu.Game.Graphics.UserInterface
 {
     public class OsuSliderBar<T> : SliderBar<T>, IHasTooltip, IHasAccentColour
-        where T : struct, IEquatable<T>, IComparable, IConvertible
+        where T : struct, IEquatable<T>, IComparable<T>, IConvertible
     {
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
@@ -31,8 +32,14 @@ namespace osu.Game.Graphics.UserInterface
         protected readonly Nub Nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+        private readonly Container nubContainer;
 
         public virtual string TooltipText { get; private set; }
+
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
+        public bool DisplayAsPercentage { get; set; }
 
         private Color4 accentColour;
 
@@ -72,10 +79,15 @@ namespace osu.Game.Graphics.UserInterface
                     Origin = Anchor.CentreRight,
                     Alpha = 0.5f,
                 },
-                Nub = new Nub
+                nubContainer = new Container
                 {
-                    Origin = Anchor.TopCentre,
-                    Expanded = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Child = Nub = new Nub
+                    {
+                        Origin = Anchor.TopCentre,
+                        RelativePositionAxes = Axes.X,
+                        Expanded = true,
+                    },
                 },
                 new HoverClickSounds()
             };
@@ -86,8 +98,15 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sample = audio.Sample.Get(@"UI/sliderbar-notch");
+            sample = audio.Samples.Get(@"UI/sliderbar-notch");
             AccentColour = colours.Pink;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            nubContainer.Padding = new MarginPadding { Horizontal = RangePadding };
         }
 
         protected override void LoadComplete()
@@ -114,10 +133,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void OnUserChange(T value)
@@ -151,18 +170,18 @@ namespace osu.Game.Graphics.UserInterface
         private void updateTooltipText(T value)
         {
             if (CurrentNumber.IsInteger)
-                TooltipText = ((int)Convert.ChangeType(value, typeof(int))).ToString("N0");
+                TooltipText = value.ToInt32(NumberFormatInfo.InvariantInfo).ToString("N0");
             else
             {
-                double floatValue = (double)Convert.ChangeType(value, typeof(double));
-                double floatMinValue = (double)Convert.ChangeType(CurrentNumber.MinValue, typeof(double));
-                double floatMaxValue = (double)Convert.ChangeType(CurrentNumber.MaxValue, typeof(double));
+                double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                if (floatMaxValue == 1 && floatMinValue >= -1)
-                    TooltipText = floatValue.ToString("P0");
+                if (DisplayAsPercentage)
+                {
+                    TooltipText = floatValue.ToString("0%");
+                }
                 else
                 {
-                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+                    var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);
 
                     // Find the number of significant digits (we could have less than 5 after normalize())
                     var significantDigits = findPrecision(decimalPrecision);
@@ -175,15 +194,15 @@ namespace osu.Game.Graphics.UserInterface
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(MathHelper.Clamp(
-                Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(MathHelper.Clamp(
-                DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            leftBox.Scale = new Vector2(Math.Clamp(
+                RangePadding + Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
+            rightBox.Scale = new Vector2(Math.Clamp(
+                DrawWidth - Nub.DrawPosition.X - RangePadding - Nub.DrawWidth / 2, 0, DrawWidth), 1);
         }
 
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX(RangePadding + UsableWidth * value, 250, Easing.OutQuint);
+            Nub.MoveToX(value, 250, Easing.OutQuint);
         }
 
         /// <summary>
@@ -203,6 +222,7 @@ namespace osu.Game.Graphics.UserInterface
         private int findPrecision(decimal d)
         {
             int precision = 0;
+
             while (d != Math.Round(d))
             {
                 d *= 10;

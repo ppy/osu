@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             {
                 case HitResult.Miss:
                     return -0.65;
+
                 default:
                     return 0;
             }

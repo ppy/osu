@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings
                             Font = OsuFont.GetFont(size: 40),
                             Margin = new MarginPadding
                             {
-                                Left = SettingsOverlay.CONTENT_MARGINS,
+                                Left = SettingsPanel.CONTENT_MARGINS,
                                 Top = Toolbar.Toolbar.TOOLTIP_HEIGHT
                             },
                         },
@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Settings
                             Font = OsuFont.GetFont(size: 18),
                             Margin = new MarginPadding
                             {
-                                Left = SettingsOverlay.CONTENT_MARGINS,
+                                Left = SettingsPanel.CONTENT_MARGINS,
                                 Bottom = 30
                             },
                         },

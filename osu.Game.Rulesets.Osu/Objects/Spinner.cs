@@ -7,13 +7,19 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
     public class Spinner : OsuHitObject, IHasEndTime
     {
-        public double EndTime { get; set; }
-        public double Duration => EndTime - StartTime;
+        public double EndTime
+        {
+            get => StartTime + Duration;
+            set => Duration = value - StartTime;
+        }
+
+        public double Duration { get; set; }
 
         /// <summary>
         /// Number of spins required to finish the spinner without miss.
@@ -31,5 +37,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
+
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

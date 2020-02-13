@@ -9,66 +9,77 @@ using osu.Framework.Threading;
 
 namespace osu.Game.Audio
 {
+    [LongRunningLoad]
     public abstract class PreviewTrack : Component
     {
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has stopped playing.
+        /// Not invoked in a thread-safe context.
         /// </summary>
         public event Action Stopped;
 
         /// <summary>
         /// Invoked when this <see cref="PreviewTrack"/> has started playing.
+        /// Not invoked in a thread-safe context.
         /// </summary>
         public event Action Started;
 
-        private Track track;
+        protected Track Track { get; private set; }
+
         private bool hasStarted;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            track = GetTrack();
-            track.Completed += () => Schedule(Stop);
+            Track = GetTrack();
+            if (Track != null)
+                Track.Completed += Stop;
         }
 
         /// <summary>
         /// Length of the track.
         /// </summary>
-        public double Length => track?.Length ?? 0;
+        public double Length => Track?.Length ?? 0;
 
         /// <summary>
         /// The current track time.
         /// </summary>
-        public double CurrentTime => track?.CurrentTime ?? 0;
+        public double CurrentTime => Track?.CurrentTime ?? 0;
 
         /// <summary>
         /// Whether the track is loaded.
         /// </summary>
-        public bool TrackLoaded => track?.IsLoaded ?? false;
+        public bool TrackLoaded => Track?.IsLoaded ?? false;
 
         /// <summary>
         /// Whether the track is playing.
         /// </summary>
-        public bool IsRunning => track?.IsRunning ?? false;
+        public bool IsRunning => Track?.IsRunning ?? false;
 
         private ScheduledDelegate startDelegate;
 
         /// <summary>
         /// Starts playing this <see cref="PreviewTrack"/>.
         /// </summary>
-        public void Start() => startDelegate = Schedule(() =>
+        /// <returns>Whether the track is started or already playing.</returns>
+        public bool Start()
         {
-            if (track == null)
-                return;
+            if (Track == null)
+                return false;
 
-            if (hasStarted)
-                return;
+            startDelegate = Schedule(() =>
+            {
+                if (hasStarted)
+                    return;
 
-            hasStarted = true;
+                hasStarted = true;
 
-            track.Restart();
-            Started?.Invoke();
-        });
+                Track.Restart();
+                Started?.Invoke();
+            });
+
+            return true;
+        }
 
         /// <summary>
         /// Stops playing this <see cref="PreviewTrack"/>.
@@ -77,7 +88,7 @@ namespace osu.Game.Audio
         {
             startDelegate?.Cancel();
 
-            if (track == null)
+            if (Track == null)
                 return;
 
             if (!hasStarted)
@@ -85,7 +96,8 @@ namespace osu.Game.Audio
 
             hasStarted = false;
 
-            track.Stop();
+            Track.Stop();
+
             Stopped?.Invoke();
         }
 

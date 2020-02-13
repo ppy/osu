@@ -35,7 +35,7 @@ namespace osu.Game.Scoring.Legacy
             using (SerializationReader sr = new SerializationReader(stream))
             {
                 currentRuleset = GetRuleset(sr.ReadByte());
-                var scoreInfo = new LegacyScoreInfo { Ruleset = currentRuleset.RulesetInfo };
+                var scoreInfo = new ScoreInfo { Ruleset = currentRuleset.RulesetInfo };
 
                 score.ScoreInfo = scoreInfo;
 
@@ -53,12 +53,12 @@ namespace osu.Game.Scoring.Legacy
                 // MD5Hash
                 sr.ReadString();
 
-                scoreInfo.Count300 = sr.ReadUInt16();
-                scoreInfo.Count100 = sr.ReadUInt16();
-                scoreInfo.Count50 = sr.ReadUInt16();
-                scoreInfo.CountGeki = sr.ReadUInt16();
-                scoreInfo.CountKatu = sr.ReadUInt16();
-                scoreInfo.CountMiss = sr.ReadUInt16();
+                scoreInfo.SetCount300(sr.ReadUInt16());
+                scoreInfo.SetCount100(sr.ReadUInt16());
+                scoreInfo.SetCount50(sr.ReadUInt16());
+                scoreInfo.SetCountGeki(sr.ReadUInt16());
+                scoreInfo.SetCountKatu(sr.ReadUInt16());
+                scoreInfo.SetCountMiss(sr.ReadUInt16());
 
                 scoreInfo.TotalScore = sr.ReadInt32();
                 scoreInfo.MaxCombo = sr.ReadUInt16();
@@ -80,6 +80,9 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     scoreInfo.OnlineScoreID = sr.ReadInt32();
 
+                if (scoreInfo.OnlineScoreID <= 0)
+                    scoreInfo.OnlineScoreID = null;
+
                 if (compressedReplay?.Length > 0)
                 {
                     using (var replayInStream = new MemoryStream(compressedReplay))
@@ -89,6 +92,7 @@ namespace osu.Game.Scoring.Legacy
                             throw new IOException("input .lzma is too short");
 
                         long outSize = 0;
+
                         for (int i = 0; i < 8; i++)
                         {
                             int v = replayInStream.ReadByte();
@@ -135,9 +139,9 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
                     else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (ratio300 > 0.8 && countMiss == 0 || ratio300 > 0.9)
+                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
                         score.Rank = ScoreRank.A;
-                    else if (ratio300 > 0.7 && countMiss == 0 || ratio300 > 0.8)
+                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
                         score.Rank = ScoreRank.B;
                     else if (ratio300 > 0.6)
                         score.Rank = ScoreRank.C;
@@ -158,9 +162,9 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
                     else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
                         score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
-                    else if (ratio300 > 0.8 && countMiss == 0 || ratio300 > 0.9)
+                    else if ((ratio300 > 0.8 && countMiss == 0) || ratio300 > 0.9)
                         score.Rank = ScoreRank.A;
-                    else if (ratio300 > 0.7 && countMiss == 0 || ratio300 > 0.8)
+                    else if ((ratio300 > 0.7 && countMiss == 0) || ratio300 > 0.8)
                         score.Rank = ScoreRank.B;
                     else if (ratio300 > 0.6)
                         score.Rank = ScoreRank.C;
@@ -214,10 +218,13 @@ namespace osu.Game.Scoring.Legacy
         private void readLegacyReplay(Replay replay, StreamReader reader)
         {
             float lastTime = 0;
+            ReplayFrame currentFrame = null;
 
-            foreach (var l in reader.ReadToEnd().Split(','))
+            var frames = reader.ReadToEnd().Split(',');
+
+            for (var i = 0; i < frames.Length; i++)
             {
-                var split = l.Split('|');
+                var split = frames[i].Split('|');
 
                 if (split.Length < 4)
                     continue;
@@ -229,30 +236,38 @@ namespace osu.Game.Scoring.Legacy
                 }
 
                 var diff = Parsing.ParseFloat(split[0]);
+
                 lastTime += diff;
+
+                if (i == 0 && diff == 0)
+                    // osu-stable adds a zero-time frame before potentially valid negative user frames.
+                    // we need to ignore this.
+                    continue;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
                 // but for now we'll achieve equal playback to stable by skipping negative frames
                 if (diff < 0)
                     continue;
 
-                replay.Frames.Add(convertFrame(new LegacyReplayFrame(lastTime,
+                currentFrame = convertFrame(new LegacyReplayFrame(lastTime,
                     Parsing.ParseFloat(split[1], Parsing.MAX_COORDINATE_VALUE),
                     Parsing.ParseFloat(split[2], Parsing.MAX_COORDINATE_VALUE),
-                    (ReplayButtonState)Parsing.ParseInt(split[3]))));
+                    (ReplayButtonState)Parsing.ParseInt(split[3])), currentFrame);
+
+                replay.Frames.Add(currentFrame);
             }
         }
 
-        private ReplayFrame convertFrame(LegacyReplayFrame legacyFrame)
+        private ReplayFrame convertFrame(LegacyReplayFrame currentFrame, ReplayFrame lastFrame)
         {
             var convertible = currentRuleset.CreateConvertibleReplayFrame();
             if (convertible == null)
                 throw new InvalidOperationException($"Legacy replay cannot be converted for the ruleset: {currentRuleset.Description}");
 
-            convertible.ConvertFrom(legacyFrame, currentBeatmap);
+            convertible.ConvertFrom(currentFrame, currentBeatmap, lastFrame);
 
             var frame = (ReplayFrame)convertible;
-            frame.Time = legacyFrame.Time;
+            frame.Time = currentFrame.Time;
 
             return frame;
         }

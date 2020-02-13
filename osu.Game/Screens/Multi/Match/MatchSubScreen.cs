@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
@@ -19,7 +19,8 @@ using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchSubScreen : MultiplayerSubScreen
+    [Cached(typeof(IPreviewTrackOwner))]
+    public class MatchSubScreen : MultiplayerSubScreen, IPreviewTrackOwner
     {
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
@@ -43,10 +44,10 @@ namespace osu.Game.Screens.Multi.Match
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
 
         [Resolved]
-        protected Bindable<IEnumerable<Mod>> SelectedMods { get; private set; }
+        private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
@@ -61,7 +62,6 @@ namespace osu.Game.Screens.Multi.Match
         [BackgroundDependencyLoader]
         private void load()
         {
-            MatchChatDisplay chat;
             Components.Header header;
             Info info;
             GridContainer bottomRow;
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Multi.Match
                                                 Vertical = 10,
                                             },
                                             RelativeSizeAxes = Axes.Both,
-                                            Child = chat = new MatchChatDisplay
+                                            Child = new MatchChatDisplay
                                             {
                                                 RelativeSizeAxes = Axes.Both
                                             }
@@ -149,25 +149,14 @@ namespace osu.Game.Screens.Multi.Match
             header.Tabs.Current.BindValueChanged(tab =>
             {
                 const float fade_duration = 500;
-                if (tab.NewValue is SettingsMatchPage)
-                {
-                    settings.Show();
-                    info.FadeOut(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
-                }
-                else
-                {
-                    settings.Hide();
-                    info.FadeIn(fade_duration, Easing.OutQuint);
-                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
-                }
-            }, true);
 
-            chat.Exit += () =>
-            {
-                if (this.IsCurrentScreen())
-                    this.Exit();
-            };
+                var settingsDisplayed = tab.NewValue is SettingsMatchPage;
+
+                header.ShowBeatmapPanel.Value = !settingsDisplayed;
+                settings.State.Value = settingsDisplayed ? Visibility.Visible : Visibility.Hidden;
+                info.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
+                bottomRow.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
+            }, true);
 
             beatmapManager.ItemAdded += beatmapAdded;
         }
@@ -182,6 +171,9 @@ namespace osu.Game.Screens.Multi.Match
         public override bool OnExiting(IScreen next)
         {
             RoomManager?.PartRoom();
+            Mods.Value = Array.Empty<Mod>();
+            previewTrackManager.StopAnyPlaying(this);
+
             return base.OnExiting(next);
         }
 
@@ -194,20 +186,23 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            SelectedMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
+            Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+
             if (e.NewValue?.Ruleset != null)
                 Ruleset.Value = e.NewValue.Ruleset;
+
+            previewTrackManager.StopAnyPlaying(this);
         }
 
         /// <summary>
         /// Handle the case where a beatmap is imported (and can be used by this match).
         /// </summary>
-        private void beatmapAdded(BeatmapSetInfo model, bool existing) => Schedule(() =>
+        private void beatmapAdded(BeatmapSetInfo model) => Schedule(() =>
         {
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
-            if (Beatmap.Value == null)
+            if (CurrentItem.Value == null)
                 return;
 
             // Try to retrieve the corresponding local beatmap
@@ -222,7 +217,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            Beatmap.Value.Mods.Value = SelectedMods.Value.ToArray();
+            previewTrackManager.StopAnyPlaying(this);
 
             switch (type.Value)
             {

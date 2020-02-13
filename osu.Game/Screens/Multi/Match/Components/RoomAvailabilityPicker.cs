@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class RoomAvailabilityPickerItem : DisableableTabItem<RoomAvailability>
+        private class RoomAvailabilityPickerItem : DisableableTabItem
         {
             private const float transition_duration = 200;
 

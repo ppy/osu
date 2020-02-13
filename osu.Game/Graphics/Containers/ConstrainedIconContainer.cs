@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osuTK;
 
 namespace osu.Game.Graphics.Containers
@@ -34,6 +35,7 @@ namespace osu.Game.Graphics.Containers
         protected override void Update()
         {
             base.Update();
+
             if (InternalChildren.Count > 0 && InternalChild.DrawSize.X > 0)
             {
                 // We're modifying scale here for a few reasons

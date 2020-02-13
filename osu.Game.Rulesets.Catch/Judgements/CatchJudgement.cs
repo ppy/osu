@@ -17,19 +17,9 @@ namespace osu.Game.Rulesets.Catch.Judgements
             {
                 default:
                     return 0;
+
                 case HitResult.Perfect:
                     return 300;
-            }
-        }
-
-        protected override double HealthIncreaseFor(HitResult result)
-        {
-            switch (result)
-            {
-                default:
-                    return 0;
-                case HitResult.Perfect:
-                    return 10.2;
             }
         }
 

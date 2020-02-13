@@ -14,12 +14,13 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapClearScoresDialog : PopupDialog
     {
-        private ScoreManager scoreManager;
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action onCompletion)
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
-            Icon = FontAwesome.Eraser;
+            Icon = FontAwesome.Solid.Eraser;
             HeaderText = @"Clearing all local scores. Are you sure?";
             Buttons = new PopupDialogButton[]
             {
@@ -37,12 +38,6 @@ namespace osu.Game.Screens.Select
                     Text = @"No, I'm still attached.",
                 },
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ScoreManager scoreManager)
-        {
-            this.scoreManager = scoreManager;
         }
     }
 }

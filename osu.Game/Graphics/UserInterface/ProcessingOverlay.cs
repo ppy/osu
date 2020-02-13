@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0.9f,
                 },
-                new LoadingAnimation { State = Visibility.Visible }
+                new LoadingAnimation { State = { Value = Visibility.Visible } }
             };
         }
 

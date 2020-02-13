@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading.Tasks;
 using osu.Framework.Bindables;
 using osu.Game.Users;
 
@@ -12,6 +13,11 @@ namespace osu.Game.Online.API
         /// The local user.
         /// </summary>
         Bindable<User> LocalUser { get; }
+
+        /// <summary>
+        /// The current user's activity.
+        /// </summary>
+        Bindable<UserActivity> Activity { get; }
 
         /// <summary>
         /// Returns whether the local user is logged in.
@@ -36,6 +42,24 @@ namespace osu.Game.Online.API
         /// </summary>
         /// <param name="request">The request to perform.</param>
         void Queue(APIRequest request);
+
+        /// <summary>
+        /// Perform a request immediately, bypassing any API state checks.
+        /// </summary>
+        /// <remarks>
+        /// Can be used to run requests as a guest user.
+        /// </remarks>
+        /// <param name="request">The request to perform.</param>
+        void Perform(APIRequest request);
+
+        /// <summary>
+        /// Perform a request immediately, bypassing any API state checks.
+        /// </summary>
+        /// <remarks>
+        /// Can be used to run requests as a guest user.
+        /// </remarks>
+        /// <param name="request">The request to perform.</param>
+        Task PerformAsync(APIRequest request);
 
         /// <summary>
         /// Register a component to receive state changes.

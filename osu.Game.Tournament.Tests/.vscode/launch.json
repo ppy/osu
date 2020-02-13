@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "VisualTests (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/bin/Debug/netcoreapp2.1/osu.Game.Tournament.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Debug)",
+            "env": {},
+            "console": "internalConsole"
+        },
+        {
+            "name": "VisualTests (Release)",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "${workspaceRoot}/bin/Release/netcoreapp2.1/osu.Game.Tournament.Tests.dll"
+            ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Build (Release)",
+            "env": {},
+            "console": "internalConsole"
+        }
+    ]
+}

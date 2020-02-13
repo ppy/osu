@@ -104,11 +104,11 @@ namespace osu.Game.Graphics.UserInterface
 
         private class CapsWarning : SpriteIcon, IHasTooltip
         {
-            public string TooltipText => @"Caps lock is active";
+            public string TooltipText => @"caps lock is active";
 
             public CapsWarning()
             {
-                Icon = FontAwesome.Warning;
+                Icon = FontAwesome.Solid.ExclamationTriangle;
             }
 
             [BackgroundDependencyLoader]

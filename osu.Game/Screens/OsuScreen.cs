@@ -1,23 +1,26 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
+using osu.Game.Users;
+using osu.Game.Online.API;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IOsuScreen, IKeyBindingHandler<GlobalAction>, IHasDescription
+    public abstract class OsuScreen : Screen, IOsuScreen, IHasDescription
     {
         /// <summary>
         /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
@@ -32,7 +35,7 @@ namespace osu.Game.Screens
 
         public string Description => Title;
 
-        protected virtual bool AllowBackButton => true;
+        public virtual bool AllowBackButton => true;
 
         public virtual bool AllowExternalScreenChange => false;
 
@@ -51,26 +54,72 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
+        /// The <see cref="UserActivity"/> to set the user's activity automatically to when this screen is entered
+        /// <para>This <see cref="Activity"/> will be automatically set to <see cref="InitialActivity"/> for this screen on entering unless
+        /// <see cref="Activity"/> is manually set before.</para>
+        /// </summary>
+        protected virtual UserActivity InitialActivity => null;
+
+        private UserActivity activity;
+
+        /// <summary>
+        /// The current <see cref="UserActivity"/> for this screen.
+        /// </summary>
+        protected UserActivity Activity
+        {
+            get => activity;
+            set
+            {
+                if (value == activity) return;
+
+                activity = value;
+                updateActivity();
+            }
+        }
+
+        /// <summary>
         /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
         /// </summary>
         public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
         private SampleChannel sampleExit;
 
+        protected virtual bool PlayResumeSound => true;
+
         public virtual float BackgroundParallaxAmount => 1;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; set; }
+        public virtual bool AllowRateAdjustments => true;
 
-        public Bindable<RulesetInfo> Ruleset { get; set; }
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
+
+        public Bindable<RulesetInfo> Ruleset { get; private set; }
+
+        public Bindable<IReadOnlyList<Mod>> Mods { get; private set; }
+
+        private OsuScreenDependencies screenDependencies;
+
+        internal void CreateLeasedDependencies(IReadOnlyDependencyContainer dependencies) => createDependencies(dependencies);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
+            if (screenDependencies == null)
+            {
+                if (DisallowExternalBeatmapRulesetChanges)
+                    throw new InvalidOperationException($"Screens that specify {nameof(DisallowExternalBeatmapRulesetChanges)} must be pushed immediately.");
 
-            Beatmap = deps.Beatmap;
-            Ruleset = deps.Ruleset;
+                createDependencies(parent);
+            }
 
-            return deps;
+            return base.CreateChildDependencies(screenDependencies);
+        }
+
+        private void createDependencies(IReadOnlyDependencyContainer dependencies)
+        {
+            screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, dependencies);
+
+            Beatmap = screenDependencies.Beatmap;
+            Ruleset = screenDependencies.Ruleset;
+            Mods = screenDependencies.Mods;
         }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
@@ -83,6 +132,9 @@ namespace osu.Game.Screens
         [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
+        [Resolved(canBeNull: true)]
+        private IAPIProvider api { get; set; }
+
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
@@ -92,28 +144,16 @@ namespace osu.Game.Screens
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osu, AudioManager audio)
         {
-            sampleExit = audio.Sample.Get(@"UI/screen-back");
+            sampleExit = audio.Samples.Get(@"UI/screen-back");
         }
-
-        public virtual bool OnPressed(GlobalAction action)
-        {
-            if (!this.IsCurrentScreen()) return false;
-
-            if (action == GlobalAction.Back && AllowBackButton)
-            {
-                this.Exit();
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
 
         public override void OnResuming(IScreen last)
         {
-            sampleExit?.Play();
+            if (PlayResumeSound)
+                sampleExit?.Play();
             applyArrivingDefaults(true);
+
+            updateActivity();
 
             base.OnResuming(last);
         }
@@ -121,6 +161,7 @@ namespace osu.Game.Screens
         public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
+
             onSuspendingLogo();
         }
 
@@ -129,6 +170,9 @@ namespace osu.Game.Screens
             applyArrivingDefaults(false);
 
             backgroundStack?.Push(localBackground = CreateBackground());
+
+            if (activity == null)
+                Activity = InitialActivity;
 
             base.OnEntering(last);
         }
@@ -145,6 +189,12 @@ namespace osu.Game.Screens
                 backgroundStack?.Exit();
 
             return false;
+        }
+
+        private void updateActivity()
+        {
+            if (api != null)
+                api.Activity.Value = activity;
         }
 
         /// <summary>

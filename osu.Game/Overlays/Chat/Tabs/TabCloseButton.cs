@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0.75f),
-                Icon = FontAwesome.Close,
+                Icon = FontAwesome.Solid.TimesCircle,
                 RelativeSizeAxes = Axes.Both,
             };
         }
@@ -34,10 +34,10 @@ namespace osu.Game.Overlays.Chat.Tabs
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnHover(HoverEvent e)

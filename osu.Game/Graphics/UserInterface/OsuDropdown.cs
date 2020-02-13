@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 
@@ -95,7 +96,11 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
+            protected override Menu CreateSubMenu() => new OsuMenu(Direction.Vertical);
+
+            protected override DrawableDropdownMenuItem CreateDrawableDropdownMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
+
+            protected override ScrollContainer<Drawable> CreateScrollContainer(Direction direction) => new OsuScrollContainer(direction);
 
             #region DrawableOsuDropdownMenuItem
 
@@ -179,7 +184,7 @@ namespace osu.Game.Graphics.UserInterface
                             Chevron = new SpriteIcon
                             {
                                 AlwaysPresent = true,
-                                Icon = FontAwesome.ChevronRight,
+                                Icon = FontAwesome.Solid.ChevronRight,
                                 Colour = Color4.Black,
                                 Alpha = 0.5f,
                                 Size = new Vector2(8),
@@ -244,11 +249,11 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     Icon = new SpriteIcon
                     {
-                        Icon = FontAwesome.ChevronDown,
+                        Icon = FontAwesome.Solid.ChevronDown,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Margin = new MarginPadding { Right = 4 },
-                        Size = new Vector2(20),
+                        Margin = new MarginPadding { Right = 5 },
+                        Size = new Vector2(12),
                     },
                 };
 

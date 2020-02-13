@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -22,7 +22,7 @@ using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics
 {
-    public class ScreenshotManager : Container, IKeyBindingHandler<GlobalAction>, IHandleGlobalInput
+    public class ScreenshotManager : Component, IKeyBindingHandler<GlobalAction>, IHandleGlobalKeyboardInput
     {
         private readonly BindableBool cursorVisibility = new BindableBool(true);
 
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            shutter = audio.Sample.Get("UI/shutter");
+            shutter = audio.Samples.Get("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)
@@ -67,7 +67,9 @@ namespace osu.Game.Graphics
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private volatile int screenShotTasks;
 
@@ -83,16 +85,25 @@ namespace osu.Game.Graphics
                 const int frames_to_wait = 3;
 
                 int framesWaited = 0;
-                ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() => framesWaited++, 0, true);
-                while (framesWaited < frames_to_wait)
-                    Thread.Sleep(10);
 
-                waitDelegate.Cancel();
+                using (var framesWaitedEvent = new ManualResetEventSlim(false))
+                {
+                    ScheduledDelegate waitDelegate = host.DrawThread.Scheduler.AddDelayed(() =>
+                    {
+                        if (framesWaited++ >= frames_to_wait)
+                            // ReSharper disable once AccessToDisposedClosure
+                            framesWaitedEvent.Set();
+                    }, 10, true);
+
+                    framesWaitedEvent.Wait();
+                    waitDelegate.Cancel();
+                }
             }
 
             using (var image = await host.TakeScreenshotAsync())
             {
-                Interlocked.Decrement(ref screenShotTasks);
+                if (Interlocked.Decrement(ref screenShotTasks) == 0 && cursorVisibility.Value == false)
+                    cursorVisibility.Value = true;
 
                 var fileName = getFileName();
                 if (fileName == null) return;
@@ -104,11 +115,13 @@ namespace osu.Game.Graphics
                     case ScreenshotFormat.Png:
                         image.SaveAsPng(stream);
                         break;
+
                     case ScreenshotFormat.Jpg:
                         image.SaveAsJpeg(stream);
                         break;
+
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(screenshotFormat));
+                        throw new InvalidOperationException($"Unknown enum member {nameof(ScreenshotFormat)} {screenshotFormat.Value}.");
                 }
 
                 notificationOverlay.Post(new SimpleNotification
@@ -122,14 +135,6 @@ namespace osu.Game.Graphics
                 });
             }
         });
-
-        protected override void Update()
-        {
-            base.Update();
-
-            if (cursorVisibility.Value == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
-                cursorVisibility.Value = true;
-        }
 
         private string getFileName()
         {

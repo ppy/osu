@@ -3,12 +3,15 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Skinning;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -17,90 +20,43 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SliderBall : CircularContainer, ISliderProgress, IRequireHighFrequencyMousePosition
     {
-        private const float width = 128;
-
-        private Color4 accentColour = Color4.Black;
-
         public Func<OsuAction?> GetInitialHitAction;
 
-        /// <summary>
-        /// The colour that is used for the slider ball.
-        /// </summary>
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                if (drawableBall != null)
-                    drawableBall.Colour = value;
-            }
-        }
-
         private readonly Slider slider;
-        public readonly Drawable FollowCircle;
-        private Drawable drawableBall;
+        private readonly Drawable followCircle;
         private readonly DrawableSlider drawableSlider;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
-            Masking = true;
-            AutoSizeAxes = Axes.Both;
-            Blending = BlendingMode.Additive;
+
+            Blending = BlendingParameters.Additive;
             Origin = Anchor.Centre;
+
+            Size = new Vector2(OsuHitObject.OBJECT_RADIUS * 2);
 
             Children = new[]
             {
-                FollowCircle = new Container
+                followCircle = new FollowCircleContainer
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Width = width,
-                    Height = width,
+                    RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
-                    Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new CircularContainer
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        BorderThickness = 5,
-                        BorderColour = Color4.Orange,
-                        Blending = BlendingMode.Additive,
-                        Child = new Box
-                        {
-                            Colour = Color4.Orange,
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0.2f,
-                        }
-                    }),
+                    Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderFollowCircle), _ => new DefaultFollowCircle()),
                 },
                 new CircularContainer
                 {
                     Masking = true,
-                    AutoSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Alpha = 1,
                     Child = new Container
                     {
-                        Width = width,
-                        Height = width,
-                        // TODO: support skin filename animation (sliderb0, sliderb1...)
-                        Child = new SkinnableDrawable("Play/osu/sliderb", _ => new CircularContainer
-                        {
-                            Masking = true,
-                            RelativeSizeAxes = Axes.Both,
-                            BorderThickness = 10,
-                            BorderColour = Color4.White,
-                            Alpha = 1,
-                            Child = drawableBall = new Box
-                            {
-                                Colour = AccentColour,
-                                RelativeSizeAxes = Axes.Both,
-                                Alpha = 0.4f,
-                            }
-                        }),
+                        RelativeSizeAxes = Axes.Both,
+                        Child = new SkinnableDrawable(new OsuSkinComponent(OsuSkinComponents.SliderBall), _ => new DefaultSliderBall()),
                     }
                 }
             };
@@ -139,8 +95,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 tracking = value;
 
-                FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
-                FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
+                followCircle.ScaleTo(tracking ? 2.4f : 1f, 300, Easing.OutQuint);
+                followCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -193,7 +149,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // in valid time range
                 Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
                 // in valid position range
-                lastScreenSpaceMousePosition.HasValue && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                lastScreenSpaceMousePosition.HasValue && followCircle.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
                 // valid action
                 (actions?.Any(isValidTrackingAction) ?? false);
         }
@@ -212,9 +168,77 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
 
+        private Vector2? lastPosition;
+
         public void UpdateProgress(double completionProgress)
         {
-            Position = slider.CurvePositionAt(completionProgress);
+            var newPos = slider.CurvePositionAt(completionProgress);
+
+            var diff = lastPosition.HasValue ? lastPosition.Value - newPos : newPos - slider.CurvePositionAt(completionProgress + 0.01f);
+            if (diff == Vector2.Zero)
+                return;
+
+            Position = newPos;
+            Rotation = -90 + (float)(-Math.Atan2(diff.X, diff.Y) * 180 / Math.PI);
+
+            lastPosition = newPos;
+        }
+
+        private class FollowCircleContainer : Container
+        {
+            public override bool HandlePositionalInput => true;
+        }
+
+        public class DefaultFollowCircle : CompositeDrawable
+        {
+            public DefaultFollowCircle()
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new CircularContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Masking = true,
+                    BorderThickness = 5,
+                    BorderColour = Color4.Orange,
+                    Blending = BlendingParameters.Additive,
+                    Child = new Box
+                    {
+                        Colour = Color4.Orange,
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.2f,
+                    }
+                };
+            }
+        }
+
+        public class DefaultSliderBall : CompositeDrawable
+        {
+            [BackgroundDependencyLoader]
+            private void load(DrawableHitObject drawableObject, ISkinSource skin)
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                float radius = skin.GetConfig<OsuSkinConfiguration, float>(OsuSkinConfiguration.SliderPathRadius)?.Value ?? OsuHitObject.OBJECT_RADIUS;
+
+                InternalChild = new CircularContainer
+                {
+                    Masking = true,
+                    RelativeSizeAxes = Axes.Both,
+                    Scale = new Vector2(radius / OsuHitObject.OBJECT_RADIUS),
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    BorderThickness = 10,
+                    BorderColour = Color4.White,
+                    Alpha = 1,
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                        Alpha = 0.4f,
+                    }
+                };
+            }
         }
     }
 }

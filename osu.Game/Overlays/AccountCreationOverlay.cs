@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -103,10 +104,12 @@ namespace osu.Game.Overlays
                 case APIState.Offline:
                 case APIState.Failing:
                     break;
+
                 case APIState.Connecting:
                     break;
+
                 case APIState.Online:
-                    State = Visibility.Hidden;
+                    Hide();
                     break;
             }
         }

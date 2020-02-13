@@ -9,5 +9,6 @@ namespace osu.Game.Rulesets.Taiko.Mods
     {
         public override string Description => @"Beats fade out before you hit them!";
         public override double ScoreMultiplier => 1.06;
+        public override bool HasImplementation => false;
     }
 }

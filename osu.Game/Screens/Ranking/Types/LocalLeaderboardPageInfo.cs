@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Ranking.Types
             this.beatmap = beatmap;
         }
 
-        public IconUsage Icon => FontAwesome.User;
+        public IconUsage Icon => FontAwesome.Solid.User;
 
         public string Name => @"Local Leaderboard";
 
