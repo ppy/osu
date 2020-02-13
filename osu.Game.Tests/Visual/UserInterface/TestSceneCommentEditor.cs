@@ -3,18 +3,19 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Comments;
 using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
-    public class TestSceneCommentEditor : OsuTestScene
+    public class TestSceneCommentEditor : ManualInputManagerTestScene
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -25,20 +26,76 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly OsuSpriteText text;
-        private readonly TestCommentEditor commentEditor;
-        private readonly TestCancellableCommentEditor cancellableCommentEditor;
+        private TestCommentEditor commentEditor;
+        private TestCancellableCommentEditor cancellableCommentEditor;
+        private string commitText;
+        private bool cancelActionFired;
 
-        public TestSceneCommentEditor()
+        [Test]
+        public void TestCommitViaKeyboard()
         {
-            Add(new Container
+            AddStep("Create", createEditors);
+            AddStep("Click on textbox", () =>
             {
-                AutoSizeAxes = Axes.Both,
-                Child = text = new OsuSpriteText
-                {
-                    Font = OsuFont.GetFont()
-                }
+                InputManager.MoveMouseTo(commentEditor);
+                InputManager.Click(MouseButton.Left);
             });
+            AddStep("Write something", () => commentEditor.Current.Value = "text");
+            AddStep("Click Enter", () => press(Key.Enter));
+            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
+            AddAssert("Button is loading", () => commentEditor.IsLoading);
+        }
+
+        [Test]
+        public void TestCommitViaKeyboardWhenEmpty()
+        {
+            AddStep("Create", createEditors);
+            AddStep("Click on textbox", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Click Enter", () => press(Key.Enter));
+            AddAssert("Text not invoked", () => string.IsNullOrEmpty(commitText));
+            AddAssert("Button is not loading", () => !commentEditor.IsLoading);
+        }
+
+        [Test]
+        public void TestCommitViaButton()
+        {
+            AddStep("Create", createEditors);
+            AddStep("Click on textbox", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddStep("Write something", () => commentEditor.Current.Value = "text");
+            AddStep("Click on button", () =>
+            {
+                InputManager.MoveMouseTo(commentEditor.ButtonsContainer);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
+            AddAssert("Button is loading", () => commentEditor.IsLoading);
+        }
+
+        [Test]
+        public void TestCancelAction()
+        {
+            AddStep("Create", createEditors);
+            AddStep("Click on cancel button", () =>
+            {
+                InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer);
+                InputManager.Click(MouseButton.Left);
+            });
+            AddAssert("Cancel action is fired", () => cancelActionFired);
+        }
+
+        private void createEditors()
+        {
+            Clear();
+            commitText = string.Empty;
+            cancelActionFired = false;
 
             Add(new FillFlowContainer
             {
@@ -52,11 +109,12 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     commentEditor = new TestCommentEditor
                     {
-                        OnCommit = onCommit
+                        OnCommit = onCommit,
                     },
                     cancellableCommentEditor = new TestCancellableCommentEditor
                     {
-                        OnCommit = onCommit
+                        OnCommit = onCommit,
+                        OnCancel = onCancel
                     }
                 }
             });
@@ -64,17 +122,29 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private void onCommit(string value)
         {
-            text.Text = $@"Invoked text: {value}";
+            commitText = value;
 
             Scheduler.AddDelayed(() =>
             {
                 commentEditor.IsLoading = false;
                 cancellableCommentEditor.IsLoading = false;
-            }, 500);
+            }, 1000);
+        }
+
+        private void onCancel() => cancelActionFired = true;
+
+        private void press(Key key)
+        {
+            InputManager.PressKey(key);
+            InputManager.ReleaseKey(key);
         }
 
         private class TestCommentEditor : CommentEditor
         {
+            public new Bindable<string> Current => base.Current;
+
+            public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
+
             protected override string FooterText => @"Footer text. And it is pretty long. Cool.";
 
             protected override string CommitButtonText => @"Commit";
@@ -84,6 +154,8 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private class TestCancellableCommentEditor : CancellableCommentEditor
         {
+            public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
+
             protected override string FooterText => @"Wow, another one. Sicc";
 
             protected override string CommitButtonText => @"Save";
