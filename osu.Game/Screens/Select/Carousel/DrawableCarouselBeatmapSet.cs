@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select.Carousel
         [BackgroundDependencyLoader(true)]
         private void load(SongSelect songSelect, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
         {
-            if(songSelect != null)
+            if (songSelect != null)
                 this.songSelect = songSelect;
 
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             return beatmaps.Count > maximum_difficulty_icons
                 ? (IEnumerable<DifficultyIcon>)beatmaps.GroupBy(b => b.Beatmap.Ruleset).Select(group => new FilterableGroupedDifficultyIcon(group.ToList(), group.Key))
-                : beatmaps.Select(b => new FilterableDifficultyIcon(b, songSelect, songSelect.Carousel));
+                : beatmaps.Select(b => new FilterableDifficultyIcon(b, songSelect));
         }
 
         public MenuItem[] ContextMenuItems
@@ -216,11 +216,10 @@ namespace osu.Game.Screens.Select.Carousel
         {
             private readonly BindableBool filtered = new BindableBool();
 
-            private SongSelect songSelect;
-            private BeatmapCarousel carousel;
-            private BeatmapInfo info;
+            private readonly SongSelect songSelect;
+            private readonly BeatmapInfo info;
 
-            public FilterableDifficultyIcon(CarouselBeatmap item, SongSelect songSelect, BeatmapCarousel carousel)
+            public FilterableDifficultyIcon(CarouselBeatmap item, SongSelect songSelect)
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
@@ -228,15 +227,14 @@ namespace osu.Game.Screens.Select.Carousel
                 filtered.TriggerChange();
 
                 this.songSelect = songSelect;
-                this.carousel = carousel;
                 info = item.Beatmap;
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                if(!filtered.Value)
+                if (!filtered.Value)
                 {
-                    carousel?.SelectBeatmap(info);
+                    songSelect?.Carousel.SelectBeatmap(info);
 
                     if (e.AltPressed)
                         songSelect?.FinaliseSelection();
