@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -183,13 +184,13 @@ namespace osu.Game.Screens.Multi.Match
         private void currentItemChanged(ValueChangedEvent<PlaylistItem> e)
         {
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
+            var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.Value.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
             Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
 
             if (e.NewValue?.Ruleset != null)
-                Ruleset.Value = e.NewValue.Ruleset;
+                Ruleset.Value = e.NewValue.Ruleset.Value;
 
             previewTrackManager.StopAnyPlaying(this);
         }
@@ -206,7 +207,7 @@ namespace osu.Game.Screens.Multi.Match
                 return;
 
             // Try to retrieve the corresponding local beatmap
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == CurrentItem.Value.Beatmap.OnlineBeatmapID);
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == CurrentItem.Value.Beatmap.Value.OnlineBeatmapID);
 
             if (localBeatmap != null)
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);

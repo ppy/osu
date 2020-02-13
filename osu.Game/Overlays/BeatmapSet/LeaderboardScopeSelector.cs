@@ -26,10 +26,10 @@ namespace osu.Game.Overlays.BeatmapSet
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OverlayColourProvider colourProvider)
         {
-            AccentColour = colours.Blue;
-            LineColour = Color4.Gray;
+            AccentColour = colourProvider.Highlight1;
+            LineColour = colourProvider.Background1;
         }
 
         private class ScopeSelectorTabItem : PageTabItem

@@ -45,14 +45,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
                     return false;
 
                 HitObject.EndTime = EditorClock.CurrentTime;
-                EndPlacement();
+                EndPlacement(true);
             }
             else
             {
                 if (e.Button != MouseButton.Left)
                     return false;
 
-                BeginPlacement();
+                BeginPlacement(commitStart: true);
                 piece.FadeTo(1f, 150, Easing.OutQuint);
 
                 isPlacingEnd = true;

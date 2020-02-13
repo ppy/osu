@@ -65,7 +65,7 @@ namespace osu.Game.Online.Multiplayer
 
         [Cached]
         [JsonIgnore]
-        public Bindable<IEnumerable<User>> Participants { get; private set; } = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
+        public BindableList<User> Participants { get; private set; } = new BindableList<User>();
 
         [Cached]
         public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
@@ -130,7 +130,6 @@ namespace osu.Game.Online.Multiplayer
             Type.Value = other.Type.Value;
             MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
-            Participants.Value = other.Participants.Value.ToArray();
             EndDate.Value = other.EndDate.Value;
 
             if (DateTimeOffset.Now >= EndDate.Value)
@@ -141,6 +140,10 @@ namespace osu.Game.Online.Multiplayer
                 Playlist.AddRange(other.Playlist);
             else if (other.Playlist.Count > 0)
                 Playlist.First().ID = other.Playlist.First().ID;
+
+            foreach (var removedItem in Participants.Except(other.Participants).ToArray())
+                Participants.Remove(removedItem);
+            Participants.AddRange(other.Participants.Except(Participants).ToArray());
 
             Position = other.Position;
         }

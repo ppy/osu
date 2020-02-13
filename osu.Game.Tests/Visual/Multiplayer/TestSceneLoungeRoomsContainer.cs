@@ -121,10 +121,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     {
                         room.Playlist.Add(new PlaylistItem
                         {
-                            Ruleset = ruleset,
-                            Beatmap = new BeatmapInfo
+                            Ruleset = { Value = ruleset },
+                            Beatmap =
                             {
-                                Metadata = new BeatmapMetadata()
+                                Value = new BeatmapInfo
+                                {
+                                    Metadata = new BeatmapMetadata()
+                                }
                             }
                         });
                     }

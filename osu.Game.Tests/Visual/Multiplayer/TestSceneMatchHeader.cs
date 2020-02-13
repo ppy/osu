@@ -23,16 +23,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
         {
             Room.Playlist.Add(new PlaylistItem
             {
-                Beatmap = new BeatmapInfo
+                Beatmap =
                 {
-                    Metadata = new BeatmapMetadata
+                    Value = new BeatmapInfo
                     {
-                        Title = "Title",
-                        Artist = "Artist",
-                        AuthorString = "Author",
-                    },
-                    Version = "Version",
-                    Ruleset = new OsuRuleset().RulesetInfo
+                        Metadata = new BeatmapMetadata
+                        {
+                            Title = "Title",
+                            Artist = "Artist",
+                            AuthorString = "Author",
+                        },
+                        Version = "Version",
+                        Ruleset = new OsuRuleset().RulesetInfo
+                    }
                 },
                 RequiredMods =
                 {
