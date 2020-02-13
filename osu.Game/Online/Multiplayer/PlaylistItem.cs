@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
@@ -24,24 +24,16 @@ namespace osu.Game.Online.Multiplayer
         public int RulesetID { get; set; }
 
         [JsonIgnore]
-        public BeatmapInfo Beatmap
-        {
-            get => beatmap;
-            set
-            {
-                beatmap = value;
-                BeatmapID = value?.OnlineBeatmapID ?? 0;
-            }
-        }
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [JsonIgnore]
-        public RulesetInfo Ruleset { get; set; }
+        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         [JsonIgnore]
-        public readonly List<Mod> AllowedMods = new List<Mod>();
+        public readonly BindableList<Mod> AllowedMods = new BindableList<Mod>();
 
         [JsonIgnore]
-        public readonly List<Mod> RequiredMods = new List<Mod>();
+        public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
         private APIBeatmap apiBeatmap { get; set; }
@@ -64,16 +56,20 @@ namespace osu.Game.Online.Multiplayer
             set => requiredModsBacking = value;
         }
 
-        private BeatmapInfo beatmap;
+        public PlaylistItem()
+        {
+            Beatmap.BindValueChanged(beatmap => BeatmapID = beatmap.NewValue?.OnlineBeatmapID ?? 0);
+            Ruleset.BindValueChanged(ruleset => RulesetID = ruleset.NewValue?.ID ?? 0);
+        }
 
         public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
             // If we don't have an api beatmap, the request occurred as a result of room creation, so we can query the local beatmap instead
             // Todo: Is this a bug? Room creation only returns the beatmap ID
-            Beatmap = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
-            Ruleset = rulesets.GetRuleset(RulesetID);
+            Beatmap.Value = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
+            Ruleset.Value = rulesets.GetRuleset(RulesetID);
 
-            Ruleset rulesetInstance = Ruleset.CreateInstance();
+            Ruleset rulesetInstance = Ruleset.Value.CreateInstance();
 
             if (allowedModsBacking != null)
             {

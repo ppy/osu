@@ -401,15 +401,14 @@ namespace osu.Game
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
-            using (var oldBeatmap = beatmap.OldValue)
-            {
-                if (oldBeatmap?.Track != null)
-                    oldBeatmap.Track.Completed -= currentTrackCompleted;
-            }
+            var oldBeatmap = beatmap.OldValue;
+            if (oldBeatmap?.Track != null)
+                oldBeatmap.Track.Completed -= currentTrackCompleted;
 
             updateModDefaults();
 
-            nextBeatmap?.LoadBeatmapAsync();
+            oldBeatmap?.CancelAsyncLoad();
+            nextBeatmap?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)
