@@ -21,8 +21,8 @@ namespace osu.Game.Online
 
         protected const double TRANSFORM_TIME = 300.0;
 
-        private readonly Container viewTarget;
-        protected override Container<Drawable> Content { get; }
+        private Container viewContent;
+        protected override Container<Drawable> Content => viewContent;
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
@@ -31,13 +31,9 @@ namespace osu.Game.Online
         {
             InternalChildren = new Drawable[]
             {
-                viewTarget = new Container
+                viewContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = Content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
                 },
                 placeholder = new LoginPlaceholder(placeholderMessage),
                 LoadingAnimation = new LoadingAnimation
@@ -52,21 +48,21 @@ namespace osu.Game.Online
             switch (state)
             {
                 case APIState.Offline:
-                    PopContentOut(viewTarget);
+                    PopContentOut(viewContent);
                     placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * TRANSFORM_TIME, Easing.OutQuint);
                     placeholder.FadeInFromZero(2 * TRANSFORM_TIME, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Online:
-                    PopContentIn(viewTarget);
+                    PopContentIn(viewContent);
                     placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
-                    PopContentOut(viewTarget);
+                    PopContentOut(viewContent);
                     LoadingAnimation.Show();
                     placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
                     break;
