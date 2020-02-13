@@ -63,9 +63,10 @@ namespace osu.Game.Overlays.Comments
             createBaseTree(commentBundle.Comments);
         }
 
+        private readonly Dictionary<long, Comment> nodeDictionary = new Dictionary<long, Comment>();
+
         private void createBaseTree(List<Comment> comments)
         {
-            var nodeDictionary = new Dictionary<long, Comment>();
             var topLevelNodes = new List<Comment>();
             var orphanedNodes = new List<Comment>();
 
@@ -82,7 +83,6 @@ namespace osu.Game.Overlays.Comments
                 {
                     if (orphan.ParentId == comment.Id)
                     {
-                        orphan.ParentComment = comment;
                         comment.ChildComments.Add(orphan);
                         orphanedNodes.Remove(orphan);
                     }
@@ -93,10 +93,7 @@ namespace osu.Game.Overlays.Comments
                     continue;
 
                 if (nodeDictionary.ContainsKey(comment.ParentId.Value))
-                {
-                    comment.ParentComment = nodeDictionary[comment.ParentId.Value];
                     nodeDictionary[comment.ParentId.Value].ChildComments.Add(comment);
-                }
                 else
                     orphanedNodes.Add(comment);
             }
@@ -107,6 +104,9 @@ namespace osu.Game.Overlays.Comments
 
         private DrawableComment createCommentWithReplies(Comment comment)
         {
+            if (comment.ParentId.HasValue)
+                comment.ParentComment = nodeDictionary[comment.ParentId.Value];
+
             var drawableComment = createDrawableComment(comment);
 
             var replies = comment.ChildComments;
