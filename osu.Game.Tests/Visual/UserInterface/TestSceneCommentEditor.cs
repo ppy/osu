@@ -28,16 +28,10 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         private TestCommentEditor commentEditor;
         private TestCancellableCommentEditor cancellableCommentEditor;
-        private string commitText;
-        private bool cancelActionFired;
 
         [SetUp]
-        public void SetUp()
-        {
-            commitText = string.Empty;
-            cancelActionFired = false;
-
-            Schedule(() => Add(new FillFlowContainer
+        public void SetUp() => Schedule(() =>
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -47,18 +41,10 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Spacing = new Vector2(0, 20),
                 Children = new Drawable[]
                 {
-                    commentEditor = new TestCommentEditor
-                    {
-                        OnCommit = onCommit,
-                    },
-                    cancellableCommentEditor = new TestCancellableCommentEditor
-                    {
-                        OnCommit = onCommit,
-                        OnCancel = onCancel
-                    }
+                    commentEditor = new TestCommentEditor(),
+                    cancellableCommentEditor = new TestCancellableCommentEditor()
                 }
             }));
-        }
 
         [Test]
         public void TestCommitViaKeyboard()
@@ -70,7 +56,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
             AddStep("Write something", () => commentEditor.Current.Value = "text");
             AddStep("Click Enter", () => press(Key.Enter));
-            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
+            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commentEditor.CommittedText));
             AddAssert("Button is loading", () => commentEditor.IsLoading);
         }
 
@@ -83,7 +69,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.Click(MouseButton.Left);
             });
             AddStep("Click Enter", () => press(Key.Enter));
-            AddAssert("Text not invoked", () => string.IsNullOrEmpty(commitText));
+            AddAssert("Text not invoked", () => string.IsNullOrEmpty(commentEditor.CommittedText));
             AddAssert("Button is not loading", () => !commentEditor.IsLoading);
         }
 
@@ -101,7 +87,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(commentEditor.ButtonsContainer);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commitText));
+            AddAssert("Text has been invoked", () => !string.IsNullOrEmpty(commentEditor.CommittedText));
             AddAssert("Button is loading", () => commentEditor.IsLoading);
         }
 
@@ -113,21 +99,8 @@ namespace osu.Game.Tests.Visual.UserInterface
                 InputManager.MoveMouseTo(cancellableCommentEditor.ButtonsContainer);
                 InputManager.Click(MouseButton.Left);
             });
-            AddAssert("Cancel action is fired", () => cancelActionFired);
+            AddAssert("Cancel action is fired", () => cancellableCommentEditor.Cancelled);
         }
-
-        private void onCommit(string value)
-        {
-            commitText = value;
-
-            Scheduler.AddDelayed(() =>
-            {
-                commentEditor.IsLoading = false;
-                cancellableCommentEditor.IsLoading = false;
-            }, 1000);
-        }
-
-        private void onCancel() => cancelActionFired = true;
 
         private void press(Key key)
         {
@@ -138,24 +111,39 @@ namespace osu.Game.Tests.Visual.UserInterface
         private class TestCommentEditor : CommentEditor
         {
             public new Bindable<string> Current => base.Current;
-
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
 
+            public string CommittedText { get; private set; }
+
+            public TestCommentEditor()
+            {
+                OnCommit = onCommit;
+            }
+
+            private void onCommit(string value)
+            {
+                CommittedText = value;
+                Scheduler.AddDelayed(() => IsLoading = false, 1000);
+            }
+
             protected override string FooterText => @"Footer text. And it is pretty long. Cool.";
-
             protected override string CommitButtonText => @"Commit";
-
             protected override string TextboxPlaceholderText => @"This textbox is empty";
         }
 
         private class TestCancellableCommentEditor : CancellableCommentEditor
         {
             public new FillFlowContainer ButtonsContainer => base.ButtonsContainer;
-
             protected override string FooterText => @"Wow, another one. Sicc";
 
-            protected override string CommitButtonText => @"Save";
+            public bool Cancelled { get; private set; }
 
+            public TestCancellableCommentEditor()
+            {
+                OnCancel = () => Cancelled = true;
+            }
+
+            protected override string CommitButtonText => @"Save";
             protected override string TextboxPlaceholderText => @"Miltiline textboxes soon";
         }
     }
