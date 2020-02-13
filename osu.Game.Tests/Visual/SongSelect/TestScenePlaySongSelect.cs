@@ -17,6 +17,7 @@ using osu.Framework.Screens;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -426,6 +427,44 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("start not requested", () => !startRequested);
         }
 
+        [TestCase(false)]
+        [TestCase(true)]
+        public void TestExternalBeatmapChangeWhileFiltered(bool differentRuleset)
+        {
+            createSongSelect();
+            addManyTestMaps();
+
+            changeRuleset(0);
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+
+            AddStep("set filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = "nonono");
+
+            AddUntilStep("dummy selected", () => Beatmap.Value is DummyWorkingBeatmap);
+
+            AddUntilStep("has no selection", () => songSelect.Carousel.SelectedBeatmap == null);
+
+            BeatmapInfo target = null;
+
+            AddStep("select beatmap externally", () =>
+            {
+                target = manager.GetAllUsableBeatmapSets().Where(b => b.Beatmaps.Any(bi => bi.RulesetID == (differentRuleset ? 1 : 0)))
+                                .ElementAt(5).Beatmaps.First();
+
+                Beatmap.Value = manager.GetWorkingBeatmap(target);
+            });
+
+            AddUntilStep("has selection", () => songSelect.Carousel.SelectedBeatmap != null);
+
+            AddUntilStep("carousel has correct", () => songSelect.Carousel.SelectedBeatmap?.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddUntilStep("game has correct", () => Beatmap.Value.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+
+            AddStep("reset filter text", () => songSelect.FilterControl.ChildrenOfType<SearchTextBox>().First().Text = string.Empty);
+
+            AddAssert("game still correct", () => Beatmap.Value?.BeatmapInfo.OnlineBeatmapID == target.OnlineBeatmapID);
+            AddAssert("carousel still correct", () => songSelect.Carousel.SelectedBeatmap.OnlineBeatmapID == target.OnlineBeatmapID);
+        }
+
         [Test]
         public void TestAutoplayViaCtrlEnter()
         {
@@ -468,6 +507,7 @@ namespace osu.Game.Tests.Visual.SongSelect
         private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
 
         private static int importId;
+
         private int getImportId() => ++importId;
 
         private void checkMusicPlaying(bool playing) =>
@@ -550,6 +590,8 @@ namespace osu.Game.Tests.Visual.SongSelect
             public Action StartRequested;
 
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
+            public new FilterControl FilterControl => base.FilterControl;
 
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;

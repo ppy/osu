@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             RelativeSizeAxes = Axes.X;
             Height = 25;
 
-            CornerRadius = 3;
+            CornerRadius = 5;
             Masking = true;
 
             InternalChildren = new Drawable[]
