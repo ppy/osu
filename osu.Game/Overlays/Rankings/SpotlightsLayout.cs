@@ -151,11 +151,11 @@ namespace osu.Game.Overlays.Rankings
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
-
             spotlightsRequest?.Cancel();
             getRankingsRequest?.Cancel();
             cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
         }
     }
 }
