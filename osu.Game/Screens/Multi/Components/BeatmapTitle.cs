@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Multi.Components
                         Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
-                }, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
+                }, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "打开此谱面");
             }
         }
     }

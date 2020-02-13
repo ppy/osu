@@ -319,3 +319,6 @@
     *   [m] [Fix BeatSyncContainer failing at song select #7776]
     *   [m] [Bump Sentry from 2.0.1 to 2.0.2 #7781]
     *   [m] [Bump Microsoft.NET.Test.Sdk from 16.4.0 to 16.5.0 #7782]
+*   补全了一些翻译
+
+### 2020/2/13
