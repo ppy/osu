@@ -311,22 +311,12 @@ namespace osu.Game
         public void ShowBeatmap(int beatmapId) => waitForReady(() => beatmapSetOverlay, _ => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId));
 
         /// <summary>
-        /// Present a beatmap at song select immediately.
+        /// Present a specific beatmap difficulty at song select immediately.
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
-        public void PresentBeatmap(BeatmapSetInfo beatmap)
+        public void PresentBeatmap(BeatmapInfo beatmap)
         {
-            var databasedSet = beatmap.OnlineBeatmapSetID != null
-                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
-                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
-
-            if (databasedSet == null)
-            {
-                Logger.Log("The requested beatmap could not be loaded.", LoggingTarget.Information);
-                return;
-            }
-
             PerformFromScreen(screen =>
             {
                 // we might already be at song select, so a check is required before performing the load to solo.
@@ -334,17 +324,34 @@ namespace osu.Game
                     menuScreen.LoadToSolo();
 
                 // we might even already be at the song
-                if (Beatmap.Value.BeatmapSetInfo.Hash == databasedSet.Hash)
-                {
+                if (Beatmap.Value.BeatmapInfo.Hash == beatmap.Hash)
                     return;
-                }
 
-                // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First();
-
-                Ruleset.Value = first.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+                Ruleset.Value = beatmap.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap);
             }, validScreens: new[] { typeof(PlaySongSelect) });
+        }
+
+        /// <summary>
+        /// <see cref="PresentBeatmap(BeatmapInfo)"/>
+        /// Instead of selecting a specific difficulty, this will select the first difficulty of the current ruleset in a beatmapset,
+        /// or the first difficulty of the set if there is none.
+        /// </summary>
+        /// <param name="beatmapSet">The beatmapset to select.</param>
+        public void PresentBeatmap(BeatmapSetInfo beatmapSet)
+        {
+            var databasedSet = beatmapSet.OnlineBeatmapSetID != null
+                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmapSet.OnlineBeatmapSetID)
+                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmapSet.Hash);
+
+            if (databasedSet == null)
+            {
+                Logger.Log("The requested beatmap could not be loaded.", LoggingTarget.Information);
+                return;
+            }
+
+            var first = databasedSet.Beatmaps.Find(b => b.Ruleset.Equals(Ruleset.Value)) ?? databasedSet.Beatmaps.First();
+            PresentBeatmap(first);
         }
 
         /// <summary>

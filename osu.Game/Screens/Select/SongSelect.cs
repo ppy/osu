@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Select
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        public BeatmapCarousel Carousel { get; private set; }
+        protected BeatmapCarousel Carousel { get; private set; }
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
