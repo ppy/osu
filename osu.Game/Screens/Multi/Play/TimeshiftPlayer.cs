@@ -50,10 +50,10 @@ namespace osu.Game.Screens.Multi.Play
             bool failed = false;
 
             // Sanity checks to ensure that TimeshiftPlayer matches the settings for the current PlaylistItem
-            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != playlistItem.Beatmap.OnlineBeatmapID)
+            if (Beatmap.Value.BeatmapInfo.OnlineBeatmapID != playlistItem.Beatmap.Value.OnlineBeatmapID)
                 throw new InvalidOperationException("Current Beatmap does not match PlaylistItem's Beatmap");
 
-            if (ruleset.Value.ID != playlistItem.Ruleset.ID)
+            if (ruleset.Value.ID != playlistItem.Ruleset.Value.ID)
                 throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
 
             if (!playlistItem.RequiredMods.All(m => Mods.Value.Any(m.Equals)))
