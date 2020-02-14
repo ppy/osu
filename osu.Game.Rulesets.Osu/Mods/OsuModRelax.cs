@@ -43,15 +43,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 switch (h)
                 {
-                    case DrawableHitCircle _:
-                        if (!h.IsHovered)
-                            break;
-
-                        Debug.Assert(h.HitObject.HitWindows != null);
-                        requiresHit |= h.HitObject.HitWindows.CanBeHit(time - h.HitObject.StartTime);
+                    case DrawableHitCircle circle:
+                        handleHitCircle(circle);
                         break;
 
                     case DrawableSlider slider:
+                        // Handles cases like "2B" beatmaps, where sliders may be overlapping and simply holding is not enough.
+                        if (!slider.HeadCircle.IsHit)
+                            handleHitCircle(slider.HeadCircle);
+
                         requiresHold |= slider.Ball.IsHovered || h.IsHovered;
                         break;
 
@@ -68,6 +68,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             addAction(requiresHold);
+
+            void handleHitCircle(DrawableHitCircle circle)
+            {
+                if (!circle.IsHovered)
+                    return;
+
+                Debug.Assert(circle.HitObject.HitWindows != null);
+                requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
+            }
         }
 
         private bool wasHit;
