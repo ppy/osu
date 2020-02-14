@@ -81,8 +81,6 @@ namespace osu.Game.Screens.Play
 
         private IdleTracker idleTracker;
 
-        private Bindable<bool> muteWarningShownOnce;
-
         private ScheduledDelegate scheduledPushPlayer;
 
         [Resolved(CanBeNull = true)]
@@ -142,6 +140,8 @@ namespace osu.Game.Screens.Play
             inputManager = GetContainingInputManager();
         }
 
+        #region Screen handling
+
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
@@ -156,15 +156,7 @@ namespace osu.Game.Screens.Play
             MetadataInfo.Delay(750).FadeIn(500);
             this.Delay(1800).Schedule(pushWhenLoaded);
 
-            if (!muteWarningShownOnce.Value)
-            {
-                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
-                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
-                {
-                    notificationOverlay?.Post(new MutedNotification());
-                    muteWarningShownOnce.Value = true;
-                }
-            }
+            showMuteWarningIfNeeded();
         }
 
         public override void OnResuming(IScreen last)
@@ -226,6 +218,8 @@ namespace osu.Game.Screens.Play
             base.LogoExiting(logo);
             content.StopTracking();
         }
+
+        #endregion
 
         protected override void Update()
         {
@@ -351,6 +345,23 @@ namespace osu.Game.Screens.Play
 
         #endregion
 
+        #region Mute warning
+
+        private Bindable<bool> muteWarningShownOnce;
+
+        private void showMuteWarningIfNeeded()
+        {
+            if (!muteWarningShownOnce.Value)
+            {
+                //Checks if the notification has not been shown yet and also if master volume is muted, track/music volume is muted or if the whole game is muted.
+                if (volumeOverlay?.IsMuted.Value == true || audioManager.Volume.Value <= audioManager.Volume.MinValue || audioManager.VolumeTrack.Value <= audioManager.VolumeTrack.MinValue)
+                {
+                    notificationOverlay?.Post(new MutedNotification());
+                    muteWarningShownOnce.Value = true;
+                }
+            }
+        }
+
         private class MutedNotification : SimpleNotification
         {
             public override bool IsImportant => true;
@@ -378,5 +389,7 @@ namespace osu.Game.Screens.Play
                 };
             }
         }
+
+        #endregion
     }
 }
