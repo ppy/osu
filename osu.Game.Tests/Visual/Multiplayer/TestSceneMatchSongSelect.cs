@@ -126,6 +126,14 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("playlist has 1 item", () => Room.Playlist.Count == 1);
         }
 
+        [Test]
+        public void TestAddSameItemMultipleTimes()
+        {
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddStep("create new item", () => songSelect.BeatmapDetails.CreateNewItem());
+            AddAssert("playlist has 2 items", () => Room.Playlist.Count == 2);
+        }
+
         private class TestMatchSongSelect : MatchSongSelect
         {
             public new MatchBeatmapDetailArea BeatmapDetails => (MatchBeatmapDetailArea)base.BeatmapDetails;

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -53,6 +54,7 @@ namespace osu.Game.Screens.Select
         {
             PlaylistItem item = new PlaylistItem
             {
+                ID = (Playlist.LastOrDefault()?.ID + 1) ?? 0,
                 Beatmap = { Value = Beatmap.Value.BeatmapInfo },
                 Ruleset = { Value = Ruleset.Value }
             };
