@@ -14,14 +14,9 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "Devices";
 
-        private AudioManager audio;
+        [Resolved]
+        private AudioManager audio { get; set; }
         private SettingsDropdown<string> dropdown;
-
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            this.audio = audio;
-        }
 
         protected override void Dispose(bool isDisposing)
         {

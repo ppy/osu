@@ -27,7 +27,8 @@ namespace osu.Game.Overlays
     {
         private const float panel_padding = 10f;
 
-        private RulesetStore rulesets;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -155,11 +156,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colours)
         {
-            this.rulesets = rulesets;
-            this.previewTrackManager = previewTrackManager;
-
             resultCountsContainer.Colour = colours.Yellow;
         }
 
@@ -228,7 +226,9 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
 
         private ScheduledDelegate queryChangedDebounce;
-        private PreviewTrackManager previewTrackManager;
+        
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {

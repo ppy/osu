@@ -102,13 +102,12 @@ namespace osu.Game.Screens.Menu
                 this.background = background;
             }
 
-            private OsuGameBase game;
+            [Resolved]
+            private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuGameBase game)
+            private void load(TextureStore textures)
             {
-                this.game = game;
-
                 InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles
