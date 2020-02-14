@@ -592,8 +592,6 @@ namespace osu.Game.Screens.Select
                         scrollPositionCache.Invalidate();
                     }
                 };
-
-                c.Select = () => SelectBeatmap(c.Beatmap);
             }
 
             return set;

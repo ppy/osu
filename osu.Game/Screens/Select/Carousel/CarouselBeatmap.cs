@@ -13,11 +13,6 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public readonly BeatmapInfo Beatmap;
 
-        /// <summary>
-        /// Select this beatmap on the carousel.
-        /// </summary>
-        public Action Select;
-
         public CarouselBeatmap(BeatmapInfo beatmap)
         {
             Beatmap = beatmap;
