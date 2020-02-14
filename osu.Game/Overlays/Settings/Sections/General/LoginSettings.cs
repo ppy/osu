@@ -202,7 +202,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private TextBox password;
             private ShakeContainer shakeSignIn;
 
-            [Resolved]
+            [Resolved(CanBeNull = true)]
             private IAPIProvider api { get; set; }
 
             public Action RequestHide;
