@@ -15,7 +15,6 @@ using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
-using osu.Game.Screens.Select;
 using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
 namespace osu.Game.Screens.Multi.Match
@@ -78,17 +77,6 @@ namespace osu.Game.Screens.Multi.Match
                             header = new Components.Header
                             {
                                 Depth = -1,
-                                RequestBeatmapSelection = () =>
-                                {
-                                    this.Push(new MatchSongSelect
-                                    {
-                                        Selected = item =>
-                                        {
-                                            Playlist.Clear();
-                                            Playlist.Add(item);
-                                        }
-                                    });
-                                }
                             }
                         },
                         new Drawable[] { info = new Info { OnStart = onStart } },
@@ -144,18 +132,6 @@ namespace osu.Game.Screens.Multi.Match
                     Child = settings = new MatchSettingsOverlay { RelativeSizeAxes = Axes.Both },
                 },
             };
-
-            header.Tabs.Current.BindValueChanged(tab =>
-            {
-                const float fade_duration = 500;
-
-                var settingsDisplayed = tab.NewValue is SettingsMatchPage;
-
-                header.ShowBeatmapPanel.Value = !settingsDisplayed;
-                settings.State.Value = settingsDisplayed ? Visibility.Visible : Visibility.Hidden;
-                info.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
-                bottomRow.FadeTo(settingsDisplayed ? 0 : 1, fade_duration, Easing.OutQuint);
-            }, true);
 
             beatmapManager.ItemAdded += beatmapAdded;
         }
