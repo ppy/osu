@@ -37,16 +37,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Room.Playlist.Clear();
                 Room.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = new BeatmapInfo
+                    Beatmap =
                     {
-                        StarDifficulty = 2.4,
-                        Ruleset = rulesets.GetRuleset(0),
-                        Metadata = new BeatmapMetadata
+                        Value = new BeatmapInfo
                         {
-                            Title = @"My Song",
-                            Artist = @"VisualTests",
-                            AuthorString = @"osu!lazer",
-                        },
+                            StarDifficulty = 2.4,
+                            Ruleset = rulesets.GetRuleset(0),
+                            Metadata = new BeatmapMetadata
+                            {
+                                Title = @"My Song",
+                                Artist = @"VisualTests",
+                                AuthorString = @"osu!lazer",
+                            },
+                        }
                     }
                 });
             });
@@ -60,16 +63,19 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Room.Playlist.Clear();
                 Room.Playlist.Add(new PlaylistItem
                 {
-                    Beatmap = new BeatmapInfo
+                    Beatmap =
                     {
-                        StarDifficulty = 4.2,
-                        Ruleset = rulesets.GetRuleset(3),
-                        Metadata = new BeatmapMetadata
+                        Value = new BeatmapInfo
                         {
-                            Title = @"Your Song",
-                            Artist = @"Tester",
-                            AuthorString = @"Someone",
-                        },
+                            StarDifficulty = 4.2,
+                            Ruleset = rulesets.GetRuleset(3),
+                            Metadata = new BeatmapMetadata
+                            {
+                                Title = @"Your Song",
+                                Artist = @"Tester",
+                                AuthorString = @"Someone",
+                            },
+                        }
                     }
                 });
             });
