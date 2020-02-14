@@ -3,19 +3,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Screens;
+using osu.Framework.Testing;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Match;
 using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
+using osuTK.Input;
+using Header = osu.Game.Screens.Multi.Match.Components.Header;
 
 namespace osu.Game.Tests.Visual.Multiplayer
 {
-    public class TestSceneMatchSubScreen : ScreenTestScene
+    public class TestSceneMatchSubScreen : MultiplayerTestScene
     {
         protected override bool UseOnlineAPI => true;
 
@@ -27,8 +36,8 @@ namespace osu.Game.Tests.Visual.Multiplayer
             typeof(Footer)
         };
 
-        [Cached]
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
+        [Cached(typeof(IRoomManager))]
+        private readonly TestRoomManager roomManager = new TestRoomManager();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -36,51 +45,77 @@ namespace osu.Game.Tests.Visual.Multiplayer
         [Resolved]
         private RulesetStore rulesets { get; set; }
 
-        public TestSceneMatchSubScreen()
+        private TestMatchSubScreen match;
+
+        [SetUp]
+        public void Setup() => Schedule(() =>
         {
-            currentRoom.Value = new Room();
+            Room.CopyFrom(new Room());
+        });
+
+        [SetUpSteps]
+        public void SetupSteps()
+        {
+            AddStep("load match", () => LoadScreen(match = new TestMatchSubScreen(Room)));
+            AddUntilStep("wait for load", () => match.IsCurrentScreen());
         }
 
         [Test]
-        public void TestShowRoom()
+        public void TestPlaylistItemSelectedOnCreate()
         {
-            AddStep(@"show", () =>
+            AddStep("set room properties", () =>
             {
-                currentRoom.Value.RoomID.Value = 1;
-                currentRoom.Value.Availability.Value = RoomAvailability.Public;
-                currentRoom.Value.Duration.Value = TimeSpan.FromHours(24);
-                currentRoom.Value.Host.Value = new User { Username = "peppy", Id = 2 };
-                currentRoom.Value.Name.Value = "super secret room";
-                currentRoom.Value.Participants.AddRange(new[]
+                Room.Name.Value = "my awesome room";
+                Room.Host.Value = new User { Id = 2, Username = "peppy" };
+                Room.Playlist.Add(new PlaylistItem
                 {
-                    new User { Username = "peppy", Id = 2 },
-                    new User { Username = "smoogipoo", Id = 1040328 }
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo }
                 });
-                currentRoom.Value.Playlist.Add(new PlaylistItem
-                {
-                    Beatmap = { Value = beatmaps.GetAllUsableBeatmapSets()[0].Beatmaps[0] },
-                    Ruleset = { Value = rulesets.GetRuleset(2) },
-                });
-
-                LoadScreen(new MatchSubScreen(currentRoom.Value));
             });
+
+            AddStep("move mouse to create button", () =>
+            {
+                var footer = match.ChildrenOfType<Footer>().Single();
+                InputManager.MoveMouseTo(footer.ChildrenOfType<OsuButton>().Single());
+            });
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+
+            AddAssert("first playlist item selected", () => match.SelectedItem.Value == Room.Playlist[0]);
         }
 
-        [Test]
-        public void TestShowSettings()
+        private class TestMatchSubScreen : MatchSubScreen
         {
-            AddStep(@"show", () =>
+            public new Bindable<PlaylistItem> SelectedItem => base.SelectedItem;
+
+            public TestMatchSubScreen(Room room)
+                : base(room)
             {
-                currentRoom.Value.RoomID.Value = null;
-                LoadScreen(new MatchSubScreen(currentRoom.Value));
-            });
+            }
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        private class TestRoomManager : IRoomManager
         {
-            var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.BindTo(currentRoom);
-            return dependencies;
+            public event Action RoomsUpdated
+            {
+                add => throw new NotImplementedException();
+                remove => throw new NotImplementedException();
+            }
+
+            public IBindableList<Room> Rooms { get; } = new BindableList<Room>();
+
+            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+            {
+                room.RoomID.Value = 1;
+                onSuccess?.Invoke(room);
+            }
+
+            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => onSuccess?.Invoke(room);
+
+            public void PartRoom()
+            {
+            }
         }
     }
 }
