@@ -22,10 +22,10 @@ namespace osu.Game.Screens.Select
         public string ShortTitle => "歌曲选择";
         public override string Title => ShortTitle.Humanize();
 
-        [Resolved(typeof(Room))]
-        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
-
         public override bool AllowEditing => false;
+
+        [Resolved(typeof(Room), nameof(Room.Playlist))]
+        protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -59,11 +59,13 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            if (CurrentItem.Value != null)
+            var firstItem = Playlist.FirstOrDefault();
+
+            if (firstItem != null)
             {
-                Ruleset.Value = CurrentItem.Value.Ruleset.Value;
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap.Value);
-                Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+                Ruleset.Value = firstItem.Ruleset.Value;
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(firstItem.Beatmap.Value);
+                Mods.Value = firstItem.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             }
 
             return false;

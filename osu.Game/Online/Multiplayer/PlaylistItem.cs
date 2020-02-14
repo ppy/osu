@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -12,7 +13,7 @@ using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Online.Multiplayer
 {
-    public class PlaylistItem
+    public class PlaylistItem : IEquatable<PlaylistItem>
     {
         [JsonProperty("id")]
         public int ID { get; set; }
@@ -90,5 +91,14 @@ namespace osu.Game.Online.Multiplayer
 
         public bool ShouldSerializeID() => false;
         public bool ShouldSerializeapiBeatmap() => false;
+
+        public bool Equals(PlaylistItem other) => ID == other?.ID && BeatmapID == other.BeatmapID && RulesetID == other.RulesetID;
+
+        public override int GetHashCode()
+        {
+            // ReSharper disable NonReadonlyMemberInGetHashCode
+            return HashCode.Combine(ID, BeatmapID, RulesetID);
+            // ReSharper restore NonReadonlyMemberInGetHashCode
+        }
     }
 }

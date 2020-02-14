@@ -332,6 +332,11 @@
     *   [m] [Disallow seeking on osu!direct download progress bars #7808]
     *   [m] [Improve extensibility of mod display expansion #7811]
     *   [m] [Make playlist beatmap and ruleset into bindables #7812]
+    *   [m] [更新Framework #7813]
+    *   [m] [Remove the concept of a "current" item from multiplayer rooms #7814]
+    *   [m] [Make room participants into a bindable list #7815]
+    *   [m] [Add missing null-allowance to leaderboard #7816]
+    *   [m] [Use Span for OsuColour.FromHex #7827]
 
 *   谱面排行榜部分字体增大
     *   [osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs](osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs)

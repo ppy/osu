@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multi.Match
 
         public override string Title { get; }
 
-        public override string ShortTitle => "房间";
+        public override string ShortTitle => "room";
 
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
@@ -41,9 +41,6 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved(typeof(Room))]
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
-        [Resolved(typeof(Room))]
-        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
-
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
@@ -53,11 +50,12 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
+        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
         private MatchLeaderboard leaderboard;
 
         public MatchSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "创建新房间" : room.Name.Value;
+            Title = room.RoomID.Value == null ? "创建房间" : room.Name.Value;
         }
 
         [BackgroundDependencyLoader]
@@ -166,7 +164,16 @@ namespace osu.Game.Screens.Multi.Match
         {
             base.LoadComplete();
 
-            CurrentItem.BindValueChanged(currentItemChanged, true);
+            Playlist.ItemsAdded += _ => updateSelectedItem();
+            Playlist.ItemsRemoved += _ => updateSelectedItem();
+
+            updateSelectedItem();
+        }
+
+        private void updateSelectedItem()
+        {
+            selectedItem.Value = Playlist.FirstOrDefault();
+            currentItemChanged();
         }
 
         public override bool OnExiting(IScreen next)
@@ -181,16 +188,18 @@ namespace osu.Game.Screens.Multi.Match
         /// <summary>
         /// Handles propagation of the current playlist item's content to game-wide mechanisms.
         /// </summary>
-        private void currentItemChanged(ValueChangedEvent<PlaylistItem> e)
+        private void currentItemChanged()
         {
+            var item = selectedItem.Value;
+
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.Value.OnlineBeatmapID);
+            var localBeatmap = item?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.Beatmap.Value.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+            Mods.Value = item?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
 
-            if (e.NewValue?.Ruleset != null)
-                Ruleset.Value = e.NewValue.Ruleset.Value;
+            if (item?.Ruleset != null)
+                Ruleset.Value = item.Ruleset.Value;
 
             previewTrackManager.StopAnyPlaying(this);
         }
@@ -203,11 +212,11 @@ namespace osu.Game.Screens.Multi.Match
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
-            if (CurrentItem.Value == null)
+            if (selectedItem.Value == null)
                 return;
 
             // Try to retrieve the corresponding local beatmap
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == CurrentItem.Value.Beatmap.Value.OnlineBeatmapID);
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == selectedItem.Value.Beatmap.Value.OnlineBeatmapID);
 
             if (localBeatmap != null)
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
@@ -224,7 +233,7 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem.Value)
+                    multiplayer?.Start(() => new TimeshiftPlayer(selectedItem.Value)
                     {
                         Exited = () => leaderboard.RefreshScores()
                     });

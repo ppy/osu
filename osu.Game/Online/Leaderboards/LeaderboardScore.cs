@@ -55,7 +55,7 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
         public LeaderboardScore(ScoreInfo score, int rank, bool allowHighlight = true)
