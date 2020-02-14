@@ -49,7 +49,8 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved(canBeNull: true)]
         private Multiplayer multiplayer { get; set; }
 
-        private readonly Bindable<PlaylistItem> selectedItem = new Bindable<PlaylistItem>();
+        protected readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
+
         private LeaderboardChatDisplay leaderboardChatDisplay;
         private MatchSettingsOverlay settingsOverlay;
 
@@ -115,7 +116,7 @@ namespace osu.Game.Screens.Multi.Match
                                                                 Padding = new MarginPadding { Horizontal = 5 },
                                                                 Child = new OverlinedPlaylist(true) // Temporarily always allow selection
                                                                 {
-                                                                    SelectedItem = { BindTarget = selectedItem }
+                                                                    SelectedItem = { BindTarget = SelectedItem }
                                                                 }
                                                             },
                                                             new Container
@@ -143,7 +144,7 @@ namespace osu.Game.Screens.Multi.Match
                             new Footer
                             {
                                 OnStart = onStart,
-                                SelectedItem = { BindTarget = selectedItem }
+                                SelectedItem = { BindTarget = SelectedItem }
                             }
                         }
                     },
@@ -171,11 +172,17 @@ namespace osu.Game.Screens.Multi.Match
                 if (id.NewValue == null)
                     settingsOverlay.Show();
                 else
+                {
                     settingsOverlay.Hide();
+
+                    // Set the first playlist item.
+                    // This is scheduled since updating the room and playlist may happen in an arbitrary order (via Room.CopyFrom()).
+                    Schedule(() => SelectedItem.Value = playlist.FirstOrDefault());
+                }
             }, true);
 
-            selectedItem.BindValueChanged(selectedItemChanged);
-            selectedItem.Value = playlist.FirstOrDefault();
+            SelectedItem.BindValueChanged(selectedItemChanged);
+            SelectedItem.Value = playlist.FirstOrDefault();
 
             beatmapManager.ItemAdded += beatmapAdded;
         }
@@ -200,7 +207,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void updateWorkingBeatmap()
         {
-            var beatmap = selectedItem.Value?.Beatmap.Value;
+            var beatmap = SelectedItem.Value?.Beatmap.Value;
 
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
@@ -222,7 +229,7 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer?.Start(() => new TimeshiftPlayer(selectedItem.Value)
+                    multiplayer?.Start(() => new TimeshiftPlayer(SelectedItem.Value)
                     {
                         Exited = () => leaderboardChatDisplay.RefreshScores()
                     });
