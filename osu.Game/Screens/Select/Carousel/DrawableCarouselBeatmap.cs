@@ -37,7 +37,8 @@ namespace osu.Game.Screens.Select.Carousel
         private Triangles triangles;
         private StarCounter starCounter;
 
-        private BeatmapSetOverlay beatmapOverlay;
+        [Resolved]
+        private BeatmapSetOverlay beatmapOverlay { get; set; }
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)
             : base(panel)
@@ -47,10 +48,8 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(SongSelect songSelect, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay)
+        private void load(SongSelect songSelect, BeatmapManager manager)
         {
-            this.beatmapOverlay = beatmapOverlay;
-
             if (songSelect != null)
             {
                 startRequested = b => songSelect.FinaliseSelection(b);

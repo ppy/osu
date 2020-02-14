@@ -26,16 +26,17 @@ namespace osu.Game.Overlays.Music
         private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-        private BeatmapManager beatmaps;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         private FilterControl filter;
         private Playlist list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
-            this.beatmaps = beatmaps;
 
             Children = new Drawable[]
             {

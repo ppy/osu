@@ -24,7 +24,8 @@ namespace osu.Game.Graphics.UserInterface
 
         private readonly CapsWarning warning;
 
-        private GameHost host;
+        [Resolved]
+        private GameHost host { get; set; }
 
         public OsuPasswordTextBox()
         {
@@ -36,12 +37,6 @@ namespace osu.Game.Graphics.UserInterface
                 Margin = new MarginPadding { Right = 10 },
                 Alpha = 0,
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(GameHost host)
-        {
-            this.host = host;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

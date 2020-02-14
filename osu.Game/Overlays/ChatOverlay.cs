@@ -30,7 +30,8 @@ namespace osu.Game.Overlays
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ChannelManager channelManager;
+        [Resolved]
+        private ChannelManager channelManager { get; set; }
 
         private Container<DrawableChannel> currentChannelContainer;
 
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             const float padding = 5;
 
@@ -208,8 +209,6 @@ namespace osu.Game.Overlays
             }, true);
 
             chatBackground.Colour = colours.ChatBlue;
-
-            this.channelManager = channelManager;
 
             loading.Show();
 

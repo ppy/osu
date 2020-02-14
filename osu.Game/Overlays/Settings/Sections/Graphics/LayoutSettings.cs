@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<Size> sizeFullscreen;
         private readonly IBindableList<WindowMode> windowModes = new BindableList<WindowMode>();
 
-        private OsuGameBase game;
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         private SettingsDropdown<Size> resolutionDropdown;
         private SettingsDropdown<WindowMode> windowModeDropdown;
 
@@ -41,10 +43,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, OsuGameBase game, GameHost host)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, GameHost host)
         {
-            this.game = game;
-
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
             scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
