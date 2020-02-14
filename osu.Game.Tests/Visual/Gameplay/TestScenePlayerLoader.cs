@@ -194,13 +194,22 @@ namespace osu.Game.Tests.Visual.Gameplay
         }
 
         [Test]
-        public void TestMutedNotificationMasterVolume() => addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+        public void TestMutedNotificationMasterVolume()
+        {
+            addVolumeSteps("master volume", () => audioManager.Volume.Value = 0, null, () => audioManager.Volume.IsDefault);
+        }
 
         [Test]
-        public void TestMutedNotificationTrackVolume() => addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+        public void TestMutedNotificationTrackVolume()
+        {
+            addVolumeSteps("music volume", () => audioManager.VolumeTrack.Value = 0, null, () => audioManager.VolumeTrack.IsDefault);
+        }
 
         [Test]
-        public void TestMutedNotificationMuteButton() => addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+        public void TestMutedNotificationMuteButton()
+        {
+            addVolumeSteps("mute button", null, () => container.VolumeOverlay.IsMuted.Value = true, () => !container.VolumeOverlay.IsMuted.Value);
+        }
 
         /// <remarks>
         /// Created for avoiding copy pasting code for the same steps.
@@ -214,7 +223,7 @@ namespace osu.Game.Tests.Visual.Gameplay
             AddStep("reset notification lock", () => sessionStatics.GetBindable<bool>(Static.MutedAudioNotificationShownOnce).Value = false);
 
             AddStep("load player", () => ResetPlayer(false, beforeLoad, afterLoad));
-            AddUntilStep("wait for player", () => player.IsLoaded);
+            AddUntilStep("wait for player", () => player.LoadState == LoadState.Ready);
 
             AddAssert("check for notification", () => container.NotificationOverlay.UnreadCount.Value == 1);
             AddStep("click notification", () =>
@@ -228,6 +237,8 @@ namespace osu.Game.Tests.Visual.Gameplay
             });
 
             AddAssert("check " + volumeName, assert);
+
+            AddUntilStep("wait for player load", () => player.IsLoaded);
         }
 
         private class TestPlayerLoaderContainer : Container
