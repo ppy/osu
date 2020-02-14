@@ -19,33 +19,46 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
 
+        /// <summary>
+        /// How early before a hitobject's start time to trigger a hit.
+        /// </summary>
+        private const float relax_leniency = 3;
+
         public void Update(Playfield playfield)
         {
             bool requiresHold = false;
             bool requiresHit = false;
 
-            const float relax_leniency = 3;
+            double time = playfield.Clock.CurrentTime;
 
-            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
+            foreach (var h in playfield.HitObjectContainer.AliveObjects.OfType<DrawableOsuHitObject>())
             {
-                if (!(drawable is DrawableOsuHitObject osuHit))
+                // we are not yet close enough to the object.
+                if (time < h.HitObject.StartTime - relax_leniency)
+                    break;
+
+                // already hit or beyond the hittable end time.
+                if (h.IsHit || (h.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime))
                     continue;
 
-                double time = osuHit.Clock.CurrentTime;
-                double relativetime = time - osuHit.HitObject.StartTime;
-
-                if (time < osuHit.HitObject.StartTime - relax_leniency) continue;
-
-                if ((osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime) || osuHit.IsHit)
-                    continue;
-
-                if (osuHit is DrawableHitCircle && osuHit.IsHovered)
+                switch (h)
                 {
-                    Debug.Assert(osuHit.HitObject.HitWindows != null);
-                    requiresHit |= osuHit.HitObject.HitWindows.CanBeHit(relativetime);
-                }
+                    case DrawableHitCircle _:
+                        if (!h.IsHovered)
+                            break;
 
-                requiresHold |= (osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered)) || osuHit is DrawableSpinner;
+                        Debug.Assert(h.HitObject.HitWindows != null);
+                        requiresHit |= h.HitObject.HitWindows.CanBeHit(time - h.HitObject.StartTime);
+                        break;
+
+                    case DrawableSlider slider:
+                        requiresHold |= slider.Ball.IsHovered || h.IsHovered;
+                        break;
+
+                    case DrawableSpinner _:
+                        requiresHold = true;
+                        break;
+                }
             }
 
             if (requiresHit)
