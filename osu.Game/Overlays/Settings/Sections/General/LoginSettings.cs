@@ -323,8 +323,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Colour = Color4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
-
-                    ItemsContainer.Padding = new MarginPadding();
                 }
 
                 [BackgroundDependencyLoader]

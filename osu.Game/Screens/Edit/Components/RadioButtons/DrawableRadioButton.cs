@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -37,8 +36,8 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         {
             this.button = button;
 
-            Text = button.Text;
-            Action = button.Action;
+            Text = button.Item.ToString();
+            Action = button.Select;
 
             RelativeSizeAxes = Axes.X;
 
@@ -98,19 +97,6 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
 
             BackgroundColour = button.Selected.Value ? selectedBackgroundColour : defaultBackgroundColour;
             bubble.Colour = button.Selected.Value ? selectedBubbleColour : defaultBubbleColour;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (button.Selected.Value)
-                return true;
-
-            if (!Enabled.Value)
-                return true;
-
-            button.Selected.Value = true;
-
-            return base.OnClick(e);
         }
 
         protected override SpriteText CreateText() => new OsuSpriteText

@@ -26,6 +26,12 @@ namespace osu.Game.Screens.Select
         public OptionalTextFilter Creator;
         public OptionalTextFilter Artist;
 
+        public OptionalRange<double> UserStarDifficulty = new OptionalRange<double>
+        {
+            IsLowerInclusive = true,
+            IsUpperInclusive = true
+        };
+
         public string[] SearchTerms = Array.Empty<string>();
 
         public RulesetInfo Ruleset;

@@ -24,8 +24,11 @@ namespace osu.Game.Screens.Select
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = @"rewind",
-                Alpha = 0
+                Alpha = 0,
             });
+
+            // force both text sprites to always be present to avoid width flickering while they're being swapped out
+            SpriteText.AlwaysPresent = secondaryText.AlwaysPresent = true;
         }
 
         [BackgroundDependencyLoader]
@@ -44,11 +47,11 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(KeyUpEvent e)
+        protected override void OnKeyUp(KeyUpEvent e)
         {
             secondaryActive = e.ShiftPressed;
             updateText();
-            return base.OnKeyUp(e);
+            base.OnKeyUp(e);
         }
 
         private void updateText()

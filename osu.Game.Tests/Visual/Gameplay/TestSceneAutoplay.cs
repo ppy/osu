@@ -12,7 +12,7 @@ using osu.Game.Storyboards;
 namespace osu.Game.Tests.Visual.Gameplay
 {
     [Description("Player instantiated with an autoplay mod.")]
-    public class TestSceneAutoplay : AllPlayersTestScene
+    public class TestSceneAutoplay : TestSceneAllRulesetPlayers
     {
         private ClockBackedTestWorkingBeatmap.TrackVirtualManual track;
 

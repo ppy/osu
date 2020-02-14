@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public readonly Bindable<float> ScaleBindable = new Bindable<float>(1);
+        public readonly Bindable<float> ScaleBindable = new BindableFloat(1);
 
         public float Scale
         {

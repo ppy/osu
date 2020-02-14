@@ -445,6 +445,28 @@ namespace osu.Game.Online.Chat
             return tcs.Task;
         }
 
+        /// <summary>
+        /// Marks the <paramref name="channel"/> as read
+        /// </summary>
+        /// <param name="channel">The channel that will be marked as read</param>
+        public void MarkChannelAsRead(Channel channel)
+        {
+            if (channel.LastMessageId == channel.LastReadId)
+                return;
+
+            var message = channel.Messages.LastOrDefault();
+
+            if (message == null)
+                return;
+
+            var req = new MarkChannelAsReadRequest(channel, message);
+
+            req.Success += () => channel.LastReadId = message.Id;
+            req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel} up to '{message}' as read");
+
+            api.Queue(req);
+        }
+
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {

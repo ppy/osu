@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             HitObject.DefaultsApplied += onDefaultsApplied;
 
             startTimeBindable = HitObject.StartTimeBindable.GetBoundCopy();
-            startTimeBindable.BindValueChanged(_ => updateState(ArmedState.Idle, true));
+            startTimeBindable.BindValueChanged(_ => updateState(State.Value, true));
 
             if (HitObject is IHasComboInformation combo)
             {
@@ -250,8 +250,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 double transformTime = HitObject.StartTime - InitialLifetimeOffset;
 
-                base.ApplyTransformsAt(transformTime, true);
-                base.ClearTransformsAfter(transformTime, true);
+                base.ApplyTransformsAt(double.MinValue, true);
+                base.ClearTransformsAfter(double.MinValue, true);
 
                 using (BeginAbsoluteSequence(transformTime, true))
                 {
@@ -349,7 +349,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (HitObject is IHasComboInformation combo)
             {
-                var comboColours = CurrentSkin.GetConfig<GlobalSkinConfiguration, IReadOnlyList<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value;
+                var comboColours = CurrentSkin.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value;
                 AccentColour.Value = comboColours?.Count > 0 ? comboColours[combo.ComboIndex % comboColours.Count] : Color4.White;
             }
         }

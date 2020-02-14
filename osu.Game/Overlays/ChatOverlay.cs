@@ -279,6 +279,10 @@ namespace osu.Game.Overlays
                 currentChannelContainer.Clear(false);
                 currentChannelContainer.Add(loaded);
             }
+
+            // mark channel as read when channel switched
+            if (e.NewValue.Messages.Any())
+                channelManager.MarkChannelAsRead(e.NewValue);
         }
 
         private float startDragChatHeight;
@@ -295,7 +299,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (isDragging)
             {
@@ -307,20 +311,20 @@ namespace osu.Game.Overlays
 
                 ChatHeight.Value = targetChatHeight;
             }
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         private void selectTab(int index)
         {
-            var channel = ChannelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            var channel = ChannelTabControl.Items
+                                           .Where(tab => !(tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                                           .ElementAtOrDefault(index);
+            if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
 

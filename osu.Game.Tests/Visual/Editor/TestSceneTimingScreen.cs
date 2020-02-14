@@ -27,7 +27,12 @@ namespace osu.Game.Tests.Visual.Editor
         };
 
         [Cached(typeof(EditorBeatmap))]
-        private readonly EditorBeatmap editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+        private readonly EditorBeatmap editorBeatmap;
+
+        public TestSceneTimingScreen()
+        {
+            editorBeatmap = new EditorBeatmap(new OsuBeatmap());
+        }
 
         [BackgroundDependencyLoader]
         private void load()

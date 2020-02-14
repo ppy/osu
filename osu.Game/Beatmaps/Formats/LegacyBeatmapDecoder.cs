@@ -64,7 +64,7 @@ namespace osu.Game.Beatmaps.Formats
                 hitObject.ApplyDefaults(this.beatmap.ControlPointInfo, this.beatmap.BeatmapInfo.BaseDifficulty);
         }
 
-        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal);
+        protected override bool ShouldSkipLine(string line) => base.ShouldSkipLine(line) || line.StartsWith(' ') || line.StartsWith('_');
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
@@ -239,11 +239,11 @@ namespace osu.Game.Beatmaps.Formats
                     break;
 
                 case @"Source":
-                    beatmap.BeatmapInfo.Metadata.Source = pair.Value;
+                    metadata.Source = pair.Value;
                     break;
 
                 case @"Tags":
-                    beatmap.BeatmapInfo.Metadata.Tags = pair.Value;
+                    metadata.Tags = pair.Value;
                     break;
 
                 case @"BeatmapID":
@@ -300,13 +300,11 @@ namespace osu.Game.Beatmaps.Formats
             switch (type)
             {
                 case LegacyEventType.Background:
-                    string bgFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = bgFilename.ToStandardisedPath();
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = CleanFilename(split[2]);
                     break;
 
                 case LegacyEventType.Video:
-                    string videoFilename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.VideoFile = videoFilename.ToStandardisedPath();
+                    beatmap.BeatmapInfo.Metadata.VideoFile = CleanFilename(split[2]);
                     break;
 
                 case LegacyEventType.Break:
