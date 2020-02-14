@@ -19,7 +19,7 @@ namespace osu.Game.Online
         private readonly Placeholder placeholder;
         protected readonly LoadingAnimation LoadingAnimation;
 
-        protected const double TRANSFORM_TIME = 300.0;
+        private const double transform_duration = 300;
 
         protected override Container<Drawable> Content { get; }
 
@@ -44,8 +44,9 @@ namespace osu.Game.Online
 
         protected override void LoadComplete()
         {
-            API.Register(this);
             base.LoadComplete();
+
+            API.Register(this);
         }
 
         public virtual void APIStateChanged(IAPIProvider api, APIState state)
@@ -54,14 +55,14 @@ namespace osu.Game.Online
             {
                 case APIState.Offline:
                     PopContentOut(Content);
-                    placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * TRANSFORM_TIME, Easing.OutQuint);
-                    placeholder.FadeInFromZero(2 * TRANSFORM_TIME, Easing.OutQuint);
+                    placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * transform_duration, Easing.OutQuint);
+                    placeholder.FadeInFromZero(2 * transform_duration, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Online:
                     PopContentIn(Content);
-                    placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
+                    placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
@@ -69,7 +70,7 @@ namespace osu.Game.Online
                 case APIState.Connecting:
                     PopContentOut(Content);
                     LoadingAnimation.Show();
-                    placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
+                    placeholder.FadeOut(transform_duration / 2, Easing.OutQuint);
                     break;
             }
         }
@@ -77,12 +78,12 @@ namespace osu.Game.Online
         /// <summary>
         /// Applies a transform to the online content to make it hidden.
         /// </summary>
-        protected virtual void PopContentOut(Drawable content) => content.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
+        protected virtual void PopContentOut(Drawable content) => content.FadeOut(transform_duration / 2, Easing.OutQuint);
 
         /// <summary>
         /// Applies a transform to the online content to make it visible.
         /// </summary>
-        protected virtual void PopContentIn(Drawable content) => content.FadeIn(TRANSFORM_TIME, Easing.OutQuint);
+        protected virtual void PopContentIn(Drawable content) => content.FadeIn(transform_duration, Easing.OutQuint);
 
         protected override void Dispose(bool isDisposing)
         {
