@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 
         private float currentZoom = 1;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private IFrameBasedClock editorClock { get; set; }
 
         public ZoomableScrollContainer()
@@ -112,7 +112,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             {
                 // can't handle scroll correctly while playing.
                 // the editor will handle this case for us.
-                if (editorClock.IsRunning)
+                if (editorClock?.IsRunning == true)
                     return false;
 
                 // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
