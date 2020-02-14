@@ -29,35 +29,6 @@ namespace osu.Game.Tests.Visual.Online
             };
         }
 
-        private class TestOnlineViewContainer : OnlineViewContainer
-        {
-            public new LoadingAnimation LoadingAnimation => base.LoadingAnimation;
-
-            public CompositeDrawable ViewTarget => base.Content;
-
-            public TestOnlineViewContainer()
-                : base(@"Please sign in to view dummy test content")
-            {
-                RelativeSizeAxes = Axes.Both;
-
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Blue.Opacity(0.8f),
-                    },
-                    new OsuSpriteText
-                    {
-                        Text = "dummy online content",
-                        Font = OsuFont.Default.With(size: 40),
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
-                };
-            }
-        }
-
         [Test]
         public void TestOnlineStateVisibility()
         {
@@ -92,6 +63,35 @@ namespace osu.Game.Tests.Visual.Online
 
             AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
             AddUntilStep("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+        }
+
+        private class TestOnlineViewContainer : OnlineViewContainer
+        {
+            public new LoadingAnimation LoadingAnimation => base.LoadingAnimation;
+
+            public CompositeDrawable ViewTarget => base.Content;
+
+            public TestOnlineViewContainer()
+                : base(@"Please sign in to view dummy test content")
+            {
+                RelativeSizeAxes = Axes.Both;
+
+                Children = new Drawable[]
+                {
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.Blue.Opacity(0.8f),
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = "dummy online content",
+                        Font = OsuFont.Default.With(size: 40),
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    }
+                };
+            }
         }
     }
 }
