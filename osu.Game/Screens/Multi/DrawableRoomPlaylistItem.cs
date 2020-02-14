@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Multi
         public Action<PlaylistItem> RequestSelection;
         public Action<PlaylistItem> RequestDeletion;
 
+        protected override bool ShowDragHandle => allowEdit;
+
         private Container maskingContainer;
         private Container difficultyIconContainer;
         private LinkFlowContainer beatmapText;
