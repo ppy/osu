@@ -5,15 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi;
@@ -30,12 +27,6 @@ namespace osu.Game.Tests.Visual.Multiplayer
             typeof(DrawableRoomPlaylist),
             typeof(DrawableRoomPlaylistItem)
         };
-
-        [Resolved]
-        private BeatmapManager beatmapManager { get; set; }
-
-        [Resolved]
-        private RulesetStore rulesetStore { get; set; }
 
         private DrawableRoomPlaylist playlist;
 
