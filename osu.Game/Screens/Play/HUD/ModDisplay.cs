@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool DisplayUnrankedText = true;
 
-        public bool AllowExpand = true;
+        public ExpansionMode ExpansionMode = ExpansionMode.ExpandOnHover;
 
         private readonly Bindable<IReadOnlyList<Mod>> current = new Bindable<IReadOnlyList<Mod>>();
 
@@ -110,11 +110,15 @@ namespace osu.Game.Screens.Play.HUD
 
         private void expand()
         {
-            if (AllowExpand)
+            if (ExpansionMode != ExpansionMode.AlwaysContracted)
                 IconsContainer.TransformSpacingTo(new Vector2(5, 0), 500, Easing.OutQuint);
         }
 
-        private void contract() => IconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+        private void contract()
+        {
+            if (ExpansionMode != ExpansionMode.AlwaysExpanded)
+                IconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
+        }
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -127,5 +131,23 @@ namespace osu.Game.Screens.Play.HUD
             contract();
             base.OnHoverLost(e);
         }
+    }
+
+    public enum ExpansionMode
+    {
+        /// <summary>
+        /// The <see cref="ModDisplay"/> will expand only when hovered.
+        /// </summary>
+        ExpandOnHover,
+
+        /// <summary>
+        /// The <see cref="ModDisplay"/> will always be expanded.
+        /// </summary>
+        AlwaysExpanded,
+
+        /// <summary>
+        /// The <see cref="ModDisplay"/> will always be contracted.
+        /// </summary>
+        AlwaysContracted
     }
 }
