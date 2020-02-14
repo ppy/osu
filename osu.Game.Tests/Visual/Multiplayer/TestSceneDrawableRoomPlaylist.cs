@@ -9,14 +9,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing;
-using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi;
+using osu.Game.Tests.Beatmaps;
 using osuTK;
 using osuTK.Input;
 
@@ -218,22 +219,13 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Size = new Vector2(500, 300)
             };
 
-            var beatmapSets = beatmapManager.GetAllUsableBeatmapSets();
-            var rulesets = rulesetStore.AvailableRulesets.ToList();
-
             for (int i = 0; i < 20; i++)
             {
-                var set = beatmapSets[RNG.Next(0, beatmapSets.Count)];
-                var beatmap = set.Beatmaps[RNG.Next(0, set.Beatmaps.Count)];
-
-                beatmap.BeatmapSet = set;
-                beatmap.Metadata = set.Metadata;
-
                 playlist.Items.Add(new PlaylistItem
                 {
                     ID = i,
-                    Beatmap = { Value = beatmap },
-                    Ruleset = { Value = rulesets[RNG.Next(0, rulesets.Count)] },
+                    Beatmap = { Value = new TestBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo },
+                    Ruleset = { Value = new OsuRuleset().RulesetInfo },
                     RequiredMods =
                     {
                         new OsuModHardRock(),
