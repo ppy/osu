@@ -13,7 +13,7 @@ namespace osu.Game.Online.Chat
 {
     public class ExternalLinkOpener : Component
     {
-        [Resolved(CanBeNull = true)]
+        [Resolved]
         private GameHost host { get; set; }
 
         [Resolved(CanBeNull = true)]
