@@ -327,7 +327,7 @@
     *   [m] [Fix disposal-related errors by making WorkingBeatmap non-disposable #7784]
     *   [m] [Fix InfoColumn minWidth implementation #7792]
     *   [m] [Fix potential crash when exiting game while entering song select #7793]
-    *   [m] [Fix editor hit objects displaying incorrectly after StartTime change #7800]
+    *   [m] [Fix order and naming of Difficulty Adjust sliders #7780]
 
 *   谱面排行榜部分字体增大
     *   [osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs](osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs)
@@ -335,4 +335,5 @@
     *   [osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs](osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs)
 
 *   整合时出现问题的更新
-    *   [! 存在更早的未整合合并] [m] [Fix blueprint showing even when mouse outside of container #7803]
+    *   [! 存在更早的未整合更新] [Fix editor hit objects displaying incorrectly after StartTime change #7800]
+    *   [! 存在更早的未整合更新] [Fix blueprint showing even when mouse outside of container #7803]
