@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             Add(new Participants { RelativeSizeAxes = Axes.Both });
 
             AddStep(@"set max to null", () => Room.MaxParticipants.Value = null);
-            AddStep(@"set users", () => Room.Participants.Value = new[]
+            AddStep(@"set users", () => Room.Participants.AddRange(new[]
             {
                 new User
                 {
@@ -42,10 +42,10 @@ namespace osu.Game.Tests.Visual.Multiplayer
                     CoverUrl = @"https://assets.ppy.sh/user-profile-covers/5287410/5cfeaa9dd41cbce038ecdc9d781396ed4b0108089170bf7f50492ef8eadeb368.jpeg",
                     IsSupporter = true,
                 },
-            });
+            }));
 
             AddStep(@"set max", () => Room.MaxParticipants.Value = 10);
-            AddStep(@"clear users", () => Room.Participants.Value = System.Array.Empty<User>());
+            AddStep(@"clear users", () => Room.Participants.Clear());
             AddStep(@"set max to null", () => Room.MaxParticipants.Value = null);
         }
     }

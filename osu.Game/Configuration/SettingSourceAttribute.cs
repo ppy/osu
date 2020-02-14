@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
@@ -16,6 +17,10 @@ namespace osu.Game.Configuration
     /// An attribute to mark a bindable as being exposed to the user via settings controls.
     /// Can be used in conjunction with <see cref="SettingSourceExtensions.CreateSettingsControls"/> to automatically create UI controls.
     /// </summary>
+    /// <remarks>
+    /// All controls with <see cref="OrderPosition"/> set will be placed first in ascending order.
+    /// All controls with no <see cref="OrderPosition"/> will come afterward in default order.
+    /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
     public class SettingSourceAttribute : Attribute
@@ -24,10 +29,18 @@ namespace osu.Game.Configuration
 
         public string Description { get; }
 
+        public int? OrderPosition { get; }
+
         public SettingSourceAttribute(string label, string description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
+        }
+
+        public SettingSourceAttribute(string label, string description, int orderPosition)
+            : this(label, description)
+        {
+            OrderPosition = orderPosition;
         }
     }
 
@@ -35,7 +48,7 @@ namespace osu.Game.Configuration
     {
         public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
-            foreach (var (attr, property) in obj.GetSettingsSourceProperties())
+            foreach (var (attr, property) in obj.GetOrderedSettingsSourceProperties())
             {
                 object value = property.GetValue(obj);
 
@@ -115,6 +128,16 @@ namespace osu.Game.Configuration
 
                 yield return (attr, property);
             }
+        }
+
+        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
+        {
+            var original = obj.GetSettingsSourceProperties();
+
+            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition != null).OrderBy(attr => attr.Item1.OrderPosition);
+            var unordered = original.Except(orderedRelative);
+
+            return orderedRelative.Concat(unordered);
         }
     }
 }
