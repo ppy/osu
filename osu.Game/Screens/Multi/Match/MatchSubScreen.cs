@@ -61,7 +61,6 @@ namespace osu.Game.Screens.Multi.Match
         private void load()
         {
             Components.Header header;
-            Info info;
             GridContainer bottomRow;
             MatchSettingsOverlay settings;
 
@@ -79,7 +78,6 @@ namespace osu.Game.Screens.Multi.Match
                                 Depth = -1,
                             }
                         },
-                        new Drawable[] { info = new Info { OnStart = onStart } },
                         new Drawable[]
                         {
                             bottomRow = new GridContainer
