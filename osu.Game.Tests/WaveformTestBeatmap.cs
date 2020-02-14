@@ -37,9 +37,9 @@ namespace osu.Game.Tests
             trackStore = audioManager.GetTrackStore(getZipReader());
         }
 
-        protected override void Dispose(bool isDisposing)
+        ~WaveformTestBeatmap()
         {
-            base.Dispose(isDisposing);
+            // Remove the track store from the audio manager
             trackStore?.Dispose();
         }
 

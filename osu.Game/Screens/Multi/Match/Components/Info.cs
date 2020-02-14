@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +19,8 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public Action OnStart;
 
+        private ReadyButton readyButton;
+
         public Info()
         {
             RelativeSizeAxes = Axes.X;
@@ -27,7 +30,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            ReadyButton readyButton;
             HostInfo hostInfo;
 
             InternalChildren = new Drawable[]
@@ -89,9 +91,17 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item => readyButton.Beatmap.Value = item.NewValue?.Beatmap, true);
-
             hostInfo.Host.BindTo(Host);
+
+            Playlist.ItemsAdded += _ => updateBeatmap();
+            Playlist.ItemsRemoved += _ => updateBeatmap();
+
+            updateBeatmap();
+        }
+
+        private void updateBeatmap()
+        {
+            readyButton.Beatmap.Value = Playlist.FirstOrDefault()?.Beatmap.Value;
         }
     }
 }
