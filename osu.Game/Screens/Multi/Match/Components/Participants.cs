@@ -51,9 +51,9 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            Participants.BindValueChanged(participants =>
+            Participants.ItemsAdded += users =>
             {
-                usersFlow.Children = participants.NewValue.Select(u =>
+                usersFlow.AddRange(users.Select(u =>
                 {
                     var panel = new UserPanel(u)
                     {
@@ -65,8 +65,13 @@ namespace osu.Game.Screens.Multi.Match.Components
                     panel.OnLoadComplete += d => d.FadeInFromZero(60);
 
                     return panel;
-                }).ToList();
-            }, true);
+                }).ToList());
+            };
+
+            Participants.ItemsRemoved += users =>
+            {
+                usersFlow.RemoveAll(p => users.Contains(p.User));
+            };
         }
     }
 }
