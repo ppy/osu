@@ -34,25 +34,7 @@ namespace osu.Game.Tests.Visual.Online
             {
                 Current = { BindTarget = scope },
                 Country = { BindTarget = countryBindable },
-                Ruleset = { BindTarget = ruleset },
-                Spotlights = new[]
-                {
-                    new Spotlight
-                    {
-                        Id = 1,
-                        Text = "Spotlight 1"
-                    },
-                    new Spotlight
-                    {
-                        Id = 2,
-                        Text = "Spotlight 2"
-                    },
-                    new Spotlight
-                    {
-                        Id = 3,
-                        Text = "Spotlight 3"
-                    }
-                }
+                Ruleset = { BindTarget = ruleset }
             });
 
             var country = new Country
