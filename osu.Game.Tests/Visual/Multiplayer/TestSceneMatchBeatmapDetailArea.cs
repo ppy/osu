@@ -24,14 +24,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
         private RulesetStore rulesetStore { get; set; }
 
-        private MatchBeatmapDetailArea detailArea;
-
         [SetUp]
         public void Setup() => Schedule(() =>
         {
             Room.Playlist.Clear();
 
-            Child = detailArea = new MatchBeatmapDetailArea
+            Child = new MatchBeatmapDetailArea
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
