@@ -39,6 +39,11 @@ namespace osu.Game.Graphics.Containers
         public int Divisor { get; set; } = 1;
 
         /// <summary>
+        /// An optional minimum beat length. Any beat length below this will be multiplied by two until valid.
+        /// </summary>
+        public double MinimumBeatLength { get; set; }
+
+        /// <summary>
         /// Default length of a beat in milliseconds. Used whenever there is no beatmap or track playing.
         /// </summary>
         private const double default_beat_length = 60000.0 / 60.0;
@@ -54,9 +59,9 @@ namespace osu.Game.Graphics.Containers
             Track track = null;
             IBeatmap beatmap = null;
 
-            double currentTrackTime;
-            TimingControlPoint timingPoint;
-            EffectControlPoint effectPoint;
+            double currentTrackTime = 0;
+            TimingControlPoint timingPoint = null;
+            EffectControlPoint effectPoint = null;
 
             if (Beatmap.Value.TrackLoaded && Beatmap.Value.BeatmapLoaded)
             {
@@ -64,30 +69,27 @@ namespace osu.Game.Graphics.Containers
                 beatmap = Beatmap.Value.Beatmap;
             }
 
-            if (track != null && beatmap != null && track.IsRunning)
+            if (track != null && beatmap != null && track.IsRunning && track.Length > 0)
             {
-                currentTrackTime = track.Length > 0 ? track.CurrentTime + EarlyActivationMilliseconds : Clock.CurrentTime;
+                currentTrackTime = track.CurrentTime + EarlyActivationMilliseconds;
 
                 timingPoint = beatmap.ControlPointInfo.TimingPointAt(currentTrackTime);
                 effectPoint = beatmap.ControlPointInfo.EffectPointAt(currentTrackTime);
-
-                if (timingPoint.BeatLength == 0)
-                {
-                    IsBeatSyncedWithTrack = false;
-                    return;
-                }
-
-                IsBeatSyncedWithTrack = true;
             }
-            else
+
+            IsBeatSyncedWithTrack = timingPoint?.BeatLength > 0;
+
+            if (timingPoint == null || !IsBeatSyncedWithTrack)
             {
-                IsBeatSyncedWithTrack = false;
                 currentTrackTime = Clock.CurrentTime;
                 timingPoint = defaultTiming;
                 effectPoint = defaultEffect;
             }
 
             double beatLength = timingPoint.BeatLength / Divisor;
+
+            while (beatLength < MinimumBeatLength)
+                beatLength *= 2;
 
             int beatIndex = (int)((currentTrackTime - timingPoint.Time) / beatLength) - (effectPoint.OmitFirstBarLine ? 1 : 0);
 

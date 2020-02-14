@@ -36,6 +36,11 @@ namespace osu.Game.Graphics.UserInterface
 
         public virtual string TooltipText { get; private set; }
 
+        /// <summary>
+        /// Whether to format the tooltip as a percentage or the actual value.
+        /// </summary>
+        public bool DisplayAsPercentage { get; set; }
+
         private Color4 accentColour;
 
         public Color4 AccentColour
@@ -128,10 +133,10 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override void OnUserChange(T value)
@@ -169,11 +174,11 @@ namespace osu.Game.Graphics.UserInterface
             else
             {
                 double floatValue = value.ToDouble(NumberFormatInfo.InvariantInfo);
-                double floatMinValue = CurrentNumber.MinValue.ToDouble(NumberFormatInfo.InvariantInfo);
-                double floatMaxValue = CurrentNumber.MaxValue.ToDouble(NumberFormatInfo.InvariantInfo);
 
-                if (floatMaxValue == 1 && floatMinValue >= -1)
-                    TooltipText = floatValue.ToString("P0");
+                if (DisplayAsPercentage)
+                {
+                    TooltipText = floatValue.ToString("0%");
+                }
                 else
                 {
                     var decimalPrecision = normalise(CurrentNumber.Precision.ToDecimal(NumberFormatInfo.InvariantInfo), max_decimal_digits);

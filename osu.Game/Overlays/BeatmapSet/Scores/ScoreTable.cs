@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const float horizontal_inset = 20;
         private const float row_height = 25;
-        private const int text_size = 14;
+        private const int text_size = 12;
 
         private readonly FillFlowContainer backgroundFlow;
 
@@ -77,12 +77,12 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("rank", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
                 new TableColumn("score", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 60, maxSize: 70)),
                 new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
-                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
+                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 110))
             };
 
-            foreach (var statistic in score.Statistics)
+            foreach (var statistic in score.SortedStatistics)
                 columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70)));
 
             columns.AddRange(new[]
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new OsuSpriteText
                 {
                     Margin = new MarginPadding { Right = horizontal_inset },
-                    Text = $@"{score.Accuracy:P2}",
+                    Text = score.DisplayAccuracy,
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
             });
 
-            foreach (var kvp in score.Statistics)
+            foreach (var kvp in score.SortedStatistics)
             {
                 content.Add(new OsuSpriteText
                 {
@@ -190,7 +190,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public HeaderText(string text)
             {
                 Text = text.ToUpper();
-                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Black);
+                Font = OsuFont.GetFont(size: 10, weight: FontWeight.Bold);
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                Colour = colourProvider.Foreground1;
             }
         }
     }

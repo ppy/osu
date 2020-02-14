@@ -7,7 +7,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Framework.Graphics;
-using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Framework.Allocation;
 
@@ -32,22 +31,11 @@ namespace osu.Game.Tests.Visual.Multiplayer
                 Origin = Anchor.Centre,
             });
 
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1763072 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2101557 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1973466 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 2109801 } });
-            Room.Playlist.Add(new PlaylistItem { Beatmap = new BeatmapInfo { OnlineBeatmapID = 1922035 } });
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            AddStep("Select random beatmap", () =>
-            {
-                Room.CurrentItem.Value = Room.Playlist[RNG.Next(Room.Playlist.Count)];
-                previewTrackManager.StopAnyPlaying(this);
-            });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 1763072 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 2101557 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 1973466 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 2109801 } } });
+            Room.Playlist.Add(new PlaylistItem { Beatmap = { Value = new BeatmapInfo { OnlineBeatmapID = 1922035 } } });
         }
     }
 }

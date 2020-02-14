@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Backgrounds
         /// <summary>
         /// The amount of blur to be applied in addition to user-specified blur.
         /// </summary>
-        public readonly Bindable<float> BlurAmount = new Bindable<float>();
+        public readonly Bindable<float> BlurAmount = new BindableFloat();
 
         internal readonly IBindable<bool> IsBreakTime = new Bindable<bool>();
 
@@ -49,9 +49,12 @@ namespace osu.Game.Screens.Backgrounds
             Beatmap = beatmap;
 
             InternalChild = dimmable = CreateFadeContainer();
+
             dimmable.EnableUserDim.BindTo(EnableUserDim);
             dimmable.IsBreakTime.BindTo(IsBreakTime);
             dimmable.BlurAmount.BindTo(BlurAmount);
+
+            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         [BackgroundDependencyLoader]
@@ -99,7 +102,6 @@ namespace osu.Game.Screens.Backgrounds
 
             b.Depth = newDepth;
             dimmable.Background = Background = b;
-            StoryboardReplacesBackground.BindTo(dimmable.StoryboardReplacesBackground);
         }
 
         public override bool Equals(BackgroundScreen other)
@@ -117,7 +119,7 @@ namespace osu.Game.Screens.Backgrounds
             /// <remarks>
             /// Used in contexts where there can potentially be both user and screen-specified blurring occuring at the same time, such as in <see cref="PlayerLoader"/>
             /// </remarks>
-            public readonly Bindable<float> BlurAmount = new Bindable<float>();
+            public readonly Bindable<float> BlurAmount = new BindableFloat();
 
             public Background Background
             {

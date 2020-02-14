@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
@@ -16,6 +17,10 @@ namespace osu.Game.Configuration
     /// An attribute to mark a bindable as being exposed to the user via settings controls.
     /// Can be used in conjunction with <see cref="SettingSourceExtensions.CreateSettingsControls"/> to automatically create UI controls.
     /// </summary>
+    /// <remarks>
+    /// All controls with <see cref="OrderPosition"/> set will be placed first in ascending order.
+    /// All controls with no <see cref="OrderPosition"/> will come afterward in default order.
+    /// </remarks>
     [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Property)]
     public class SettingSourceAttribute : Attribute
@@ -24,10 +29,18 @@ namespace osu.Game.Configuration
 
         public string Description { get; }
 
+        public int? OrderPosition { get; }
+
         public SettingSourceAttribute(string label, string description = null)
         {
             Label = label ?? string.Empty;
             Description = description ?? string.Empty;
+        }
+
+        public SettingSourceAttribute(string label, string description, int orderPosition)
+            : this(label, description)
+        {
+            OrderPosition = orderPosition;
         }
     }
 
@@ -35,22 +48,18 @@ namespace osu.Game.Configuration
     {
         public static IEnumerable<Drawable> CreateSettingsControls(this object obj)
         {
-            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
+            foreach (var (attr, property) in obj.GetOrderedSettingsSourceProperties())
             {
-                var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
+                object value = property.GetValue(obj);
 
-                if (attr == null)
-                    continue;
-
-                var prop = property.GetValue(obj);
-
-                switch (prop)
+                switch (value)
                 {
                     case BindableNumber<float> bNumber:
                         yield return new SettingsSlider<float>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Bindable = bNumber,
+                            KeyboardStep = 0.1f,
                         };
 
                         break;
@@ -59,7 +68,8 @@ namespace osu.Game.Configuration
                         yield return new SettingsSlider<double>
                         {
                             LabelText = attr.Label,
-                            Bindable = bNumber
+                            Bindable = bNumber,
+                            KeyboardStep = 0.1f,
                         };
 
                         break;
@@ -102,9 +112,32 @@ namespace osu.Game.Configuration
                         break;
 
                     default:
-                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({prop})");
+                        throw new InvalidOperationException($"{nameof(SettingSourceAttribute)} was attached to an unsupported type ({value})");
                 }
             }
+        }
+
+        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetSettingsSourceProperties(this object obj)
+        {
+            foreach (var property in obj.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
+            {
+                var attr = property.GetCustomAttribute<SettingSourceAttribute>(true);
+
+                if (attr == null)
+                    continue;
+
+                yield return (attr, property);
+            }
+        }
+
+        public static IEnumerable<(SettingSourceAttribute, PropertyInfo)> GetOrderedSettingsSourceProperties(this object obj)
+        {
+            var original = obj.GetSettingsSourceProperties();
+
+            var orderedRelative = original.Where(attr => attr.Item1.OrderPosition != null).OrderBy(attr => attr.Item1.OrderPosition);
+            var unordered = original.Except(orderedRelative);
+
+            return orderedRelative.Concat(unordered);
         }
     }
 }

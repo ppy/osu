@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Globalization;
 using osu.Game.Beatmaps;
 using osuTK.Graphics;
 
@@ -14,27 +15,40 @@ namespace osu.Game.Graphics
 
         public static Color4 FromHex(string hex)
         {
-            if (hex[0] == '#')
-                hex = hex.Substring(1);
+            var hexSpan = hex[0] == '#' ? hex.AsSpan().Slice(1) : hex.AsSpan();
 
-            switch (hex.Length)
+            switch (hexSpan.Length)
             {
                 default:
                     throw new ArgumentException(@"Invalid hex string length!");
 
                 case 3:
                     return new Color4(
-                        (byte)(Convert.ToByte(hex.Substring(0, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(1, 1), 16) * 17),
-                        (byte)(Convert.ToByte(hex.Substring(2, 1), 16) * 17),
+                        (byte)(byte.Parse(hexSpan.Slice(0, 1), NumberStyles.HexNumber) * 17),
+                        (byte)(byte.Parse(hexSpan.Slice(1, 1), NumberStyles.HexNumber) * 17),
+                        (byte)(byte.Parse(hexSpan.Slice(2, 1), NumberStyles.HexNumber) * 17),
                         255);
 
                 case 6:
                     return new Color4(
-                        Convert.ToByte(hex.Substring(0, 2), 16),
-                        Convert.ToByte(hex.Substring(2, 2), 16),
-                        Convert.ToByte(hex.Substring(4, 2), 16),
+                        byte.Parse(hexSpan.Slice(0, 2), NumberStyles.HexNumber),
+                        byte.Parse(hexSpan.Slice(2, 2), NumberStyles.HexNumber),
+                        byte.Parse(hexSpan.Slice(4, 2), NumberStyles.HexNumber),
                         255);
+
+                case 4:
+                    return new Color4(
+                        (byte)(byte.Parse(hexSpan.Slice(0, 1), NumberStyles.HexNumber) * 17),
+                        (byte)(byte.Parse(hexSpan.Slice(1, 1), NumberStyles.HexNumber) * 17),
+                        (byte)(byte.Parse(hexSpan.Slice(0, 1), NumberStyles.HexNumber) * 17),
+                        (byte)(byte.Parse(hexSpan.Slice(0, 1), NumberStyles.HexNumber) * 17));
+
+                case 8:
+                    return new Color4(
+                        byte.Parse(hexSpan.Slice(0, 2), NumberStyles.HexNumber),
+                        byte.Parse(hexSpan.Slice(2, 2), NumberStyles.HexNumber),
+                        byte.Parse(hexSpan.Slice(4, 2), NumberStyles.HexNumber),
+                        byte.Parse(hexSpan.Slice(6, 2), NumberStyles.HexNumber));
             }
         }
 

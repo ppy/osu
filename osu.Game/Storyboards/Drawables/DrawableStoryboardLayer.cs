@@ -10,7 +10,7 @@ namespace osu.Game.Storyboards.Drawables
 {
     public class DrawableStoryboardLayer : LifetimeManagementContainer
     {
-        public StoryboardLayer Layer { get; private set; }
+        public StoryboardLayer Layer { get; }
         public bool Enabled;
 
         public override bool IsPresent => Enabled && base.IsPresent;
