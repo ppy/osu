@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         [Resolved]
         private DialogOverlay dialogOverlay { get; set; }
+
         private readonly BeatmapSetInfo beatmapSet;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)

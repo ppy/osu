@@ -16,6 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         [Resolved]
         private AudioManager audio { get; set; }
+
         private SettingsDropdown<string> dropdown;
 
         protected override void Dispose(bool isDisposing)
