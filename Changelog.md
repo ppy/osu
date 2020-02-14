@@ -325,3 +325,9 @@
 *   整合更新
     *   [m] [Bypass song select filter to show externally changed beatmap temporarily #7783]
     *   [m] [Fix disposal-related errors by making WorkingBeatmap non-disposable #7784]
+    *   [m] [Fix InfoColumn minWidth implementation #7792]
+
+*   谱面排行榜部分字体增大
+    *   [osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs](osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs)
+    *   [osu.Game/Overlays/BeatmapSet/Scores/TopScoreUserSection.cs](osu.Game/Overlays/BeatmapSet/Scores/TopScoreUserSection.cs)
+    *   [osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs](osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs)

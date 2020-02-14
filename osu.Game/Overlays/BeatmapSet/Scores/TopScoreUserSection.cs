@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
+                                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                             },
                             flag = new UpdateableFlag
                             {

@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     {
         private const float horizontal_inset = 20;
         private const float row_height = 25;
-        private const int text_size = 12;
+        private const int text_size = 16;
 
         private readonly FillFlowContainer backgroundFlow;
 
