@@ -445,7 +445,7 @@ namespace osu.Game
         /// </summary>
         /// <param name="action">The action to perform once we are in the correct state.</param>
         /// <param name="validScreens">An optional collection of valid screen types. If any of these screens are already current we can perform the action immediately, else the first valid parent will be made current before performing the action. <see cref="MainMenu"/> is used if not specified.</param>
-        protected void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
+        public void PerformFromScreen(Action<IScreen> action, IEnumerable<Type> validScreens = null)
         {
             performFromMainMenuTask?.Cancel();
 
