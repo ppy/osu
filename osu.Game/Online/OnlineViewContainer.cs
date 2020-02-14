@@ -44,7 +44,7 @@ namespace osu.Game.Online
 
         protected override void LoadComplete()
         {
-            API?.Register(this);
+            API.Register(this);
             base.LoadComplete();
         }
 
