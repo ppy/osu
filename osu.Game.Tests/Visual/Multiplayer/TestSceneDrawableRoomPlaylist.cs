@@ -79,6 +79,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
 
                 playlist.Items.Add(new PlaylistItem
                 {
+                    ID = i,
                     Beatmap = { Value = beatmap },
                     Ruleset = { Value = rulesets[RNG.Next(0, rulesets.Count)] },
                     RequiredMods =
