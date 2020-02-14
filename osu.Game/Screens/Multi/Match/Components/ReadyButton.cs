@@ -5,11 +5,9 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
-using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
@@ -30,9 +28,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public ReadyButton()
         {
-            RelativeSizeAxes = Axes.Y;
-            Size = new Vector2(200, 1);
-
             Text = "Start";
         }
 
