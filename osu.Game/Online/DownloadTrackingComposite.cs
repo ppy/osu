@@ -19,7 +19,7 @@ namespace osu.Game.Online
     {
         protected readonly Bindable<TModel> Model = new Bindable<TModel>();
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private TModelManager manager { get; set; }
 
         /// <summary>

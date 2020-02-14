@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Select.Carousel
         private Triangles triangles;
         private StarCounter starCounter;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private BeatmapSetOverlay beatmapOverlay { get; set; }
 
         public DrawableCarouselBeatmap(CarouselBeatmap panel)

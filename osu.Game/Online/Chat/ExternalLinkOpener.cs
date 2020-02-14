@@ -13,10 +13,10 @@ namespace osu.Game.Online.Chat
 {
     public class ExternalLinkOpener : Component
     {
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private GameHost host { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
         private Bindable<bool> externalLinkWarning;

@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private DialogOverlay dialogOverlay { get; set; }
 
         private readonly BeatmapSetInfo beatmapSet;
