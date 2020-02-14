@@ -30,7 +30,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
-        public Bindable<float> CursorScale;
+        public Bindable<float> CursorScale = new BindableFloat(1);
+
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
 
@@ -57,6 +58,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
 
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
@@ -65,7 +68,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
             autoCursorScale.ValueChanged += _ => calculateScale();
 
-            CursorScale = new BindableFloat();
             CursorScale.ValueChanged += e =>
             {
                 var newScale = new Vector2(e.NewValue);
@@ -75,8 +77,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             };
 
             calculateScale();
-
-            base.LoadComplete();
         }
 
         /// <summary>
