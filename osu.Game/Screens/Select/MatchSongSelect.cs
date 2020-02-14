@@ -10,8 +10,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi;
+using osu.Game.Screens.Multi.Components;
 
 namespace osu.Game.Screens.Select
 {
@@ -35,42 +35,33 @@ namespace osu.Game.Screens.Select
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
         }
 
-        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new PlayBeatmapDetailArea(); // Todo: Temporary
+        protected override BeatmapDetailArea CreateBeatmapDetailArea() => new MatchBeatmapDetailArea
+        {
+            CreateNewItem = createNewItem
+        };
 
         protected override bool OnStart()
         {
-            var item = new PlaylistItem
-            {
-                Beatmap = { Value = Beatmap.Value.BeatmapInfo },
-                Ruleset = { Value = Ruleset.Value },
-                RulesetID = Ruleset.Value.ID ?? 0
-            };
+            if (Playlist.Count == 0)
+                createNewItem();
 
-            item.RequiredMods.AddRange(Mods.Value);
-
-            Selected?.Invoke(item);
-
-            if (this.IsCurrentScreen())
-                this.Exit();
+            this.Exit();
 
             return true;
         }
 
-        public override bool OnExiting(IScreen next)
+        private void createNewItem()
         {
-            if (base.OnExiting(next))
-                return true;
-
-            var firstItem = Playlist.FirstOrDefault();
-
-            if (firstItem != null)
+            PlaylistItem item = new PlaylistItem
             {
-                Ruleset.Value = firstItem.Ruleset.Value;
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(firstItem.Beatmap.Value);
-                Mods.Value = firstItem.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
-            }
+                ID = (Playlist.LastOrDefault()?.ID + 1) ?? 0,
+                Beatmap = { Value = Beatmap.Value.BeatmapInfo },
+                Ruleset = { Value = Ruleset.Value }
+            };
 
-            return false;
+            item.RequiredMods.AddRange(Mods.Value);
+
+            Playlist.Add(item);
         }
     }
 }
