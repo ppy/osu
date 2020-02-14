@@ -36,8 +36,9 @@ namespace osu.Game.Beatmaps
                     using (var stream = new LineBufferedReader(store.GetStream(getPathForFile(BeatmapInfo.Path))))
                         return Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Beatmap failed to load");
                     return null;
                 }
             }
@@ -59,8 +60,9 @@ namespace osu.Game.Beatmaps
                 {
                     return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Background failed to load");
                     return null;
                 }
             }
@@ -74,8 +76,9 @@ namespace osu.Game.Beatmaps
                 {
                     return new VideoSprite(textureStore.GetStream(getPathForFile(Metadata.VideoFile)));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Video failed to load");
                     return null;
                 }
             }
@@ -86,8 +89,9 @@ namespace osu.Game.Beatmaps
                 {
                     return (trackStore ??= AudioManager.GetTrackStore(store)).Get(getPathForFile(Metadata.AudioFile));
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Track failed to load");
                     return null;
                 }
             }
@@ -115,8 +119,9 @@ namespace osu.Game.Beatmaps
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
                     return trackData == null ? null : new Waveform(trackData);
                 }
-                catch
+                catch (Exception e)
                 {
+                    Logger.Error(e, "Waveform failed to load");
                     return null;
                 }
             }

@@ -249,7 +249,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"This link type is not yet supported!",
+                        Text = @"该类型的链接暂不支持打开!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -401,15 +401,14 @@ namespace osu.Game
             if (nextBeatmap?.Track != null)
                 nextBeatmap.Track.Completed += currentTrackCompleted;
 
-            using (var oldBeatmap = beatmap.OldValue)
-            {
-                if (oldBeatmap?.Track != null)
-                    oldBeatmap.Track.Completed -= currentTrackCompleted;
-            }
+            var oldBeatmap = beatmap.OldValue;
+            if (oldBeatmap?.Track != null)
+                oldBeatmap.Track.Completed -= currentTrackCompleted;
 
             updateModDefaults();
 
-            nextBeatmap?.LoadBeatmapAsync();
+            oldBeatmap?.CancelAsyncLoad();
+            nextBeatmap?.BeginAsyncLoad();
         }
 
         private void modsChanged(ValueChangedEvent<IReadOnlyList<Mod>> mods)

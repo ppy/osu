@@ -321,4 +321,7 @@
     *   [m] [Bump Microsoft.NET.Test.Sdk from 16.4.0 to 16.5.0 #7782]
 *   补全了一些翻译
 
-### 2020/2/13
+### 2020/2/14
+*   整合更新
+    *   [m] [Bypass song select filter to show externally changed beatmap temporarily #7783]
+    *   [m] [Fix disposal-related errors by making WorkingBeatmap non-disposable #7784]
