@@ -12,6 +12,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -32,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public Bindable<float> CursorScale;
         private Bindable<float> userCursorScale;
         private Bindable<bool> autoCursorScale;
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         public OsuCursorContainer()
         {
@@ -43,13 +43,21 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             };
         }
 
+        [Resolved(canBeNull: true)]
+        private GameplayBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig, IBindable<WorkingBeatmap> beatmap)
+        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig)
         {
             rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+        }
 
-            this.beatmap.BindTo(beatmap);
-            this.beatmap.ValueChanged += _ => calculateScale();
+        protected override void LoadComplete()
+        {
+            showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
 
             userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
             userCursorScale.ValueChanged += _ => calculateScale();
@@ -58,29 +66,41 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             autoCursorScale.ValueChanged += _ => calculateScale();
 
             CursorScale = new BindableFloat();
-            CursorScale.ValueChanged += e => ActiveCursor.Scale = cursorTrail.Scale = new Vector2(e.NewValue);
+            CursorScale.ValueChanged += e =>
+            {
+                var newScale = new Vector2(e.NewValue);
+
+                ActiveCursor.Scale = newScale;
+                cursorTrail.Scale = newScale;
+            };
 
             calculateScale();
+
+            base.LoadComplete();
         }
+
+        /// <summary>
+        /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
+        /// </summary>
+        public static float GetScaleForCircleSize(float circleSize) =>
+            1f - 0.7f * (1f + circleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
         private void calculateScale()
         {
             float scale = userCursorScale.Value;
 
-            if (autoCursorScale.Value && beatmap.Value != null)
+            if (autoCursorScale.Value && beatmap != null)
             {
                 // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
-                scale *= 1f - 0.7f * (1f + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
+                scale *= GetScaleForCircleSize(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
             }
 
             CursorScale.Value = scale;
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
+            var newScale = new Vector2(scale);
 
-            showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
+            ActiveCursor.ScaleTo(newScale, 400, Easing.OutQuint);
+            cursorTrail.Scale = newScale;
         }
 
         private int downCount;
