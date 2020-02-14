@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.ExceptionExtensions;
 using osu.Framework.Graphics;
@@ -21,7 +22,9 @@ namespace osu.Game.Online.API
 {
     public class APIAccess : Component, IAPIProvider
     {
-        private readonly OsuConfigManager config;
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         private readonly OAuth authentication;
 
         public string Endpoint => @"https://osu.ppy.sh";
