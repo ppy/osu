@@ -226,7 +226,7 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
 
         private ScheduledDelegate queryChangedDebounce;
-        
+
         [Resolved]
         private PreviewTrackManager previewTrackManager { get; set; }
 
