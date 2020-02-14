@@ -21,8 +21,7 @@ namespace osu.Game.Online
 
         protected const double TRANSFORM_TIME = 300.0;
 
-        private readonly Container viewContent;
-        protected override Container<Drawable> Content => viewContent;
+        protected override Container<Drawable> Content { get; }
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
@@ -31,7 +30,7 @@ namespace osu.Game.Online
         {
             InternalChildren = new Drawable[]
             {
-                viewContent = new Container
+                Content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
@@ -48,21 +47,21 @@ namespace osu.Game.Online
             switch (state)
             {
                 case APIState.Offline:
-                    PopContentOut(viewContent);
+                    PopContentOut(Content);
                     placeholder.ScaleTo(0.8f).Then().ScaleTo(1, 3 * TRANSFORM_TIME, Easing.OutQuint);
                     placeholder.FadeInFromZero(2 * TRANSFORM_TIME, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Online:
-                    PopContentIn(viewContent);
+                    PopContentIn(Content);
                     placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
                     LoadingAnimation.Hide();
                     break;
 
                 case APIState.Failing:
                 case APIState.Connecting:
-                    PopContentOut(viewContent);
+                    PopContentOut(Content);
                     LoadingAnimation.Show();
                     placeholder.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
                     break;
