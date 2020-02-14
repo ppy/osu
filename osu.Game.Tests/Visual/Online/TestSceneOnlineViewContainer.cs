@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online;
@@ -38,6 +39,7 @@ namespace osu.Game.Tests.Visual.Online
                 : base(@"Please sign in to view dummy test content")
             {
                 RelativeSizeAxes = Axes.Both;
+
                 Children = new Drawable[]
                 {
                     new Box
@@ -48,7 +50,7 @@ namespace osu.Game.Tests.Visual.Online
                     new OsuSpriteText
                     {
                         Text = "dummy online content",
-                        RelativeSizeAxes = Axes.Both,
+                        Font = OsuFont.Default.With(size: 40),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     }
