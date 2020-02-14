@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -38,11 +37,11 @@ namespace osu.Game.Screens.Multi
                     ((DrawableRoomPlaylistItem)newItem).Select();
             }, true);
 
-            Items.ItemsRemoved += items =>
+            Items.ItemsRemoved += items => Schedule(() =>
             {
-                if (items.Any(i => i == SelectedItem.Value))
+                if (!Items.Contains(SelectedItem.Value))
                     SelectedItem.Value = null;
-            };
+            });
         }
 
         protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
