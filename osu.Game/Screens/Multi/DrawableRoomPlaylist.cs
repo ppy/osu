@@ -12,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi
 {
-    public class DrawableRoomPlaylist : RearrangeableListContainer<PlaylistItem>
+    public class DrawableRoomPlaylist : OsuRearrangeableListContainer<PlaylistItem>
     {
         public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
@@ -45,10 +45,10 @@ namespace osu.Game.Screens.Multi
             };
         }
 
-        protected override ScrollContainer<Drawable> CreateScrollContainer() => new OsuScrollContainer
+        protected override ScrollContainer<Drawable> CreateScrollContainer() => base.CreateScrollContainer().With(d =>
         {
-            ScrollbarVisible = false
-        };
+            d.ScrollbarVisible = false;
+        });
 
         protected override FillFlowContainer<RearrangeableListItem<PlaylistItem>> CreateListFillFlowContainer() => new FillFlowContainer<RearrangeableListItem<PlaylistItem>>
         {
@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Multi
             Spacing = new Vector2(0, 2)
         };
 
-        protected override RearrangeableListItem<PlaylistItem> CreateDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection)
+        protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection)
         {
             RequestSelection = requestSelection,
             RequestDeletion = requestDeletion

@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -17,6 +19,12 @@ namespace osu.Game.Tests.Visual.Multiplayer
 {
     public class TestSceneDrawableRoomPlaylist : OsuTestScene
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(DrawableRoomPlaylist),
+            typeof(DrawableRoomPlaylistItem)
+        };
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
@@ -26,25 +34,25 @@ namespace osu.Game.Tests.Visual.Multiplayer
         private DrawableRoomPlaylist playlist;
 
         [Test]
-        public void TestItemsCanNotBeRemovedOrSelectedFromNonEditableAndNonSelectablePlaylist()
+        public void TestNonEditableNonSelectable()
         {
             createPlaylist(false, false);
         }
 
         [Test]
-        public void TestItemsCanBeRemovedFromEditablePlaylist()
+        public void TestEditable()
         {
             createPlaylist(true, false);
         }
 
         [Test]
-        public void TestItemsCanBeSelectedInSelectablePlaylist()
+        public void TestSelectable()
         {
             createPlaylist(false, true);
         }
 
         [Test]
-        public void TestItemsCanBeSelectedAndRemovedFromEditableAndSelectablePlaylist()
+        public void TestEditableSelectable()
         {
             createPlaylist(true, true);
         }
