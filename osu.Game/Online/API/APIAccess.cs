@@ -22,7 +22,6 @@ namespace osu.Game.Online.API
 {
     public class APIAccess : Component, IAPIProvider
     {
-        [Resolved]
         private OsuConfigManager config { get; set; }
 
         private readonly OAuth authentication;
