@@ -24,6 +24,18 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// </summary>
         private const float relax_leniency = 3;
 
+        private bool wasHit;
+        private bool wasLeft;
+
+        private OsuInputManager osuInputManager;
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            // grab the input manager for future use.
+            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            osuInputManager.AllowUserPresses = false;
+        }
+
         public void Update(Playfield playfield)
         {
             bool requiresHold = false;
@@ -79,11 +91,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
         }
 
-        private bool wasHit;
-        private bool wasLeft;
-
-        private OsuInputManager osuInputManager;
-
         private void addAction(bool hitting)
         {
             if (wasHit == hitting)
@@ -103,13 +110,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             }
 
             state.Apply(osuInputManager.CurrentState, osuInputManager);
-        }
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            osuInputManager.AllowUserPresses = false;
         }
     }
 }
