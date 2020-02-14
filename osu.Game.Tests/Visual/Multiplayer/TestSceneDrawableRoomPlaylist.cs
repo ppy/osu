@@ -46,6 +46,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToItem(0);
             assertHandleVisibility(0, false);
             assertDeleteButtonVisibility(0, false);
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
         [Test]
@@ -56,6 +59,9 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToItem(0);
             assertHandleVisibility(0, true);
             assertDeleteButtonVisibility(0, true);
+
+            AddStep("click", () => InputManager.Click(MouseButton.Left));
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
         [Test]
@@ -165,7 +171,7 @@ namespace osu.Game.Tests.Visual.Multiplayer
             moveToDeleteButton(0);
             AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
 
-            AddAssert("selected item is null", () => playlist.SelectedItem.Value == null);
+            AddAssert("no item selected", () => playlist.SelectedItem.Value == null);
         }
 
         // Todo: currently not possible due to bindable list shortcomings (https://github.com/ppy/osu-framework/issues/3081)

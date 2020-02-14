@@ -31,8 +31,9 @@ namespace osu.Game.Screens.Multi
 {
     public class DrawableRoomPlaylistItem : OsuRearrangeableListItem<PlaylistItem>
     {
-        public Action<PlaylistItem> RequestSelection;
         public Action<PlaylistItem> RequestDeletion;
+
+        public readonly Bindable<PlaylistItem> SelectedItem = new Bindable<PlaylistItem>();
 
         protected override bool ShowDragHandle => allowEdit;
 
@@ -75,6 +76,8 @@ namespace osu.Game.Screens.Multi
         {
             base.LoadComplete();
 
+            SelectedItem.BindValueChanged(selected => maskingContainer.BorderThickness = selected.NewValue == Model ? 5 : 0);
+
             beatmap.BindValueChanged(_ => scheduleRefresh());
             ruleset.BindValueChanged(_ => scheduleRefresh());
 
@@ -82,6 +85,32 @@ namespace osu.Game.Screens.Multi
             requiredMods.ItemsRemoved += _ => scheduleRefresh();
 
             refresh();
+        }
+
+        private ScheduledDelegate scheduledRefresh;
+
+        private void scheduleRefresh()
+        {
+            scheduledRefresh?.Cancel();
+            scheduledRefresh = Schedule(refresh);
+        }
+
+        private void refresh()
+        {
+            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value) { Size = new Vector2(32) };
+
+            beatmapText.Clear();
+            beatmapText.AddLink(item.Beatmap.ToString(), LinkAction.OpenBeatmap, item.Beatmap.Value.OnlineBeatmapID.ToString());
+
+            authorText.Clear();
+
+            if (item.Beatmap?.Value?.Metadata?.Author != null)
+            {
+                authorText.AddText("mapped by ");
+                authorText.AddUserLink(item.Beatmap.Value?.Metadata.Author);
+            }
+
+            modDisplay.Current.Value = requiredMods.ToArray();
         }
 
         protected override Drawable CreateContent() => maskingContainer = new Container
@@ -173,42 +202,12 @@ namespace osu.Game.Screens.Multi
             }
         };
 
-        private ScheduledDelegate scheduledRefresh;
-
-        private void scheduleRefresh()
-        {
-            scheduledRefresh?.Cancel();
-            scheduledRefresh = Schedule(refresh);
-        }
-
-        private void refresh()
-        {
-            difficultyIconContainer.Child = new DifficultyIcon(beatmap.Value, ruleset.Value) { Size = new Vector2(32) };
-
-            beatmapText.Clear();
-            beatmapText.AddLink(item.Beatmap.ToString(), LinkAction.OpenBeatmap, item.Beatmap.Value.OnlineBeatmapID.ToString());
-
-            authorText.Clear();
-
-            if (item.Beatmap?.Value?.Metadata?.Author != null)
-            {
-                authorText.AddText("mapped by ");
-                authorText.AddUserLink(item.Beatmap.Value?.Metadata.Author);
-            }
-
-            modDisplay.Current.Value = requiredMods.ToArray();
-        }
-
         protected override bool OnClick(ClickEvent e)
         {
             if (allowSelection)
-                RequestSelection?.Invoke(Model);
+                SelectedItem.Value = Model;
             return true;
         }
-
-        public void Select() => maskingContainer.BorderThickness = 5;
-
-        public void Deselect() => maskingContainer.BorderThickness = 0;
 
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
         private class PanelBackground : Container // todo: should be a buffered container (https://github.com/ppy/osu-framework/issues/3222)
