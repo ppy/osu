@@ -31,29 +31,59 @@ namespace osu.Game.Screens.Play
     {
         protected const float BACKGROUND_BLUR = 15;
 
+        public override bool HideOverlaysOnEnter => hideOverlays;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
+        // Here because IsHovered will not update unless we do so.
+        public override bool HandlePositionalInput => true;
+
+        // We show the previous screen status
+        protected override UserActivity InitialActivity => null;
+
+        protected override bool PlayResumeSound => false;
+
+        protected BeatmapMetadataDisplay MetadataInfo;
+
+        protected VisualSettings VisualSettings;
+
+        protected Task LoadTask { get; private set; }
+
+        protected Task DisposalTask { get; private set; }
+
+        private bool backgroundBrightnessReduction;
+
+        protected bool BackgroundBrightnessReduction
+        {
+            set
+            {
+                if (value == backgroundBrightnessReduction)
+                    return;
+
+                backgroundBrightnessReduction = value;
+
+                Background.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200);
+            }
+        }
+
+        private bool readyForPush =>
+            player.LoadState == LoadState.Ready && (IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
+
         private readonly Func<Player> createPlayer;
 
         private Player player;
 
         private LogoTrackingContainer content;
 
-        protected BeatmapMetadataDisplay MetadataInfo;
-
         private bool hideOverlays;
-        public override bool HideOverlaysOnEnter => hideOverlays;
-
-        protected override UserActivity InitialActivity => null; //shows the previous screen status
-
-        public override bool DisallowExternalBeatmapRulesetChanges => true;
-
-        protected override bool PlayResumeSound => false;
-
-        protected Task LoadTask { get; private set; }
-
-        protected Task DisposalTask { get; private set; }
 
         private InputManager inputManager;
+
         private IdleTracker idleTracker;
+
+        private Bindable<bool> muteWarningShownOnce;
+
+        private ScheduledDelegate scheduledPushPlayer;
 
         [Resolved(CanBeNull = true)]
         private NotificationOverlay notificationOverlay { get; set; }
@@ -64,17 +94,9 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private AudioManager audioManager { get; set; }
 
-        private Bindable<bool> muteWarningShownOnce;
-
         public PlayerLoader(Func<Player> createPlayer)
         {
             this.createPlayer = createPlayer;
-        }
-
-        private void restartRequested()
-        {
-            hideOverlays = true;
-            ValidForResume = true;
         }
 
         [BackgroundDependencyLoader]
@@ -124,7 +146,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            loadNewPlayer();
+            prepareNewPlayer();
 
             content.ScaleTo(0.7f);
             Background?.FadeColour(Color4.White, 800, Easing.OutQuint);
@@ -153,36 +175,32 @@ namespace osu.Game.Screens.Play
 
             MetadataInfo.Loading = true;
 
-            //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            loadNewPlayer();
+            // we will only be resumed if the player has requested a re-run (see restartRequested).
+            prepareNewPlayer();
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
 
-        private void loadNewPlayer()
+        public override void OnSuspending(IScreen next)
         {
-            var restartCount = player?.RestartCount + 1 ?? 0;
+            base.OnSuspending(next);
 
-            player = createPlayer();
-            player.RestartCount = restartCount;
-            player.RestartRequested = restartRequested;
+            cancelLoad();
 
-            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
+            BackgroundBrightnessReduction = false;
         }
 
-        private void contentIn()
+        public override bool OnExiting(IScreen next)
         {
-            content.ScaleTo(1, 650, Easing.OutQuint);
-            content.FadeInFromZero(400);
-        }
+            cancelLoad();
 
-        private void contentOut()
-        {
-            // Ensure the logo is no longer tracking before we scale the content
-            content.StopTracking();
+            content.ScaleTo(0.7f, 150, Easing.InQuint);
+            this.FadeOut(150);
 
-            content.ScaleTo(0.7f, 300, Easing.InQuint);
-            content.FadeOut(250);
+            Background.EnableUserDim.Value = false;
+            BackgroundBrightnessReduction = false;
+
+            return base.OnExiting(next);
         }
 
         protected override void LogoArriving(OsuLogo logo, bool resuming)
@@ -191,10 +209,7 @@ namespace osu.Game.Screens.Play
 
             const double duration = 300;
 
-            if (!resuming)
-            {
-                logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
-            }
+            if (!resuming) logo.MoveTo(new Vector2(0.5f), duration, Easing.In);
 
             logo.ScaleTo(new Vector2(0.15f), duration, Easing.In);
             logo.FadeIn(350);
@@ -210,110 +225,6 @@ namespace osu.Game.Screens.Play
         {
             base.LogoExiting(logo);
             content.StopTracking();
-        }
-
-        private ScheduledDelegate pushDebounce;
-        protected VisualSettings VisualSettings;
-
-        // Here because IsHovered will not update unless we do so.
-        public override bool HandlePositionalInput => true;
-
-        private bool readyForPush => player.LoadState == LoadState.Ready && (IsHovered || idleTracker.IsIdle.Value) && inputManager?.DraggedDrawable == null;
-
-        private void pushWhenLoaded()
-        {
-            if (!this.IsCurrentScreen()) return;
-
-            try
-            {
-                if (!readyForPush)
-                {
-                    // as the pushDebounce below has a delay, we need to keep checking and cancel a future debounce
-                    // if we become unready for push during the delay.
-                    cancelLoad();
-                    return;
-                }
-
-                if (pushDebounce != null)
-                    return;
-
-                pushDebounce = Scheduler.AddDelayed(() =>
-                {
-                    contentOut();
-
-                    this.Delay(250).Schedule(() =>
-                    {
-                        if (!this.IsCurrentScreen()) return;
-
-                        LoadTask = null;
-
-                        //By default, we want to load the player and never be returned to.
-                        //Note that this may change if the player we load requested a re-run.
-                        ValidForResume = false;
-
-                        if (player.LoadedBeatmapSuccessfully)
-                            this.Push(player);
-                        else
-                            this.Exit();
-                    });
-                }, 500);
-            }
-            finally
-            {
-                Schedule(pushWhenLoaded);
-            }
-        }
-
-        private void cancelLoad()
-        {
-            pushDebounce?.Cancel();
-            pushDebounce = null;
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            BackgroundBrightnessReduction = false;
-            base.OnSuspending(next);
-            cancelLoad();
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            content.ScaleTo(0.7f, 150, Easing.InQuint);
-            this.FadeOut(150);
-            cancelLoad();
-
-            Background.EnableUserDim.Value = false;
-            BackgroundBrightnessReduction = false;
-
-            return base.OnExiting(next);
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (isDisposing)
-            {
-                // if the player never got pushed, we should explicitly dispose it.
-                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
-            }
-        }
-
-        private bool backgroundBrightnessReduction;
-
-        protected bool BackgroundBrightnessReduction
-        {
-            get => backgroundBrightnessReduction;
-            set
-            {
-                if (value == backgroundBrightnessReduction)
-                    return;
-
-                backgroundBrightnessReduction = value;
-
-                Background.FadeColour(OsuColour.Gray(backgroundBrightnessReduction ? 0.8f : 1), 200);
-            }
         }
 
         protected override void Update()
@@ -343,14 +254,111 @@ namespace osu.Game.Screens.Play
             }
         }
 
+        private void prepareNewPlayer()
+        {
+            var restartCount = player?.RestartCount + 1 ?? 0;
+
+            player = createPlayer();
+            player.RestartCount = restartCount;
+            player.RestartRequested = restartRequested;
+
+            LoadTask = LoadComponentAsync(player, _ => MetadataInfo.Loading = false);
+        }
+
+        private void restartRequested()
+        {
+            hideOverlays = true;
+            ValidForResume = true;
+        }
+
+        private void contentIn()
+        {
+            content.ScaleTo(1, 650, Easing.OutQuint);
+            content.FadeInFromZero(400);
+        }
+
+        private void contentOut()
+        {
+            // Ensure the logo is no longer tracking before we scale the content
+            content.StopTracking();
+
+            content.ScaleTo(0.7f, 300, Easing.InQuint);
+            content.FadeOut(250);
+        }
+
+        private void pushWhenLoaded()
+        {
+            if (!this.IsCurrentScreen()) return;
+
+            try
+            {
+                if (!readyForPush)
+                {
+                    // as the pushDebounce below has a delay, we need to keep checking and cancel a future debounce
+                    // if we become unready for push during the delay.
+                    cancelLoad();
+                    return;
+                }
+
+                if (scheduledPushPlayer != null)
+                    return;
+
+                scheduledPushPlayer = Scheduler.AddDelayed(() =>
+                {
+                    contentOut();
+
+                    this.Delay(250).Schedule(() =>
+                    {
+                        if (!this.IsCurrentScreen()) return;
+
+                        LoadTask = null;
+
+                        //By default, we want to load the player and never be returned to.
+                        //Note that this may change if the player we load requested a re-run.
+                        ValidForResume = false;
+
+                        if (player.LoadedBeatmapSuccessfully)
+                            this.Push(player);
+                        else
+                            this.Exit();
+                    });
+                }, 500);
+            }
+            finally
+            {
+                Schedule(pushWhenLoaded);
+            }
+        }
+
+        private void cancelLoad()
+        {
+            scheduledPushPlayer?.Cancel();
+            scheduledPushPlayer = null;
+        }
+
+        #region Disposal
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (isDisposing)
+            {
+                // if the player never got pushed, we should explicitly dispose it.
+                DisposalTask = LoadTask?.ContinueWith(_ => player.Dispose());
+            }
+        }
+
+        #endregion
+
         private class MutedNotification : SimpleNotification
         {
+            public override bool IsImportant => true;
+
             public MutedNotification()
             {
                 Text = "Your music volume is set to 0%! Click here to restore it.";
             }
-
-            public override bool IsImportant => true;
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours, AudioManager audioManager, NotificationOverlay notificationOverlay, VolumeOverlay volumeOverlay)
