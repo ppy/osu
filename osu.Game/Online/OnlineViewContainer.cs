@@ -68,8 +68,14 @@ namespace osu.Game.Online
             }
         }
 
+        /// <summary>
+        /// Applies a transform to the online content to make it hidden.
+        /// </summary>
         protected virtual void PopContentOut(Drawable content) => content.FadeOut(TRANSFORM_TIME / 2, Easing.OutQuint);
 
+        /// <summary>
+        /// Applies a transform to the online content to make it visible.
+        /// </summary>
         protected virtual void PopContentIn(Drawable content) => content.FadeIn(TRANSFORM_TIME, Easing.OutQuint);
 
         protected override void LoadComplete()
