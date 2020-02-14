@@ -28,11 +28,7 @@ namespace osu.Game.Screens.Select
 
         public readonly BeatmapDetails Details;
 
-        protected Bindable<BeatmapDetailAreaTabItem> CurrentTab
-        {
-            get => tabControl.Current;
-            set => tabControl.Current = value;
-        }
+        protected Bindable<BeatmapDetailAreaTabItem> CurrentTab => tabControl.Current;
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
