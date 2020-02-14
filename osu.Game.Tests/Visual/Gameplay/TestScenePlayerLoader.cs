@@ -91,8 +91,43 @@ namespace osu.Game.Tests.Visual.Gameplay
         {
             AddStep("load dummy beatmap", () => ResetPlayer(false));
             AddUntilStep("wait for current", () => loader.IsCurrentScreen());
-            AddRepeatStep("move mouse", () => InputManager.MoveMouseTo(loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft) * RNG.NextSingle()), 20);
+
+            AddUntilStep("wait for load ready", () =>
+            {
+                moveMouse();
+                return player.LoadState == LoadState.Ready;
+            });
+            AddRepeatStep("move mouse", moveMouse, 20);
+
             AddAssert("loader still active", () => loader.IsCurrentScreen());
+            AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
+
+            void moveMouse()
+            {
+                InputManager.MoveMouseTo(
+                    loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft
+                    + (loader.VisualSettings.ScreenSpaceDrawQuad.BottomRight - loader.VisualSettings.ScreenSpaceDrawQuad.TopLeft)
+                    * RNG.NextSingle());
+            }
+        }
+
+        [Test]
+        public void TestBlockLoadViaFocus()
+        {
+            OsuFocusedOverlayContainer overlay = null;
+
+            AddStep("load dummy beatmap", () => ResetPlayer(false));
+            AddUntilStep("wait for current", () => loader.IsCurrentScreen());
+
+            AddStep("show focused overlay", () => { container.Add(overlay = new ChangelogOverlay { State = { Value = Visibility.Visible } }); });
+            AddUntilStep("overlay visible", () => overlay.IsPresent);
+
+            AddUntilStep("wait for load ready", () => player.LoadState == LoadState.Ready);
+            AddRepeatStep("twiddle thumbs", () => { }, 20);
+
+            AddAssert("loader still active", () => loader.IsCurrentScreen());
+
+            AddStep("hide overlay", () => overlay.Hide());
             AddUntilStep("loads after idle", () => !loader.IsCurrentScreen());
         }
 
