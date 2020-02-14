@@ -23,6 +23,9 @@ namespace osu.Game.Graphics.Containers
 
         private Color4 handleColour = Color4.White;
 
+        /// <summary>
+        /// The colour of the drag handle.
+        /// </summary>
         protected Color4 HandleColour
         {
             get => handleColour;
@@ -38,6 +41,11 @@ namespace osu.Game.Graphics.Containers
             }
         }
 
+        /// <summary>
+        /// Whether the drag handle should be shown.
+        /// </summary>
+        protected virtual bool ShowDragHandle => true;
+
         private PlaylistItemHandle handle;
 
         protected OsuRearrangeableListItem(TModel item)
@@ -50,6 +58,8 @@ namespace osu.Game.Graphics.Containers
         [BackgroundDependencyLoader]
         private void load()
         {
+            Container handleContainer;
+
             InternalChild = new GridContainer
             {
                 RelativeSizeAxes = Axes.X,
@@ -58,7 +68,7 @@ namespace osu.Game.Graphics.Containers
                 {
                     new[]
                     {
-                        new Container
+                        handleContainer = new Container
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -78,6 +88,9 @@ namespace osu.Game.Graphics.Containers
                 ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
                 RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
             };
+
+            if (!ShowDragHandle)
+                handleContainer.Alpha = 0;
         }
 
         protected override bool OnDragStart(DragStartEvent e)
@@ -107,7 +120,7 @@ namespace osu.Game.Graphics.Containers
 
         protected abstract Drawable CreateContent();
 
-        private class PlaylistItemHandle : SpriteIcon
+        public class PlaylistItemHandle : SpriteIcon
         {
             public bool HandlingDrag { get; private set; }
             private bool isHovering;
