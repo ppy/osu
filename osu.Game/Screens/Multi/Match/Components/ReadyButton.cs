@@ -7,12 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class ReadyButton : HeaderButton
+    public class ReadyButton : OsuButton
     {
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
