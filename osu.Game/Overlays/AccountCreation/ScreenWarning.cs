@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private IAPIProvider api { get; set; }
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
