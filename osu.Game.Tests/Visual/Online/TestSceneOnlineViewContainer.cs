@@ -61,8 +61,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to online", () => ((DummyAPIAccess)API).State = APIState.Online);
 
-            AddAssert("children are visible", () => onlineView.ViewTarget.IsPresent);
-            AddAssert("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("children are visible", () => onlineView.ViewTarget.IsPresent);
+            AddUntilStep("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
         }
 
         [Test]
@@ -70,8 +70,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to offline", () => ((DummyAPIAccess)API).State = APIState.Offline);
 
-            AddAssert("children are hidden", () => !onlineView.ViewTarget.IsPresent);
-            AddAssert("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
+            AddUntilStep("loading animation is not visible", () => !onlineView.LoadingAnimation.IsPresent);
         }
 
         [Test]
@@ -79,8 +79,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to connecting", () => ((DummyAPIAccess)API).State = APIState.Connecting);
 
-            AddAssert("children are hidden", () => !onlineView.ViewTarget.IsPresent);
-            AddAssert("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
+            AddUntilStep("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
         }
 
         [Test]
@@ -88,8 +88,8 @@ namespace osu.Game.Tests.Visual.Online
         {
             AddStep("set status to failing", () => ((DummyAPIAccess)API).State = APIState.Failing);
 
-            AddAssert("children are hidden", () => !onlineView.ViewTarget.IsPresent);
-            AddAssert("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
+            AddUntilStep("children are not visible", () => !onlineView.ViewTarget.IsPresent);
+            AddUntilStep("loading animation is visible", () => onlineView.LoadingAnimation.IsPresent);
         }
     }
 }
