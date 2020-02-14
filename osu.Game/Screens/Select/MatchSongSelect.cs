@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Linq;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -26,7 +27,6 @@ namespace osu.Game.Screens.Select
 
         public override bool AllowEditing => false;
 
-
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
@@ -39,8 +39,8 @@ namespace osu.Game.Screens.Select
         {
             var item = new PlaylistItem
             {
-                Beatmap = Beatmap.Value.BeatmapInfo,
-                Ruleset = Ruleset.Value,
+                Beatmap = { Value = Beatmap.Value.BeatmapInfo },
+                Ruleset = { Value = Ruleset.Value },
                 RulesetID = Ruleset.Value.ID ?? 0
             };
 
@@ -61,8 +61,8 @@ namespace osu.Game.Screens.Select
 
             if (CurrentItem.Value != null)
             {
-                Ruleset.Value = CurrentItem.Value.Ruleset;
-                Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap);
+                Ruleset.Value = CurrentItem.Value.Ruleset.Value;
+                Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value.Beatmap.Value);
                 Mods.Value = CurrentItem.Value.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
             }
 

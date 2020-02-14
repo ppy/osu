@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
 
             if (beatmap == null)
             {
-                textFlow.AddText("还没有选择谱面", s =>
+                textFlow.AddText("还没有选择任何谱面", s =>
                 {
                     s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;
@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
+                        Text = new LocalisedString((beatmap.Value.Metadata.ArtistUnicode, beatmap.Value.Metadata.Artist)),
                         Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
@@ -80,10 +80,10 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
+                        Text = new LocalisedString((beatmap.Value.Metadata.TitleUnicode, beatmap.Value.Metadata.Title)),
                         Font = OsuFont.GetFont(size: TextSize),
                     }
-                }, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "打开此谱面");
+                }, LinkAction.OpenBeatmap, beatmap.Value.OnlineBeatmapID.ToString(), "打开此谱面");
             }
         }
     }

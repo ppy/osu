@@ -331,6 +331,7 @@
     *   [m] [Add mouse down repeat support to timeline zoom buttons #7806]
     *   [m] [Disallow seeking on osu!direct download progress bars #7808]
     *   [m] [Improve extensibility of mod display expansion #7811]
+    *   [m] [Make playlist beatmap and ruleset into bindables #7812]
 
 *   谱面排行榜部分字体增大
     *   [osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs](osu.Game/Overlays/BeatmapSet/Scores/TopScoreStatisticsSection.cs)
