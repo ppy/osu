@@ -16,24 +16,30 @@ namespace osu.Game.Online
     /// </summary>
     public abstract class OnlineViewContainer : Container, IOnlineComponent
     {
-        private readonly Placeholder placeholder;
-        protected readonly LoadingAnimation LoadingAnimation;
+        protected LoadingAnimation LoadingAnimation { get; private set; }
+
+        protected override Container<Drawable> Content { get; } = new Container { RelativeSizeAxes = Axes.Both };
+
+        private readonly string placeholderMessage;
+
+        private Placeholder placeholder;
 
         private const double transform_duration = 300;
-
-        protected override Container<Drawable> Content { get; }
 
         [Resolved]
         protected IAPIProvider API { get; private set; }
 
         protected OnlineViewContainer(string placeholderMessage)
         {
+            this.placeholderMessage = placeholderMessage;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             InternalChildren = new Drawable[]
             {
-                Content = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
+                Content,
                 placeholder = new LoginPlaceholder(placeholderMessage),
                 LoadingAnimation = new LoadingAnimation
                 {
