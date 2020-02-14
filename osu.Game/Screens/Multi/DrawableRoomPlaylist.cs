@@ -28,15 +28,7 @@ namespace osu.Game.Screens.Multi
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(item =>
-            {
-                if (item.OldValue != null && ItemMap.TryGetValue(item.OldValue, out var oldItem))
-                    ((DrawableRoomPlaylistItem)oldItem).Deselect();
-
-                if (item.NewValue != null && ItemMap.TryGetValue(item.NewValue, out var newItem))
-                    ((DrawableRoomPlaylistItem)newItem).Select();
-            }, true);
-
+            // Scheduled since items are removed and re-added upon rearrangement
             Items.ItemsRemoved += items => Schedule(() =>
             {
                 if (!Items.Contains(SelectedItem.Value))
@@ -58,7 +50,7 @@ namespace osu.Game.Screens.Multi
 
         protected override OsuRearrangeableListItem<PlaylistItem> CreateOsuDrawable(PlaylistItem item) => new DrawableRoomPlaylistItem(item, allowEdit, allowSelection)
         {
-            RequestSelection = requestSelection,
+            SelectedItem = { BindTarget = SelectedItem },
             RequestDeletion = requestDeletion
         };
 
