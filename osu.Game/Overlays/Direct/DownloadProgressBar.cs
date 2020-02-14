@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Direct
         public DownloadProgressBar(BeatmapSetInfo beatmapSet)
             : base(beatmapSet)
         {
-            AddInternal(progressBar = new ProgressBar
+            AddInternal(progressBar = new InteractionDisabledProgressBar
             {
                 Height = 0,
                 Alpha = 0,
@@ -63,6 +63,12 @@ namespace osu.Game.Overlays.Direct
                         break;
                 }
             }, true);
+        }
+
+        private class InteractionDisabledProgressBar : ProgressBar
+        {
+            public override bool HandlePositionalInput => false;
+            public override bool HandleNonPositionalInput => false;
         }
     }
 }
