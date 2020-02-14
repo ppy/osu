@@ -42,6 +42,12 @@ namespace osu.Game.Online
             };
         }
 
+        protected override void LoadComplete()
+        {
+            API?.Register(this);
+            base.LoadComplete();
+        }
+
         public virtual void APIStateChanged(IAPIProvider api, APIState state)
         {
             switch (state)
@@ -77,12 +83,6 @@ namespace osu.Game.Online
         /// Applies a transform to the online content to make it visible.
         /// </summary>
         protected virtual void PopContentIn(Drawable content) => content.FadeIn(TRANSFORM_TIME, Easing.OutQuint);
-
-        protected override void LoadComplete()
-        {
-            API?.Register(this);
-            base.LoadComplete();
-        }
 
         protected override void Dispose(bool isDisposing)
         {
