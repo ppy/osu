@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 Samples = tickSamples,
                                 StartTime = t + lastEvent.Value.Time,
                                 X = X + Path.PositionAt(
-                                        lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
+                                    lastEvent.Value.PathProgress + (t / sinceLastTick) * (e.PathProgress - lastEvent.Value.PathProgress)).X / CatchPlayfield.BASE_WIDTH,
                             });
                         }
                     }
