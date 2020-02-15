@@ -179,6 +179,16 @@ namespace osu.Game.Tests.Visual.Multiplayer
             AddAssert("item 0 is selected", () => playlist.SelectedItem.Value == playlist.Items[0]);
         }
 
+        [Test]
+        public void TestChangeBeatmapAndRemove()
+        {
+            createPlaylist(true, true);
+
+            AddStep("change beatmap of first item", () => playlist.Items[0].BeatmapID = 30);
+            moveToDeleteButton(0);
+            AddStep("click delete button", () => InputManager.Click(MouseButton.Left));
+        }
+
         private void moveToItem(int index, Vector2? offset = null)
             => AddStep($"move mouse to item {index}", () => InputManager.MoveMouseTo(playlist.ChildrenOfType<OsuRearrangeableListItem<PlaylistItem>>().ElementAt(index), offset));
 
