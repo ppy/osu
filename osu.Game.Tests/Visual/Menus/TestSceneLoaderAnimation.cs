@@ -33,23 +33,15 @@ namespace osu.Game.Tests.Visual.Menus
         [Test]
         public void TestInstantLoad()
         {
-            bool logoVisible = false;
+            // visual only, very impossible to test this using asserts.
 
-            AddStep("begin loading", () =>
+            AddStep("load immediately", () =>
             {
                 loader = new TestLoader();
                 loader.AllowLoad.Set();
 
                 LoadScreen(loader);
             });
-
-            AddUntilStep("loaded", () =>
-            {
-                logoVisible = loader.Logo?.Alpha > 0;
-                return loader.Logo != null && loader.ScreenLoaded;
-            });
-
-            AddAssert("logo was not visible", () => !logoVisible);
         }
 
         [Test]
@@ -58,7 +50,7 @@ namespace osu.Game.Tests.Visual.Menus
             AddStep("begin loading", () => LoadScreen(loader = new TestLoader()));
             AddUntilStep("wait for logo visible", () => loader.Logo?.Alpha > 0);
             AddStep("finish loading", () => loader.AllowLoad.Set());
-            AddAssert("loaded", () => loader.Logo != null && loader.ScreenLoaded);
+            AddUntilStep("loaded", () => loader.Logo != null && loader.ScreenLoaded);
             AddUntilStep("logo gone", () => loader.Logo?.Alpha == 0);
         }
 

@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private float[] calculatedValues = Array.Empty<float>(); // values but adjusted to fit the amount of columns
 
         private int[] values;
 
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Play
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)Math.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;

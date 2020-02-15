@@ -21,9 +21,10 @@ namespace osu.Game.Rulesets.Judgements
     /// </summary>
     public class DrawableJudgement : CompositeDrawable
     {
-        private const float judgement_size = 80;
+        private const float judgement_size = 128;
 
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         protected readonly JudgementResult Result;
 
@@ -34,9 +35,13 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// Duration of initial fade in.
-        /// Default fade out will start immediately after this duration.
         /// </summary>
         protected virtual double FadeInDuration => 100;
+
+        /// <summary>
+        /// Duration to wait until fade out begins. Defaults to <see cref="FadeInDuration"/>.
+        /// </summary>
+        protected virtual double FadeOutDelay => FadeInDuration;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -52,10 +57,8 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             InternalChild = JudgementBody = new Container
             {
                 Anchor = Anchor.Centre,
@@ -64,10 +67,10 @@ namespace osu.Game.Rulesets.Judgements
                 Child = new SkinnableDrawable(new GameplaySkinComponent<HitResult>(Result.Type), _ => JudgementText = new OsuSpriteText
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = OsuFont.Numeric.With(size: 12),
+                    Font = OsuFont.Numeric.With(size: 20),
                     Colour = judgementColour(Result.Type),
                     Scale = new Vector2(0.85f, 1),
-                })
+                }, confineMode: ConfineMode.NoScaling)
             };
         }
 
@@ -76,7 +79,7 @@ namespace osu.Game.Rulesets.Judgements
             JudgementBody.ScaleTo(0.9f);
             JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
 
-            this.Delay(FadeInDuration).FadeOut(400);
+            this.Delay(FadeOutDelay).FadeOut(400);
         }
 
         protected override void LoadComplete()

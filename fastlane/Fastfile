@@ -1,5 +1,83 @@
 update_fastlane
 
+platform :android do
+desc 'Deploy to play store'
+  lane :beta do |options|
+
+    update_version(
+      version: options[:version],
+      build: options[:build],
+    )
+
+    build(options)
+
+    supply(
+      apk: './osu.Android/bin/Release/sh.ppy.osulazer-Signed.apk',
+      package_name: 'sh.ppy.osulazer',
+      track: 'alpha', # upload to alpha, we can promote it later
+      json_key: options[:json_key],
+    )
+  end
+
+  desc 'Deploy to github release'
+  lane :build_github do |options|
+
+    update_version(
+      version: options[:version],
+      build: options[:build],
+    )
+
+    build(options)
+
+    client = HTTPClient.new
+    changelog = client.get_content 'https://gist.githubusercontent.com/peppy/aaa2ec1a323554b619671cac6dbbb776/raw'
+    changelog.gsub!('$BUILD_ID', options[:build])
+
+    set_github_release(
+      repository_name: "ppy/osu",
+      api_token: ENV["GITHUB_TOKEN"],
+      name: options[:build],
+      tag_name: options[:build],
+      is_draft: true,
+      description: changelog,
+      commitish: "master",
+      upload_assets: ["osu.Android/bin/Release/sh.ppy.osulazer.apk"]
+    )
+
+  end
+
+  desc 'Compile the project'
+  lane :build do |options|
+    nuget_restore(
+      project_path: 'osu.sln'
+    )
+
+    souyuz(
+      build_configuration: 'Release',
+      solution_path: 'osu.sln',
+      platform: "android",
+      output_path: "osu.Android/bin/Release/",
+      keystore_path: options[:keystore_path],
+      keystore_alias: options[:keystore_alias],
+      keystore_password: ENV["KEYSTORE_PASSWORD"]
+    )
+  end
+
+  lane :update_version do |options|
+
+    split = options[:build].split('.')
+    split[1] = split[1].to_s.rjust(4, '0')
+    android_build = split.join('')
+
+    app_version(
+      solution_path: 'osu.sln',
+      version: options[:version],
+      build: android_build,
+    )
+  end
+
+end
+
 platform :ios do
   desc 'Deploy to testflight'
   lane :beta do |options|
@@ -28,12 +106,11 @@ platform :ios do
   desc 'Compile the project'
   lane :build do
     nuget_restore(
-      project_path: 'osu.iOS.sln'
+      project_path: 'osu.sln'
     )
 
     souyuz(
       platform: "ios",
-      build_target: "osu_iOS",
       plist_path: "../osu.iOS/Info.plist"
     )
   end

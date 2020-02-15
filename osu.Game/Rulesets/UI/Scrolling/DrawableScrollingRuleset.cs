@@ -15,7 +15,6 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
@@ -86,7 +85,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly LocalScrollingInfo scrollingInfo;
 
-        protected DrawableScrollingRuleset(Ruleset ruleset, IWorkingBeatmap beatmap, IReadOnlyList<Mod> mods)
+        protected DrawableScrollingRuleset(Ruleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
             : base(ruleset, beatmap, mods)
         {
             scrollingInfo = new LocalScrollingInfo();
@@ -112,7 +111,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [BackgroundDependencyLoader]
         private void load()
         {
-            double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
+            double lastObjectTime = Objects.LastOrDefault()?.GetEndTime() ?? double.MaxValue;
             double baseBeatLength = TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
             if (RelativeScaleBeatLengths)
@@ -131,7 +130,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     if (duration > maxDuration)
                     {
                         maxDuration = duration;
-                        baseBeatLength = timingPoints[i].BeatLength;
+                        // The slider multiplier is post-multiplied to determine the final velocity, but for relative scale beat lengths
+                        // the multiplier should not affect the effective timing point (the longest in the beatmap), so it is factored out here
+                        baseBeatLength = timingPoints[i].BeatLength / Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier;
                     }
                 }
             }
@@ -146,13 +147,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // Generate the timing points, making non-timing changes use the previous timing change and vice-versa
             var timingChanges = allPoints.Select(c =>
             {
-                var timingPoint = c as TimingControlPoint;
-                var difficultyPoint = c as DifficultyControlPoint;
-
-                if (timingPoint != null)
+                if (c is TimingControlPoint timingPoint)
                     lastTimingPoint = timingPoint;
-
-                if (difficultyPoint != null)
+                else if (c is DifficultyControlPoint difficultyPoint)
                     lastDifficultyPoint = difficultyPoint;
 
                 return new MultiplierControlPoint(c.Time)
@@ -204,7 +201,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 throw new ArgumentException($"{nameof(Playfield)} must be a {nameof(ScrollingPlayfield)} when using {nameof(DrawableScrollingRuleset<TObject>)}.");
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private class LocalScrollingInfo : IScrollingInfo
         {

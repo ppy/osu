@@ -40,9 +40,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             for (int i = 0; i < max_sprites; i++)
             {
-                // InvalidationID 1 forces an update of each part of the cursor trail the first time ApplyState is run on the draw node
-                // This is to prevent garbage data from being sent to the vertex shader, resulting in visual issues on some platforms
-                parts[i].InvalidationID = 1;
+                // -1 signals that the part is unusable, and should not be drawn
+                parts[i].InvalidationID = -1;
             }
         }
 
@@ -112,7 +111,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             for (int i = 0; i < parts.Length; ++i)
             {
                 parts[i].Time -= time;
-                ++parts[i].InvalidationID;
+
+                if (parts[i].InvalidationID != -1)
+                    ++parts[i].InvalidationID;
             }
 
             time = 0;
@@ -173,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private void addPart(Vector2 screenSpacePosition)
         {
             parts[currentIndex].Position = screenSpacePosition;
-            parts[currentIndex].Time = time;
+            parts[currentIndex].Time = time + 1;
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
@@ -200,13 +201,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
             private Vector2 size;
 
-            private readonly TrailBatch vertexBatch = new TrailBatch(max_sprites, 1);
+            private readonly QuadBatch<TexturedTrailVertex> vertexBatch = new QuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
             public TrailDrawNode(CursorTrail source)
                 : base(source)
             {
-                for (int i = 0; i < max_sprites; i++)
-                    parts[i].InvalidationID = 0;
             }
 
             public override void ApplyState()
@@ -218,11 +217,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 size = Source.partSize;
                 time = Source.time;
 
-                for (int i = 0; i < Source.parts.Length; ++i)
-                {
-                    if (Source.parts[i].InvalidationID > parts[i].InvalidationID)
-                        parts[i] = Source.parts[i];
-                }
+                Source.parts.CopyTo(parts, 0);
             }
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
@@ -232,20 +227,52 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 shader.Bind();
                 shader.GetUniform<float>("g_FadeClock").UpdateValue(ref time);
 
-                for (int i = 0; i < parts.Length; ++i)
+                texture.TextureGL.Bind();
+
+                RectangleF textureRect = texture.GetTextureRect();
+
+                foreach (var part in parts)
                 {
-                    vertexBatch.DrawTime = parts[i].Time;
+                    if (part.InvalidationID == -1)
+                        continue;
 
-                    Vector2 pos = parts[i].Position;
+                    if (time - part.Time >= 1)
+                        continue;
 
-                    DrawQuad(
-                        texture,
-                        new Quad(pos.X - size.X / 2, pos.Y - size.Y / 2, size.X, size.Y),
-                        DrawColourInfo.Colour,
-                        null,
-                        vertexBatch.AddAction);
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y + size.Y / 2),
+                        TexturePosition = textureRect.BottomLeft,
+                        Colour = DrawColourInfo.Colour.BottomLeft.Linear,
+                        Time = part.Time
+                    });
+
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y + size.Y / 2),
+                        TexturePosition = textureRect.BottomRight,
+                        Colour = DrawColourInfo.Colour.BottomRight.Linear,
+                        Time = part.Time
+                    });
+
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X + size.X / 2, part.Position.Y - size.Y / 2),
+                        TexturePosition = textureRect.TopRight,
+                        Colour = DrawColourInfo.Colour.TopRight.Linear,
+                        Time = part.Time
+                    });
+
+                    vertexBatch.Add(new TexturedTrailVertex
+                    {
+                        Position = new Vector2(part.Position.X - size.X / 2, part.Position.Y - size.Y / 2),
+                        TexturePosition = textureRect.TopLeft,
+                        Colour = DrawColourInfo.Colour.TopLeft.Linear,
+                        Time = part.Time
+                    });
                 }
 
+                vertexBatch.Draw();
                 shader.Unbind();
             }
 
@@ -254,25 +281,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 base.Dispose(isDisposing);
 
                 vertexBatch.Dispose();
-            }
-
-            // Todo: This shouldn't exist, but is currently used to reduce allocations by caching variable-capturing closures.
-            private class TrailBatch : QuadBatch<TexturedTrailVertex>
-            {
-                public new readonly Action<TexturedVertex2D> AddAction;
-                public float DrawTime;
-
-                public TrailBatch(int size, int maxBuffers)
-                    : base(size, maxBuffers)
-                {
-                    AddAction = v => Add(new TexturedTrailVertex
-                    {
-                        Position = v.Position,
-                        TexturePosition = v.TexturePosition,
-                        Time = DrawTime + 1,
-                        Colour = v.Colour,
-                    });
-                }
             }
         }
 

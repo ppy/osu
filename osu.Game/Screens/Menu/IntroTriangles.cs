@@ -7,22 +7,17 @@ using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Audio.Track;
-using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Timing;
-using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.IO.Archives;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
@@ -32,9 +27,9 @@ namespace osu.Game.Screens.Menu
 {
     public class IntroTriangles : IntroScreen
     {
-        private const string menu_music_beatmap_hash = "a1556d0801b3a6b175dda32ef546f0ec812b400499f575c44fccbe9c67f9b1e5";
+        protected override string BeatmapHash => "a1556d0801b3a6b175dda32ef546f0ec812b400499f575c44fccbe9c67f9b1e5";
 
-        private SampleChannel welcome;
+        protected override string BeatmapFile => "triangles.osz";
 
         protected override BackgroundScreen CreateBackground() => background = new BackgroundScreenDefault(false)
         {
@@ -44,47 +39,14 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private AudioManager audio { get; set; }
 
-        private Bindable<bool> menuMusic;
-        private Track track;
-        private WorkingBeatmap introBeatmap;
-
         private BackgroundScreenDefault background;
 
+        private SampleChannel welcome;
+
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
+        private void load()
         {
-            menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
-
-            BeatmapSetInfo setInfo = null;
-
-            if (!menuMusic.Value)
-            {
-                var sets = beatmaps.GetAllUsableBeatmapSets();
-                if (sets.Count > 0)
-                    setInfo = beatmaps.QueryBeatmapSet(s => s.ID == sets[RNG.Next(0, sets.Count - 1)].ID);
-            }
-
-            if (setInfo == null)
-            {
-                setInfo = beatmaps.QueryBeatmapSet(b => b.Hash == menu_music_beatmap_hash);
-
-                if (setInfo == null)
-                {
-                    // we need to import the default menu background beatmap
-                    setInfo = beatmaps.Import(new ZipArchiveReader(game.Resources.GetStream(@"Tracks/triangles.osz"), "triangles.osz")).Result;
-
-                    setInfo.Protected = true;
-                    beatmaps.Update(setInfo);
-                }
-            }
-
-            introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
-
-            track = introBeatmap.Track;
-            track.Reset();
-
-            if (config.Get<bool>(OsuSetting.MenuVoice) && !menuMusic.Value)
-                // triangles has welcome sound included in the track. only play this if the user doesn't want menu music.
+            if (MenuVoice.Value && !MenuMusic.Value)
                 welcome = audio.Samples.Get(@"welcome");
         }
 
@@ -96,24 +58,19 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                Beatmap.Value = introBeatmap;
-                introBeatmap = null;
-
                 PrepareMenuLoad();
 
                 LoadComponentAsync(new TrianglesIntroSequence(logo, background)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Clock = new FramedClock(menuMusic.Value ? track : null),
+                    Clock = new FramedClock(MenuMusic.Value ? Track : null),
                     LoadMenu = LoadMenu
                 }, t =>
                 {
                     AddInternal(t);
                     welcome?.Play();
 
-                    // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Menu.
-                    if (menuMusic.Value)
-                        track.Start();
+                    StartTrack();
                 });
             }
         }
@@ -122,12 +79,6 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
             background.FadeOut(100);
-        }
-
-        public override void OnSuspending(IScreen next)
-        {
-            track = null;
-            base.OnSuspending(next);
         }
 
         private class TrianglesIntroSequence : CompositeDrawable
@@ -151,13 +102,12 @@ namespace osu.Game.Screens.Menu
                 this.background = background;
             }
 
-            private OsuGameBase game;
+            [Resolved]
+            private OsuGameBase game { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuGameBase game)
+            private void load(TextureStore textures)
             {
-                this.game = game;
-
                 InternalChildren = new Drawable[]
                 {
                     triangles = new GlitchingTriangles

@@ -3,7 +3,7 @@
 
 using System;
 using System.Linq;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Beatmaps;
@@ -36,9 +36,6 @@ namespace osu.Game.Rulesets.Catch.Replays
             const double movement_speed = dash_speed / 2;
             float lastPosition = 0.5f;
             double lastTime = 0;
-
-            // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            addFrame(-100000, lastPosition);
 
             void moveToNext(CatchHitObject h)
             {
@@ -127,6 +124,10 @@ namespace osu.Game.Rulesets.Catch.Replays
 
         private void addFrame(double time, float? position = null, bool dashing = false)
         {
+            // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
+            if (Replay.Frames.Count == 0)
+                Replay.Frames.Add(new CatchReplayFrame(time - 1, position, false, null));
+
             var last = currentFrame;
             currentFrame = new CatchReplayFrame(time, position, dashing, last);
             Replay.Frames.Add(currentFrame);

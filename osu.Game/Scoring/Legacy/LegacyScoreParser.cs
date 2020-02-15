@@ -35,7 +35,7 @@ namespace osu.Game.Scoring.Legacy
             using (SerializationReader sr = new SerializationReader(stream))
             {
                 currentRuleset = GetRuleset(sr.ReadByte());
-                var scoreInfo = new LegacyScoreInfo { Ruleset = currentRuleset.RulesetInfo };
+                var scoreInfo = new ScoreInfo { Ruleset = currentRuleset.RulesetInfo };
 
                 score.ScoreInfo = scoreInfo;
 
@@ -53,12 +53,12 @@ namespace osu.Game.Scoring.Legacy
                 // MD5Hash
                 sr.ReadString();
 
-                scoreInfo.Count300 = sr.ReadUInt16();
-                scoreInfo.Count100 = sr.ReadUInt16();
-                scoreInfo.Count50 = sr.ReadUInt16();
-                scoreInfo.CountGeki = sr.ReadUInt16();
-                scoreInfo.CountKatu = sr.ReadUInt16();
-                scoreInfo.CountMiss = sr.ReadUInt16();
+                scoreInfo.SetCount300(sr.ReadUInt16());
+                scoreInfo.SetCount100(sr.ReadUInt16());
+                scoreInfo.SetCount50(sr.ReadUInt16());
+                scoreInfo.SetCountGeki(sr.ReadUInt16());
+                scoreInfo.SetCountKatu(sr.ReadUInt16());
+                scoreInfo.SetCountMiss(sr.ReadUInt16());
 
                 scoreInfo.TotalScore = sr.ReadInt32();
                 scoreInfo.MaxCombo = sr.ReadUInt16();
@@ -220,9 +220,11 @@ namespace osu.Game.Scoring.Legacy
             float lastTime = 0;
             ReplayFrame currentFrame = null;
 
-            foreach (var l in reader.ReadToEnd().Split(','))
+            var frames = reader.ReadToEnd().Split(',');
+
+            for (var i = 0; i < frames.Length; i++)
             {
-                var split = l.Split('|');
+                var split = frames[i].Split('|');
 
                 if (split.Length < 4)
                     continue;
@@ -234,7 +236,13 @@ namespace osu.Game.Scoring.Legacy
                 }
 
                 var diff = Parsing.ParseFloat(split[0]);
+
                 lastTime += diff;
+
+                if (i == 0 && diff == 0)
+                    // osu-stable adds a zero-time frame before potentially valid negative user frames.
+                    // we need to ignore this.
+                    continue;
 
                 // Todo: At some point we probably want to rewind and play back the negative-time frames
                 // but for now we'll achieve equal playback to stable by skipping negative frames

@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <param name="amount"></param>
         public void Increment(int amount = 1)
         {
-            Current.Value = Current.Value + amount;
+            Current.Value += amount;
         }
 
         /// <summary>

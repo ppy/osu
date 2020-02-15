@@ -14,6 +14,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
@@ -180,6 +181,20 @@ namespace osu.Game.Screens.Menu
                 State = ButtonSystemState.Initial;
         }
 
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (State == ButtonSystemState.Initial)
+            {
+                if (buttonsTopLevel.Any(b => e.Key == b.TriggerKey))
+                {
+                    logo?.Click();
+                    return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
+        }
+
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
@@ -196,7 +211,9 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        public void OnReleased(GlobalAction action)
+        {
+        }
 
         private bool goBack()
         {
@@ -284,15 +301,15 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.Initial:
                     logoDelayedAction?.Cancel();
                     logoDelayedAction = Scheduler.AddDelayed(() =>
-                        {
-                            logoTrackingContainer.StopTracking();
+                    {
+                        logoTrackingContainer.StopTracking();
 
-                            game?.Toolbar.Hide();
+                        game?.Toolbar.Hide();
 
-                            logo.ClearTransforms(targetMember: nameof(Position));
-                            logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
-                            logo.ScaleTo(1, 800, Easing.OutExpo);
-                        }, buttonArea.Alpha * 150);
+                        logo.ClearTransforms(targetMember: nameof(Position));
+                        logo.MoveTo(new Vector2(0.5f), 800, Easing.OutExpo);
+                        logo.ScaleTo(1, 800, Easing.OutExpo);
+                    }, buttonArea.Alpha * 150);
                     break;
 
                 case ButtonSystemState.TopLevel:

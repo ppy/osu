@@ -8,13 +8,16 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Framework.Testing;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -48,42 +51,48 @@ namespace osu.Game.Tests.Visual.UserInterface
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
+        }
 
-            Add(modSelect = new TestModSelectOverlay
+        [SetUp]
+        public void SetUp() => Schedule(() =>
+        {
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                Origin = Anchor.BottomCentre,
-                Anchor = Anchor.BottomCentre,
-            });
+                modSelect = new TestModSelectOverlay
+                {
+                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomCentre,
+                    SelectedMods = { BindTarget = SelectedMods }
+                },
 
-            Add(modDisplay = new ModDisplay
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Position = new Vector2(0, 25),
-            });
+                modDisplay = new ModDisplay
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    AutoSizeAxes = Axes.Both,
+                    Position = new Vector2(0, 25),
+                    Current = { BindTarget = modSelect.SelectedMods }
+                }
+            };
+        });
 
-            modDisplay.Current.UnbindBindings();
-            modDisplay.Current.BindTo(modSelect.SelectedMods);
-
-            AddStep("Show", modSelect.Show);
-            AddStep("Toggle", modSelect.ToggleVisibility);
-            AddStep("Toggle", modSelect.ToggleVisibility);
+        [SetUpSteps]
+        public void SetUpSteps()
+        {
+            AddStep("show", () => modSelect.Show());
         }
 
         [Test]
         public void TestOsuMods()
         {
-            var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            changeRuleset(ruleset);
+            changeRuleset(0);
 
-            var instance = ruleset.CreateInstance();
+            var osu = new OsuRuleset();
 
-            var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
-            var harderMods = instance.GetModsFor(ModType.DifficultyIncrease);
+            var easierMods = osu.GetModsFor(ModType.DifficultyReduction);
+            var harderMods = osu.GetModsFor(ModType.DifficultyIncrease);
 
-            var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
+            var noFailMod = osu.GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
 
             var doubleTimeMod = harderMods.OfType<MultiMod>().FirstOrDefault(m => m.Mods.Any(a => a is OsuModDoubleTime));
@@ -97,8 +106,8 @@ namespace osu.Game.Tests.Visual.UserInterface
             testMultiMod(doubleTimeMod);
             testIncompatibleMods(easy, hardRock);
             testDeselectAll(easierMods.Where(m => !(m is MultiMod)));
-            testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
-            testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
+            testMultiplierTextColour(noFailMod, () => modSelect.LowMultiplierColour);
+            testMultiplierTextColour(hiddenMod, () => modSelect.HighMultiplierColour);
 
             testUnimplementedMod(spunOutMod);
         }
@@ -106,37 +115,31 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Test]
         public void TestManiaMods()
         {
-            var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 3);
-            changeRuleset(ruleset);
+            changeRuleset(3);
 
-            testRankedText(ruleset.CreateInstance().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
+            testRankedText(new ManiaRuleset().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
         }
 
         [Test]
         public void TestRulesetChanges()
         {
-            var rulesetOsu = rulesets.AvailableRulesets.First(r => r.ID == 0);
-            var rulesetMania = rulesets.AvailableRulesets.First(r => r.ID == 3);
+            changeRuleset(0);
 
-            changeRuleset(null);
+            var noFailMod = new OsuRuleset().GetModsFor(ModType.DifficultyReduction).FirstOrDefault(m => m is OsuModNoFail);
 
-            var instance = rulesetOsu.CreateInstance();
-            var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
-            var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
+            AddStep("set mods externally", () => { SelectedMods.Value = new[] { noFailMod }; });
 
-            AddStep("set mods externally", () => { modDisplay.Current.Value = new[] { noFailMod }; });
-
-            changeRuleset(rulesetOsu);
+            changeRuleset(0);
 
             AddAssert("ensure mods still selected", () => modDisplay.Current.Value.Single(m => m is OsuModNoFail) != null);
 
-            changeRuleset(rulesetMania);
+            changeRuleset(3);
 
-            AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any(m => m is OsuModNoFail));
+            AddAssert("ensure mods not selected", () => modDisplay.Current.Value.Count == 0);
 
-            changeRuleset(rulesetOsu);
+            changeRuleset(0);
 
-            AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any());
+            AddAssert("ensure mods not selected", () => modDisplay.Current.Value.Count == 0);
         }
 
         private void testSingleMod(Mod mod)
@@ -198,19 +201,19 @@ namespace osu.Game.Tests.Visual.UserInterface
                 selectNext(mod);
 
             AddAssert("check for any selection", () => modSelect.SelectedMods.Value.Any());
-            AddStep("deselect all", modSelect.DeselectAllButton.Action.Invoke);
+            AddStep("deselect all", () => modSelect.DeselectAllButton.Action.Invoke());
             AddAssert("check for no selection", () => !modSelect.SelectedMods.Value.Any());
         }
 
-        private void testMultiplierTextColour(Mod mod, Color4 colour)
+        private void testMultiplierTextColour(Mod mod, Func<Color4> getCorrectColour)
         {
-            checkLabelColor(Color4.White);
+            checkLabelColor(() => Color4.White);
             selectNext(mod);
             AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(colour);
+            checkLabelColor(getCorrectColour);
             selectPrevious(mod);
             AddWaitStep("wait for changing colour", 1);
-            checkLabelColor(Color4.White);
+            checkLabelColor(() => Color4.White);
         }
 
         private void testRankedText(Mod mod)
@@ -235,9 +238,9 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private void changeRuleset(RulesetInfo ruleset)
+        private void changeRuleset(int? id)
         {
-            AddStep($"change ruleset to {ruleset}", () => { Ruleset.Value = ruleset; });
+            AddStep($"change ruleset to {(id?.ToString() ?? "none")}", () => { Ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault(r => r.ID == id); });
             waitForLoad();
         }
 
@@ -253,7 +256,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             });
         }
 
-        private void checkLabelColor(Color4 color) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == color);
+        private void checkLabelColor(Func<Color4> getColour) => AddAssert("check label has expected colour", () => modSelect.MultiplierLabel.Colour.AverageColour == getColour());
 
         private class TestModSelectOverlay : ModSelectOverlay
         {

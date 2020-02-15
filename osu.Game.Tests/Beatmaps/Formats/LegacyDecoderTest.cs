@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.IO;
 using NUnit.Framework;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.IO;
 using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
             var decoder = new LineLoggingDecoder(14);
 
             using (var resStream = TestResources.OpenResource("comments.osu"))
-            using (var stream = new StreamReader(resStream))
+            using (var stream = new LineBufferedReader(resStream))
             {
                 decoder.Decode(stream);
 

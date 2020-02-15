@@ -8,8 +8,11 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play;
 using osu.Game.Skinning;
 using osuTK;
 
@@ -27,6 +30,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Drawable cursorTrail;
 
+        public Bindable<float> CursorScale = new BindableFloat(1);
+
+        private Bindable<float> userCursorScale;
+        private Bindable<bool> autoCursorScale;
+
         public OsuCursorContainer()
         {
             InternalChild = fadeContainer = new Container
@@ -36,12 +44,63 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             };
         }
 
+        [Resolved(canBeNull: true)]
+        private GameplayBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private OsuConfigManager config { get; set; }
+
         [BackgroundDependencyLoader(true)]
-        private void load(OsuRulesetConfigManager config)
+        private void load(OsuConfigManager config, OsuRulesetConfigManager rulesetConfig)
         {
-            config?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+            rulesetConfig?.BindWith(OsuRulesetSetting.ShowCursorTrail, showTrail);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             showTrail.BindValueChanged(v => cursorTrail.FadeTo(v.NewValue ? 1 : 0, 200), true);
+
+            userCursorScale = config.GetBindable<float>(OsuSetting.GameplayCursorSize);
+            userCursorScale.ValueChanged += _ => calculateScale();
+
+            autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
+            autoCursorScale.ValueChanged += _ => calculateScale();
+
+            CursorScale.ValueChanged += e =>
+            {
+                var newScale = new Vector2(e.NewValue);
+
+                ActiveCursor.Scale = newScale;
+                cursorTrail.Scale = newScale;
+            };
+
+            calculateScale();
+        }
+
+        /// <summary>
+        /// Get the scale applicable to the ActiveCursor based on a beatmap's circle size.
+        /// </summary>
+        public static float GetScaleForCircleSize(float circleSize) =>
+            1f - 0.7f * (1f + circleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
+        private void calculateScale()
+        {
+            float scale = userCursorScale.Value;
+
+            if (autoCursorScale.Value && beatmap != null)
+            {
+                // if we have a beatmap available, let's get its circle size to figure out an automatic cursor scale modifier.
+                scale *= GetScaleForCircleSize(beatmap.BeatmapInfo.BaseDifficulty.CircleSize);
+            }
+
+            CursorScale.Value = scale;
+
+            var newScale = new Vector2(scale);
+
+            ActiveCursor.ScaleTo(newScale, 400, Easing.OutQuint);
+            cursorTrail.Scale = newScale;
         }
 
         private int downCount;
@@ -68,7 +127,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return false;
         }
 
-        public bool OnReleased(OsuAction action)
+        public void OnReleased(OsuAction action)
         {
             switch (action)
             {
@@ -81,8 +140,6 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         updateExpandedState();
                     break;
             }
-
-            return false;
         }
 
         public override bool HandlePositionalInput => true; // OverlayContainer will set this false when we go hidden, but we always want to receive input.
@@ -90,13 +147,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void PopIn()
         {
             fadeContainer.FadeTo(1, 300, Easing.OutQuint);
-            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
+            ActiveCursor.ScaleTo(CursorScale.Value, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(CursorScale.Value * 0.8f, 450, Easing.OutQuint);
         }
 
         private class DefaultCursorTrail : CursorTrail

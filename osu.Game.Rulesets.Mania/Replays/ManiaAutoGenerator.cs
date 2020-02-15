@@ -6,7 +6,6 @@ using System.Linq;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Mania.Replays
@@ -47,9 +46,6 @@ namespace osu.Game.Rulesets.Mania.Replays
 
         public override Replay Generate()
         {
-            // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
-            Replay.Frames.Add(new ManiaReplayFrame(-100000, 0));
-
             var pointGroups = generateActionPoints().GroupBy(a => a.Time).OrderBy(g => g.First().Time);
 
             var actions = new List<ManiaAction>();
@@ -70,6 +66,10 @@ namespace osu.Game.Rulesets.Mania.Replays
                     }
                 }
 
+                // todo: can be removed once FramedReplayInputHandler correctly handles rewinding before first frame.
+                if (Replay.Frames.Count == 0)
+                    Replay.Frames.Add(new ManiaReplayFrame(group.First().Time - 1));
+
                 Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));
             }
 
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Mania.Replays
                 var currentObject = Beatmap.HitObjects[i];
                 var nextObjectInColumn = GetNextObject(i); // Get the next object that requires pressing the same button
 
-                double endTime = (currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime;
+                double endTime = currentObject.GetEndTime();
 
                 bool canDelayKeyUp = nextObjectInColumn == null ||
                                      nextObjectInColumn.StartTime > endTime + RELEASE_DELAY;

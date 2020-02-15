@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Multi
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
+        // this is required due to PlayerLoader eventually being pushed to the main stack
+        // while leases may be taken out by a subscreen.
         public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private readonly MultiplayerWaveContainer waves;
@@ -96,7 +98,7 @@ namespace osu.Game.Screens.Multi
                     {
                         RelativeSizeAxes = Axes.Both,
                         Padding = new MarginPadding { Top = Header.HEIGHT },
-                        Child = screenStack = new OsuScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                        Child = screenStack = new MultiplayerSubScreenStack { RelativeSizeAxes = Axes.Both }
                     },
                     new Header(screenStack),
                     createButton = new HeaderButton
@@ -119,6 +121,8 @@ namespace osu.Game.Screens.Multi
                     roomManager = new RoomManager()
                 }
             };
+
+            screenStack.Push(loungeSubScreen = new LoungeSubScreen());
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
@@ -167,14 +171,17 @@ namespace osu.Game.Screens.Multi
         public void APIStateChanged(IAPIProvider api, APIState state)
         {
             if (state != APIState.Online)
-                forcefullyExit();
+                Schedule(forcefullyExit);
         }
 
         private void forcefullyExit()
         {
             // This is temporary since we don't currently have a way to force screens to be exited
             if (this.IsCurrentScreen())
-                this.Exit();
+            {
+                while (this.IsCurrentScreen())
+                    this.Exit();
+            }
             else
             {
                 this.MakeCurrent();
@@ -212,6 +219,8 @@ namespace osu.Game.Screens.Multi
 
         public override bool OnExiting(IScreen next)
         {
+            roomManager.PartRoom();
+
             if (screenStack.CurrentScreen != null && !(screenStack.CurrentScreen is LoungeSubScreen))
             {
                 screenStack.Exit();
@@ -270,11 +279,7 @@ namespace osu.Game.Screens.Multi
 
         private void updateTrack(ValueChangedEvent<WorkingBeatmap> _ = null)
         {
-            bool isMatch = screenStack.CurrentScreen is MatchSubScreen;
-
-            Beatmap.Disabled = isMatch;
-
-            if (isMatch)
+            if (screenStack.CurrentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value?.Track;
 

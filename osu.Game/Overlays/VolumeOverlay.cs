@@ -19,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class VolumeOverlay : OverlayContainer
+    public class VolumeOverlay : VisibilityContainer
     {
         private const float offset = 10;
 
@@ -28,9 +28,9 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMusic;
         private MuteButton muteButton;
 
-        protected override bool BlockPositionalInput => false;
-
         private readonly BindableDouble muteAdjustment = new BindableDouble();
+
+        public Bindable<bool> IsMuted { get; } = new Bindable<bool>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
@@ -64,7 +64,8 @@ namespace osu.Game.Overlays
                         volumeMeterMusic = new VolumeMeter("MUSIC", 125, colours.BlueDarker),
                         muteButton = new MuteButton
                         {
-                            Margin = new MarginPadding { Top = 100 }
+                            Margin = new MarginPadding { Top = 100 },
+                            Current = { BindTarget = IsMuted }
                         }
                     }
                 },
@@ -74,13 +75,13 @@ namespace osu.Game.Overlays
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            muteButton.Current.ValueChanged += muted =>
+            IsMuted.BindValueChanged(muted =>
             {
                 if (muted.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
-            };
+            });
         }
 
         protected override void LoadComplete()

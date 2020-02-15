@@ -116,13 +116,13 @@ namespace osu.Game.IO.Legacy
         }
 
         /// <summary> Reads a generic Dictionary from the buffer. </summary>
-        public IDictionary<T, U> ReadDictionary<T, U>()
+        public IDictionary<TKey, TValue> ReadDictionary<TKey, TValue>()
         {
             int count = ReadInt32();
             if (count < 0) return null;
 
-            IDictionary<T, U> d = new Dictionary<T, U>();
-            for (int i = 0; i < count; i++) d[(T)ReadObject()] = (U)ReadObject();
+            IDictionary<TKey, TValue> d = new Dictionary<TKey, TValue>();
+            for (int i = 0; i < count; i++) d[(TKey)ReadObject()] = (TValue)ReadObject();
             return d;
         }
 
@@ -192,7 +192,7 @@ namespace osu.Game.IO.Legacy
             }
         }
 
-        public class DynamicDeserializer
+        public static class DynamicDeserializer
         {
             private static VersionConfigToNamespaceAssemblyObjectBinder versionBinder;
             private static BinaryFormatter formatter;
@@ -226,9 +226,7 @@ namespace osu.Game.IO.Legacy
 
                 public override Type BindToType(string assemblyName, string typeName)
                 {
-                    Type typeToDeserialize;
-
-                    if (cache.TryGetValue(assemblyName + typeName, out typeToDeserialize))
+                    if (cache.TryGetValue(assemblyName + typeName, out var typeToDeserialize))
                         return typeToDeserialize;
 
                     List<Type> tmpTypes = new List<Type>();

@@ -9,7 +9,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -33,20 +33,21 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextBox emailTextBox;
         private OsuPasswordTextBox passwordTextBox;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private ShakeContainer registerShake;
         private IEnumerable<Drawable> characterCheckText;
 
         private OsuTextBox[] textboxes;
         private ProcessingOverlay processingOverlay;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api, GameHost host)
+        private void load(OsuColour colours)
         {
-            this.api = api;
-            this.host = host;
-
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
@@ -138,18 +139,13 @@ namespace osu.Game.Overlays.AccountCreation
             passwordTextBox.Current.ValueChanged += password => { characterCheckText.ForEach(s => s.Colour = password.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(password.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (host?.OnScreenKeyboardOverlapsGameWindow != true && !textboxes.Any(t => t.HasFocus))
-                focusNextTextbox();
-        }
-
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             processingOverlay.Hide();
+
+            if (host?.OnScreenKeyboardOverlapsGameWindow != true)
+                focusNextTextbox();
         }
 
         private void performRegistration()
@@ -201,7 +197,7 @@ namespace osu.Game.Overlays.AccountCreation
                         return;
                     }
 
-                    api.Login(emailTextBox.Text, passwordTextBox.Text);
+                    api.Login(usernameTextBox.Text, passwordTextBox.Text);
                 });
             });
         }

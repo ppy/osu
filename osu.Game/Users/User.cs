@@ -26,9 +26,9 @@ namespace osu.Game.Users
         [JsonProperty(@"country")]
         public Country Country;
 
-        public Bindable<UserStatus> Status = new Bindable<UserStatus>();
+        public readonly Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        public IBindable<UserActivity> Activity = new Bindable<UserActivity>();
+        public readonly Bindable<UserActivity> Activity = new Bindable<UserActivity>();
 
         //public Team Team;
 
@@ -78,6 +78,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_bng")]
         public bool IsBNG;
 
+        [JsonProperty(@"is_bot")]
+        public bool IsBot;
+
         [JsonProperty(@"is_active")]
         public bool Active;
 
@@ -123,10 +126,28 @@ namespace osu.Game.Users
         [JsonProperty(@"follower_count")]
         public int FollowerCount;
 
+        [JsonProperty(@"favourite_beatmapset_count")]
+        public int FavouriteBeatmapsetCount;
+
+        [JsonProperty(@"graveyard_beatmapset_count")]
+        public int GraveyardBeatmapsetCount;
+
+        [JsonProperty(@"loved_beatmapset_count")]
+        public int LovedBeatmapsetCount;
+
+        [JsonProperty(@"ranked_and_approved_beatmapset_count")]
+        public int RankedAndApprovedBeatmapsetCount;
+
+        [JsonProperty(@"unranked_beatmapset_count")]
+        public int UnrankedBeatmapsetCount;
+
+        [JsonProperty(@"scores_first_count")]
+        public int ScoresFirstCount;
+
         [JsonProperty]
         private string[] playstyle
         {
-            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+            set => PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray();
         }
 
         public PlayStyle[] PlayStyles;
@@ -180,6 +201,21 @@ namespace osu.Game.Users
 
             [JsonProperty("achievement_id")]
             public int ID;
+        }
+
+        [JsonProperty("monthly_playcounts")]
+        public UserHistoryCount[] MonthlyPlaycounts;
+
+        [JsonProperty("replays_watched_counts")]
+        public UserHistoryCount[] ReplaysWatchedCounts;
+
+        public class UserHistoryCount
+        {
+            [JsonProperty("start_date")]
+            public DateTime Date;
+
+            [JsonProperty("count")]
+            public long Count;
         }
 
         public override string ToString() => Username;

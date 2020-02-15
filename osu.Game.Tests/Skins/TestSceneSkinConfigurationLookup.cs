@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
@@ -9,6 +10,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Testing;
 using osu.Game.Audio;
 using osu.Game.Skinning;
 using osu.Game.Tests.Visual;
@@ -17,10 +19,11 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Skins
 {
     [TestFixture]
+    [HeadlessTest]
     public class TestSceneSkinConfigurationLookup : OsuTestScene
     {
-        private LegacySkin source1;
-        private LegacySkin source2;
+        private SkinSource source1;
+        private SkinSource source2;
         private SkinRequester requester;
 
         [SetUp]
@@ -92,7 +95,7 @@ namespace osu.Game.Tests.Skins
         [Test]
         public void TestGlobalLookup()
         {
-            AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinConfiguration, List<Color4>>(GlobalSkinConfiguration.ComboColours)?.Value?.Count > 0);
+            AddAssert("Check combo colours", () => requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.Count > 0);
         }
 
         [Test]
@@ -112,6 +115,36 @@ namespace osu.Game.Tests.Skins
                     return true;
                 }
             });
+        }
+
+        [Test]
+        public void TestEmptyComboColours()
+        {
+            AddAssert("Check retrieved combo colours is skin default colours", () =>
+                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(SkinConfiguration.DefaultComboColours) ?? false);
+        }
+
+        [Test]
+        public void TestEmptyComboColoursNoFallback()
+        {
+            AddStep("Add custom combo colours to source1", () => source1.Configuration.AddComboColours(
+                new Color4(100, 150, 200, 255),
+                new Color4(55, 110, 166, 255),
+                new Color4(75, 125, 175, 255)
+            ));
+
+            AddStep("Disallow default colours fallback in source2", () => source2.Configuration.AllowDefaultComboColoursFallback = false);
+
+            AddAssert("Check retrieved combo colours from source1", () =>
+                requester.GetConfig<GlobalSkinColours, IReadOnlyList<Color4>>(GlobalSkinColours.ComboColours)?.Value?.SequenceEqual(source1.Configuration.ComboColours) ?? false);
+        }
+
+        [Test]
+        public void TestLegacyVersionLookup()
+        {
+            AddStep("Set source1 version 2.3", () => source1.Configuration.LegacyVersion = 2.3m);
+            AddStep("Set source2 version null", () => source2.Configuration.LegacyVersion = null);
+            AddAssert("Check legacy version lookup", () => requester.GetConfig<LegacySkinConfiguration.LegacySetting, decimal>(LegacySkinConfiguration.LegacySetting.Version)?.Value == 2.3m);
         }
 
         public enum LookupType

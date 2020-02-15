@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
 {
     public class FooterButton : OsuClickableContainer
     {
-        public static readonly float SHEAR_WIDTH = 7.5f;
+        public const float SHEAR_WIDTH = 7.5f;
 
         protected static readonly Vector2 SHEAR = new Vector2(SHEAR_WIDTH / Footer.HEIGHT, 0);
 
@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        protected FillFlowContainer ButtonContentContainer;
         protected readonly Container TextContainer;
         protected readonly SpriteText SpriteText;
         private readonly Box box;
@@ -80,15 +81,36 @@ namespace osu.Game.Screens.Select
                     EdgeSmoothness = new Vector2(2, 0),
                     RelativeSizeAxes = Axes.X,
                 },
-                TextContainer = new Container
+                new Container
                 {
-                    Size = new Vector2(100 - SHEAR_WIDTH, 50),
-                    Shear = -SHEAR,
-                    Child = SpriteText = new OsuSpriteText
+                    AutoSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                    }
+                        ButtonContentContainer = new FillFlowContainer
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Direction = FillDirection.Horizontal,
+                            Shear = -SHEAR,
+                            AutoSizeAxes = Axes.X,
+                            Height = 50,
+                            Spacing = new Vector2(15, 0),
+                            Children = new Drawable[]
+                            {
+                                TextContainer = new Container
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    AutoSizeAxes = Axes.Both,
+                                    Child = SpriteText = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.Centre,
+                                        Origin = Anchor.Centre,
+                                    }
+                                },
+                            },
+                        },
+                    },
                 },
             };
         }
@@ -96,6 +118,19 @@ namespace osu.Game.Screens.Select
         public Action Hovered;
         public Action HoverLost;
         public Key? Hotkey;
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            float horizontalMargin = (100 - TextContainer.Width) / 2;
+            ButtonContentContainer.Padding = new MarginPadding
+            {
+                Left = horizontalMargin,
+                // right side margin offset to compensate for shear
+                Right = horizontalMargin - SHEAR_WIDTH / 2
+            };
+        }
 
         protected override bool OnHover(HoverEvent e)
         {
@@ -118,10 +153,10 @@ namespace osu.Game.Screens.Select
             return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override void OnMouseUp(MouseUpEvent e)
         {
             box.FadeOut(Footer.TRANSITION_LENGTH, Easing.OutQuint);
-            return base.OnMouseUp(e);
+            base.OnMouseUp(e);
         }
 
         protected override bool OnClick(ClickEvent e)

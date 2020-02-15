@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
     {
         public override Judgement CreateJudgement() => new TaikoStrongJudgement();
 
-        protected override HitWindows CreateHitWindows() => null;
+        protected override HitWindows CreateHitWindows() => HitWindows.Empty;
     }
 }

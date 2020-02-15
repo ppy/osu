@@ -48,11 +48,9 @@ namespace osu.Game.Beatmaps.Drawables
             InternalChild = iconContainer = new Container { Size = new Vector2(20f) };
         }
 
-        public string TooltipText { get; set; }
-
         public ITooltip GetCustomTooltip() => new DifficultyIconTooltip();
 
-        public object TooltipContent { get; set; }
+        public object TooltipContent { get; }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -152,12 +150,12 @@ namespace osu.Game.Beatmaps.Drawables
                 };
             }
 
-            private OsuColour colours;
+            [Resolved]
+            private OsuColour colours { get; set; }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load()
             {
-                this.colours = colours;
                 background.Colour = colours.Gray3;
             }
 
@@ -168,7 +166,7 @@ namespace osu.Game.Beatmaps.Drawables
 
                 difficultyName.Text = beatmap.Version;
                 starRating.Text = $"{beatmap.StarDifficulty:0.##}";
-                difficultyFlow.Colour = colours.ForDifficultyRating(beatmap.DifficultyRating);
+                difficultyFlow.Colour = colours.ForDifficultyRating(beatmap.DifficultyRating, true);
 
                 return true;
             }

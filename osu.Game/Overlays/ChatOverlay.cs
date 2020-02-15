@@ -21,6 +21,7 @@ using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
+using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
@@ -29,7 +30,8 @@ namespace osu.Game.Overlays
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ChannelManager channelManager;
+        [Resolved]
+        private ChannelManager channelManager { get; set; }
 
         private Container<DrawableChannel> currentChannelContainer;
 
@@ -71,7 +73,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             const float padding = 5;
 
@@ -138,7 +140,6 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.Both,
                                             Height = 1,
                                             PlaceholderText = "type your message",
-                                            Exit = Hide,
                                             OnCommit = postMessage,
                                             ReleaseFocusOnCommit = false,
                                             HoldFocus = true,
@@ -157,12 +158,21 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
+                                new SpriteIcon
+                                {
+                                    Icon = FontAwesome.Solid.Comments,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    Size = new Vector2(20),
+                                    Margin = new MarginPadding(10),
+                                },
                                 ChannelTabControl = CreateChannelTabControl().With(d =>
                                 {
                                     d.Anchor = Anchor.BottomLeft;
                                     d.Origin = Anchor.BottomLeft;
                                     d.RelativeSizeAxes = Axes.Both;
                                     d.OnRequestLeave = channelManager.LeaveChannel;
+                                    d.IsSwitchable = true;
                                 }),
                             }
                         },
@@ -199,8 +209,6 @@ namespace osu.Game.Overlays
             }, true);
 
             chatBackground.Colour = colours.ChatBlue;
-
-            this.channelManager = channelManager;
 
             loading.Show();
 
@@ -270,6 +278,10 @@ namespace osu.Game.Overlays
                 currentChannelContainer.Clear(false);
                 currentChannelContainer.Add(loaded);
             }
+
+            // mark channel as read when channel switched
+            if (e.NewValue.Messages.Any())
+                channelManager.MarkChannelAsRead(e.NewValue);
         }
 
         private float startDragChatHeight;
@@ -286,7 +298,7 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDrag(DragEvent e)
+        protected override void OnDrag(DragEvent e)
         {
             if (isDragging)
             {
@@ -298,20 +310,20 @@ namespace osu.Game.Overlays
 
                 ChatHeight.Value = targetChatHeight;
             }
-
-            return true;
         }
 
-        protected override bool OnDragEnd(DragEndEvent e)
+        protected override void OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(e);
+            base.OnDragEnd(e);
         }
 
         private void selectTab(int index)
         {
-            var channel = ChannelTabControl.Items.Skip(index).FirstOrDefault();
-            if (channel != null && !(channel is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+            var channel = ChannelTabControl.Items
+                                           .Where(tab => !(tab is ChannelSelectorTabItem.ChannelSelectorTabChannel))
+                                           .ElementAtOrDefault(index);
+            if (channel != null)
                 ChannelTabControl.Current.Value = channel;
         }
 

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,28 +16,27 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistOverlay : OverlayContainer
+    public class PlaylistOverlay : VisibilityContainer
     {
         private const float transition_duration = 600;
         private const float playlist_height = 510;
 
-        /// <summary>
-        /// Invoked when the order of an item in the list has changed.
-        /// The second parameter indicates the new index of the item.
-        /// </summary>
-        public Action<BeatmapSetInfo, int> OrderChanged;
+        public IBindableList<BeatmapSetInfo> BeatmapSets => beatmapSets;
+
+        private readonly BindableList<BeatmapSetInfo> beatmapSets = new BindableList<BeatmapSetInfo>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-        private BeatmapManager beatmaps;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         private FilterControl filter;
-        private PlaylistList list;
+        private Playlist list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
-            this.beatmaps = beatmaps;
 
             Children = new Drawable[]
             {
@@ -60,24 +58,24 @@ namespace osu.Game.Overlays.Music
                             Colour = colours.Gray3,
                             RelativeSizeAxes = Axes.Both,
                         },
-                        list = new PlaylistList
+                        list = new Playlist
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
-                            Selected = itemSelected,
-                            OrderChanged = (s, i) => OrderChanged?.Invoke(s, i)
+                            RequestSelection = itemSelected
                         },
                         filter = new FilterControl
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            ExitRequested = Hide,
                             FilterChanged = search => list.Filter(search),
                             Padding = new MarginPadding(10),
                         },
                     },
                 },
             };
+
+            list.Items.BindTo(beatmapSets);
 
             filter.Search.OnCommit = (sender, newText) =>
             {
@@ -89,6 +87,8 @@ namespace osu.Game.Overlays.Music
                     beatmap.Value.Track.Restart();
                 }
             };
+
+            beatmap.BindValueChanged(working => list.SelectedSet.Value = working.NewValue.BeatmapSetInfo, true);
         }
 
         protected override void PopIn()

@@ -102,7 +102,8 @@ namespace osu.Game.Tournament.Tests.Components
                 Content = "Okay okay, calm down guys. Let's do this!"
             }));
 
-            AddStep("multiple messages", () => testChannel.AddNewMessages(new Message(nextMessageId())
+            AddStep("multiple messages", () => testChannel.AddNewMessages(
+                new Message(nextMessageId())
                 {
                     Sender = admin,
                     Content = "I spam you!"

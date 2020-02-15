@@ -70,7 +70,10 @@ namespace osu.Game.Screens.Ranking.Pages
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new UserHeader(Score.User)
+                        new DelayedLoadWrapper(new UserHeader(Score.User)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        })
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -169,16 +172,23 @@ namespace osu.Game.Screens.Ranking.Pages
                         },
                     },
                 },
-                new ReplayDownloadButton(score)
+                new FillFlowContainer
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Margin = new MarginPadding { Bottom = 10 },
-                    Size = new Vector2(50, 30),
+                    Spacing = new Vector2(5),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        new ReplayDownloadButton(score),
+                        new RetryButton()
+                    }
                 },
             };
 
-            statisticsContainer.ChildrenEnumerable = Score.Statistics.OrderByDescending(p => p.Key).Select(s => new DrawableScoreStatistic(s));
+            statisticsContainer.ChildrenEnumerable = Score.SortedStatistics.Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()
@@ -253,9 +263,7 @@ namespace osu.Game.Screens.Ranking.Pages
             {
                 this.date = date;
 
-                AutoSizeAxes = Axes.Y;
-
-                Width = 140;
+                AutoSizeAxes = Axes.Both;
 
                 Masking = true;
                 CornerRadius = 5;
@@ -271,22 +279,26 @@ namespace osu.Game.Screens.Ranking.Pages
                         RelativeSizeAxes = Axes.Both,
                         Colour = colours.Gray6,
                     },
-                    new OsuSpriteText
+                    new FillFlowContainer
                     {
-                        Origin = Anchor.CentreLeft,
-                        Anchor = Anchor.CentreLeft,
-                        Text = date.ToShortDateString(),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Horizontal,
                         Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                        Colour = Color4.White,
+                        Spacing = new Vector2(10),
+                        Children = new[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = date.ToShortDateString(),
+                                Colour = Color4.White,
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = date.ToShortTimeString(),
+                                Colour = Color4.White,
+                            }
+                        }
                     },
-                    new OsuSpriteText
-                    {
-                        Origin = Anchor.CentreRight,
-                        Anchor = Anchor.CentreRight,
-                        Text = date.ToShortTimeString(),
-                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
-                        Colour = Color4.White,
-                    }
                 };
             }
         }
@@ -361,6 +373,7 @@ namespace osu.Game.Screens.Ranking.Pages
             }
         }
 
+        [LongRunningLoad]
         private class UserHeader : Container
         {
             private readonly User user;

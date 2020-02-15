@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -17,13 +18,25 @@ namespace osu.Game.Screens.Select
 {
     public class BeatmapDetailAreaTabControl : Container
     {
-        public static readonly float HEIGHT = 24;
+        public const float HEIGHT = 24;
+
+        public Bindable<BeatmapDetailAreaTabItem> Current
+        {
+            get => tabs.Current;
+            set => tabs.Current = value;
+        }
+
+        public Action<BeatmapDetailAreaTabItem, bool> OnFilter; //passed the selected tab and if mods is checked
+
+        public IReadOnlyList<BeatmapDetailAreaTabItem> TabItems
+        {
+            get => tabs.Items;
+            set => tabs.Items = value;
+        }
+
         private readonly OsuTabControlCheckbox modsCheckbox;
-        private readonly OsuTabControl<BeatmapDetailTab> tabs;
-
-        public Action<BeatmapDetailTab, bool> OnFilter; //passed the selected tab and if mods is checked
-
-        private Bindable<BeatmapDetailTab> selectedTab;
+        private readonly OsuTabControl<BeatmapDetailAreaTabItem> tabs;
+        private readonly Container tabsContainer;
 
         public BeatmapDetailAreaTabControl()
         {
@@ -39,17 +52,22 @@ namespace osu.Game.Screens.Select
                     Height = 1,
                     Colour = Color4.White.Opacity(0.2f),
                 },
-                tabs = new OsuTabControl<BeatmapDetailTab>
+                tabsContainer = new Container
                 {
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
+                    Child = tabs = new OsuTabControl<BeatmapDetailAreaTabItem>
+                    {
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        RelativeSizeAxes = Axes.Both,
+                        IsSwitchable = true,
+                    },
                 },
                 modsCheckbox = new OsuTabControlCheckbox
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Text = @"Mods",
+                    Text = @"Selected Mods",
                     Alpha = 0,
                 },
             };
@@ -62,27 +80,22 @@ namespace osu.Game.Screens.Select
         private void load(OsuColour colour, OsuConfigManager config)
         {
             modsCheckbox.AccentColour = tabs.AccentColour = colour.YellowLight;
-
-            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
-
-            tabs.Current.BindTo(selectedTab);
-            tabs.Current.TriggerChange();
         }
 
         private void invokeOnFilter()
         {
             OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value);
 
-            modsCheckbox.FadeTo(tabs.Current.Value == BeatmapDetailTab.Details ? 0 : 1, 200, Easing.OutQuint);
+            if (tabs.Current.Value.FilterableByMods)
+            {
+                modsCheckbox.FadeTo(1, 200, Easing.OutQuint);
+                tabsContainer.Padding = new MarginPadding { Right = 100 };
+            }
+            else
+            {
+                modsCheckbox.FadeTo(0, 200, Easing.OutQuint);
+                tabsContainer.Padding = new MarginPadding();
+            }
         }
-    }
-
-    public enum BeatmapDetailTab
-    {
-        Details,
-        Local,
-        Country,
-        Global,
-        Friends
     }
 }

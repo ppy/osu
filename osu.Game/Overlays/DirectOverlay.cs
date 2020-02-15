@@ -27,7 +27,8 @@ namespace osu.Game.Overlays
     {
         private const float panel_padding = 10f;
 
-        private RulesetStore rulesets;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
@@ -47,7 +48,7 @@ namespace osu.Game.Overlays
             get => beatmapSets;
             set
             {
-                if (beatmapSets?.Equals(value) ?? false) return;
+                if (ReferenceEquals(beatmapSets, value)) return;
 
                 beatmapSets = value?.ToList();
 
@@ -84,14 +85,8 @@ namespace osu.Game.Overlays
         }
 
         public DirectOverlay()
+            : base(OverlayColourScheme.Blue)
         {
-            // osu!direct colours are not part of the standard palette
-
-            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
-            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
-
             ScrollFlow.Children = new Drawable[]
             {
                 resultCountsContainer = new FillFlowContainer
@@ -116,7 +111,7 @@ namespace osu.Game.Overlays
 
             Filter.Search.Current.ValueChanged += text =>
             {
-                if (text.NewValue != string.Empty)
+                if (!string.IsNullOrEmpty(text.NewValue))
                 {
                     Header.Tabs.Current.Value = DirectTab.Search;
 
@@ -161,11 +156,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
+        private void load(OsuColour colours)
         {
-            this.rulesets = rulesets;
-            this.previewTrackManager = previewTrackManager;
-
             resultCountsContainer.Colour = colours.Yellow;
         }
 
@@ -234,7 +226,9 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>(string.Empty);
 
         private ScheduledDelegate queryChangedDebounce;
-        private PreviewTrackManager previewTrackManager;
+
+        [Resolved]
+        private PreviewTrackManager previewTrackManager { get; set; }
 
         private void queueUpdateSearch(bool queryTextChanged = false)
         {

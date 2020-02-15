@@ -48,7 +48,8 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public IBindableList<Channel> AvailableChannels => availableChannels;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         public readonly BindableBool HighPollRate = new BindableBool();
 
@@ -220,7 +221,7 @@ namespace osu.Game.Online.Chat
                         break;
                     }
 
-                    var channel = availableChannels.Where(c => c.Name == content || c.Name == $"#{content}").FirstOrDefault();
+                    var channel = availableChannels.FirstOrDefault(c => c.Name == content || c.Name == $"#{content}");
 
                     if (channel == null)
                     {
@@ -445,10 +446,26 @@ namespace osu.Game.Online.Chat
             return tcs.Task;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(IAPIProvider api)
+        /// <summary>
+        /// Marks the <paramref name="channel"/> as read
+        /// </summary>
+        /// <param name="channel">The channel that will be marked as read</param>
+        public void MarkChannelAsRead(Channel channel)
         {
-            this.api = api;
+            if (channel.LastMessageId == channel.LastReadId)
+                return;
+
+            var message = channel.Messages.LastOrDefault();
+
+            if (message == null)
+                return;
+
+            var req = new MarkChannelAsReadRequest(channel, message);
+
+            req.Success += () => channel.LastReadId = message.Id;
+            req.Failure += e => Logger.Error(e, $"Failed to mark channel {channel} up to '{message}' as read");
+
+            api.Queue(req);
         }
     }
 

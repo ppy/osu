@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         private bool bounding = true;
         private LoginForm form;
-        private OsuColour colours;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         private UserPanel panel;
         private UserDropdown dropdown;
@@ -60,14 +62,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(IAPIProvider api)
         {
-            this.colours = colours;
-
             api?.Register(this);
         }
 
-        public void APIStateChanged(IAPIProvider api, APIState state)
+        public void APIStateChanged(IAPIProvider api, APIState state) => Schedule(() =>
         {
             form = null;
 
@@ -184,7 +184,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             if (form != null) GetContainingInputManager()?.ChangeFocus(form);
-        }
+        });
 
         public override bool AcceptsFocus => true;
 
@@ -200,7 +200,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             private TextBox username;
             private TextBox password;
-            private IAPIProvider api;
+            private ShakeContainer shakeSignIn;
+
+            [Resolved(CanBeNull = true)]
+            private IAPIProvider api { get; set; }
 
             public Action RequestHide;
 
@@ -208,12 +211,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
                     api.Login(username.Text, password.Text);
+                else
+                    shakeSignIn.Shake();
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(IAPIProvider api, OsuConfigManager config, AccountCreationOverlay accountCreation)
+            private void load(OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
-                this.api = api;
                 Direction = FillDirection.Vertical;
                 Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
@@ -222,7 +226,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "email address",
+                        PlaceholderText = "username",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
@@ -236,7 +240,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     },
                     new SettingsCheckbox
                     {
-                        LabelText = "Remember email address",
+                        LabelText = "Remember username",
                         Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
@@ -244,10 +248,23 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         LabelText = "Stay signed in",
                         Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
-                    new SettingsButton
+                    new Container
                     {
-                        Text = "Sign in",
-                        Action = performLogin
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        Children = new Drawable[]
+                        {
+                            shakeSignIn = new ShakeContainer
+                            {
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Child = new SettingsButton
+                                {
+                                    Text = "Sign in",
+                                    Action = performLogin
+                                },
+                            }
+                        }
                     },
                     new SettingsButton
                     {
@@ -281,10 +298,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             {
                 set
                 {
-                    var h = Header as UserDropdownHeader;
-                    if (h == null) return;
-
-                    h.StatusColour = value;
+                    if (Header is UserDropdownHeader h)
+                        h.StatusColour = value;
                 }
             }
 
@@ -309,8 +324,6 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         Colour = Color4.Black.Opacity(0.25f),
                         Radius = 4,
                     };
-
-                    ItemsContainer.Padding = new MarginPadding();
                 }
 
                 [BackgroundDependencyLoader]

@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
                 placeholder.FadeOut(fade_duration, Easing.Out);
 
                 graph.DefaultValueCount = ranks.Length;
-                graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
+                graph.Values = ranks.Select(x => -MathF.Log(x.Value));
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
@@ -167,9 +167,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OverlayColourProvider colourProvider, OsuColour colours)
             {
-                ballBg.Colour = colours.GreySeafoamDarker;
+                ballBg.Colour = colourProvider.Background5;
                 movingBall.BorderColour = line.Colour = colours.Yellow;
             }
 
@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Profile.Header.Components
 
             public void HideBar() => bar.FadeOut(fade_duration);
 
-            private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
+            private int calculateIndex(float mouseXPosition) => (int)MathF.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
             private Vector2 calculateBallPosition(int index)
             {
@@ -270,7 +270,9 @@ namespace osu.Game.Overlays.Profile.Header.Components
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                background.Colour = colours.GreySeafoamDark;
+                // Temporary colour since it's currently impossible to change it without bugs (see https://github.com/ppy/osu-framework/issues/3231)
+                // If above is fixed, this should use OverlayColourProvider
+                background.Colour = colours.Gray1;
             }
 
             public bool SetContent(object content)

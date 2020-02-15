@@ -10,8 +10,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class ProgressionPath : Path
     {
-        public DrawableTournamentMatch Source { get; private set; }
-        public DrawableTournamentMatch Destination { get; private set; }
+        public DrawableTournamentMatch Source { get; }
+        public DrawableTournamentMatch Destination { get; }
 
         public ProgressionPath(DrawableTournamentMatch source, DrawableTournamentMatch destination)
         {
@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             base.LoadComplete();
 
-            Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
+            static Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
 
             var q1 = Source.ScreenSpaceDrawQuad;
             var q2 = Destination.ScreenSpaceDrawQuad;

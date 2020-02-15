@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Framework.MathUtils;
+using osu.Framework.Utils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
@@ -103,7 +103,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 MovableCatcher.X = state.CatcherX.Value;
         }
 
-        public bool OnReleased(CatchAction action) => false;
+        public void OnReleased(CatchAction action)
+        {
+        }
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
 
@@ -198,7 +200,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 var additive = createCatcherSprite();
 
                 additive.Anchor = Anchor;
-                additive.OriginPosition = additive.OriginPosition + new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
+                additive.OriginPosition += new Vector2(DrawWidth / 2, 0); // also temporary to align sprite correctly.
                 additive.Position = Position;
                 additive.Scale = Scale;
                 additive.Colour = HyperDashing ? Color4.Red : Color4.White;
@@ -235,7 +237,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     fruit.Y -= RNG.NextSingle() * diff;
                 }
 
-                fruit.X = MathHelper.Clamp(fruit.X, -CATCHER_SIZE / 2, CATCHER_SIZE / 2);
+                fruit.X = Math.Clamp(fruit.X, -CATCHER_SIZE / 2, CATCHER_SIZE / 2);
 
                 caughtFruit.Add(fruit);
             }
@@ -341,24 +343,22 @@ namespace osu.Game.Rulesets.Catch.UI
                 return false;
             }
 
-            public bool OnReleased(CatchAction action)
+            public void OnReleased(CatchAction action)
             {
                 switch (action)
                 {
                     case CatchAction.MoveLeft:
                         currentDirection++;
-                        return true;
+                        break;
 
                     case CatchAction.MoveRight:
                         currentDirection--;
-                        return true;
+                        break;
 
                     case CatchAction.Dash:
                         Dashing = false;
-                        return true;
+                        break;
                 }
-
-                return false;
             }
 
             /// <summary>
@@ -377,8 +377,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 double dashModifier = Dashing ? 1 : 0.5;
                 double speed = BASE_SPEED * dashModifier * hyperDashModifier;
 
-                Scale = new Vector2(Math.Abs(Scale.X) * direction, Scale.Y);
-                X = (float)MathHelper.Clamp(X + direction * Clock.ElapsedFrameTime * speed, 0, 1);
+                UpdatePosition((float)(X + direction * Clock.ElapsedFrameTime * speed));
 
                 // Correct overshooting.
                 if ((hyperDashDirection > 0 && hyperDashTargetPosition < X) ||
@@ -451,6 +450,17 @@ namespace osu.Game.Rulesets.Catch.UI
                 // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
                 fruit.LifetimeStart = Time.Current;
                 fruit.Expire();
+            }
+
+            public void UpdatePosition(float position)
+            {
+                position = Math.Clamp(position, 0, 1);
+
+                if (position == X)
+                    return;
+
+                Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
+                X = position;
             }
         }
     }

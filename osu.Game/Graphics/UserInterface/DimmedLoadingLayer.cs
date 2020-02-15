@@ -6,16 +6,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
+using osuTK;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    public class DimmedLoadingLayer : VisibilityContainer
+    public class DimmedLoadingLayer : OverlayContainer
     {
         private const float transition_duration = 250;
 
         private readonly LoadingAnimation loading;
 
-        public DimmedLoadingLayer()
+        public DimmedLoadingLayer(float dimAmount = 0.5f, float iconScale = 1f)
         {
             RelativeSizeAxes = Axes.Both;
             Children = new Drawable[]
@@ -23,9 +25,9 @@ namespace osu.Game.Graphics.UserInterface
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.Black.Opacity(0.5f),
+                    Colour = Color4.Black.Opacity(dimAmount),
                 },
-                loading = new LoadingAnimation(),
+                loading = new LoadingAnimation { Scale = new Vector2(iconScale) },
             };
         }
 
@@ -39,6 +41,18 @@ namespace osu.Game.Graphics.UserInterface
         {
             this.FadeOut(transition_duration, Easing.OutQuint);
             loading.Hide();
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                // blocking scroll can cause weird behaviour when this layer is used within a ScrollContainer.
+                case ScrollEvent _:
+                    return false;
+            }
+
+            return base.Handle(e);
         }
     }
 }
