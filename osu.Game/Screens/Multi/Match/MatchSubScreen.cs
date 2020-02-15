@@ -99,6 +99,12 @@ namespace osu.Game.Screens.Multi.Match
                                                 Padding = new MarginPadding { Top = 65 },
                                                 Child = new GridContainer
                                                 {
+                                                    ColumnDimensions = new[]
+                                                    {
+                                                        new Dimension(minSize: 160),
+                                                        new Dimension(minSize: 360),
+                                                        new Dimension(minSize: 400),
+                                                    },
                                                     RelativeSizeAxes = Axes.Both,
                                                     Content = new[]
                                                     {
