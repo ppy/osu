@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.UI;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 
@@ -23,6 +24,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         /// How early before a hitobject's start time to trigger a hit.
         /// </summary>
         private const float relax_leniency = 3;
+
+        private bool isDownState;
+        private bool wasLeft;
+
+        private OsuInputManager osuInputManager;
+
+        private ReplayState<OsuAction> state;
+        private double lastStateChangeTime;
+
+        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
+        {
+            // grab the input manager for future use.
+            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
+            osuInputManager.AllowUserPresses = false;
+        }
 
         public void Update(Playfield playfield)
         {
@@ -63,11 +79,14 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             if (requiresHit)
             {
-                addAction(false);
-                addAction(true);
+                changeState(false);
+                changeState(true);
             }
 
-            addAction(requiresHold);
+            if (requiresHold)
+                changeState(true);
+            else if (isDownState && time - lastStateChangeTime > AutoGenerator.KEY_UP_DELAY)
+                changeState(false);
 
             void handleHitCircle(DrawableHitCircle circle)
             {
@@ -77,39 +96,28 @@ namespace osu.Game.Rulesets.Osu.Mods
                 Debug.Assert(circle.HitObject.HitWindows != null);
                 requiresHit |= circle.HitObject.HitWindows.CanBeHit(time - circle.HitObject.StartTime);
             }
-        }
 
-        private bool wasHit;
-        private bool wasLeft;
-
-        private OsuInputManager osuInputManager;
-
-        private void addAction(bool hitting)
-        {
-            if (wasHit == hitting)
-                return;
-
-            wasHit = hitting;
-
-            var state = new ReplayState<OsuAction>
+            void changeState(bool down)
             {
-                PressedActions = new List<OsuAction>()
-            };
+                if (isDownState == down)
+                    return;
 
-            if (hitting)
-            {
-                state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
-                wasLeft = !wasLeft;
+                isDownState = down;
+                lastStateChangeTime = time;
+
+                state = new ReplayState<OsuAction>
+                {
+                    PressedActions = new List<OsuAction>()
+                };
+
+                if (down)
+                {
+                    state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                    wasLeft = !wasLeft;
+                }
+
+                state?.Apply(osuInputManager.CurrentState, osuInputManager);
             }
-
-            state.Apply(osuInputManager.CurrentState, osuInputManager);
-        }
-
-        public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
-        {
-            // grab the input manager for future use.
-            osuInputManager = (OsuInputManager)drawableRuleset.KeyBindingInputManager;
-            osuInputManager.AllowUserPresses = false;
         }
     }
 }
