@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osuTK;
@@ -84,7 +83,9 @@ namespace osu.Game.Screens.Select
 
         private BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
-        private BeatmapManager beatmaps;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         protected ModSelectOverlay ModSelect { get; private set; }
 
@@ -101,7 +102,7 @@ namespace osu.Game.Screens.Select
         private MusicController music { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
+        private void load(AudioManager audio, DialogOverlay dialog, OsuColour colours, SkinManager skins, ScoreManager scores)
         {
             // initial value transfer is required for FilterControl (it uses our re-cached bindables in its async load for the initial filter).
             transferRulesetValue();
@@ -205,11 +206,11 @@ namespace osu.Game.Screens.Select
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
                                                 },
-                                                Child = BeatmapDetails = new BeatmapDetailArea
+                                                Child = BeatmapDetails = CreateBeatmapDetailArea().With(d =>
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding { Top = 10, Right = 5 },
-                                                },
+                                                    d.RelativeSizeAxes = Axes.Both;
+                                                    d.Padding = new MarginPadding { Top = 10, Right = 5 };
+                                                })
                                             },
                                         }
                                     },
@@ -260,8 +261,6 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
-
             if (Footer != null)
             {
                 Footer.AddButton(new FooterButtonMods { Current = Mods }, ModSelect);
@@ -269,17 +268,9 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(new FooterButtonOptions(), BeatmapOptions);
 
                 BeatmapOptions.AddButton(@"从", @"未玩过的谱面中移除", FontAwesome.Regular.TimesCircle, colours.Purple, null, Key.Number1);
-                BeatmapOptions.AddButton(@"清除所有的", @"本地成绩", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
-                BeatmapOptions.AddButton(@"删除该谱面的", @"所有难度", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number3);
+                BeatmapOptions.AddButton(@"清除", @"所有本地成绩", FontAwesome.Solid.Eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
+                BeatmapOptions.AddButton(@"删除", @"所有难度", FontAwesome.Solid.Trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number3);
             }
-
-            if (this.beatmaps == null)
-                this.beatmaps = beatmaps;
-
-            this.beatmaps.ItemAdded += onBeatmapSetAdded;
-            this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
-            this.beatmaps.BeatmapHidden += onBeatmapHidden;
-            this.beatmaps.BeatmapRestored += onBeatmapRestored;
 
             dialogOverlay = dialog;
 
@@ -325,11 +316,16 @@ namespace osu.Game.Screens.Select
             return dependencies;
         }
 
+        /// <summary>
+        /// Creates the beatmap details to be displayed underneath the wedge.
+        /// </summary>
+        protected abstract BeatmapDetailArea CreateBeatmapDetailArea();
+
         public void Edit(BeatmapInfo beatmap = null)
         {
             if (!AllowEditing)
             {
-                notificationOverlay?.Post(new SimpleNotification { Text = "该模式下不能编辑!" });
+                notificationOverlay?.Post(new SimpleNotification { Text = "Editing is not available from the current mode." });
                 return;
             }
 
@@ -380,7 +376,7 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
+        private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             if (e.NewValue is DummyWorkingBeatmap || !this.IsCurrentScreen()) return;
 
@@ -539,7 +535,7 @@ private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
 
             Carousel.AllowSelection = true;
 
-            BeatmapDetails.Leaderboard.RefreshScores();
+            BeatmapDetails.Refresh();
 
             Beatmap.Value.Track.Looping = true;
             music?.ResetTrackAdjustments();
@@ -602,14 +598,6 @@ private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
             base.Dispose(isDisposing);
 
             decoupledRuleset.UnbindAll();
-
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= onBeatmapSetAdded;
-                beatmaps.ItemRemoved -= onBeatmapSetRemoved;
-                beatmaps.BeatmapHidden -= onBeatmapHidden;
-                beatmaps.BeatmapRestored -= onBeatmapRestored;
-            }
         }
 
         /// <summary>
@@ -655,11 +643,6 @@ private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
 
             lastTrack.SetTarget(track);
         }
-
-        private void onBeatmapSetAdded(BeatmapSetInfo s) => Carousel.UpdateBeatmapSet(s);
-        private void onBeatmapSetRemoved(BeatmapSetInfo s) => Carousel.RemoveBeatmapSet(s);
-        private void onBeatmapRestored(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
-        private void onBeatmapHidden(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
 
         private void carouselBeatmapsLoaded()
         {
@@ -735,7 +718,7 @@ private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
 
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
-                Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
+                Schedule(() => BeatmapDetails.Refresh())));
         }
 
         public virtual bool OnPressed(GlobalAction action)
