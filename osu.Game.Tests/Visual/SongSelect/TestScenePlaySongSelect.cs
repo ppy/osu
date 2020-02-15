@@ -463,6 +463,46 @@ namespace osu.Game.Tests.Visual.SongSelect
             AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
         }
 
+        [Test]
+        public void TestDifficultyIconSelecting()
+        {
+            int? previousID = null;
+            addRulesetImportStep(0);
+            createSongSelect();
+
+            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
+            AddStep("Click on a difficulty", () =>
+            {
+                InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                                                   .First(icon => icon.Item.Beatmap != songSelect.Carousel.SelectedBeatmap));
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("Selected beatmap changed", () => songSelect.Carousel.SelectedBeatmap.ID != previousID);
+
+            AddStep("Filter some difficulties", () => songSelect.Carousel.Filter(new FilterCriteria
+            {
+                BPM = new FilterCriteria.OptionalRange<double>
+                {
+                    Min = songSelect.Carousel.SelectedBeatmapSet.MaxBPM,
+                    IsLowerInclusive = true
+                }
+            }));
+            AddUntilStep("Wait for filter", () => songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>().Any(icon => icon.Item.Filtered.Value));
+
+            AddStep("Store current ID", () => previousID = songSelect.Carousel.SelectedBeatmap.ID);
+            AddStep("Click on a filtered difficulty", () =>
+            {
+                InputManager.MoveMouseTo(songSelect.Carousel.ChildrenOfType<DrawableCarouselBeatmapSet.FilterableDifficultyIcon>()
+                                                   .First(icon => icon.Item.Filtered.Value));
+
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Left);
+            });
+            AddAssert("Selected beatmap has not changed", () => songSelect.Carousel.SelectedBeatmap.ID == previousID);
+        }
+
         private void addRulesetImportStep(int id) => AddStep($"import test map for ruleset {id}", () => importForRuleset(id));
 
         private void importForRuleset(int id) => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())).Wait();
