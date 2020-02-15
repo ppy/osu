@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Multi
         {
             base.LoadComplete();
 
-            SelectedItem.BindValueChanged(selected => maskingContainer.BorderThickness = selected.NewValue == Model ? 5 : 0);
+            SelectedItem.BindValueChanged(selected => maskingContainer.BorderThickness = selected.NewValue == Model ? 5 : 0, true);
 
             beatmap.BindValueChanged(_ => scheduleRefresh());
             ruleset.BindValueChanged(_ => scheduleRefresh());
