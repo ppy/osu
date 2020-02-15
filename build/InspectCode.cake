@@ -1,5 +1,5 @@
 #addin "nuget:?package=CodeFileSanity&version=0.0.33"
-#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2019.3.0"
+#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2019.3.2"
 #tool "nuget:?package=NVika.MSBuild&version=1.0.1"
 var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
 
