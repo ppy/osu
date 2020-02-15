@@ -129,6 +129,26 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 OnCommit = (sender, text) => apply(),
                                                             },
                                                         },
+                                                        new Section("Duration")
+                                                        {
+                                                            Child = DurationField = new DurationDropdown
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                Items = new[]
+                                                                {
+                                                                    TimeSpan.FromMinutes(30),
+                                                                    TimeSpan.FromHours(1),
+                                                                    TimeSpan.FromHours(2),
+                                                                    TimeSpan.FromHours(4),
+                                                                    TimeSpan.FromHours(8),
+                                                                    TimeSpan.FromHours(12),
+                                                                    //TimeSpan.FromHours(16),
+                                                                    TimeSpan.FromHours(24),
+                                                                    TimeSpan.FromDays(3),
+                                                                    TimeSpan.FromDays(7)
+                                                                }
+                                                            }
+                                                        },
                                                         new Section("Room visibility")
                                                         {
                                                             Alpha = disabled_alpha,
@@ -171,26 +191,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 ReadOnly = true,
                                                                 OnCommit = (sender, text) => apply()
                                                             },
-                                                        },
-                                                        new Section("Duration")
-                                                        {
-                                                            Child = DurationField = new DurationDropdown
-                                                            {
-                                                                RelativeSizeAxes = Axes.X,
-                                                                Items = new[]
-                                                                {
-                                                                    TimeSpan.FromMinutes(30),
-                                                                    TimeSpan.FromHours(1),
-                                                                    TimeSpan.FromHours(2),
-                                                                    TimeSpan.FromHours(4),
-                                                                    TimeSpan.FromHours(8),
-                                                                    TimeSpan.FromHours(12),
-                                                                    //TimeSpan.FromHours(16),
-                                                                    TimeSpan.FromHours(24),
-                                                                    TimeSpan.FromDays(3),
-                                                                    TimeSpan.FromDays(7)
-                                                                }
-                                                            }
                                                         },
                                                         new Section("Password (optional)")
                                                         {
