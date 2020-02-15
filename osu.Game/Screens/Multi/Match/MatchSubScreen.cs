@@ -181,7 +181,7 @@ namespace osu.Game.Screens.Multi.Match
                 }
             }, true);
 
-            SelectedItem.BindValueChanged(selectedItemChanged);
+            SelectedItem.BindValueChanged(_ => Scheduler.AddOnce(selectedItemChanged));
             SelectedItem.Value = playlist.FirstOrDefault();
 
             beatmapManager.ItemAdded += beatmapAdded;
@@ -195,14 +195,16 @@ namespace osu.Game.Screens.Multi.Match
             return base.OnExiting(next);
         }
 
-        private void selectedItemChanged(ValueChangedEvent<PlaylistItem> e)
+        private void selectedItemChanged()
         {
             updateWorkingBeatmap();
 
-            Mods.Value = e.NewValue?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+            var item = SelectedItem.Value;
 
-            if (e.NewValue?.Ruleset != null)
-                Ruleset.Value = e.NewValue.Ruleset.Value;
+            Mods.Value = item?.RequiredMods?.ToArray() ?? Array.Empty<Mod>();
+
+            if (item?.Ruleset != null)
+                Ruleset.Value = item.Ruleset.Value;
         }
 
         private void updateWorkingBeatmap()

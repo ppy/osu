@@ -42,8 +42,16 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnStart()
         {
-            if (Playlist.Count == 0)
-                createNewItem();
+            switch (Playlist.Count)
+            {
+                case 0:
+                    createNewItem();
+                    break;
+
+                case 1:
+                    populateItemFromCurrent(Playlist.Single());
+                    break;
+            }
 
             this.Exit();
 
@@ -55,13 +63,20 @@ namespace osu.Game.Screens.Select
             PlaylistItem item = new PlaylistItem
             {
                 ID = (Playlist.LastOrDefault()?.ID + 1) ?? 0,
-                Beatmap = { Value = Beatmap.Value.BeatmapInfo },
-                Ruleset = { Value = Ruleset.Value }
             };
 
-            item.RequiredMods.AddRange(Mods.Value);
+            populateItemFromCurrent(item);
 
             Playlist.Add(item);
+        }
+
+        private void populateItemFromCurrent(PlaylistItem item)
+        {
+            item.Beatmap.Value = Beatmap.Value.BeatmapInfo;
+            item.Ruleset.Value = Ruleset.Value;
+
+            item.RequiredMods.Clear();
+            item.RequiredMods.AddRange(Mods.Value);
         }
     }
 }
