@@ -23,7 +23,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osuTK;
@@ -207,11 +206,11 @@ namespace osu.Game.Screens.Select
                                                     Left = left_area_padding,
                                                     Right = left_area_padding * 2,
                                                 },
-                                                Child = BeatmapDetails = new BeatmapDetailArea
+                                                Child = BeatmapDetails = CreateBeatmapDetailArea().With(d =>
                                                 {
-                                                    RelativeSizeAxes = Axes.Both,
-                                                    Padding = new MarginPadding { Top = 10, Right = 5 },
-                                                },
+                                                    d.RelativeSizeAxes = Axes.Both;
+                                                    d.Padding = new MarginPadding { Top = 10, Right = 5 };
+                                                })
                                             },
                                         }
                                     },
@@ -261,8 +260,6 @@ namespace osu.Game.Screens.Select
                     Footer = new Footer()
                 });
             }
-
-            BeatmapDetails.Leaderboard.ScoreSelected += score => this.Push(new SoloResults(score));
 
             if (Footer != null)
             {
@@ -318,6 +315,11 @@ namespace osu.Game.Screens.Select
 
             return dependencies;
         }
+
+        /// <summary>
+        /// Creates the beatmap details to be displayed underneath the wedge.
+        /// </summary>
+        protected abstract BeatmapDetailArea CreateBeatmapDetailArea();
 
         public void Edit(BeatmapInfo beatmap = null)
         {
@@ -533,7 +535,7 @@ namespace osu.Game.Screens.Select
 
             Carousel.AllowSelection = true;
 
-            BeatmapDetails.Leaderboard.RefreshScores();
+            BeatmapDetails.Refresh();
 
             Beatmap.Value.Track.Looping = true;
             music?.ResetTrackAdjustments();
@@ -716,7 +718,7 @@ namespace osu.Game.Screens.Select
 
             dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () =>
                 // schedule done here rather than inside the dialog as the dialog may fade out and never callback.
-                Schedule(() => BeatmapDetails.Leaderboard.RefreshScores())));
+                Schedule(() => BeatmapDetails.Refresh())));
         }
 
         public virtual bool OnPressed(GlobalAction action)
