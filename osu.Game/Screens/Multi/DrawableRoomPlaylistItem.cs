@@ -189,16 +189,16 @@ namespace osu.Game.Screens.Multi
                     X = -18,
                     Children = new Drawable[]
                     {
+                        new PlaylistDownloadButton(item.Beatmap.Value.BeatmapSet)
+                        {
+                            Size = new Vector2(50, 30)
+                        },
                         new IconButton
                         {
                             Icon = FontAwesome.Solid.MinusSquare,
                             Alpha = allowEdit ? 1 : 0,
                             Action = () => RequestDeletion?.Invoke(Model),
                         },
-                        new PlaylistDownloadButton(item.Beatmap.Value.BeatmapSet)
-                        {
-                            Size = new Vector2(50, 30)
-                        }
                     }
                 }
             }
