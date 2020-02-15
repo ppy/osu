@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.Direct;
@@ -194,10 +195,9 @@ namespace osu.Game.Screens.Multi
                             Alpha = allowEdit ? 1 : 0,
                             Action = () => RequestDeletion?.Invoke(Model),
                         },
-                        new PanelDownloadButton(item.Beatmap.Value.BeatmapSet)
+                        new PlaylistDownloadButton(item.Beatmap.Value.BeatmapSet)
                         {
-                            Size = new Vector2(50, 30),
-                            Alpha = allowEdit ? 0 : 1
+                            Size = new Vector2(50, 30)
                         }
                     }
                 }
@@ -209,6 +209,27 @@ namespace osu.Game.Screens.Multi
             if (allowSelection)
                 SelectedItem.Value = Model;
             return true;
+        }
+
+        private class PlaylistDownloadButton : PanelDownloadButton
+        {
+            public PlaylistDownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+                : base(beatmapSet, noVideo)
+            {
+                Alpha = 0;
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                State.BindValueChanged(stateChanged, true);
+            }
+
+            private void stateChanged(ValueChangedEvent<DownloadState> state)
+            {
+                this.FadeTo(state.NewValue == DownloadState.LocallyAvailable ? 0 : 1, 500);
+            }
         }
 
         // For now, this is the same implementation as in PanelBackground, but supports a beatmap info rather than a working beatmap
