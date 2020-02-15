@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = 10, Right = performance_width + 30 },
+                        Padding = new MarginPadding { Left = 10, Right = performance_width + 120 },
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                     CreateRightContent().With(c =>
                                     {
                                         c.Anchor = Anchor.CentreRight;
-                                        c.Origin = Anchor.CentreRight;
+                                        c.Origin = Anchor.CentreLeft;
                                     }),
                                     new FillFlowContainer
                                     {
