@@ -164,8 +164,8 @@ namespace osu.Game.Screens.Multi.Match
         {
             base.LoadComplete();
 
-            Playlist.ItemsAdded += _ => updateSelectedItem();
-            Playlist.ItemsRemoved += _ => updateSelectedItem();
+            Playlist.ItemsAdded += _ => Scheduler.AddOnce(updateSelectedItem);
+            Playlist.ItemsRemoved += _ => Scheduler.AddOnce(updateSelectedItem);
 
             updateSelectedItem();
         }
