@@ -65,7 +65,8 @@ namespace osu.Game.Screens.Play
 
         private Ruleset ruleset;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
 
         private SampleChannel sampleRestart;
 
@@ -118,10 +119,8 @@ namespace osu.Game.Screens.Play
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, IAPIProvider api, OsuConfigManager config)
+        private void load(AudioManager audio, OsuConfigManager config)
         {
-            this.api = api;
-
             Mods.Value = base.Mods.Value.Select(m => m.CreateCopy()).ToArray();
 
             if (Beatmap.Value is DummyWorkingBeatmap)

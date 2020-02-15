@@ -29,7 +29,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
     {
         private bool bounding = true;
         private LoginForm form;
-        private OsuColour colours;
+
+        [Resolved]
+        private OsuColour colours { get; set; }
 
         private UserPanel panel;
         private UserDropdown dropdown;
@@ -60,10 +62,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, IAPIProvider api)
+        private void load(IAPIProvider api)
         {
-            this.colours = colours;
-
             api?.Register(this);
         }
 
@@ -201,7 +201,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private TextBox username;
             private TextBox password;
             private ShakeContainer shakeSignIn;
-            private IAPIProvider api;
+
+            [Resolved(CanBeNull = true)]
+            private IAPIProvider api { get; set; }
 
             public Action RequestHide;
 
@@ -214,9 +216,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(IAPIProvider api, OsuConfigManager config, AccountCreationOverlay accountCreation)
+            private void load(OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
-                this.api = api;
                 Direction = FillDirection.Vertical;
                 Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
