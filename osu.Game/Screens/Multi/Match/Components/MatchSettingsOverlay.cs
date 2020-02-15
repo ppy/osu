@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         private const float transition_duration = 350;
         private const float field_padding = 45;
 
+        public Action EditPlaylist;
+
         protected MatchSettings Settings { get; private set; }
 
         [BackgroundDependencyLoader]
@@ -35,7 +37,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             Child = Settings = new MatchSettings
             {
                 RelativeSizeAxes = Axes.Both,
-                RelativePositionAxes = Axes.Y
+                RelativePositionAxes = Axes.Y,
+                EditPlaylist = () => EditPlaylist?.Invoke()
             };
         }
 
@@ -53,6 +56,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             private const float disabled_alpha = 0.2f;
 
+            public Action EditPlaylist;
+
             public OsuTextBox NameField, MaxParticipantsField;
             public OsuDropdown<TimeSpan> DurationField;
             public RoomAvailabilityPicker AvailabilityPicker;
@@ -63,6 +68,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private OsuSpriteText typeLabel;
             private ProcessingOverlay processingOverlay;
+            private DrawableRoomPlaylist playlist;
 
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
@@ -123,6 +129,26 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 OnCommit = (sender, text) => apply(),
                                                             },
                                                         },
+                                                        new Section("Duration")
+                                                        {
+                                                            Child = DurationField = new DurationDropdown
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                Items = new[]
+                                                                {
+                                                                    TimeSpan.FromMinutes(30),
+                                                                    TimeSpan.FromHours(1),
+                                                                    TimeSpan.FromHours(2),
+                                                                    TimeSpan.FromHours(4),
+                                                                    TimeSpan.FromHours(8),
+                                                                    TimeSpan.FromHours(12),
+                                                                    //TimeSpan.FromHours(16),
+                                                                    TimeSpan.FromHours(24),
+                                                                    TimeSpan.FromDays(3),
+                                                                    TimeSpan.FromDays(7)
+                                                                }
+                                                            }
+                                                        },
                                                         new Section("Room visibility")
                                                         {
                                                             Alpha = disabled_alpha,
@@ -155,15 +181,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 },
                                                             },
                                                         },
-                                                    },
-                                                },
-                                                new SectionContainer
-                                                {
-                                                    Anchor = Anchor.TopRight,
-                                                    Origin = Anchor.TopRight,
-                                                    Padding = new MarginPadding { Left = field_padding / 2 },
-                                                    Children = new[]
-                                                    {
                                                         new Section("Max participants")
                                                         {
                                                             Alpha = disabled_alpha,
@@ -175,26 +192,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 OnCommit = (sender, text) => apply()
                                                             },
                                                         },
-                                                        new Section("Duration")
-                                                        {
-                                                            Child = DurationField = new DurationDropdown
-                                                            {
-                                                                RelativeSizeAxes = Axes.X,
-                                                                Items = new[]
-                                                                {
-                                                                    TimeSpan.FromMinutes(30),
-                                                                    TimeSpan.FromHours(1),
-                                                                    TimeSpan.FromHours(2),
-                                                                    TimeSpan.FromHours(4),
-                                                                    TimeSpan.FromHours(8),
-                                                                    TimeSpan.FromHours(12),
-                                                                    //TimeSpan.FromHours(16),
-                                                                    TimeSpan.FromHours(24),
-                                                                    TimeSpan.FromDays(3),
-                                                                    TimeSpan.FromDays(7)
-                                                                }
-                                                            }
-                                                        },
                                                         new Section("Password (optional)")
                                                         {
                                                             Alpha = disabled_alpha,
@@ -205,6 +202,45 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 ReadOnly = true,
                                                                 OnCommit = (sender, text) => apply()
                                                             },
+                                                        },
+                                                    },
+                                                },
+                                                new SectionContainer
+                                                {
+                                                    Anchor = Anchor.TopRight,
+                                                    Origin = Anchor.TopRight,
+                                                    Padding = new MarginPadding { Left = field_padding / 2 },
+                                                    Children = new[]
+                                                    {
+                                                        new Section("Playlist")
+                                                        {
+                                                            Child = new GridContainer
+                                                            {
+                                                                RelativeSizeAxes = Axes.X,
+                                                                Height = 300,
+                                                                Content = new[]
+                                                                {
+                                                                    new Drawable[]
+                                                                    {
+                                                                        playlist = new DrawableRoomPlaylist(true, true) { RelativeSizeAxes = Axes.Both }
+                                                                    },
+                                                                    new Drawable[]
+                                                                    {
+                                                                        new OsuButton
+                                                                        {
+                                                                            RelativeSizeAxes = Axes.X,
+                                                                            Height = 40,
+                                                                            Text = "Edit playlist",
+                                                                            Action = () => EditPlaylist?.Invoke()
+                                                                        }
+                                                                    }
+                                                                },
+                                                                RowDimensions = new[]
+                                                                {
+                                                                    new Dimension(),
+                                                                    new Dimension(GridSizeMode.AutoSize),
+                                                                }
+                                                            }
                                                         },
                                                     },
                                                 },
@@ -271,6 +307,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                 Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
                 MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
                 Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue, true);
+
+                playlist.Items.BindTo(Playlist);
             }
 
             protected override void Update()
