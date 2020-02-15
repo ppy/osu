@@ -50,6 +50,23 @@ namespace osu.Game.Tests.Visual.Online
                 Accuracy = 0.998546
             };
 
+            var secondScore = new ScoreInfo
+            {
+                PP = 96.83,
+                Rank = ScoreRank.S,
+                Beatmap = new BeatmapInfo
+                {
+                    Metadata = new BeatmapMetadata
+                    {
+                        Title = "Idolize",
+                        Artist = "Creo"
+                    },
+                    Version = "Insane"
+                },
+                Date = DateTimeOffset.Now,
+                Accuracy = 0.9726
+            };
+
             var noPPScore = new ScoreInfo
             {
                 Rank = ScoreRank.B,
@@ -78,7 +95,8 @@ namespace osu.Game.Tests.Visual.Online
                 {
                     new ColourProvidedContainer(OverlayColourScheme.Green, new DrawableProfileScore(score)),
                     new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileScore(noPPScore)),
-                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(score, 0.85))
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(score, 0.85)),
+                    new ColourProvidedContainer(OverlayColourScheme.Pink, new DrawableProfileWeightedScore(secondScore, 0.66)),
                 }
             });
         }
