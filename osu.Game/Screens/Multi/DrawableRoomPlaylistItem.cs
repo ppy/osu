@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Multi
         private readonly bool allowEdit;
         private readonly bool allowSelection;
 
+        protected override bool ShouldBeConsideredForInput(Drawable child) => allowEdit || SelectedItem.Value == Model;
+
         public DrawableRoomPlaylistItem(PlaylistItem item, bool allowEdit, bool allowSelection)
             : base(item)
         {
