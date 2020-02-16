@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -20,8 +19,7 @@ namespace osu.Game.Overlays.BeatmapListing
     {
         public BeatmapSearchFilter()
         {
-            AutoSizeAxes = Axes.Y;
-            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Both;
 
             if (typeof(T).IsEnum)
             {
@@ -36,11 +34,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
         {
-            AutoSizeAxes = Axes.Y,
-            RelativeSizeAxes = Axes.X,
-            Direction = FillDirection.Full,
+            AutoSizeAxes = Axes.Both,
             Spacing = new Vector2(10),
-            AllowMultiline = true,
         };
 
         protected class FilterTabItem : TabItem<T>

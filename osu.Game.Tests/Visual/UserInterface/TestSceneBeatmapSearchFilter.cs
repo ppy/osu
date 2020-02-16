@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,16 +24,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly FillFlowContainer resizableContainer;
-
         public TestSceneBeatmapSearchFilter()
         {
-            Add(resizableContainer = new FillFlowContainer
+            Add(new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Y,
-                Width = 600,
+                AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
@@ -43,13 +39,6 @@ namespace osu.Game.Tests.Visual.UserInterface
                     new BeatmapSearchFilter<BeatmapSearchCategory>(),
                 }
             });
-        }
-
-        [Test]
-        public void TestResize()
-        {
-            AddStep("Resize to 100px", () => resizableContainer.ResizeWidthTo(100, 1000));
-            AddStep("Resize to 600px", () => resizableContainer.ResizeWidthTo(600, 1000));
         }
     }
 }
