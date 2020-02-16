@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
@@ -128,14 +127,17 @@ namespace osu.Game.Online.Multiplayer
                     item.Beatmap.Value.Metadata = localItem.Beatmap.Value.Metadata;
             }
 
-            foreach (var removeableItem in Playlist.Except(other.Playlist, new PlaylistEqualityComparer()).ToArray())
-                Playlist.Remove(removeableItem);
+            if (!Playlist.SequenceEqual(other.Playlist))
+            {
+                Playlist.Clear();
+                Playlist.AddRange(other.Playlist);
+            }
 
-            Playlist.AddRange(other.Playlist.Except(Playlist, new PlaylistEqualityComparer()).ToArray());
-
-            foreach (var removedItem in Participants.Except(other.Participants).ToArray())
-                Participants.Remove(removedItem);
-            Participants.AddRange(other.Participants.Except(Participants).ToArray());
+            if (!Participants.SequenceEqual(other.Participants))
+            {
+                Participants.Clear();
+                Participants.AddRange(other.Participants);
+            }
 
             Position = other.Position;
         }
@@ -143,12 +145,5 @@ namespace osu.Game.Online.Multiplayer
         public bool ShouldSerializeRoomID() => false;
         public bool ShouldSerializeHost() => false;
         public bool ShouldSerializeEndDate() => false;
-
-        private class PlaylistEqualityComparer : IEqualityComparer<PlaylistItem>
-        {
-            public bool Equals(PlaylistItem x, PlaylistItem y) => x?.Equals(y) ?? false;
-
-            public int GetHashCode(PlaylistItem obj) => HashCode.Combine(obj.ID, obj.BeatmapID, obj.RulesetID);
-        }
     }
 }
