@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             BackgroundUnfocused = BackgroundFocused = Color4.White;
             IconColour = colourProvider.Light1;
-            placeholder.Colour = colourProvider.Foreground1;
+            Placeholder.Colour = colourProvider.Foreground1;
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -57,9 +57,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override Color4 SelectionColour => Color4.Gray;
 
-        private OsuSpriteText placeholder;
-
-        protected override SpriteText CreatePlaceholder() => placeholder = new OsuSpriteText
+        protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
             Font = OsuFont.GetFont(weight: FontWeight.Light, italics: true),
             Shadow = false
