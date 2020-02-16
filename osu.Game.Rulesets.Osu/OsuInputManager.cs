@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.UI;
@@ -17,6 +18,14 @@ namespace osu.Game.Rulesets.Osu
         {
             set => ((OsuKeyBindingContainer)KeyBindingContainer).AllowUserPresses = value;
         }
+
+        public OsuAction? BlockedButton
+        {
+            get => ((OsuKeyBindingContainer)KeyBindingContainer).BlockedButton;
+            set => ((OsuKeyBindingContainer)KeyBindingContainer).BlockedButton = value;
+        }
+
+        public OsuAction? LastButton => ((OsuKeyBindingContainer)KeyBindingContainer).LastButton;
 
         /// <summary>
         /// Whether the user's cursor movement events should be accepted.
@@ -42,6 +51,8 @@ namespace osu.Game.Rulesets.Osu
         private class OsuKeyBindingContainer : RulesetKeyBindingContainer
         {
             public bool AllowUserPresses = true;
+            public OsuAction? BlockedButton;
+            public OsuAction? LastButton;
 
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
                 : base(ruleset, variant, unique)
@@ -51,6 +62,25 @@ namespace osu.Game.Rulesets.Osu
             protected override bool Handle(UIEvent e)
             {
                 if (!AllowUserPresses) return false;
+
+                if (e is KeyboardEvent || e is MouseButtonEvent)
+                {
+                    var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
+                    var combos = KeyBindings.ToList().Where(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any)).ToList();
+
+                    if (combos.Any())
+                    {
+                        if (e is KeyDownEvent || e is MouseDownEvent)
+                            LastButton = combos.Find(c => c.GetAction<OsuAction>() != BlockedButton)?.GetAction<OsuAction>();
+                        else
+                            return base.Handle(e);
+
+                        var key = e is KeyboardEvent ? KeyCombination.FromKey(((KeyboardEvent)e).Key) : KeyCombination.FromMouseButton(((MouseButtonEvent)e).Button);
+                        var single = combos.FirstOrDefault(c => c.KeyCombination.Keys.Any(k => k == key));
+                        if (single?.GetAction<OsuAction>() == BlockedButton)
+                            return false;
+                    }
+                }
 
                 return base.Handle(e);
             }
