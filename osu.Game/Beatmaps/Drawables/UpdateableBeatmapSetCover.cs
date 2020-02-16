@@ -50,7 +50,7 @@ namespace osu.Game.Beatmaps.Drawables
             Child = new Box
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = ColourInfo.GradientVertical(OsuColour.Gray(0.2f), OsuColour.Gray(0.1f)),
+                Colour = OsuColour.Gray(0.2f),
             };
         }
 
