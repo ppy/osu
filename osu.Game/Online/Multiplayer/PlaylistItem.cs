@@ -93,12 +93,5 @@ namespace osu.Game.Online.Multiplayer
         public bool ShouldSerializeapiBeatmap() => false;
 
         public bool Equals(PlaylistItem other) => ID == other?.ID && BeatmapID == other.BeatmapID && RulesetID == other.RulesetID;
-
-        public override int GetHashCode()
-        {
-            // ReSharper disable NonReadonlyMemberInGetHashCode
-            return HashCode.Combine(ID, BeatmapID, RulesetID);
-            // ReSharper restore NonReadonlyMemberInGetHashCode
-        }
     }
 }
