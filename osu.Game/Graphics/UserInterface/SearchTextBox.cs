@@ -35,6 +35,7 @@ namespace osu.Game.Graphics.UserInterface
                 Size = new Vector2(20),
             });
 
+            TextFlow.Padding = new MarginPadding { Right = 40 };
             PlaceholderText = "type to search";
         }
 
