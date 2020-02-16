@@ -3,7 +3,6 @@
 
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using osuTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
