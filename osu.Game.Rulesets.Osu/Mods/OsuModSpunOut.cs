@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (drawable is DrawableSpinner spinner)
             {
                 if (spinner.Disc.Valid)
-                    spinner.Disc.Rotate(180 / MathF.PI * (float)spinner.Clock.ElapsedFrameTime / 40);
+                    spinner.Disc.Rotate(180 / MathF.PI * (float)spinner.Clock.ElapsedFrameTime * 0.03f);
                 if (!spinner.SpmCounter.IsPresent)
                     spinner.SpmCounter.FadeIn(spinner.HitObject.TimeFadeIn);
             }
