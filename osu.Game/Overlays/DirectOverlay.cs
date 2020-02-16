@@ -39,6 +39,7 @@ namespace osu.Game.Overlays
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
+
         protected override string LoginPlaceholder => @"Please sign in to browse direct!";
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
