@@ -20,6 +20,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         public BeatmapSearchTextBox()
         {
+            Height = 47;
+            TextContainer.Height = 0.42f;
             CornerRadius = 0;
             PlaceholderText = @"type in keywords...";
             EdgeEffect = new EdgeEffectParameters
@@ -65,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText
         {
-            Font = OsuFont.GetFont(weight: FontWeight.Light, italics: true),
+            Font = OsuFont.GetFont(size: CalculatedTextSize, weight: FontWeight.Light, italics: true),
             Colour = Color4.Black,
             Shadow = false,
             Text = c.ToString()
