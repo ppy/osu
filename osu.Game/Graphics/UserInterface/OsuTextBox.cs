@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
             SelectionColour = SelectionColour,
         };
 
-        private class OsuCaret : Caret
+        protected class OsuCaret : Caret
         {
             private const float caret_move_time = 60;
 
@@ -100,6 +100,12 @@ namespace osu.Game.Graphics.UserInterface
 
             public Color4 SelectionColour { get; set; }
 
+            public Color4 CaretColour
+            {
+                get => beatSync.Colour;
+                set => beatSync.Colour = value;
+            }
+
             public override void DisplayAt(Vector2 position, float? selectionWidth)
             {
                 beatSync.HasSelection = selectionWidth != null;
@@ -127,16 +133,24 @@ namespace osu.Game.Graphics.UserInterface
                     set
                     {
                         hasSelection = value;
-                        if (value)
 
+                        if (value)
                             this.FadeTo(0.5f, 200, Easing.Out);
                     }
                 }
 
+                public new Color4 Colour
+                {
+                    get => box.Colour;
+                    set => box.Colour = value;
+                }
+
+                private readonly Box box;
+
                 public CaretBeatSyncedContainer()
                 {
                     MinimumBeatLength = 300;
-                    InternalChild = new Box
+                    InternalChild = box = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.White,
