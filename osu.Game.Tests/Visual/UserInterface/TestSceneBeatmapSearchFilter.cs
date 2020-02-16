@@ -37,6 +37,7 @@ namespace osu.Game.Tests.Visual.UserInterface
                 {
                     new BeatmapSearchRulesetFilter(),
                     new BeatmapSearchFilter<BeatmapSearchCategory>(),
+                    new SmallBeatmapSearchFilter<BeatmapSearchCategory>()
                 }
             });
         }
