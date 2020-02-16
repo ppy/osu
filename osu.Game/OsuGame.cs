@@ -150,10 +150,8 @@ namespace osu.Game
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig)
+        private void load()
         {
-            this.frameworkConfig = frameworkConfig;
-
             if (!Host.IsPrimaryInstance && !DebugUtils.IsDebugBuild)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -249,7 +247,7 @@ namespace osu.Game
                 case LinkAction.Spectate:
                     waitForReady(() => notifications, _ => notifications?.Post(new SimpleNotification
                     {
-                        Text = @"该类型的链接暂不支持打开!",
+                        Text = @"This link type is not yet supported!",
                         Icon = FontAwesome.Solid.LifeRing,
                     }));
                     break;
@@ -881,7 +879,8 @@ namespace osu.Game
 
         private Container topMostOverlayContent;
 
-        private FrameworkConfigManager frameworkConfig;
+        [Resolved]
+        private FrameworkConfigManager frameworkConfig { get; set; }
 
         private ScalingContainer screenContainer;
 

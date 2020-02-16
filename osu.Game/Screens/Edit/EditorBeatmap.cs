@@ -33,7 +33,15 @@ namespace osu.Game.Screens.Edit
         /// </summary>
         public event Action<HitObject> StartTimeChanged;
 
-        public BindableList<HitObject> SelectedHitObjects { get; } = new BindableList<HitObject>();
+        /// <summary>
+        /// All currently selected <see cref="HitObject"/>s.
+        /// </summary>
+        public readonly BindableList<HitObject> SelectedHitObjects = new BindableList<HitObject>();
+
+        /// <summary>
+        /// The current placement. Null if there's no active placement.
+        /// </summary>
+        public readonly Bindable<HitObject> PlacementObject = new Bindable<HitObject>();
 
         public readonly IBeatmap PlayableBeatmap;
 

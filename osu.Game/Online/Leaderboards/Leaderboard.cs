@@ -152,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new LoginPlaceholder());
+                        replacePlaceholder(new LoginPlaceholder(@"请登录来查看在线排行!"));
                         break;
 
                     case PlaceholderState.NotSupporter:
@@ -217,14 +217,14 @@ namespace osu.Game.Online.Leaderboards
             Scores = null;
         }
 
-        private IAPIProvider api;
+        [Resolved(CanBeNull = true)]
+        private IAPIProvider api { get; set; }
 
         private ScheduledDelegate pendingUpdateScores;
 
-        [BackgroundDependencyLoader(true)]
-        private void load(IAPIProvider api)
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            this.api = api;
             api?.Register(this);
         }
 

@@ -14,14 +14,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "输出设备";
 
-        private AudioManager audio;
-        private SettingsDropdown<string> dropdown;
+        [Resolved]
+        private AudioManager audio { get; set; }
 
-        [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
-        {
-            this.audio = audio;
-        }
+        private SettingsDropdown<string> dropdown;
 
         protected override void Dispose(bool isDisposing)
         {
@@ -62,7 +58,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             {
                 dropdown = new AudioDeviceSettingsDropdown
                 {
-                    Keywords = new[] { "speaker", "headphone", "output" }
+                    Keywords = new[] { "扬声器", "耳机", "输出" }
                 }
             };
 

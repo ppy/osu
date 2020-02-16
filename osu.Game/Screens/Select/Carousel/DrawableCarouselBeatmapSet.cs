@@ -30,7 +30,9 @@ namespace osu.Game.Screens.Select.Carousel
         private Action<BeatmapSetInfo> restoreHiddenRequested;
         private Action<int> viewDetails;
 
-        private DialogOverlay dialogOverlay;
+        [Resolved(CanBeNull = true)]
+        private DialogOverlay dialogOverlay { get; set; }
+
         private readonly BeatmapSetInfo beatmapSet;
 
         public DrawableCarouselBeatmapSet(CarouselBeatmapSet set)
@@ -40,10 +42,9 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
+        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay)
         {
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
-            dialogOverlay = overlay;
             if (beatmapOverlay != null)
                 viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
 
@@ -133,9 +134,9 @@ namespace osu.Game.Screens.Select.Carousel
                     items.Add(new OsuMenuItem("细节...", MenuItemType.Standard, () => viewDetails?.Invoke(beatmapSet.OnlineBeatmapSetID.Value)));
 
                 if (beatmapSet.Beatmaps.Any(b => b.Hidden))
-                    items.Add(new OsuMenuItem("恢复所有隐藏的难度", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
+                    items.Add(new OsuMenuItem("恢复所有隐藏难度", MenuItemType.Standard, () => restoreHiddenRequested?.Invoke(beatmapSet)));
 
-                items.Add(new OsuMenuItem("删除", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
+                items.Add(new OsuMenuItem("删除整租图", MenuItemType.Destructive, () => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet))));
 
                 return items.ToArray();
             }

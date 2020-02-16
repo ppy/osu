@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Masking = true,
-                                    CornerRadius = 10,
+                                    CornerRadius = 5,
                                     Child = loading = new DimmedLoadingLayer(iconScale: 0.8f)
                                     {
                                         Alpha = 0,

@@ -14,7 +14,7 @@ namespace osu.Game.Online.Placeholders
         [Resolved(CanBeNull = true)]
         private LoginOverlay login { get; set; }
 
-        public LoginPlaceholder()
+        public LoginPlaceholder(string actionMessage)
         {
             AddIcon(FontAwesome.Solid.UserLock, cp =>
             {
@@ -22,7 +22,7 @@ namespace osu.Game.Online.Placeholders
                 cp.Padding = new MarginPadding { Right = 10 };
             });
 
-            AddText(@"请登录来查看在线排行!");
+            AddText(actionMessage);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

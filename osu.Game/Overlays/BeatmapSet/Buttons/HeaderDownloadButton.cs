@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled.Value ? "下载这张图" : "登入以下载";
+        public string TooltipText => button.Enabled.Value ? "下载该谱面" : "请先登录再进行下载";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "不带视频" : string.Empty,
+                                Text = getVideoSuffixText(),
                                 Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                             },
                         };
@@ -163,5 +163,13 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
         private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+
+        private string getVideoSuffixText()
+        {
+            if (!BeatmapSet.Value.OnlineInfo.HasVideo)
+                return string.Empty;
+
+            return noVideo ? "不带视频" : "带视频";
+        }
     }
 }

@@ -344,6 +344,33 @@
     *   [osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs](osu.Game/Overlays/BeatmapSet/Scores/ScoreTable.cs)
 
 *   整合时出现问题的更新
-    *   [! 存在更早的未整合更新] [Fix editor hit objects displaying incorrectly after StartTime change #7800]
-    *   [! 存在更早的未整合更新] [Fix blueprint showing even when mouse outside of container #7803]
-    *   [! 存在更早的未整合更新] [Update placement blueprint's position more often #7805]
+### 2020/02/15
+*   整合更新
+    *   [m] [Make beatmap detail area abstract #7832]
+    *   [m] [Improve PlayerLoader code quality #7835]
+    *   [m] [Use Resolved attribute instead of BackgroundDependencyLoader wherever possible #7837]
+
+### 2020/02/16
+*   整合更新
+    *   [m] [Show current placement blueprint in timeline #7753]
+    *   [m] [Seek to previous object's end time on successful placement #7756]
+    *   [m] [Fix not being able to seek using scroll wheel in timeline while playing track #7807]
+    *   [m] [Fix osu! gameplay cursor not adjusting to mod/convert circle size changes #7828]
+    *   [m] [Fix player loading sequence continuing even when a priority overlay is visible #7836]
+    *   [m] [Fix editor hit objects displaying incorrectly after StartTime change #7800]
+    *   [m] [Fix blueprint showing even when mouse outside of container #7803]
+    *   [m] [Update placement blueprint's position more often #7805]
+    *   [m] [Fix relax mod not working correctly on beatmaps with overlapping sliders/spinners #7830]
+    *   [m] [Add a key up delay for relax mod presses #7831]
+    *   [m] [Implement a rearrangeable beatmap playlist control #7829]
+
+    *   [m] [Implement the match beatmap detail area #7833]
+    *   [m] [Add the ability to select multiple beatmaps in multiplayer song select #7834]
+    *   [m] [Redesign match subscreen to add playlist support #7839]
+    
+    *   [m] [Adjust minor BeatmapSetOverlay details to better match osu-web #7730]
+    *   [m] [Add spotlight selector to RankingsOverlay #7733]
+    *   [m] [Add a container type to easily hide online content when not online #7546]
+    *   [m] [Fix DownloadTrackingComposite incorrectly receiving cancelled state #7844]
+
+    7753(ok),7756(ok),7807(ok),7828(ok),7836(ok),7800(ok),7803(ok),7805(ok),7830(ok),7831(ok?),7829(ok),7833(ok),7834(ok),7839(ok),7730(ok),7733(ok),7546(ok),7844(ok)

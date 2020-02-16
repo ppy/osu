@@ -77,9 +77,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("排名", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
                 new TableColumn("分数", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("准确率", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
+                new TableColumn("准确率", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 60, maxSize: 70)),
                 new TableColumn("玩家", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
-                new TableColumn("最大连击", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 90))
+                new TableColumn("最大连击", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 110))
             };
 
             foreach (var statistic in score.SortedStatistics)

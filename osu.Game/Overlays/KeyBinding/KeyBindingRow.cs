@@ -66,13 +66,12 @@ namespace osu.Game.Overlays.KeyBinding
             CornerRadius = padding;
         }
 
-        private KeyBindingStore store;
+        [Resolved]
+        private KeyBindingStore store { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, KeyBindingStore store)
+        private void load(OsuColour colours)
         {
-            this.store = store;
-
             EdgeEffect = new EdgeEffectParameters
             {
                 Radius = 2,

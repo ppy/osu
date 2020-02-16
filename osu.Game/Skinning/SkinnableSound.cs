@@ -21,7 +21,8 @@ namespace osu.Game.Skinning
 
         private SampleChannel[] channels;
 
-        private ISampleStore samples;
+        [Resolved]
+        private ISampleStore samples { get; set; }
 
         public SkinnableSound(IEnumerable<ISampleInfo> hitSamples)
         {
@@ -31,12 +32,6 @@ namespace osu.Game.Skinning
         public SkinnableSound(ISampleInfo hitSamples)
         {
             this.hitSamples = new[] { hitSamples };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ISampleStore samples)
-        {
-            this.samples = samples;
         }
 
         private bool looping;

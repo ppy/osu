@@ -25,15 +25,14 @@ namespace osu.Game.Screens.Edit.Components
     {
         private IconButton playButton;
 
-        private IAdjustableClock adjustableClock;
+        [Resolved]
+        private IAdjustableClock adjustableClock { get; set; }
 
         private readonly BindableNumber<double> tempo = new BindableDouble(1);
 
         [BackgroundDependencyLoader]
-        private void load(IAdjustableClock adjustableClock)
+        private void load()
         {
-            this.adjustableClock = adjustableClock;
-
             Children = new Drawable[]
             {
                 playButton = new IconButton

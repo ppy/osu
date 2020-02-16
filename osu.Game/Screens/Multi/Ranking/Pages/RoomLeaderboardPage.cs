@@ -23,7 +23,9 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 {
     public class RoomLeaderboardPage : ResultsPage
     {
-        private OsuColour colours;
+        [Resolved]
+        private OsuColour colours { get; set; }
+
         private TextFlowContainer rankText;
 
         [Resolved(typeof(Room), nameof(Room.Name))]
@@ -35,10 +37,8 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            this.colours = colours;
-
             MatchLeaderboard leaderboard;
 
             Children = new Drawable[]
@@ -85,11 +85,11 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             }
 
             rankText.AddText(name + "\n", white);
-            rankText.AddText("你在房间内排第", gray);
+            rankText.AddText("你在房间内排名第", gray);
 
             int index = scores.IndexOf(new APIUserScoreAggregate { User = Score.User }, new FuncEqualityComparer<APIUserScoreAggregate>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
 
-            rankText.AddText($"#{index + 1} ", s =>
+            rankText.AddText($"{index + 1} ", s =>
             {
                 s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold);
                 s.Colour = colours.YellowDark;

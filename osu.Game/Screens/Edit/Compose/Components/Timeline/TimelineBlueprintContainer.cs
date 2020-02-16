@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
@@ -21,7 +22,14 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         [Resolved(CanBeNull = true)]
         private Timeline timeline { get; set; }
 
+        [Resolved]
+        private EditorBeatmap beatmap { get; set; }
+
         private DragEvent lastDragEvent;
+
+        private Bindable<HitObject> placement;
+
+        private SelectionBlueprint placementBlueprint;
 
         public TimelineBlueprintContainer()
         {
@@ -43,6 +51,29 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         {
             base.LoadComplete();
             DragBox.Alpha = 0;
+
+            placement = beatmap.PlacementObject.GetBoundCopy();
+            placement.ValueChanged += placementChanged;
+        }
+
+        private void placementChanged(ValueChangedEvent<HitObject> obj)
+        {
+            if (obj.NewValue == null)
+            {
+                if (placementBlueprint != null)
+                {
+                    SelectionBlueprints.Remove(placementBlueprint);
+                    placementBlueprint = null;
+                }
+            }
+            else
+            {
+                placementBlueprint = CreateBlueprintFor(obj.NewValue);
+
+                placementBlueprint.Colour = Color4.MediumPurple;
+
+                SelectionBlueprints.Add(placementBlueprint);
+            }
         }
 
         protected override Container<SelectionBlueprint> CreateSelectionBlueprintContainer() => new TimelineSelectionBlueprintContainer { RelativeSizeAxes = Axes.Both };
