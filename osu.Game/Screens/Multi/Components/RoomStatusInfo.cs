@@ -34,9 +34,9 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     statusPart = new StatusPart
                     {
-                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14)
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18)
                     },
-                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 14) }
+                    endDatePart = new EndDatePart { Font = OsuFont.GetFont(size: 18) }
                 }
             };
 

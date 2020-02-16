@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private class RoomStatusNoneSelected : RoomStatus
         {
-            public override string Message => @"No Room Selected";
+            public override string Message => @"还没有选择房间";
             public override Color4 GetAppropriateColour(OsuColour colours) => colours.Gray8;
         }
 

@@ -93,7 +93,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private enum DisplayMode
         {
+            [System.ComponentModel.Description("排行榜")]
             Leaderboard,
+            [System.ComponentModel.Description("聊天")]
             Chat,
         }
     }

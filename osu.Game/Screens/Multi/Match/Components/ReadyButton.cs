@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public ReadyButton()
         {
-            Text = "Start";
+            Text = "开始";
         }
 
         [BackgroundDependencyLoader]

@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Multi.Components
                         {
                             new TriangleButton
                             {
-                                Text = "添加新的谱面",
+                                Text = "添加该谱面至游玩列表",
                                 RelativeSizeAxes = Axes.Both,
                                 Size = Vector2.One,
                                 Action = () => CreateNewItem?.Invoke()

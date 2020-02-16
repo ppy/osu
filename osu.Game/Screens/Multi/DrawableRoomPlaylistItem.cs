@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Multi
 
             if (item.Beatmap?.Value?.Metadata?.Author != null)
             {
-                authorText.AddText("mapped by ");
+                authorText.AddText("作图者");
                 authorText.AddUserLink(item.Beatmap.Value?.Metadata.Author);
             }
 

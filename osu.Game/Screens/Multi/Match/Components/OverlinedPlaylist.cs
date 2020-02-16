@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private readonly DrawableRoomPlaylist playlist;
 
         public OverlinedPlaylist(bool allowSelection)
-            : base("Playlist")
+            : base("游玩列表")
         {
             Content.Add(playlist = new DrawableRoomPlaylist(false, allowSelection)
             {

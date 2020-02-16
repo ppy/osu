@@ -54,9 +54,9 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 new OsuSpriteText
                                 {
                                     Text = title,
-                                    Font = OsuFont.GetFont(size: 14)
+                                    Font = OsuFont.GetFont(size: 18)
                                 },
-                                details = new OsuSpriteText { Font = OsuFont.GetFont(size: 14) },
+                                details = new OsuSpriteText { Font = OsuFont.GetFont(size: 18) },
                             }
                         },
                     },

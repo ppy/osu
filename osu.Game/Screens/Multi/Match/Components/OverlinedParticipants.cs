@@ -10,7 +10,7 @@ namespace osu.Game.Screens.Multi.Match.Components
     public class OverlinedParticipants : OverlinedDisplay
     {
         public OverlinedParticipants()
-            : base("Participants")
+            : base("参与者")
         {
             Content.Add(new ParticipantsList { RelativeSizeAxes = Axes.Both });
         }
