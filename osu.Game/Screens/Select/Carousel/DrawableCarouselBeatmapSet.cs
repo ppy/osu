@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             private readonly BindableBool filtered = new BindableBool();
 
-            public readonly CarouselBeatmap Item;
+            private readonly CarouselBeatmap item;
 
             public FilterableDifficultyIcon(CarouselBeatmap item)
                 : base(item.Beatmap)
@@ -220,13 +220,13 @@ namespace osu.Game.Screens.Select.Carousel
                 filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
 
-                Item = item;
+                this.item = item;
             }
 
             protected override bool OnClick(ClickEvent e)
             {
                 if (!filtered.Value)
-                    Item.State.Value = CarouselItemState.Selected;
+                    item.State.Value = CarouselItemState.Selected;
 
                 return true;
             }
