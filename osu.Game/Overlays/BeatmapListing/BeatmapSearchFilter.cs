@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected class FilterTabItem : TabItem<T>
         {
+            protected virtual float TextSize() => 13;
+
             [Resolved]
             private OverlayColourProvider colourProvider { get; set; }
 
@@ -53,7 +55,7 @@ namespace osu.Game.Overlays.BeatmapListing
                 {
                     text = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(size: 13, weight: FontWeight.Regular),
+                        Font = OsuFont.GetFont(size: TextSize(), weight: FontWeight.Regular),
                         Text = GetText(value)
                     },
                     new HoverClickSounds()
