@@ -57,8 +57,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
         protected override Color4 SelectionColour => Color4.Gray;
 
-        protected override bool AllowCommit => true;
-
         private OsuSpriteText placeholder;
 
         protected override SpriteText CreatePlaceholder() => placeholder = new OsuSpriteText
