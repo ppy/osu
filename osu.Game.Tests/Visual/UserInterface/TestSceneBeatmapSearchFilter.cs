@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,29 +18,40 @@ namespace osu.Game.Tests.Visual.UserInterface
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(BeatmapSearchFilter<>),
-            typeof(BeatmapSearchRulesetFilter)
+            typeof(BeatmapSearchFilterRow<>),
+            typeof(BeatmapSearchRulesetFilterRow),
+            typeof(BeatmapSearchSmallFilterRow<>),
         };
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        private readonly FillFlowContainer resizableContainer;
+
         public TestSceneBeatmapSearchFilter()
         {
-            Add(new FillFlowContainer
+            Add(resizableContainer = new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                AutoSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Y,
+                RelativeSizeAxes = Axes.X,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 10),
                 Children = new Drawable[]
                 {
-                    new BeatmapSearchRulesetFilter(),
-                    new BeatmapSearchFilter<BeatmapSearchCategory>(),
-                    new SmallBeatmapSearchFilter<BeatmapSearchCategory>()
+                    new BeatmapSearchRulesetFilterRow(),
+                    new BeatmapSearchFilterRow<BeatmapSearchCategory>("Categories"),
+                    new BeatmapSearchSmallFilterRow<BeatmapSearchCategory>("Header Name")
                 }
             });
+        }
+
+        [Test]
+        public void TestResize()
+        {
+            AddStep("Resize to 0.3", () => resizableContainer.ResizeWidthTo(0.3f, 1000));
+            AddStep("Resize to 1", () => resizableContainer.ResizeWidthTo(1, 1000));
         }
     }
 }
