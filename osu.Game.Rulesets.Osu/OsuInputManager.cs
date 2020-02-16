@@ -63,24 +63,23 @@ namespace osu.Game.Rulesets.Osu
             {
                 if (!AllowUserPresses) return false;
 
-                if (e is KeyboardEvent || e is MouseButtonEvent)
-                {
-                    var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
-                    var combos = KeyBindings.ToList().Where(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any)).ToList();
+                var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
+                var combos = KeyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
 
-                    if (combos.Any())
-                    {
-                        if (e is KeyDownEvent || e is MouseDownEvent)
-                            LastButton = combos.Find(c => c.GetAction<OsuAction>() != BlockedButton)?.GetAction<OsuAction>();
-                        else
-                            return base.Handle(e);
+                InputKey? key;
+                if (e is KeyDownEvent kb)
+                    key = KeyCombination.FromKey(kb.Key);
+                else if (e is MouseDownEvent mouse)
+                    key = KeyCombination.FromMouseButton(mouse.Button);
+                else
+                    return base.Handle(e);
 
-                        var key = e is KeyboardEvent ? KeyCombination.FromKey(((KeyboardEvent)e).Key) : KeyCombination.FromMouseButton(((MouseButtonEvent)e).Button);
-                        var single = combos.FirstOrDefault(c => c.KeyCombination.Keys.Any(k => k == key));
-                        if (single?.GetAction<OsuAction>() == BlockedButton)
-                            return false;
-                    }
-                }
+                var single = combos?.Find(c => c.KeyCombination.Keys.Any(k => k == key))?.GetAction<OsuAction>();
+
+                LastButton = single;
+
+                if (single == BlockedButton)
+                    return false;
 
                 return base.Handle(e);
             }

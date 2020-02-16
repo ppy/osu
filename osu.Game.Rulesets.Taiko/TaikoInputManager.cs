@@ -50,67 +50,56 @@ namespace osu.Game.Rulesets.Taiko
 
             protected override bool Handle(UIEvent e)
             {
-                if (e is KeyboardEvent ev)
+                if (e is KeyDownEvent ev)
                 {
                     var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
                     var combos = KeyBindings.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
 
-                    if (combos.Any())
+                    var rims = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftRim || c.GetAction<TaikoAction>() == TaikoAction.RightRim);
+                    var centres = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftCentre || c.GetAction<TaikoAction>() == TaikoAction.RightCentre);
+
+                    var rimActions = rims.Select(c => c.GetAction<TaikoAction>());
+                    var centreActions = centres.Select(c => c.GetAction<TaikoAction>());
+
+                    bool bothLeft = (rimActions.Count() == 1 && rimActions.First() == TaikoAction.LeftRim) && (centreActions.Count() == 1 && centreActions.First() == TaikoAction.LeftCentre);
+                    bool bothRight = (rimActions.Count() == 1 && rimActions.First() == TaikoAction.RightRim) && (centreActions.Count() == 1 && centreActions.First() == TaikoAction.RightCentre);
+
+                    bool bothRim = rimActions.Count() == 2 && !centreActions.Any();
+                    bool bothCentre = centreActions.Count() == 2 && !rimActions.Any();
+
+                    if (rims.Count == 1)
+                        LastRim = rims.First().GetAction<TaikoAction>();
+
+                    if (centres.Count == 1)
+                        LastCentre = centres.First().GetAction<TaikoAction>();
+
+                    if (bothRim)
                     {
-                        var rims = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftRim || c.GetAction<TaikoAction>() == TaikoAction.RightRim);
-                        var centres = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftCentre || c.GetAction<TaikoAction>() == TaikoAction.RightCentre);
-
-                        var rimActions = rims.Select(c => c.GetAction<TaikoAction>());
-                        var centreActions = centres.Select(c => c.GetAction<TaikoAction>());
-
-                        bool bothLeft = (rimActions.Count() == 1 && rimActions.First() == TaikoAction.LeftRim) && (centreActions.Count() == 1 && centreActions.First() == TaikoAction.LeftCentre);
-                        bool bothRight = (rimActions.Count() == 1 && rimActions.First() == TaikoAction.RightRim) && (centreActions.Count() == 1 && centreActions.First() == TaikoAction.RightCentre);
-
-                        bool bothRim = rimActions.Count() == 2 && !centreActions.Any();
-                        bool bothCentre = centreActions.Count() == 2 && !rimActions.Any();
-
-                        if (e is KeyDownEvent)
-                        {
-                            if (rims.Count == 1)
-                                LastRim = rims.First().GetAction<TaikoAction>();
-
-                            if (centres.Count == 1)
-                                LastCentre = centres.First().GetAction<TaikoAction>();
-                        }
-                        else
-                        {
-                            return base.Handle(e);
-                        }
-
-                        if (bothRim)
-                        {
-                            LastRim = null;
-                            BlockedRim = null;
-                            return base.Handle(e);
-                        }
-
-                        if (bothCentre)
-                        {
-                            LastCentre = null;
-                            BlockedCentre = null;
-                            return base.Handle(e);
-                        }
-
-                        if (bothLeft || bothRight)
-                        {
-                            LastRim = null;
-                            BlockedRim = null;
-                            LastCentre = null;
-                            BlockedCentre = null;
-                            return base.Handle(e);
-                        }
-
-                        var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == KeyCombination.FromKey(ev.Key)));
-                        var singleAction = single?.GetAction<TaikoAction>();
-
-                        if (singleAction == BlockedRim || singleAction == BlockedCentre)
-                            return false;
+                        LastRim = null;
+                        BlockedRim = null;
+                        return base.Handle(e);
                     }
+
+                    if (bothCentre)
+                    {
+                        LastCentre = null;
+                        BlockedCentre = null;
+                        return base.Handle(e);
+                    }
+
+                    if (bothLeft || bothRight)
+                    {
+                        LastRim = null;
+                        BlockedRim = null;
+                        LastCentre = null;
+                        BlockedCentre = null;
+                        return base.Handle(e);
+                    }
+
+                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == KeyCombination.FromKey(ev.Key)))?.GetAction<TaikoAction>();
+
+                    if (single == BlockedRim || single == BlockedCentre)
+                        return false;
                 }
 
                 return base.Handle(e);

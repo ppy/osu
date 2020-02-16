@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
@@ -9,6 +10,8 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModEnforceAlternate : ModEnforceAlternate, IUpdatableByPlayfield, IApplicableToDrawableRuleset<TaikoHitObject>
     {
+        public override IconUsage? Icon => FontAwesome.Solid.SignLanguage;
+
         private TaikoInputManager inputManager;
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
