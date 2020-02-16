@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osuTK;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
@@ -14,19 +15,24 @@ namespace osu.Game.Graphics.UserInterface
     {
         protected virtual bool AllowCommit => false;
 
+        public Color4 IconColour
+        {
+            get => icon.Colour;
+            set => icon.Colour = value;
+        }
+
+        private readonly SpriteIcon icon;
+
         public SearchTextBox()
         {
             Height = 35;
-            AddRange(new Drawable[]
+            Add(icon = new SpriteIcon
             {
-                new SpriteIcon
-                {
-                    Icon = FontAwesome.Solid.Search,
-                    Origin = Anchor.CentreRight,
-                    Anchor = Anchor.CentreRight,
-                    Margin = new MarginPadding { Right = 10 },
-                    Size = new Vector2(20),
-                }
+                Icon = FontAwesome.Solid.Search,
+                Origin = Anchor.CentreRight,
+                Anchor = Anchor.CentreRight,
+                Margin = new MarginPadding { Right = 10 },
+                Size = new Vector2(20),
             });
 
             PlaceholderText = "type to search";
