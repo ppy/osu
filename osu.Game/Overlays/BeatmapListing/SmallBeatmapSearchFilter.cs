@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.BeatmapListing
             {
             }
 
-            protected override float TextSize() => 10;
+            protected override float TextSize => 10;
         }
     }
 }
