@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -77,17 +77,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 new TableColumn("rank", Anchor.CentreRight, new Dimension(GridSizeMode.AutoSize)),
                 new TableColumn("", Anchor.Centre, new Dimension(GridSizeMode.Absolute, 70)), // grade
                 new TableColumn("score", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
-                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 60, maxSize: 70)),
-                new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 150)),
-                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 110))
+                new TableColumn("accuracy", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, minSize: 60, maxSize: 70)),
+                new TableColumn("", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 25)), // flag
+                new TableColumn("player", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 125)),
+                new TableColumn("max combo", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 70, maxSize: 120))
             };
 
-            foreach (var statistic in score.SortedStatistics)
-                columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 50, maxSize: 70)));
+            foreach (var statistic in score.SortedStatistics.Take(score.SortedStatistics.Count() - 1))
+                columns.Add(new TableColumn(statistic.Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 35, maxSize: 60)));
+
+            columns.Add(new TableColumn(score.SortedStatistics.LastOrDefault().Key.GetDescription(), Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 45, maxSize: 95)));
 
             columns.AddRange(new[]
             {
-                new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Distributed, minSize: 40, maxSize: 70)),
+                new TableColumn("pp", Anchor.CentreLeft, new Dimension(GridSizeMode.Absolute, 30)),
                 new TableColumn("mods", Anchor.CentreLeft, new Dimension(GridSizeMode.AutoSize)),
             });
 
