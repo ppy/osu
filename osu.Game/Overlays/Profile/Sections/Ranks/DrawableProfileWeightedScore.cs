@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -23,25 +24,28 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             AutoSizeAxes = Axes.Both,
             Direction = FillDirection.Vertical,
+            Origin = Anchor.CentreLeft,
+            Anchor = Anchor.CentreLeft,
             Children = new Drawable[]
             {
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Children = new Drawable[]
+                    Spacing = new Vector2(10, 0),
+                    Children = new[]
                     {
+                        CreateDrawableAccuracy(),
                         new Container
                         {
                             AutoSizeAxes = Axes.Y,
-                            Width = 60,
-                            Child = CreateDrawableAccuracy()
-                        },
-                        new OsuSpriteText
-                        {
-                            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-                            Text = $"{Score.PP * weight:0}pp",
-                        },
+                            Width = 50,
+                            Child = new OsuSpriteText
+                            {
+                                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                                Text = $"{Score.PP * weight:0}pp",
+                            },
+                        }
                     }
                 },
                 new OsuSpriteText
