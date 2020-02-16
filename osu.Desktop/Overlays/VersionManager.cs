@@ -61,8 +61,7 @@ namespace osu.Desktop.Overlays
                             Origin = Anchor.TopCentre,
                             Font = OsuFont.Numeric.With(size: 16),//翻译时修改
                             Colour = colours.Yellow,
-                            Text = @"2020.208.0+matrixfeather 1"
-                            //Text = "早期开发版本"
+                            Text = @"2020.215.0+matrixfeather 1 / development build"
                         },
                         new Sprite
                         {
