@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class ScoreTable : TableContainer
     {
         private const float horizontal_inset = 20;
-        private const float row_height = 25;
+        private const float row_height = 22;
         private const int text_size = 12;
 
         private readonly FillFlowContainer backgroundFlow;
@@ -63,7 +63,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     return;
 
                 for (int i = 0; i < value.Count; i++)
-                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i]));
+                    backgroundFlow.Add(new ScoreTableRowBackground(i, value[i], row_height));
 
                 Columns = createHeaders(value[0]);
                 Content = value.Select((s, i) => createContent(i, s)).ToArray().ToRectangular();
@@ -99,6 +99,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private Drawable[] createContent(int index, ScoreInfo score)
         {
+            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
+            username.AddUserLink(score.User);
+
             var content = new List<Drawable>
             {
                 new OsuSpriteText
@@ -108,7 +111,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new UpdateableRank(score.Rank)
                 {
-                    Size = new Vector2(30, 20)
+                    Size = new Vector2(28, 14)
                 },
                 new OsuSpriteText
                 {
@@ -123,35 +126,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = OsuFont.GetFont(size: text_size),
                     Colour = score.Accuracy == 1 ? highAccuracyColour : Color4.White
                 },
-            };
-
-            var username = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: text_size)) { AutoSizeAxes = Axes.Both };
-            username.AddUserLink(score.User);
-
-            content.AddRange(new Drawable[]
-            {
-                new FillFlowContainer
+                new UpdateableFlag(score.User.Country)
                 {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding { Right = horizontal_inset },
-                    Spacing = new Vector2(5, 0),
-                    Children = new Drawable[]
-                    {
-                        new UpdateableFlag(score.User.Country)
-                        {
-                            Size = new Vector2(20, 13),
-                            ShowPlaceholderOnNull = false,
-                        },
-                        username
-                    }
+                    Size = new Vector2(19, 13),
+                    ShowPlaceholderOnNull = false,
                 },
+                username,
                 new OsuSpriteText
                 {
                     Text = $@"{score.MaxCombo:N0}x",
                     Font = OsuFont.GetFont(size: text_size)
                 }
-            });
+            };
 
             foreach (var kvp in score.SortedStatistics)
             {
