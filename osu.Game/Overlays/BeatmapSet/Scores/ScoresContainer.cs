@@ -90,9 +90,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Width = 0.95f,
                     Direction = FillDirection.Vertical,
-                    Margin = new MarginPadding { Vertical = spacing },
+                    Padding = new MarginPadding { Horizontal = 50 },
+                    Margin = new MarginPadding { Vertical = 20 },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Margin = new MarginPadding { Vertical = spacing },
+                            Margin = new MarginPadding { Top = spacing },
                             Children = new Drawable[]
                             {
                                 noScoresPlaceholder = new NoScoresPlaceholder
