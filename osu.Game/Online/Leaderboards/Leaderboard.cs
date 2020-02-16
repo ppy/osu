@@ -152,7 +152,7 @@ namespace osu.Game.Online.Leaderboards
                         break;
 
                     case PlaceholderState.NotLoggedIn:
-                        replacePlaceholder(new LoginPlaceholder(@"请登录来查看在线排行!"));
+                        replacePlaceholder(new LoginPlaceholder(@"查看在线排行"));
                         break;
 
                     case PlaceholderState.NotSupporter:

@@ -22,7 +22,7 @@ namespace osu.Game.Online.Placeholders
                 cp.Padding = new MarginPadding { Right = 10 };
             });
 
-            AddText(actionMessage);
+            AddText("请登入来" + actionMessage + "!" );
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)

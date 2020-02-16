@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Chat
                             text = new OsuSpriteText
                             {
                                 Margin = new MarginPadding { Horizontal = 10 },
-                                Text = time.ToLocalTime().ToString("dd MMM yyyy"),
+                                Text = time.ToLocalTime().ToString("yyyy MM dd"),
                             },
                             rightBox = new Box
                             {

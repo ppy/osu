@@ -373,4 +373,11 @@
     *   [m] [Add a container type to easily hide online content when not online #7546]
     *   [m] [Fix DownloadTrackingComposite incorrectly receiving cancelled state #7844]
 
-    7753(ok),7756(ok),7807(ok),7828(ok),7836(ok),7800(ok),7803(ok),7805(ok),7830(ok),7831(ok?),7829(ok),7833(ok),7834(ok),7839(ok),7730(ok),7733(ok),7546(ok),7844(ok)
+### 2020/02/16 更新后:
+*   整合更新
+    *   [m] [Update inspectcode version and fix new issues #7841]
+    *   [m] [Adjust user profile score to closer match web #7846]
+    *   [m] [Replace hashcode override with local equality comparer #7848]
+    *   [m] [Fix transform mod not being applied correctly #7855]
+    *   [m] [Fix visible error being thrown when playing a no-video beatmap #7856]
+    *   [o] [Display a login placeholder in direct when user isn't logged in. #7854]

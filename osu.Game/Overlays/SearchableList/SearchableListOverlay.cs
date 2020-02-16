@@ -10,6 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Online;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -34,16 +35,20 @@ namespace osu.Game.Overlays.SearchableList
         protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
         protected readonly FillFlowContainer ScrollFlow;
 
+        protected override Container<Drawable> Content => scrollContainer;
+
         protected abstract Color4 BackgroundColour { get; }
         protected abstract Color4 TrianglesColourLight { get; }
         protected abstract Color4 TrianglesColourDark { get; }
         protected abstract SearchableListHeader<THeader> CreateHeader();
         protected abstract SearchableListFilterControl<TTab, TCategory> CreateFilterControl();
 
+        protected abstract string LoginPlaceholder { get; }
+
         protected SearchableListOverlay(OverlayColourScheme colourScheme)
             : base(colourScheme)
         {
-            Children = new Drawable[]
+            base.Content.Children = new Drawable[]
             {
                 new Box
                 {
@@ -65,7 +70,7 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
-                scrollContainer = new Container
+                scrollContainer = new PanelContainer(LoginPlaceholder)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = new OsuContextMenuContainer
@@ -125,5 +130,14 @@ namespace osu.Game.Overlays.SearchableList
 
             Filter.Search.HoldFocus = false;
         }
+
+        private class PanelContainer : OnlineViewContainer
+        {
+            public PanelContainer(string placeholderMessage)
+                : base(placeholderMessage)
+            {
+            }
+        }
+        //存在异议，详见https://github.com/ppy/osu/pull/7854/files
     }
 }

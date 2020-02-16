@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
@@ -22,10 +21,9 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     public class DrawableProfileScore : CompositeDrawable
     {
         private const int height = 40;
-        private const int performance_width = 80;
+        private const int performance_width = 100;
 
         private const float performance_background_shear = 0.45f;
-        private static readonly float performance_background_width = performance_width + (height / 4f * MathF.Tan(performance_background_shear));
 
         protected readonly ScoreInfo Score;
 
@@ -53,7 +51,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Left = 10, Right = performance_width + 30 },
+                        Padding = new MarginPadding { Left = 20, Right = performance_width },
                         Children = new Drawable[]
                         {
                             new FillFlowContainer
@@ -62,7 +60,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                 Origin = Anchor.CentreLeft,
                                 AutoSizeAxes = Axes.Both,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(8, 0),
+                                Spacing = new Vector2(10, 0),
                                 Children = new Drawable[]
                                 {
                                     new UpdateableRank(Score.Rank)
@@ -85,7 +83,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                                             {
                                                 AutoSizeAxes = Axes.Both,
                                                 Direction = FillDirection.Horizontal,
-                                                Spacing = new Vector2(5, 0),
+                                                Spacing = new Vector2(15, 0),
                                                 Children = new Drawable[]
                                                 {
                                                     new OsuSpriteText
@@ -108,16 +106,21 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             {
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                AutoSizeAxes = Axes.Both,
+                                AutoSizeAxes = Axes.X,
+                                RelativeSizeAxes = Axes.Y,
                                 Direction = FillDirection.Horizontal,
                                 Spacing = new Vector2(15),
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
-                                    CreateRightContent().With(c =>
+                                    new Container
                                     {
-                                        c.Anchor = Anchor.CentreRight;
-                                        c.Origin = Anchor.CentreRight;
-                                    }),
+                                        AutoSizeAxes = Axes.X,
+                                        RelativeSizeAxes = Axes.Y,
+                                        Padding = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        Child = CreateRightContent()
+                                    },
                                     new FillFlowContainer
                                     {
                                         AutoSizeAxes = Axes.Both,
@@ -140,14 +143,13 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                         Width = performance_width,
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Children = new[]
+                        Children = new Drawable[]
                         {
                             new Box
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Y,
-                                Width = performance_background_width,
+                                RelativeSizeAxes = Axes.Both,
                                 Height = 0.5f,
                                 Colour = colourProvider.Background4,
                                 Shear = new Vector2(-performance_background_shear, 0),
@@ -157,20 +159,29 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
-                                RelativeSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.Both,
                                 RelativePositionAxes = Axes.Y,
-                                Width = performance_background_width,
                                 Height = -0.5f,
                                 Position = new Vector2(0, 1),
                                 Colour = colourProvider.Background4,
                                 Shear = new Vector2(performance_background_shear, 0),
                                 EdgeSmoothness = new Vector2(2, 0),
                             },
-                            createDrawablePerformance().With(d =>
+                            new Container
                             {
-                                d.Anchor = Anchor.Centre;
-                                d.Origin = Anchor.Centre;
-                            })
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding
+                                {
+                                    Vertical = 5,
+                                    Left = 30,
+                                    Right = 20
+                                },
+                                Child = createDrawablePerformance().With(d =>
+                                {
+                                    d.Anchor = Anchor.Centre;
+                                    d.Origin = Anchor.Centre;
+                                })
+                            }
                         }
                     }
                 }
@@ -180,11 +191,18 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [NotNull]
         protected virtual Drawable CreateRightContent() => CreateDrawableAccuracy();
 
-        protected OsuSpriteText CreateDrawableAccuracy() => new OsuSpriteText
+        protected Drawable CreateDrawableAccuracy() => new Container
         {
-            Text = Score.DisplayAccuracy,
-            Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
-            Colour = colours.Yellow,
+            Width = 65,
+            RelativeSizeAxes = Axes.Y,
+            Child = new OsuSpriteText
+            {
+                Text = Score.DisplayAccuracy,
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold, italics: true),
+                Colour = colours.Yellow,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft
+            }
         };
 
         private Drawable createDrawablePerformance()
@@ -248,7 +266,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     Text = "by " + new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                    Font = OsuFont.GetFont(size: 16, italics: true)
+                    Font = OsuFont.GetFont(size: 12, italics: true)
                 },
             };
         }

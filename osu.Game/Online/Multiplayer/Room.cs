@@ -124,19 +124,20 @@ namespace osu.Game.Online.Multiplayer
                 var localItem = Playlist.FirstOrDefault(i => i.BeatmapID == item.BeatmapID);
 
                 if (localItem != null)
-                {
                     item.Beatmap.Value.Metadata = localItem.Beatmap.Value.Metadata;
-                }
             }
 
-            foreach (var removeableItem in Playlist.Except(other.Playlist).ToArray())
-                Playlist.Remove(removeableItem);
+            if (!Playlist.SequenceEqual(other.Playlist))
+            {
+                Playlist.Clear();
+                Playlist.AddRange(other.Playlist);
+            }
 
-            Playlist.AddRange(other.Playlist.Except(Playlist).ToArray());
-
-            foreach (var removedItem in Participants.Except(other.Participants).ToArray())
-                Participants.Remove(removedItem);
-            Participants.AddRange(other.Participants.Except(Participants).ToArray());
+            if (!Participants.SequenceEqual(other.Participants))
+            {
+                Participants.Clear();
+                Participants.AddRange(other.Participants);
+            }
 
             Position = other.Position;
         }

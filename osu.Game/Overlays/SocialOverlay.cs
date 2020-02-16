@@ -35,6 +35,8 @@ namespace osu.Game.Overlays
         protected override SearchableListHeader<SocialTab> CreateHeader() => new Header();
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
+        protected override string LoginPlaceholder => @"查看在线玩家列表";
+
         private User[] users = Array.Empty<User>();
 
         public User[] Users
