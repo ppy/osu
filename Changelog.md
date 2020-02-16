@@ -381,3 +381,8 @@
     *   [m] [Fix transform mod not being applied correctly #7855]
     *   [m] [Fix visible error being thrown when playing a no-video beatmap #7856]
     *   [o] [Display a login placeholder in direct when user isn't logged in. #7854]
+
+*   [改进了聊天栏动作信息的显示方式](osu.Game/Overlays/Chat/ChatLine.cs)
+*   [改进了LoginPlaceHolder的显示方式](osu.Game/Online/Placeholders/LoginPlaceholder.cs)
+*   [向Toolbar添加了“时间”按钮](osu.Game/Overlays/Toolbar/ToolbarTimeButton.cs)
+*   [删除了之前的ToolbarVideoButton]

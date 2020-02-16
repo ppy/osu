@@ -14,6 +14,19 @@ namespace osu.Game.Online.Placeholders
         [Resolved(CanBeNull = true)]
         private LoginOverlay login { get; set; }
 
+        /// <summary>
+        /// Usage: LoginPlaceholder => @"text";
+        ///
+        /// Example 1: 
+        ///
+        ///     Code : protected override string LoginPlaceholder => @"see leaderboard";\
+        ///     Display : Please login to see leaderboard !
+        ///
+        /// Example 2:
+        ///
+        ///     Code : protected override string LoginPlaceholder => @""; //Use with a null or Empty string\
+        ///     Display : Please login to check out this thing !
+        /// </summary>
         public LoginPlaceholder(string actionMessage)
         {
             AddIcon(FontAwesome.Solid.UserLock, cp =>
@@ -22,7 +35,7 @@ namespace osu.Game.Online.Placeholders
                 cp.Padding = new MarginPadding { Right = 10 };
             });
 
-            AddText("请登入来" + actionMessage + "!" );
+            AddText("请登入来" + (string.IsNullOrEmpty(actionMessage) ? "浏览该项目" : actionMessage) + "!" );
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
