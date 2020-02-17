@@ -116,8 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Slider()
         {
-            SamplesBindable.ItemsAdded += _ => updateNestedSamples();
-            SamplesBindable.ItemsRemoved += _ => updateNestedSamples();
+            SamplesBindable.CollectionChanged += (_, __) => updateNestedSamples();
             Path.Version.ValueChanged += _ => updateNestedPositions();
         }
 
