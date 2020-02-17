@@ -32,7 +32,11 @@ namespace osu.Game.Rulesets.Catch.Skinning
                 case CatchSkinComponents.FruitOrange:
                 case CatchSkinComponents.FruitGrapes:
                 case CatchSkinComponents.FruitPear:
-                    return this.GetAnimation(catchSkinComponent.Component.ToString().Underscore().Hyphenate(), true, false, true);
+                    var lookupName = catchSkinComponent.Component.ToString().Underscore().Hyphenate();
+                    if (GetTexture(lookupName) != null)
+                        return new LegacyFruitPiece(lookupName);
+
+                    break;
             }
 
             return null;
