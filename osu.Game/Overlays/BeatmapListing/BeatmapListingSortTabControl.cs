@@ -33,74 +33,74 @@ namespace osu.Game.Overlays.BeatmapListing
             {
                 SortDirection = { BindTarget = SortDirection }
             };
+        }
 
-            private class BeatmapSortTabItem : SortTabItem
+        private class BeatmapSortTabItem : SortTabItem
+        {
+            public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
+
+            public BeatmapSortTabItem(BeatmapSortCriteria value)
+                : base(value)
             {
-                public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
+            }
 
-                public BeatmapSortTabItem(BeatmapSortCriteria value)
-                    : base(value)
+            protected override TabButton CreateTabButton(BeatmapSortCriteria value) => new BeatmapTabButton(value)
+            {
+                Active = { BindTarget = Active },
+                SortDirection = { BindTarget = SortDirection }
+            };
+        }
+
+        private class BeatmapTabButton : TabButton
+        {
+            public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
+
+            protected override Color4 ContentColour
+            {
+                set
                 {
+                    base.ContentColour = value;
+                    icon.Colour = value;
                 }
+            }
 
-                protected override TabButton CreateTabButton(BeatmapSortCriteria value) => new BeatmapTabButton(value)
+            private readonly SpriteIcon icon;
+
+            public BeatmapTabButton(BeatmapSortCriteria value)
+                : base(value)
+            {
+                Add(icon = new SpriteIcon
                 {
-                    Active = { BindTarget = Active },
-                    SortDirection = { BindTarget = SortDirection }
-                };
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    AlwaysPresent = true,
+                    Alpha = 0,
+                    Size = new Vector2(6)
+                });
+            }
 
-                private class BeatmapTabButton : TabButton
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                SortDirection.BindValueChanged(direction =>
                 {
-                    public readonly Bindable<SortDirection> SortDirection = new Bindable<SortDirection>();
+                    icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
+                }, true);
+            }
 
-                    protected override Color4 ContentColour
-                    {
-                        set
-                        {
-                            base.ContentColour = value;
-                            icon.Colour = value;
-                        }
-                    }
+            protected override void UpdateState()
+            {
+                base.UpdateState();
+                icon.FadeTo(Active.Value || IsHovered ? 1 : 0, 200, Easing.OutQuint);
+            }
 
-                    private readonly SpriteIcon icon;
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (Active.Value)
+                    SortDirection.Value = SortDirection.Value == Overlays.SortDirection.Ascending ? Overlays.SortDirection.Descending : Overlays.SortDirection.Ascending;
 
-                    public BeatmapTabButton(BeatmapSortCriteria value)
-                        : base(value)
-                    {
-                        Add(icon = new SpriteIcon
-                        {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            AlwaysPresent = true,
-                            Alpha = 0,
-                            Size = new Vector2(6)
-                        });
-                    }
-
-                    protected override void LoadComplete()
-                    {
-                        base.LoadComplete();
-
-                        SortDirection.BindValueChanged(direction =>
-                        {
-                            icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
-                        }, true);
-                    }
-
-                    protected override void UpdateState()
-                    {
-                        base.UpdateState();
-                        icon.FadeTo(Active.Value || IsHovered ? 1 : 0, 200, Easing.OutQuint);
-                    }
-
-                    protected override bool OnClick(ClickEvent e)
-                    {
-                        if (Active.Value)
-                            SortDirection.Value = SortDirection.Value == Overlays.SortDirection.Ascending ? Overlays.SortDirection.Descending : Overlays.SortDirection.Ascending;
-
-                        return base.OnClick(e);
-                    }
-                }
+                return base.OnClick(e);
             }
         }
     }

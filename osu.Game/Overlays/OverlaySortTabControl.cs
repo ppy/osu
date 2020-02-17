@@ -75,93 +75,93 @@ namespace osu.Game.Overlays
             {
                 AutoSizeAxes = Axes.Both;
             }
+        }
 
-            protected class SortTabItem : TabItem<T>
+        protected class SortTabItem : TabItem<T>
+        {
+            public SortTabItem(T value)
+                : base(value)
             {
-                public SortTabItem(T value)
-                    : base(value)
+                AutoSizeAxes = Axes.Both;
+                Child = CreateTabButton(value);
+            }
+
+            [NotNull]
+            protected virtual TabButton CreateTabButton(T value) => new TabButton(value)
+            {
+                Active = { BindTarget = Active }
+            };
+
+            protected override void OnActivated()
+            {
+            }
+
+            protected override void OnDeactivated()
+            {
+            }
+        }
+
+        protected class TabButton : HeaderButton
+        {
+            public readonly BindableBool Active = new BindableBool();
+
+            protected override Container<Drawable> Content => content;
+
+            protected virtual Color4 ContentColour
+            {
+                set => text.Colour = value;
+            }
+
+            [Resolved]
+            private OverlayColourProvider colourProvider { get; set; }
+
+            private readonly SpriteText text;
+            private readonly FillFlowContainer content;
+
+            public TabButton(T value)
+            {
+                base.Content.Add(content = new FillFlowContainer
                 {
-                    AutoSizeAxes = Axes.Both;
-                    Child = CreateTabButton(value);
-                }
-
-                [NotNull]
-                protected virtual TabButton CreateTabButton(T value) => new TabButton(value)
-                {
-                    Active = { BindTarget = Active }
-                };
-
-                protected override void OnActivated()
-                {
-                }
-
-                protected override void OnDeactivated()
-                {
-                }
-
-                protected class TabButton : HeaderButton
-                {
-                    public readonly BindableBool Active = new BindableBool();
-
-                    protected override Container<Drawable> Content => content;
-
-                    protected virtual Color4 ContentColour
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Spacing = new Vector2(3, 0),
+                    Children = new Drawable[]
                     {
-                        set => text.Colour = value;
-                    }
-
-                    [Resolved]
-                    private OverlayColourProvider colourProvider { get; set; }
-
-                    private readonly SpriteText text;
-                    private readonly FillFlowContainer content;
-
-                    public TabButton(T value)
-                    {
-                        base.Content.Add(content = new FillFlowContainer
+                        text = new OsuSpriteText
                         {
-                            AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
-                            Spacing = new Vector2(3, 0),
-                            Children = new Drawable[]
-                            {
-                                text = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-                                    Font = OsuFont.GetFont(size: 12),
-                                    Text = value.ToString()
-                                }
-                            }
-                        });
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = OsuFont.GetFont(size: 12),
+                            Text = value.ToString()
+                        }
                     }
+                });
+            }
 
-                    protected override void LoadComplete()
-                    {
-                        base.LoadComplete();
-                        Active.BindValueChanged(_ => UpdateState(), true);
-                    }
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                Active.BindValueChanged(_ => UpdateState(), true);
+            }
 
-                    protected override bool OnHover(HoverEvent e)
-                    {
-                        UpdateState();
-                        return true;
-                    }
+            protected override bool OnHover(HoverEvent e)
+            {
+                UpdateState();
+                return true;
+            }
 
-                    protected override void OnHoverLost(HoverLostEvent e) => UpdateState();
+            protected override void OnHoverLost(HoverLostEvent e) => UpdateState();
 
-                    protected virtual void UpdateState()
-                    {
-                        if (Active.Value || IsHovered)
-                            ShowBackground();
-                        else
-                            HideBackground();
+            protected virtual void UpdateState()
+            {
+                if (Active.Value || IsHovered)
+                    ShowBackground();
+                else
+                    HideBackground();
 
-                        ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
+                ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
 
-                        text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-                    }
-                }
+                text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
             }
         }
     }
