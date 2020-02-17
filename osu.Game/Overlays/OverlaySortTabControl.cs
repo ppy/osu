@@ -82,8 +82,14 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     AutoSizeAxes = Axes.Both;
-                    Child = new TabButton(value) { Active = { BindTarget = Active } };
+                    Child = CreateTabButton(value);
                 }
+
+                [NotNull]
+                protected virtual TabButton CreateTabButton(T value) => new TabButton(value)
+                {
+                    Active = { BindTarget = Active }
+                };
 
                 protected override void OnActivated()
                 {
@@ -93,52 +99,67 @@ namespace osu.Game.Overlays
                 {
                 }
 
-                private class TabButton : HeaderButton
+                protected class TabButton : HeaderButton
                 {
                     public readonly BindableBool Active = new BindableBool();
+
+                    protected override Container<Drawable> Content => content;
+
+                    protected virtual Color4 ContentColour
+                    {
+                        set => text.Colour = value;
+                    }
 
                     [Resolved]
                     private OverlayColourProvider colourProvider { get; set; }
 
                     private readonly SpriteText text;
+                    private readonly FillFlowContainer content;
 
                     public TabButton(T value)
                     {
-                        Add(text = new OsuSpriteText
+                        base.Content.Add(content = new FillFlowContainer
                         {
-                            Font = OsuFont.GetFont(size: 12),
-                            Text = value.ToString()
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Horizontal,
+                            Spacing = new Vector2(3, 0),
+                            Children = new Drawable[]
+                            {
+                                text = new OsuSpriteText
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Font = OsuFont.GetFont(size: 12),
+                                    Text = value.ToString()
+                                }
+                            }
                         });
                     }
 
                     protected override void LoadComplete()
                     {
                         base.LoadComplete();
-                        Active.BindValueChanged(_ => updateState(), true);
+                        Active.BindValueChanged(_ => UpdateState(), true);
                     }
 
                     protected override bool OnHover(HoverEvent e)
                     {
-                        updateHoverState();
+                        UpdateState();
                         return true;
                     }
 
-                    protected override void OnHoverLost(HoverLostEvent e) => updateHoverState();
+                    protected override void OnHoverLost(HoverLostEvent e) => UpdateState();
 
-                    private void updateState()
-                    {
-                        updateHoverState();
-                        text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
-                    }
-
-                    private void updateHoverState()
+                    protected virtual void UpdateState()
                     {
                         if (Active.Value || IsHovered)
                             ShowBackground();
                         else
                             HideBackground();
 
-                        text.Colour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
+                        ContentColour = Active.Value && !IsHovered ? colourProvider.Light1 : Color4.White;
+
+                        text.Font = text.Font.With(weight: Active.Value ? FontWeight.Bold : FontWeight.Medium);
                     }
                 }
             }
