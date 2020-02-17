@@ -32,33 +32,37 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
-            AddInternal(new FillFlowContainer
+            AddInternal(new GridContainer
             {
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
-                Spacing = new Vector2(0, 7),
-                Children = new Drawable[]
+                ColumnDimensions = new[]
                 {
-                    new Container
+                    new Dimension(GridSizeMode.Absolute, size: 100),
+                    new Dimension()
+                },
+                RowDimensions = new[]
+                {
+                    new Dimension(GridSizeMode.AutoSize)
+                },
+                Content = new[]
+                {
+                    new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        AutoSizeAxes = Axes.Y,
-                        Width = 100,
-                        Child = new OsuSpriteText
+                        new OsuSpriteText
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Font = OsuFont.GetFont(size: 10),
                             Text = headerName.ToUpper()
-                        }
-                    },
-                    CreateFilter().With(f =>
-                    {
-                        f.Anchor = Anchor.CentreLeft;
-                        f.Origin = Anchor.CentreLeft;
-                        f.Current = current;
-                    })
+                        },
+                        CreateFilter().With(f =>
+                        {
+                            f.Anchor = Anchor.CentreLeft;
+                            f.Origin = Anchor.CentreLeft;
+                            f.Current = current;
+                        })
+                    }
                 }
             });
         }
