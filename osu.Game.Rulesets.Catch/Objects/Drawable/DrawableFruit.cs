@@ -4,6 +4,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Utils;
 using osu.Game.Skinning;
 using osuTK;
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
     public class DrawableFruit : PalpableCatchHitObject<Fruit>
     {
-        public const float DRAWABLE_RADIUS = (float)CatchHitObject.OBJECT_RADIUS * RADIUS_ADJUST;
+        private Container scaleContainer;
 
         /// <summary>
         /// Because we're adding a border around the fruit, we need to scale down some.
@@ -25,7 +26,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             Origin = Anchor.Centre;
 
-            Size = new Vector2(DRAWABLE_RADIUS);
+            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
+
             Masking = false;
 
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
@@ -34,10 +36,24 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new SkinnableDrawable(
-                new CatchSkinComponent(getComponent(HitObject.VisualRepresentation)), _ => new FruitPiece()));
+            AddRangeInternal(new Framework.Graphics.Drawable[]
+            {
+                scaleContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        new SkinnableDrawable(
+                            new CatchSkinComponent(getComponent(HitObject.VisualRepresentation)), _ => new FruitPiece())
+                    }
+                }
+            });
 
             AccentColour.Value = colourForRepresentation(HitObject.VisualRepresentation);
+
+            scaleContainer.Scale = new Vector2(HitObject.Scale);
         }
 
         private CatchSkinComponents getComponent(FruitVisualRepresentation hitObjectVisualRepresentation)
