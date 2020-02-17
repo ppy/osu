@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                Title = "多人联机";
+                Title = "多人游戏";
                 Icon = OsuIcon.Multi;
                 AccentColour = colours.Yellow;
             }

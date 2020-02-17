@@ -386,3 +386,16 @@
 *   [改进了LoginPlaceHolder的显示方式](osu.Game/Online/Placeholders/LoginPlaceholder.cs)
 *   [向Toolbar添加了“时间”按钮](osu.Game/Overlays/Toolbar/ToolbarTimeButton.cs)
 *   [删除了之前的ToolbarVideoButton]
+
+### 2020/02/17:
+*   增大了[osu.Game/Overlays/TabControlOverlayHeader.cs](osu.Game/Overlays/TabControlOverlayHeader.cs)和[osu.Game/Graphics/UserInterface/ScreenTitle.cs](osu.Game/Graphics/UserInterface/ScreenTitle.cs)的字体
+*   优化翻译
+    *   [多人联机的Header](osu.Game/Screens/Multi/Header.cs)
+*   整合更新
+    *   [m] [Update framework #7861]
+    *   [m] [Use OverlayColourProvider for CounterPill in profile overlay #7866]
+    *   [m] [Update readme with local changelog and project management link #7868]
+    *   [m] [Fix possible error in SpotlightsLayout after it's disposal #7872]
+    *   [m] [Fix playlist items added with the wrong IDs #7876]
+    *   [m] [Bump Sentry from 2.0.2 to 2.0.3 #7877]
+    *   [m] [Bump ppy.osu.Framework.NativeLibs from 2019.1104.0 to 2020.213.0 #7878]

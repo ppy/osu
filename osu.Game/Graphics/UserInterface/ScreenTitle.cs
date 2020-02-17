@@ -77,7 +77,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
+                            Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                             Margin = new MarginPadding { Bottom = text_offset }
                         },
                         new Circle
@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 20),
+                            Font = OsuFont.GetFont(size: 30),
                             Margin = new MarginPadding { Bottom = text_offset }
                         }
                     }

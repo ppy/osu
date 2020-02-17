@@ -91,7 +91,7 @@ namespace osu.Game.Overlays
                     : base(value)
                 {
                     Text.Text = value.ToString().ToLower();
-                    Text.Font = OsuFont.GetFont(size: 14);
+                    Text.Font = OsuFont.GetFont(size: 20);
                     Bar.ExpandedSize = 5;
                 }
             }
