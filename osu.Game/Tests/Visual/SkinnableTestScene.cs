@@ -7,9 +7,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Skinning;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -30,10 +34,10 @@ namespace osu.Game.Tests.Visual
         {
             var dllStore = new DllResourceStore(GetType().Assembly);
 
-            metricsSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
+            metricsSkin = new TestLegacySkin(new SkinInfo { Name = "metrics-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
             defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
-            specialSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
-            oldSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
+            specialSkin = new TestLegacySkin(new SkinInfo { Name = "special-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/special_skin"), audio, true);
+            oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
         }
 
         public void SetContents(Func<Drawable> creationFunction)
@@ -47,13 +51,76 @@ namespace osu.Game.Tests.Visual
 
         private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
         {
-            var mainProvider = new SkinProvidingContainer(skin);
+            var created = creationFunction();
+            var autoSize = created.RelativeSizeAxes == Axes.None;
 
-            return mainProvider
-                .WithChild(new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider))
+            var mainProvider = new SkinProvidingContainer(skin)
+            {
+                RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
+                AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
+            };
+
+            return new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                BorderColour = Color4.White,
+                BorderThickness = 5,
+                Masking = true,
+
+                Children = new Drawable[]
                 {
-                    Child = creationFunction()
-                });
+                    new Box
+                    {
+                        AlwaysPresent = true,
+                        Alpha = 0,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    new OsuSpriteText
+                    {
+                        Text = skin?.SkinInfo?.Name ?? "none",
+                        Scale = new Vector2(1.5f),
+                        Padding = new MarginPadding(5),
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
+                        AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            new OutlineBox { Alpha = autoSize ? 1 : 0 },
+                            mainProvider.WithChild(
+                                new SkinProvidingContainer(Ruleset.Value.CreateInstance().CreateLegacySkinProvider(mainProvider))
+                                {
+                                    Child = created,
+                                    RelativeSizeAxes = !autoSize ? Axes.Both : Axes.None,
+                                    AutoSizeAxes = autoSize ? Axes.Both : Axes.None,
+                                }
+                            )
+                        }
+                    },
+                }
+            };
+        }
+
+        private class OutlineBox : CompositeDrawable
+        {
+            public OutlineBox()
+            {
+                BorderColour = Color4.IndianRed;
+                BorderThickness = 5;
+                Masking = true;
+                RelativeSizeAxes = Axes.Both;
+
+                InternalChild = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                    Colour = Color4.Brown,
+                    AlwaysPresent = true
+                };
+            }
         }
 
         private class TestLegacySkin : LegacySkin
