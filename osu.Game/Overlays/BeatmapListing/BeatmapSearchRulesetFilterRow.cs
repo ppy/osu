@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.BeatmapListing
@@ -28,18 +27,6 @@ namespace osu.Game.Overlays.BeatmapListing
 
                 foreach (var r in rulesets.AvailableRulesets)
                     AddItem(r);
-            }
-
-            protected override TabItem<RulesetInfo> CreateTabItem(RulesetInfo value) => new RulesetTabItem(value);
-
-            private class RulesetTabItem : FilterTabItem
-            {
-                public RulesetTabItem(RulesetInfo value)
-                    : base(value)
-                {
-                }
-
-                protected override string GetText(RulesetInfo value) => value.Name;
             }
         }
     }
