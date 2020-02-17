@@ -84,7 +84,6 @@ namespace osu.Game.Overlays.BeatmapListing
                         SortDirection.BindValueChanged(direction =>
                         {
                             icon.Icon = direction.NewValue == Overlays.SortDirection.Ascending ? FontAwesome.Solid.CaretUp : FontAwesome.Solid.CaretDown;
-                            icon.Margin = direction.NewValue == Overlays.SortDirection.Ascending ? new MarginPadding { Top = 1 } : new MarginPadding { Top = 2 };
                         }, true);
                     }
 
