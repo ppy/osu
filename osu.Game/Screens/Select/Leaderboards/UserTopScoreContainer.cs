@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = @"个人最佳成绩".ToUpper(),
-                            Font = OsuFont.GetFont(size: 19, weight: FontWeight.Bold),//第一次翻译时修改
+                            Font = OsuFont.GetFont(size: 25, weight: FontWeight.Bold),//第一次翻译时修改
                         },
                         scoreContainer = new Container
                         {

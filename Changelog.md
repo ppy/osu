@@ -388,9 +388,17 @@
 *   [删除了之前的ToolbarVideoButton]
 
 ### 2020/02/17:
-*   增大了[osu.Game/Overlays/TabControlOverlayHeader.cs](osu.Game/Overlays/TabControlOverlayHeader.cs)和[osu.Game/Graphics/UserInterface/ScreenTitle.cs](osu.Game/Graphics/UserInterface/ScreenTitle.cs)的字体
+*   增大字体
+    *   [osu.Game/Overlays/TabControlOverlayHeader.cs](osu.Game/Overlays/TabControlOverlayHeader.cs)
+    *   [osu.Game/Graphics/UserInterface/ScreenTitle.cs](osu.Game/Graphics/UserInterface/ScreenTitle.cs)
+    *   [osu.Game/Screens/Select/Leaderboards/UserTopScoreContainer.cs](osu.Game/Screens/Select/Leaderboards/UserTopScoreContainer.cs)
 *   优化翻译
     *   [多人联机的Header](osu.Game/Screens/Multi/Header.cs)
+    *   [timing设计菜单的各种section](osu.Game/Screens/Edit/Timing/DifficultySection.cs)
+*   补全翻译
+    *   [!涉及界面逻辑代码更改] [编辑器滑条点１级菜单的翻译](osu.Game.Rulesets.Osu/Edit/Blueprints/Sliders/Components/PathControlPointVisualiser.cs)
+    *   [SkipBarLine](osu.Game/Screens/Edit/Timing/EffectSection.cs)
+
 *   整合更新
     *   [m] [Update framework #7861]
     *   [m] [Use OverlayColourProvider for CounterPill in profile overlay #7866]

@@ -166,8 +166,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem($"Delete {"control point".ToQuantity(count, count > 1 ? ShowQuantityAs.Numeric : ShowQuantityAs.None)}", MenuItemType.Destructive, () => deleteSelected()),
-                    new OsuMenuItem("Curve type")
+                    new OsuMenuItem($"删除 {"个滑条点".ToQuantity(count, ShowQuantityAs.Numeric)}", MenuItemType.Destructive, () => deleteSelected()),
+                    new OsuMenuItem("曲线类型")
                     {
                         Items = items
                     }

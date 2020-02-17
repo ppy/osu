@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Edit
         [Description("谱面设计")]
         Design,
 
-        [Description("timing")]
+        [Description("timing设计")]
         Timing,
     }
 }
