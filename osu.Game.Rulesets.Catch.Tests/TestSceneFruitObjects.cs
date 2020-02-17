@@ -58,13 +58,13 @@ namespace osu.Game.Rulesets.Catch.Tests
                 ? new Banana
                 {
                     StartTime = 1000000000000,
-                    IndexInBeatmap = index,
+                    ComboIndex = index,
                     Scale = 1.5f,
                 }
                 : new Fruit
                 {
                     StartTime = 1000000000000,
-                    IndexInBeatmap = index,
+                    ComboIndex = index,
                     Scale = 1.5f,
                 };
 
