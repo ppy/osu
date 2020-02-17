@@ -23,8 +23,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             InternalChild = sprite = CreateBackgroundSprite();
 
-            Playlist.ItemsAdded += _ => updateBeatmap();
-            Playlist.ItemsRemoved += _ => updateBeatmap();
+            Playlist.CollectionChanged += (_, __) => updateBeatmap();
 
             updateBeatmap();
         }
