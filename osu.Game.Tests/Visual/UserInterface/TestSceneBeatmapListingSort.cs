@@ -5,8 +5,11 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -20,14 +23,39 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+        private readonly FillFlowContainer placeholder;
+        private readonly BeatmapListingSortTabControl control;
 
         public TestSceneBeatmapListingSort()
         {
-            Add(new BeatmapListingSortTabControl
+            Add(control = new BeatmapListingSortTabControl
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
+
+            Add(placeholder = new FillFlowContainer
+            {
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 5),
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            control.SortDirection.BindValueChanged(_ => updateBindablesVisual());
+            control.Current.BindValueChanged(_ => updateBindablesVisual(), true);
+        }
+
+        private void updateBindablesVisual()
+        {
+            placeholder.Clear();
+
+            placeholder.Add(new OsuSpriteText { Text = $"Current: {control.Current.Value}" });
+            placeholder.Add(new OsuSpriteText { Text = $"Sort direction: {control.SortDirection.Value}" });
         }
     }
 }
