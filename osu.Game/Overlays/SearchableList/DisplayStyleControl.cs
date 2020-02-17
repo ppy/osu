@@ -17,6 +17,8 @@ namespace osu.Game.Overlays.SearchableList
         public readonly SlimEnumDropdown<T> Dropdown;
         public readonly Bindable<PanelDisplayStyle> DisplayStyle = new Bindable<PanelDisplayStyle>();
 
+        public override bool HandleNonPositionalInput => !DisplayStyle.Disabled;
+
         public DisplayStyleControl()
         {
             AutoSizeAxes = Axes.Both;
@@ -53,6 +55,13 @@ namespace osu.Game.Overlays.SearchableList
             };
 
             DisplayStyle.Value = PanelDisplayStyle.Grid;
+            DisplayStyle.DisabledChanged += disabled =>
+            {
+                if (disabled)
+                    Dropdown.Current.Disabled = true;
+                else
+                    Dropdown.Current.Disabled = false;
+            };
         }
 
         private class DisplayStyleToggleButton : OsuClickableContainer
@@ -81,7 +90,12 @@ namespace osu.Game.Overlays.SearchableList
 
                 bindable.ValueChanged += Bindable_ValueChanged;
                 Bindable_ValueChanged(new ValueChangedEvent<PanelDisplayStyle>(bindable.Value, bindable.Value));
-                Action = () => bindable.Value = this.style;
+                Action = () =>
+                {
+                    if (bindable.Disabled) return;
+
+                    bindable.Value = this.style;
+                };
             }
 
             private void Bindable_ValueChanged(ValueChangedEvent<PanelDisplayStyle> e)
