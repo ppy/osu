@@ -17,7 +17,7 @@ This project under heavy development, but is in a stable state. Users are encour
 
 We are accepting bug reports (please report with as much detail as possible). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features.
 
-Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh/home/changelog). You can also learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
+Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer). You can also learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
 
 ## Requirements
 
