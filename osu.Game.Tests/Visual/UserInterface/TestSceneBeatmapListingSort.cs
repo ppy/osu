@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual.UserInterface
 
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
+
         private readonly FillFlowContainer placeholder;
         private readonly BeatmapListingSortTabControl control;
 
