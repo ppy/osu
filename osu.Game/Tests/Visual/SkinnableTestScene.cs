@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -40,8 +41,12 @@ namespace osu.Game.Tests.Visual
             oldSkin = new TestLegacySkin(new SkinInfo { Name = "old-skin" }, new NamespacedResourceStore<byte[]>(dllStore, "Resources/old_skin"), audio, true);
         }
 
+        private readonly List<Drawable> createdDrawables = new List<Drawable>();
+
         public void SetContents(Func<Drawable> creationFunction)
         {
+            createdDrawables.Clear();
+
             Cell(0).Child = createProvider(null, creationFunction);
             Cell(1).Child = createProvider(metricsSkin, creationFunction);
             Cell(2).Child = createProvider(defaultSkin, creationFunction);
@@ -49,9 +54,13 @@ namespace osu.Game.Tests.Visual
             Cell(4).Child = createProvider(oldSkin, creationFunction);
         }
 
+        protected IEnumerable<Drawable> CreatedDrawables => createdDrawables;
+
         private Drawable createProvider(Skin skin, Func<Drawable> creationFunction)
         {
             var created = creationFunction();
+            createdDrawables.Add(created);
+
             var autoSize = created.RelativeSizeAxes == Axes.None;
 
             var mainProvider = new SkinProvidingContainer(skin)
