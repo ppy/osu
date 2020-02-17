@@ -11,6 +11,8 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online;
+using osu.Framework.Bindables;
+using osu.Game.Online.API;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -30,6 +32,7 @@ namespace osu.Game.Overlays.SearchableList
         where TCategory : struct, Enum
     {
         private readonly Container scrollContainer;
+        private readonly Bindable<bool> disabled = new Bindable<bool>();
 
         protected readonly SearchableListHeader<THeader> Header;
         protected readonly SearchableListFilterControl<TTab, TCategory> Filter;
@@ -103,6 +106,26 @@ namespace osu.Game.Overlays.SearchableList
                     },
                 },
             };
+
+            Header.Disabled.BindTo(disabled);
+            Filter.Disabled.BindTo(disabled);
+        }
+
+        public override void APIStateChanged(IAPIProvider api, APIState state)
+        {
+            switch (state)
+            {
+                case APIState.Offline:
+                case APIState.Failing:
+                case APIState.Connecting:
+                    disabled.Value = true;
+                    break;
+
+                case APIState.Online:
+                    disabled.Value = false;
+                    break;
+            }
+            base.APIStateChanged(api, state);   
         }
 
         protected override void Update()
