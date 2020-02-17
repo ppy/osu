@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
@@ -26,11 +27,11 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly FillFlowContainer resizableContainer;
+        private readonly ReverseChildIDFillFlowContainer<Drawable> resizableContainer;
 
         public TestSceneBeatmapSearchFilter()
         {
-            Add(resizableContainer = new FillFlowContainer
+            Add(resizableContainer = new ReverseChildIDFillFlowContainer<Drawable>
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
