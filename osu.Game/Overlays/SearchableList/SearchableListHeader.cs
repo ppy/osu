@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -17,6 +18,8 @@ namespace osu.Game.Overlays.SearchableList
         where T : struct, Enum
     {
         public readonly HeaderTabControl<T> Tabs;
+
+        public readonly Bindable<bool> Disabled = new Bindable<bool>();
 
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
@@ -67,6 +70,14 @@ namespace osu.Game.Overlays.SearchableList
                         },
                     },
                 },
+            };
+
+            Disabled.ValueChanged += disabled =>
+            {
+                if (disabled.NewValue)
+                    Tabs.Current.Disabled = true;
+                else
+                    Tabs.Current.Disabled = false;
             };
 
             Tabs.Current.Value = DefaultTab;
