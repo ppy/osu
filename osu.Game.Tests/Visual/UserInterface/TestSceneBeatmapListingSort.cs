@@ -24,39 +24,32 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
-        private readonly FillFlowContainer placeholder;
-        private readonly BeatmapListingSortTabControl control;
-
         public TestSceneBeatmapListingSort()
         {
+            BeatmapListingSortTabControl control;
+            OsuSpriteText current;
+            OsuSpriteText direction;
+
             Add(control = new BeatmapListingSortTabControl
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
 
-            Add(placeholder = new FillFlowContainer
+            Add(new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 5),
+                Children = new Drawable[]
+                {
+                    current = new OsuSpriteText(),
+                    direction = new OsuSpriteText()
+                }
             });
-        }
 
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            control.SortDirection.BindValueChanged(_ => updateBindablesVisual());
-            control.Current.BindValueChanged(_ => updateBindablesVisual(), true);
-        }
-
-        private void updateBindablesVisual()
-        {
-            placeholder.Clear();
-
-            placeholder.Add(new OsuSpriteText { Text = $"Current: {control.Current.Value}" });
-            placeholder.Add(new OsuSpriteText { Text = $"Sort direction: {control.SortDirection.Value}" });
+            control.SortDirection.BindValueChanged(sortDirection => direction.Text = $"Sort direction: {sortDirection.NewValue}", true);
+            control.Current.BindValueChanged(criteria => current.Text = $"Criteria: {criteria.NewValue}", true);
         }
     }
 }
