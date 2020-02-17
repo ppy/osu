@@ -51,15 +51,13 @@ namespace osu.Game.Overlays.BeatmapListing
                     {
                         new OsuSpriteText
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                             Font = OsuFont.GetFont(size: 10),
                             Text = headerName.ToUpper()
                         },
                         CreateFilter().With(f =>
                         {
-                            f.Anchor = Anchor.CentreLeft;
-                            f.Origin = Anchor.CentreLeft;
                             f.Current = current;
                         })
                     }
@@ -74,7 +72,12 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             public BeatmapSearchFilter()
             {
-                AutoSizeAxes = Axes.Both;
+                Anchor = Anchor.BottomLeft;
+                Origin = Anchor.BottomLeft;
+                RelativeSizeAxes = Axes.X;
+                Height = 15;
+
+                TabContainer.Spacing = new Vector2(10, 0);
 
                 if (typeof(T).IsEnum)
                 {
@@ -83,15 +86,15 @@ namespace osu.Game.Overlays.BeatmapListing
                 }
             }
 
-            protected override Dropdown<T> CreateDropdown() => null;
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                ((FilterDropdown)Dropdown).AccentColour = colourProvider.Light2;
+            }
+
+            protected override Dropdown<T> CreateDropdown() => new FilterDropdown();
 
             protected override TabItem<T> CreateTabItem(T value) => new FilterTabItem(value);
-
-            protected override TabFillFlowContainer CreateTabFlow() => new TabFillFlowContainer
-            {
-                AutoSizeAxes = Axes.Both,
-                Spacing = new Vector2(10),
-            };
 
             protected class FilterTabItem : TabItem<T>
             {
@@ -106,6 +109,8 @@ namespace osu.Game.Overlays.BeatmapListing
                     : base(value)
                 {
                     AutoSizeAxes = Axes.Both;
+                    Anchor = Anchor.BottomLeft;
+                    Origin = Anchor.BottomLeft;
                     AddRangeInternal(new Drawable[]
                     {
                         text = new OsuSpriteText
@@ -147,6 +152,23 @@ namespace osu.Game.Overlays.BeatmapListing
                 private void updateState() => text.FadeColour(Active.Value ? Color4.White : getStateColour(), 200, Easing.OutQuint);
 
                 private Color4 getStateColour() => IsHovered ? colourProvider.Light1 : colourProvider.Light3;
+            }
+
+            private class FilterDropdown : OsuTabDropdown<T>
+            {
+                protected override DropdownHeader CreateHeader() => new FilterHeader
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight
+                };
+
+                private class FilterHeader : OsuTabDropdownHeader
+                {
+                    public FilterHeader()
+                    {
+                        Background.Height = 1;
+                    }
+                }
             }
         }
     }
