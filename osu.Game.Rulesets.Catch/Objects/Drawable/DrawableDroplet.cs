@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(h)
         {
             Origin = Anchor.Centre;
-            Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 4;
+            Size = new Vector2(CatchHitObject.OBJECT_RADIUS) / 4;
             Masking = false;
         }
 

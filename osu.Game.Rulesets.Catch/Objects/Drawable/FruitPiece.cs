@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BorderColour = Color4.White,
-                    BorderThickness = 3f * DrawableFruit.RADIUS_ADJUST,
+                    BorderThickness = 6f * DrawableFruit.RADIUS_ADJUST,
                     Children = new Framework.Graphics.Drawable[]
                     {
                         new Box
@@ -82,7 +82,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         private Framework.Graphics.Drawable createPulp(FruitVisualRepresentation representation)
         {
-            const float large_pulp_3 = 8f * DrawableFruit.RADIUS_ADJUST;
+            const float large_pulp_3 = 16f * DrawableFruit.RADIUS_ADJUST;
             const float distance_from_centre_3 = 0.15f;
 
             const float large_pulp_4 = large_pulp_3 * 0.925f;
