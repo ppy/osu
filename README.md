@@ -13,9 +13,9 @@ Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the 
 
 ## Status
 
-This project is still heavily under development, but is in a state where users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve over the coming months and hopefully bring some new unique features to the table.
+This project under heavy development, but is in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
 
-We are accepting bug reports (please report with as much detail as possible). Feature requests are welcome as long as you read and understand the contribution guidelines listed below.
+We are accepting bug reports (please report with as much detail as possible). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features.
 
 Detailed changelogs are published on the [official osu! site](https://osu.ppy.sh/home/changelog).
 
