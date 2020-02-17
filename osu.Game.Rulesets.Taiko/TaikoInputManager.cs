@@ -26,6 +26,8 @@ namespace osu.Game.Rulesets.Taiko
             set => ((TaikoKeyBindingContainer)KeyBindingContainer).BlockedCentre = value;
         }
 
+        public int BlockedKeystrokes => ((TaikoKeyBindingContainer)KeyBindingContainer).BlockedKeystrokes;
+
         public TaikoAction? LastRim => ((TaikoKeyBindingContainer)KeyBindingContainer).LastRim;
 
         public TaikoAction? LastCentre => ((TaikoKeyBindingContainer)KeyBindingContainer).LastCentre;
@@ -39,6 +41,7 @@ namespace osu.Game.Rulesets.Taiko
         {
             public TaikoAction? BlockedRim;
             public TaikoAction? BlockedCentre;
+            public int BlockedKeystrokes;
 
             public TaikoAction? LastRim;
             public TaikoAction? LastCentre;
@@ -98,8 +101,13 @@ namespace osu.Game.Rulesets.Taiko
 
                     var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == KeyCombination.FromKey(ev.Key)))?.GetAction<TaikoAction>();
 
-                    if (single == BlockedRim || single == BlockedCentre)
+                    if (single != null && (single == BlockedRim || single == BlockedCentre))
+                    {
+                        if (!ev.Repeat)
+                            BlockedKeystrokes++;
+
                         return false;
+                    }
                 }
 
                 return base.Handle(e);

@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -16,5 +18,12 @@ namespace osu.Game.Rulesets.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay) };
+
+        [SettingSource("Fail on repeat tap", "Fail when you don't alternate")]
+        public Bindable<bool> CauseFail { get; } = new BindableBool
+        {
+            Default = false,
+            Value = false
+        };
     }
 }

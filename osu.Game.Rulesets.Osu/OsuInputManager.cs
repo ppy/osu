@@ -25,6 +25,8 @@ namespace osu.Game.Rulesets.Osu
             set => ((OsuKeyBindingContainer)KeyBindingContainer).BlockedButton = value;
         }
 
+        public int BlockedKeystrokes => ((OsuKeyBindingContainer)KeyBindingContainer).BlockedKeystrokes;
+
         public OsuAction? LastButton => ((OsuKeyBindingContainer)KeyBindingContainer).LastButton;
 
         /// <summary>
@@ -52,6 +54,7 @@ namespace osu.Game.Rulesets.Osu
         {
             public bool AllowUserPresses = true;
             public OsuAction? BlockedButton;
+            public int BlockedKeystrokes;
             public OsuAction? LastButton;
 
             public OsuKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
@@ -67,9 +70,11 @@ namespace osu.Game.Rulesets.Osu
                 var combos = KeyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
 
                 InputKey? key;
-                if (e is KeyDownEvent kb)
+                var kb = e as KeyDownEvent;
+                var mouse = e as MouseDownEvent;
+                if (kb != null)
                     key = KeyCombination.FromKey(kb.Key);
-                else if (e is MouseDownEvent mouse)
+                else if (mouse != null)
                     key = KeyCombination.FromMouseButton(mouse.Button);
                 else
                     return base.Handle(e);
@@ -78,8 +83,14 @@ namespace osu.Game.Rulesets.Osu
 
                 LastButton = single;
 
-                if (single == BlockedButton)
+                if (single != null && single == BlockedButton)
+                {
+                    if (kb != null && !kb.Repeat)
+                        BlockedKeystrokes++;
+                    else if (mouse != null)
+                        BlockedKeystrokes++;
                     return false;
+                }
 
                 return base.Handle(e);
             }
