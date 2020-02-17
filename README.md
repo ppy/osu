@@ -15,9 +15,11 @@ Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the 
 
 This project is under heavy development, but is in a stable state. Users are encouraged to try it out and keep it installed alongside the stable *osu!* client. It will continue to evolve to the point of eventually replacing the existing stable client as an update.
 
-We are accepting bug reports (please report with as much detail as possible). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features.
+We are accepting bug reports (please report with as much detail as possible). Feature requests are also welcome, but understand that our focus is on completing the game to feature parity before adding new features. A few resources are available as starting points to getting involved and understanding the project:
 
-Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer). You can also learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
+- Detailed release changelogs are available on the [official osu! site](https://osu.ppy.sh/home/changelog/lazer).
+- You can learn more about our approach to [project management](https://github.com/ppy/osu/wiki/Project-management).
+- Read peppy's [latest blog post](https://blog.ppy.sh/a-definitive-lazer-faq/) exploring where lazer is currently and the roadmap going forward.
 
 ## Requirements
 
