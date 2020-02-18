@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Specialized;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -29,10 +30,15 @@ namespace osu.Game.Screens.Multi
             base.LoadComplete();
 
             // Scheduled since items are removed and re-added upon rearrangement
-            Items.ItemsRemoved += items => Schedule(() =>
+            Items.CollectionChanged += (_, args) => Schedule(() =>
             {
-                if (!Items.Contains(SelectedItem.Value))
-                    SelectedItem.Value = null;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Remove:
+                        if (args.OldItems.Contains(SelectedItem))
+                            SelectedItem.Value = null;
+                        break;
+                }
             });
         }
 

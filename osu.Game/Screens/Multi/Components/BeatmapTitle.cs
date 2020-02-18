@@ -26,8 +26,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Playlist.ItemsAdded += _ => updateText();
-            Playlist.ItemsRemoved += _ => updateText();
+            Playlist.CollectionChanged += (_, __) => updateText();
 
             updateText();
         }
