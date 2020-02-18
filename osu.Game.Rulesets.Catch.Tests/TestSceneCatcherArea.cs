@@ -3,8 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.UI;
@@ -13,10 +15,9 @@ using osu.Game.Tests.Visual;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestSceneCatcherArea : OsuTestScene
+    public class TestSceneCatcherArea : SkinnableTestScene
     {
         private RulesetInfo catchRuleset;
-        private TestCatcherArea catcherArea;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -26,20 +27,22 @@ namespace osu.Game.Rulesets.Catch.Tests
         public TestSceneCatcherArea()
         {
             AddSliderStep<float>("CircleSize", 0, 8, 5, createCatcher);
-            AddToggleStep("Hyperdash", t => catcherArea.ToggleHyperDash(t));
+            AddToggleStep("Hyperdash", t =>
+                CreatedDrawables.OfType<CatchInputManager>().Select(i => i.Child)
+                                .OfType<TestCatcherArea>().ForEach(c => c.ToggleHyperDash(t)));
         }
 
         private void createCatcher(float size)
         {
-            Child = new CatchInputManager(catchRuleset)
+            SetContents(() => new CatchInputManager(catchRuleset)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = catcherArea = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
+                Child = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.TopLeft
                 },
-            };
+            });
         }
 
         [BackgroundDependencyLoader]

@@ -134,7 +134,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = 0.5f;
 
                 Origin = Anchor.TopCentre;
-                Anchor = Anchor.TopLeft;
 
                 Size = new Vector2(CATCHER_SIZE);
                 if (difficulty != null)
