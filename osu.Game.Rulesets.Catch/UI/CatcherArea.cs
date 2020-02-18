@@ -418,7 +418,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     Explode(f);
             }
 
-            public void Drop(DrawableHitObject fruit) => removeFromPlatWithTransform(fruit, f =>
+            public void Drop(DrawableHitObject fruit) => removeFromPlateWithTransform(fruit, f =>
             {
                 f.MoveToY(f.Y + 75, 750, Easing.InSine);
                 f.FadeOut(750);
@@ -428,7 +428,7 @@ namespace osu.Game.Rulesets.Catch.UI
             {
                 var originalX = fruit.X * Scale.X;
 
-                removeFromPlatWithTransform(fruit, f =>
+                removeFromPlateWithTransform(fruit, f =>
                 {
                     f.MoveToY(f.Y - 50, 250, Easing.OutSine).Then().MoveToY(f.Y + 50, 500, Easing.InSine);
                     f.MoveToX(f.X + originalX * 6, 1000);
@@ -436,7 +436,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 });
             }
 
-            private void removeFromPlatWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
+            private void removeFromPlateWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
             {
                 if (ExplodingFruitTarget != null)
                 {
