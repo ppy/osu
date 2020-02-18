@@ -125,8 +125,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
 
             samplesBindable = HitObject.SamplesBindable.GetBoundCopy();
-            samplesBindable.ItemsAdded += _ => loadSamples();
-            samplesBindable.ItemsRemoved += _ => loadSamples();
+            samplesBindable.CollectionChanged += (_, __) => loadSamples();
 
             updateState(ArmedState.Idle, true);
             onDefaultsApplied();
