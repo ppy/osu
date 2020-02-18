@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             AddStep("Set null beatmap", () => section.BeatmapSet = null);
         }
 
-        private static BeatmapSetInfo beatmap_set = new BeatmapSetInfo
+        private static readonly BeatmapSetInfo beatmap_set = new BeatmapSetInfo
         {
             OnlineInfo = new BeatmapSetOnlineInfo
             {
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual.UserInterface
             }
         };
 
-        private static BeatmapSetInfo no_cover_beatmap_set = new BeatmapSetInfo
+        private static readonly BeatmapSetInfo no_cover_beatmap_set = new BeatmapSetInfo
         {
             OnlineInfo = new BeatmapSetOnlineInfo
             {
