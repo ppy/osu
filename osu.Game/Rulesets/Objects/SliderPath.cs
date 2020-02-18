@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Objects
                         break;
 
                     case NotifyCollectionChangedAction.Remove:
-                        foreach (var c in args.NewItems.Cast<PathControlPoint>())
+                        foreach (var c in args.OldItems.Cast<PathControlPoint>())
                             c.Changed -= invalidate;
                         break;
                 }
