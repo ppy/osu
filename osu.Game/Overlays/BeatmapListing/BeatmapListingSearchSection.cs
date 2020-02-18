@@ -13,6 +13,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapListing
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Overlays.BeatmapListing
         {
             set
             {
-                if (value == null)
+                if (value == null || string.IsNullOrEmpty(value.OnlineInfo.Covers.Cover))
                 {
                     beatmapCover.FadeOut(600, Easing.OutQuint);
                     return;
@@ -39,7 +40,7 @@ namespace osu.Game.Overlays.BeatmapListing
             }
         }
 
-        private readonly SearchTextBox textBox;
+        private readonly BeatmapSearchTextBox textBox;
         private readonly BeatmapSearchRulesetFilterRow modeFilter;
         private readonly BeatmapSearchFilterRow<BeatmapSearchCategory> categoryFilter;
 
@@ -83,7 +84,7 @@ namespace osu.Game.Overlays.BeatmapListing
                         Spacing = new Vector2(0, 20),
                         Children = new Drawable[]
                         {
-                            textBox = new SearchTextBox
+                            textBox = new BeatmapSearchTextBox
                             {
                                 RelativeSizeAxes = Axes.X,
                             },
@@ -109,6 +110,16 @@ namespace osu.Game.Overlays.BeatmapListing
         private void load(OverlayColourProvider colourProvider)
         {
             background.Colour = colourProvider.Dark6;
+        }
+
+        private class BeatmapSearchTextBox : SearchTextBox
+        {
+            protected override Color4 SelectionColour => Color4.Gray;
+
+            public BeatmapSearchTextBox()
+            {
+                PlaceholderText = @"type in keywords...";
+            }
         }
     }
 }
