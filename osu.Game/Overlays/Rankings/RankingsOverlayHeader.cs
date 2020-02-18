@@ -12,6 +12,7 @@ namespace osu.Game.Overlays.Rankings
     public class RankingsOverlayHeader : TabControlOverlayHeader<RankingsScope>
     {
         public Bindable<RulesetInfo> Ruleset => rulesetSelector.Current;
+
         public Bindable<Country> Country => countryFilter.Current;
 
         private OverlayRulesetSelector rulesetSelector;
