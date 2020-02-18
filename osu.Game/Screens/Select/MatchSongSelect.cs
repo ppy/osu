@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Select
         {
             PlaylistItem item = new PlaylistItem
             {
-                ID = (Playlist.LastOrDefault()?.ID + 1) ?? 0,
+                ID = Playlist.Count == 0 ? 0 : Playlist.Max(p => p.ID) + 1
             };
 
             populateItemFromCurrent(item);
