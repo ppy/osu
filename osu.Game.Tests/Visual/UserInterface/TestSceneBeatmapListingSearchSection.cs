@@ -3,11 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
+using osuTK;
 
 namespace osu.Game.Tests.Visual.UserInterface
 {
@@ -21,9 +25,13 @@ namespace osu.Game.Tests.Visual.UserInterface
         [Cached]
         private readonly OverlayColourProvider colourProvider = new OverlayColourProvider(OverlayColourScheme.Blue);
 
+        private readonly BeatmapListingSearchSection section;
+
         public TestSceneBeatmapListingSearchSection()
         {
-            BeatmapListingSearchSection section;
+            OsuSpriteText query;
+            OsuSpriteText ruleset;
+            OsuSpriteText category;
 
             Add(section = new BeatmapListingSearchSection
             {
@@ -31,31 +39,52 @@ namespace osu.Game.Tests.Visual.UserInterface
                 Origin = Anchor.Centre,
             });
 
-            var beatmapSet = new BeatmapSetInfo
+            Add(new FillFlowContainer
             {
-                OnlineInfo = new BeatmapSetOnlineInfo
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 5),
+                Children = new Drawable[]
                 {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = "https://assets.ppy.sh/beatmaps/1094296/covers/cover@2x.jpg?1581416305"
-                    }
+                    query = new OsuSpriteText(),
+                    ruleset = new OsuSpriteText(),
+                    category = new OsuSpriteText(),
                 }
-            };
+            });
 
-            var noCoverBeatmapSet = new BeatmapSetInfo
-            {
-                OnlineInfo = new BeatmapSetOnlineInfo
-                {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = string.Empty
-                    }
-                }
-            };
+            section.Query.BindValueChanged(q => query.Text = $"Query: {q.NewValue}", true);
+            section.Ruleset.BindValueChanged(r => ruleset.Text = $"Ruleset: {r.NewValue}", true);
+            section.Category.BindValueChanged(c => category.Text = $"Category: {c.NewValue}", true);
+        }
 
-            AddStep("Set beatmap", () => section.BeatmapSet = beatmapSet);
-            AddStep("Set beatmap (no cover)", () => section.BeatmapSet = noCoverBeatmapSet);
+        [Test]
+        public void TestCovers()
+        {
+            AddStep("Set beatmap", () => section.BeatmapSet = beatmap_set);
+            AddStep("Set beatmap (no cover)", () => section.BeatmapSet = no_cover_beatmap_set);
             AddStep("Set null beatmap", () => section.BeatmapSet = null);
         }
+
+        private static BeatmapSetInfo beatmap_set = new BeatmapSetInfo
+        {
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = "https://assets.ppy.sh/beatmaps/1094296/covers/cover@2x.jpg?1581416305"
+                }
+            }
+        };
+
+        private static BeatmapSetInfo no_cover_beatmap_set = new BeatmapSetInfo
+        {
+            OnlineInfo = new BeatmapSetOnlineInfo
+            {
+                Covers = new BeatmapSetOnlineCovers
+                {
+                    Cover = string.Empty
+                }
+            }
+        };
     }
 }
