@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using System.Collections.Specialized;
 
 namespace osu.Game.Overlays.Comments
 {
@@ -269,10 +270,21 @@ namespace osu.Game.Overlays.Comments
                 });
             }
 
-            Replies.ItemsAdded += onRepliesAdded;
-
             if (Replies.Any())
                 onRepliesAdded(Replies);
+
+            Replies.CollectionChanged += (_, args) =>
+            {
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        onRepliesAdded(args.NewItems.Cast<DrawableComment>());
+                        break;
+
+                    default:
+                        throw new NotSupportedException(@"You can only add replies to this list. Other actions are not supported.");
+                }
+            };
         }
 
         protected override void LoadComplete()
