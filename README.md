@@ -37,7 +37,7 @@ If your platform is not listed above, there is still a chance you can manually b
 
 ## Developing or debugging
 
-Please make sure you have the following preqreuisites:
+Please make sure you have the following prerequisites:
 
 - A desktop platform with the [.NET Core 3.1 SDK](https://dotnet.microsoft.com/download) or higher installed.
 - When developing with mobile, [Xamarin](https://docs.microsoft.com/en-us/xamarin/) is required, which is shipped together with Visual Studio or [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/).
