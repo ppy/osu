@@ -25,7 +25,8 @@ namespace osu.Game.Overlays
         public const float RIGHT_WIDTH = 275;
         protected readonly Header Header;
 
-        private RulesetStore rulesets;
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
 
         private readonly Bindable<BeatmapSetInfo> beatmapSet = new Bindable<BeatmapSetInfo>();
 
@@ -90,10 +91,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets)
+        private void load()
         {
-            this.rulesets = rulesets;
-
             background.Colour = ColourProvider.Background6;
         }
 

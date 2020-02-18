@@ -24,13 +24,12 @@ namespace osu.Game.Overlays.Settings.Sections
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
-        private SkinManager skins;
+        [Resolved]
+        private SkinManager skins { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skins)
+        private void load(OsuConfigManager config)
         {
-            this.skins = skins;
-
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
