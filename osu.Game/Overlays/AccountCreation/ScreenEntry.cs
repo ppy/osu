@@ -33,20 +33,21 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextBox emailTextBox;
         private OsuPasswordTextBox passwordTextBox;
 
-        private IAPIProvider api;
+        [Resolved]
+        private IAPIProvider api { get; set; }
+
         private ShakeContainer registerShake;
         private IEnumerable<Drawable> characterCheckText;
 
         private OsuTextBox[] textboxes;
         private ProcessingOverlay processingOverlay;
-        private GameHost host;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IAPIProvider api, GameHost host)
+        private void load(OsuColour colours)
         {
-            this.api = api;
-            this.host = host;
-
             InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
