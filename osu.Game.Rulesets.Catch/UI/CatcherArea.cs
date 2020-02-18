@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit && fruit.CanBePlated)
             {
+                // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
                 var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
 
                 if (caughtFruit == null) return;
@@ -442,14 +443,22 @@ namespace osu.Game.Rulesets.Catch.UI
                     ExplodingFruitTarget.Add(fruit);
                 }
 
-                fruit.ClearTransforms();
-                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
-                fruit.MoveToX(fruit.X + originalX * 6, 1000);
-                fruit.FadeOut(750);
+                double explodeTime = Clock.CurrentTime;
 
-                // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
-                fruit.LifetimeStart = Time.Current;
-                fruit.Expire();
+                fruit.ApplyCustomUpdateState += onFruitOnApplyCustomUpdateState;
+                onFruitOnApplyCustomUpdateState(fruit, fruit.State.Value);
+
+                void onFruitOnApplyCustomUpdateState(DrawableHitObject o, ArmedState state)
+                {
+                    using (fruit.BeginAbsoluteSequence(explodeTime))
+                    {
+                        fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
+                        fruit.MoveToX(fruit.X + originalX * 6, 1000);
+                        fruit.FadeOut(750);
+                    }
+
+                    fruit.Expire();
+                }
             }
 
             public void UpdatePosition(float position)
