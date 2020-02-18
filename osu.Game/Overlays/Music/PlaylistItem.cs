@@ -14,36 +14,27 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Music
 {
-    public class PlaylistItem : RearrangeableListItem<BeatmapSetInfo>, IFilterable
+    public class PlaylistItem : OsuRearrangeableListItem<BeatmapSetInfo>, IFilterable
     {
-        private const float fade_duration = 100;
-
-        public BindableBool PlaylistDragActive = new BindableBool();
-
         public readonly Bindable<BeatmapSetInfo> SelectedSet = new Bindable<BeatmapSetInfo>();
 
         public Action<BeatmapSetInfo> RequestSelection;
 
-        private PlaylistItemHandle handle;
         private TextFlowContainer text;
         private IEnumerable<Drawable> titleSprites;
         private ILocalisedBindableString titleBind;
         private ILocalisedBindableString artistBind;
 
-        private Color4 hoverColour;
+        private Color4 selectedColour;
         private Color4 artistColour;
 
         public PlaylistItem(BeatmapSetInfo item)
             : base(item)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-
             Padding = new MarginPadding { Left = 5 };
 
             FilterTerms = item.Metadata.SearchableTerms;
@@ -52,42 +43,12 @@ namespace osu.Game.Overlays.Music
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, LocalisationManager localisation)
         {
-            hoverColour = colours.Yellow;
+            selectedColour = colours.Yellow;
             artistColour = colours.Gray9;
-
-            InternalChild = new GridContainer
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Content = new[]
-                {
-                    new Drawable[]
-                    {
-                        handle = new PlaylistItemHandle
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Size = new Vector2(12),
-                            Colour = colours.Gray5,
-                            AlwaysPresent = true,
-                            Alpha = 0
-                        },
-                        text = new OsuTextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Left = 5 },
-                        },
-                    }
-                },
-                ColumnDimensions = new[] { new Dimension(GridSizeMode.AutoSize) },
-                RowDimensions = new[] { new Dimension(GridSizeMode.AutoSize) }
-            };
+            HandleColour = colours.Gray5;
 
             titleBind = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.TitleUnicode, Model.Metadata.Title)));
             artistBind = localisation.GetLocalisedString(new LocalisedString((Model.Metadata.ArtistUnicode, Model.Metadata.Artist)));
-
-            artistBind.BindValueChanged(_ => recreateText(), true);
         }
 
         protected override void LoadComplete()
@@ -100,9 +61,17 @@ namespace osu.Game.Overlays.Music
                     return;
 
                 foreach (Drawable s in titleSprites)
-                    s.FadeColour(set.NewValue == Model ? hoverColour : Color4.White, fade_duration);
+                    s.FadeColour(set.NewValue == Model ? selectedColour : Color4.White, FADE_DURATION);
             }, true);
+
+            artistBind.BindValueChanged(_ => recreateText(), true);
         }
+
+        protected override Drawable CreateContent() => text = new OsuTextFlowContainer
+        {
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+        };
 
         private void recreateText()
         {
@@ -125,31 +94,6 @@ namespace osu.Game.Overlays.Music
             return true;
         }
 
-        protected override bool OnDragStart(DragStartEvent e)
-        {
-            if (!base.OnDragStart(e))
-                return false;
-
-            PlaylistDragActive.Value = true;
-            return true;
-        }
-
-        protected override void OnDragEnd(DragEndEvent e)
-        {
-            PlaylistDragActive.Value = false;
-            base.OnDragEnd(e);
-        }
-
-        protected override bool IsDraggableAt(Vector2 screenSpacePos) => handle.HandlingDrag;
-
-        protected override bool OnHover(HoverEvent e)
-        {
-            handle.UpdateHoverState(IsDragged || !PlaylistDragActive.Value);
-            return base.OnHover(e);
-        }
-
-        protected override void OnHoverLost(HoverLostEvent e) => handle.UpdateHoverState(false);
-
         public IEnumerable<string> FilterTerms { get; }
 
         private bool matching = true;
@@ -168,44 +112,5 @@ namespace osu.Game.Overlays.Music
         }
 
         public bool FilteringActive { get; set; }
-
-        private class PlaylistItemHandle : SpriteIcon
-        {
-            public bool HandlingDrag { get; private set; }
-            private bool isHovering;
-
-            public PlaylistItemHandle()
-            {
-                Icon = FontAwesome.Solid.Bars;
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                base.OnMouseDown(e);
-
-                HandlingDrag = true;
-                UpdateHoverState(isHovering);
-
-                return false;
-            }
-
-            protected override void OnMouseUp(MouseUpEvent e)
-            {
-                base.OnMouseUp(e);
-
-                HandlingDrag = false;
-                UpdateHoverState(isHovering);
-            }
-
-            public void UpdateHoverState(bool hovering)
-            {
-                isHovering = hovering;
-
-                if (isHovering || HandlingDrag)
-                    this.FadeIn(fade_duration);
-                else
-                    this.FadeOut(fade_duration);
-            }
-        }
     }
 }

@@ -63,6 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (result.IsHit && fruit.CanBePlated)
             {
+                // create a new (cloned) fruit to stay on the plate. the original is faded out immediately.
                 var caughtFruit = (DrawableCatchHitObject)CreateDrawableRepresentation?.Invoke(fruit.HitObject);
 
                 if (caughtFruit == null) return;
@@ -133,7 +134,6 @@ namespace osu.Game.Rulesets.Catch.UI
                 X = 0.5f;
 
                 Origin = Anchor.TopCentre;
-                Anchor = Anchor.TopLeft;
 
                 Size = new Vector2(CATCHER_SIZE);
                 if (difficulty != null)
@@ -388,32 +388,24 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
             }
 
+            public void UpdatePosition(float position)
+            {
+                position = Math.Clamp(position, 0, 1);
+
+                if (position == X)
+                    return;
+
+                Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
+                X = position;
+            }
+
             /// <summary>
             /// Drop any fruit off the plate.
             /// </summary>
             public void Drop()
             {
-                var fruit = caughtFruit.ToArray();
-
-                foreach (var f in fruit)
-                {
-                    if (ExplodingFruitTarget != null)
-                    {
-                        f.Anchor = Anchor.TopLeft;
-                        f.Position = caughtFruit.ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
-
-                        caughtFruit.Remove(f);
-
-                        ExplodingFruitTarget.Add(f);
-                    }
-
-                    f.MoveToY(f.Y + 75, 750, Easing.InSine);
-                    f.FadeOut(750);
-
-                    // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
-                    f.LifetimeStart = Time.Current;
-                    f.Expire();
-                }
+                foreach (var f in caughtFruit.ToArray())
+                    Drop(f);
             }
 
             /// <summary>
@@ -425,10 +417,26 @@ namespace osu.Game.Rulesets.Catch.UI
                     Explode(f);
             }
 
+            public void Drop(DrawableHitObject fruit) => removeFromPlateWithTransform(fruit, f =>
+            {
+                f.MoveToY(f.Y + 75, 750, Easing.InSine);
+                f.FadeOut(750);
+            });
+
             public void Explode(DrawableHitObject fruit)
             {
                 var originalX = fruit.X * Scale.X;
 
+                removeFromPlateWithTransform(fruit, f =>
+                {
+                    f.MoveToY(f.Y - 50, 250, Easing.OutSine).Then().MoveToY(f.Y + 50, 500, Easing.InSine);
+                    f.MoveToX(f.X + originalX * 6, 1000);
+                    f.FadeOut(750);
+                });
+            }
+
+            private void removeFromPlateWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
+            {
                 if (ExplodingFruitTarget != null)
                 {
                     fruit.Anchor = Anchor.TopLeft;
@@ -442,25 +450,18 @@ namespace osu.Game.Rulesets.Catch.UI
                     ExplodingFruitTarget.Add(fruit);
                 }
 
-                fruit.ClearTransforms();
-                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
-                fruit.MoveToX(fruit.X + originalX * 6, 1000);
-                fruit.FadeOut(750);
+                double actionTime = Clock.CurrentTime;
 
-                // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
-                fruit.LifetimeStart = Time.Current;
-                fruit.Expire();
-            }
+                fruit.ApplyCustomUpdateState += onFruitOnApplyCustomUpdateState;
+                onFruitOnApplyCustomUpdateState(fruit, fruit.State.Value);
 
-            public void UpdatePosition(float position)
-            {
-                position = Math.Clamp(position, 0, 1);
+                void onFruitOnApplyCustomUpdateState(DrawableHitObject o, ArmedState state)
+                {
+                    using (fruit.BeginAbsoluteSequence(actionTime))
+                        action(fruit);
 
-                if (position == X)
-                    return;
-
-                Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
-                X = position;
+                    fruit.Expire();
+                }
             }
         }
     }
