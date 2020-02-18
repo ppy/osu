@@ -389,32 +389,24 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
             }
 
+            public void UpdatePosition(float position)
+            {
+                position = Math.Clamp(position, 0, 1);
+
+                if (position == X)
+                    return;
+
+                Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
+                X = position;
+            }
+
             /// <summary>
             /// Drop any fruit off the plate.
             /// </summary>
             public void Drop()
             {
-                var fruit = caughtFruit.ToArray();
-
-                foreach (var f in fruit)
-                {
-                    if (ExplodingFruitTarget != null)
-                    {
-                        f.Anchor = Anchor.TopLeft;
-                        f.Position = caughtFruit.ToSpaceOfOtherDrawable(f.DrawPosition, ExplodingFruitTarget);
-
-                        caughtFruit.Remove(f);
-
-                        ExplodingFruitTarget.Add(f);
-                    }
-
-                    f.MoveToY(f.Y + 75, 750, Easing.InSine);
-                    f.FadeOut(750);
-
-                    // todo: this shouldn't exist once DrawableHitObject's ClearTransformsAfter overrides are repaired.
-                    f.LifetimeStart = Time.Current;
-                    f.Expire();
-                }
+                foreach (var f in caughtFruit.ToArray())
+                    Drop(f);
             }
 
             /// <summary>
@@ -426,10 +418,26 @@ namespace osu.Game.Rulesets.Catch.UI
                     Explode(f);
             }
 
+            public void Drop(DrawableHitObject fruit) => removeFromPlatWithTransform(fruit, f =>
+            {
+                f.MoveToY(f.Y + 75, 750, Easing.InSine);
+                f.FadeOut(750);
+            });
+
             public void Explode(DrawableHitObject fruit)
             {
                 var originalX = fruit.X * Scale.X;
 
+                removeFromPlatWithTransform(fruit, f =>
+                {
+                    f.MoveToY(f.Y - 50, 250, Easing.OutSine).Then().MoveToY(f.Y + 50, 500, Easing.InSine);
+                    f.MoveToX(f.X + originalX * 6, 1000);
+                    f.FadeOut(750);
+                });
+            }
+
+            private void removeFromPlatWithTransform(DrawableHitObject fruit, Action<DrawableHitObject> action)
+            {
                 if (ExplodingFruitTarget != null)
                 {
                     fruit.Anchor = Anchor.TopLeft;
@@ -443,33 +451,18 @@ namespace osu.Game.Rulesets.Catch.UI
                     ExplodingFruitTarget.Add(fruit);
                 }
 
-                double explodeTime = Clock.CurrentTime;
+                double actionTime = Clock.CurrentTime;
 
                 fruit.ApplyCustomUpdateState += onFruitOnApplyCustomUpdateState;
                 onFruitOnApplyCustomUpdateState(fruit, fruit.State.Value);
 
                 void onFruitOnApplyCustomUpdateState(DrawableHitObject o, ArmedState state)
                 {
-                    using (fruit.BeginAbsoluteSequence(explodeTime))
-                    {
-                        fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
-                        fruit.MoveToX(fruit.X + originalX * 6, 1000);
-                        fruit.FadeOut(750);
-                    }
+                    using (fruit.BeginAbsoluteSequence(actionTime))
+                        action(fruit);
 
                     fruit.Expire();
                 }
-            }
-
-            public void UpdatePosition(float position)
-            {
-                position = Math.Clamp(position, 0, 1);
-
-                if (position == X)
-                    return;
-
-                Scale = new Vector2(Math.Abs(Scale.X) * (position > X ? 1 : -1), Scale.Y);
-                X = position;
             }
         }
     }
