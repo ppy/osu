@@ -84,8 +84,7 @@ namespace osu.Game.Screens.Multi
             beatmap.BindValueChanged(_ => scheduleRefresh());
             ruleset.BindValueChanged(_ => scheduleRefresh());
 
-            requiredMods.ItemsAdded += _ => scheduleRefresh();
-            requiredMods.ItemsRemoved += _ => scheduleRefresh();
+            requiredMods.CollectionChanged += (_, __) => scheduleRefresh();
 
             refresh();
         }

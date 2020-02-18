@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -70,18 +71,20 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 AddBlueprintFor(obj);
 
             selectedHitObjects.BindTo(beatmap.SelectedHitObjects);
-            selectedHitObjects.ItemsAdded += objects =>
+            selectedHitObjects.CollectionChanged += (selectedObjects, args) =>
             {
-                foreach (var o in objects)
-                    SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Select();
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var o in args.NewItems)
+                            SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Select();
+                        break;
 
-                SelectionChanged?.Invoke(selectedHitObjects);
-            };
-
-            selectedHitObjects.ItemsRemoved += objects =>
-            {
-                foreach (var o in objects)
-                    SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var o in args.OldItems)
+                            SelectionBlueprints.FirstOrDefault(b => b.HitObject == o)?.Deselect();
+                        break;
+                }
 
                 SelectionChanged?.Invoke(selectedHitObjects);
             };

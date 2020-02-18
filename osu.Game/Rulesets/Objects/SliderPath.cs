@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Bindables;
@@ -47,18 +48,20 @@ namespace osu.Game.Rulesets.Objects
         {
             ExpectedDistance.ValueChanged += _ => invalidate();
 
-            ControlPoints.ItemsAdded += items =>
+            ControlPoints.CollectionChanged += (_, args) =>
             {
-                foreach (var c in items)
-                    c.Changed += invalidate;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Add:
+                        foreach (var c in args.NewItems.Cast<PathControlPoint>())
+                            c.Changed += invalidate;
+                        break;
 
-                invalidate();
-            };
-
-            ControlPoints.ItemsRemoved += items =>
-            {
-                foreach (var c in items)
-                    c.Changed -= invalidate;
+                    case NotifyCollectionChangedAction.Remove:
+                        foreach (var c in args.OldItems.Cast<PathControlPoint>())
+                            c.Changed -= invalidate;
+                        break;
+                }
 
                 invalidate();
             };
