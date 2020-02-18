@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.SearchableList
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Overlays.SearchableList
 
         private readonly Container filterContainer;
         private readonly Box tabStrip;
+
+        public readonly Bindable<bool> Disabled = new Bindable<bool>();
 
         public readonly SearchTextBox Search;
         public readonly PageTabControl<TTab> Tabs;
@@ -115,6 +118,22 @@ namespace osu.Game.Overlays.SearchableList
 
             Tabs.Current.Value = DefaultTab;
             Tabs.Current.TriggerChange();
+
+            Disabled.ValueChanged += disabled =>
+            {
+                if (disabled.NewValue)
+                {
+                    Tabs.Current.Disabled = true;
+                    DisplayStyleControl.DisplayStyle.Disabled = true;
+                    Search.Current.Disabled = true;
+                }
+                else
+                {
+                    Tabs.Current.Disabled = false;
+                    DisplayStyleControl.DisplayStyle.Disabled = false;
+                    Search.Current.Disabled = false;
+                }
+            };
 
             DisplayStyleControl.Dropdown.Current.Value = DefaultCategory;
             DisplayStyleControl.Dropdown.Current.TriggerChange();

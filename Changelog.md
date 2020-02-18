@@ -411,3 +411,8 @@
 ## 2020/02/18:
 *   整合更新
     *   [m] [Restructure readme to better define prerequisites that are required for development only #7885]
+    *   [m] [Fix osu!catch fruit exploding/dropping multiple timed is skin is changed during explode animation #7888]
+    *   [m] [Fix ogg beatmap/skin samples not loading #7889]
+    *   [m] [Fix playlist items potentially not updating to the correct selected state #7891]
+*   跟踪更新
+    *   [o] [Display a login placeholder in direct when user isn't logged in. #7854]

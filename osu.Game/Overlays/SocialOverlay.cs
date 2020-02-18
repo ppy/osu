@@ -239,6 +239,7 @@ namespace osu.Game.Overlays
                     clearPanels();
                     break;
             }
+            base.APIStateChanged(api, state);
         }
     }
 

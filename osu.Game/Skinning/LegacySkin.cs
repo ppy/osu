@@ -54,6 +54,8 @@ namespace osu.Game.Skinning
             {
                 Samples = audioManager?.GetSampleStore(storage);
                 Textures = new TextureStore(new TextureLoaderStore(storage));
+                
+                (storage as ResourceStore<byte[]>)?.AddExtension("ogg");
             }
         }
 
