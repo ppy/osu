@@ -10,9 +10,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Skinning;
-using osu.Game.Tests.Visual;
 
-namespace osu.Game.Rulesets.Osu.Tests
+namespace osu.Game.Tests.Visual
 {
     public abstract class SkinnableTestScene : OsuGridTestScene
     {
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, SkinManager skinManager)
         {
-            var dllStore = new DllResourceStore(typeof(SkinnableTestScene).Assembly);
+            var dllStore = new DllResourceStore(GetType().Assembly);
 
             metricsSkin = new TestLegacySkin(new SkinInfo(), new NamespacedResourceStore<byte[]>(dllStore, "Resources/metrics_skin"), audio, true);
             defaultSkin = skinManager.GetSkin(DefaultLegacySkin.Info);
