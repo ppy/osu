@@ -27,7 +27,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private const double timeThresholdBase = 1200;
         private const double tpMin = 0.1;
         private const double tpMax = 100;
-        private const double tpPrecision = 1e-8;
+        private const double probPrecision = 1e-4;
+        private const double timePrecision = 5e-4;
+        private const int maxIterations = 100;
 
         private const double defaultCheeseLevel = 0.4;
         private const int cheeseLevelCount = 11;
@@ -45,19 +47,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             List<OsuMovement> movementsHidden = createMovements(hitObjects, clockRate, strainHistory,
                                                                 hidden: true, noteDensities: noteDensities);
 
+            var mapCache = new HitProbabilities(movements, defaultCheeseLevel);
             double fcProbTP = calculateFCProbTP(movements);
             double fcProbTPHidden = calculateFCProbTP(movementsHidden);
-            double fcTimeTP = calculateFCTimeTP(movements);
 
             double hiddenFactor = fcProbTPHidden / fcProbTP;
 
             string graphText = generateGraphText(movements, fcProbTP);
 
-            double[] comboTPs = calculateComboTps(movements);
+            double[] comboTPs = calculateComboTps(mapCache);
+            double fcTimeTP = comboTPs.Last();
             (var missTPs, var missCounts) = calculateMissTPsMissCounts(movements, fcTimeTP);
             (var cheeseLevels, var cheeseFactors) = calculateCheeseLevelsVSCheeseFactors(movements, fcProbTP);
             double cheeseNoteCount = getCheeseNoteCount(movements, fcProbTP);
-
+            //Console.WriteLine($"cache misses: {HitProbabilities.cacheMiss} hits: {HitProbabilities.cacheHit}");
             return (fcProbTP, hiddenFactor, comboTPs, missTPs, missCounts, cheeseNoteCount, cheeseLevels, cheeseFactors, graphText);
         }
 
@@ -106,33 +109,30 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return tpMax;
 
             double fcProbMinusThreshold(double tp) => calculateFCProb(movements, tp, cheeseLevel) - probabilityThreshold;
-            return Brent.FindRoot(fcProbMinusThreshold, tpMin, tpMax, tpPrecision);
+            return Brent.FindRoot(fcProbMinusThreshold, tpMin, tpMax, probPrecision, maxIterations);
         }
 
         /// <summary>
         /// Calculates the throughput at which the expected time to FC the given movements =
         /// timeThresholdBase + time span of the movements
         /// </summary>
-        private static double calculateFCTimeTP(IEnumerable<OsuMovement> movements)
+        private static double calculateFCTimeTP(HitProbabilities mapCache, int sectionCount)
         {
-            if (movements.Count() == 0)
+            if (mapCache.IsNull(sectionCount))
                 return 0;
 
-            double mapLength = movements.Last().Time - movements.First().Time;
-            double timeThreshold = timeThresholdBase + mapLength;
+            double maxFCTime = mapCache.MinExpectedTimeForCount(tpMin, sectionCount);
 
-            double maxFCTime = calculateFCTime(movements, tpMin);
-
-            if (maxFCTime <= timeThreshold)
+            if (maxFCTime <= timeThresholdBase)
                 return tpMin;
 
-            double minFCTime = calculateFCTime(movements, tpMax);
+            double minFCTime = mapCache.MinExpectedTimeForCount(tpMax, sectionCount);
 
-            if (minFCTime >= timeThreshold)
+            if (minFCTime >= timeThresholdBase)
                 return tpMax;
 
-            double fcTimeMinusThreshold(double tp) => calculateFCTime(movements, tp) - timeThreshold;
-            return Brent.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, tpPrecision);
+            double fcTimeMinusThreshold(double tp) => mapCache.MinExpectedTimeForCount(tp, sectionCount) - timeThresholdBase;
+            return Bisection.FindRoot(fcTimeMinusThreshold, tpMin, tpMax, timeThresholdBase * timePrecision, maxIterations);
         }
 
         private static string generateGraphText(List<OsuMovement> movements, double tp)
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 double time = movement.Time;
                 double ipRaw = movement.IP12;
                 double ipCorrected = FittsLaw.CalculateIP(movement.D, movement.MT * (1 + defaultCheeseLevel * movement.CheesableRatio));
-                double missProb = 1 - calculateCheeseHitProb(movement, tp, defaultCheeseLevel);
+                double missProb = 1 - HitProbabilities.CalculateCheeseHitProb(movement, tp, defaultCheeseLevel);
 
                 sw.WriteLine($"{time} {ipRaw} {ipCorrected} {missProb}");
             }
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             for (int i = 0; i < movements.Count; ++i)
             {
                 var movement = movements[i];
-                missProbs[i] = 1 - calculateCheeseHitProb(movement, tp, defaultCheeseLevel);
+                missProbs[i] = 1 - HitProbabilities.CalculateCheeseHitProb(movement, tp, defaultCheeseLevel);
             }
 
             return missProbs;
@@ -233,34 +233,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             return count;
         }
 
-        private static double[] calculateComboTps(List<OsuMovement> movements)
+        private static double[] calculateComboTps(HitProbabilities movements)
         {
             double[] ComboTPs = new double[difficultyCount];
 
             for (int i = 1; i <= difficultyCount; ++i)
             {
-                ComboTPs[i - 1] = double.PositiveInfinity;
-
-                for (int j = 0; j <= difficultyCount - i; ++j)
-                {
-                    ComboTPs[i - 1] = Math.Min(ComboTPs[i - 1], calculateComboTPForPart(movements, i, j));
-                }
+                ComboTPs[i - 1] = calculateFCTimeTP(movements, i);
             }
 
             return ComboTPs;
-        }
-
-        private static double calculateComboTPForPart(List<OsuMovement> movements, int i, int j)
-        {
-            int start = movements.Count * j / difficultyCount;
-            int end = movements.Count * (j + i) / difficultyCount - 1;
-
-            double partTP = calculateFCTimeTP(movements.GetRange(start, end - start + 1));
-            //Console.WriteLine($"{start} {end} {partTP.ToString("N3")}");
-
-            return partTP;
-        }
-       
+        }       
 
         private static double calculateFCProb(IEnumerable<OsuMovement> movements, double tp, double cheeseLevel)
         {
@@ -268,37 +251,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             foreach (OsuMovement movement in movements)
             {
-                double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
+                double hitProb = HitProbabilities.CalculateCheeseHitProb(movement, tp, cheeseLevel);
                 fcProb *= hitProb;
             }
             return fcProb;
         }
 
-
-        // Uses dynamic programming to calculate expected fc time
-        private static double calculateFCTime(IEnumerable<OsuMovement> movements, double tp,
-                                              double cheeseLevel = defaultCheeseLevel)
-        {
-            double fcTime = 5;
-
-            foreach (OsuMovement movement in movements)
-            {
-                double hitProb = calculateCheeseHitProb(movement, tp, cheeseLevel);
-                fcTime = (fcTime + movement.RawMT) / (hitProb + 1e-10);
-            }
-            return fcTime;
-        }
-
-        private static double calculateCheeseHitProb(OsuMovement movement, double tp, double cheeseLevel)
-        {
-            double perMovementCheeseLevel = cheeseLevel;
-
-            if (movement.EndsOnSlider)
-                perMovementCheeseLevel = 0.5 * cheeseLevel + 0.5;
-
-            double cheeseMT = movement.MT * (1 + perMovementCheeseLevel * movement.CheesableRatio);
-            return FittsLaw.CalculateHitProb(movement.D, cheeseMT, tp);
-        }
 
         protected override double SkillMultiplier => throw new NotImplementedException();
         protected override double StrainDecayBase => throw new NotImplementedException();
