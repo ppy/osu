@@ -3,15 +3,16 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.UI;
-using osuTK.Input;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
@@ -24,11 +25,16 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private TaikoAction? blockedRim;
         private TaikoAction? blockedCentre;
-        private TaikoAction? lastRim;
-        private TaikoAction? lastCentre;
 
         private TaikoAction? lastBlocked;
         private int blockedKeystrokes;
+
+        [SettingSource("Allow repeats on color change")]
+        public Bindable<bool> RepeatOnColorChange { get; } = new BindableBool
+        {
+            Default = true,
+            Value = true
+        };
 
         public void ApplyToDrawableRuleset(DrawableRuleset<TaikoHitObject> drawableRuleset)
         {
@@ -39,79 +45,100 @@ namespace osu.Game.Rulesets.Taiko.Mods
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
             this.healthProcessor = healthProcessor;
+
             if (CauseFail.Value)
                 healthProcessor.FailConditions += FailCondition;
         }
 
-        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0;
+        protected virtual bool FailCondition(HealthProcessor healthProcessor, JudgementResult result) => blockedKeystrokes > 0 && lastBlocked != null;
 
         protected virtual bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
         {
             if (e is KeyDownEvent ev && !healthProcessor.IsBreakTime.Value)
             {
                 var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
-                var combos = keyBindings.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
+                var combos = keyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
 
-                var rims = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftRim || c.GetAction<TaikoAction>() == TaikoAction.RightRim);
-                var centres = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftCentre || c.GetAction<TaikoAction>() == TaikoAction.RightCentre);
-
-                bool bothLeft = (rims.Count == 1 && rims.First().GetAction<TaikoAction>() == TaikoAction.LeftRim) && (centres.Count == 1 && centres.First().GetAction<TaikoAction>() == TaikoAction.LeftCentre);
-                bool bothRight = (rims.Count == 1 && rims.First().GetAction<TaikoAction>() == TaikoAction.RightRim) && (centres.Count == 1 && centres.First().GetAction<TaikoAction>() == TaikoAction.RightCentre);
-
-                if (rims.Count == 1)
+                if (combos != null)
                 {
-                    blockedRim = lastRim;
-                    lastRim = rims.First().GetAction<TaikoAction>();
-                }
+                    var rims = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftRim || c.GetAction<TaikoAction>() == TaikoAction.RightRim);
+                    var centres = combos.FindAll(c => c.GetAction<TaikoAction>() == TaikoAction.LeftCentre || c.GetAction<TaikoAction>() == TaikoAction.RightCentre);
 
-                if (centres.Count == 1)
-                {
-                    blockedCentre = lastCentre;
-                    lastCentre = centres.First().GetAction<TaikoAction>();
-                }
+                    var rimActions = rims.Select(c => c.GetAction<TaikoAction>());
+                    var centreActions = centres.Select(c => c.GetAction<TaikoAction>());
 
-                if (combos.Count > 1)
-                {
-                    var blocked = combos.Find(c => c.GetAction<TaikoAction>() == lastBlocked);
+                    bool bothLeft = (rims.Count == 1 && rimActions.First() == TaikoAction.LeftRim) && (centres.Count == 1 && centreActions.First() == TaikoAction.LeftCentre);
+                    bool bothRight = (rims.Count == 1 && rimActions.First() == TaikoAction.RightRim) && (centres.Count == 1 && centreActions.First() == TaikoAction.RightCentre);
 
-                    if (bothLeft || bothRight)
+                    if (RepeatOnColorChange.Value)
                     {
-                        bool rimBlocked = bothLeft ? blockedRim == TaikoAction.LeftRim : blockedRim == TaikoAction.RightRim;
-                        bool centreBlocked = bothLeft ? blockedCentre == TaikoAction.LeftCentre : blockedCentre == TaikoAction.RightCentre;
+                        if (!rims.Any())
+                            blockedRim = null;
 
-                        if (rimBlocked && centreBlocked)
+                        if (!centres.Any())
+                            blockedCentre = null;
+                    }
+
+                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == KeyCombination.FromKey(ev.Key)))?.GetAction<TaikoAction>();
+
+                    if (combos.Count > 1)
+                    {
+                        var blocked = combos.Find(c => c.GetAction<TaikoAction>() == lastBlocked);
+
+                        if (bothLeft || bothRight)
                         {
-                            lastBlocked = null;
-                            return true;
+                            bool rimBlocked = bothLeft ? blockedRim == TaikoAction.LeftRim : blockedRim == TaikoAction.RightRim;
+                            bool centreBlocked = bothLeft ? blockedCentre == TaikoAction.LeftCentre : blockedCentre == TaikoAction.RightCentre;
+
+                            if (rimBlocked && centreBlocked)
+                            {
+                                blockedKeystrokes++;
+                                return true;
+                            }
+                            else
+                            {
+                                blockedRim = rimActions.First();
+                                blockedCentre = centreActions.First();
+                            }
                         }
+                        else
+                        {
+                            if (single == TaikoAction.LeftRim || single == TaikoAction.RightRim)
+                                blockedRim = null;
+                            else
+                                blockedCentre = null;
+                        }
+
+                        lastBlocked = null;
+
+                        if (blocked != null)
+                        {
+                            var key = ev.PressedKeys.ToList().Find(k => KeyCombination.FromKey(k) == blocked.KeyCombination.Keys.First());
+                            inputManager.PressKey(key, true);
+                        }
+
+                        return false;
                     }
-                    else
+
+                    if (single != null && (single == blockedRim || single == blockedCentre))
                     {
-                        lastRim = null;
-                        lastCentre = null;
+                        if (!ev.Repeat)
+                            blockedKeystrokes++;
+
+                        lastBlocked = single;
+
+                        return true;
                     }
 
-                    lastBlocked = null;
-
-                    if (blocked != null)
+                    if (rims.Count == 1)
                     {
-                        Key key = ev.PressedKeys.ToList().Find(k => KeyCombination.FromKey(k) == blocked.KeyCombination.Keys.First());
-                        inputManager.PressKey(key, true);
+                        blockedRim = rims.First().GetAction<TaikoAction>();
                     }
 
-                    return false;
-                }
-
-                var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == KeyCombination.FromKey(ev.Key)))?.GetAction<TaikoAction>();
-
-                if (single != null && (single == blockedRim || single == blockedCentre))
-                {
-                    if (!ev.Repeat)
-                        blockedKeystrokes++;
-
-                    lastBlocked = single;
-
-                    return true;
+                    if (centres.Count == 1)
+                    {
+                        blockedCentre = centres.First().GetAction<TaikoAction>();
+                    }
                 }
             }
 

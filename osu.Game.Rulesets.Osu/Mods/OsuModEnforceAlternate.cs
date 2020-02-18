@@ -14,7 +14,7 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModEnforceAlternate : ModEnforceAlternate, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
+    public class OsuModEnforceAlternate : ModEnforceAlternate, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToHealthProcessor
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Concat(new[] { typeof(OsuModRelax), typeof(OsuModAutopilot) }).ToArray();
 
@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         private HealthProcessor healthProcessor;
 
         private OsuAction? blockedButton;
-        private OsuAction? lastButton;
 
         private int blockedKeystrokes;
 
@@ -32,15 +31,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             inputManager.BlockConditions += BlockCondition;
         }
 
-        public void Update(Playfield playfield)
-        {
-            if (!healthProcessor.IsBreakTime.Value && lastButton != null)
-                blockedButton = lastButton;
-        }
-
         public void ApplyToHealthProcessor(HealthProcessor healthProcessor)
         {
             this.healthProcessor = healthProcessor;
+
             if (CauseFail.Value)
                 healthProcessor.FailConditions += FailCondition;
         }
@@ -49,34 +43,40 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected virtual bool BlockCondition(UIEvent e, IEnumerable<KeyBinding> keyBindings)
         {
-            var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
-            var combos = keyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
-
-            InputKey? key;
-            var kb = e as KeyDownEvent;
-            var mouse = e as MouseDownEvent;
-            if (kb != null)
-                key = KeyCombination.FromKey(kb.Key);
-            else if (mouse != null)
-                key = KeyCombination.FromMouseButton(mouse.Button);
-            else
-                return false;
-
-            var single = combos?.Find(c => c.KeyCombination.Keys.Any(k => k == key))?.GetAction<OsuAction>();
-
-            if (single != null)
+            if (!healthProcessor.IsBreakTime.Value)
             {
-                if (single == blockedButton)
-                {
-                    if (kb != null && !kb.Repeat)
-                        blockedKeystrokes++;
-                    else if (mouse != null)
-                        blockedKeystrokes++;
+                var pressedCombination = KeyCombination.FromInputState(e.CurrentState);
+                var combos = keyBindings?.ToList().FindAll(m => m.KeyCombination.IsPressed(pressedCombination, KeyCombinationMatchingMode.Any));
 
-                    return true;
+                if (combos != null)
+                {
+                    InputKey? key;
+                    var kb = e as KeyDownEvent;
+                    var mouse = e as MouseDownEvent;
+                    if (kb != null)
+                        key = KeyCombination.FromKey(kb.Key);
+                    else if (mouse != null)
+                        key = KeyCombination.FromMouseButton(mouse.Button);
+                    else
+                        return false;
+
+                    var single = combos.Find(c => c.KeyCombination.Keys.Any(k => k == key))?.GetAction<OsuAction>();
+
+                    if (single != null)
+                    {
+                        if (single == blockedButton)
+                        {
+                            if (kb != null && !kb.Repeat)
+                                blockedKeystrokes++;
+                            else if (mouse != null)
+                                blockedKeystrokes++;
+
+                            return true;
+                        }
+                        else
+                            blockedButton = single;
+                    }
                 }
-                else
-                    lastButton = single;
             }
 
             return false;
