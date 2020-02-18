@@ -407,3 +407,7 @@
     *   [m] [Fix playlist items added with the wrong IDs #7876]
     *   [m] [Bump Sentry from 2.0.2 to 2.0.3 #7877]
     *   [m] [Bump ppy.osu.Framework.NativeLibs from 2019.1104.0 to 2020.213.0 #7878]
+
+## 2020/02/18:
+*   整合更新
+    *   [m] [Restructure readme to better define prerequisites that are required for development only #7885]
