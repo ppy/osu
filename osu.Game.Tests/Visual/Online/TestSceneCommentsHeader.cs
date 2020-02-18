@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual.Online
         {
             typeof(CommentsHeader),
             typeof(HeaderButton),
-            typeof(SortTabControl),
+            typeof(OverlaySortTabControl<>),
         };
 
         [Cached]

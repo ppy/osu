@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Rankings
         private void getSpotlights()
         {
             spotlightsRequest = new GetSpotlightsRequest();
-            spotlightsRequest.Success += response => selector.Spotlights = response.Spotlights;
+            spotlightsRequest.Success += response => Schedule(() => selector.Spotlights = response.Spotlights);
             api.Queue(spotlightsRequest);
         }
 
@@ -151,11 +151,11 @@ namespace osu.Game.Overlays.Rankings
 
         protected override void Dispose(bool isDisposing)
         {
-            base.Dispose(isDisposing);
-
             spotlightsRequest?.Cancel();
             getRankingsRequest?.Cancel();
             cancellationToken?.Cancel();
+
+            base.Dispose(isDisposing);
         }
     }
 }
