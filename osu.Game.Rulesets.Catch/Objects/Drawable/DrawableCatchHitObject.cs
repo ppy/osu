@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -18,7 +18,9 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected PalpableCatchHitObject(TObject hitObject)
             : base(hitObject)
         {
-            Scale = new Vector2(HitObject.Scale);
+            Origin = Anchor.Centre;
+            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
+            Masking = false;
         }
     }
 
