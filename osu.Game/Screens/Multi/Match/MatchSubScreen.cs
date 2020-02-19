@@ -5,22 +5,17 @@ using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Select;
-using osuTK.Graphics;
 using Footer = osu.Game.Screens.Multi.Match.Components.Footer;
 
 namespace osu.Game.Screens.Multi.Match
@@ -64,12 +59,6 @@ namespace osu.Game.Screens.Multi.Match
         {
             InternalChildren = new Drawable[]
             {
-                new HeaderBackgroundSprite
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 200,
-                    Colour = ColourInfo.GradientVertical(Color4.White.Opacity(0.4f), Color4.White.Opacity(0))
-                },
                 new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -251,16 +240,6 @@ namespace osu.Game.Screens.Multi.Match
 
             if (beatmapManager != null)
                 beatmapManager.ItemAdded -= beatmapAdded;
-        }
-
-        private class HeaderBackgroundSprite : MultiplayerBackgroundSprite
-        {
-            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
-
-            private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
-            {
-                protected override double TransformDuration => 200;
-            }
         }
     }
 }
