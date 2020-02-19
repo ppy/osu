@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableTinyDroplet(TinyDroplet h)
             : base(h)
         {
-            Size = new Vector2(CatchHitObject.OBJECT_RADIUS / 8);
+            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2) / 8;
         }
     }
 }

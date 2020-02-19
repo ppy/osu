@@ -3,8 +3,11 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
+using osu.Game.Skinning;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -16,18 +19,35 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(h)
         {
             Origin = Anchor.Centre;
-            Size = new Vector2(CatchHitObject.OBJECT_RADIUS) / 4;
+            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2) / 4;
             Masking = false;
         }
+
+        private Container scaleContainer;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(new Pulp
+            AddRangeInternal(new Framework.Graphics.Drawable[]
             {
-                Size = Size,
-                AccentColour = { BindTarget = AccentColour }
+                scaleContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Children = new Framework.Graphics.Drawable[]
+                    {
+                        new SkinnableDrawable(
+                            new CatchSkinComponent(CatchSkinComponents.Droplet), _ => new Pulp
+                            {
+                                Size = Size,
+                                AccentColour = { Value = Color4.White }
+                            })
+                    }
+                }
             });
+
+            scaleContainer.Scale = new Vector2(HitObject.Scale);
         }
     }
 }

@@ -37,6 +37,12 @@ namespace osu.Game.Rulesets.Catch.Skinning
                         return new LegacyFruitPiece(lookupName);
 
                     break;
+
+                case CatchSkinComponents.Droplet:
+                    if (GetTexture("fruit-drop") != null)
+                        return new LegacyFruitPiece("fruit-drop");
+
+                    break;
             }
 
             return null;
