@@ -130,7 +130,7 @@ namespace osu.Game.Overlays
 
             Show();
 
-            Country.Value = requested;
+            Schedule(() => Country.Value = requested);
         }
 
         private void loadNewContent()
