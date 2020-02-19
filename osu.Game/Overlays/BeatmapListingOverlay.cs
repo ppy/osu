@@ -153,7 +153,6 @@ namespace osu.Game.Overlays
                 Scheduler.AddOnce(updateSearch);
             });
 
-            searchSection.Query.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
             searchSection.Ruleset.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
             searchSection.Category.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
             sortCriteria.BindValueChanged(_ => Scheduler.AddOnce(updateSearch));
