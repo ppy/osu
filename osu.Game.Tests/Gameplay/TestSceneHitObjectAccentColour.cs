@@ -76,6 +76,8 @@ namespace osu.Game.Tests.Gameplay
                 : base(new TestHitObjectWithCombo())
             {
             }
+
+            protected override void UpdateComboColour(Color4 proposedColour, IReadOnlyList<Color4> comboColours) => AccentColour.Value = proposedColour;
         }
 
         private class TestHitObjectWithCombo : HitObject, IHasComboInformation
