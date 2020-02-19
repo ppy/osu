@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -10,7 +10,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableTinyDroplet(TinyDroplet h)
             : base(h)
         {
-            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2) / 8;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Scale /= 2;
         }
     }
 }

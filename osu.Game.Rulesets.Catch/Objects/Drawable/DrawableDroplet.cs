@@ -18,19 +18,16 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableDroplet(Droplet h)
             : base(h)
         {
-            Origin = Anchor.Centre;
-            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2) / 4;
-            Masking = false;
         }
 
-        private Container scaleContainer;
+        protected Container ScaleContainer;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             AddRangeInternal(new Framework.Graphics.Drawable[]
             {
-                scaleContainer = new Container
+                ScaleContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
@@ -47,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 }
             });
 
-            scaleContainer.Scale = new Vector2(HitObject.Scale);
+            ScaleContainer.Scale = new Vector2(HitObject.Scale);
         }
     }
 }

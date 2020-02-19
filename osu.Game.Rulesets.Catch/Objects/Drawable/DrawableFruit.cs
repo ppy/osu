@@ -18,12 +18,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         public DrawableFruit(Fruit h)
             : base(h)
         {
-            Origin = Anchor.Centre;
-
-            Size = new Vector2(CatchHitObject.OBJECT_RADIUS * 2);
-
-            Masking = false;
-
             Rotation = (float)(RNG.NextDouble() - 0.5f) * 40;
         }
 
